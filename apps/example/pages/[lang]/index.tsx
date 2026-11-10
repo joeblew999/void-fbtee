@@ -7,7 +7,11 @@ function Slow({ late }: { late: Props["late"] }) {
   return (
     <p data-testid="deferred">
       <fbt desc="Text rendered from deferred loader data">
-        Deferred: <fbt:plural count={count} many="nights" showCount="yes">night</fbt:plural> left
+        Deferred:{" "}
+        <fbt:plural count={count} many="nights" showCount="yes">
+          night
+        </fbt:plural>{" "}
+        left
       </fbt>
     </p>
   );
@@ -15,18 +19,21 @@ function Slow({ late }: { late: Props["late"] }) {
 
 export default function LangPage({ count, late }: Props) {
   return (
-      <main>
-        <h1 data-testid="title">
-          <fbt desc="Page title of the i18n spike">Hello world</fbt>
-        </h1>
-        <p data-testid="plural">
-          <fbt desc="How many nights are booked">
-            You booked <fbt:plural count={count} many="nights" showCount="yes">night</fbt:plural>
-          </fbt>
-        </p>
-        <Suspense fallback={<p>…</p>}>
-          <Slow late={late} />
-        </Suspense>
-      </main>
+    <main>
+      <h1 data-testid="title">
+        <fbt desc="Page title of the i18n spike">Hello world</fbt>
+      </h1>
+      <p data-testid="plural">
+        <fbt desc="How many nights are booked">
+          You booked{" "}
+          <fbt:plural count={count} many="nights" showCount="yes">
+            night
+          </fbt:plural>
+        </fbt>
+      </p>
+      <Suspense fallback={<p>…</p>}>
+        <Slow late={late} />
+      </Suspense>
+    </main>
   );
 }

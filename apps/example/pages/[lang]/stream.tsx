@@ -1,4 +1,4 @@
-import { Suspense, use } from "react";
+import { Suspense, use, useState } from "react";
 import { fbt } from "fbtee";
 
 // Suspends during SSR (not a Void defer), so it renders after the shell,
@@ -10,18 +10,24 @@ function ServerSlow({ id }: { id: string }) {
   use(p);
   return (
     <p data-testid="streamed">
-      <fbt desc="Text rendered in a server Suspense boundary after the shell">Streamed after the shell</fbt>
+      <fbt desc="Text rendered in a server Suspense boundary after the shell">
+        Streamed after the shell
+      </fbt>
     </p>
   );
 }
 
 export default function StreamPage() {
+  // One wait per request, so concurrent requests really overlap after the shell.
+  const [id] = useState(() => crypto.randomUUID());
   return (
-      <main>
-        <h1 data-testid="title"><fbt desc="Page title of the i18n spike">Hello world</fbt></h1>
-        <Suspense fallback={<p>…</p>}>
-          <ServerSlow id={String(Math.random())} />
-        </Suspense>
-      </main>
+    <main>
+      <h1 data-testid="title">
+        <fbt desc="Page title of the i18n spike">Hello world</fbt>
+      </h1>
+      <Suspense fallback={<p>…</p>}>
+        <ServerSlow id={id} />
+      </Suspense>
+    </main>
   );
 }
