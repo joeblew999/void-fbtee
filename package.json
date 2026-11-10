@@ -4,16 +4,18 @@
   "type": "module",
   "scripts": {
     "dev": "vp run -r --parallel dev",
-    "e2e": "playwright test",
-    "e2e:fresh": "playwright test -c playwright.fresh.config.ts",
-    "e2e:browser": "playwright install chromium",
-    "ci": "vp check && playwright test"
+    "test": "vp test run",
+    "test:fresh": "node e2e/fresh/check.mjs",
+    "test:browser": "playwright install chromium",
+    "ci": "vp check && vp test run"
   },
   "devDependencies": {
-    "@playwright/test": "1.65.0",
+    "@nkzw/eslint-plugin-fbtee": "5.0.0",
     "@types/node": "26.6.6",
+    "playwright": "1.65.0",
     "vite": "npm:@voidzero-dev/vite-plus-core@1.5.1",
-    "vite-plus": "1.5.1"
+    "vite-plus": "1.5.1",
+    "void-fbtee": "workspace:*"
   },
   "packageManager": "pnpm@12.18.0"
 }

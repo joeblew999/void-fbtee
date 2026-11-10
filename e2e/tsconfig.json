@@ -9,5 +9,5 @@
     "noEmit": true,
     "skipLibCheck": true
   },
-  "include": ["*.ts", "fresh/*.mjs", "../playwright.config.ts", "../playwright.fresh.config.ts"]
+  "include": ["*.ts", "fresh/*.mjs"]
 }
