@@ -1,0 +1,14 @@
+node_modules/
+dist/
+lib/
+.void/
+.void-wrangler.jsonc
+.cloudflare/
+.wrangler/
+.e2e-work/
+source_strings.json
+.enum_manifest.json
+src/translations/
+test-results/
+playwright-report/
+apps/example/i18n/translations/

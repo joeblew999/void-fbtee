@@ -1,0 +1,17 @@
+# mise.toml: the Node runtime and pnpm for this repo.
+# Vite+ (vp), Void and fbtee come from package.json, so each tool lives in one place.
+[tools]
+node = "24.22.2"
+pnpm = "12.18.0"
+
+[env]
+_.path = ["{{config_root}}/node_modules/.bin"]
+
+[tasks."deps:install"]
+description = "Install the repo's packages"
+run = "pnpm install"
+
+[tasks."ci:run"]
+description = "Run exactly what GitHub CI runs: check, test, end-to-end"
+depends = ["deps:install"]
+run = "vp run check && vp run test && vp run e2e"
