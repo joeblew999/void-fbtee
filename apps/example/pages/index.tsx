@@ -17,9 +17,12 @@ export default function HomePage({ messages }: Props) {
           <h1 id="welcome-title">Welcome to Void</h1>
           <div className="starter-description">
             <p>
-              This starter is running in Pages mode. The list below is loaded from your database in <code>pages/index.server.ts</code>.
+              This starter is running in Pages mode. The list below is loaded from your database in{" "}
+              <code>pages/index.server.ts</code>.
             </p>
-            <p>API example: <a href="/api/hello">/api/hello</a></p>
+            <p>
+              API example: <a href="/api/hello">/api/hello</a>
+            </p>
           </div>
         </div>
       </section>
@@ -29,7 +32,8 @@ export default function HomePage({ messages }: Props) {
           <h2 id="messages-title">Messages</h2>
           {messages.length === 0 ? (
             <p className="empty-state">
-              No messages yet. Run <code>void db seed</code> to load the sample row from <code>db/seed.ts</code>.
+              No messages yet. Run <code>void db seed</code> to load the sample row from{" "}
+              <code>db/seed.ts</code>.
             </p>
           ) : (
             <ul className="messages">
@@ -44,8 +48,17 @@ export default function HomePage({ messages }: Props) {
           <Form form={form} className="message-form">
             <label htmlFor="message-text">Message</label>
             <div className="message-fields">
-              <input id="message-text" name="text" value={form.data.text} onChange={(event) => form.setData("text", event.target.value)} required maxLength={1000} />
-              <button type="submit" disabled={form.pending}>Add message</button>
+              <input
+                id="message-text"
+                name="text"
+                value={form.data.text}
+                onChange={(event) => form.setData("text", event.target.value)}
+                required
+                maxLength={1000}
+              />
+              <button type="submit" disabled={form.pending}>
+                Add message
+              </button>
             </div>
           </Form>
         </div>
