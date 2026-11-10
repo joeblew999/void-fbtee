@@ -68,7 +68,8 @@ test("wires void-fbtee into a Vite+ app, and a second run changes nothing", asyn
 
   const pkg = JSON.parse(read(root, "package.json"));
   const own = JSON.parse(read(join(import.meta.dirname, ".."), "package.json"));
-  expect(pkg.dependencies["void-fbtee"]).toBe(own.version);
+  // void-fbtee itself is the app's own choice of source (installed before init runs).
+  expect(pkg.dependencies["void-fbtee"]).toBeUndefined();
   expect(pkg.dependencies.fbtee).toBe(own.devDependencies.fbtee);
   expect(pkg.devDependencies["@nkzw/eslint-plugin-fbtee"]).toBe(
     own.devDependencies["@nkzw/eslint-plugin-fbtee"],

@@ -77,10 +77,9 @@ const LINT_RULES: Record<string, unknown> = {
 /** Versions void-fbtee itself is built and tested with, for the app's package.json. */
 function testedVersions(): Record<string, string> {
   const own = createRequire(import.meta.url)("../package.json") as {
-    version: string;
     devDependencies: Record<string, string>;
   };
-  return { ...own.devDependencies, "void-fbtee": own.version };
+  return own.devDependencies;
 }
 
 /** magicast's writeFile leaves no final newline; formatters (vp fmt) tidy the rest. */
@@ -113,10 +112,9 @@ export async function init(o: InitOptions): Promise<InitResult> {
   const vitePlus = !!(pkg.devDependencies?.["vite-plus"] ?? pkg.dependencies?.["vite-plus"]);
   const versions = testedVersions();
 
-  // 1. void-fbtee itself (`npx void-fbtee init` doesn't add it) and the peers it needs in the app,
-  //    at the versions void-fbtee is tested with.
+  // 1. The peers void-fbtee needs in the app, at the versions void-fbtee is tested with.
+  //    void-fbtee itself is already a dependency (it's installed to run init), so it's left as is.
   const need: [string, "dependencies" | "devDependencies"][] = [
-    ["void-fbtee", "dependencies"],
     ["fbtee", "dependencies"],
     ["temporal-polyfill", "dependencies"],
   ];

@@ -6,20 +6,34 @@ It works the Void way: a Vite plugin, a Void middleware and a layout provider. I
 
 ## Add it to a Void app
 
-Not on npm yet. Once it is, in an app made with `void init`:
+It isn't on npm. An app installs it straight from this GitHub repo, with pnpm.
 
-```sh
-npx void-fbtee init --locales th-TH,de-DE
+In the app's `package.json`:
+
+```json
+"dependencies": {
+  "void-fbtee": "github:joeblew999/void-fbtee#path:/packages/void-fbtee"
+}
 ```
 
-`init` wires everything in and only adds what's missing. Then install, and translate:
+In the app's `pnpm-workspace.yaml` (pnpm only builds a git dependency you allow):
 
-```sh
-npm install
-npm run i18n:translate
+```yaml
+allowBuilds:
+  "void-fbtee@git+https://github.com/joeblew999/void-fbtee.git": true
 ```
 
-`void-fbtee --help` lists the commands.
+Then:
+
+```sh
+pnpm install
+pnpm exec void-fbtee init --locales th-TH,de-DE
+pnpm install
+pnpm run i18n:translate
+```
+
+`init` wires everything in and only adds what's missing. `pnpm update void-fbtee` gets the latest
+main. `void-fbtee --help` lists the commands.
 
 ## This repo
 

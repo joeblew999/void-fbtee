@@ -1,20 +1,21 @@
-// `pnpm run test:fresh`: void-fbtee installed from its tarball into fresh `void init` apps, as a
-// user gets it. Like voidzero-dev/void's packed-consumer smoke check, it uses no browser: the
-// package's contents, a real `void-fbtee init`, the CLI, a build, TypeScript and a few requests
-// to the dev server. Work happens in .e2e-work/ (git ignores it).
+// `pnpm run test:fresh`: void-fbtee installed into fresh `void init` apps the way an app installs
+// it: as a git dependency, built by pnpm (the README's two lines). It installs from this checkout's
+// last commit rather than from GitHub, so commit first. Like voidzero-dev/void's packed-consumer
+// smoke check, it uses no browser: the package's contents, a real `void-fbtee init`, the CLI, a
+// build, TypeScript and a few requests to the dev server. Work happens in .e2e-work/ (git ignores it).
 //
 //   node e2e/fresh/check.mjs              both apps
-//   node e2e/fresh/check.mjs vite-plus    a `void init --toolchain vite-plus` app, with pnpm
-//   node e2e/fresh/check.mjs vite         a `void init --toolchain vite` app, with npm
+//   node e2e/fresh/check.mjs vite-plus    a `void init --toolchain vite-plus` app
+//   node e2e/fresh/check.mjs vite         a `void init --toolchain vite` app
 //
 // e2e/fresh/<toolchain>/ holds what `void init` made (package.json with exact versions,
-// vite.config.ts with @void/md added, void.config.ts, tsconfig.json, AGENTS.md). There are no
-// lockfiles in this repo; pnpm would insist on one in CI unless told otherwise.
+// vite.config.ts with @void/md added, void.config.ts, tsconfig.json, AGENTS.md). Both use pnpm:
+// a git dependency on a folder inside a repo (`path:`) is a pnpm feature npm doesn't have. There
+// are no lockfiles in this repo; pnpm would insist on one in CI unless told otherwise.
 import { execFileSync, spawn } from "node:child_process";
 import {
   cpSync,
   existsSync,
-  mkdirSync,
   readdirSync,
   readFileSync,
   realpathSync,
@@ -33,8 +34,15 @@ const APPS = {
     cli: ["exec", "vp"],
     port: 5274,
   },
-  vite: { pm: "npm", install: ["install"], cli: ["exec", "--", "vite"], port: 5275 },
+  vite: {
+    pm: "pnpm",
+    install: ["install", "--no-frozen-lockfile"],
+    cli: ["exec", "vite"],
+    port: 5275,
+  },
 };
+// The builds `void init` allows on Vite+ (its pnpm-workspace.yaml), for the plain-Vite app too.
+const VOID_INIT_BUILDS = { "better-sqlite3": false, esbuild: true, sharp: true, workerd: true };
 
 const run = (cmd, args, cwd, options = {}) => {
   console.error(`\n$ (${cwd.replace(root, ".")}) ${cmd} ${args.join(" ")}`);
@@ -49,16 +57,16 @@ const check = (ok, what) => {
   console.error(`✓ ${what}`);
 };
 
-// The tarball, once.
-const pkgDir = join(work, "pkg");
-rmSync(pkgDir, { recursive: true, force: true });
-mkdirSync(pkgDir, { recursive: true });
-run("pnpm", ["exec", "vp", "pack"], join(root, "packages/void-fbtee"));
-run("pnpm", ["pack", "--pack-destination", pkgDir], join(root, "packages/void-fbtee"));
-const tarball = join(
-  pkgDir,
-  readdirSync(pkgDir).find((f) => f.endsWith(".tgz")),
-);
+// The README's two lines, pointed at this checkout's last commit instead of GitHub.
+const pending = execFileSync("git", ["status", "--porcelain", "packages/void-fbtee"], {
+  cwd: root,
+  encoding: "utf8",
+});
+if (pending.trim())
+  throw new Error(`commit packages/void-fbtee first; this installs the last commit:\n${pending}`);
+const sha = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
+const repo = `git+file://${root}`;
+const dependency = `${repo}#${sha}&path:/packages/void-fbtee`;
 
 for (const target of targets) {
   const app = APPS[target];
@@ -69,8 +77,11 @@ for (const target of targets) {
   // Its own git repo, as a real app is: tools that honour .gitignore (Oxlint) would otherwise
   // skip it, since this repo ignores .e2e-work/.
   run("git", ["init", "--quiet"], dir);
+  allowBuild(dir, `void-fbtee@${repo}`);
+  const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
+  pkg.dependencies["void-fbtee"] = dependency;
+  writeFileSync(join(dir, "package.json"), JSON.stringify(pkg, null, 2) + "\n");
   run(app.pm, app.install, dir);
-  run(app.pm, target === "vite-plus" ? ["add", tarball] : ["install", tarball], dir);
 
   const installed = realpathSync(join(dir, "node_modules/void-fbtee"));
   for (const f of [
@@ -101,6 +112,18 @@ for (const target of targets) {
   check(true, `${target}: builds and typechecks`);
   if (target === "vite-plus") checkLint(dir);
   await checkDev(target, dir, app);
+}
+
+/** The README's allowBuilds line (pnpm only runs an approved git dependency's build). */
+function allowBuild(dir, spec) {
+  const file = join(dir, "pnpm-workspace.yaml");
+  if (existsSync(file)) {
+    const text = readFileSync(file, "utf8");
+    writeFileSync(file, text.replace("allowBuilds:\n", `allowBuilds:\n  "${spec}": true\n`));
+  } else {
+    const builds = Object.entries({ [spec]: true, ...VOID_INIT_BUILDS });
+    writeFileSync(file, `allowBuilds:\n${builds.map(([k, v]) => `  "${k}": ${v}`).join("\n")}\n`);
+  }
 }
 
 /** Every package void-fbtee's built code imports resolves inside the app (not in this repo's). */
