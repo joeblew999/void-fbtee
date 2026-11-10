@@ -70,8 +70,13 @@ export default defineMiddleware(async (c, next) => {
     } as never,
   );
   // No catalog for light requests, but still inside fbtee state, so a not-found page with <fbt> renders.
-  if (light) return runWithFbtee({ locale: current.locale, translations: {} }, () => next());
+  const sourceLocale = config.sourceLocale;
+  if (light)
+    return runWithFbtee({ locale: current.locale, sourceLocale, translations: {} }, () => next());
   const load = catalogs[current.locale];
   const translations = load ? (await load()).default : {};
-  await runWithFbtee({ locale: current.locale, translations: translations as never }, () => next());
+  await runWithFbtee(
+    { locale: current.locale, sourceLocale, translations: translations as never },
+    () => next(),
+  );
 });

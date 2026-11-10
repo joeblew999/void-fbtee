@@ -8,3 +8,8 @@ declare module "virtual:void-fbtee/catalogs" {
   const catalogs: Record<string, () => Promise<{ default: Record<string, unknown> }>>;
   export default catalogs;
 }
+declare module "virtual:void-fbtee/texts" {
+  /** Dev only: each string's source text by hash, for naming untranslated strings. Empty in builds. */
+  const texts: Record<string, string>;
+  export default texts;
+}

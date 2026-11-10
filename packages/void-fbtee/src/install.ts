@@ -2,6 +2,8 @@
 // and by islands (which hydrate without the layout).
 import { setupFbtee, IntlVariations } from "fbtee";
 import catalogs from "virtual:void-fbtee/catalogs";
+import config from "virtual:void-fbtee/config";
+import texts from "virtual:void-fbtee/texts";
 import { META_NAME } from "./locales";
 import type { SharedI18n } from "./middleware";
 
@@ -20,7 +22,15 @@ export function install(locale: string): Tracked {
       (translations) => {
         setupFbtee({
           translations: translations as never,
+          sourceLocale: config.sourceLocale,
           hooks: { getViewerContext: () => ({ GENDER: IntlVariations.GENDER_UNKNOWN, locale }) },
+          // Dev only: name each string this page shows untranslated (fbtee reports each once).
+          onMissingTranslation: import.meta.env.DEV
+            ? ({ hashKey }) =>
+                console.warn(
+                  `void-fbtee: no ${locale} translation for ${JSON.stringify(texts[hashKey] ?? hashKey)}`,
+                )
+            : undefined,
         });
         p.status = "fulfilled";
       },
