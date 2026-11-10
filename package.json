@@ -6,7 +6,7 @@
     "dev": "vp run -r --parallel dev",
     "test": "vp test run",
     "test:fresh": "node e2e/fresh/check.mjs",
-    "test:browser": "playwright install chromium",
+    "test:browser": "playwright install --with-deps chromium",
     "ci": "vp check && vp test run"
   },
   "devDependencies": {
