@@ -8,7 +8,7 @@
     "strict": true,
     "skipLibCheck": true,
     "isolatedDeclarations": false,
-    "types": ["vite/client", "fbtee/ReactTypes"]
+    "types": ["vite/client", "fbtee/ReactTypes", "node"]
   },
-  "include": ["src"]
+  "include": ["src", "test"]
 }

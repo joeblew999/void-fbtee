@@ -9,9 +9,13 @@ export default defineConfig({
       react: "src/react.tsx",
       locales: "src/locales.ts",
       client: "src/client.ts",
+      cli: "src/cli.ts",
+      lint: "src/lint.ts",
     },
     format: ["esm"],
     dts: true,
     deps: { neverBundle: [/^virtual:void-fbtee\//] },
   },
+  // `vp test`: the package's own tests, on test/fixture (a tiny app; each test works on a copy).
+  test: { include: ["test/**/*.test.ts"] },
 });

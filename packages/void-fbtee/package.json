@@ -3,8 +3,13 @@
   "version": "0.1.0",
   "description": "i18n for Void apps: fbtee strings, Temporal dates and Intl formatting, with a Vite plugin, Void middleware and React helpers",
   "license": "MIT",
+  "bin": {
+    "void-fbtee": "./dist/cli.mjs"
+  },
   "files": [
-    "dist"
+    "dist",
+    "skills",
+    "docs"
   ],
   "type": "module",
   "exports": {
@@ -27,18 +32,26 @@
     "./client": {
       "types": "./dist/client.d.mts",
       "default": "./dist/client.mjs"
+    },
+    "./lint": {
+      "types": "./dist/lint.d.mts",
+      "default": "./dist/lint.mjs"
     }
   },
   "scripts": {
     "dev": "vp pack --watch --no-clean",
     "build": "vp pack",
+    "test": "vp test",
     "prepare": "vp pack"
   },
   "dependencies": {
     "@nkzw/fbtee-compiler": "5.0.0",
-    "@nkzw/vite-plugin-fbtee": "5.0.0"
+    "@nkzw/vite-plugin-fbtee": "5.0.0",
+    "magicast": "0.5.5"
   },
   "devDependencies": {
+    "@nkzw/eslint-plugin-fbtee": "5.0.0",
+    "@types/node": "26.6.6",
     "@types/react": "19.3.0",
     "@void/react": "1.7.0",
     "fbtee": "5.0.0",
