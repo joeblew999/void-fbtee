@@ -32,8 +32,7 @@ pnpm install
 pnpm run i18n:translate
 ```
 
-`init` wires everything in and only adds what's missing. `pnpm update void-fbtee` gets the latest
-main. `void-fbtee --help` lists the commands.
+`init` wires everything in and only adds what's missing. `void-fbtee --help` lists the commands.
 
 ## This repo
 
