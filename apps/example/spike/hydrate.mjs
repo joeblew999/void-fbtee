@@ -3,11 +3,26 @@
 // console errors (hydration mismatches).
 import { chromium } from "@playwright/test";
 
-const base = "http://localhost:5173";
+const base = process.env.BASE ?? "http://localhost:5173";
 const expect = {
-  "en-US": { title: "Hello world", plural: "You booked 3 nights", deferred: "Deferred: 1 night left", streamed: "Streamed after the shell" },
-  "th-TH": { title: "สวัสดีชาวโลก", plural: "คุณจองไว้ 3 คืน", deferred: "ภายหลัง: เหลืออีก 1 คืน", streamed: "ส่งตามมาหลังเชลล์" },
-  "de-DE": { title: "Hallo Welt", plural: "Sie haben 3 Nächte gebucht", deferred: "Später: noch 1 Nacht", streamed: "Nach der Shell gestreamt" },
+  "en-US": {
+    title: "Hello world",
+    plural: "You booked 3 nights",
+    deferred: "Deferred: 1 night left",
+    streamed: "Streamed after the shell",
+  },
+  "th-TH": {
+    title: "สวัสดีชาวโลก",
+    plural: "คุณจองไว้ 3 คืน",
+    deferred: "ภายหลัง: เหลืออีก 1 คืน",
+    streamed: "ส่งตามมาหลังเชลล์",
+  },
+  "de-DE": {
+    title: "Hallo Welt",
+    plural: "Sie haben 3 Nächte gebucht",
+    deferred: "Später: noch 1 Nacht",
+    streamed: "Nach der Shell gestreamt",
+  },
 };
 const browser = await chromium.launch({ executablePath: "/usr/bin/google-chrome" });
 let failed = 0;
@@ -15,30 +30,54 @@ for (const [locale, want] of Object.entries(expect)) {
   for (const path of ["", "/stream"]) {
     const page = await browser.newPage();
     const errors = [];
-    page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
+    page.on("console", (m) => {
+      if (m.type() === "error") errors.push(m.text());
+    });
     page.on("pageerror", (e) => errors.push(String(e)));
     await page.addInitScript(() => {
       window.__seen = {};
-      const rec = () => document.querySelectorAll("[data-testid]").forEach((el) => {
-        const k = el.dataset.testid; (window.__seen[k] ??= new Set()).add(el.textContent);
+      const rec = () =>
+        document.querySelectorAll("[data-testid]").forEach((el) => {
+          const k = el.dataset.testid;
+          (window.__seen[k] ??= new Set()).add(el.textContent);
+        });
+      new MutationObserver(rec).observe(document, {
+        subtree: true,
+        childList: true,
+        characterData: true,
       });
-      new MutationObserver(rec).observe(document, { subtree: true, childList: true, characterData: true });
     });
     await page.goto(base + "/" + locale + path, { waitUntil: "networkidle" });
     await page.waitForTimeout(800);
-    const seen = await page.evaluate(() => Object.fromEntries(Object.entries(window.__seen).map(([k, v]) => [k, [...v]])));
-    const hydrated = await page.evaluate(() => !!document.getElementById("app")?._reactRootContainer || Object.keys(document.getElementById("app") ?? {}).some((k) => k.startsWith("__reactContainer")));
+    const seen = await page.evaluate(() =>
+      Object.fromEntries(Object.entries(window.__seen).map(([k, v]) => [k, [...v]])),
+    );
+    const hydrated = await page.evaluate(
+      () =>
+        !!document.getElementById("app")?._reactRootContainer ||
+        Object.keys(document.getElementById("app") ?? {}).some((k) =>
+          k.startsWith("__reactContainer"),
+        ),
+    );
     const keys = path ? ["title", "streamed"] : ["title", "plural", "deferred"];
     const problems = [];
     for (const k of keys) {
       const vals = (seen[k] ?? []).filter((v) => v !== "…");
-      if (!vals.includes(want[k])) problems.push(`${k} never showed "${want[k]}" (saw ${JSON.stringify(vals)})`);
+      if (!vals.includes(want[k]))
+        problems.push(`${k} never showed "${want[k]}" (saw ${JSON.stringify(vals)})`);
       const other = vals.filter((v) => v !== want[k]);
       if (other.length) problems.push(`${k} flashed ${JSON.stringify(other)}`);
     }
     if (!hydrated) problems.push("React root not found (not hydrated)");
-    if (errors.length) problems.push("console errors: " + errors.join(" | "));
-    console.log(`${problems.length ? "FAIL" : "ok  "} /${locale}${path}` + (problems.length ? "\n   - " + problems.join("\n   - ") : ""));
+    // Void cuts the server stream on defer() pages and React reports it (#419 in
+    // production). Same message on a control page with no fbtee, so it is expected there.
+    const voidDefer = /Switched to client rendering|Minified React error #419/;
+    const unexpected = path ? errors : errors.filter((e) => !voidDefer.test(e));
+    if (unexpected.length) problems.push("console errors: " + unexpected.join(" | "));
+    console.log(
+      `${problems.length ? "FAIL" : "ok  "} /${locale}${path}` +
+        (problems.length ? "\n   - " + problems.join("\n   - ") : ""),
+    );
     failed += problems.length ? 1 : 0;
     await page.close();
   }
