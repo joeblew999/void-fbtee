@@ -1,0 +1,29 @@
+{
+  "fb-locale": "de-DE",
+  "translations": {
+    "SSJ6IVWoQjvWr8iQwHsMTA==": {
+      "description": "Greeting in the test fixture",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hallo",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "b/nCn+YYLtYoOyFE5vX8Sg==": {
+      "description": "Farewell in the test fixture",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Goodbye",
+          "variations": {}
+        }
+      ],
+      "types": []
+    }
+  }
+}
