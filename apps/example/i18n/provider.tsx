@@ -7,14 +7,16 @@ import { use, type ReactNode } from "react";
 import { setupFbtee, IntlVariations } from "fbtee";
 import { useShared } from "@void/react";
 
-const loaders = import.meta.glob<Record<string, unknown>>("./translations/*.json", { import: "default" });
+const loaders = import.meta.glob<Record<string, unknown>>("./translations/*.json", {
+  import: "default",
+});
 const pending = new Map<string, Promise<void>>();
 
 function install(locale: string): Promise<void> {
   let p = pending.get(locale);
   if (!p) {
     const load = loaders[`./translations/${locale}.json`];
-    p = (load ? load() : Promise.resolve({})).then((table) => {
+    p = (load ? load() : Promise.resolve({})).then((table: Record<string, unknown>) => {
       setupFbtee({
         translations: table as never,
         hooks: { getViewerContext: () => ({ GENDER: IntlVariations.GENDER_UNKNOWN, locale }) },
@@ -22,7 +24,7 @@ function install(locale: string): Promise<void> {
     });
     pending.set(locale, p);
   }
-  return p;
+  return p as Promise<void>;
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {

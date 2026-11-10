@@ -2,9 +2,9 @@
   "name": "void-fbtee-repo",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@12.18.0",
   "devDependencies": {
     "vite": "npm:@voidzero-dev/vite-plus-core@1.5.1",
     "vite-plus": "1.5.1"
-  }
+  },
+  "packageManager": "pnpm@12.18.0"
 }

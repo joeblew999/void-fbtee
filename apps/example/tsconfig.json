@@ -7,18 +7,9 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": [
-      "void/env"
-    ],
-    "jsx": "react-jsx"
+    "types": ["void/env", "fbtee/ReactTypes"],
+    "jsx": "react-jsx",
+    "lib": ["ES2025", "DOM", "DOM.Iterable"]
   },
-  "include": [
-    "src",
-    "pages",
-    "routes",
-    "middleware",
-    "crons",
-    "queues",
-    "db"
-  ]
+  "include": ["src", "pages", "routes", "middleware", "crons", "queues", "db", "i18n"]
 }

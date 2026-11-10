@@ -21,16 +21,16 @@ function fbteeServerOnWorker(): Plugin {
       return { optimizeDeps: { exclude: ["fbtee"], include: ["fbtee > invariant"] } };
     },
     resolveId(id) {
-      if (id === "fbtee/server" && this.environment.name !== "client") return fbteeServer;
+      if (this.environment.name === "client") return;
+      if (id === "fbtee/server") return fbteeServer;
+      // Cloudflare's native Temporal shipped broken once and was pulled (workerd#6907),
+      // so the server always uses the polyfill's own code, never "native if present".
+      if (id === "temporal-polyfill")
+        return this.resolve("temporal-polyfill/implementation", undefined, { skipSelf: true });
     },
   };
 }
 
 export default defineConfig({
-  plugins: [
-    fbteeServerOnWorker(),
-    fbtee(),
-    voidPlugin(),
-    voidReact({ react: { compiler: true } }),
-  ],
+  plugins: [fbteeServerOnWorker(), fbtee(), voidPlugin(), voidReact({ react: { compiler: true } })],
 });
