@@ -1,0 +1,19 @@
+{
+  "name": "void-fbtee-repo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vp run -r --parallel dev",
+    "e2e": "playwright test",
+    "e2e:fresh": "playwright test -c playwright.fresh.config.ts",
+    "e2e:browser": "playwright install chromium",
+    "ci": "vp check && playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0",
+    "@types/node": "26.6.6",
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.5.1",
+    "vite-plus": "1.5.1"
+  },
+  "packageManager": "pnpm@12.18.0"
+}

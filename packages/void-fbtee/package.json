@@ -1,0 +1,62 @@
+{
+  "name": "void-fbtee",
+  "version": "0.1.0",
+  "description": "i18n for Void apps: fbtee strings, Temporal dates and Intl formatting, with a Vite plugin, Void middleware and React helpers",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    "./vite": {
+      "types": "./dist/vite.d.mts",
+      "default": "./dist/vite.mjs"
+    },
+    "./middleware": {
+      "types": "./dist/middleware.d.mts",
+      "default": "./dist/middleware.mjs"
+    },
+    "./react": {
+      "types": "./dist/react.d.mts",
+      "default": "./dist/react.mjs"
+    },
+    "./locales": {
+      "types": "./dist/locales.d.mts",
+      "default": "./dist/locales.mjs"
+    },
+    "./client": {
+      "types": "./dist/client.d.mts",
+      "default": "./dist/client.mjs"
+    }
+  },
+  "scripts": {
+    "dev": "vp pack --watch --no-clean",
+    "build": "vp pack",
+    "prepare": "vp pack"
+  },
+  "dependencies": {
+    "@nkzw/fbtee-compiler": "5.0.0",
+    "@nkzw/vite-plugin-fbtee": "5.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@void/react": "1.7.0",
+    "fbtee": "5.0.0",
+    "hono": "4.13.17",
+    "react": "19.3.1",
+    "temporal-polyfill": "1.0.8",
+    "typescript": "7.0.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.5.1",
+    "vite-plus": "1.5.1",
+    "void": "1.7.0"
+  },
+  "peerDependencies": {
+    "@void/react": "1.7.0",
+    "fbtee": "5.0.0",
+    "hono": "^4.11.0",
+    "react": "^19.2.0",
+    "temporal-polyfill": "^1.0.8",
+    "vite": "*",
+    "void": "1.7.0"
+  }
+}
