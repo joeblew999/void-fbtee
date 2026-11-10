@@ -1,0 +1,293 @@
+{
+  "fb-locale": "th-TH",
+  "translations": {
+    "W2S4HeMOJcq2xOy3+nXfaw==": {
+      "description": "Text rendered from deferred loader data",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ภายหลัง: เหลืออีก {number} คืน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HEbq6lwochMG+bINu8ib4w==": {
+      "description": "Text rendered from deferred loader data",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ภายหลัง: เหลืออีก 1 คืน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kpz/9JXVX1WbALbJcnrUZg==": {
+      "description": "Page title of the i18n spike",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สวัสดีชาวโลก",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "d20AdENCUCFEupNI3bkyqg==": {
+      "description": "How many nights are booked",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "คุณจองไว้ {number} คืน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "firIdTpNp5HR3/x49jpnZA==": {
+      "description": "How many nights are booked",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "คุณจองไว้ 1 คืน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IYUmtYxQtGdt1MucjXrsVA==": {
+      "description": "Label with meaning 'at least number'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{number}+",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZIF1WhVQwt7WZJvFTEbMWw==": {
+      "description": "Label with meaning 'less than number'",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "<{number}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Oc/9PrbjfyLHS60BXceD1A==": {
+      "description": "A list of items of various types, for example: \"San Francisco; London; Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{previous items}; {following items}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AXXbKEUZuc0ji1IClRrOOw==": {
+      "description": "A list of items of various types separated by bullets, for example: \"San Francisco \\u2022 London \\u2022 Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{previous items} • {following items}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "89ACgPMtnwlLDSeqhLBx2Q==": {
+      "description": "A list of items of various types separated by commas, for example: \"San Francisco, London, Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{previous items}, {following items}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5hL7VXOBVnetm46YAjpX0g==": {
+      "description": "A list of items of various types with a serial comma, for example: \"item1, item2, and item3\"",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items}, and {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "icNetEL/crQv/PS6yhySVQ==": {
+      "description": "A list of items of various types, for example: \"item1, item2, item3 and item4\"",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items} and {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8kLAQ3ffiiFnQ/bWPqXfuQ==": {
+      "description": "A list of items of various types with a serial comma, for example: \"item1, item2, or item3\"",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items}, or {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8eSaAzrWtAqn9ktNKfkaEg==": {
+      "description": "A list of items of various types, for example: \"item1, item2, item3 or item4\"",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items} or {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+IBI7kr/mMKdzp+3stDvkw==": {
+      "description": "A list of items of various types, for example: \"San Francisco; London; Tokyo\". {previous items} itself contains one or more items.",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{previous items}; {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "55IeE8c0qqtjTU0lo7q9AA==": {
+      "description": "A list of items of various types separated by bullets, for example: \"San Francisco \\u2022 London \\u2022 Tokyo\". {previous items} contains one or more items.",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items} • {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6PRJS0QalZfvaN8CkKCUCw==": {
+      "description": "A list of items of various types, for example: \"item1, item2, item3, item4\"",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items}, {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kZ8tUgypNFMb+56B/BsSUA==": {
+      "description": "Text rendered in a server Suspense boundary after the shell",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ส่งตามมาหลังเชลล์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "U0x8YnwfkoAxSzwcf1mfXQ==": {
+      "description": "When the launch is, relative to today",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เปิดตัว: {when}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tM77ujLuxM2vdLYjDoWThA==": {
+      "description": "Seats left, island",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เหลือ {number} ที่นั่ง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "l617jlL65guL4frUlrxOCw==": {
+      "description": "Seats left, island",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เหลือ 1 ที่นั่ง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "y5Jti7qFflauSnV7N6N/Iw==": {
+      "description": "Button that takes one seat",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "จองที่นั่ง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5ltmmUgT2eFS09sVXI0wMw==": {
+      "description": "Marketing page heading",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "จองโต๊ะได้ในไม่กี่วินาที",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "aUCfk9oc1MN7PJ4I0BHyug==": {
+      "description": "Like button on a blog post, with the number of likes",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ถูกใจ ({count})",
+          "variations": {}
+        }
+      ],
+      "types": []
+    }
+  }
+}
