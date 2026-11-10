@@ -7,5 +7,7 @@ export default defineConfig({
   },
   worker: {
     compatibility_date: "2026-02-24",
+    // Native Temporal in the worker (Cloudflare's `temporal` flag; default for dates from 2026-12-01).
+    compatibility_flags: ["temporal"],
   },
 });
