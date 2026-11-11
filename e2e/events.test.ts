@@ -28,6 +28,29 @@ const WHEN: Intl.DateTimeFormatOptions = {
   timeZoneName: "longGeneric",
 };
 const SWIM = "2027-03-06T19:00:00Z"; // Harbour sunrise swim: 6:00 on 7 March in Sydney
+
+/**
+ * Post a new event through the app's form, so a test that books has its own seats on any database
+ * (a fresh local one or the live site's). Returns its path without the language, "/events/<id>".
+ */
+async function postEvent(seats: number): Promise<string> {
+  const p = await page();
+  await p.goto(`/${SOURCE}/events`);
+  await started(p);
+  await p.getByTestId("event-title-input").fill(`Test event ${crypto.randomUUID().slice(0, 8)}`);
+  await p.getByTestId("event-description-input").fill("Posted by the tests.");
+  await p.getByTestId("event-local-input").fill("2027-04-01T20:00");
+  await p.getByTestId("event-seats-input").fill(String(seats));
+  await p.getByTestId("event-post").click();
+  await p.waitForURL(/\/events\/[0-9a-f-]{36}$/);
+  return new URL(p.url()).pathname.replace(`/${SOURCE}`, "");
+}
+
+/** That event's page in a language, ready to use. */
+async function open(p: import("playwright").Page, locale: string, path: string) {
+  await p.goto(`/${locale}${path}`);
+  await started(p);
+}
 const at = (locale: string, timeZone: string) =>
   new Intl.DateTimeFormat(locale, { ...WHEN, timeZone }).format(new Date(SWIM));
 
@@ -72,12 +95,13 @@ test("an event written in Arabic, read in English: its translation, and the orig
 });
 
 test("book in Thai; an Arabic page open on the event sees the seat go, live", async () => {
+  const event = await postEvent(12);
   const thai = await page();
   const arabic = await page();
   const errors = [...collectErrors(thai), ...collectErrors(arabic)];
-  await goToEvent(arabic, "ar-EG", "Harbour sunrise swim");
+  await open(arabic, "ar-EG", event);
   await seeText(arabic, "seats-left", "تبقّى ١٢ مقعدًا");
-  await goToEvent(thai, "th-TH", "Harbour sunrise swim");
+  await open(thai, "th-TH", event);
   await thai.getByTestId("book-name").fill("Somchai");
   await thai.getByTestId("book-email").fill("somchai@example.com");
   await thai.getByTestId("book").click();
@@ -89,20 +113,16 @@ test("book in Thai; an Arabic page open on the event sees the seat go, live", as
 });
 
 test("two people book the last seat at once: one gets it, the other is told, in Arabic", async () => {
+  const event = await postEvent(1);
   const [a, b] = [await page(), await page()];
   for (const p of [a, b]) {
-    await goToEvent(p, "ar-EG", "Supper for one");
+    await open(p, "ar-EG", event);
     await p.getByTestId("book-name").fill("Laila");
     await p.getByTestId("book-email").fill("laila@example.com");
   }
   await Promise.all([a.getByTestId("book").click(), b.getByTestId("book").click()]);
   const outcome = async (p: import("playwright").Page) => {
-    await expect
-      .poll(
-        async () =>
-          (await p.getByTestId("booked").count()) + (await p.getByTestId("sold-out-error").count()),
-      )
-      .toBe(1);
+    await p.locator('[data-testid="booked"], [data-testid="sold-out-error"]').waitFor();
     return (await p.getByTestId("booked").count()) ? "booked" : "sold out";
   };
   expect([await outcome(a), await outcome(b)].sort()).toEqual(["booked", "sold out"]);

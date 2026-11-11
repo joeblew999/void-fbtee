@@ -65,6 +65,10 @@ export default defineConfig({
           include: ["e2e/*.test.ts"],
           globalSetup: ["e2e/setup.ts"],
           pool: "forks",
+          // Real servers and browsers, locally or over the internet: voidzero-dev/void gives its
+          // integration tests the same (its vite.config.ts, the parallel-integration project).
+          testTimeout: 120_000,
+          hookTimeout: 120_000,
         },
       },
     ],
