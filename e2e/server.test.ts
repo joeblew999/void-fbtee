@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
 import { url } from "./helpers";
 import { EXAMPLE } from "./setup";
-import { LOCALES } from "./locales";
+import { LOCALES, SOURCE } from "./locales";
 
 const get = (path: string, init?: RequestInit) => fetch(url("prod") + path, init);
 
@@ -39,7 +39,8 @@ test("the server never shows a stand-in for the reader's own time: those lines c
   // "in N days" and "in your time zone" empty, their space kept, for the browser to fill once.
   const empty = (html: string, id: string) =>
     [...html.matchAll(new RegExp(`data-testid="${id}"[^>]*>(.*?)</`, "g"))].map((m) => m[1]);
-  for (const l of LOCALES) {
+  // The same in every language, so the source language is enough.
+  for (const l of [SOURCE]) {
     const events = await (await get(`/${l}/events`)).text();
     const lines = [...empty(events, "event-yours"), ...empty(events, "event-when")];
     expect(lines.length, l).toBeGreaterThan(0);

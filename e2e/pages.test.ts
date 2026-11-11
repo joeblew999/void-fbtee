@@ -10,7 +10,6 @@ import {
   watchTexts,
   started,
 } from "./helpers";
-import { LOCALES } from "./locales";
 
 const page = browser("prod");
 
@@ -47,35 +46,4 @@ test("Link: same language stays client-side, another language loads a fresh page
   expect(loads).toBe(2);
   expect(await p.locator("html").getAttribute("dir")).toBe("rtl");
   expect(errors.filter((e) => !VOID_DEFER_MESSAGE.test(e))).toEqual([]);
-});
-
-test("every page fits a phone's width, in every language", async () => {
-  // A phone, not a narrow desktop window: without the viewport meta tag a phone lays a page out
-  // 980px wide and shrinks it, so everything looks tiny.
-  const p = await page({
-    viewport: { width: 390, height: 844 },
-    isMobile: true,
-    hasTouch: true,
-    deviceScaleFactor: 3,
-  });
-  const wide: string[] = [];
-  for (const locale of LOCALES)
-    for (const path of [
-      "",
-      "/events",
-      "/docs",
-      "/docs/strings",
-      "/docs/formats",
-      "/docs/temporal",
-      "/docs/tour",
-    ]) {
-      await p.goto(`/${locale}${path}`);
-      const { layout, content } = await p.evaluate(() => ({
-        layout: window.innerWidth,
-        content: document.documentElement.scrollWidth,
-      }));
-      if (layout !== 390 || content > 390)
-        wide.push(`/${locale}${path}: laid out ${layout}px, content ${content}px`);
-    }
-  expect(wide).toEqual([]);
 });

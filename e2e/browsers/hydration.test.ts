@@ -1,4 +1,5 @@
-// Every page, in every language, in Chromium and WebKit: it loads and hydrates with no errors.
+// Every page, in every language, in each browser (engines.ts): it loads and hydrates with no
+// errors, and fits a phone's width.
 // A page whose server text and browser text disagree fails here (React error #418), which is what
 // happens when text formatted while rendering isn't <Formatted>: each engine has its own locale
 // data. The pages come from the site's own links (each language's home and docs index, one event
@@ -7,6 +8,7 @@ import { describe, expect, test } from "vite-plus/test";
 import type { Page } from "playwright";
 import { browser, collectErrors, VOID_DEFER_MESSAGE } from "../helpers";
 import { LOCALES } from "../locales";
+import { ENGINES, prepare } from "./engines";
 
 /**
  * Wait until the page has come alive, if it has anything to bring alive: the layout marks a
@@ -33,12 +35,16 @@ async function pages(p: Page, locale: string): Promise<string[]> {
   return [...found].filter((h) => !events.includes(h)).concat(events.slice(0, 1));
 }
 
-for (const engine of ["chromium", "webkit"] as const) {
-  describe(engine, () => {
-    const open = browser("prod", engine);
+/** A phone: an iPhone's width. */
+const PHONE = { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true };
+
+for (const e of ENGINES) {
+  describe(e.name, () => {
+    const open = browser("prod", e.engine);
     for (const locale of LOCALES) {
-      test(`${locale}: every page hydrates with no errors`, async () => {
-        const p = await open({ timezoneId: "Asia/Bangkok" });
+      test(`${locale}: every page hydrates with no errors, and fits a phone`, async () => {
+        const p = await open({ ...PHONE, timezoneId: "Asia/Bangkok" });
+        await prepare(p, e);
         const paths = await pages(p, locale);
         expect(paths.length).toBeGreaterThan(5);
         const failed: string[] = [];
@@ -46,12 +52,18 @@ for (const engine of ["chromium", "webkit"] as const) {
           const errors = collectErrors(p);
           await p.goto(path);
           await settled(p);
-          const real = errors.filter((e) => !VOID_DEFER_MESSAGE.test(e));
+          const real = errors.filter((x) => !VOID_DEFER_MESSAGE.test(x));
           if (real.length) failed.push(`${path}: ${real.join(" | ")}`);
+          const { layout, content } = await p.evaluate(() => ({
+            layout: window.innerWidth,
+            content: document.documentElement.scrollWidth,
+          }));
+          if (layout !== 390 || content > 390)
+            failed.push(`${path}: laid out ${layout}px, content ${content}px`);
           p.removeAllListeners("console");
           p.removeAllListeners("pageerror");
         }
-        console.log(`${engine}, ${locale}: ${paths.length} pages`);
+        console.log(`${e.name}, ${locale}: ${paths.length} pages`);
         expect(failed).toEqual([]);
       });
     }

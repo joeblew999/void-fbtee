@@ -23,7 +23,8 @@ export default defineConfig({
       // Every browser test against what Cloudflare's Workers Builds deployed for this commit: production
       // for main, the branch's Preview otherwise (e2e/deployed.ts). What CI runs: no Cloudflare login.
       "test:deployed": { command: "vpx e2e/deployed.ts", cache: false },
-      // Every page in every language, in Chromium and WebKit (Safari's engine), and the Formats and
+      // Every page in every language, in Chromium, WebKit (Safari's engine) and WebKit as today's
+      // iPhones have it (no built-in Temporal): no errors, fits a phone; and the Formats and
       // Temporal pages' engine checks (e2e/browsers/): its own run, as it grows with each language.
       // CI runs it against the deployed site (test:deployed); not part of `vp test run`.
       "test:browsers": {

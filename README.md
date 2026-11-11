@@ -54,8 +54,11 @@ vp run test:production   # every test, against production; report: .vitest/index
 vp run deploy:preview    # this branch as a Worker Preview beside production (needs cf's login)
 vp run test:deployed     # every test against what Cloudflare deployed for this commit, then
                          # test:browsers (what CI runs; CLOUDFLARE_WORKERS_SUBDOMAIN=gedw99)
-vp run test:browsers     # every page in every language in Chromium and WebKit, and the Formats and
-                         # Temporal pages' engine checks: slow, so not in vp test run; CI runs it
+vp run test:browsers     # every page in every language in Chromium, WebKit and WebKit as today's
+                         # iPhones have it (no built-in Temporal): no errors, fits a phone; and
+                         # the Formats and Temporal pages' engine checks. It grows with each
+                         # language, so it's not in vp test run, whose tests use a fixed few
+                         # languages (each for what it exercises); CI runs it
 ```
 
 Translations (from `apps/example`):

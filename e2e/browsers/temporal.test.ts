@@ -1,4 +1,4 @@
-// The Temporal page, in Chromium and WebKit: each row's neutral result on the Worker (the
+// The Temporal page, in each browser (engines.ts): each row's neutral result on the Worker (the
 // polyfill, and Cloudflare's own Temporal), with the browser's own Temporal (where it has one)
 // and with the polyfill in the browser. Neutral results don't depend on locale data, so every row must be the same three ways:
 // a row that differs is a real bug in one implementation, and the test names it. The results
@@ -6,12 +6,14 @@
 import { describe, expect, test } from "vite-plus/test";
 import { browser, collectErrors, untilText } from "../helpers";
 import { SOURCE } from "../locales";
+import { ENGINES, prepare } from "./engines";
 
-for (const engine of ["chromium", "webkit"] as const) {
-  describe(engine, () => {
-    const open = browser("prod", engine);
+for (const e of ENGINES) {
+  describe(e.name, () => {
+    const open = browser("prod", e.engine);
     test("every Temporal row the same four ways: the Worker's polyfill and own, the browser's", async () => {
       const p = await open();
+      await prepare(p, e);
       const errors = collectErrors(p);
       await p.goto(`/${SOURCE}/docs/temporal`);
       await untilText(p, '[data-testid="temporal-polyfill"]', "not", "");
@@ -34,7 +36,7 @@ for (const engine of ["chromium", "webkit"] as const) {
       const has = (side: string) =>
         !rows.some((r) => r.results.some(([s, t]) => s === side && t === "—"));
       console.log(
-        `${engine}: Cloudflare's own Temporal ${has("worker-own") ? "yes" : "no"}, the browser's own ${has("own") ? "yes" : "no"}`,
+        `${e.name}: Cloudflare's own Temporal ${has("worker-own") ? "yes" : "no"}, the browser's own ${has("own") ? "yes" : "no"}`,
       );
       expect(differs).toEqual([]);
       expect(errors).toEqual([]);

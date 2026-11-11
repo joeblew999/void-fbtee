@@ -2,7 +2,7 @@
 // (the loader: the text the app's pages show) and again by the browser after hydration. Each
 // engine ships its own locale data, so rows can differ, by design: the page must load without
 // errors in each, and the rows that differ go to the report (and the GitHub job's summary), not
-// a list kept here, so a new language needs no change. Hydration itself is pages.test.ts.
+// a list kept here, so a new language needs no change. Hydration itself is hydration.test.ts.
 import { appendFileSync } from "node:fs";
 import { describe, expect, test } from "vite-plus/test";
 import type { Page } from "playwright";
