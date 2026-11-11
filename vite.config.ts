@@ -23,14 +23,14 @@ export default defineConfig({
       // Move the project to the global vp's version (`vp upgrade` first): the catalog's pins and
       // the Vite+ section of AGENTS.md. Then vp check, vp test run.
       "upgrade:vite-plus": {
-        command: "vp migrate --agent agents --no-editor --no-hooks --no-interactive",
+        command: "vp migrate",
         cache: false,
       },
       // The example's tasks (apps/example/vite.config.ts), runnable from the root.
       login: { command: "vp run example#login", cache: false },
       // The example's deploy, saving the URL Void reports for test:live (e2e/deploy.ts).
       deploy: { command: "vpx e2e/deploy.ts", cache: false },
-      "deploy:atomic": { command: "vp run example#deploy:atomic", cache: false },
+      "deploy:atomic": { command: "vpx e2e/deploy.ts --atomic", cache: false },
     },
   },
   lint: {

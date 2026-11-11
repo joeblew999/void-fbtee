@@ -1,4 +1,5 @@
-// `vp run deploy`: the example's deploy (Void's `void deploy`), with its output as it comes. Void
+// `vp run deploy` (and `deploy:atomic`, with --atomic): the example's deploy (Void's
+// `void deploy`), with its output as it comes. Void
 // prints the URL it deployed to (its summary box, `+- https://… --+`) and keeps no record of it,
 // so this saves it in .e2e-work/live-url for `vp run test:live`.
 import { spawn } from "node:child_process";
@@ -6,7 +7,8 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { stripVTControlCharacters } from "node:util";
 
-const child = spawn("vp", ["run", "example#deploy", ...process.argv.slice(2)], {
+const task = process.argv.includes("--atomic") ? "example#deploy:atomic" : "example#deploy";
+const child = spawn("vp", ["run", task], {
   stdio: ["inherit", "pipe", "inherit"],
 });
 let output = "";
