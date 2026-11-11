@@ -46,17 +46,7 @@ function sidebar(title: (slug: string) => ReactNode) {
       name: (
         <fbt desc="Docs sidebar group: the events app that demonstrates void-fbtee">The demo</fbt>
       ),
-      entries: [
-        ...entries("tour"),
-        {
-          slug: "try-it",
-          title: (
-            <fbt desc="Docs sidebar: the page where you type a number and text and see them formatted">
-              Try it
-            </fbt>
-          ),
-        },
-      ],
+      entries: entries("tour"),
     },
   ];
 }

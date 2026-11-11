@@ -313,54 +313,6 @@
       ],
       "types": []
     },
-    "jykOBYvEl6d3aJ2EOKWUtg==": {
-      "description": "Sample text to split into words",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "แอป Void พูดได้ทุกภาษา ส่วนที่เหลือ Intl จัดการให้",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "s9vH7nv/Pm4TLjvtmxE9sA==": {
-      "description": "Input label: a number, written the visitor's way",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ตัวเลข ตามแบบที่คุณเขียน",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "0FRkzfQzZT20XMBogIPnDw==": {
-      "description": "Input label: any text",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ข้อความใดก็ได้",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "BIgbdupV3Hu8VKWr6212Yw==": {
-      "description": "Button: send the number and text to the server to format",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "จัดรูปแบบบนเซิร์ฟเวอร์",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "GT3+qur89p160RfLJ/9CmQ==": {
       "description": "Home page heading",
       "status": "translated",
@@ -1741,18 +1693,6 @@
       ],
       "types": []
     },
-    "uaP7us5gKCyIzYfiWk85Yw==": {
-      "description": "Docs sidebar: the page where you type a number and text and see them formatted",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ลองเลย",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "1MRfK1NgI+jnW+SPgLHuJw==": {
       "description": "Home feature fact: the same calls run on the server and in the browser",
       "status": "translated",
@@ -1885,25 +1825,25 @@
       ],
       "types": []
     },
-    "yMg3uj422mMWylgkTUvDHg==": {
-      "description": "Try it page heading: type a number and text, see them formatted",
+    "o+M4dP3r8NzgvqEoGp7ZZA==": {
+      "description": "Heading of the box showing an event exactly as it's saved in the database",
       "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "ลองเลย",
+          "translation": "บันทึกเป็น",
           "variations": {}
         }
       ],
       "types": []
     },
-    "f2BjA+SGmdSYF5dkcy50Eg==": {
-      "description": "Try it page introduction",
+    "q7oxLKwGpElWrMadA+doDQ==": {
+      "description": "Under 'Stored as': what the box shows and why it never changes",
       "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "พิมพ์ตัวเลขตามแบบที่ภาษาของคุณเขียน และข้อความใดก็ได้ เบราว์เซอร์ของคุณจะอ่านตัวเลขกลับเป็นตัวเลขธรรมดา และนั่นคือสิ่งที่ส่งไปยัง Worker ข้อมูลเดินทางเป็นค่ากลาง ไม่ใช่ข้อความที่จัดรูปแบบแล้ว จากนั้นทั้งสองฝั่งจัดรูปแบบด้วย Intl ของตัวเอง",
+          "translation": "ตรงตามที่บันทึกไว้ ไม่ว่าคุณจะอ่านเป็นภาษาใด ทุกอย่างด้านบนเขียนขึ้นจากข้อมูลนี้ ตามภาษาและนาฬิกาของคุณ",
           "variations": {}
         }
       ],

@@ -1,7 +1,7 @@
 // One event: its title and description in the language the organiser wrote them in (marked with
 // lang, so the browser and screen readers use the right one), its start on both clocks, the seats
 // left (live: every open page sees a booking), and booking a seat with Void's useForm.
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { fbt } from "fbtee";
 import { Form, useForm, useRouter } from "@void/react";
 import { connectLiveStream } from "void/live/client";
@@ -115,6 +115,46 @@ function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut:
   );
 }
 
+/**
+ * The event as it's saved in the database: neutral data, the same in every language. Everything
+ * else on the page is formatted from it, in the page's language and the reader's zone.
+ */
+function Stored({ event }: { event: Props["event"] }) {
+  const fields = {
+    starts_at: event.starts_at,
+    starts_at_utc: event.starts_at_utc,
+    seats: event.seats,
+    locale: event.locale,
+  };
+  return (
+    <section className="grid gap-2 border-t pt-6 text-sm">
+      <h2 className="font-medium">
+        <fbt desc="Heading of the box showing an event exactly as it's saved in the database">
+          Stored as
+        </fbt>
+      </h2>
+      <p className="text-muted-foreground">
+        <fbt desc="Under 'Stored as': what the box shows and why it never changes">
+          Exactly as it's saved, whatever language you read it in. Everything above is written from
+          it, for your language and your clock.
+        </fbt>
+      </p>
+      <dl
+        dir="ltr"
+        className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 rounded-md border bg-muted/40 p-4 font-mono text-xs"
+        data-testid="event-stored"
+      >
+        {Object.entries(fields).map(([name, value]) => (
+          <Fragment key={name}>
+            <dt className="text-muted-foreground">{name}</dt>
+            <dd className="break-all">{String(value)}</dd>
+          </Fragment>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
 export default function Event({ event, text, left }: Props) {
   const { locale } = useLocale();
   // The browser's zone once known (null before); nothing has been typed into the form yet.
@@ -183,6 +223,7 @@ export default function Event({ event, text, left }: Props) {
           <Book key={zone} id={event.id} zone={zone} soldOut={seatsLeft === 0} />
         </CardContent>
       </Card>
+      <Stored event={event} />
     </article>
   );
 }

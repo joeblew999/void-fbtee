@@ -481,54 +481,6 @@
       ],
       "types": []
     },
-    "jykOBYvEl6d3aJ2EOKWUtg==": {
-      "description": "Sample text to split into words",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تطبيقات Void تتحدث كل اللغات. وIntl يتولى الباقي.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "s9vH7nv/Pm4TLjvtmxE9sA==": {
-      "description": "Input label: a number, written the visitor's way",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "رقم، بطريقتك في الكتابة",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "0FRkzfQzZT20XMBogIPnDw==": {
-      "description": "Input label: any text",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "أي نص",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "BIgbdupV3Hu8VKWr6212Yw==": {
-      "description": "Button: send the number and text to the server to format",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "نسّقه على الخادم",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "GT3+qur89p160RfLJ/9CmQ==": {
       "description": "Home page heading",
       "status": "translated",
@@ -2107,18 +2059,6 @@
       ],
       "types": []
     },
-    "uaP7us5gKCyIzYfiWk85Yw==": {
-      "description": "Docs sidebar: the page where you type a number and text and see them formatted",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "جرّبه",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "1MRfK1NgI+jnW+SPgLHuJw==": {
       "description": "Home feature fact: the same calls run on the server and in the browser",
       "status": "translated",
@@ -2251,25 +2191,25 @@
       ],
       "types": []
     },
-    "yMg3uj422mMWylgkTUvDHg==": {
-      "description": "Try it page heading: type a number and text, see them formatted",
+    "o+M4dP3r8NzgvqEoGp7ZZA==": {
+      "description": "Heading of the box showing an event exactly as it's saved in the database",
       "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "جرّبه",
+          "translation": "محفوظة هكذا",
           "variations": {}
         }
       ],
       "types": []
     },
-    "f2BjA+SGmdSYF5dkcy50Eg==": {
-      "description": "Try it page introduction",
+    "q7oxLKwGpElWrMadA+doDQ==": {
+      "description": "Under 'Stored as': what the box shows and why it never changes",
       "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "اكتب رقمًا بالطريقة التي تكتبه بها لغتك، وأي نص. يقرأ متصفحك الرقم ويعيده رقمًا عاديًا، وهذا ما يُرسَل إلى الـ Worker: تنتقل البيانات محايدة، لا نصًا منسقًا. ثم ينسّقه كلاهما بـ Intl الخاص به.",
+          "translation": "كما حُفظت تمامًا، بأي لغة قرأتها. كل ما في الأعلى مكتوب منها، بلغتك وبحسب ساعتك.",
           "variations": {}
         }
       ],

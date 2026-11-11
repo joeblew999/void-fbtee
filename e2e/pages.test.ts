@@ -47,3 +47,10 @@ test("Link: same language stays client-side, another language loads a fresh page
   expect(await p.locator("html").getAttribute("dir")).toBe("rtl");
   expect(errors.filter((e) => !VOID_DEFER_MESSAGE.test(e))).toEqual([]);
 });
+
+// The Intl page's "in your time zone": the browser's own zone, filled in after hydration.
+test("in your time zone: the browser's own zone, after hydration", async () => {
+  const p = await page({ timezoneId: "America/New_York", locale: "en-US" });
+  await p.goto("/en-US/docs/intl");
+  await seeText(p, "your-time", "In your time zone: Saturday, July 4, 2026 at 11:30:45 AM EDT");
+});

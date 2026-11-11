@@ -26,4 +26,11 @@ in Bangkok, in your language and your time zone:
 
 <EventTime startsAt="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
 
+## Saved once, shown in every language
+
+What you post is saved as plain data, not as text in your language: the start on its city's
+clock with the city's time zone, the same moment in UTC, the number of seats. Each event's page
+shows it under **Stored as**. Switch language at the top: everything on the page changes, except
+that box.
+
 [See the upcoming events](/en-US/events)

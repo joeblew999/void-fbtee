@@ -72,7 +72,7 @@ test("th-TH, in New York: Sydney's clock, the reader's, and how far off, in Thai
   expect(errors).toEqual([]);
 });
 
-test("ar-EG: post an event (a missing title first)", async () => {
+test("ar-EG: post an event (a missing title first); it is saved neutral and reads the same in English", async () => {
   const p = await page({ timezoneId: "Africa/Cairo" });
   const errors = collectErrors(p);
   await p.goto("/ar-EG/events");
@@ -86,6 +86,19 @@ test("ar-EG: post an event (a missing title first)", async () => {
   await p.getByTestId("event-post").click();
   await p.waitForURL(/\/ar-EG\/events\/[0-9a-f-]{36}$/);
   await seeText(p, "event-title", "أمسية شعر");
+  // Saved neutral: the time on Cairo's clock with its zone, the same moment in UTC, a plain number.
+  const stored = () => p.getByTestId("event-stored").textContent();
+  const saved = await stored();
+  expect(saved).toBe(
+    "starts_at2026-01-01T20:00:00+02:00[Africa/Cairo]" +
+      "starts_at_utc2026-01-01T18:00:00Z" +
+      "seats20" +
+      "localear-EG",
+  );
+  // The same event in English: the page in English, the stored record unchanged.
+  await p.goto(p.url().replace("/ar-EG/", "/en-US/"));
+  await untilText(p, '[data-testid="event-local"]', "has", "8:00 PM");
+  expect(await stored()).toBe(saved);
   expect(errors).toEqual([]);
 });
 
