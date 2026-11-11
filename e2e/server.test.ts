@@ -35,6 +35,18 @@ test("the middleware leaves files and API routes alone", async () => {
   expect((await get("/api/hello")).status).toBe(200);
 });
 
+test("/api/format checks its input: a 400 for a language Intl doesn't know or a missing field", async () => {
+  const post = (body: unknown) =>
+    get("/api/format", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  expect((await post({ locale: "th-TH", number: "1,234.5", text: "สวัสดี" })).status).toBe(200);
+  expect((await post({ locale: "not a language!", number: "1", text: "" })).status).toBe(400);
+  expect((await post({ locale: "th-TH", text: "" })).status).toBe(400);
+});
+
 test("60 concurrent requests in 3 languages don't mix", async () => {
   const want = {
     "en-US": "i18n for Void apps",

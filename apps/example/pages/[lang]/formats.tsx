@@ -3,6 +3,7 @@
 // what server rendering with Intl depends on. Times "in your time zone" are the browser's alone.
 import { Fragment, useState, useSyncExternalStore, type ReactNode } from "react";
 import { fbs, fbt } from "fbtee";
+import { fetch } from "void/client";
 import { useLocale, useTimeZone } from "void-fbtee/react";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -284,12 +285,9 @@ function TryIt() {
   const [worker, setWorker] = useState<TryItResult | null>(null);
   const browser = tryIt(locale, parseNumber(locale, numberText), text);
   async function formatOnServer() {
-    const res = await fetch("/api/format", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ locale, number: numberText, text }),
-    });
-    setWorker((await res.json()) as TryItResult);
+    setWorker(
+      await fetch("/api/format", { method: "POST", body: { locale, number: numberText, text } }),
+    );
   }
   const rows: [string, (r: TryItResult) => unknown][] = [
     ["value", (r) => r.value],
