@@ -46,11 +46,11 @@ function useLiveEvent(id: string, left: number) {
 }
 
 /** Booking, in the reader's zone (Event remounts it once the browser knows it). */
-function Book({ id, zone, soldOut }: { id: string; zone: string; soldOut: boolean }) {
+function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut: boolean }) {
   const { locale } = useLocale();
   const form = useForm(
     "/[lang]/events/[id]",
-    { name: "", email: "", time_zone: zone },
+    { name: "", email: "", time_zone: zone ?? "" },
     { params: { lang: locale, id } },
   );
   if (form.wasSuccessful)
@@ -117,7 +117,7 @@ function Book({ id, zone, soldOut }: { id: string; zone: string; soldOut: boolea
 
 export default function Event({ event, text, left }: Props) {
   const { locale } = useLocale();
-  // "UTC" until hydration, then the browser's zone; nothing has been typed into the form yet.
+  // The browser's zone once known (null before); nothing has been typed into the form yet.
   const zone = useTimeZone();
   const seatsLeft = useLiveEvent(event.id, left);
   // In the page's language once translated; until then, as written.

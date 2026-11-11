@@ -102,13 +102,14 @@ export function useNow(): Temporal.Instant {
 }
 
 /**
- * The viewer's time zone, for times shown "in your time". Only the browser knows it, so the server
- * renders such times in UTC; while hydrating this is "UTC" too (the same text as the HTML), then
- * the browser's own zone. A time that belongs to a place carries its own zone instead (a
- * ZonedDateTime) and needs none of this.
+ * The reader's time zone, for times shown "in your time", or null while it isn't known. Only the
+ * browser knows it (the device's own setting, through Intl), so it's null on the server and while
+ * hydrating, then the browser's zone: render nothing for such a time until then (keep its space),
+ * so no stand-in time is ever shown. A time that belongs to a place carries its own zone instead
+ * (a ZonedDateTime) and needs none of this.
  */
-export function useTimeZone(): string {
-  return useSyncExternalStore(noSubscribe, browserZone, () => "UTC");
+export function useTimeZone(): string | null {
+  return useSyncExternalStore(noSubscribe, browserZone, () => null);
 }
 
 let zone: string | undefined;

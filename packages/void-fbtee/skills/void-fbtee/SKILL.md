@@ -62,8 +62,10 @@ Text formatted while rendering (`Intl`, `toLocaleString`) goes in `<Formatted>` 
 since each browser engine has its own locale data (Safari writes some values differently from
 Chrome and the Worker), and a mismatch is React error 418. A list that comes from `Intl` (such as
 `Intl.supportedValuesOf("timeZone")`) comes from the loader, not the browser. What only the
-browser knows: `useTimeZone()` and `useNow()` (the server's value while hydrating, then the
-browser's), and `useHydrated()` for anything else of the browser's own.
+browser knows is formatted only by the browser: `useTimeZone()` is null on the server and while
+hydrating, then the reader's zone, so render a time "in your time" as nothing until then (keep
+its space), never a stand-in such as UTC. `useNow()` is the server's "now" while hydrating, then
+the browser's; `useHydrated()` is for anything else of the browser's own.
 
 ## Markdown pages
 

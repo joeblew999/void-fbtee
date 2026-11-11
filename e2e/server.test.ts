@@ -34,6 +34,24 @@ test("page head: lang, dir, hreflang alternates with x-default, i18n meta", asyn
   expect(Number.isNaN(Date.parse(i18n.now))).toBe(false);
 });
 
+test("the server never shows a stand-in for the reader's own time: those lines come empty", async () => {
+  // Only the browser knows the reader's zone (useTimeZone), so the server leaves "your time",
+  // "in N days" and "in your time zone" empty, their space kept, for the browser to fill once.
+  const empty = (html: string, id: string) =>
+    [...html.matchAll(new RegExp(`data-testid="${id}"[^>]*>(.*?)</`, "g"))].map((m) => m[1]);
+  for (const l of LOCALES) {
+    const events = await (await get(`/${l}/events`)).text();
+    const lines = [...empty(events, "event-yours"), ...empty(events, "event-when")];
+    expect(lines.length, l).toBeGreaterThan(0);
+    expect(
+      lines.filter((t) => t !== ""),
+      l,
+    ).toEqual([]);
+    const formats = await (await get(`/${l}/docs/formats`)).text();
+    expect(empty(formats, "your-time"), l).toEqual([""]);
+  }
+});
+
 test("the middleware leaves files and API routes alone", async () => {
   expect((await get("/void.svg")).status).toBe(200);
   expect((await get("/api/hello")).status).toBe(200);

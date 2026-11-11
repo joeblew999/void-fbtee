@@ -1,8 +1,9 @@
 // The formats page, a reference: every Intl call the example knows, in the page's language. The
 // Worker's column (the loader) is the text a void-fbtee app's pages show; the browser's, run after
 // hydration, shows where its engine's own locale data writes it differently. Pages don't depend
-// on the two agreeing: text formatted while rendering is <Formatted>, the server's kept. Times
-// "in your time zone" are the browser's alone. Temporal is on its own page (docs/temporal).
+// on the two agreeing: text formatted while rendering is <Formatted>, the server's kept. "Your
+// time zone" and the time in it are the browser's alone: empty until it knows the zone. Temporal
+// is on its own page (docs/temporal).
 import { Fragment, useState, useSyncExternalStore } from "react";
 import { fbs, fbt } from "fbtee";
 import { fetch } from "void/client";
@@ -225,19 +226,20 @@ function PageFacts() {
 function YourTimeZone() {
   const { locale } = useLocale();
   const zone = useTimeZone();
-  const text = new Intl.DateTimeFormat(locale, {
-    dateStyle: "full",
-    timeStyle: "long",
-    timeZone: zone,
-  }).format(new Date(INSTANT));
   return (
-    <p className="text-sm" data-testid="your-time">
-      <fbt desc="The same moment in the visitor's own time zone">
-        In your time zone:{" "}
-        <fbt:param name="time">
-          <Formatted>{text}</Formatted>
-        </fbt:param>
-      </fbt>
+    <p className="min-h-5 text-sm" data-testid="your-time">
+      {zone && (
+        <fbt desc="The same moment in the visitor's own time zone">
+          In your time zone:{" "}
+          <fbt:param name="time">
+            {new Intl.DateTimeFormat(locale, {
+              dateStyle: "full",
+              timeStyle: "long",
+              timeZone: zone,
+            }).format(new Date(INSTANT))}
+          </fbt:param>
+        </fbt>
+      )}
     </p>
   );
 }

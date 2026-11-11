@@ -9,8 +9,9 @@ the browser's own `Intl`.
 The rule it follows is the one for dates in a database: data stays neutral (UTC instants with zone
 names, plain numbers with currency codes), both to the browser and back, and is formatted once,
 for the screen. The server formats a page's text and the browser keeps it (`<Formatted>`), because
-each browser engine ships its own locale data and writes some values differently. The browser
-formats only what the server can't know, such as the reader's own time zone.
+each browser engine ships its own locale data and writes some values differently. What only the
+browser knows, such as the reader's own time zone, the browser formats, once it knows it: the
+server leaves that space empty rather than showing a stand-in.
 
 ## Commands
 

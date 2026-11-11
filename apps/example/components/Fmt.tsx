@@ -29,7 +29,8 @@ export default function Fmt({
   const now = useNow();
   return (
     <Formatted data-fmt={JSON.stringify(props)} className="font-medium">
-      {fmt(props, locale, zone, now.toString())}
+      {/* yours and ago need the reader's zone: nothing until the browser knows it. */}
+      {zone || !(props.yours || props.ago) ? fmt(props, locale, zone ?? "UTC", now.toString()) : ""}
     </Formatted>
   );
 }

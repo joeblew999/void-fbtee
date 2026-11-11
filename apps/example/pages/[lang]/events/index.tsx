@@ -17,11 +17,11 @@ import type { Props } from "./index.server";
  * The form, starting in the reader's zone (Events remounts it once the browser knows it), with
  * the server's zones. What it sends is neutral: the picker's "2026-04-01T20:00" and a zone name.
  */
-function PostEvent({ zone, zones }: { zone: string; zones: string[] }) {
+function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
   const { locale } = useLocale();
   const form = useForm(
     "/[lang]/events",
-    { title: "", description: "", local: "", time_zone: zone, seats: 20 },
+    { title: "", description: "", local: "", time_zone: zone ?? "", seats: 20 },
     { params: { lang: locale } },
   );
   const error = (field: keyof typeof form.errors, message: React.ReactNode) =>
@@ -92,7 +92,7 @@ function PostEvent({ zone, zones }: { zone: string; zones: string[] }) {
                 value={form.data.time_zone}
                 onChange={(e) => form.setData("time_zone", e.target.value)}
               >
-                {[...new Set(["UTC", ...zones])].map((z) => (
+                {[...new Set([...(zone ? [] : [""]), "UTC", ...zones])].map((z) => (
                   <NativeSelectOption key={z} value={z}>
                     {z}
                   </NativeSelectOption>
@@ -125,7 +125,7 @@ function PostEvent({ zone, zones }: { zone: string; zones: string[] }) {
 
 export default function Events({ events, zones }: Props) {
   const { locale } = useLocale();
-  // "UTC" until hydration, then the browser's zone; nothing has been typed into the form yet.
+  // The browser's zone once known (null before); nothing has been typed into the form yet.
   const zone = useTimeZone();
   return (
     <div className="grid gap-8">

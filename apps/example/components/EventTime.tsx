@@ -1,6 +1,7 @@
 // An event's start: on the clock where it happens, on the reader's own clock (when that's a
-// different zone), and how far off it is. Times in the reader's zone show in UTC until hydration
-// (useTimeZone), as the formats page's do. Each text is <Formatted>: the server's, kept by the browser.
+// different zone), and how far off it is. The place's clock is the server's text, kept through
+// hydration (<Formatted>); the reader's clock and "in N days" are the browser's alone, filled in
+// once it knows the zone (useTimeZone), with nothing shown before.
 import { fbt } from "fbtee";
 import { Temporal } from "temporal-polyfill";
 import { Formatted, useLocale, useNow, useTimeZone } from "void-fbtee/react";
@@ -27,18 +28,19 @@ export function EventTime({ startsAt }: { startsAt: string }) {
       <div data-testid="event-local">
         <Formatted>{at(start.timeZoneId)}</Formatted>
       </div>
+      {/* The reader's clock and how far off: only the browser knows the zone, so these lines are
+          empty (their space kept) until it does, then filled once. None if it's the event's zone. */}
       {reader !== start.timeZoneId && (
-        <div className="text-muted-foreground" data-testid="event-yours">
-          <fbt desc="An event's start time on the reader's own clock">
-            Your time:{" "}
-            <fbt:param name="time">
-              <Formatted>{at(reader)}</Formatted>
-            </fbt:param>
-          </fbt>
+        <div className="min-h-5 text-muted-foreground" data-testid="event-yours">
+          {reader && (
+            <fbt desc="An event's start time on the reader's own clock">
+              Your time: <fbt:param name="time">{at(reader)}</fbt:param>
+            </fbt>
+          )}
         </div>
       )}
-      <div className="text-muted-foreground" data-testid="event-when">
-        <Formatted>{relativeDays(locale, start.withTimeZone(reader), now)}</Formatted>
+      <div className="min-h-5 text-muted-foreground" data-testid="event-when">
+        {reader && relativeDays(locale, start.withTimeZone(reader), now)}
       </div>
     </div>
   );
