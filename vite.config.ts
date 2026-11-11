@@ -17,8 +17,8 @@ export default defineConfig({
       "test:fresh": { command: "vpx e2e/fresh/check.ts", cache: false },
       // Vite+'s, Void's and void-fbtee's setup commands, run again: fails if any changes a file.
       "check:tools": { command: "node e2e/check-tools.mjs", cache: false },
-      // Upgrade Vite+ to the vp in mise.toml (change it there, `mise install`, then this): the
-      // catalog's pins and the Vite+ section of AGENTS.md. Then vp check, vp test run.
+      // Move the project to the global vp's version (`vp upgrade` first): the catalog's pins and
+      // the Vite+ section of AGENTS.md. Then vp check, vp test run.
       "upgrade:vite-plus": {
         command: "vp migrate --agent agents --no-editor --no-hooks --no-interactive",
         cache: false,

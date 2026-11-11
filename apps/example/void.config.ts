@@ -17,7 +17,8 @@ export default defineConfig({
     ],
   },
   // The Worker's name on Cloudflare: void-fbtee-example.<subdomain>.workers.dev.
-  cloudflare: { name: "void-fbtee-example" },
+  // The account too, as Void asks for deploys from CI (.github/workflows/void-deploy.yml).
+  cloudflare: { name: "void-fbtee-example", account_id: "7384af54e33b8a54ff240371ea368440" },
   worker: {
     compatibility_date: "2026-02-24",
     // Native Temporal in the worker (Cloudflare's `temporal` flag; default for dates from 2026-12-01).

@@ -1,7 +1,15 @@
 // Production build: translated text from the server, kept through hydration with no flash of
 // another language (including text that arrives after the shell); void-fbtee's Link.
 import { expect, test } from "vite-plus/test";
-import { browser, collectErrors, seeText, text, VOID_DEFER_MESSAGE, watchTexts } from "./helpers";
+import {
+  browser,
+  collectErrors,
+  seeText,
+  text,
+  VOID_DEFER_MESSAGE,
+  watchTexts,
+  started,
+} from "./helpers";
 import { LOCALES } from "./locales";
 
 const page = browser("prod");
@@ -28,7 +36,7 @@ test("Link: same language stays client-side, another language loads a fresh page
   let loads = 0;
   p.on("load", () => loads++);
   await p.goto("/th-TH");
-  await p.waitForLoadState("networkidle");
+  await started(p);
   await p.getByTestId("nav-formats").click();
   await p.waitForURL("**/th-TH/formats");
   await seeText(p, "formats-title", "รูปแบบ");

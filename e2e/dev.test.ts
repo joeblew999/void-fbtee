@@ -4,7 +4,7 @@
 import { readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
-import { browser, collectErrors, seeText, url, VOID_DEFER_MESSAGE } from "./helpers";
+import { browser, collectErrors, seeText, url, VOID_DEFER_MESSAGE, started } from "./helpers";
 import { EXAMPLE } from "./setup";
 
 const page = browser("dev");
@@ -21,7 +21,7 @@ test("editing a catalog updates the server and the open page", async () => {
     await p.goto("/th-TH");
     // Edit once the page has loaded, as a person would: a file changed while the page is still
     // loading its modules gives a hydration mismatch in any SSR dev server.
-    await p.waitForLoadState("networkidle");
+    await started(p);
     const json = JSON.parse(original);
     json.translations[TITLE].translations[0].translation = "i18n (แก้แล้ว)";
     writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
@@ -40,14 +40,14 @@ test("removing and putting back a locale's catalog", async () => {
   const p = await page();
   const errors = collectErrors(p);
   await p.goto("/ar-EG");
-  await p.waitForLoadState("networkidle");
+  await started(p);
   // Removing a catalog reloads the page; let that load finish before the next change.
   const reloaded = p.waitForEvent("load");
   renameSync(file, file + ".off");
   try {
     await reloaded;
     await seeText(p, "title", "i18n for Void apps");
-    await p.waitForLoadState("networkidle");
+    await started(p);
   } finally {
     renameSync(file + ".off", file);
   }

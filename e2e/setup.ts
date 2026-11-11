@@ -6,6 +6,7 @@ import { execFileSync, spawn, type ChildProcess } from "node:child_process";
 import { once } from "node:events";
 import { createServer, type AddressInfo } from "node:net";
 import { join } from "node:path";
+import { stripVTControlCharacters } from "node:util";
 import type { TestProject } from "vite-plus/test/node";
 import { SOURCE } from "./locales";
 
@@ -24,21 +25,35 @@ async function freePort(): Promise<number> {
 
 const run = (args: string[], cwd: string) => execFileSync("vp", args, { cwd, stdio: "inherit" });
 
-/** Start a server and wait until it answers; --strictPort makes a taken port fail, not move. */
-async function start(args: string[], url: string): Promise<ChildProcess> {
-  const child = spawn("vp", [...args, "--strictPort"], {
-    cwd: EXAMPLE,
-    stdio: ["ignore", "ignore", "inherit"],
-    detached: true,
-  });
+/**
+ * Start a server and wait until it's ready: --strictPort makes a taken port fail rather than move,
+ * and only this server's own "Local: http://…:<port>" line counts, not any answer on the port (as
+ * voidzero-dev/void's startServer, test/integration-helpers.ts).
+ */
+async function start(args: string[], port: number, url: string): Promise<ChildProcess> {
+  const child = spawn(
+    "vp",
+    [...args, "--host", "127.0.0.1", "--port", String(port), "--strictPort"],
+    {
+      cwd: EXAMPLE,
+      stdio: ["ignore", "pipe", "inherit"],
+      detached: true,
+    },
+  );
+  let output = "";
+  child.stdout!.on("data", (chunk: Buffer) => (output += chunk));
+  const listening = new RegExp(
+    String.raw`(?:Local:?|Listening on)\s+https?://[^\s/]+:${port}(?!\d)`,
+  );
   for (let i = 0; i < 300; i++) {
     if (child.exitCode !== null) throw new Error(`${args.join(" ")} exited with ${child.exitCode}`);
-    try {
-      if ((await fetch(url)).ok) return child;
-    } catch {}
+    if (listening.test(stripVTControlCharacters(output)))
+      try {
+        if ((await fetch(url)).ok) return child;
+      } catch {}
     await new Promise((r) => setTimeout(r, 100));
   }
-  throw new Error(`${args.join(" ")} didn't answer at ${url}`);
+  throw new Error(`${args.join(" ")} didn't answer at ${url}:\n${output}`);
 }
 
 export default async function setup(project: TestProject) {
@@ -50,11 +65,8 @@ export default async function setup(project: TestProject) {
   const prod = `http://127.0.0.1:${prodPort}`;
   const dev = `http://127.0.0.1:${devPort}`;
   const servers = [
-    await start(
-      ["preview", "--host", "127.0.0.1", "--port", String(prodPort)],
-      `${prod}/${SOURCE}`,
-    ),
-    await start(["dev", "--host", "127.0.0.1", "--port", String(devPort)], `${dev}/${SOURCE}`),
+    await start(["preview"], prodPort, `${prod}/${SOURCE}`),
+    await start(["dev"], devPort, `${dev}/${SOURCE}`),
   ];
   project.provide("prod" as never, prod as never);
   project.provide("dev" as never, dev as never);

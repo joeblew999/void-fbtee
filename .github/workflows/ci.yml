@@ -1,7 +1,6 @@
-# The same as on your machine: mise installs what mise.toml says (vp, and the Node in .node-version),
-# vp installs the pnpm in package.json, then the vp commands run. Laid out like
-# voidzero-dev/void's ci.yml: read-only permissions, pinned actions, the fresh-install check as its
-# own job.
+# Vite+'s own CI setup (https://viteplus.dev/guide/ci): setup-vp installs vp, the Node in
+# .node-version and the pnpm in package.json, then vp install. No Cloudflare credentials: as in
+# voidzero-dev/void, ordinary tests don't call Cloudflare.
 name: CI
 
 on:
@@ -26,31 +25,16 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v5.2.7
-      # No lockfiles in this repo, so the install mustn't insist on one (it does in CI by default).
-      - run: vp install --no-frozen-lockfile
+      - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+        with:
+          node-version-file: .node-version
+          # No lockfiles in this repo, so the install mustn't insist on one (it does in CI by default).
+          run-install: |
+            - args: ["--no-frozen-lockfile"]
       - run: vp run install:browser
       - run: vp check
       - run: vp run check:tools
-      # The tests post events, which Workers AI translates: Void's dev and preview use the real
-      # one on Cloudflare (it has no local version). In CI that needs a token, as Void's AI guide
-      # says; on your machine, `vp run login` instead.
       - run: vp test run
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-
-  fresh:
-    name: fresh install (Vite+ and plain Vite)
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: jdx/mise-action@v5.2.7
-      - run: vp install --no-frozen-lockfile
-      - run: vp run test:fresh
 
   # A release when packages/void-fbtee/package.json has a version with no tag yet: the tag and the
   # GitHub release (notes written by GitHub from the commits). Apps pin it in their dependency:
@@ -58,7 +42,7 @@ jobs:
   release:
     name: release
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [ci, fresh]
+    needs: [ci]
     runs-on: ubuntu-latest
     permissions:
       contents: write

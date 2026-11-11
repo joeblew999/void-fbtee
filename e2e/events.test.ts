@@ -2,7 +2,7 @@
 // reader's, in the reader's language; an event posted in Arabic, then read in English. Void's
 // forms, database and cache are Void's to test; this checks what void-fbtee and the app add.
 import { expect, test } from "vite-plus/test";
-import { browser, collectErrors, seeText } from "./helpers";
+import { browser, collectErrors, seeText, started } from "./helpers";
 import { SOURCE } from "./locales";
 
 const page = browser("prod");
@@ -17,7 +17,7 @@ async function goToEvent(p: import("playwright").Page, locale: string, englishTi
     .getAttribute("href");
   await p.goto(href!.replace(`/${SOURCE}/`, `/${locale}/`));
   // Void's form works once the page has hydrated.
-  await p.waitForLoadState("networkidle");
+  await started(p);
 }
 const WHEN: Intl.DateTimeFormatOptions = {
   weekday: "long",
@@ -50,7 +50,7 @@ test("ar-EG: post an event (a missing title first)", async () => {
   const errors = collectErrors(p);
   await p.goto("/ar-EG/events");
   // Void's form works once the page has hydrated.
-  await p.waitForLoadState("networkidle");
+  await started(p);
   await p.getByTestId("event-post").click();
   await seeText(p, "error-title", "أعطِها عنوانًا.");
   await p.getByTestId("event-title-input").fill("أمسية شعر");

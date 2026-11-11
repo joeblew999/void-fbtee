@@ -1,7 +1,7 @@
 #!/bin/sh
 # Claude cloud sessions only (a Mac or a developer's machine is left alone). It gives the session
 # what a developer's machine already has, so Claude runs the same commands they do:
-#   - the tools in mise.toml (`mise install`), on the PATH;
+#   - Vite+'s global `vp` (https://viteplus.dev/guide/global-cli), managing the Node in .node-version;
 #   - a system keyring, where `void` keeps the Cloudflare sign-in (a cloud session has none).
 # Run by .claude/settings.json at the start of a session and before each prompt: this environment
 # stops background programs between turns, so the keyring is restarted when it has stopped.
@@ -13,9 +13,13 @@ mkdir -p "$dir"
 sudo=""
 [ "$(id -u)" = "0" ] || sudo="sudo -n"
 
-# The tools in mise.toml, as a developer gets them with `mise install`.
-cd "$CLAUDE_PROJECT_DIR" && mise trust -q mise.toml && mise install -q > "$dir/mise.log" 2>&1 ||
-  echo "cloud-session: mise install failed ($dir/mise.log)"
+# Vite+'s global vp, as a developer installs it, with Node managed from .node-version (`vp env on`).
+vpbin="$HOME/.local/share/vite-plus/bin"
+if [ ! -x "$vpbin/vp" ]; then
+  curl -fsSL https://vite.plus | bash > "$dir/vp.log" 2>&1 ||
+    echo "cloud-session: installing Vite+ failed ($dir/vp.log)"
+fi
+"$vpbin/vp" env on > /dev/null 2>&1
 
 if ! command -v gnome-keyring-daemon > /dev/null; then
   $sudo apt-get install -y -q gnome-keyring > "$dir/apt.log" 2>&1 ||
@@ -32,8 +36,8 @@ if ! DBUS_SESSION_BUS_ADDRESS="$bus" dbus-send --session --print-reply --dest=or
   printf 'void' | DBUS_SESSION_BUS_ADDRESS="$bus" gnome-keyring-daemon --unlock --components=secrets > /dev/null 2>&1
 fi
 
-# At session start: every later command gets mise's tools on its PATH and the keyring's bus.
+# At session start: every later command gets vp (and its Node) on its PATH and the keyring's bus.
 if [ -n "$CLAUDE_ENV_FILE" ]; then
-  echo "export PATH=\"$HOME/.local/share/mise/shims:\$PATH\"" >> "$CLAUDE_ENV_FILE"
+  echo ". \"$HOME/.config/vite-plus/env\"" >> "$CLAUDE_ENV_FILE"
   echo "export DBUS_SESSION_BUS_ADDRESS='$bus'" >> "$CLAUDE_ENV_FILE"
 fi

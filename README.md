@@ -41,25 +41,28 @@ pnpm run i18n:translate
 - `apps/example`: a Void app using it, in three languages, live at https://void-fbtee-example.gedw99.workers.dev
 - `e2e/`: the browser tests and the fresh-install check
 
-It runs on [Vite+](https://viteplus.dev). [mise](https://mise.jdx.dev) installs what
-`mise.toml` says (Vite+'s `vp`, and the Node in `.node-version`), and `vp` brings the pnpm in
-`package.json`. Then:
+It runs on [Vite+](https://viteplus.dev). Install its `vp` once per machine
+(`curl -fsSL https://vite.plus | bash`, or [Homebrew](https://viteplus.dev/guide/homebrew)); it
+runs the project's own Vite+ version (`vite-plus` in `package.json`), the Node in `.node-version`
+and the pnpm in `package.json`. Then:
 
 ```sh
-mise install
 vp install
 vp run install:browser   # Chromium for the browser tests, once
 vp check                 # format, lint, types
 vp test run              # every test
 ```
 
-CI runs those same commands, and `vp run check:tools` (below). The repo's tasks are in
+CI runs those same commands, and `vp run check:tools` (below); the fresh-install check runs
+when the package, the manifests or the versions change (`.github/workflows/fresh.yml`). The repo's tasks are in
 `vite.config.ts` and `apps/example/vite.config.ts`; `vp run` lists them. Changes to the package
 reach the example by themselves: `vp run dev` rebuilds the package on save, and the example's
 build (`vp run -t example#build`) and `vp run deploy` build it first. Each commit is checked first
 (`vp staged`, a Vite+ commit hook that `vp install` sets up).
 
-To deploy the example to Cloudflare, `vp run deploy`. Once per machine, `vp run login` first: it
+To deploy the example to Cloudflare, `vp run deploy`. Each push to main also deploys it
+(`.github/workflows/void-deploy.yml`, Void's deploy workflow), once the repository has a
+`CLOUDFLARE_API_TOKEN` secret. Once per machine, `vp run login` first: it
 signs you in to Cloudflare and points the project at your account (Void's `void connect`), which
 deploys and Void's remote database commands (`void db execute --remote`) use. When a change adds
 or changes a Durable Object class, Void stops and asks for an atomic deploy: `vp run
@@ -70,7 +73,7 @@ prints the command to go back. Then:
 - the Worker in the Cloudflare dashboard (deployments, logs, settings):
   https://dash.cloudflare.com/7384af54e33b8a54ff240371ea368440/workers/services/view/void-fbtee-example/production
 
-In a Claude cloud session, `.claude/hooks/cloud-session.sh` runs `mise install` and starts a
+In a Claude cloud session, `.claude/hooks/cloud-session.sh` installs `vp` and starts a
 keyring for the sign-in, so Claude runs the same commands. A new session needs one sign-in: Claude runs
 `vp run login` (inside `script`, as Void's sign-in wants a terminal), which prints Cloudflare's link, and you click Allow.
 
@@ -90,12 +93,13 @@ that wants something different shows what it wants.
 
 ## Upgrading
 
-- **Vite+:** change its version in `mise.toml`, then `mise install` and `vp run upgrade:vite-plus`.
-  pnpm won't install a release less than a day old, so upgrade a day after it comes out.
+- **Vite+:** `vp upgrade` (the global `vp`), then `vp run upgrade:vite-plus` (Vite+'s `vp migrate`:
+  moves the project to that version). pnpm won't install a release less than a day old, so upgrade
+  a day after it comes out.
 - **Void:** change `void`, `@void/md` and `@void/react` in the catalog in `pnpm-workspace.yaml`,
   then `vp install`. Run `vp run check:tools` to see what the new Void wants, and `void init` in
   `apps/example` (it asks about the database: D1) to refresh its section of `AGENTS.md`.
-- **Node:** change `.node-version`, then `mise install`.
+- **Node:** change `.node-version`; `vp` uses it from the next command.
 
 Then `vp check`, `vp test run` and `vp run test:fresh`.
 

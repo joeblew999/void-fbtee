@@ -1,8 +1,0 @@
-# What this repo needs on a machine: Vite+ (`vp`), and the Node in .node-version.
-# `mise install`, then `vp install` (which brings the pnpm in package.json).
-[tools]
-"github:voidzero-dev/vite-plus" = "1.5.1"
-
-[settings]
-# Node comes from .node-version, the file Vite+ reads too: one pin for both.
-idiomatic_version_file_enable_tools = ["node"]

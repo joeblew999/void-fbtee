@@ -49,6 +49,14 @@ export async function seeText(page: Page, id: string, want: string) {
 }
 
 /**
+ * Wait until the page has started in the browser (the root layout's `<html data-hydrated>`), before
+ * using a form or a link. Not `networkidle`, which voidzero-dev/void's TESTING.md says doesn't show
+ * that the page is ready.
+ */
+export const started = (page: Page) =>
+  page.locator('html[data-hydrated="true"]').waitFor({ state: "attached" });
+
+/**
  * Wait for an island (by the end of its name; any island without one) to hydrate. Each island
  * hydrates on its own (void's waitForIslandsHydrated).
  */
