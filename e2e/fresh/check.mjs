@@ -1,4 +1,4 @@
-// `pnpm run test:fresh`: void-fbtee installed into fresh `void init` apps the way an app installs
+// `vp run test:fresh`: void-fbtee installed into fresh `void init` apps the way an app installs
 // it: as a git dependency, built by pnpm (the README's two lines). It installs from this checkout's
 // last commit rather than from GitHub, so commit first. Like voidzero-dev/void's packed-consumer
 // smoke check, it uses no browser: the package's contents, a real `void-fbtee init`, the CLI, a

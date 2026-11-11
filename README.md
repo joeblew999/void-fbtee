@@ -37,10 +37,31 @@ pnpm run i18n:translate
 ## This repo
 
 - `packages/void-fbtee`: the package
-- `apps/example`: a Void app using it, in five languages
+- `apps/example`: a Void app using it, in three languages, live at https://void-fbtee-example.gedw99.workers.dev
 - `e2e/`: the browser tests and the fresh-install check
 
-The scripts are in `package.json`. `pnpm run ci` is what CI runs.
+It runs on [Vite+](https://viteplus.dev). Install its `vp` command once per machine
+([guide](https://viteplus.dev/guide/global-cli)); it brings the Node in `.node-version` and the
+pnpm in `package.json`. Then:
+
+```sh
+vp install
+vp run install:browser   # Chromium for the browser tests, once
+vp check                 # format, lint, types
+vp test run              # every test
+```
+
+CI runs those same commands. The repo's tasks are in `vite.config.ts` and
+`apps/example/vite.config.ts`; `vp run` lists them. Changes to the package reach the example by
+themselves: `vp run dev` rebuilds the package on save, and the example's `build` and `deploy`
+rebuild it first.
+
+To deploy the example to Cloudflare, `vp run deploy`. The first time on a machine it asks you to
+sign in (`vp run login` does only that).
+
+In a Claude cloud session, `.claude/hooks/cloud-session.sh` installs `vp` and a keyring for the
+sign-in, so Claude runs the same commands. A new session needs one sign-in: Claude runs
+`vp run login` (inside `script`, as void's sign-in wants a terminal), which prints Cloudflare's link, and you click Allow.
 
 ## License
 

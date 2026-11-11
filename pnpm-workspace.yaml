@@ -8,7 +8,7 @@ allowBuilds:
   sharp: true
   workerd: true
 
-# mise manages Node and pnpm; stop pnpm from switching versions itself.
+# vp manages Node (.node-version) and pnpm (package.json); stop pnpm from switching versions itself.
 runtimeOnFail: ignore
 pmOnFail: ignore
 
