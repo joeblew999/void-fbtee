@@ -3,12 +3,6 @@
 @import "shadcn/tailwind.css";
 @import "@void/md/theme-content.css";
 
-/* A full page load (Markdown pages, a new language) keeps the old page on screen and cross-fades,
-   instead of a blank flash: the browser's own cross-document view transition. */
-@view-transition {
-  navigation: auto;
-}
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
