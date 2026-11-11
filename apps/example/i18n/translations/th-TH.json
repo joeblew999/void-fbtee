@@ -589,18 +589,6 @@
       ],
       "types": []
     },
-    "sZwEotiBXWMmEcE7PyEKvA==": {
-      "description": "Formats table column: the code that was run",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "การเรียก",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "gZ38nGkAxQ9wR2vGJ/GUJg==": {
       "description": "Formats table column: the result on the Cloudflare Worker",
       "status": "translated",
@@ -812,6 +800,102 @@
       "translations": [
         {
           "translation": "ที่นั่ง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "toZs8GPjojr+z/WYHXg3Ow==": {
+      "description": "Footer: the tools this example is built with (names, not translated)",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สร้างด้วย Void, Vite+, fbtee, Temporal และ shadcn/ui",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "p55uU35UBaT1/WQUayZJzg==": {
+      "description": "Formats card heading: facts about this page's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หน้านี้",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7QKKwA/9MV4zWs9oQu2l8A==": {
+      "description": "Home card title: the formats page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "รูปแบบ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GSdxSpabhOQBFrHpWqai1g==": {
+      "description": "Home card text: what the formats page shows",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "รูปแบบ Intl ทุกแบบ ทำงานบน Worker และในเบราว์เซอร์ของคุณ แสดงเทียบกัน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eJ1VdkN1b+QnfxnopfvP7A==": {
+      "description": "Home card title: the page made of islands",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ไอแลนด์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EeU1TnF7VY6Hwm8YTi55+Q==": {
+      "description": "Home card text: what the islands page shows",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หน้าคงที่ที่ส่วนโต้ตอบทำงานขึ้นมาเอง ในภาษาของหน้านั้น",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Ca5AJpTqcKLFQ1lgSwVWtw==": {
+      "description": "Home card title: the documentation",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เอกสาร",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BWGB7cju3+tlpcpaeCdWSw==": {
+      "description": "Home card text: what the docs show",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หน้า markdown ที่แปลเป็นทุกภาษา",
           "variations": {}
         }
       ],

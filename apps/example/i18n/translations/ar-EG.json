@@ -817,18 +817,6 @@
       ],
       "types": []
     },
-    "sZwEotiBXWMmEcE7PyEKvA==": {
-      "description": "Formats table column: the code that was run",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "الاستدعاء",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "gZ38nGkAxQ9wR2vGJ/GUJg==": {
       "description": "Formats table column: the result on the Cloudflare Worker",
       "status": "translated",
@@ -1040,6 +1028,102 @@
       "translations": [
         {
           "translation": "المقاعد",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "toZs8GPjojr+z/WYHXg3Ow==": {
+      "description": "Footer: the tools this example is built with (names, not translated)",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مبني باستخدام Void وVite+ وfbtee وTemporal وshadcn/ui.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "p55uU35UBaT1/WQUayZJzg==": {
+      "description": "Formats card heading: facts about this page's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "هذه الصفحة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7QKKwA/9MV4zWs9oQu2l8A==": {
+      "description": "Home card title: the formats page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "التنسيقات",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GSdxSpabhOQBFrHpWqai1g==": {
+      "description": "Home card text: what the formats page shows",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "كل تنسيقات Intl، منفّذة على الـ Worker وفي متصفحك، جنبًا إلى جنب.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eJ1VdkN1b+QnfxnopfvP7A==": {
+      "description": "Home card title: the page made of islands",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الجزر",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EeU1TnF7VY6Hwm8YTi55+Q==": {
+      "description": "Home card text: what the islands page shows",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "صفحة ثابتة تعمل أجزاؤها التفاعلية وحدها، بلغة الصفحة.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Ca5AJpTqcKLFQ1lgSwVWtw==": {
+      "description": "Home card title: the documentation",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "التوثيق",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BWGB7cju3+tlpcpaeCdWSw==": {
+      "description": "Home card text: what the docs show",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "صفحات markdown مترجمة إلى كل اللغات.",
           "variations": {}
         }
       ],
