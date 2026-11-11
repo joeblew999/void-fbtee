@@ -1,4 +1,9 @@
 {
+  "extraKnownMarketplaces": {
+    "impeccable": { "source": { "source": "github", "repo": "pbakaus/impeccable" } }
+  },
+  "enabledPlugins": { "impeccable@impeccable": true },
+  "env": { "DO_NOT_TRACK": "1", "IMPECCABLE_HOOK_DISABLED": "1" },
   "hooks": {
     "SessionStart": [
       {
