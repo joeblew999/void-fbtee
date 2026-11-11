@@ -1,5 +1,7 @@
 # void-fbtee
 
+**Production:** https://void-fbtee-example.gedw99.workers.dev
+
 i18n for [Void](https://void.cloud) apps: strings translated with
 [fbtee](https://github.com/nkzw-tech/fbtee), dates and times with Temporal, numbers and lists with
 the browser's own `Intl`.
