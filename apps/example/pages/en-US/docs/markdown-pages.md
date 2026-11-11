@@ -1,3 +1,7 @@
+<script>
+import Fmt from "../../../components/Fmt.tsx" with { island: "load" }
+</script>
+
 # Translating markdown pages
 
 Markdown pages (`@void/md`) are translated as whole files: one copy per locale.
@@ -31,6 +35,16 @@ hand, and it can't show the reader's own time. Put the value in a component that
 `Intl`, imported as an island in the `<script>` block. The tour does this with
 `<EventTime startsAt="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />`: it shows in the reader's
 language, on the event's clock and on theirs.
+
+For a single value there's `<Fmt>` (`components/Fmt.tsx`). This page uses it, so each line below
+is formatted for you, in this page's language:
+
+- A number: <Fmt num="1234567.891" />
+- Money: <Fmt money="1299" currency="THB" />
+- A time, on its place's clock: <Fmt when="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+- The same time, on yours: <Fmt yours="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+- How far off it is: <Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+- Languages, named in yours: <Fmt langs="en-US,ar-EG,th-TH" />
 
 ## translatedFrom
 

@@ -15,7 +15,7 @@ import { VOID_INIT_DIR } from "./void-init";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vite-plus/test";
 import type { Project } from "../src/catalogs";
-import { markdownPages } from "../src/check";
+import { check, markdownPages } from "../src/check";
 import { loadProject, prepare } from "../src/commands";
 import { init } from "../src/init";
 import { stamp, translateTask } from "../src/translate";
@@ -75,6 +75,16 @@ test("stamp records the original's version, and check then sees the page as up t
     readFileSync(join(root, "pages/de-DE/blog/hello.md"), "utf8").match(/translatedFrom/g),
   ).toHaveLength(1);
   expect(stateOf("de-DE")).toBe("ok");
+});
+
+test("check reports a copy whose components or their values differ from the original's", () => {
+  const original = POST.replace("<Meta />", '<Fmt money="1299" currency="THB" />');
+  write("pages/en-US/blog/hello.md", original);
+  write("pages/de-DE/blog/hello.md", original.replace('money="1299"', 'money="1300"'));
+  stamp(p, join(root, "pages/de-DE/blog/hello.md"));
+  expect(check(p).filter((l) => l.includes("components differ"))).toEqual([
+    'pages: de-DE: pages/de-DE/blog/hello.md: components differ: lacks <Fmt money="1299" currency="THB" />; has <Fmt money="1300" currency="THB" /> that the original doesn\'t',
+  ]);
 });
 
 test("stamp adds frontmatter to a page without any", () => {

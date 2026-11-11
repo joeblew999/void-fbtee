@@ -1,5 +1,10 @@
+<script>
+import Fmt from "../../../components/Fmt.tsx" with { island: "load" }
+</script>
+
 ---
-translatedFrom: "3716fb52d737"
+
+translatedFrom: "696bdc1fbe95"
 ---
 
 # ترجمة صفحات markdown
@@ -34,6 +39,16 @@ translatedFrom: "3716fb52d737"
 القارئ. ضع القيمة في مكوّن ينسّقها بـ`Intl`، واستورده جزيرةً في كتلة `<script>`. صفحة الجولة تفعل ذلك بـ
 `<EventTime startsAt="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />`: يظهر بلغة القارئ، بتوقيت مكان
 الفعالية وبتوقيته.
+
+ولقيمة واحدة يوجد `<Fmt>` (`components/Fmt.tsx`). هذه الصفحة تستخدمه، فكل سطر أدناه منسّق لك بلغة
+هذه الصفحة:
+
+- رقم: <Fmt num="1234567.891" />
+- مبلغ: <Fmt money="1299" currency="THB" />
+- وقت، بتوقيت مكانه: <Fmt when="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+- الوقت نفسه، بتوقيتك: <Fmt yours="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+- كم بقي عليه: <Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+- أسماء اللغات، بلغتك: <Fmt langs="en-US,ar-EG,th-TH" />
 
 ## translatedFrom
 

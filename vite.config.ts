@@ -26,6 +26,7 @@ export default defineConfig({
       // The example's tasks (apps/example/vite.config.ts), runnable from the root.
       login: { command: "vp run example#login", cache: false },
       deploy: { command: "vp run example#deploy", cache: false },
+      "deploy:atomic": { command: "vp run example#deploy:atomic", cache: false },
     },
   },
   lint: {

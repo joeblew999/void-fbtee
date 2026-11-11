@@ -30,6 +30,8 @@ export interface MarkdownPage {
   locale: string;
   /** Where the translation is, or should be. */
   file: string;
+  /** The original, under the source locale's folder. */
+  original: string;
   state: "ok" | "missing" | "stale" | "unrecorded";
 }
 
@@ -45,13 +47,41 @@ export function markdownPages(p: Project): MarkdownPage[] {
     .flatMap((l) =>
       files.map((path): MarkdownPage => {
         const file = join(pages, l.segment, path);
-        if (!existsSync(file)) return { path, locale: l.locale, file, state: "missing" };
+        const original = join(sourceDir, path);
+        if (!existsSync(file)) return { path, locale: l.locale, file, original, state: "missing" };
         const recorded = recordedHash(readFileSync(file, "utf8"));
-        const current = markdownHash(readFileSync(join(sourceDir, path), "utf8"));
+        const current = markdownHash(readFileSync(original, "utf8"));
         const state = !recorded ? "unrecorded" : recorded === current ? "ok" : "stale";
-        return { path, locale: l.locale, file, state };
+        return { path, locale: l.locale, file, original, state };
       }),
     );
+}
+
+/**
+ * What a translated copy must keep exactly as the original has it: the `<script>` block and every
+ * component tag (`<Fmt num="1234567.891" />`), props and all, whitespace collapsed.
+ */
+export function keptParts(text: string): string[] {
+  const squash = (s: string) => s.replace(/\s+/g, " ").trim();
+  const script = text.match(/<script\b[\s\S]*?<\/script>/)?.[0];
+  const body = script ? text.replace(script, "") : text;
+  const tags = [...body.matchAll(/<[A-Z][\w.]*\b[^>]*>/g)].map((m) => squash(m[0]));
+  return [...(script ? [squash(script)] : []), ...tags].sort();
+}
+
+/** The parts the copy lacks and the ones it has that the original doesn't, as one line. */
+function partsDiffer(original: string, copy: string): string | undefined {
+  const want = keptParts(original);
+  const have = keptParts(copy);
+  const lacks = want.filter((x) => !have.includes(x));
+  const extra = have.filter((x) => !want.includes(x));
+  if (!lacks.length && !extra.length) return undefined;
+  return [
+    lacks.length && `lacks ${lacks.join(", ")}`,
+    extra.length && `has ${extra.join(", ")} that the original doesn't`,
+  ]
+    .filter(Boolean)
+    .join("; ");
 }
 
 const firstFile = (dir: string, names: string[]) =>
@@ -112,6 +142,16 @@ export function check(p: Project): string[] {
       unrecorded: `doesn't record which original it was translated from (${TRANSLATED_FROM})`,
     }[page.state];
     if (what) problems.push(`pages: ${page.locale}: ${rel(page.file)}: ${what}`);
+    // Components and the script block are data, the same in every copy (an out-of-date copy is
+    // reported above, and is redone from the original anyway).
+    if (page.state === "ok" || page.state === "unrecorded") {
+      const differ = partsDiffer(
+        readFileSync(page.original, "utf8"),
+        readFileSync(page.file, "utf8"),
+      );
+      if (differ)
+        problems.push(`pages: ${page.locale}: ${rel(page.file)}: components differ: ${differ}`);
+    }
   }
   return problems;
 }

@@ -59,8 +59,12 @@ reach the example by themselves: `vp run dev` rebuilds the package on save, and 
 build (`vp run -t example#build`) and `vp run deploy` build it first. Each commit is checked first
 (`vp staged`, a Vite+ commit hook that `vp install` sets up).
 
-To deploy the example to Cloudflare, `vp run deploy`. The first time on a machine it asks you to
-sign in (`vp run login` does only that). Then:
+To deploy the example to Cloudflare, `vp run deploy`. Once per machine, `vp run login` first: it
+signs you in to Cloudflare and points the project at your account (Void's `void connect`), which
+deploys and Void's remote database commands (`void db execute --remote`) use. When a change adds
+or changes a Durable Object class, Void stops and asks for an atomic deploy: `vp run
+deploy:atomic`. Deploying applies new database migrations; Void saves a restore point first and
+prints the command to go back. Then:
 
 - the site: https://void-fbtee-example.gedw99.workers.dev
 - the Worker in the Cloudflare dashboard (deployments, logs, settings):
@@ -68,7 +72,7 @@ sign in (`vp run login` does only that). Then:
 
 In a Claude cloud session, `.claude/hooks/cloud-session.sh` runs `mise install` and starts a
 keyring for the sign-in, so Claude runs the same commands. A new session needs one sign-in: Claude runs
-`vp run login` (inside `script`, as void's sign-in wants a terminal), which prints Cloudflare's link, and you click Allow.
+`vp run login` (inside `script`, as Void's sign-in wants a terminal), which prints Cloudflare's link, and you click Allow.
 
 ## Tools that set this repo up
 

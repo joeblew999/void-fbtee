@@ -1,5 +1,10 @@
+<script>
+import Fmt from "../../../components/Fmt.tsx" with { island: "load" }
+</script>
+
 ---
-translatedFrom: "3716fb52d737"
+
+translatedFrom: "696bdc1fbe95"
 ---
 
 # การแปลหน้า markdown
@@ -35,6 +40,16 @@ translatedFrom: "3716fb52d737"
 โดย import เป็นไอแลนด์ในบล็อก `<script>` หน้าทัวร์ทำแบบนี้ด้วย
 `<EventTime startsAt="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />`: แสดงเป็นภาษาของผู้อ่าน
 ตามนาฬิกาของกิจกรรมและของผู้อ่าน
+
+สำหรับค่าเดียวมี `<Fmt>` (`components/Fmt.tsx`) หน้านี้ใช้มัน ทุกบรรทัดด้านล่างจึงจัดรูปแบบให้คุณ
+เป็นภาษาของหน้านี้:
+
+- ตัวเลข: <Fmt num="1234567.891" />
+- เงิน: <Fmt money="1299" currency="THB" />
+- เวลาตามนาฬิกาของสถานที่: <Fmt when="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+- เวลาเดียวกันตามนาฬิกาของคุณ: <Fmt yours="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+- อีกนานเท่าไร: <Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+- ชื่อภาษาในภาษาของคุณ: <Fmt langs="en-US,ar-EG,th-TH" />
 
 ## translatedFrom
 

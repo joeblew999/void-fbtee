@@ -11,11 +11,19 @@ export default defineConfig({
   // package.json; `vp run -t example#build` builds void-fbtee first.
   run: {
     tasks: {
-      // Sign in to Cloudflare (void keeps the sign-in in the system keyring).
-      login: { command: "void cloudflare login", cache: false },
+      // Sign in to Cloudflare if needed, and point this project at your account (Void's own
+      // command; once per machine): deploys and `void db … --remote` then use it.
+      login: { command: "void connect --platform cloudflare", cache: false },
       // Deploy to Cloudflare: https://void-fbtee-example.gedw99.workers.dev (void-fbtee built first).
       deploy: {
         command: "void deploy --platform cloudflare",
+        cache: false,
+        dependsOn: [{ task: "build", from: "dependencies" }],
+      },
+      // The same, all at once: Void asks for this when a Durable Object class changes (it stops
+      // and says so). Traffic moves before the readiness check, so only when it asks.
+      "deploy:atomic": {
+        command: "void deploy --platform cloudflare --atomic",
         cache: false,
         dependsOn: [{ task: "build", from: "dependencies" }],
       },
