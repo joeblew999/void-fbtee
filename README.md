@@ -23,7 +23,9 @@ Every day:
 vp run dev               # develop: the package rebuilds on save, the example runs
 vp check                 # format, lint, types
 vp test run              # every test, on a local build; report: .vitest/index.html
-vp run deploy            # deploy the example to production (Cloudflare); log: ~/.void/logs/
+vp run deploy            # deploy the example to production (Cloudflare), with no downtime:
+                         # Void uploads the new version, checks it's ready, then moves traffic
+                         # to it; log: ~/.void/logs/
 vp run test:production   # every test, against production; report: .vitest/index.html
 ```
 
