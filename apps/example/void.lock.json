@@ -11,7 +11,16 @@
         "binding": "ISR_CACHE",
         "id": "aed8524aaceb4369b8c9705d4480191a"
       }
-    ]
+    ],
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "void-fbtee-example-db",
+        "database_id": "a61a1673-1b3d-4fc6-9e38-62acce3abedc",
+        "migrations_dir": "./db/migrations"
+      }
+    ],
+    "compatibility_date": "2026-02-24"
   },
-  "text": "{\n  \"name\": \"void-fbtee-example\",\n  \"account_id\": \"7384af54e33b8a54ff240371ea368440\",\n  \"kv_namespaces\": [\n    {\n      \"binding\": \"ISR_CACHE\",\n      \"id\": \"aed8524aaceb4369b8c9705d4480191a\"\n    }\n  ]\n}\n"
+  "text": "{\n  \"name\": \"void-fbtee-example\",\n  \"account_id\": \"7384af54e33b8a54ff240371ea368440\",\n  \"kv_namespaces\": [\n    {\n      \"binding\": \"ISR_CACHE\",\n      \"id\": \"aed8524aaceb4369b8c9705d4480191a\"\n    }\n  ],\n  \"d1_databases\": [\n    {\n      \"binding\": \"DB\",\n      \"database_name\": \"void-fbtee-example-db\",\n      \"database_id\": \"a61a1673-1b3d-4fc6-9e38-62acce3abedc\",\n      \"migrations_dir\": \"./db/migrations\"\n    }\n  ],\n  \"compatibility_date\": \"2026-02-24\"\n}\n"
 }
