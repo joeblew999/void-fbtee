@@ -19,8 +19,9 @@ import { init } from "./init";
 import {
   AGENT_TOOLS,
   hasClaude,
-  packageManager,
+  insideClaudeCode,
   runClaude,
+  runner,
   stamp,
   translateTask,
 } from "./translate";
@@ -113,10 +114,15 @@ async function translate(p: Awaited<ReturnType<typeof loadProject>>, root: strin
   const task = translateTask(p);
   if (!task) {
     console.log("nothing to translate");
-  } else if (!hasClaude()) {
+  } else if (insideClaudeCode() || !hasClaude()) {
+    // Inside Claude Code already (it sets CLAUDECODE=1 in its shell): that agent does the work.
+    // A second `claude -p` started there has no sign-in of its own in a Claude cloud session, and
+    // on a laptop it would be a second agent without the first one's context.
     console.log(
-      "\nClaude Code (claude) isn't installed here. Give this prompt to your coding agent, then run\n" +
-        `${packageManager(root)} exec void-fbtee stamp <each translated page> and void-fbtee check:\n`,
+      (insideClaudeCode()
+        ? "\nYou're running in Claude Code, so translate in this session: follow this prompt, then run\n"
+        : "\nClaude Code (claude) isn't installed here. Give this prompt to your coding agent, then run\n") +
+        `${runner(root)} exec void-fbtee stamp <each translated page> and void-fbtee check:\n`,
     );
     console.log(task.prompt);
     process.exitCode = 1;

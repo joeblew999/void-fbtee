@@ -5,8 +5,12 @@ description: Translate a Void app that uses void-fbtee (fbtee strings in i18n/tr
 
 # Translate a Void app with void-fbtee
 
-Commands: `void-fbtee --help` (run them through the app's package manager, e.g.
-`pnpm exec void-fbtee check`).
+Commands: `void-fbtee --help` (run them with `vp exec` in a Vite+ app, else through the app's
+package manager, e.g. `pnpm exec void-fbtee check`).
+
+`void-fbtee translate` hands this work to Claude Code (`claude -p`). Run inside Claude Code, it
+doesn't start a second one: it prints the prompt for the session it runs in. Then you do the work
+here, by this skill.
 
 ## Strings
 

@@ -103,6 +103,18 @@ export function packageManager(root: string): "pnpm" | "npm" {
   return "npm";
 }
 
+/** How to run a package's command in the app: `vp exec` in a Vite+ app, else its package manager's. */
+export function runner(root: string): string {
+  try {
+    const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+    if (pkg.devDependencies?.["vite-plus"] ?? pkg.dependencies?.["vite-plus"]) return "vp";
+  } catch {}
+  return packageManager(root);
+}
+
+/** Running inside a Claude Code session (it sets CLAUDECODE=1 for the commands it runs). */
+export const insideClaudeCode = () => process.env.CLAUDECODE === "1";
+
 export const hasClaude = () => spawnSync("claude", ["--version"], { stdio: "ignore" }).status === 0;
 
 /** The tools the agent gets: read and edit files, nothing that runs commands. */
