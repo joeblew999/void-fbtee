@@ -18,5 +18,13 @@ export default defineConfig({
   },
   // `vp test`: the package's own tests, on test/fixture (a tiny app; each test works on a copy),
   // and init's on apps `void init` makes (test/void-init.ts).
-  test: { include: ["test/**/*.test.ts"], globalSetup: ["test/void-init.ts"] },
+  test: {
+    include: ["test/**/*.test.ts"],
+    globalSetup: ["test/void-init.ts"],
+    // As the browser tests: one file after another, no time limits; run before them.
+    fileParallelism: false,
+    testTimeout: 0,
+    hookTimeout: 0,
+    sequence: { groupOrder: 1 },
+  },
 });
