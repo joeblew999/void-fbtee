@@ -4,7 +4,7 @@ import Fmt from "../../../components/Fmt.tsx" with { island: "load" }
 
 ---
 
-translatedFrom: "696bdc1fbe95"
+translatedFrom: "5371cb36c3a2"
 ---
 
 # ترجمة صفحات markdown
@@ -48,7 +48,7 @@ translatedFrom: "696bdc1fbe95"
 - وقت، بتوقيت مكانه: <Fmt when="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
 - الوقت نفسه، بتوقيتك: <Fmt yours="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
 - كم بقي عليه: <Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
-- أسماء اللغات، بلغتك: <Fmt langs="en-US,ar-EG,th-TH" />
+- أسماء اللغات، بلغتك: <Fmt langs />
 
 ## translatedFrom
 

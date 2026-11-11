@@ -5,13 +5,26 @@
 //   <Fmt when="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />   on that place's clock
 //   <Fmt yours="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />  on the reader's clock
 //   <Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />    "in 115 days", from now
-//   <Fmt langs="en-US,ar-EG,th-TH" />               each language named in the reader's
+//   <Fmt langs />                                   this app's languages (void-fbtee's list), each
+//                                                   named in the reader's
 // The span carries the kind and value, so a test can check every one on every page.
-import { useLocale, useNow, useTimeZone } from "void-fbtee/react";
+import { useLocale, useLocales, useNow, useTimeZone } from "void-fbtee/react";
 import { fmt, type FmtProps } from "@/lib/fmt";
 
-export default function Fmt(props: FmtProps) {
+export default function Fmt({
+  langs,
+  ...rest
+}: Omit<FmtProps, "langs"> & { langs?: string | true }) {
   const { locale } = useLocale();
+  const locales = useLocales();
+  // `langs` with no value: the app's own languages, so no page lists them.
+  const props: FmtProps = {
+    ...rest,
+    // Markdown passes a bare attribute as "", JSX as true.
+    ...(langs !== undefined && {
+      langs: langs === true || langs === "" ? locales.map((l) => l.locale).join(",") : langs,
+    }),
+  };
   const zone = useTimeZone();
   const now = useNow();
   return (

@@ -44,7 +44,7 @@ is formatted for you, in this page's language:
 - A time, on its place's clock: <Fmt when="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
 - The same time, on yours: <Fmt yours="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
 - How far off it is: <Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
-- Languages, named in yours: <Fmt langs="en-US,ar-EG,th-TH" />
+- Languages, named in yours: <Fmt langs />
 
 ## translatedFrom
 

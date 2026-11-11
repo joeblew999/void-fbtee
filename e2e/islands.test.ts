@@ -27,6 +27,8 @@ test("Markdown pages: every <Fmt> value, formatted in the page's language and th
     for (let i = 0; i < (await values.count()); i++) {
       const props = JSON.parse((await values.nth(i).getAttribute("data-fmt"))!);
       const want = fmt(props, locale, "America/New_York", now);
+      // A <Fmt> that renders nothing is a mistake in the page, not a match.
+      expect(want, `${url} ${JSON.stringify(props)}`).not.toBe("");
       await expect
         .poll(() => values.nth(i).textContent(), { message: `${url} ${JSON.stringify(props)}` })
         .toBe(want);
