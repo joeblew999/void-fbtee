@@ -82,7 +82,7 @@ missing; where it can't safely edit a file it prints the line to add). The piece
 
 - `voidFbtee({ sourceLocale, locales })` from `void-fbtee/vite`, first in `plugins` in
   `vite.config.ts`.
-- `middleware/99.i18n.ts`: `export { default } from "void-fbtee/middleware";`.
+- `middleware/i18n.ts`: `export { default } from "void-fbtee/middleware";`.
 - `pages/layout.tsx` wraps its children in `<I18nProvider>` from `void-fbtee/react`.
 - `worker: { compatibility_flags: ["temporal"] }` in `void.config.ts`.
 - tsconfig: `"fbtee/ReactTypes"` in `compilerOptions.types`; `"lib"` with `ES2025`, `DOM`,

@@ -1,23 +1,84 @@
-// The site footer, in the root layout: what the example is made with.
-import { fbt, list } from "fbtee";
-import { Separator } from "@/components/ui/separator";
+// The site footer, in the root layout, in link columns as Void's own site has: the docs pages (from
+// the docs sidebar, so it matches), the project, and what the example is made with.
+import type { ReactNode } from "react";
+import { fbt } from "fbtee";
+import { Link, useLocale } from "void-fbtee/react";
+import { useDocs } from "@/components/DocsLayout";
+import { RELEASES, REPO } from "@/lib/project";
 
-// The tools' names, each in Unicode isolate marks (FSI … PDI): in a right-to-left sentence, a name
-// like "Vite+" keeps its "+" at its own end instead of the sentence's. Joined by fbtee's list(),
-// the language's own way.
-const TOOLS = ["Void", "Vite+", "fbtee", "Temporal", "shadcn/ui"].map((t) => `⁨${t}⁩`);
-// oxlint-disable-next-line no-base-to-string
-const tools = () => String(list(TOOLS));
+/** What the example is made with (names, not translated). */
+const TOOLS = [
+  ["Void", "https://void.cloud"],
+  ["Vite+", "https://viteplus.dev"],
+  ["fbtee", "https://github.com/nkzw-tech/fbtee"],
+  ["Temporal", "https://tc39.es/proposal-temporal/docs/"],
+  ["shadcn/ui", "https://ui.shadcn.com"],
+] as const;
+
+const linkClass =
+  "text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground";
+
+function Column({ title, children }: { title: ReactNode; children: ReactNode }) {
+  return (
+    <section>
+      <h2 className="text-sm font-semibold">{title}</h2>
+      <ul className="mt-3 space-y-2">{children}</ul>
+    </section>
+  );
+}
 
 export default function SiteFooter() {
+  const { locale } = useLocale();
+  const { groups, href } = useDocs();
   return (
-    <footer className="mt-12">
-      <Separator />
-      <p className="mx-auto max-w-6xl px-4 py-6 text-sm text-muted-foreground">
-        <fbt desc="Footer: the tools this example is built with; tools is a list of their names">
-          Built with <fbt:param name="tools">{tools()}</fbt:param>.
-        </fbt>
-      </p>
+    <footer className="mt-12 border-t">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:grid-cols-3">
+        <Column title={<fbt desc="Footer column heading: the documentation pages">Docs</fbt>}>
+          {groups
+            .flatMap((g) => g.entries)
+            .map((e) => (
+              <li key={e.slug}>
+                <Link href={href(e.slug) as never} className={linkClass}>
+                  {e.title}
+                </Link>
+              </li>
+            ))}
+        </Column>
+        <Column
+          title={
+            <fbt desc="Footer column heading: links about the void-fbtee project">Project</fbt>
+          }
+        >
+          <li>
+            <Link href={`/${locale}/events` as never} className={linkClass}>
+              <fbt desc="Navigation: the demo, the events app people post and book in">Demo</fbt>
+            </Link>
+          </li>
+          <li>
+            <a href={REPO} className={linkClass}>
+              GitHub
+            </a>
+          </li>
+          <li>
+            <a href={RELEASES} className={linkClass}>
+              <fbt desc="Footer link: the project's releases on GitHub">Releases</fbt>
+            </a>
+          </li>
+        </Column>
+        <Column
+          title={
+            <fbt desc="Footer column heading: the tools this example is built with">Built with</fbt>
+          }
+        >
+          {TOOLS.map(([name, url]) => (
+            <li key={name}>
+              <a href={url} className={linkClass}>
+                {name}
+              </a>
+            </li>
+          ))}
+        </Column>
+      </div>
     </footer>
   );
 }

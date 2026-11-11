@@ -1,12 +1,13 @@
 // The home page: the claim, the fbtee code of one line beside what it renders on this page, and
 // the example's pages. Translated strings with fbtee (a plural, a list in a sentence), and a line
 // that arrives after the shell (a defer() read), which must render in the page's language too.
-import { Suspense, use } from "react";
+import { Suspense, use, useState } from "react";
 import { fbt, list } from "fbtee";
 import { ArrowRight } from "lucide-react";
 import { Link, useLocale, useLocales } from "void-fbtee/react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { AddIt, Closing, Features, GitHubButton } from "@/components/HomeSections";
 import type { Props } from "./index.server";
 
 // fbtee's list(), joined to plain text first. A list inside a string (<fbt:list>, or list() in an
@@ -48,6 +49,36 @@ function Highlighted({ code }: { code: string }) {
   return <code>{parts}</code>;
 }
 
+/** The files in the code window: the line's code, the plugin that turns it on, and one of the
+    catalogs it produces (each an excerpt of the real file). */
+const FILES = [
+  { name: "index.tsx", code: CODE },
+  {
+    name: "vite.config.ts",
+    code: `import voidFbtee from "void-fbtee/vite";
+
+export default defineConfig({
+  plugins: [
+    voidFbtee({
+      sourceLocale: "en-US",
+      locales: ["en-US", "ar-EG", "th-TH"],
+    }),
+    voidPlugin(),
+  ],
+});`,
+  },
+  {
+    name: "th-TH.json",
+    code: `"d20AdENCUCFEupNI3bkyqg==": {
+  "description": "How many nights are booked",
+  "status": "translated",
+  "translations": [
+    { "translation": "คุณจองไว้ {number} คืน" }
+  ]
+}`,
+  },
+];
+
 /** A language's name in its own language: "English", "العربية", "ไทย". */
 const languageName = (locale: string) =>
   new Intl.DisplayNames(locale, { type: "language" }).of(new Intl.Locale(locale).language)!;
@@ -70,17 +101,53 @@ function Slow({ late }: { late: Props["late"] }) {
 /** The code window: the line's fbtee code, and below it the line as this page renders it. */
 function CodeWindow({ count, late }: Props) {
   const { locale } = useLocale();
+  const [open, setOpen] = useState(0);
   return (
     <figure className="overflow-hidden rounded-lg border bg-card shadow-[0_24px_60px_-24px_rgb(0_0_0/0.6)]">
       <figcaption className="flex items-center justify-between border-b">
-        <span className="border-e px-4 py-2.5 font-mono text-xs text-foreground">index.tsx</span>
-        <span className="px-4 text-xs text-muted-foreground">{languageName(locale)}</span>
+        <div role="tablist" dir="ltr" className="flex min-w-0 flex-1 overflow-x-auto">
+          {FILES.map((f, i) => (
+            <button
+              key={f.name}
+              type="button"
+              role="tab"
+              id={`file-${i}`}
+              aria-selected={i === open}
+              aria-controls="file-code"
+              tabIndex={i === open ? 0 : -1}
+              onClick={() => setOpen(i)}
+              onKeyDown={(e) => {
+                // The tabs pattern: one Tab stop, the arrow keys move between the files.
+                const step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+                if (!step) return;
+                e.preventDefault();
+                const next = (i + step + FILES.length) % FILES.length;
+                setOpen(next);
+                document.getElementById(`file-${next}`)?.focus();
+              }}
+              className={cn(
+                "shrink-0 border-e px-4 py-2.5 font-mono text-xs transition-colors duration-150 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring",
+                i === open
+                  ? "bg-background/60 text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {f.name}
+            </button>
+          ))}
+        </div>
+        <span className="hidden shrink-0 px-4 text-xs text-muted-foreground sm:inline">
+          {languageName(locale)}
+        </span>
       </figcaption>
       <pre
+        id="file-code"
+        role="tabpanel"
+        aria-labelledby={`file-${open}`}
         dir="ltr"
-        className="overflow-x-auto p-5 font-mono text-sm leading-relaxed [scrollbar-color:var(--border)_transparent]"
+        className="min-h-72 overflow-x-auto p-5 font-mono text-sm leading-relaxed [scrollbar-color:var(--border)_transparent]"
       >
-        <Highlighted code={CODE} />
+        <Highlighted code={FILES[open]!.code} />
       </pre>
       <div className="border-t bg-muted/40 p-5">
         {/* A fixed height: switching language changes the words, never the layout around them. */}
@@ -138,6 +205,7 @@ function Hero(props: Props) {
           >
             <fbt desc="Navigation: the documentation">Docs</fbt>
           </Link>
+          <GitHubButton />
         </div>
       </div>
       <CodeWindow {...props} />
@@ -203,7 +271,10 @@ export default function HomePage(props: Props) {
   return (
     <div>
       <Hero {...props} />
+      <AddIt />
+      <Features />
       <Pages />
+      <Closing />
     </div>
   );
 }

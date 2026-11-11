@@ -1,5 +1,5 @@
 // Void middleware: one request = one locale and one fbtee state.
-// The app re-exports it from middleware/99.i18n.ts (Void only finds middleware by file name):
+// The app re-exports it from middleware/i18n.ts (Void only finds middleware by file name):
 //
 //   export { default } from "void-fbtee/middleware";
 //

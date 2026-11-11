@@ -26,8 +26,7 @@ export function useLocale(): SharedI18n {
   // hydrating in the browser has only its props, so it reads the middleware's <meta> instead.
   const shared = useContext(SharedContext) as { i18n?: SharedI18n } | null;
   const i18n = shared?.i18n ?? documentI18n();
-  if (!i18n)
-    throw new Error("void-fbtee: shared.i18n is missing. Is middleware/99.i18n.ts set up?");
+  if (!i18n) throw new Error("void-fbtee: shared.i18n is missing. Is middleware/i18n.ts set up?");
   return i18n;
 }
 

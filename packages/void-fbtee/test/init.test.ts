@@ -62,7 +62,7 @@ test("wires void-fbtee into a Vite+ app, and a second run changes nothing", asyn
   expect(vite.endsWith(");\n")).toBe(true);
 
   expect(read(root, "void.config.ts")).toMatch(/compatibility_flags: \["temporal"\]/);
-  expect(read(root, "middleware/99.i18n.ts")).toContain(`from "void-fbtee/middleware"`);
+  expect(read(root, "middleware/i18n.ts")).toContain(`from "void-fbtee/middleware"`);
   expect(read(root, "pages/layout.tsx")).toContain("<I18nProvider>{children}</I18nProvider>");
   expect(existsSync(join(root, "i18n/translations"))).toBe(true);
 

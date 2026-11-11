@@ -1423,18 +1423,6 @@
       ],
       "types": []
     },
-    "LB5qRS7mqSOz2AWaPF1rHw==": {
-      "description": "Footer: the tools this example is built with; tools is a list of their names",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "مبني باستخدام {tools}.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "CH3XfQbtsw2ACBQd4yLJGg==": {
       "description": "Docs sidebar group: the first page to read",
       "status": "translated",
@@ -1538,6 +1526,438 @@
       "translations": [
         {
           "translation": "عرض توضيحي",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "r4IKuw5azKxSmaT1to8Vxg==": {
+      "description": "Home page section heading: how to install void-fbtee",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "أضفه إلى تطبيق Void",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1mDHR8oSgYcns8pzU3E7oA==": {
+      "description": "Home page link to the setup page of the docs",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "اقرأ خطوات الإعداد كاملة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uPAZSuG30yJgomrJUHscxw==": {
+      "description": "Home feature title: translated strings",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "النصوص، بواسطة fbtee",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Mi7KvJU4yazxSF0yc2+aDg==": {
+      "description": "Home feature fact about translated strings",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ضع علامة fbt على النصوص في مكوّناتك؛ ولكل لغة ملف فهرس خاص بها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qnFB+IIDm4Gl3YRnqnwJeg==": {
+      "description": "Home feature fact about plurals",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "صيغ الجمع تتبع قواعد كل لغة: للعربية ست صيغ.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EPORB6pVCBAyS1k9iojeYw==": {
+      "description": "Home feature fact about the check command",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يعرض void-fbtee check كل ما لم يُترجم بعد.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sjKkcyIzeAcfN6dmuNNMBw==": {
+      "description": "Home feature title: dates and times",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "التواريخ والأوقات، بواسطة Temporal",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Z18dFUo92yTODxTOj74iZg==": {
+      "description": "Home feature fact about times and time zones",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "كل وقت يظهر بتوقيت مكانه وبتوقيت القارئ.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "22R3BWXFqX8yXBs1Gxh41w==": {
+      "description": "Home feature fact about daylight saving time",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "التوقيت الصيفي محسوب لذلك التاريخ نفسه، لا لليوم.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3psdWa+GK46B490i3KleuQ==": {
+      "description": "Home feature fact: Temporal runs natively on Cloudflare",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Temporal المدمج في Cloudflare على الـ Worker.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/s93hh9vqUCZEcDcAH6YJA==": {
+      "description": "Home feature title: numbers and other formats",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الأرقام وكل ما عداها، بواسطة Intl",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SBDZza5p69hRnrnpACDRTQ==": {
+      "description": "Home feature fact about the Intl formats",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الأرقام والعملات ووحدات القياس والقوائم والأسماء من Intl الخاص بالمنصة.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DmqGxHb9es+9U2UWl1iZLQ==": {
+      "description": "Home feature fact: server and browser format alike",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "النتيجة نفسها على الـ Worker وفي المتصفح.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rGA2sEdvXM8TzENm3eRJLQ==": {
+      "description": "Home feature fact: no locale data in the app's bundle",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لا بيانات لغوية لإرسالها: المنصة تملكها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qoffyYuCF9Wq02kyuS/PGA==": {
+      "description": "Home feature title: translated markdown pages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "صفحات markdown مترجمة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SjxKJHxSSe+ArVBVsUjLmg==": {
+      "description": "Home feature fact about where translated markdown pages are",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "نسخة من كل صفحة لكل لغة، تحت ⁨pages/⁩ ثم اسم اللغة.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nKuYg7h0hnsbJw8ektkJ2w==": {
+      "description": "Home feature fact about out-of-date translated pages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يُبلَّغ عن النسخة بأنها قديمة عندما يتغير أصلها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xHMRN0XLJs7RmbCydFWFGA==": {
+      "description": "Home feature fact about dates and numbers inside markdown pages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "التواريخ والأرقام في الصفحة تُنسَّق لكل قارئ.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UNGENmBfbH2jubY2hOm1UQ==": {
+      "description": "Home feature title: machine translation",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يترجمها الذكاء الاصطناعي، وتراجعها أنت",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "G7RXnz19kUZWTq5YW/DqhQ==": {
+      "description": "Home feature fact about the translate command (vp run i18n:translate)",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يسلّم vp run i18n:translate العمل إلى Claude Code مع مهارة void-fbtee.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cLHgEo25WrhEIYVsOQg+Hw==": {
+      "description": "Home feature fact: translations are files in the app's repository",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الترجمات ملفات في مستودعك، جاهزة للمراجعة.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XrZbF/1kCVzdQSUsXFfG6g==": {
+      "description": "Home feature fact: the demo translates what people post with Workers AI",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "في العرض التوضيحي، يترجم Workers AI ما ينشره الناس.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6uTUKKFe9hZt2kh1Xrj86A==": {
+      "description": "Home feature title: right-to-left languages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "كل اللغات، ومنها ما يُكتب من اليمين إلى اليسار",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0+6Iq11NYcCJ+uDy7/PqnA==": {
+      "description": "Home feature fact: the middleware sets the page's language and direction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يضبط الـ middleware قيمتي lang وdir للصفحة من الرابط.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eGIqKsERRp8K5kgis80MWQ==": {
+      "description": "Home feature fact about one address per language for search engines",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "رابط لكل لغة، مع روابط hreflang لمحركات البحث.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kVhM+CK26wd8XAPPfI2OGg==": {
+      "description": "Home feature fact: this site mirrors in Arabic",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ينعكس هذا الموقع بالعربية، لأنه مبني على البداية والنهاية، لا على اليسار واليمين.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fykgbnzGpf5GpLV7UBKJzw==": {
+      "description": "Home page section heading over the list of features",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "كل ما يحتاجه تطبيق Void ليتحدث كل اللغات",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Q+0QGT6iYNlMZlBgDqRzqA==": {
+      "description": "Home page: link from a feature to the docs page about it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "اقرأ المزيد",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BZZazFJe6vI4eA2kaQFieQ==": {
+      "description": "Button: open void-fbtee's code on GitHub",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "اعرضه على GitHub",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "b9Kyosa3J9PZxDexO55V2w==": {
+      "description": "Button: start with the setup page of the docs",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ابدأ الآن",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "V89sDqXgTZmT3ns8pdDdjg==": {
+      "description": "Footer column heading: the documentation pages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "التوثيق",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "A6TDmycq7yBlxeKyYOytYA==": {
+      "description": "Footer column heading: links about the void-fbtee project",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المشروع",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ErUa3WEq8TmzE91xxjgvPQ==": {
+      "description": "Footer link: the project's releases on GitHub",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الإصدارات",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lA4Xg52VghMOLVP1ogXVWA==": {
+      "description": "Footer column heading: the tools this example is built with",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مبني باستخدام",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KzkjAkRRUHUc+Khepmx5Xg==": {
+      "description": "Caption of a window showing commands typed in a terminal",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الطرفية",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hhR1x6vVuOTbvaY+I1JJHg==": {
+      "description": "Home page: what to do before running the install commands shown beside it; packageJson and workspace are file names",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "أضف إصدار GitHub إلى {packageJson} الخاص بالتطبيق واسمح ببنائه في {workspace}، ثم شغّل هذه الأوامر. يضيف init ما ينقص فقط، ويملأ translate كل اللغات.",
           "variations": {}
         }
       ],

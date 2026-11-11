@@ -22,7 +22,7 @@ const write = (path: string, text: string) => {
   writeFileSync(join(root, path), text);
 };
 const setUp = () => {
-  write("middleware/99.i18n.ts", `export { default } from "void-fbtee/middleware";\n`);
+  write("middleware/i18n.ts", `export { default } from "void-fbtee/middleware";\n`);
   write(
     "pages/layout.tsx",
     `export default ({ children }) => <I18nProvider>{children}</I18nProvider>;\n`,

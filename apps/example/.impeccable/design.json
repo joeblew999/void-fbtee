@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-11T10:32:40.886Z",
+  "generatedAt": "2026-11-11T11:07:24.000Z",
   "title": "Design System: void-fbtee example",
   "extensions": {
     "colorMeta": {
@@ -142,7 +142,7 @@
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Inner page titles (Events, an event, Formats)."
+        "purpose": "Inner page titles (Events, an event, Formats); docs index at 2.25rem; home section headings 1.875rem to 2.25rem."
       },
       "title": {
         "displayName": "Title",
@@ -158,18 +158,22 @@
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Buttons; nav items at 0.8rem; file tab at 0.75rem."
+        "purpose": "Buttons and inline violet links; nav items at 0.8rem; file tabs at 0.75rem."
       },
       "code": {
         "displayName": "Code",
-        "purpose": "Code windows, always dir=ltr."
+        "purpose": "Code and terminal windows, always dir=ltr."
+      },
+      "subtitle": {
+        "displayName": "Subtitle",
+        "purpose": "Feature headings and docs index group headings."
       }
     },
     "shadows": [
       {
-        "name": "code-window-lift",
+        "name": "window-lift",
         "value": "0 24px 60px -24px rgb(0 0 0 / 0.6)",
-        "purpose": "The home code window only; everything else is flat."
+        "purpose": "The home code window and terminal window only; everything else is flat."
       },
       {
         "name": "focus-ring",
@@ -192,6 +196,16 @@
         "name": "control-default",
         "value": "all 150ms cubic-bezier(0.4, 0, 0.2, 1)",
         "purpose": "Tailwind's default transition on buttons and badges."
+      },
+      {
+        "name": "chevron-turn",
+        "value": "transform 200ms",
+        "purpose": "The docs phone menu's chevron turning 180 degrees when open."
+      },
+      {
+        "name": "link-color",
+        "value": "color 150ms, border-color 150ms",
+        "purpose": "List links to white ink, docs previous/next borders to violet, on hover."
       }
     ],
     "breakpoints": [
@@ -206,6 +220,10 @@
       {
         "name": "lg",
         "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
       }
     ]
   },
@@ -222,7 +240,7 @@
       "name": "Outline Button",
       "kind": "button",
       "refersTo": "button-outline",
-      "description": "The secondary action beside the primary (Docs).",
+      "description": "The secondary actions beside the primary (Docs, View on GitHub).",
       "html": "<a class=\"ds-btn-outline\" href=\"#\">Docs</a>",
       "css": ".ds-btn-outline { display: inline-flex; align-items: center; height: 44px; padding: 0 20px; background: color-mix(in oklch, oklch(1 0 0 / 16%) 30%, oklch(0.2 0.012 275)); color: oklch(0.985 0 0); font: 500 0.875rem/1.43 system-ui, sans-serif; border: 1px solid oklch(1 0 0 / 16%); border-radius: 0.375rem; text-decoration: none; transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-outline:hover { background: color-mix(in oklch, oklch(1 0 0 / 16%) 50%, oklch(0.2 0.012 275)); } .ds-btn-outline:focus-visible { outline: none; border-color: oklch(0.68 0.19 285); box-shadow: 0 0 0 3px color-mix(in oklch, oklch(0.68 0.19 285) 50%, transparent); } .ds-btn-outline:active { transform: translateY(1px); }"
     },
@@ -230,9 +248,9 @@
       "name": "Header Navigation",
       "kind": "nav",
       "refersTo": "nav-item",
-      "description": "Sticky header: wordmark, page links as small ghost buttons, languages named in their own language.",
-      "html": "<header class=\"ds-nav\"><a class=\"ds-nav-mark\" href=\"#\">void-fbtee</a><nav class=\"ds-nav-links\"><a class=\"ds-nav-item\" aria-current=\"page\" href=\"#\">Home</a><a class=\"ds-nav-item\" href=\"#\">Tour</a><a class=\"ds-nav-item\" href=\"#\">Events</a><a class=\"ds-nav-item\" href=\"#\">Docs</a></nav><div class=\"ds-nav-langs\"><a class=\"ds-nav-item ds-lang\" aria-current=\"true\" href=\"#\">English</a><a class=\"ds-nav-item ds-lang\" lang=\"ar\" href=\"#\">العربية</a><a class=\"ds-nav-item ds-lang\" lang=\"th\" href=\"#\">ไทย</a></div></header>",
-      "css": ".ds-nav { display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 16px; background: oklch(0.2 0.012 275); border-bottom: 1px solid oklch(1 0 0 / 12%); font-family: system-ui, sans-serif; } .ds-nav-mark { color: oklch(0.985 0 0); font-weight: 600; letter-spacing: -0.025em; text-decoration: none; padding-inline-end: 8px; } .ds-nav-links, .ds-nav-langs { display: flex; gap: 4px; } .ds-nav-langs { margin-inline-start: auto; } .ds-nav-item { display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border-radius: 0.3rem; color: oklch(0.985 0 0); font: 500 0.8rem/1 system-ui, sans-serif; text-decoration: none; transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-item:hover { background: color-mix(in oklch, oklch(0.25 0.012 275) 50%, transparent); } .ds-nav-item[aria-current=page] { background: oklch(0.27 0.014 275); } .ds-nav-item:focus-visible { outline: none; border-color: oklch(0.68 0.19 285); box-shadow: 0 0 0 3px color-mix(in oklch, oklch(0.68 0.19 285) 50%, transparent); } .ds-lang { color: oklch(0.74 0.012 275); } .ds-lang[aria-current=true] { color: oklch(0.985 0 0); text-decoration: underline; text-decoration-color: oklch(0.68 0.19 285); text-decoration-thickness: 2px; text-underline-offset: 8px; }"
+      "description": "Sticky header: wordmark, Home · Demo · Docs as small ghost buttons, languages named in their own language, then a GitHub link after a start rule.",
+      "html": "<header class=\"ds-nav\"><a class=\"ds-nav-mark\" href=\"#\">void-fbtee</a><nav class=\"ds-nav-links\"><a class=\"ds-nav-item\" aria-current=\"page\" href=\"#\">Home</a><a class=\"ds-nav-item\" href=\"#\">Demo</a><a class=\"ds-nav-item\" href=\"#\">Docs</a></nav><div class=\"ds-nav-langs\"><a class=\"ds-nav-item ds-lang\" aria-current=\"true\" href=\"#\">English</a><a class=\"ds-nav-item ds-lang\" lang=\"ar\" href=\"#\">العربية</a><a class=\"ds-nav-item ds-lang\" lang=\"th\" href=\"#\">ไทย</a><a class=\"ds-nav-item ds-nav-gh\" href=\"#\">GitHub</a></div></header>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 16px; background: oklch(0.2 0.012 275); border-bottom: 1px solid oklch(1 0 0 / 12%); font-family: system-ui, sans-serif; } .ds-nav-mark { color: oklch(0.985 0 0); font-weight: 600; letter-spacing: -0.025em; text-decoration: none; padding-inline-end: 8px; } .ds-nav-links, .ds-nav-langs { display: flex; gap: 4px; } .ds-nav-langs { margin-inline-start: auto; } .ds-nav-item { display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border-radius: 0.3rem; color: oklch(0.985 0 0); font: 500 0.8rem/1 system-ui, sans-serif; text-decoration: none; transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-item:hover { background: color-mix(in oklch, oklch(0.25 0.012 275) 50%, transparent); } .ds-nav-item[aria-current=page] { background: oklch(0.27 0.014 275); } .ds-nav-item:focus-visible { outline: none; border-color: oklch(0.68 0.19 285); box-shadow: 0 0 0 3px color-mix(in oklch, oklch(0.68 0.19 285) 50%, transparent); } .ds-lang { color: oklch(0.74 0.012 275); } .ds-lang[aria-current=true] { color: oklch(0.985 0 0); text-decoration: underline; text-decoration-color: oklch(0.68 0.19 285); text-decoration-thickness: 2px; text-underline-offset: 8px; } .ds-nav-gh { margin-inline-start: 8px; padding-inline-start: 16px; border-inline-start: 1px solid oklch(1 0 0 / 12%); border-radius: 0; color: oklch(0.74 0.012 275); }"
     },
     {
       "name": "Text Input",
@@ -262,9 +280,25 @@
       "name": "Code Window",
       "kind": "custom",
       "refersTo": "code-window",
-      "description": "Signature: file tab, LTR code coloured like Void's site, and the line as rendered in this language.",
-      "html": "<figure class=\"ds-code\"><figcaption class=\"ds-code-bar\"><span class=\"ds-code-tab\">index.tsx</span><span class=\"ds-code-lang\">English</span></figcaption><pre class=\"ds-code-pre\" dir=\"ltr\"><code><span class=\"t\">&lt;fbt</span> <span class=\"a\">desc</span>=<span class=\"s\">\"How many nights are booked\"</span><span class=\"t\">&gt;</span>\n  You booked<span class=\"s\">{\" \"}</span>\n  <span class=\"t\">&lt;fbt:plural</span>\n    <span class=\"a\">count</span>=<span class=\"s\">{count}</span>\n    <span class=\"a\">many</span>=<span class=\"s\">\"nights\"</span>\n    <span class=\"a\">showCount</span>=<span class=\"s\">\"yes\"</span>\n  <span class=\"t\">&gt;</span>\n    night\n  <span class=\"t\">&lt;/fbt:plural</span><span class=\"t\">&gt;</span>\n<span class=\"t\">&lt;/fbt</span><span class=\"t\">&gt;</span></code></pre><div class=\"ds-code-out\">You booked 3 nights</div></figure>",
-      "css": ".ds-code { margin: 0; overflow: hidden; background: oklch(0.225 0.012 275); border: 1px solid oklch(1 0 0 / 12%); border-radius: 0.375rem; box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.6); color: oklch(0.74 0.012 275); } .ds-code-bar { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid oklch(1 0 0 / 12%); } .ds-code-tab { padding: 10px 16px; border-inline-end: 1px solid oklch(1 0 0 / 12%); color: oklch(0.985 0 0); font: 400 0.75rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace; } .ds-code-lang { padding: 0 16px; color: oklch(0.74 0.012 275); font: 400 0.75rem/1 system-ui, sans-serif; } .ds-code-pre { margin: 0; padding: 20px; overflow-x: auto; font: 400 0.875rem/1.625 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace; scrollbar-color: oklch(1 0 0 / 12%) transparent; } .ds-code .t { color: oklch(0.68 0.19 285); } .ds-code .a { color: oklch(0.985 0 0); } .ds-code .s { color: oklch(0.74 0.012 275); } .ds-code-out { padding: 20px; min-height: 4rem; border-top: 1px solid oklch(1 0 0 / 12%); background: color-mix(in oklch, oklch(0.25 0.012 275) 40%, oklch(0.225 0.012 275)); color: oklch(0.985 0 0); font: 500 1.5rem/1.33 system-ui, sans-serif; }"
+      "description": "Signature: three file tabs (ARIA tabs, dir=ltr), LTR code coloured like Void's site, and the line as rendered in this language.",
+      "html": "<figure class=\"ds-code\"><figcaption class=\"ds-code-bar\"><div class=\"ds-code-tabs\" role=\"tablist\" dir=\"ltr\"><button class=\"ds-code-tab\" role=\"tab\" aria-selected=\"true\">index.tsx</button><button class=\"ds-code-tab\" role=\"tab\" aria-selected=\"false\" tabindex=\"-1\">vite.config.ts</button><button class=\"ds-code-tab\" role=\"tab\" aria-selected=\"false\" tabindex=\"-1\">th-TH.json</button></div><span class=\"ds-code-lang\">English</span></figcaption><pre class=\"ds-code-pre\" role=\"tabpanel\" dir=\"ltr\"><code><span class=\"t\">&lt;fbt</span> <span class=\"a\">desc</span>=<span class=\"s\">\"How many nights are booked\"</span><span class=\"t\">&gt;</span>\n  You booked<span class=\"s\">{\" \"}</span>\n  <span class=\"t\">&lt;fbt:plural</span>\n    <span class=\"a\">count</span>=<span class=\"s\">{count}</span>\n    <span class=\"a\">many</span>=<span class=\"s\">\"nights\"</span>\n    <span class=\"a\">showCount</span>=<span class=\"s\">\"yes\"</span>\n  <span class=\"t\">&gt;</span>\n    night\n  <span class=\"t\">&lt;/fbt:plural</span><span class=\"t\">&gt;</span>\n<span class=\"t\">&lt;/fbt</span><span class=\"t\">&gt;</span></code></pre><div class=\"ds-code-out\">You booked 3 nights</div></figure>",
+      "css": ".ds-code { margin: 0; overflow: hidden; background: oklch(0.225 0.012 275); border: 1px solid oklch(1 0 0 / 12%); border-radius: 0.375rem; box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.6); color: oklch(0.74 0.012 275); } .ds-code-bar { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid oklch(1 0 0 / 12%); } .ds-code-tabs { display: flex; min-width: 0; flex: 1; overflow-x: auto; } .ds-code-tab { flex-shrink: 0; padding: 10px 16px; background: none; border: 0; border-inline-end: 1px solid oklch(1 0 0 / 12%); color: oklch(0.74 0.012 275); cursor: pointer; transition: color 150ms, background-color 150ms; font: 400 0.75rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace; } .ds-code-lang { padding: 0 16px; color: oklch(0.74 0.012 275); font: 400 0.75rem/1 system-ui, sans-serif; } .ds-code-pre { margin: 0; padding: 20px; overflow-x: auto; font: 400 0.875rem/1.625 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace; scrollbar-color: oklch(1 0 0 / 12%) transparent; } .ds-code .t { color: oklch(0.68 0.19 285); } .ds-code .a { color: oklch(0.985 0 0); } .ds-code .s { color: oklch(0.74 0.012 275); } .ds-code-out { padding: 20px; min-height: 4rem; border-top: 1px solid oklch(1 0 0 / 12%); background: color-mix(in oklch, oklch(0.25 0.012 275) 40%, oklch(0.225 0.012 275)); color: oklch(0.985 0 0); font: 500 1.5rem/1.33 system-ui, sans-serif; } .ds-code-tab[aria-selected=true] { background: color-mix(in oklch, oklch(0.2 0.012 275) 60%, transparent); color: oklch(0.985 0 0); } .ds-code-tab:hover { color: oklch(0.985 0 0); } .ds-code-tab:focus-visible { outline: 2px solid oklch(0.68 0.19 285); outline-offset: -2px; } .ds-code-pre { min-height: 18rem; }"
+    },
+    {
+      "name": "Terminal Window",
+      "kind": "custom",
+      "refersTo": "terminal-window",
+      "description": "Signature: the README's install commands, violet $ prompts, words never broken, hanging indent on a phone.",
+      "html": "<figure class=\"ds-term\"><figcaption class=\"ds-term-bar\">Terminal</figcaption><pre class=\"ds-term-pre\" dir=\"ltr\"><code><span class=\"ds-term-line\"><span class=\"ds-term-p\">$ </span><span class=\"w\">vp</span> <span class=\"w\">install</span></span><span class=\"ds-term-line\"><span class=\"ds-term-p\">$ </span><span class=\"w\">vp</span> <span class=\"w\">exec</span> <span class=\"w\">void-fbtee</span> <span class=\"w\">init</span> <span class=\"w\">--locales</span> <span class=\"w\">ar-EG,th-TH</span></span><span class=\"ds-term-line\"><span class=\"ds-term-p\">$ </span><span class=\"w\">vp</span> <span class=\"w\">install</span></span><span class=\"ds-term-line\"><span class=\"ds-term-p\">$ </span><span class=\"w\">vp</span> <span class=\"w\">run</span> <span class=\"w\">i18n:translate</span></span></code></pre></figure>",
+      "css": ".ds-term { margin: 0; overflow: hidden; background: oklch(0.225 0.012 275); border: 1px solid oklch(1 0 0 / 12%); border-radius: 0.375rem; box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.6); color: oklch(0.985 0 0); } .ds-term-bar { padding: 10px 16px; border-bottom: 1px solid oklch(1 0 0 / 12%); color: oklch(0.74 0.012 275); font: 400 0.75rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace; } .ds-term-pre { margin: 0; padding: 20px; white-space: pre-wrap; font: 400 0.875rem/2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace; } .ds-term-line { display: block; padding-inline-start: 2ch; text-indent: -2ch; } .ds-term-p { color: oklch(0.68 0.19 285); user-select: none; } .ds-term .w { white-space: nowrap; }"
+    },
+    {
+      "name": "Feature Grid",
+      "kind": "custom",
+      "refersTo": "feature-cell",
+      "description": "Signature: features in a gap-px ruled grid, each with a violet icon, three dotted facts and a Read more link.",
+      "html": "<div class=\"ds-feat\"><article class=\"ds-feat-cell\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m5 8 6 6\"/><path d=\"m4 14 6-6 2-3\"/><path d=\"M2 5h12\"/><path d=\"M7 2h1\"/><path d=\"m22 22-5-10-5 10\"/><path d=\"M14 18h6\"/></svg><h3>Strings, by fbtee</h3><ul><li><span class=\"dot\"></span><span>Mark text with fbt in your components; each language gets a catalog file.</span></li><li><span class=\"dot\"></span><span>Plurals follow each language's own rules: Arabic has six forms.</span></li><li><span class=\"dot\"></span><span>void-fbtee check lists anything still untranslated.</span></li></ul><a class=\"ds-link\" href=\"#\">Read more <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></article><article class=\"ds-feat-cell\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m5 8 6 6\"/><path d=\"m4 14 6-6 2-3\"/><path d=\"M2 5h12\"/><path d=\"M7 2h1\"/><path d=\"m22 22-5-10-5 10\"/><path d=\"M14 18h6\"/></svg><h3>Numbers and the rest, by Intl</h3><ul><li><span class=\"dot\"></span><span>Numbers, money, units, lists and names from the platform's own Intl.</span></li><li><span class=\"dot\"></span><span>The same result on the Worker and in the browser.</span></li><li><span class=\"dot\"></span><span>No locale data to ship: the platform has it.</span></li></ul><a class=\"ds-link\" href=\"#\">Read more <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></article></div>",
+      "css": ".ds-feat { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: oklch(1 0 0 / 12%); border-block: 1px solid oklch(1 0 0 / 12%); font-family: system-ui, sans-serif; } .ds-feat-cell { display: flex; flex-direction: column; padding: 24px; background: oklch(0.2 0.012 275); } .ds-feat-cell > svg { color: oklch(0.68 0.19 285); } .ds-feat-cell h3 { margin: 16px 0 0; color: oklch(0.985 0 0); font-size: 1.125rem; font-weight: 500; } .ds-feat-cell ul { flex: 1; margin: 12px 0 0; padding: 0; list-style: none; color: oklch(0.74 0.012 275); font-size: 0.875rem; line-height: 1.43; } .ds-feat-cell li { display: flex; gap: 8px; margin-top: 8px; } .ds-feat-cell .dot { flex-shrink: 0; width: 4px; height: 4px; margin-top: 8px; border-radius: 9999px; background: oklch(0.68 0.19 285); } .ds-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; color: oklch(0.68 0.19 285); font-size: 0.875rem; font-weight: 500; text-decoration: none; } .ds-link svg { transition: transform 200ms ease-out; } .ds-link:hover svg { transform: translateX(2px); } [dir=rtl] .ds-link svg { transform: scaleX(-1); } [dir=rtl] .ds-link:hover svg { transform: scaleX(-1) translateX(2px); }"
     },
     {
       "name": "Ruled Page Grid",
@@ -273,23 +307,31 @@
       "description": "Signature: page links in a 1px-ruled grid with violet end arrows.",
       "html": "<section class=\"ds-grid\"><a class=\"ds-grid-cell\" href=\"#\"><h2>Events <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></h2><p>What this page shows, in a line.</p></a><a class=\"ds-grid-cell\" href=\"#\"><h2>Formats <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></h2><p>What this page shows, in a line.</p></a><a class=\"ds-grid-cell\" href=\"#\"><h2>Docs <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></h2><p>What this page shows, in a line.</p></a></section>",
       "css": ".ds-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-block: 1px solid oklch(1 0 0 / 12%); font-family: system-ui, sans-serif; } .ds-grid-cell { padding: 24px; border-inline-end: 1px solid oklch(1 0 0 / 12%); text-decoration: none; transition: background-color 200ms; } .ds-grid-cell:last-child { border-inline-end: 0; } .ds-grid-cell:hover { background: color-mix(in oklch, oklch(0.25 0.012 275) 50%, transparent); } .ds-grid-cell:focus-visible { outline: 2px solid oklch(0.68 0.19 285); outline-offset: -2px; } .ds-grid-cell h2 { display: flex; align-items: center; justify-content: space-between; margin: 0; color: oklch(0.985 0 0); font-size: 1.25rem; font-weight: 500; letter-spacing: -0.025em; } .ds-grid-cell svg { color: oklch(0.68 0.19 285); transition: transform 200ms ease-out; } .ds-grid-cell:hover svg { transform: translateX(4px); } [dir=rtl] .ds-grid-cell h2 { letter-spacing: normal; } [dir=rtl] .ds-grid-cell svg { transform: scaleX(-1); } [dir=rtl] .ds-grid-cell:hover svg { transform: scaleX(-1) translateX(4px); } .ds-grid-cell p { margin: 12px 0 0; color: oklch(0.74 0.012 275); }"
+    },
+    {
+      "name": "Docs Sidebar and Pager",
+      "kind": "nav",
+      "refersTo": "sidebar-link-current",
+      "description": "VitePress-style docs navigation: grouped sidebar with the current page in violet, and previous/next boxes whose border turns violet on hover.",
+      "html": "<div class=\"ds-docs\"><nav class=\"ds-side\"><section><h2>Start here</h2><ul><li><a href=\"#\">Setup</a></li></ul></section><section><h2>Guides</h2><ul><li><a href=\"#\" aria-current=\"page\">Strings</a></li><li><a href=\"#\">Markdown pages</a></li></ul></section></nav><nav class=\"ds-pager\"><a href=\"#\"><span>Previous page</span><b>Setup</b></a><a href=\"#\" class=\"end\"><span>Next page</span><b>Markdown pages</b></a></nav></div>",
+      "css": ".ds-docs { font-family: system-ui, sans-serif; color: oklch(0.985 0 0); } .ds-side section + section { margin-top: 24px; } .ds-side h2 { margin: 0; font-size: 0.875rem; font-weight: 600; } .ds-side ul { margin: 8px 0 0; padding: 0; list-style: none; } .ds-side a { display: block; padding: 4px 0; color: oklch(0.74 0.012 275); font-size: 0.875rem; text-decoration: none; transition: color 150ms; } .ds-side a:hover { color: oklch(0.985 0 0); } .ds-side a[aria-current=page] { color: oklch(0.68 0.19 285); font-weight: 500; } .ds-pager { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px; padding-top: 32px; border-top: 1px solid oklch(1 0 0 / 12%); } .ds-pager a { display: block; padding: 16px; border: 1px solid oklch(1 0 0 / 12%); border-radius: 0.3rem; text-decoration: none; transition: border-color 150ms; } .ds-pager a:hover { border-color: oklch(0.68 0.19 285); } .ds-pager a:focus-visible { outline: 2px solid oklch(0.68 0.19 285); outline-offset: 2px; } .ds-pager .end { text-align: end; } .ds-pager span { color: oklch(0.74 0.012 275); font-size: 0.75rem; } .ds-pager b { display: block; margin-top: 4px; color: oklch(0.68 0.19 285); font-weight: 500; }"
     }
   ],
   "narrative": {
     "northStar": "The Workbench in Void's Livery",
-    "overview": "The site is a developer-tool page in Void's own family look (benchmark: void.cloud), played straight. Its centrepiece is real code and the line that code renders in the page's own language; everything around it is quiet so that proof carries the page. A near-black ground with a faint blue cast, white ink, one violet accent, and 1px rules that divide sections into a grid. No gradient heroes, no glow, no marketing claims.\n\nThe world is always dark. The layout wrapper in `pages/layout.tsx` carries the `dark` class on every page, which turns on the `.dark` palette in `pages/style.css`; the `:root` block in that file is shadcn's light default and is never shown. Density is moderate: a 72rem container, generous hero spacing, compact controls.\n\nThe site ships in several languages, including Arabic, so right-to-left is a first-class requirement of the visual system, not an afterthought. Which languages appear comes from the app's locales (`useLocales()`), never from a hard-coded list.",
+    "overview": "The site is a developer-tool page in Void's own family look (benchmark: void.cloud), played straight. Its centrepiece is real code and the line that code renders in the page's own language; everything around it is quiet so that proof carries the page. A near-black ground with a faint blue cast, white ink, one violet accent, and 1px rules that divide sections into a grid. No gradient heroes, no glow, no marketing claims.\n\nThe world is always dark. `void.config.ts` sets `head.htmlAttrs` to `class=\"dark\"` and `data-theme=\"dark\"` on `<html>` of every page (no wrapper class): `dark` turns on the `.dark` palette in `pages/style.css`, and `data-theme=\"dark\"` keeps @void/md's markdown and code colours dark whatever the device's setting. The `:root` block in `pages/style.css` is shadcn's light default and is never shown. Density is moderate: a 72rem container, generous hero spacing, compact controls.\n\nThe site ships in several languages, including Arabic, so right-to-left is a first-class requirement of the visual system, not an afterthought. Which languages appear comes from the app's locales (`useLocales()`), never from a hard-coded list.",
     "keyCharacteristics": [
-      "Always dark: the `.dark` palette, applied by the layout wrapper.",
+      "Always dark: `class=\"dark\"` and `data-theme=\"dark\"` on `<html>`, from `void.config.ts`.",
       "One violet accent (`--brand`), used sparingly.",
       "System fonts only: system-ui sans and the platform mono, no web fonts.",
       "1px rules divide sections into ruled grids; surfaces are flat.",
-      "Code windows with a file tab are the signature element.",
+      "Code windows with file tabs, and a terminal window beside them, are the signature elements.",
       "Right-to-left first-class: logical properties, mirrored arrows, code stays left-to-right."
     ],
     "rules": [
       {
         "name": "The One Voice Rule",
-        "body": "Violet is the only hue on the page. It marks what to look at (code tags, arrows, the current language, focus) and never fills a surface or a button.",
+        "body": "Violet is the only hue on the page. It marks what to look at (code tags, prompts, arrows, icons, links, the current page and language, focus) and never fills a surface or a button; its only fills are the 4px fact dots.",
         "section": "colors"
       },
       {
@@ -308,24 +350,36 @@
         "section": "typography"
       },
       {
+        "name": "The Kept Whole Rule",
+        "body": "A file or tool name inside a translated sentence must not break or flip: pass it to the sentence as `<bdi dir=\"ltr\" class=\"whitespace-nowrap\">` (the `file()` helper in `components/HomeSections.tsx`). Terminal commands break only between words (each word `whitespace-nowrap`), so \"ar-EG\" never splits into what reads as another command.",
+        "section": "typography"
+      },
+      {
+        "name": "The Ruled Gap Rule",
+        "body": "For a grid whose column count changes, draw the rules with `gap-px` over a `bg-border` grid, each cell on the ground colour, so 1px rules fall between cells at any count. All direction-dependent spacing uses logical properties (`ps`/`pe`, `ms-auto`, `border-e`, `inline-start`), so layouts mirror in right-to-left pages with no extra rules.",
+        "section": "layout"
+      },
+      {
         "name": "The Logical Sides Rule",
         "body": "Never use left/right for spacing, borders or floats; use start/end. Where a dependency uses physical sides (the @void/md heading anchors), override it with logical ones, as `pages/style.css` does.",
         "section": "layout"
       },
       {
         "name": "The Rules Not Shadows Rule",
-        "body": "Divide and group with 1px rules (`--border`). Shadows are reserved for the code window.",
+        "body": "Divide and group with 1px rules (`--border`). Shadows are reserved for the code and terminal windows.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "Do keep the site dark on every page; the `dark` class on the layout wrapper is the theme.",
+      "Do keep the site dark on every page: `class=\"dark\"` and `data-theme=\"dark\"` on `<html>`, set once in `void.config.ts`.",
       "Do use `--brand` (oklch(0.68 0.19 285)) as the only accent, for pointers, never for fills.",
       "Do use system-ui for text and the platform mono for code.",
       "Do use logical properties for every direction-dependent style, and mirror arrows with `rtl:-scale-x-100`.",
       "Do keep code blocks `dir=\"ltr\"` in every language.",
       "Do list languages from the app's locales, each named in its own language.",
-      "Do divide sections with 1px rules (`--border`, oklch(1 0 0 / 12%))."
+      "Do divide sections with 1px rules (`--border`, oklch(1 0 0 / 12%)).",
+      "Do keep file and tool names in translated sentences whole and left-to-right with `<bdi dir=\"ltr\" class=\"whitespace-nowrap\">`.",
+      "Do take the repository's address from `lib/project.ts` (`REPO`, `RELEASES`), never a copy of the URL."
     ],
     "donts": [
       "Don't load web fonts.",
@@ -333,7 +387,8 @@
       "Don't hard-code the list of languages.",
       "Don't use gradient heroes, glow or marketing claims.",
       "Don't use left/right for spacing, borders or floats.",
-      "Don't style anything from the `:root` light palette; it is never shown."
+      "Don't style anything from the `:root` light palette; it is never shown.",
+      "Don't put a theme class on a wrapper element; the theme lives on `<html>`."
     ]
   }
 }

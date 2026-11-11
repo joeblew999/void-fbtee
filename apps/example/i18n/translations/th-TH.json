@@ -1165,18 +1165,6 @@
       ],
       "types": []
     },
-    "LB5qRS7mqSOz2AWaPF1rHw==": {
-      "description": "Footer: the tools this example is built with; tools is a list of their names",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "สร้างด้วย {tools}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "CH3XfQbtsw2ACBQd4yLJGg==": {
       "description": "Docs sidebar group: the first page to read",
       "status": "translated",
@@ -1280,6 +1268,438 @@
       "translations": [
         {
           "translation": "เดโม",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "r4IKuw5azKxSmaT1to8Vxg==": {
+      "description": "Home page section heading: how to install void-fbtee",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เพิ่มลงในแอป Void",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1mDHR8oSgYcns8pzU3E7oA==": {
+      "description": "Home page link to the setup page of the docs",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "อ่านวิธีตั้งค่าทั้งหมด",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uPAZSuG30yJgomrJUHscxw==": {
+      "description": "Home feature title: translated strings",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ข้อความ ด้วย fbtee",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Mi7KvJU4yazxSF0yc2+aDg==": {
+      "description": "Home feature fact about translated strings",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ทำเครื่องหมายข้อความด้วย fbt ในคอมโพเนนต์ แต่ละภาษาจะได้ไฟล์แคตตาล็อกของตัวเอง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qnFB+IIDm4Gl3YRnqnwJeg==": {
+      "description": "Home feature fact about plurals",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "รูปพหูพจน์เป็นไปตามกฎของแต่ละภาษา: ภาษาอาหรับมีหกรูป",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EPORB6pVCBAyS1k9iojeYw==": {
+      "description": "Home feature fact about the check command",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "void-fbtee check จะแสดงทุกอย่างที่ยังไม่ได้แปล",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sjKkcyIzeAcfN6dmuNNMBw==": {
+      "description": "Home feature title: dates and times",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "วันที่และเวลา ด้วย Temporal",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Z18dFUo92yTODxTOj74iZg==": {
+      "description": "Home feature fact about times and time zones",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ทุกเวลาแสดงทั้งตามนาฬิกาของสถานที่นั้นและของผู้อ่าน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "22R3BWXFqX8yXBs1Gxh41w==": {
+      "description": "Home feature fact about daylight saving time",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "คำนวณเวลาออมแสงตามวันที่นั้นเอง ไม่ใช่ตามวันนี้",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3psdWa+GK46B490i3KleuQ==": {
+      "description": "Home feature fact: Temporal runs natively on Cloudflare",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ใช้ Temporal ในตัวของ Cloudflare บน Worker",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/s93hh9vqUCZEcDcAH6YJA==": {
+      "description": "Home feature title: numbers and other formats",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ตัวเลขและอื่นๆ ด้วย Intl",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SBDZza5p69hRnrnpACDRTQ==": {
+      "description": "Home feature fact about the Intl formats",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ตัวเลข เงิน หน่วย รายการ และชื่อ จาก Intl ของแพลตฟอร์มเอง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DmqGxHb9es+9U2UWl1iZLQ==": {
+      "description": "Home feature fact: server and browser format alike",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ได้ผลลัพธ์เหมือนกันทั้งบน Worker และในเบราว์เซอร์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rGA2sEdvXM8TzENm3eRJLQ==": {
+      "description": "Home feature fact: no locale data in the app's bundle",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ไม่ต้องส่งข้อมูลภาษาไปด้วย: แพลตฟอร์มมีอยู่แล้ว",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qoffyYuCF9Wq02kyuS/PGA==": {
+      "description": "Home feature title: translated markdown pages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หน้า markdown ที่แปลแล้ว",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SjxKJHxSSe+ArVBVsUjLmg==": {
+      "description": "Home feature fact about where translated markdown pages are",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หนึ่งสำเนาของแต่ละหน้าต่อหนึ่งภาษา อยู่ใต้ pages/ ตามด้วยชื่อภาษา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nKuYg7h0hnsbJw8ektkJ2w==": {
+      "description": "Home feature fact about out-of-date translated pages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สำเนาจะถูกแจ้งว่าล้าสมัยเมื่อต้นฉบับเปลี่ยน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xHMRN0XLJs7RmbCydFWFGA==": {
+      "description": "Home feature fact about dates and numbers inside markdown pages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "วันที่และตัวเลขในหน้าจะจัดรูปแบบให้ผู้อ่านแต่ละคน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UNGENmBfbH2jubY2hOm1UQ==": {
+      "description": "Home feature title: machine translation",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แปลโดย AI ตรวจโดยคุณ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "G7RXnz19kUZWTq5YW/DqhQ==": {
+      "description": "Home feature fact about the translate command (vp run i18n:translate)",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "vp run i18n:translate ส่งงานให้ Claude Code พร้อมสกิลของ void-fbtee",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cLHgEo25WrhEIYVsOQg+Hw==": {
+      "description": "Home feature fact: translations are files in the app's repository",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "คำแปลเป็นไฟล์ใน repo ของคุณ พร้อมให้ตรวจ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XrZbF/1kCVzdQSUsXFfG6g==": {
+      "description": "Home feature fact: the demo translates what people post with Workers AI",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ในเดโม สิ่งที่ผู้คนโพสต์จะแปลโดย Workers AI",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6uTUKKFe9hZt2kh1Xrj86A==": {
+      "description": "Home feature title: right-to-left languages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ทุกภาษา รวมถึงภาษาที่เขียนจากขวาไปซ้าย",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0+6Iq11NYcCJ+uDy7/PqnA==": {
+      "description": "Home feature fact: the middleware sets the page's language and direction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "มิดเดิลแวร์ตั้งค่า lang และ dir ของหน้าจาก URL",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eGIqKsERRp8K5kgis80MWQ==": {
+      "description": "Home feature fact about one address per language for search engines",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หนึ่ง URL ต่อหนึ่งภาษา พร้อมลิงก์ hreflang สำหรับเสิร์ชเอนจิน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kVhM+CK26wd8XAPPfI2OGg==": {
+      "description": "Home feature fact: this site mirrors in Arabic",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เว็บไซต์นี้กลับด้านในภาษาอาหรับ เพราะสร้างด้วยต้นและปลาย ไม่ใช่ซ้ายและขวา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fykgbnzGpf5GpLV7UBKJzw==": {
+      "description": "Home page section heading over the list of features",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ทุกอย่างที่แอป Void ต้องใช้เพื่อพูดได้ทุกภาษา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Q+0QGT6iYNlMZlBgDqRzqA==": {
+      "description": "Home page: link from a feature to the docs page about it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "อ่านเพิ่มเติม",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BZZazFJe6vI4eA2kaQFieQ==": {
+      "description": "Button: open void-fbtee's code on GitHub",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ดูบน GitHub",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "b9Kyosa3J9PZxDexO55V2w==": {
+      "description": "Button: start with the setup page of the docs",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เริ่มต้นใช้งาน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "V89sDqXgTZmT3ns8pdDdjg==": {
+      "description": "Footer column heading: the documentation pages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เอกสาร",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "A6TDmycq7yBlxeKyYOytYA==": {
+      "description": "Footer column heading: links about the void-fbtee project",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "โปรเจกต์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ErUa3WEq8TmzE91xxjgvPQ==": {
+      "description": "Footer link: the project's releases on GitHub",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "รีลีส",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lA4Xg52VghMOLVP1ogXVWA==": {
+      "description": "Footer column heading: the tools this example is built with",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สร้างด้วย",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KzkjAkRRUHUc+Khepmx5Xg==": {
+      "description": "Caption of a window showing commands typed in a terminal",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เทอร์มินัล",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hhR1x6vVuOTbvaY+I1JJHg==": {
+      "description": "Home page: what to do before running the install commands shown beside it; packageJson and workspace are file names",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เพิ่มรีลีสจาก GitHub ลงใน {packageJson} ของแอป และอนุญาตให้บิลด์ใน {workspace} แล้วรันคำสั่งเหล่านี้ init จะเพิ่มเฉพาะสิ่งที่ยังขาด และ translate จะเติมคำแปลให้ทุกภาษา",
           "variations": {}
         }
       ],

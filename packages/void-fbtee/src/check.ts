@@ -100,9 +100,7 @@ export function check(p: Project): string[] {
       readFileSync(join(middlewareDir, f), "utf8").includes("void-fbtee/middleware"),
     );
   if (!hasMiddleware)
-    problems.push(
-      `setup: no middleware re-exports "void-fbtee/middleware" (middleware/99.i18n.ts)`,
-    );
+    problems.push(`setup: no middleware re-exports "void-fbtee/middleware" (middleware/i18n.ts)`);
   const layout = firstFile(join(p.root, "pages"), ["layout.tsx", "layout.jsx"]);
   if (!layout || !readFileSync(layout, "utf8").includes("I18nProvider"))
     problems.push(`setup: the root layout (pages/layout.tsx) doesn't wrap pages in <I18nProvider>`);

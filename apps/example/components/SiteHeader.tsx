@@ -5,6 +5,7 @@
 import { fbt } from "fbtee";
 import { Link, useLocale, useLocales } from "void-fbtee/react";
 import { buttonVariants } from "@/components/ui/button";
+import { REPO } from "@/lib/project";
 import { cn } from "@/lib/utils";
 
 const PAGES = ["", "/events", "/docs"] as const;
@@ -70,6 +71,15 @@ export default function SiteHeader() {
               )}
             </Link>
           ))}
+          <a
+            href={REPO}
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "sm" }),
+              "ms-2 border-s ps-4 text-muted-foreground",
+            )}
+          >
+            GitHub
+          </a>
         </div>
       </div>
     </header>
