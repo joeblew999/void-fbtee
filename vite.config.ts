@@ -14,9 +14,10 @@ export default defineConfig({
       // Chromium for the browser tests (once per machine).
       "install:browser": { command: "playwright install --with-deps chromium", cache: false },
       // void-fbtee installed into fresh `void init` apps, as a user's app installs it.
-      // Deploy the example (Void's deploy), then run the read-only browser tests against the URL
-      // Void reports (e2e/live.ts).
-      "deploy:test": { command: "vpx e2e/live.ts", cache: false },
+      // Deploy the example (Void's deploy), then run the browser tests against the URL Void
+      // reports; test:live runs them again on that URL, with no deploy (e2e/live.ts).
+      "deploy:test": { command: "vpx e2e/live.ts --deploy", cache: false },
+      "test:live": { command: "vpx e2e/live.ts", cache: false },
       "test:fresh": { command: "vpx e2e/fresh/check.ts", cache: false },
       // Vite+'s, Void's and void-fbtee's setup commands, run again: fails if any changes a file.
       "check:tools": { command: "node e2e/check-tools.mjs", cache: false },
@@ -54,7 +55,7 @@ export default defineConfig({
   },
   // `vp test run`: the package's unit tests, and the browser tests on the example (e2e/), which
   // Vitest runs with Playwright's library, as voidzero-dev/void does. e2e/setup.ts builds once
-  // and starts the production preview and the dev server.
+  // and starts the production preview.
   test: {
     projects: [
       "packages/void-fbtee",

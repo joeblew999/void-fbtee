@@ -1,7 +1,7 @@
 // Vitest global setup for the browser tests (the e2e project in the root vite.config.ts), as in
 // voidzero-dev/void's integration tests (test/integration-helpers.ts): build the package and the
-// example once, start the example's production preview and its dev server, each on a free port
-// on 127.0.0.1 (so a server left by a stopped run can't block this one), and stop both at the end.
+// example once, start the example's production preview on a free port
+// on 127.0.0.1 (so a server left by a stopped run can't block this one), and stop it at the end.
 import { execFileSync, spawn, type ChildProcess } from "node:child_process";
 import { once } from "node:events";
 import { createServer, type AddressInfo } from "node:net";
@@ -67,15 +67,10 @@ export default async function setup(project: TestProject) {
   run(["exec", "void", "db", "reset", "--yes"], EXAMPLE);
   // The example's build, and before it void-fbtee's (Vite+'s transitive run: -t).
   run(["run", "-t", "example#build"], root);
-  const [prodPort, devPort] = [await freePort(), await freePort()];
-  const prod = `http://127.0.0.1:${prodPort}`;
-  const dev = `http://127.0.0.1:${devPort}`;
-  const servers = [
-    await start(["preview"], prodPort, `${prod}/${SOURCE}`),
-    await start(["dev"], devPort, `${dev}/${SOURCE}`),
-  ];
+  const port = await freePort();
+  const prod = `http://127.0.0.1:${port}`;
+  const servers = [await start(["preview"], port, `${prod}/${SOURCE}`)];
   project.provide("prod" as never, prod as never);
-  project.provide("dev" as never, dev as never);
   return () => {
     // Each server runs in its own process group (detached): stop vp and what it started.
     for (const s of servers) if (s.pid) process.kill(-s.pid, "SIGTERM");

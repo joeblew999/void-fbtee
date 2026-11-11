@@ -9,10 +9,10 @@ import {
 } from "playwright";
 import { afterAll, afterEach, beforeAll, inject } from "vite-plus/test";
 
-export const url = (mode: "prod" | "dev") => inject(mode as never) as string;
+export const url = (mode: "prod") => inject(mode as never) as string;
 
 /** One browser per test file; each `page()` gets a fresh context, closed after its test. */
-export function browser(mode: "prod" | "dev") {
+export function browser(mode: "prod") {
   let b: Browser;
   const contexts: BrowserContext[] = [];
   beforeAll(async () => {
@@ -37,9 +37,9 @@ export async function text(page: Page, id: string) {
 }
 
 /**
- * Wait until `[data-testid=id]` shows `want` (live reload, hydration). Playwright's wait, not
- * Vitest's expect.poll: that gives up after 1s, too soon for a dev server to see a changed file
- * while other tests share the machine. The test's own timeout still applies.
+ * Wait until `[data-testid=id]` shows `want` (hydration, live updates). Playwright's wait, not
+ * Vitest's expect.poll: that gives up after 1s, too soon on a busy machine or over the internet.
+ * The test's own timeout still applies.
  */
 export async function seeText(page: Page, id: string, want: string) {
   await page.waitForFunction(
