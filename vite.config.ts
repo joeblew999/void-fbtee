@@ -34,6 +34,9 @@ export default defineConfig({
       // The example's deploy, saving the URL Void reports for test:production (e2e/deploy.ts).
       deploy: { command: "vpx e2e/deploy.ts", cache: false },
       "deploy:atomic": { command: "vpx e2e/deploy.ts --atomic", cache: false },
+      // This branch as a Cloudflare Worker Preview beside production (e2e/preview.ts); Workers Builds runs
+      // it for every branch but main, and posts its URL on the pull request.
+      "deploy:preview": { command: "vpx e2e/preview.ts", cache: false },
     },
   },
   lint: {
