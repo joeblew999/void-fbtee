@@ -20,15 +20,16 @@ export default defineConfig({
       logs: { command: "void project logs", cache: false },
       rollback: { command: "void project rollback", cache: false },
       // Deploy to Cloudflare: https://void-fbtee-example.gedw99.workers.dev (void-fbtee built first).
+      // --platform cloudflare: a fresh checkout (Cloudflare's Workers Builds) has no .void/project.json.
       deploy: {
-        command: "void deploy",
+        command: "void deploy --platform cloudflare",
         cache: false,
         dependsOn: [{ task: "build", from: "dependencies" }],
       },
       // The same, all at once: Void asks for this when a Durable Object class changes (it stops
       // and says so). Traffic moves before the readiness check, so only when it asks.
       "deploy:atomic": {
-        command: "void deploy --atomic",
+        command: "void deploy --platform cloudflare --atomic",
         cache: false,
         dependsOn: [{ task: "build", from: "dependencies" }],
       },

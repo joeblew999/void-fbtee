@@ -8,6 +8,7 @@
   "devDependencies": {
     "@nkzw/eslint-plugin-fbtee": "5.0.0",
     "@types/node": "26.6.6",
+    "cf": "1.0.0-beta.26",
     "playwright": "1.65.0",
     "vite": "catalog:",
     "vite-plus": "catalog:",
