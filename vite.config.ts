@@ -17,6 +17,9 @@ export default defineConfig({
       // Every browser test against production (the deployed site), at the URL Void reported on the last deploy
       // (e2e/production.ts). Deploying and testing are separate: `vp run deploy`, then this.
       "test:production": { command: "vpx e2e/production.ts", cache: false },
+      // Every browser test against what Cloudflare's Workers Builds deployed for this commit: production
+      // for main, the branch's Preview otherwise (e2e/deployed.ts). What CI runs: no Cloudflare login.
+      "test:deployed": { command: "vpx e2e/deployed.ts", cache: false },
       "test:fresh": { command: "vpx e2e/fresh/check.ts", cache: false },
       // Vite+'s, Void's and void-fbtee's setup commands, run again: fails if any changes a file.
       "check:tools": { command: "node e2e/check-tools.mjs", cache: false },

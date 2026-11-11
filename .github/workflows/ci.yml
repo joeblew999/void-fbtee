@@ -1,6 +1,7 @@
 # Vite+'s own CI setup (https://viteplus.dev/guide/ci): setup-vp installs vp, the Node in
-# .node-version and the pnpm in package.json, then vp install. No Cloudflare credentials: as in
-# voidzero-dev/void, ordinary tests don't call Cloudflare.
+# .node-version and the pnpm in package.json, then vp install. No Cloudflare credentials: Cloudflare's
+# Workers Builds builds and deploys each push itself (main as production, other branches as Worker
+# Previews), and the browser tests run against what it deployed (vp run test:deployed).
 name: CI
 
 on:
@@ -21,6 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      checks: read # Cloudflare's "Workers Builds" check on the commit
+    env:
+      CLOUDFLARE_WORKERS_SUBDOMAIN: gedw99
+      GH_TOKEN: ${{ github.token }} # gh, for the check
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -34,7 +39,8 @@ jobs:
       - run: vp run install:browser
       - run: vp check
       - run: vp run check:tools
-      - run: vp test run
+      - run: vp test run --project void-fbtee
+      - run: vp run test:deployed
 
   # A release when packages/void-fbtee/package.json has a version with no tag yet: the tag and the
   # GitHub release (notes written by GitHub from the commits). Apps pin it in their dependency:

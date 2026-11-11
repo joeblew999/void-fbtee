@@ -17,9 +17,16 @@ curl -fsSL https://vite.plus | bash   # Vite+'s vp; it runs the Node in .node-ve
 vp install                            # dependencies; Void generates its types and links its
                                       # skills for coding agents
 vp run install:browser                # Chromium for the tests
-vp run login                          # Cloudflare sign-in (Void's void connect); it saves
-                                      # Cloudflare as where this project deploys
+vp run login                          # Cloudflare sign-in (Void's void connect), for vp run dev
+                                      # and deploys from this machine
 ```
+
+On GitHub, Cloudflare's Workers Builds does the deploying: a push to `main` runs `vp run deploy` on
+Cloudflare (production), and a push to any other branch runs `vp run build:preview` and
+`npx cf previews deploy` (a Worker Preview at `<branch>-void-fbtee-example.gedw99.workers.dev`, deleted
+with its branch). CI then tests what was deployed (`vp run test:deployed`). GitHub holds no Cloudflare
+credential. Build logs: the Worker's Builds in Cloudflare's dashboard, linked from each commit's
+"Workers Builds" check.
 
 Every day:
 
@@ -37,6 +44,9 @@ vp run deploy            # deploy the example to production (Cloudflare), with n
                          # again before traffic moves, so no one gets an old page.
                          # Log: ~/.void/logs/
 vp run test:production   # every test, against production; report: .vitest/index.html
+vp run deploy:preview    # this branch as a Worker Preview beside production (needs cf's login)
+vp run test:deployed     # every test against what Cloudflare deployed for this commit (what CI runs;
+                         # CLOUDFLARE_WORKERS_SUBDOMAIN=gedw99)
 ```
 
 Translations (from `apps/example`):
