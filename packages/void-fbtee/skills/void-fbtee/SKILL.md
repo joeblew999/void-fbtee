@@ -59,7 +59,11 @@ Pages under `pages/<source locale>/` have a copy per locale at the same path und
   numbers, slugs, file names).
 - **Keep exactly:** the `<script>` block at the top (first in the file; its import paths stay the
   same), components and islands with their props, code blocks, inline code, URLs, HTML
-  attributes, and the page's structure (same headings in the same order).
+  attributes, and the page's structure (same headings in the same order). One exception: a link
+  to another page of the site points to that page in the copy's language (`/th-TH/events`).
+- **Dates, times, numbers:** a page shows them through a component that formats them with `Intl`
+  (an island, with the value as a prop), not as written-out text. Leave the component as it is;
+  if the original has one written out, keep it as written and say so in your summary.
 - **translatedFrom:** each translated page records the original it came from in its frontmatter.
   Don't write it yourself: `void-fbtee translate` records it, and after a hand translation run
   `void-fbtee stamp pages/<locale>/<path>.md`. For a page `check` reports out of date, compare it

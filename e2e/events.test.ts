@@ -2,7 +2,7 @@
 // reader's, in the reader's language; an event posted in Arabic, then read in English. Void's
 // forms, database and cache are Void's to test; this checks what void-fbtee and the app add.
 import { expect, test } from "vite-plus/test";
-import { browser, collectErrors, seeText } from "./helpers";
+import { browser, collectErrors, hydrated, seeText } from "./helpers";
 
 const page = browser("prod");
 const WHEN: Intl.DateTimeFormatOptions = {
@@ -50,5 +50,22 @@ test("ar-EG: post an event (a missing title first), then read it in English", as
   await seeText(p, "event-title", "أمسية شعر");
   await p.goto(p.url().replace("/ar-EG/", "/en-US/"));
   await seeText(p, "event-written-in", "Written in Arabic (Egypt)");
+  expect(errors).toEqual([]);
+});
+
+test("the tour (Markdown): its event time is an island, formatted in each language and zone", async () => {
+  const p = await page({ timezoneId: "America/New_York" });
+  const errors = collectErrors(p);
+  const MARKET = new Date("2027-03-06T11:30:00Z"); // the night market: 18:30 in Bangkok
+  for (const locale of ["en-US", "th-TH", "ar-EG"]) {
+    const at = (timeZone: string) =>
+      new Intl.DateTimeFormat(locale, { ...WHEN, timeZone }).format(MARKET);
+    await p.goto(`/${locale}/tour`);
+    await hydrated(p, "EventTime");
+    expect(await p.getByTestId("event-local").textContent(), locale).toBe(at("Asia/Bangkok"));
+    await expect
+      .poll(() => p.getByTestId("event-yours").textContent())
+      .toContain(at("America/New_York"));
+  }
   expect(errors).toEqual([]);
 });

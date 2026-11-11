@@ -4,9 +4,9 @@ Markdown pages (`@void/md`) are translated as whole files: one copy per locale.
 
 ## Where things are
 
-- The original is under `pages/<source locale>/`, e.g. `pages/en-US/blog/hello.md`.
+- The original is under `pages/<source locale>/`, e.g. `pages/en-US/tour/index.md`.
 - Each translation is the same path under the locale's URL segment, e.g.
-  `pages/th-TH/blog/hello.md`. The segment is the locale unless `vite.config.ts` sets another.
+  `pages/th-TH/tour/index.md`. The segment is the locale unless `vite.config.ts` sets another.
 
 ## What to translate
 
@@ -18,10 +18,19 @@ Markdown pages (`@void/md`) are translated as whole files: one copy per locale.
 
 - The `<script>` block at the top. @void/md needs it first in the file, and its import paths stay
   the same: the page sits at the same depth under another locale folder.
-- Components and islands such as `<PostMeta />`, with their props. They translate their own text
-  through fbtee catalogs.
-- Code blocks, inline code, URLs and HTML attributes.
+- Components and islands such as `<EventTime startsAt="…" />`, with their props: props are data,
+  the same in every copy. Components translate their own text through fbtee catalogs.
+- Code blocks, inline code, URLs and HTML attributes. One exception: a link to another page of
+  this site points to that page in the copy's language (`/th-TH/events` in the Thai copy).
 - The page's structure: the same headings and sections in the same order, so the locales match.
+
+## Dates, times and numbers
+
+Don't write them out as text: a date written out is only text, so every copy has to redo it by
+hand, and it can't show the reader's own time. Put the value in a component that formats it with
+`Intl`, imported as an island in the `<script>` block. The tour does this with
+`<EventTime startsAt="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />`: it shows in the reader's
+language, on the event's clock and on theirs.
 
 ## translatedFrom
 

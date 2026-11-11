@@ -38,3 +38,6 @@ export function EventTime({ startsAt }: { startsAt: string }) {
     </div>
   );
 }
+
+// Default export: Markdown pages import it as an island (pages/<locale>/tour/index.md).
+export default EventTime;
