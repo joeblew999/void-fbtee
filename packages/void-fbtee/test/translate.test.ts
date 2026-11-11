@@ -11,6 +11,7 @@ import {
   rmSync,
   writeFileSync,
 } from "node:fs";
+import { VOID_INIT_DIR } from "./void-init";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vite-plus/test";
 import type { Project } from "../src/catalogs";
@@ -98,10 +99,14 @@ test("nothing to do once everything is translated", () => {
 });
 
 test("init links the skill for Claude Code like void init, once", async () => {
-  // A void init app that has a .claude folder (from e2e/fresh/vite-plus).
+  // A void init app (test/void-init.ts) that has a .claude folder.
   const app = mkdtempSync(join(import.meta.dirname, ".tmp-"));
   try {
-    cpSync(join(import.meta.dirname, "../../../e2e/fresh/vite-plus"), app, { recursive: true });
+    cpSync(join(VOID_INIT_DIR, "vite-plus"), app, {
+      recursive: true,
+      filter: (src) =>
+        !["node_modules", ".void", "pnpm-lock.yaml", ".git"].includes(src.split("/").pop() ?? ""),
+    });
     mkdirSync(join(app, ".claude"));
     const o = { root: app, sourceLocale: "en-US", locales: ["en-US", "de-DE"] };
     expect((await init(o)).done).toContain(

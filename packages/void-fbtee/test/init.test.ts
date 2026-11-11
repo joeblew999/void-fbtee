@@ -1,5 +1,5 @@
-// `void-fbtee init`, on copies of what `void init` made (e2e/fresh/<toolchain>/, also what the
-// fresh-install e2e tests start from).
+// `void-fbtee init`, on copies of apps `void init` made for this run (test/void-init.ts), the
+// files only: no node_modules.
 import {
   cpSync,
   existsSync,
@@ -13,8 +13,11 @@ import {
 import { join, relative } from "node:path";
 import { afterEach, expect, test } from "vite-plus/test";
 import { init } from "../src/init";
+import { VOID_INIT_DIR } from "./void-init";
 
-const generated = (toolchain: string) => join(import.meta.dirname, "../../../e2e/fresh", toolchain);
+const generated = (toolchain: string) => join(VOID_INIT_DIR, toolchain);
+// What `void init` installs or generates, rather than writes as the app's files.
+const NOT_COPIED = new Set(["node_modules", ".void", "pnpm-lock.yaml", ".git"]);
 const dirs: string[] = [];
 afterEach(() => {
   for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true });
@@ -23,7 +26,10 @@ afterEach(() => {
 function app(toolchain: "vite-plus" | "vite") {
   const root = mkdtempSync(join(import.meta.dirname, ".tmp-"));
   dirs.push(root);
-  cpSync(generated(toolchain), root, { recursive: true });
+  cpSync(generated(toolchain), root, {
+    recursive: true,
+    filter: (src) => !NOT_COPIED.has(src.split("/").pop() ?? ""),
+  });
   return root;
 }
 const read = (root: string, f: string) => readFileSync(join(root, f), "utf8");
@@ -102,7 +108,7 @@ test("on plain Vite, it leaves defineConfig from vite and adds no lint settings"
 test("an existing layout is left alone, with the line to add", async () => {
   const root = app("vite-plus");
   const layout = `export default function Layout({ children }) {\n  return <main>{children}</main>;\n}\n`;
-  mkdirSync(join(root, "pages"));
+  mkdirSync(join(root, "pages"), { recursive: true });
   writeFileSync(join(root, "pages/layout.tsx"), layout);
   const { todo } = await init(options(root));
   expect(read(root, "pages/layout.tsx")).toBe(layout);
@@ -111,15 +117,41 @@ test("an existing layout is left alone, with the line to add", async () => {
   );
 });
 
-test("in a workspace, the lint settings are left for the root config", async () => {
-  // Without its own pnpm-workspace.yaml, the app is part of this repo's workspace.
-  const root = app("vite-plus");
+/** A pnpm workspace with a Vite+ app in apps/app; the root config has `rootConfig`. */
+function workspace(rootConfig: string, rootDevDependencies: Record<string, string> = {}) {
+  const ws = mkdtempSync(join(import.meta.dirname, ".tmp-"));
+  dirs.push(ws);
+  writeFileSync(join(ws, "pnpm-workspace.yaml"), "packages:\n  - apps/*\n");
+  writeFileSync(join(ws, "package.json"), JSON.stringify({ devDependencies: rootDevDependencies }));
+  writeFileSync(join(ws, "vite.config.ts"), rootConfig);
+  const root = join(ws, "apps/app");
+  mkdirSync(root, { recursive: true });
+  cpSync(app("vite-plus"), root, { recursive: true });
+  // Without its own pnpm-workspace.yaml, the app is part of the workspace.
   rmSync(join(root, "pnpm-workspace.yaml"));
+  return { ws, root };
+}
+
+test("in a workspace, the lint settings and plugin are left for the root", async () => {
+  const { root } = workspace(`export default {};\n`);
   const { todo } = await init(options(root));
   const vite = read(root, "vite.config.ts");
   expect(vite).toContain(`import { defineConfig } from "vite";`);
   expect(vite).not.toContain("lint");
+  expect(JSON.parse(read(root, "package.json")).devDependencies).not.toHaveProperty(
+    "@nkzw/eslint-plugin-fbtee",
+  );
   expect(todo.join("\n")).toMatch(
     /vite\.config\.ts: Vite\+ only reads lint settings from the workspace's root config/,
   );
+  expect(todo.join("\n")).toMatch(/package\.json: add "@nkzw\/eslint-plugin-fbtee"/);
+  expect(todo[0]).toMatch(/^vp /);
+});
+
+test("in a workspace whose root already has them, there's nothing to add", async () => {
+  const { root } = workspace(`export default { lint: { jsPlugins: ["void-fbtee/lint"] } };\n`, {
+    "@nkzw/eslint-plugin-fbtee": "5.0.0",
+  });
+  const { todo } = await init(options(root));
+  expect(todo.join("\n")).not.toMatch(/lint settings|eslint-plugin-fbtee/);
 });

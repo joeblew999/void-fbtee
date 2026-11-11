@@ -16,6 +16,7 @@ export default defineConfig({
     dts: true,
     deps: { neverBundle: [/^virtual:void-fbtee\//] },
   },
-  // `vp test`: the package's own tests, on test/fixture (a tiny app; each test works on a copy).
-  test: { include: ["test/**/*.test.ts"] },
+  // `vp test`: the package's own tests, on test/fixture (a tiny app; each test works on a copy),
+  // and init's on apps `void init` makes (test/void-init.ts).
+  test: { include: ["test/**/*.test.ts"], globalSetup: ["test/void-init.ts"] },
 });
