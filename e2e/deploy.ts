@@ -1,7 +1,7 @@
 // `vp run deploy` (and `deploy:atomic`, with --atomic): the example's deploy (Void's
 // `void deploy`), with its output as it comes. Void
 // prints the URL it deployed to (its summary box, `+- https://… --+`) and keeps no record of it,
-// so this saves it in .e2e-work/production-url for `vp run test:production`.
+// so this saves it in .vitest/production-url for `vp run test:production`.
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -20,7 +20,7 @@ const code: number = await new Promise((resolve) => child.on("close", (c) => res
 const plain = stripVTControlCharacters(output);
 const url = /^\+- (https:\/\/\S+) -+\+$/m.exec(plain)?.[1];
 if (code === 0 && plain.includes("Successfully deployed!") && url) {
-  const saved = join(import.meta.dirname, "../.e2e-work/production-url");
+  const saved = join(import.meta.dirname, "../.vitest/production-url");
   mkdirSync(join(saved, ".."), { recursive: true });
   writeFileSync(saved, url);
 }

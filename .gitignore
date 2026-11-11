@@ -4,7 +4,6 @@ dist/
 .void-wrangler.jsonc
 .cloudflare/
 .wrangler/
-.e2e-work/
 source_strings.json
 .enum_manifest.json
 # No lockfiles: dependencies are pinned exactly in package.json instead (plan #1).

@@ -2,7 +2,7 @@
 // it: as a git dependency, built by pnpm (the README's two lines). It installs from this checkout's
 // last commit rather than from GitHub, so commit first. Like voidzero-dev/void's packed-consumer
 // smoke check, it uses no browser: the package's contents, a real `void-fbtee init`, the CLI, a
-// build, TypeScript and a few requests to the dev server. Work happens in .e2e-work/ (git ignores it).
+// build, TypeScript and a few requests to the dev server. Work happens in .vitest/ (git ignores it).
 //
 //   vpx e2e/fresh/check.ts              both apps
 //   vpx e2e/fresh/check.ts vite-plus    a `void init --toolchain vite-plus` app
@@ -29,7 +29,7 @@ import { dirname, join, resolve } from "node:path";
 const root = resolve(import.meta.dirname, "../..");
 // The example's languages, from its voidFbtee() (e2e/locales.ts).
 const { TRANSLATED } = await import("../locales");
-const work = join(root, ".e2e-work");
+const work = join(root, ".vitest");
 const targets = process.argv[2] ? [process.argv[2]] : ["vite-plus", "vite"];
 type App = { pm: string; install: string[]; cli: string[]; port: number };
 const APPS: Record<string, App> = {
@@ -83,7 +83,7 @@ for (const target of targets) {
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(dir, { recursive: true });
   // Its own git repo, as a real app is: tools that honour .gitignore (Oxlint) would otherwise
-  // skip it, since this repo ignores .e2e-work/.
+  // skip it, since this repo ignores .vitest/.
   run("git", ["init", "--quiet"], dir);
   if (target === "vite") allowBuild(dir); // pnpm, for `void init` (see the top of this file)
   run(VOID, [...VOID_INIT, "--toolchain", target], dir);

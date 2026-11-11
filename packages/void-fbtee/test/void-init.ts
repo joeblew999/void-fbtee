@@ -1,12 +1,12 @@
 // Vitest global setup for init.test.ts: a Vite+ app and a plain-Vite app, made by `void init` (the
 // Void version the workspace pins), as e2e/fresh/check.ts makes them. Once per run, into
-// .e2e-work/void-init/<toolchain>/; each test copies one (see `app()` in init.test.ts).
+// .vitest/void-init/<toolchain>/; each test copies one (see `app()` in init.test.ts).
 import { execFileSync } from "node:child_process";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = join(import.meta.dirname, "../../..");
-export const VOID_INIT_DIR = join(root, ".e2e-work/void-init");
+export const VOID_INIT_DIR = join(root, ".vitest/void-init");
 const VOID = join(import.meta.dirname, "../node_modules/.bin/void");
 
 export default function setup() {
