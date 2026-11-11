@@ -69,3 +69,50 @@ test("the tour (Markdown): its event time is an island, formatted in each langua
   }
   expect(errors).toEqual([]);
 });
+
+/** The page of the sample event with this title. */
+async function eventPage(p: import("playwright").Page, locale: string, title: string) {
+  await p.goto(`/${locale}/events`);
+  await p.getByTestId("events-list").locator("a").filter({ hasText: title }).click();
+  await p.waitForURL(/\/events\/[0-9a-f-]{36}$/);
+  // Void's form works once the page has hydrated.
+  await p.waitForLoadState("networkidle");
+}
+
+test("book in Thai; an Arabic page open on the event sees the seat go, live", async () => {
+  const thai = await page();
+  const arabic = await page();
+  const errors = [...collectErrors(thai), ...collectErrors(arabic)];
+  await eventPage(arabic, "ar-EG", "Harbour sunrise swim");
+  await seeText(arabic, "seats-left", "تبقّى ١٢ مقعدًا");
+  await eventPage(thai, "th-TH", "Harbour sunrise swim");
+  await thai.getByTestId("book-name").fill("Somchai");
+  await thai.getByTestId("book-email").fill("somchai@example.com");
+  await thai.getByTestId("book").click();
+  await seeText(thai, "booked", "จองเรียบร้อยแล้ว แล้วเจอกันนะ!");
+  await seeText(thai, "seats-left", "เหลือ 11 ที่นั่ง");
+  // Arabic's "many" form, for 11.
+  await seeText(arabic, "seats-left", "تبقّى ١١ مقعدًا");
+  expect(errors).toEqual([]);
+});
+
+test("two people book the last seat at once: one gets it, the other is told, in Arabic", async () => {
+  const [a, b] = [await page(), await page()];
+  for (const p of [a, b]) {
+    await eventPage(p, "ar-EG", "Supper for one");
+    await p.getByTestId("book-name").fill("Laila");
+    await p.getByTestId("book-email").fill("laila@example.com");
+  }
+  await Promise.all([a.getByTestId("book").click(), b.getByTestId("book").click()]);
+  const outcome = async (p: import("playwright").Page) => {
+    await expect
+      .poll(
+        async () =>
+          (await p.getByTestId("booked").count()) + (await p.getByTestId("sold-out-error").count()),
+      )
+      .toBe(1);
+    return (await p.getByTestId("booked").count()) ? "booked" : "sold out";
+  };
+  expect([await outcome(a), await outcome(b)].sort()).toEqual(["booked", "sold out"]);
+  for (const p of [a, b]) await seeText(p, "seats-left", "اكتمل الحجز");
+});

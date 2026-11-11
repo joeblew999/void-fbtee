@@ -1152,6 +1152,138 @@
         }
       ],
       "types": []
+    },
+    "8iI5+J5iHJYOuCRoSsmG+g==": {
+      "description": "Shown after booking a seat on an event",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "จองเรียบร้อยแล้ว แล้วเจอกันนะ!",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pqpH8iaZyoOLqrE2GYYamA==": {
+      "description": "Booking form label: the booker's name",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ชื่อของคุณ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Dw+hp8/GQPXdJK2IisVSTA==": {
+      "description": "Booking form error: no name",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "คุณชื่ออะไร",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uSI6kPEEk8gVXZZ3f8DCqg==": {
+      "description": "Booking form label: the booker's email address",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "อีเมล",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9z7bciuQIIFa5+4PwbgSBA==": {
+      "description": "Booking form error: not an email address",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "นี่ไม่ใช่อีเมลที่ถูกต้อง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7lGrFc+0C2V2I0I/KTxryQ==": {
+      "description": "Booking error: the last seat went just before",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ขออภัย ที่นั่งสุดท้ายเพิ่งถูกจองไป",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Zib2BCOsjezfb1fyn8UNwA==": {
+      "description": "Button: book a seat on the event",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "จองที่นั่ง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3F6C/X8jjdqy0NUriWUeJQ==": {
+      "description": "Heading of the booking box on an event's page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "จองที่นั่ง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "z0y3w4ix7fjn6Gfpky7afQ==": {
+      "description": "How many seats an event has left",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เหลือ {number} ที่นั่ง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vEMyyfPJPzzmHW8XeXGuyQ==": {
+      "description": "How many seats an event has left",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เหลือ 1 ที่นั่ง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lUEE32CdWTk+U9F7rmd09g==": {
+      "description": "Badge: an event has no seats left",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เต็มแล้ว",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

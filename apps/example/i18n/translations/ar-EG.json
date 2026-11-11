@@ -1410,6 +1410,168 @@
         }
       ],
       "types": []
+    },
+    "8iI5+J5iHJYOuCRoSsmG+g==": {
+      "description": "Shown after booking a seat on an event",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تم حجزك. نراك هناك!",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pqpH8iaZyoOLqrE2GYYamA==": {
+      "description": "Booking form label: the booker's name",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "اسمك",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Dw+hp8/GQPXdJK2IisVSTA==": {
+      "description": "Booking form error: no name",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ما اسمك؟",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uSI6kPEEk8gVXZZ3f8DCqg==": {
+      "description": "Booking form label: the booker's email address",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "البريد الإلكتروني",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9z7bciuQIIFa5+4PwbgSBA==": {
+      "description": "Booking form error: not an email address",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "هذا ليس عنوان بريد إلكتروني.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7lGrFc+0C2V2I0I/KTxryQ==": {
+      "description": "Booking error: the last seat went just before",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "عذرًا، حُجز آخر مقعد للتو.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Zib2BCOsjezfb1fyn8UNwA==": {
+      "description": "Button: book a seat on the event",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "احجز مقعدًا",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3F6C/X8jjdqy0NUriWUeJQ==": {
+      "description": "Heading of the booking box on an event's page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "احجز مقعدًا",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "z0y3w4ix7fjn6Gfpky7afQ==": {
+      "description": "How many seats an event has left",
+      "status": "translated",
+      "tokens": [
+        "number"
+      ],
+      "translations": [
+        {
+          "translation": "لم يتبقَّ أي مقعد",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "تبقّى مقعدان",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "تبقّت {number} مقاعد",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "تبقّى {number} مقعدًا",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "تبقّى {number} مقعد",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "vEMyyfPJPzzmHW8XeXGuyQ==": {
+      "description": "How many seats an event has left",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تبقّى مقعد واحد",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lUEE32CdWTk+U9F7rmd09g==": {
+      "description": "Badge: an event has no seats left",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "اكتمل الحجز",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

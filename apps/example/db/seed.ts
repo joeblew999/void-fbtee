@@ -27,5 +27,12 @@ export default defineSeed<typeof import("./schema")>(async ({ db, schema }) => {
       seats: 15,
       locale: "ar-EG",
     },
+    {
+      title: "Supper for one",
+      description: "A chef's table with a single seat. Whoever books first gets it.",
+      ...startsAt("2027-03-09T20:00", "Asia/Bangkok"),
+      seats: 1,
+      locale: "en-US",
+    },
   ]);
 });
