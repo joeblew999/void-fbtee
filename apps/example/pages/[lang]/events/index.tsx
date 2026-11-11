@@ -137,8 +137,8 @@ export default function Events({ events }: Props) {
             <Link href={`/${locale}/events/${e.id}`} className="block">
               <Card className="transition-colors hover:bg-muted/50">
                 <CardHeader className="flex-row items-start justify-between gap-4">
-                  <CardTitle lang={e.locale} data-testid="event-title">
-                    {e.title}
+                  <CardTitle lang={e.text ? locale : e.locale} data-testid="event-title">
+                    {e.text?.title ?? e.title}
                   </CardTitle>
                   <Badge variant="secondary">
                     <fbt desc="How many seats an event has">

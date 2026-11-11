@@ -3,7 +3,7 @@
 // left (live: every open page sees a booking), and booking a seat with Void's useForm.
 import { useEffect, useState } from "react";
 import { fbt } from "fbtee";
-import { Form, useForm } from "@void/react";
+import { Form, useForm, useRouter } from "@void/react";
 import { connectLiveStream } from "void/live/client";
 import { Link, useLocale, useTimeZone } from "void-fbtee/react";
 import { EventTime } from "@/components/EventTime";
@@ -14,18 +14,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Props } from "./[id].server";
 
-/** The seats left, from the page and from the live stream. Seats only go down, so the lower wins. */
-function useSeatsLeft(id: string, left: number) {
+/**
+ * The event's live stream: the seats left (seats only go down, so the lower count wins), and
+ * reloading the page's data when its translations arrive (queues/translate.ts).
+ */
+function useLiveEvent(id: string, left: number) {
+  const router = useRouter();
   const [live, setLive] = useState(Infinity);
   useEffect(() => {
     const stream = connectLiveStream("/api/live");
     void stream.subscribe({
-      id: "seats",
+      id: "event",
       topic: `event:${id}`,
-      onEvent: (event) => setLive((event.data as { left: number }).left),
+      onEvent: (event) => {
+        if (event.type === "seats") setLive((event.data as { left: number }).left);
+        if (event.type === "translated") void router.refresh();
+      },
     });
     return () => stream.close();
-  }, [id]);
+  }, [id, router]);
   return Math.min(left, live);
 }
 
@@ -99,32 +106,44 @@ function Book({ id, zone, soldOut }: { id: string; zone: string; soldOut: boolea
   );
 }
 
-export default function Event({ event, left }: Props) {
+export default function Event({ event, text, left }: Props) {
   const { locale } = useLocale();
   // "UTC" until hydration, then the browser's zone; nothing has been typed into the form yet.
   const zone = useTimeZone();
-  const seatsLeft = useSeatsLeft(event.id, left);
+  const seatsLeft = useLiveEvent(event.id, left);
+  // In the page's language once translated; until then, as written.
+  const shown = text ?? event;
+  const lang = text ? locale : event.locale;
   const written = new Intl.DisplayNames(locale, { type: "language" }).of(event.locale);
   return (
     <article className="grid gap-6">
       <Link href={`/${locale}/events`} className="text-muted-foreground text-sm">
         <fbt desc="Link back to the list of events">All events</fbt>
       </Link>
-      <h1
-        className="text-3xl font-semibold tracking-tight"
-        lang={event.locale}
-        data-testid="event-title"
-      >
-        {event.title}
+      <h1 className="text-3xl font-semibold tracking-tight" lang={lang} data-testid="event-title">
+        {shown.title}
       </h1>
       <EventTime startsAt={event.starts_at} />
-      <p className="max-w-prose" lang={event.locale} data-testid="event-description">
-        {event.description}
+      <p className="max-w-prose" lang={lang} data-testid="event-description">
+        {shown.description}
       </p>
-      {event.locale !== locale && (
-        <p className="text-muted-foreground text-sm" data-testid="event-written-in">
-          <fbt desc="Note under an event: the language its organiser wrote it in">
-            Written in <fbt:param name="language">{written}</fbt:param>
+      {text && (
+        <details className="text-muted-foreground text-sm">
+          <summary data-testid="event-translated">
+            <fbt desc="Note under an event: its text was machine-translated from this language">
+              Translated by machine from <fbt:param name="language">{written}</fbt:param>
+            </fbt>
+          </summary>
+          <div className="mt-2 grid gap-1" lang={event.locale} data-testid="event-original">
+            <strong>{event.title}</strong>
+            <p>{event.description}</p>
+          </div>
+        </details>
+      )}
+      {!text && event.locale !== locale && (
+        <p className="text-muted-foreground text-sm" data-testid="event-translating">
+          <fbt desc="Note under an event: shown as written while it is being translated">
+            Written in <fbt:param name="language">{written}</fbt:param>. Translating…
           </fbt>
         </p>
       )}

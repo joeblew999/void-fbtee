@@ -39,6 +39,11 @@ export function localizedPaths(path: string): string[] {
   return config.locales.map((l) => `/${l.segment}${path}`);
 }
 
+/** The app's languages (`voidFbtee({ locales })`), for server code that works per language. */
+export function appLocales(): string[] {
+  return config.locales.map((l) => l.locale);
+}
+
 // Void's own endpoints, API routes and file requests: no catalog, no fbtee state. They still get
 // shared.i18n, because Void renders its not-found page (through the app's layout) for them.
 const LIGHT = /^\/(__void|api)(\/|$)|\.[a-z0-9]+$/i;

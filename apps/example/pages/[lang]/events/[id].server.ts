@@ -1,7 +1,7 @@
 // One event, by its id, with its seats left (the loader), and booking a seat (the action).
-import { bookings, bookSchema, events } from "@schema";
+import { bookings, bookSchema, event_texts, events } from "@schema";
 import { defineHandler, type InferProps } from "void";
-import { count, db, eq, sql } from "void/db";
+import { and, count, db, eq, sql } from "void/db";
 import { revalidate } from "void/isr";
 import type { RouteUrl } from "void/routes";
 import { localizedPaths, type SharedI18n } from "void-fbtee/middleware";
@@ -16,11 +16,17 @@ const booked = (id: string) =>
     .where(eq(bookings.event_id, id))
     .then(([row]) => row.n);
 
+// The event, its title and description in the page's language where translated, seats left.
 export const loader = defineHandler(async (c) => {
   const id = c.req.param("id")!;
+  const { locale } = (c.get("shared" as never) as { i18n: SharedI18n }).i18n;
   const [event] = await db.select().from(events).where(eq(events.id, id));
   if (!event) return c.notFound();
-  return { event, left: event.seats - (await booked(id)) };
+  const [text] = await db
+    .select()
+    .from(event_texts)
+    .where(and(eq(event_texts.event_id, id), eq(event_texts.locale, locale)));
+  return { event, text: text ?? null, left: event.seats - (await booked(id)) };
 });
 
 export const action = defineHandler.withValidator({ body: bookSchema })(async (c, { body }) => {

@@ -985,18 +985,6 @@
       ],
       "types": []
     },
-    "PHHeMDyaiacbVYUaBw9ZQQ==": {
-      "description": "Note under an event: the language its organiser wrote it in",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ภาษาที่เขียน: {language}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "88bXloxtPp7U7Ddof/il7g==": {
       "description": "Heading of the form for posting a new event",
       "status": "translated",
@@ -1280,6 +1268,30 @@
       "translations": [
         {
           "translation": "เต็มแล้ว",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WuCoCUNhGtauyKMWXLhgug==": {
+      "description": "Note under an event: its text was machine-translated from this language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แปลด้วยเครื่องจากภาษา{language}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mlUsmLsMcHJirdFKd5pLoA==": {
+      "description": "Note under an event: shown as written while it is being translated",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เขียนเป็นภาษา{language} กำลังแปล…",
           "variations": {}
         }
       ],

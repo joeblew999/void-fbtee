@@ -2,6 +2,12 @@
 import { defineConfig } from "void/config";
 
 export default defineConfig({
+  // Workers AI translates newly posted events (queues/translate.ts), on Cloudflare only: the
+  // deploy tasks set VOID_AI=1 (apps/example/vite.config.ts). Workers AI has no local version, so
+  // with it on, dev, preview and the tests would all need Cloudflare credentials; off, they need
+  // none. Locally the sample events come translated (db/seed.ts, written by Claude Code), and an
+  // event posted locally stays as written.
+  inference: { bindings: { ai: process.env.VOID_AI === "1" } },
   routing: {
     typedRoutes: true,
     // Cache prerendered pages (the docs and the island page) at the edge; set here so a
