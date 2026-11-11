@@ -7,7 +7,7 @@ import { SOURCE } from "./locales";
 
 const page = browser("prod");
 
-/** A sample event's page in a language, found by its English title (the seed's). */
+/** A sample event's page in a language, found by its English title (db/migrations/*_sample_events.sql). */
 async function goToEvent(p: import("playwright").Page, locale: string, englishTitle: string) {
   await p.goto(`/${SOURCE}/events`);
   const href = await p

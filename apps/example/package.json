@@ -33,6 +33,7 @@
   "devDependencies": {
     "@nkzw/fbtee-compiler": "5.0.0",
     "@tailwindcss/vite": "4.3.5",
+    "@types/node": "26.6.6",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@void/react": "catalog:",
