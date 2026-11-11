@@ -39,17 +39,22 @@ test("the middleware leaves files and API routes alone", async () => {
   expect((await get("/api/hello")).status).toBe(200);
 });
 
-test("built worker: one fbtee core, no native Temporal in app code, temporal flag on", () => {
-  const read = (f: string) => readFileSync(f, "utf8");
-  const worker = globSync(join(EXAMPLE, "dist/ssr/**/*.js"));
-  expect(worker.length).toBeGreaterThan(0);
-  // One copy of fbtee's per-request state (plan #1, decision 2).
-  expect(worker.filter((f) => read(f).includes("runWithFbtee"))).toHaveLength(1);
-  // App code uses the polyfill on the server (decision 17), never the native global.
-  expect(worker.filter((f) => /globalThis\.Temporal\b/.test(read(f)))).toEqual([]);
-  // Cloudflare's temporal flag reaches the Worker config `void deploy` uploads (decision 15).
-  const config = JSON.parse(
-    read(join(EXAMPLE, ".cloudflare/output/v0/workers/default/worker.config.json")),
-  );
-  expect(config.compatibilityFlags).toContain("temporal");
-});
+// It reads the build on disk, which the tests make only when they run the site themselves: against a
+// deployed site (E2E_URL: test:deployed, test:production) there is no build of this commit here.
+test.skipIf(!!process.env.E2E_URL)(
+  "built worker: one fbtee core, no native Temporal in app code, temporal flag on",
+  () => {
+    const read = (f: string) => readFileSync(f, "utf8");
+    const worker = globSync(join(EXAMPLE, "dist/ssr/**/*.js"));
+    expect(worker.length).toBeGreaterThan(0);
+    // One copy of fbtee's per-request state (plan #1, decision 2).
+    expect(worker.filter((f) => read(f).includes("runWithFbtee"))).toHaveLength(1);
+    // App code uses the polyfill on the server (decision 17), never the native global.
+    expect(worker.filter((f) => /globalThis\.Temporal\b/.test(read(f)))).toEqual([]);
+    // Cloudflare's temporal flag reaches the Worker config `void deploy` uploads (decision 15).
+    const config = JSON.parse(
+      read(join(EXAMPLE, ".cloudflare/output/v0/workers/default/worker.config.json")),
+    );
+    expect(config.compatibilityFlags).toContain("temporal");
+  },
+);
