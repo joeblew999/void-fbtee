@@ -22,9 +22,9 @@ Every day:
 ```sh
 vp run dev               # develop: the package rebuilds on save, the example runs
 vp check                 # format, lint, types
-vp test run              # every test, on a local build
-vp run deploy            # deploy the example to production (Cloudflare)
-vp run test:production   # every test, against production
+vp test run              # every test, on a local build; log: test-results/junit.xml
+vp run deploy            # deploy the example to production (Cloudflare); log: ~/.void/logs/
+vp run test:production   # every test, against production; log: test-results/junit.xml
 ```
 
 Translations (from `apps/example`):
@@ -55,8 +55,7 @@ The tasks are in `vite.config.ts` and `apps/example/vite.config.ts`.
 - A deploy applies new database migrations. Void saves a restore point first and prints how to go
   back.
 - `vp run test:production` tests the URL the last `vp run deploy` reported.
-- Logs: each deploy's is in `~/.void/logs/` (Void's), each test run's results in
-  `test-results/junit.xml`, and `vp run --last-details` shows the last task run.
+- `vp run --last-details` shows how the last task run went.
 - Each commit is checked first (`vp check --fix`, a hook `vp install` sets up). CI runs
   `vp check` and `vp test run`.
 
