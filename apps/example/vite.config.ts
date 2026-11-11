@@ -15,6 +15,10 @@ export default defineConfig({
       // command; once per machine). It saves the platform in .void/project.json, so deploys and
       // `void db … --remote` use Cloudflare without saying so.
       login: { command: "void connect --platform cloudflare", cache: false },
+      // Void's own: the deployment's state, its logs (a live tail), and going back a version.
+      status: { command: "void project status", cache: false },
+      logs: { command: "void project logs", cache: false },
+      rollback: { command: "void project rollback", cache: false },
       // Deploy to Cloudflare: https://void-fbtee-example.gedw99.workers.dev (void-fbtee built first).
       deploy: {
         command: "void deploy",

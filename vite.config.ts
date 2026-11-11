@@ -28,6 +28,9 @@ export default defineConfig({
       },
       // The example's tasks (apps/example/vite.config.ts), runnable from the root.
       login: { command: "vp run example#login", cache: false },
+      status: { command: "vp run example#status", cache: false },
+      logs: { command: "vp run example#logs", cache: false },
+      rollback: { command: "vp run example#rollback", cache: false },
       // The example's deploy, saving the URL Void reports for test:production (e2e/deploy.ts).
       deploy: { command: "vpx e2e/deploy.ts", cache: false },
       "deploy:atomic": { command: "vpx e2e/deploy.ts --atomic", cache: false },
