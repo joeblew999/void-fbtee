@@ -2,7 +2,6 @@
 import { fbt } from "fbtee";
 import { useLocale } from "void-fbtee/react";
 import { Temporal } from "temporal-polyfill";
-import Nav from "../../../components/Nav";
 import Signup from "./_Signup" with { island: "load" };
 import Countdown from "./_Countdown" with { island: "visible" };
 
@@ -11,8 +10,7 @@ const launch = Temporal.ZonedDateTime.from("2026-12-24T19:30:00+07:00[Asia/Bangk
 export default function About() {
   const { locale } = useLocale();
   return (
-    <main>
-      <Nav page="/about" />
+    <div>
       <h1 className="mb-2 text-3xl font-semibold" data-testid="about-title">
         <fbt desc="Marketing page heading">Book a table in seconds</fbt>
       </h1>
@@ -21,6 +19,6 @@ export default function About() {
       </p>
       <Signup seats={4} />
       <Countdown launch={launch.toString()} />
-    </main>
+    </div>
   );
 }

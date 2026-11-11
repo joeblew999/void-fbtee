@@ -8,7 +8,8 @@
 // - fbtee's per-request state is held by fbtee itself in AsyncLocalStorage (runWithFbtee), so
 //   text rendered after the shell streams in the right language too. It gets every catalog, so
 //   fbtee falls back per message (de-AT -> de -> source text) as its README describes.
-// - shared.i18n = { locale, dir, now }: the browser gets the same "now" the server rendered with.
+// - shared.i18n = { locale, dir, now, path }: the browser gets the same "now" the server rendered
+//   with; path is the page without its locale prefix, for links to it in other languages.
 // - <html lang dir>, hreflang alternates (plus x-default, the source locale) and <meta name="void-fbtee"> (the same i18n data, for
 //   islands) go into headDefaults.
 import { defineMiddleware } from "void";
@@ -24,6 +25,9 @@ export interface SharedI18n {
   dir: Dir;
   /** The server's "now" for this response, as an ISO instant. */
   now: string;
+  /** This page's path without the locale prefix ("/formats" for /th-TH/formats; "" for /th-TH):
+   * `/${locale.segment}${path}` is the same page in another language. */
+  path: string;
 }
 
 // Void's own endpoints, API routes and file requests: no catalog, no fbtee state. They still get
@@ -40,12 +44,13 @@ export default defineMiddleware(async (c, next) => {
   // Accept-Language, and redirecting by language hides the other versions from it.
   if (!found && path === "/" && !light) return c.redirect(`/${source.segment}`, 301);
   const current = found ?? source;
+  const rest = found ? path.slice(found.segment.length + 1) : path;
   const i18n: SharedI18n = {
     locale: current.locale,
     dir: current.dir,
     now: Temporal.Now.instant().toString(),
+    path: rest,
   };
-  const rest = found ? path.slice(found.segment.length + 1) : path;
   const origin = new URL(c.req.url).origin;
   const alternates = [
     ...config.locales.map((l) => ({ hreflang: l.locale, segment: l.segment })),

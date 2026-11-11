@@ -45,3 +45,16 @@ test("Link: same language stays client-side, another language loads a fresh page
   expect(await p.locator("html").getAttribute("dir")).toBe("rtl");
   expect(errors.filter((e) => !VOID_DEFER_MESSAGE.test(e))).toEqual([]);
 });
+
+test("every page fits a phone's width, in every language", async () => {
+  const p = await page();
+  await p.setViewportSize({ width: 390, height: 844 });
+  const wide: string[] = [];
+  for (const locale of ["en-US", "ar-EG", "th-TH"])
+    for (const path of ["", "/formats", "/about", "/docs", "/docs/strings"]) {
+      await p.goto(`/${locale}${path}`);
+      const width = await p.evaluate(() => document.documentElement.scrollWidth);
+      if (width > 390) wide.push(`/${locale}${path}: ${width}px`);
+    }
+  expect(wide).toEqual([]);
+});

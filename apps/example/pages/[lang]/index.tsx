@@ -2,8 +2,7 @@
 // arrives after the shell (a defer() read), which must render in the page's language too.
 import { Suspense, use } from "react";
 import { fbt, list } from "fbtee";
-import { useLocales } from "void-fbtee/react";
-import Nav from "../../components/Nav";
+import { Link, useLocale, useLocales } from "void-fbtee/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Props } from "./index.server";
 
@@ -28,14 +27,61 @@ function Slow({ late }: { late: Props["late"] }) {
   );
 }
 
+/** The example's pages, as cards. */
+function Pages() {
+  const { locale } = useLocale();
+  const cards = [
+    {
+      href: `/${locale}/formats`,
+      title: <fbt desc="Home card title: the formats page">Formats</fbt>,
+      text: (
+        <fbt desc="Home card text: what the formats page shows">
+          Every Intl format, run on the Worker and in your browser, side by side.
+        </fbt>
+      ),
+    },
+    {
+      href: `/${locale}/about`,
+      title: <fbt desc="Home card title: the page made of islands">Islands</fbt>,
+      text: (
+        <fbt desc="Home card text: what the islands page shows">
+          A static page whose interactive parts hydrate on their own, in the page's language.
+        </fbt>
+      ),
+    },
+    {
+      href: `/${locale}/docs`,
+      title: <fbt desc="Home card title: the documentation">Docs</fbt>,
+      text: (
+        <fbt desc="Home card text: what the docs show">
+          Markdown pages, translated into every language.
+        </fbt>
+      ),
+    },
+  ];
+  return (
+    <div className="grid gap-4 sm:grid-cols-3">
+      {cards.map((c) => (
+        <Link key={c.href} href={c.href as never} className="group">
+          <Card className="h-full transition-colors group-hover:bg-muted/50">
+            <CardHeader>
+              <CardTitle>{c.title}</CardTitle>
+              <CardDescription>{c.text}</CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
 export default function HomePage({ count, late }: Props) {
   // Each language named in its own language: "English", "العربية", "ไทย".
   const names = useLocales().map((l) =>
     new Intl.DisplayNames(l.locale, { type: "language" }).of(new Intl.Locale(l.locale).language)!,
   );
   return (
-    <main>
-      <Nav page="" />
+    <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="text-3xl" data-testid="title">
@@ -62,6 +108,7 @@ export default function HomePage({ count, late }: Props) {
           </Suspense>
         </CardContent>
       </Card>
-    </main>
+      <Pages />
+    </div>
   );
 }

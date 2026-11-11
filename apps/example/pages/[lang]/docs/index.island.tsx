@@ -3,15 +3,13 @@
 import { fbt } from "fbtee";
 import pages from "@void/md/pages";
 import { useLocale } from "void-fbtee/react";
-import Nav from "../../../components/Nav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function DocsIndex() {
   const { locale } = useLocale();
   const docs = pages.filter((p) => p.path.startsWith(`/${locale}/docs/`));
   return (
-    <main>
-      <Nav page="/docs" />
+    <div>
       <Card>
         <CardHeader>
           <CardTitle className="text-3xl" data-testid="docs-title">
@@ -30,6 +28,6 @@ export default function DocsIndex() {
           </ul>
         </CardContent>
       </Card>
-    </main>
+    </div>
   );
 }

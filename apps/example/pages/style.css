@@ -4,6 +4,7 @@
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/noto-sans-arabic";
 @import "@fontsource-variable/noto-sans-thai";
+@import "@void/md/theme-content.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -129,4 +130,31 @@
   html {
     @apply font-sans;
   }
+}
+
+/* @void/md's markdown theme in shadcn's colours and font. ":root .void-md" outranks the theme's own
+   dark-mode rule, so markdown follows the shadcn theme like the rest of the page. */
+:root .void-md {
+  --vmd-font-body: var(--font-sans);
+  --vmd-text: var(--foreground);
+  --vmd-text-muted: var(--muted-foreground);
+  --vmd-link: var(--primary);
+  --vmd-link-hover: var(--primary);
+  --vmd-border: var(--border);
+  --vmd-bg-soft: var(--muted);
+}
+
+/* Long paths and commands in markdown wrap instead of widening the page on a phone. */
+.void-md :not(pre) > code {
+  overflow-wrap: anywhere;
+}
+
+/* @void/md 1.7.0 places heading anchors with physical left (float: left; margin-left), so in
+   right-to-left pages they stick out past the left edge. The same, in logical directions. */
+.void-md .header-anchor {
+  float: inline-start;
+  margin-left: 0;
+  margin-inline-start: -0.87em;
+  padding-right: 0;
+  padding-inline-end: 0.23em;
 }
