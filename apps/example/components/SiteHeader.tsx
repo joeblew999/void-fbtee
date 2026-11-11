@@ -1,13 +1,13 @@
 // The site header, in the root layout: the pages, and this page in every language, each named in
 // its own language (Intl.DisplayNames). Plain links, so crawlers find every language version, and
-// no JavaScript, so it works on island and markdown pages too. One row on desktop; on a phone the
+// no JavaScript, so it works on markdown pages too. One row on desktop; on a phone the
 // page links move to a second row that scrolls sideways.
 import { fbt } from "fbtee";
 import { Link, useLocale, useLocales } from "void-fbtee/react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const PAGES = ["", "/tour", "/events", "/formats", "/about", "/docs"] as const;
+const PAGES = ["", "/tour", "/events", "/formats", "/docs"] as const;
 
 function label(page: (typeof PAGES)[number]) {
   switch (page) {
@@ -19,8 +19,6 @@ function label(page: (typeof PAGES)[number]) {
       return <fbt desc="Navigation: the events people post and book">Events</fbt>;
     case "/formats":
       return <fbt desc="Navigation: the page that shows every Intl format">Formats</fbt>;
-    case "/about":
-      return <fbt desc="Navigation: the page made of islands">Islands</fbt>;
     case "/docs":
       return <fbt desc="Navigation: the documentation">Docs</fbt>;
   }

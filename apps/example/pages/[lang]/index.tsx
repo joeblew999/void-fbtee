@@ -50,15 +50,6 @@ function Pages() {
       ),
     },
     {
-      href: `/${locale}/about`,
-      title: <fbt desc="Home card title: the page made of islands">Islands</fbt>,
-      text: (
-        <fbt desc="Home card text: what the islands page shows">
-          A static page whose interactive parts hydrate on their own, in the page's language.
-        </fbt>
-      ),
-    },
-    {
       href: `/${locale}/docs`,
       title: <fbt desc="Home card title: the documentation">Docs</fbt>,
       text: (

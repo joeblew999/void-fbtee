@@ -193,66 +193,6 @@
       ],
       "types": []
     },
-    "U0x8YnwfkoAxSzwcf1mfXQ==": {
-      "description": "When the launch is, relative to today",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เปิดตัว: {when}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "tM77ujLuxM2vdLYjDoWThA==": {
-      "description": "Seats left, island",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เหลือ {number} ที่นั่ง",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "l617jlL65guL4frUlrxOCw==": {
-      "description": "Seats left, island",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เหลือ 1 ที่นั่ง",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "y5Jti7qFflauSnV7N6N/Iw==": {
-      "description": "Button that takes one seat",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "จองที่นั่ง",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "5ltmmUgT2eFS09sVXI0wMw==": {
-      "description": "Marketing page heading",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "จองโต๊ะได้ในไม่กี่วินาที",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "dPy3hYVB2dPFPscaAj2iKg==": {
       "description": "A number of nights, on the formats page",
       "status": "translated",
@@ -308,18 +248,6 @@
       "translations": [
         {
           "translation": "รูปแบบ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "EvLnLmDKXa53JMBjhXgIFw==": {
-      "description": "Navigation: the page made of islands",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ไอแลนด์",
           "variations": {}
         }
       ],
@@ -793,18 +721,6 @@
       ],
       "types": []
     },
-    "0dUvJl6QCwFvbjqUd5l/Ww==": {
-      "description": "Menu button: choose how many seats are left",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ที่นั่ง",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "toZs8GPjojr+z/WYHXg3Ow==": {
       "description": "Footer: the tools this example is built with (names, not translated)",
       "status": "translated",
@@ -848,30 +764,6 @@
       "translations": [
         {
           "translation": "รูปแบบ Intl ทุกแบบ ทำงานบน Worker และในเบราว์เซอร์ของคุณ แสดงเทียบกัน",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "eJ1VdkN1b+QnfxnopfvP7A==": {
-      "description": "Home card title: the page made of islands",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ไอแลนด์",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "EeU1TnF7VY6Hwm8YTi55+Q==": {
-      "description": "Home card text: what the islands page shows",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "หน้าคงที่ที่ส่วนโต้ตอบทำงานขึ้นมาเอง ในภาษาของหน้านั้น",
           "variations": {}
         }
       ],

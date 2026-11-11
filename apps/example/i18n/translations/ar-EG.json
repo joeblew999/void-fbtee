@@ -109,96 +109,6 @@
       ],
       "types": []
     },
-    "U0x8YnwfkoAxSzwcf1mfXQ==": {
-      "description": "When the launch is, relative to today",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "الإطلاق: {when}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "tM77ujLuxM2vdLYjDoWThA==": {
-      "description": "Seats left, island",
-      "status": "translated",
-      "tokens": [
-        "number"
-      ],
-      "translations": [
-        {
-          "translation": "لم يتبقَّ أي مقعد",
-          "variations": {
-            "0": 16
-          }
-        },
-        {
-          "translation": "تبقّى مقعدان",
-          "variations": {
-            "0": 8
-          }
-        },
-        {
-          "translation": "تبقّت {number} مقاعد",
-          "variations": {
-            "0": 20
-          }
-        },
-        {
-          "translation": "تبقّى {number} مقعدًا",
-          "variations": {
-            "0": 12
-          }
-        },
-        {
-          "translation": "تبقّى {number} مقعد",
-          "variations": {
-            "0": 24
-          }
-        }
-      ],
-      "types": [
-        28
-      ]
-    },
-    "l617jlL65guL4frUlrxOCw==": {
-      "description": "Seats left, island",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تبقّى مقعد واحد",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "y5Jti7qFflauSnV7N6N/Iw==": {
-      "description": "Button that takes one seat",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "احجز مقعدًا",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "5ltmmUgT2eFS09sVXI0wMw==": {
-      "description": "Marketing page heading",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "احجز طاولة في ثوانٍ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "IYUmtYxQtGdt1MucjXrsVA==": {
       "description": "Label with meaning 'at least number'",
       "status": "translated",
@@ -500,18 +410,6 @@
       "translations": [
         {
           "translation": "التنسيقات",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "EvLnLmDKXa53JMBjhXgIFw==": {
-      "description": "Navigation: the page made of islands",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "الجزر",
           "variations": {}
         }
       ],
@@ -1021,18 +919,6 @@
       ],
       "types": []
     },
-    "0dUvJl6QCwFvbjqUd5l/Ww==": {
-      "description": "Menu button: choose how many seats are left",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "المقاعد",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "toZs8GPjojr+z/WYHXg3Ow==": {
       "description": "Footer: the tools this example is built with (names, not translated)",
       "status": "translated",
@@ -1076,30 +962,6 @@
       "translations": [
         {
           "translation": "كل تنسيقات Intl، منفّذة على الـ Worker وفي متصفحك، جنبًا إلى جنب.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "eJ1VdkN1b+QnfxnopfvP7A==": {
-      "description": "Home card title: the page made of islands",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "الجزر",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "EeU1TnF7VY6Hwm8YTi55+Q==": {
-      "description": "Home card text: what the islands page shows",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "صفحة ثابتة تعمل أجزاؤها التفاعلية وحدها، بلغة الصفحة.",
           "variations": {}
         }
       ],

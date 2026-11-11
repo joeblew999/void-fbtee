@@ -208,9 +208,9 @@ async function checkDev(target: string, dir: string, app: App) {
       if (html === undefined) await new Promise((r) => setTimeout(r, 100));
     }
     check(html?.includes("i18n สำหรับแอป Void"), `${target}: dev serves /th-TH in Thai`);
-    const ar = await (await fetch(`${base}/ar-EG/about`)).text();
+    const ar = await (await fetch(`${base}/ar-EG`)).text();
     check(
-      ar.includes('<html lang="ar-EG" dir="rtl"') && ar.includes("احجز مقعدًا"),
+      ar.includes('<html lang="ar-EG" dir="rtl"') && ar.includes("تدويل تطبيقات Void"),
       `${target}: dev serves /ar-EG right-to-left, in Arabic`,
     );
   } finally {

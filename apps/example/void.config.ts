@@ -10,7 +10,7 @@ export default defineConfig({
   inference: { bindings: { ai: process.env.VOID_AI === "1" } },
   routing: {
     typedRoutes: true,
-    // Cache prerendered pages (the docs and the island page) at the edge; set here so a
+    // Cache prerendered pages (the docs and the tour) at the edge; set here so a
     // non-interactive deploy doesn't stop to ask.
     isr: true,
   },

@@ -1,4 +1,4 @@
-// The fresh-install check's pages: void-fbtee alone in a plain `void init` app (no shadcn), using
+// The fresh-install check's page: void-fbtee alone in a plain `void init` app (no shadcn), using
 // strings the example translates, so the example's catalogs apply.
 import { fbt } from "fbtee";
 
