@@ -8,6 +8,14 @@ export default defineConfig({
     // non-interactive deploy doesn't stop to ask.
     isr: true,
   },
+  // On every page (Void's site-wide head defaults). The viewport tag makes phones lay a page out at
+  // their own width; without it they lay it out 980px wide and shrink it.
+  head: {
+    meta: [
+      { charset: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+    ],
+  },
   // The Worker's name on Cloudflare: void-fbtee-example.<subdomain>.workers.dev.
   cloudflare: { name: "void-fbtee-example" },
   worker: {

@@ -47,14 +47,24 @@ test("Link: same language stays client-side, another language loads a fresh page
 });
 
 test("every page fits a phone's width, in every language", async () => {
-  const p = await page();
-  await p.setViewportSize({ width: 390, height: 844 });
+  // A phone, not a narrow desktop window: without the viewport meta tag a phone lays a page out
+  // 980px wide and shrinks it, so everything looks tiny.
+  const p = await page({
+    viewport: { width: 390, height: 844 },
+    isMobile: true,
+    hasTouch: true,
+    deviceScaleFactor: 3,
+  });
   const wide: string[] = [];
   for (const locale of ["en-US", "ar-EG", "th-TH"])
     for (const path of ["", "/formats", "/about", "/docs", "/docs/strings"]) {
       await p.goto(`/${locale}${path}`);
-      const width = await p.evaluate(() => document.documentElement.scrollWidth);
-      if (width > 390) wide.push(`/${locale}${path}: ${width}px`);
+      const { layout, content } = await p.evaluate(() => ({
+        layout: window.innerWidth,
+        content: document.documentElement.scrollWidth,
+      }));
+      if (layout !== 390 || content > 390)
+        wide.push(`/${locale}${path}: laid out ${layout}px, content ${content}px`);
     }
   expect(wide).toEqual([]);
 });

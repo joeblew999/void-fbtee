@@ -1,6 +1,12 @@
 // Browser helpers for the e2e tests: Playwright's library inside Vitest, as voidzero-dev/void
 // does (test/browser-helpers.ts).
-import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
+import {
+  chromium,
+  type Browser,
+  type BrowserContext,
+  type BrowserContextOptions,
+  type Page,
+} from "playwright";
 import { afterAll, afterEach, beforeAll, expect, inject } from "vite-plus/test";
 
 export const url = (mode: "prod" | "dev") => inject(mode as never) as string;
@@ -16,7 +22,7 @@ export function browser(mode: "prod" | "dev") {
     for (const c of contexts.splice(0)) await c.close();
   });
   afterAll(() => b?.close());
-  return async (options: { timezoneId?: string; locale?: string } = {}): Promise<Page> => {
+  return async (options: BrowserContextOptions = {}): Promise<Page> => {
     const context = await b.newContext({ baseURL: url(mode), ...options });
     contexts.push(context);
     return context.newPage();

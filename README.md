@@ -58,7 +58,11 @@ themselves: `vp run dev` rebuilds the package on save, and the example's `build`
 rebuild it first.
 
 To deploy the example to Cloudflare, `vp run deploy`. The first time on a machine it asks you to
-sign in (`vp run login` does only that).
+sign in (`vp run login` does only that). Then:
+
+- the site: https://void-fbtee-example.gedw99.workers.dev
+- the Worker in the Cloudflare dashboard (deployments, logs, settings):
+  https://dash.cloudflare.com/7384af54e33b8a54ff240371ea368440/workers/services/view/void-fbtee-example/production
 
 In a Claude cloud session, `.claude/hooks/cloud-session.sh` runs `mise install` and starts a
 keyring for the sign-in, so Claude runs the same commands. A new session needs one sign-in: Claude runs
