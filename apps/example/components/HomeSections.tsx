@@ -146,8 +146,8 @@ function features(): Feature[] {
         <fbt key="1" desc="Home feature fact about the Intl formats">
           Numbers, money, units, lists and names from the platform's own Intl.
         </fbt>,
-        <fbt key="2" desc="Home feature fact: server and browser format alike">
-          The same result on the Worker and in the browser.
+        <fbt key="2" desc="Home feature fact: the same calls run on the server and in the browser">
+          The same calls on the Worker and in the browser; Formats shows where engines differ.
         </fbt>,
         <fbt key="3" desc="Home feature fact: no locale data in the app's bundle">
           No locale data to ship: the platform has it.

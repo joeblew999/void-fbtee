@@ -2,6 +2,7 @@
 // does (test/browser-helpers.ts).
 import {
   chromium,
+  webkit,
   type Browser,
   type BrowserContext,
   type BrowserContextOptions,
@@ -11,12 +12,15 @@ import { afterAll, afterEach, beforeAll, inject } from "vite-plus/test";
 
 export const url = (mode: "prod") => inject(mode as never) as string;
 
-/** One browser per test file; each `page()` gets a fresh context, closed after its test. */
-export function browser(mode: "prod") {
+/**
+ * One browser per test file; each `page()` gets a fresh context, closed after its test. Chromium
+ * unless asked for WebKit, Safari's engine (its own Intl and locale data).
+ */
+export function browser(mode: "prod", engine: "chromium" | "webkit" = "chromium") {
   let b: Browser;
   const contexts: BrowserContext[] = [];
   beforeAll(async () => {
-    b = await chromium.launch();
+    b = await (engine === "webkit" ? webkit : chromium).launch();
   });
   afterEach(async () => {
     for (const c of contexts.splice(0)) await c.close();

@@ -39,10 +39,15 @@ function useBrowserRows(locale: string): Record<string, string> | null {
   );
 }
 
+/** A row listing an engine's supported values (the "supported" section), not a format. */
+const isInventory = (key: string) => key.startsWith("supported/");
+
 export default function FormatsPage({ worker }: Props) {
   const { locale, dir } = useLocale();
   const browser = useBrowserRows(locale);
-  const keys = Object.keys(worker);
+  // The rows that format something. The "supported" rows list each engine's own inventory
+  // (Intl.supportedValuesOf), which differs between engines by design, so they're shown, not compared.
+  const keys = Object.keys(worker).filter((k) => !isInventory(k));
   const same = browser ? keys.filter((k) => browser[k] === worker[k]).length : 0;
   const number = (n: number) => new Intl.NumberFormat(locale).format(n);
   return (
@@ -75,6 +80,13 @@ export default function FormatsPage({ worker }: Props) {
             </Badge>
           )}
         </div>
+        <p className="text-sm text-pretty text-muted-foreground">
+          <fbt desc="Formats page: what a highlighted row means">
+            A highlighted row is where your browser's engine formats differently: each engine ships
+            its own locale data. The supported-value lists at the end are each engine's own, so they
+            aren't compared.
+          </fbt>
+        </p>
       </div>
       <PageFacts />
       <TryIt />
@@ -111,7 +123,8 @@ export default function FormatsPage({ worker }: Props) {
               <TableBody>
                 {section.rows.map((row) => {
                   const key = `${section.id}/${row.id}`;
-                  const differs = browser !== null && browser[key] !== worker[key];
+                  const differs =
+                    browser !== null && !isInventory(key) && browser[key] !== worker[key];
                   const cell = "whitespace-normal break-words align-top";
                   return (
                     <Fragment key={key}>
@@ -125,7 +138,8 @@ export default function FormatsPage({ worker }: Props) {
                       </TableRow>
                       <TableRow
                         data-row={key}
-                        className={differs ? "bg-destructive/10" : undefined}
+                        className={differs ? "bg-brand/10" : undefined}
+                        data-differs={differs || undefined}
                       >
                         <TableCell className={cell} data-side="worker" dir={dir}>
                           {worker[key]}

@@ -12,7 +12,10 @@ export default defineConfig({
       // The package rebuilding on save, and the example's dev server, together.
       dev: { command: "vp run -r --parallel dev", cache: false },
       // Chromium for the browser tests (once per machine).
-      "install:browser": { command: "playwright install --with-deps chromium", cache: false },
+      "install:browser": {
+        command: "playwright install --with-deps chromium webkit",
+        cache: false,
+      },
       // void-fbtee installed into fresh `void init` apps, as a user's app installs it.
       // Every browser test against production (the deployed site), at the URL Void reported on the last deploy
       // (e2e/production.ts). Deploying and testing are separate: `vp run deploy`, then this.
@@ -20,6 +23,9 @@ export default defineConfig({
       // Every browser test against what Cloudflare's Workers Builds deployed for this commit: production
       // for main, the branch's Preview otherwise (e2e/deployed.ts). What CI runs: no Cloudflare login.
       "test:deployed": { command: "vpx e2e/deployed.ts", cache: false },
+      // The formats page in every language, Chromium and WebKit (e2e/formats/): its own run, as it
+      // grows with each language. CI runs it against the deployed site (test:deployed).
+      "test:formats": { command: "vp test run --config e2e/formats/vite.config.ts", cache: false },
       "test:fresh": { command: "vpx e2e/fresh/check.ts", cache: false },
       // Vite+'s, Void's and void-fbtee's setup commands, run again: fails if any changes a file.
       "check:tools": { command: "node e2e/check-tools.mjs", cache: false },

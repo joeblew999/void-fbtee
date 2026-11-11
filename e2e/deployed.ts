@@ -54,8 +54,14 @@ const [, worker, preview] =
   /\/services\/view\/([^/]+)\/production\/(?:previews\/([^/]+)\/)?builds\//.exec(run.details_url)!;
 const url = `https://${preview ? `${preview}-` : ""}${worker}.${subdomain}.workers.dev`;
 console.log(`test:deployed: testing ${url}\n`);
-const tests = spawn("vp", ["test", "run", "e2e"], {
-  stdio: "inherit",
-  env: { ...process.env, E2E_URL: url },
-});
-tests.on("close", (c) => process.exit(c ?? 1));
+// The browser tests, then the formats page's (e2e/formats/), one after the other.
+const env = { ...process.env, E2E_URL: url };
+for (const args of [
+  ["test", "run", "e2e"],
+  ["test", "run", "--config", "e2e/formats/vite.config.ts"],
+]) {
+  const code = await new Promise<number | null>((done) =>
+    spawn("vp", args, { stdio: "inherit", env }).on("close", done),
+  );
+  if (code !== 0) process.exit(code ?? 1);
+}

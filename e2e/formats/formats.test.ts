@@ -1,10 +1,15 @@
-// Production build: the formats page. Every row is formatted by the Worker (the loader) and again
-// by the browser; they must be identical, in every language. That agreement is what rendering with
-// Intl on the server and hydrating in the browser depends on (plan #1, decision 49).
-import { expect, test } from "vite-plus/test";
+// The formats page, every language, in Chromium and WebKit: its own run (`vp run test:formats`, and
+// in CI against the deployed site), apart from `vp test run`, because it grows with every language.
+// Every row is formatted by the Worker (the loader) and again by the browser. In Chromium (V8 with
+// ICU, as the Worker) they must be identical: what rendering with Intl on the server and hydrating
+// in the browser depends on (plan #1, decision 49). WebKit has Apple's locale data, so some rows
+// differ there by design: it must load without errors, and its differences are reported, not
+// listed here (no per-language list to keep up as languages are added).
+import { appendFileSync } from "node:fs";
+import { describe, expect, test } from "vite-plus/test";
 import type { Page } from "playwright";
-import { browser, collectErrors, seeText, text, untilText } from "./helpers";
-import { LOCALES } from "./locales";
+import { browser, collectErrors, seeText, text, untilText } from "../helpers";
+import { LOCALES } from "../locales";
 
 const page = browser("prod");
 
@@ -31,6 +36,37 @@ for (const locale of LOCALES) {
     expect(await p.locator("tr[data-row]").count()).toBeGreaterThan(130);
     expect(errors).toEqual([]);
   });
+}
+
+describe("WebKit", () => {
+  const safari = browser("prod", "webkit");
+  for (const locale of LOCALES) {
+    test(`${locale}: no errors; engine differences reported`, async () => {
+      const p = await safari();
+      const errors = collectErrors(p);
+      const differs = (await differences(p, locale)).filter(
+        ([row]) => !row!.startsWith("supported/"),
+      );
+      expect(await p.locator("tr[data-row]").count()).toBeGreaterThan(130);
+      expect(errors).toEqual([]);
+      report(`WebKit, ${locale}`, differs);
+    });
+  }
+});
+
+/** Print the rows that differ, and add them to the GitHub job's summary when run there. */
+function report(title: string, rows: (string | null | undefined)[][]) {
+  const lines = rows.map(([row, worker, browser]) => `| ${row} | ${worker} | ${browser} |`);
+  console.log(`${title}: ${rows.length} rows differ\n${lines.join("\n")}`);
+  const summary = process.env.GITHUB_STEP_SUMMARY;
+  if (summary)
+    appendFileSync(
+      summary,
+      `### ${title}: ${rows.length} rows differ\n\n` +
+        (rows.length
+          ? `| Row | Worker | Browser |\n| --- | --- | --- |\n${lines.join("\n")}\n\n`
+          : ""),
+    );
 }
 
 test("Temporal rows match with the polyfill too (Safari's path)", async () => {

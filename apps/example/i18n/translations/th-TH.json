@@ -1417,18 +1417,6 @@
       ],
       "types": []
     },
-    "DmqGxHb9es+9U2UWl1iZLQ==": {
-      "description": "Home feature fact: server and browser format alike",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ได้ผลลัพธ์เหมือนกันทั้งบน Worker และในเบราว์เซอร์",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "rGA2sEdvXM8TzENm3eRJLQ==": {
       "description": "Home feature fact: no locale data in the app's bundle",
       "status": "translated",
@@ -1700,6 +1688,30 @@
       "translations": [
         {
           "translation": "เพิ่มรีลีสจาก GitHub ลงใน {packageJson} ของแอป และอนุญาตให้บิลด์ใน {workspace} แล้วรันคำสั่งเหล่านี้ init จะเพิ่มเฉพาะสิ่งที่ยังขาด และ translate จะเติมคำแปลให้ทุกภาษา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XpENML4mulBCjQ8ncsWiHA==": {
+      "description": "Home feature fact: the same calls run on the server and in the browser",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เรียกใช้แบบเดียวกันทั้งบน Worker และในเบราว์เซอร์ หน้ารูปแบบแสดงจุดที่แต่ละเอนจินต่างกัน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mxCKYNLxFaKMZAJAH9rSOw==": {
+      "description": "Formats page: what a highlighted row means",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แถวที่ไฮไลต์คือจุดที่เอนจินของเบราว์เซอร์คุณจัดรูปแบบต่างออกไป เพราะแต่ละเอนจินมีข้อมูลภาษาของตัวเอง รายการค่าที่รองรับท้ายหน้าเป็นของแต่ละเอนจินเอง จึงไม่นำมาเทียบกัน",
           "variations": {}
         }
       ],
