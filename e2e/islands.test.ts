@@ -6,6 +6,7 @@ import { expect, test } from "vite-plus/test";
 import { fmt } from "../apps/example/lib/fmt";
 import { browser, collectErrors, hydrated, seeText, text, watchTexts } from "./helpers";
 import { EXAMPLE } from "./setup";
+import { SOURCE, TRANSLATED } from "./locales";
 
 const page = browser("prod");
 
@@ -47,9 +48,9 @@ test("docs: markdown pages, one set per language", async () => {
     return links.evaluateAll((as) => as.map((a) => a.getAttribute("href")!));
   };
   // Each language's sidebar lists its own pages, and the same pages in every language.
-  const english = (await sidebar("en-US")).map((h) => h.replace("/en-US/", "/"));
-  for (const locale of ["th-TH", "ar-EG"])
-    expect((await sidebar(locale)).map((h) => h.replace(`/${locale}/`, "/"))).toEqual(english);
+  const source = (await sidebar(SOURCE)).map((h) => h.replace(`/${SOURCE}/`, "/"));
+  for (const locale of TRANSLATED)
+    expect((await sidebar(locale)).map((h) => h.replace(`/${locale}/`, "/"))).toEqual(source);
   await p.goto("/th-TH/docs/strings");
   expect(await p.locator("h1").textContent()).toContain("การแปลข้อความในแอป Void");
   await p.goto("/en-US/docs/strings");

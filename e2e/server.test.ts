@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
 import { url } from "./helpers";
 import { EXAMPLE } from "./setup";
+import { LOCALES } from "./locales";
 
 const get = (path: string, init?: RequestInit) => fetch(url("prod") + path, init);
 
@@ -21,7 +22,7 @@ test('"/" always redirects to the source language, whatever the browser asks for
 test("page head: lang, dir, hreflang alternates with x-default, i18n meta", async () => {
   const html = await (await get("/ar-EG/formats")).text();
   expect(html).toContain('<html lang="ar-EG" dir="rtl"');
-  for (const l of ["en-US", "ar-EG", "th-TH"])
+  for (const l of LOCALES)
     expect(html).toContain(`hreflang="${l}" href="${url("prod")}/${l}/formats"`);
   expect(html).toContain(`hreflang="x-default" href="${url("prod")}/en-US/formats"`);
   const meta = html.match(/<meta name="void-fbtee" content="([^"]*)"/)?.[1];

@@ -4,6 +4,7 @@
 import { expect, test } from "vite-plus/test";
 import type { Page } from "playwright";
 import { browser, collectErrors, seeText, text } from "./helpers";
+import { LOCALES } from "./locales";
 
 const page = browser("prod");
 
@@ -22,7 +23,7 @@ async function differences(p: Page, locale: string) {
   );
 }
 
-for (const locale of ["en-US", "ar-EG", "th-TH"]) {
+for (const locale of LOCALES) {
   test(`${locale}: every row the same on the Worker and in the browser`, async () => {
     const p = await page();
     const errors = collectErrors(p);

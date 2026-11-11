@@ -14,7 +14,7 @@ export default defineConfig({
       // Chromium for the browser tests (once per machine).
       "install:browser": { command: "playwright install --with-deps chromium", cache: false },
       // void-fbtee installed into fresh `void init` apps, as a user's app installs it.
-      "test:fresh": { command: "node e2e/fresh/check.mjs", cache: false },
+      "test:fresh": { command: "vpx e2e/fresh/check.ts", cache: false },
       // Vite+'s, Void's and void-fbtee's setup commands, run again: fails if any changes a file.
       "check:tools": { command: "node e2e/check-tools.mjs", cache: false },
       // Upgrade Vite+ to the vp in mise.toml (change it there, `mise install`, then this): the

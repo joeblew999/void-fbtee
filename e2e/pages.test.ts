@@ -2,6 +2,7 @@
 // another language (including text that arrives after the shell); void-fbtee's Link.
 import { expect, test } from "vite-plus/test";
 import { browser, collectErrors, seeText, text, VOID_DEFER_MESSAGE, watchTexts } from "./helpers";
+import { LOCALES } from "./locales";
 
 const page = browser("prod");
 
@@ -56,7 +57,7 @@ test("every page fits a phone's width, in every language", async () => {
     deviceScaleFactor: 3,
   });
   const wide: string[] = [];
-  for (const locale of ["en-US", "ar-EG", "th-TH"])
+  for (const locale of LOCALES)
     for (const path of ["", "/tour", "/events", "/formats", "/about", "/docs", "/docs/strings"]) {
       await p.goto(`/${locale}${path}`);
       const { layout, content } = await p.evaluate(() => ({

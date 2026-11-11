@@ -4,6 +4,7 @@
 import { execFileSync, spawn, type ChildProcess } from "node:child_process";
 import { join } from "node:path";
 import type { TestProject } from "vite-plus/test/node";
+import { SOURCE } from "./locales";
 
 const root = join(import.meta.dirname, "..");
 export const EXAMPLE = join(root, "apps/example");
@@ -36,8 +37,8 @@ export default async function setup(project: TestProject) {
   const prod = `http://localhost:${PORTS.prod}`;
   const dev = `http://localhost:${PORTS.dev}`;
   const servers = [
-    await start(["preview", "--port", String(PORTS.prod)], `${prod}/en-US`),
-    await start(["dev", "--port", String(PORTS.dev)], `${dev}/en-US`),
+    await start(["preview", "--port", String(PORTS.prod)], `${prod}/${SOURCE}`),
+    await start(["dev", "--port", String(PORTS.dev)], `${dev}/${SOURCE}`),
   ];
   project.provide("prod" as never, prod as never);
   project.provide("dev" as never, dev as never);

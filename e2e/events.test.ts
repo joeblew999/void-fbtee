@@ -3,18 +3,19 @@
 // forms, database and cache are Void's to test; this checks what void-fbtee and the app add.
 import { expect, test } from "vite-plus/test";
 import { browser, collectErrors, hydrated, seeText } from "./helpers";
+import { LOCALES, SOURCE } from "./locales";
 
 const page = browser("prod");
 
 /** A sample event's page in a language, found by its English title (the seed's). */
 async function goToEvent(p: import("playwright").Page, locale: string, englishTitle: string) {
-  await p.goto("/en-US/events");
+  await p.goto(`/${SOURCE}/events`);
   const href = await p
     .getByTestId("events-list")
     .locator("a")
     .filter({ hasText: englishTitle })
     .getAttribute("href");
-  await p.goto(href!.replace("/en-US/", `/${locale}/`));
+  await p.goto(href!.replace(`/${SOURCE}/`, `/${locale}/`));
   // Void's form works once the page has hydrated.
   await p.waitForLoadState("networkidle");
 }
@@ -65,7 +66,7 @@ test("the tour (Markdown): its event time is an island, formatted in each langua
   const p = await page({ timezoneId: "America/New_York" });
   const errors = collectErrors(p);
   const MARKET = new Date("2027-03-06T11:30:00Z"); // the night market: 18:30 in Bangkok
-  for (const locale of ["en-US", "th-TH", "ar-EG"]) {
+  for (const locale of LOCALES) {
     const at = (timeZone: string) =>
       new Intl.DateTimeFormat(locale, { ...WHEN, timeZone }).format(MARKET);
     await p.goto(`/${locale}/tour`);

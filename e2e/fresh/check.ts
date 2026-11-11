@@ -4,9 +4,9 @@
 // smoke check, it uses no browser: the package's contents, a real `void-fbtee init`, the CLI, a
 // build, TypeScript and a few requests to the dev server. Work happens in .e2e-work/ (git ignores it).
 //
-//   node e2e/fresh/check.mjs              both apps
-//   node e2e/fresh/check.mjs vite-plus    a `void init --toolchain vite-plus` app
-//   node e2e/fresh/check.mjs vite         a `void init --toolchain vite` app
+//   vpx e2e/fresh/check.ts              both apps
+//   vpx e2e/fresh/check.ts vite-plus    a `void init --toolchain vite-plus` app
+//   vpx e2e/fresh/check.ts vite         a `void init --toolchain vite` app
 //
 // Each app is made fresh by `void init`, the Void version this repo pins
 // (apps/example/node_modules/.bin/void), in an empty folder, as a user starts one. Both use
@@ -27,9 +27,12 @@ import {
 import { dirname, join, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "../..");
+// The example's languages, from its voidFbtee() (e2e/locales.ts).
+const { TRANSLATED } = await import("../locales");
 const work = join(root, ".e2e-work");
 const targets = process.argv[2] ? [process.argv[2]] : ["vite-plus", "vite"];
-const APPS = {
+type App = { pm: string; install: string[]; cli: string[]; port: number };
+const APPS: Record<string, App> = {
   "vite-plus": {
     pm: "pnpm",
     install: ["install", "--no-frozen-lockfile"],
@@ -49,7 +52,7 @@ const VOID_INIT_BUILDS = { "better-sqlite3": false, esbuild: true, sharp: true, 
 const VOID = join(root, "apps/example/node_modules/.bin/void");
 const VOID_INIT = ["init", "--framework", "react", "--starter", "static", "--deploy", "none"];
 
-const run = (cmd, args, cwd, options = {}) => {
+const run = (cmd: string, args: string[], cwd: string, options: { capture?: boolean } = {}) => {
   console.error(`\n$ (${cwd.replace(root, ".")}) ${cmd} ${args.join(" ")}`);
   return execFileSync(cmd, args, {
     cwd,
@@ -57,7 +60,7 @@ const run = (cmd, args, cwd, options = {}) => {
     encoding: "utf8",
   });
 };
-const check = (ok, what) => {
+const check = (ok: unknown, what: string) => {
   if (!ok) throw new Error(`fresh check failed: ${what}`);
   console.error(`✓ ${what}`);
 };
@@ -75,7 +78,7 @@ const dependency = `${repo}#${sha}&path:/packages/void-fbtee`;
 
 for (const target of targets) {
   const app = APPS[target];
-  if (!app) throw new Error(`usage: node e2e/fresh/check.mjs [vite-plus|vite] (got ${target})`);
+  if (!app) throw new Error(`usage: vpx e2e/fresh/check.ts [vite-plus|vite] (got ${target})`);
   const dir = join(work, `fresh-${target}`);
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(dir, { recursive: true });
@@ -100,8 +103,9 @@ for (const target of targets) {
     `${target}: void-fbtee --help`,
   );
 
-  // The example's locales; init adds the plugin, middleware, flags, scripts and peers.
-  run(app.pm, ["exec", "--", "void-fbtee", "init", "--locales", "ar-EG,th-TH"], dir);
+  // The example's languages (its translations are copied in below); init adds the plugin,
+  // middleware, flags, scripts and peers.
+  run(app.pm, ["exec", "--", "void-fbtee", "init", "--locales", TRANSLATED.join(",")], dir);
   run(app.pm, app.install, dir);
   // void-fbtee's own pages (e2e/fresh/app/) and the example's translations of their strings.
   cpSync(join(import.meta.dirname, "app/pages"), join(dir, "pages"), { recursive: true });
@@ -121,7 +125,7 @@ for (const target of targets) {
  * pnpm-workspace.yaml's allowBuilds: with `spec`, the README's line (pnpm only runs an approved
  * git dependency's build); without, the file `void init` writes on Vite+, for the plain-Vite app.
  */
-function allowBuild(dir, spec) {
+function allowBuild(dir: string, spec?: string) {
   const file = join(dir, "pnpm-workspace.yaml");
   if (spec) {
     const text = readFileSync(file, "utf8");
@@ -133,18 +137,18 @@ function allowBuild(dir, spec) {
 }
 
 /** Every package void-fbtee's built code imports resolves inside the app (not in this repo's). */
-function checkOwnDependencies(dir, installed) {
-  const specifiers = new Set();
+function checkOwnDependencies(dir: string, installed: string) {
+  const specifiers = new Set<string>();
   for (const f of readdirSync(join(installed, "dist")).filter((f) => f.endsWith(".mjs"))) {
     const code = readFileSync(join(installed, "dist", f), "utf8");
     for (const m of code.matchAll(/(?:from|import)\s*\(?\s*"([^".][^"]*)"/g)) specifiers.add(m[1]);
   }
-  const outside = [];
+  const outside: string[] = [];
   for (const spec of specifiers) {
     if (spec.startsWith("node:") || spec.startsWith("virtual:")) continue;
     const name = spec.startsWith("@") ? spec.split("/").slice(0, 2).join("/") : spec.split("/")[0];
     // Node's lookup: the first node_modules/<name> walking up from the package's folder.
-    let found;
+    let found: string | undefined;
     for (let d = installed; !found; d = dirname(d)) {
       const candidate = join(d, "node_modules", name);
       if (existsSync(candidate)) found = realpathSync(candidate);
@@ -160,7 +164,7 @@ function checkOwnDependencies(dir, installed) {
 }
 
 /** init's lint wiring, in Vite+ itself: the example passes, a showCount="no" probe fails. */
-function checkLint(dir) {
+function checkLint(dir: string) {
   run("pnpm", ["exec", "vp", "lint", "pages"], dir);
   mkdirSync(join(dir, "components"), { recursive: true });
   const probe = join(dir, "components/_LintProbe.tsx");
@@ -176,7 +180,8 @@ function checkLint(dir) {
       stdio: "pipe",
     });
   } catch (error) {
-    output = `${error.stdout}${error.stderr}`;
+    const e = error as { stdout?: string; stderr?: string };
+    output = `${e.stdout}${e.stderr}`;
   }
   rmSync(probe);
   check(
@@ -186,7 +191,7 @@ function checkLint(dir) {
 }
 
 /** The dev server serves translated pages, and an Arabic page right-to-left. */
-async function checkDev(target, dir, app) {
+async function checkDev(target: string, dir: string, app: App) {
   const server = spawn(app.pm, [...app.cli, "dev", "--port", String(app.port), "--strictPort"], {
     cwd: dir,
     stdio: ["ignore", "ignore", "inherit"],
