@@ -37,9 +37,9 @@ if [ -n "$CLAUDE_ENV_FILE" ]; then
   echo "export DBUS_SESSION_BUS_ADDRESS='$bus'" >> "$CLAUDE_ENV_FILE"
 fi
 
-# A session bus at a fixed address, with an unlocked keyring (if it's installed).
-command -v gnome-keyring-daemon > /dev/null || exit 0 The keyring file stays on disk with
-# the same password, so a restarted keyring still has the sign-in.
+# A session bus at a fixed address, with an unlocked keyring (if it's installed). The keyring file
+# stays on disk with the same password, so a restarted keyring still has the sign-in.
+command -v gnome-keyring-daemon > /dev/null || exit 0
 if ! DBUS_SESSION_BUS_ADDRESS="$bus" dbus-send --session --print-reply --dest=org.freedesktop.secrets \
   /org/freedesktop/secrets org.freedesktop.DBus.Peer.Ping > /dev/null 2>&1; then
   rm -f "$dir/bus"
