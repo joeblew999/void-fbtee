@@ -17,7 +17,7 @@ export default defineConfig({
     ],
   },
   // The Worker's name on Cloudflare: void-fbtee-example.<subdomain>.workers.dev.
-  // The account too, as Void asks for deploys from CI (.github/workflows/void-deploy.yml).
+  // The account too, as Void's config reference shows.
   cloudflare: { name: "void-fbtee-example", account_id: "7384af54e33b8a54ff240371ea368440" },
   worker: {
     compatibility_date: "2026-02-24",

@@ -60,9 +60,7 @@ reach the example by themselves: `vp run dev` rebuilds the package on save, and 
 build (`vp run -t example#build`) and `vp run deploy` build it first. Each commit is checked first
 (`vp staged`, a Vite+ commit hook that `vp install` sets up).
 
-To deploy the example to Cloudflare, `vp run deploy`. Each push to main also deploys it
-(`.github/workflows/void-deploy.yml`, Void's deploy workflow), once the repository has a
-`CLOUDFLARE_API_TOKEN` secret. Once per machine, `vp run login` first: it
+To deploy the example to Cloudflare, `vp run deploy`. Once per machine, `vp run login` first: it
 signs you in to Cloudflare and points the project at your account (Void's `void connect`), which
 deploys and Void's remote database commands (`void db execute --remote`) use. When a change adds
 or changes a Durable Object class, Void stops and asks for an atomic deploy: `vp run
