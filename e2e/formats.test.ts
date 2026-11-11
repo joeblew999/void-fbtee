@@ -3,7 +3,7 @@
 // Intl on the server and hydrating in the browser depends on (plan #1, decision 49).
 import { expect, test } from "vite-plus/test";
 import type { Page } from "playwright";
-import { browser, collectErrors, seeText, text } from "./helpers";
+import { browser, collectErrors, seeText, text, untilText } from "./helpers";
 import { LOCALES } from "./locales";
 
 const page = browser("prod");
@@ -11,7 +11,7 @@ const page = browser("prod");
 /** Load the formats page and return the rows where the browser differs from the Worker. */
 async function differences(p: Page, locale: string) {
   await p.goto(`/${locale}/formats`);
-  await expect.poll(() => p.getByTestId("formats-match").textContent()).not.toBe("…");
+  await untilText(p, '[data-testid="formats-match"]', "not", "…");
   return p.$$eval("tr[data-row]", (rows) =>
     rows
       .map((r) => [
@@ -51,13 +51,11 @@ test("ar-EG: a number typed in Arabic digits, read back and formatted by the Wor
   const p = await page();
   const errors = collectErrors(p);
   await p.goto("/ar-EG/formats");
-  await expect.poll(() => p.getByTestId("formats-match").textContent()).not.toBe("…");
+  await untilText(p, '[data-testid="formats-match"]', "not", "…");
   await p.getByTestId("try-number").fill("٢٬٥٠٠٫٧٥");
   await p.getByTestId("try-server").click();
   const row = (name: string) => p.locator(`[data-try="${name}"]`);
-  await expect
-    .poll(() => row("value").locator('[data-side="worker"]').textContent())
-    .toBe("2500.75");
+  await untilText(p, '[data-try="value"] [data-side="worker"]', "is", "2500.75");
   for (const name of ["value", "default", "currency", "compact", "plural", "words"])
     expect(await row(name).locator('[data-side="worker"]').textContent(), name).toBe(
       await row(name).locator('[data-side="browser"]').textContent(),

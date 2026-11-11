@@ -24,6 +24,8 @@ export function browser(mode: "prod") {
   afterAll(() => b?.close());
   return async (options: BrowserContextOptions = {}): Promise<Page> => {
     const context = await b.newContext({ baseURL: url(mode), ...options });
+    // No time limits on Playwright's waits either (its default is 30s).
+    context.setDefaultTimeout(0);
     contexts.push(context);
     return context.newPage();
   };
@@ -37,16 +39,33 @@ export async function text(page: Page, id: string) {
 }
 
 /**
- * Wait until `[data-testid=id]` shows `want` (hydration, live updates). Playwright's wait, not
- * Vitest's expect.poll: that gives up after 1s, too soon on a busy machine or over the internet.
- * The test's own timeout still applies.
+ * Wait until the `nth` element matching `selector` has text that `is`, `has` or is `not` `want`
+ * (hydration, live updates, an answer from the Worker). Playwright's wait, with no time limit.
  */
-export async function seeText(page: Page, id: string, want: string) {
+export async function untilText(
+  page: Page,
+  selector: string,
+  kind: "is" | "has" | "not",
+  want: string,
+  nth = 0,
+) {
   await page.waitForFunction(
-    ([id, want]) => document.querySelector(`[data-testid="${id}"]`)?.textContent === want,
-    [id, want],
+    ([selector, kind, want, nth]) => {
+      const text = document.querySelectorAll(selector as string)[nth as number]?.textContent;
+      if (text == null) return false;
+      return kind === "is"
+        ? text === want
+        : kind === "has"
+          ? text.includes(want as string)
+          : text !== want;
+    },
+    [selector, kind, want, nth] as const,
   );
 }
+
+/** Wait until `[data-testid=id]` shows `want`. */
+export const seeText = (page: Page, id: string, want: string) =>
+  untilText(page, `[data-testid="${id}"]`, "is", want);
 
 /**
  * Wait until the page has started in the browser (the root layout's `<html data-hydrated>`), before

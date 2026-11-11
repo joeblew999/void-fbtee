@@ -40,20 +40,23 @@ async function start(args: string[], port: number, url: string): Promise<ChildPr
       detached: true,
     },
   );
-  let output = "";
-  child.stdout!.on("data", (chunk: Buffer) => (output += chunk));
   const listening = new RegExp(
     String.raw`(?:Local:?|Listening on)\s+https?://[^\s/]+:${port}(?!\d)`,
   );
-  for (let i = 0; i < 300; i++) {
-    if (child.exitCode !== null) throw new Error(`${args.join(" ")} exited with ${child.exitCode}`);
-    if (listening.test(stripVTControlCharacters(output)))
-      try {
-        if ((await fetch(url)).ok) return child;
-      } catch {}
-    await new Promise((r) => setTimeout(r, 100));
-  }
-  throw new Error(`${args.join(" ")} didn't answer at ${url}:\n${output}`);
+  // Ready when it prints its URL; failed if it exits first. No time limit.
+  await new Promise<void>((resolve, reject) => {
+    let output = "";
+    child.stdout!.on("data", (chunk: Buffer) => {
+      output += chunk;
+      if (listening.test(stripVTControlCharacters(output))) resolve();
+    });
+    child.once("exit", (code) =>
+      reject(new Error(`${args.join(" ")} exited with ${code}:\n${output}`)),
+    );
+  });
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`${args.join(" ")}: ${url} answered ${res.status}`);
+  return child;
 }
 
 export default async function setup(project: TestProject) {

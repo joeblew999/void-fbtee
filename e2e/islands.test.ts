@@ -4,7 +4,7 @@ import { globSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
 import { fmt } from "../apps/example/lib/fmt";
-import { browser, hydrated } from "./helpers";
+import { browser, hydrated, untilText } from "./helpers";
 import { EXAMPLE } from "./setup";
 
 const page = browser("prod");
@@ -29,9 +29,7 @@ test("Markdown pages: every <Fmt> value, formatted in the page's language and th
       const want = fmt(props, locale, "America/New_York", now);
       // A <Fmt> that renders nothing is a mistake in the page, not a match.
       expect(want, `${url} ${JSON.stringify(props)}`).not.toBe("");
-      await expect
-        .poll(() => values.nth(i).textContent(), { message: `${url} ${JSON.stringify(props)}` })
-        .toBe(want);
+      await untilText(p, "[data-fmt]", "is", want, i);
     }
   }
 });

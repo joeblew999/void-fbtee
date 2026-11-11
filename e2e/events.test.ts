@@ -2,7 +2,7 @@
 // reader's, in the reader's language; an event posted in Arabic, then read in English. Void's
 // forms, database and cache are Void's to test; this checks what void-fbtee and the app add.
 import { expect, test } from "vite-plus/test";
-import { browser, collectErrors, seeText, started } from "./helpers";
+import { browser, collectErrors, seeText, started, untilText } from "./helpers";
 import { SOURCE } from "./locales";
 
 const page = browser("prod");
@@ -60,9 +60,7 @@ test("th-TH, in New York: Sydney's clock, the reader's, and how far off, in Thai
   await p.clock.install({ time: new Date("2027-03-05T12:00:00Z") });
   await goToEvent(p, "th-TH", "Harbour sunrise swim");
   const swim = p.locator("article");
-  await expect
-    .poll(() => swim.getByTestId("event-yours").textContent())
-    .toContain(at("th-TH", "America/New_York"));
+  await untilText(p, 'article [data-testid="event-yours"]', "has", at("th-TH", "America/New_York"));
   expect(await swim.getByTestId("event-local").textContent()).toBe(at("th-TH", "Australia/Sydney"));
   expect(await swim.getByTestId("event-when").textContent()).toBe("พรุ่งนี้");
   expect(errors).toEqual([]);
