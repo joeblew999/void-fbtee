@@ -1,12 +1,14 @@
-// `vp run deploy:preview`: the example as a Cloudflare Worker Preview of this branch, beside production
-// (https://developers.cloudflare.com/workers/previews/). Workers Builds runs it for every branch but main;
-// it works here too, logged in with `cf` (`cf auth activate <profile>` in apps/example).
+// `vp run build:preview`: the example's build as Preview Build Output, for a Cloudflare Worker Preview of
+// this branch beside production (https://developers.cloudflare.com/workers/previews/). Then
+// `npx cf previews deploy --prebuilt --mode production` in apps/example uploads it, named after the branch
+// (cf reads it from Workers Builds or git): `vp run deploy:preview` does both. Workers Builds runs the two
+// for every branch but main, the upload as its own Preview command, which Cloudflare requires to call
+// `cf previews deploy` itself.
 //
-// Void has no preview deploy, so: Void builds as usual, with CLOUDFLARE_PREVIEW_BUILD=true, the switch
-// Cloudflare's Vite plugin reads to write Preview Build Output; then Cloudflare's cf uploads it
-// (`cf previews deploy --prebuilt`, https://developers.cloudflare.com/cf/projects/#deploy-a-preview), named
-// after the branch, which cf reads from Workers Builds or git. Two things in Void's output a preview
-// can't take, changed in between:
+// Void has no preview deploy, so Void builds as usual, with CLOUDFLARE_PREVIEW_BUILD=true, the switch
+// Cloudflare's Vite plugin reads to write Preview Build Output
+// (https://developers.cloudflare.com/cf/projects/#deploy-a-preview). Two things in Void's output a
+// preview can't take are changed here:
 // - the queue consumer (`triggers`): "Queue consumers cannot target a Preview", so production's
 //   consumer does that work;
 // - a queue's name: Void names the queue on Cloudflare "<Worker>-<queue>" when it deploys
@@ -35,5 +37,3 @@ for (const binding of Object.values(worker.env))
   if (binding.type === "queue" && binding.name && !binding.name.startsWith(`${worker.name}-`))
     binding.name = `${worker.name}-${binding.name}`;
 writeFileSync(file, JSON.stringify(worker));
-
-run("vp", ["exec", "cf", "previews", "deploy", "--prebuilt", "--mode", "production"], app);
