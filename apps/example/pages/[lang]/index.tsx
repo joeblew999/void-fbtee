@@ -159,7 +159,7 @@ function Pages() {
       ),
     },
     {
-      href: `/${locale}/formats`,
+      href: `/${locale}/docs/formats`,
       title: <fbt desc="Home card title: the formats page">Formats</fbt>,
       text: (
         <fbt desc="Home card text: what the formats page shows">

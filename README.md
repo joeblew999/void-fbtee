@@ -33,7 +33,7 @@ vp run deploy            # deploy the example to production (Cloudflare), with n
                          # traffic to it. It creates what's missing (D1 with read replicas,
                          # KV, the queue, the live-updates Durable Object), and applies new
                          # migrations after saving a restore point; it stops if the schema
-                         # changed with no migration. It renders the cached pages (Docs, Tour)
+                         # changed with no migration. It renders the cached pages (the Docs)
                          # again before traffic moves, so no one gets an old page.
                          # Log: ~/.void/logs/
 vp run test:production   # every test, against production; report: .vitest/index.html

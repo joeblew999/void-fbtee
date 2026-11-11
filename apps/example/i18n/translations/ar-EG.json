@@ -991,18 +991,6 @@
       ],
       "types": []
     },
-    "5/TdMDxCRFAzrR+6DJ8ppw==": {
-      "description": "Navigation: the events people post and book",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "الفعاليات",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "WHNLr3T+RwGJg0fnjocoaw==": {
       "description": "Home card title: the events app",
       "status": "translated",
@@ -1237,18 +1225,6 @@
       ],
       "types": []
     },
-    "4pdkn8KuYw3MG5sQyQkf7A==": {
-      "description": "Navigation: the tour of the events app",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "جولة",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "8iI5+J5iHJYOuCRoSsmG+g==": {
       "description": "Shown after booking a seat on an event",
       "status": "translated",
@@ -1454,6 +1430,114 @@
       "translations": [
         {
           "translation": "مبني باستخدام {tools}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CH3XfQbtsw2ACBQd4yLJGg==": {
+      "description": "Docs sidebar group: the first page to read",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ابدأ من هنا",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Qe+vPjeAchOE7rGhN+Pjjw==": {
+      "description": "Docs sidebar group: how-to pages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "أدلة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bJNB5x27sSngKuHm5czO2A==": {
+      "description": "Docs sidebar group: reference pages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مرجع",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "P+G8vsrZGIeowZaO58AmZw==": {
+      "description": "Docs sidebar group: the events app that demonstrates void-fbtee",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "العرض التوضيحي",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YVHOtZ0ZvktNU/M91HDijQ==": {
+      "description": "Docs: heading over the list of this page's sections",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "في هذه الصفحة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kNJtK2JlSeD8N9dlqguLyA==": {
+      "description": "Docs: label on the link to the previous page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الصفحة السابقة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "L7hD7JxSeUhLF9soMEVkHQ==": {
+      "description": "Docs: label on the link to the next page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الصفحة التالية",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gbekjQeH7R7EhnLqCjXXBQ==": {
+      "description": "Docs: the menu of documentation pages on a phone",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الصفحات",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lj5ks/Yl+iuw6sPFsjQRtw==": {
+      "description": "Navigation: the demo, the events app people post and book in",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "عرض توضيحي",
           "variations": {}
         }
       ],

@@ -21,8 +21,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <I18nProvider>
       <Started />
-      {/* Always dark, as Void's own site: `dark` turns on shadcn's dark variants inside. */}
-      <div className="dark flex min-h-svh flex-col bg-background text-foreground">
+      <div className="flex min-h-svh flex-col">
         <SiteHeader />
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
         <SiteFooter />

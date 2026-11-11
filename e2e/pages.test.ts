@@ -37,13 +37,13 @@ test("Link: same language stays client-side, another language loads a fresh page
   p.on("load", () => loads++);
   await p.goto("/th-TH");
   await started(p);
-  await p.getByTestId("nav-formats").click();
-  await p.waitForURL("**/th-TH/formats");
-  await seeText(p, "formats-title", "รูปแบบ");
+  await p.getByTestId("nav-events").click();
+  await p.waitForURL("**/th-TH/events");
+  await seeText(p, "events-title", "กิจกรรมที่กำลังจะมาถึง");
   expect(loads).toBe(1);
   await p.getByTestId("to-ar-EG").click();
-  await p.waitForURL("**/ar-EG/formats");
-  await seeText(p, "formats-title", "التنسيقات");
+  await p.waitForURL("**/ar-EG/events");
+  await seeText(p, "events-title", "الفعاليات القادمة");
   expect(loads).toBe(2);
   expect(await p.locator("html").getAttribute("dir")).toBe("rtl");
   expect(errors.filter((e) => !VOID_DEFER_MESSAGE.test(e))).toEqual([]);
@@ -60,7 +60,7 @@ test("every page fits a phone's width, in every language", async () => {
   });
   const wide: string[] = [];
   for (const locale of LOCALES)
-    for (const path of ["", "/tour", "/events", "/formats", "/docs", "/docs/strings"]) {
+    for (const path of ["", "/events", "/docs", "/docs/strings", "/docs/formats", "/docs/tour"]) {
       await p.goto(`/${locale}${path}`);
       const { layout, content } = await p.evaluate(() => ({
         layout: window.innerWidth,

@@ -8,9 +8,9 @@ Markdown pages (`@void/md`) are translated as whole files: one copy per locale.
 
 ## Where things are
 
-- The original is under `pages/<source locale>/`, e.g. `pages/en-US/tour/index.md`.
+- The original is under `pages/<source locale>/`, e.g. `pages/en-US/docs/tour.md`.
 - Each translation is the same path under the locale's URL segment, e.g.
-  `pages/th-TH/tour/index.md`. The segment is the locale unless `vite.config.ts` sets another.
+  `pages/th-TH/docs/tour.md`. The segment is the locale unless `vite.config.ts` sets another.
 
 ## What to translate
 

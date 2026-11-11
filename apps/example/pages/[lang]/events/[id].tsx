@@ -129,7 +129,7 @@ export default function Event({ event, text, left }: Props) {
       <Link href={`/${locale}/events`} className="text-muted-foreground text-sm">
         <fbt desc="Link back to the list of events">All events</fbt>
       </Link>
-      <h1 className="text-3xl font-semibold tracking-tight" lang={lang} data-testid="event-title">
+      <h1 className="text-3xl font-medium" lang={lang} data-testid="event-title">
         {shown.title}
       </h1>
       <EventTime startsAt={event.starts_at} />

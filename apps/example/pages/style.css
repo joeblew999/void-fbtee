@@ -86,7 +86,7 @@
 }
 
 /* The site's palette, after Void's own site (void.cloud): a near-black ground with a touch of blue,
-   white ink, and one violet accent (--brand). The layout turns it on with the "dark" class. */
+   white ink, and one violet accent (--brand). void.config.ts puts class="dark" on <html>. */
 .dark {
   color-scheme: dark;
   --background: oklch(0.2 0.012 275);
@@ -128,10 +128,8 @@
   * {
     @apply border-border outline-ring/50;
   }
-  /* The page behind the layout (overscroll, the strip under a short page) in the site's ground. */
   body {
-    background: oklch(0.2 0.012 275);
-    @apply text-foreground;
+    @apply bg-background text-foreground;
   }
   .dark ::selection {
     background: color-mix(in oklch, var(--brand) 45%, transparent);
@@ -149,9 +147,9 @@
   }
 }
 
-/* @void/md's markdown theme in shadcn's colours and font. ":root .void-md" outranks the theme's own
-   dark-mode rule, so markdown follows the shadcn theme like the rest of the page. */
-:root .void-md {
+/* @void/md's markdown theme in the site's colours and font. ":root[data-theme] .void-md" ties with
+   the theme's own dark rule (":root[data-theme='dark'] .void-md") and comes after it, so it wins. */
+:root[data-theme] .void-md {
   --vmd-font-body: var(--font-sans);
   --vmd-text: var(--foreground);
   --vmd-text-muted: var(--muted-foreground);

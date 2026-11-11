@@ -4,13 +4,16 @@ import { defineConfig } from "void/config";
 export default defineConfig({
   routing: {
     typedRoutes: true,
-    // Cache prerendered pages (the docs and the tour) at the edge; set here so a
+    // Cache prerendered pages (the docs) at the edge; set here so a
     // non-interactive deploy doesn't stop to ask.
     isr: true,
   },
   // On every page (Void's site-wide head defaults). The viewport tag makes phones lay a page out at
-  // their own width; without it they lay it out 980px wide and shrink it.
+  // their own width; without it they lay it out 980px wide and shrink it. The site is always dark:
+  // `class="dark"` for the site's palette (pages/style.css), `data-theme="dark"` for @void/md's
+  // markdown and code colours, which otherwise follow the device's light or dark setting.
   head: {
+    htmlAttrs: { class: "dark", "data-theme": "dark" },
     meta: [
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },

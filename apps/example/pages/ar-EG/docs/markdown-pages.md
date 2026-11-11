@@ -4,7 +4,7 @@ import Fmt from "../../../components/Fmt.tsx" with { island: "load" }
 
 ---
 
-translatedFrom: "5371cb36c3a2"
+translatedFrom: "1e12b63a34e3"
 ---
 
 # ترجمة صفحات markdown
@@ -13,9 +13,9 @@ translatedFrom: "5371cb36c3a2"
 
 ## أين توجد الأشياء
 
-- الأصل موجود تحت `pages/<source locale>/`، مثل `pages/en-US/tour/index.md`.
+- الأصل موجود تحت `pages/<source locale>/`، مثل `pages/en-US/docs/tour.md`.
 - كل ترجمة في المسار نفسه تحت جزء الرابط الخاص بلغتها، مثل
-  `pages/th-TH/tour/index.md`. جزء الرابط هو اسم اللغة ما لم يضبط `vite.config.ts` غيره.
+  `pages/th-TH/docs/tour.md`. جزء الرابط هو اسم اللغة ما لم يضبط `vite.config.ts` غيره.
 
 ## ما يجب ترجمته
 

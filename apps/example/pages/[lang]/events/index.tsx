@@ -128,7 +128,7 @@ export default function Events({ events }: Props) {
   const zone = useTimeZone();
   return (
     <div className="grid gap-8">
-      <h1 className="text-3xl font-semibold tracking-tight" data-testid="events-title">
+      <h1 className="text-3xl font-medium" data-testid="events-title">
         <fbt desc="Heading of the events page">Upcoming events</fbt>
       </h1>
       <ul className="grid gap-4" data-testid="events-list">

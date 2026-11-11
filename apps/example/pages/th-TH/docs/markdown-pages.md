@@ -4,7 +4,7 @@ import Fmt from "../../../components/Fmt.tsx" with { island: "load" }
 
 ---
 
-translatedFrom: "5371cb36c3a2"
+translatedFrom: "1e12b63a34e3"
 ---
 
 # การแปลหน้า markdown
@@ -13,9 +13,9 @@ translatedFrom: "5371cb36c3a2"
 
 ## ไฟล์อยู่ที่ไหน
 
-- ต้นฉบับอยู่ใต้ `pages/<source locale>/` เช่น `pages/en-US/tour/index.md`
+- ต้นฉบับอยู่ใต้ `pages/<source locale>/` เช่น `pages/en-US/docs/tour.md`
 - คำแปลแต่ละฉบับอยู่ที่พาธเดียวกันใต้ส่วน URL ของภาษานั้น เช่น
-  `pages/th-TH/tour/index.md` ส่วน URL คือชื่อภาษา เว้นแต่ `vite.config.ts` จะตั้งเป็นอย่างอื่น
+  `pages/th-TH/docs/tour.md` ส่วน URL คือชื่อภาษา เว้นแต่ `vite.config.ts` จะตั้งเป็นอย่างอื่น
 
 ## สิ่งที่ต้องแปล
 

@@ -1,12 +1,12 @@
 // The formats page: every Intl call the example knows, run on the Worker (the loader) and again in
 // your browser, side by side. They match when the Worker's Intl and the browser's agree, which is
 // what server rendering with Intl depends on. Times "in your time zone" are the browser's alone.
-import { Fragment, useState, useSyncExternalStore, type ReactNode } from "react";
+import { Fragment, useState, useSyncExternalStore } from "react";
 import { fbs, fbt } from "fbtee";
 import { fetch } from "void/client";
 import { useLocale, useTimeZone } from "void-fbtee/react";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,56 +18,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { INSTANT, runAll, SECTIONS, ZONE, type SectionId } from "../../lib/formats";
-import { parseNumber } from "../../lib/parse-number";
-import { tryIt } from "../../lib/try-it";
+import { INSTANT, runAll, SECTIONS, ZONE } from "../../../lib/formats";
+import { sectionTitle } from "../../../lib/formats-titles";
+import { parseNumber } from "../../../lib/parse-number";
+import { tryIt } from "../../../lib/try-it";
 import { cn } from "@/lib/utils";
 import type { Props } from "./formats.server";
-
-function title(id: SectionId): ReactNode {
-  switch (id) {
-    case "dates":
-      return <fbt desc="Formats section: dates and times">Dates and times</fbt>;
-    case "zones":
-      return <fbt desc="Formats section: named time zones">Time zones</fbt>;
-    case "ranges":
-      return <fbt desc="Formats section: date ranges">Date ranges</fbt>;
-    case "relative":
-      return <fbt desc="Formats section: relative time, like 'yesterday'">Relative time</fbt>;
-    case "numbers":
-      return <fbt desc="Formats section: numbers">Numbers</fbt>;
-    case "currency":
-      return <fbt desc="Formats section: money">Currency</fbt>;
-    case "units":
-      return <fbt desc="Formats section: units of measure">Units</fbt>;
-    case "plurals":
-      return <fbt desc="Formats section: plural rules">Plural rules</fbt>;
-    case "lists":
-      return <fbt desc="Formats section: lists of items">Lists</fbt>;
-    case "durations":
-      return <fbt desc="Formats section: lengths of time">Durations</fbt>;
-    case "names":
-      return <fbt desc="Formats section: names of languages, regions and currencies">Names</fbt>;
-    case "collation":
-      return <fbt desc="Formats section: sorting text">Sorting</fbt>;
-    case "segments":
-      return (
-        <fbt desc="Formats section: splitting text into characters, words and sentences">
-          Splitting text
-        </fbt>
-      );
-    case "locale":
-      return <fbt desc="Formats section: facts about this page's language">This language</fbt>;
-    case "supported":
-      return <fbt desc="Formats section: everything this Intl supports">Supported values</fbt>;
-    case "temporal":
-      return <fbt desc="Formats section: dates with Temporal">Temporal</fbt>;
-    case "strings":
-      return (
-        <fbt desc="Formats section: translated strings with fbtee">Translated strings (fbtee)</fbt>
-      );
-  }
-}
 
 // The browser's rows: none while hydrating (the server sent none), then computed once.
 const noSubscribe = () => () => {};
@@ -89,38 +45,26 @@ export default function FormatsPage({ worker }: Props) {
   const keys = Object.keys(worker);
   const same = browser ? keys.filter((k) => browser[k] === worker[k]).length : 0;
   const number = (n: number) => new Intl.NumberFormat(locale).format(n);
-  const toc = SECTIONS.map((section) => (
-    <a
-      key={section.id}
-      href={`#${section.id}`}
-      className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "shrink-0 justify-start")}
-    >
-      {title(section.id)}
-    </a>
-  ));
   return (
-    <div className="lg:grid lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-10">
-      <aside className="hidden lg:block">
-        <nav className="sticky top-20 flex max-h-[calc(100svh-6rem)] flex-col gap-0.5 overflow-y-auto">
-          {toc}
-        </nav>
-      </aside>
-      <div className="min-w-0 space-y-6">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-semibold tracking-tight" data-testid="formats-title">
-            <fbt desc="Formats page heading">Formats</fbt>
-          </h1>
-          <p className="text-muted-foreground">
-            <fbt desc="Formats page introduction">
-              Each row is one call to the platform's own Intl, in this page's language. The Worker
-              ran it before sending the page; your browser ran it again.
-            </fbt>
-          </p>
-          <Badge
-            variant={browser && same === keys.length ? "secondary" : "outline"}
-            data-testid="formats-match"
-          >
-            {browser ? (
+    <div className="min-w-0 space-y-6">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-medium" data-testid="formats-title">
+          <fbt desc="Formats page heading">Formats</fbt>
+        </h1>
+        <p className="text-muted-foreground">
+          <fbt desc="Formats page introduction">
+            Each row is one call to the platform's own Intl, in this page's language. The Worker ran
+            it before sending the page; your browser ran it again.
+          </fbt>
+        </p>
+        {/* Once the browser has run every row: how many match the Worker's. Its line is kept free
+            meanwhile, so the page doesn't shift when it appears. */}
+        <div className="min-h-6">
+          {browser && (
+            <Badge
+              variant={same === keys.length ? "secondary" : "outline"}
+              data-testid="formats-match"
+            >
               <fbt desc="How many rows the browser formatted exactly as the Worker did">
                 <fbt:param name="same">{number(same)}</fbt:param> of{" "}
                 <fbt:param name="total" number={keys.length}>
@@ -128,76 +72,76 @@ export default function FormatsPage({ worker }: Props) {
                 </fbt:param>{" "}
                 rows are the same in your browser.
               </fbt>
-            ) : (
-              "…"
-            )}
-          </Badge>
+            </Badge>
+          )}
         </div>
-        <PageFacts />
-        <TryIt />
-        <nav className="-mx-4 flex gap-1 overflow-x-auto px-4 lg:hidden">{toc}</nav>
-        <p className="text-sm text-muted-foreground">
-          <fbt desc="Where the times on the formats page are shown">
-            The times below are <fbt:param name="instant">{INSTANT}</fbt:param>, shown in{" "}
-            <fbt:param name="zone">{ZONE}</fbt:param>.
-          </fbt>
-        </p>
-        {SECTIONS.map((section) => (
-          <Card key={section.id} id={section.id} data-section={section.id} className="scroll-mt-20">
-            <CardHeader>
-              <CardTitle>{title(section.id)}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table className="table-fixed">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-1/2">
-                      <fbt desc="Formats table column: the result on the Cloudflare Worker">
-                        Worker
-                      </fbt>
-                    </TableHead>
-                    <TableHead>
-                      <fbt desc="Formats table column: the result in the visitor's browser">
-                        Your browser
-                      </fbt>
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {section.rows.map((row) => {
-                    const key = `${section.id}/${row.id}`;
-                    const differs = browser !== null && browser[key] !== worker[key];
-                    const cell = "whitespace-normal break-words align-top";
-                    return (
-                      <Fragment key={key}>
-                        {/* The call, across both columns; its results in the row below. */}
-                        <TableRow className="border-b-0 hover:bg-transparent">
-                          <TableCell colSpan={2} dir="ltr" className={cn(cell, "pt-3 pb-0")}>
-                            <code className="font-mono text-xs text-muted-foreground">
-                              {row.code.replace(/\blang\b/g, JSON.stringify(locale))}
-                            </code>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow
-                          data-row={key}
-                          className={differs ? "bg-destructive/10" : undefined}
-                        >
-                          <TableCell className={cell} data-side="worker" dir={dir}>
-                            {worker[key]}
-                          </TableCell>
-                          <TableCell className={cell} data-side="browser" dir={dir}>
-                            {browser ? browser[key] : "…"}
-                          </TableCell>
-                        </TableRow>
-                      </Fragment>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        ))}
       </div>
+      <PageFacts />
+      <TryIt />
+      <p className="text-sm text-muted-foreground">
+        <fbt desc="Where the times on the formats page are shown">
+          The times below are <fbt:param name="instant">{INSTANT}</fbt:param>, shown in{" "}
+          <fbt:param name="zone">{ZONE}</fbt:param>.
+        </fbt>
+      </p>
+      {SECTIONS.map((section) => (
+        <section
+          key={section.id}
+          id={section.id}
+          data-section={section.id}
+          className="scroll-mt-20 pt-6"
+        >
+          <h2 className="border-b pb-2 text-2xl font-medium">{sectionTitle(section.id)}</h2>
+          <div className="mt-2">
+            <Table className="table-fixed">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-1/2">
+                    <fbt desc="Formats table column: the result on the Cloudflare Worker">
+                      Worker
+                    </fbt>
+                  </TableHead>
+                  <TableHead>
+                    <fbt desc="Formats table column: the result in the visitor's browser">
+                      Your browser
+                    </fbt>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {section.rows.map((row) => {
+                  const key = `${section.id}/${row.id}`;
+                  const differs = browser !== null && browser[key] !== worker[key];
+                  const cell = "whitespace-normal break-words align-top";
+                  return (
+                    <Fragment key={key}>
+                      {/* The call, across both columns; its results in the row below. */}
+                      <TableRow className="border-b-0 hover:bg-transparent">
+                        <TableCell colSpan={2} dir="ltr" className={cn(cell, "pt-3 pb-0")}>
+                          <code className="font-mono text-xs text-muted-foreground">
+                            {row.code.replace(/\blang\b/g, JSON.stringify(locale))}
+                          </code>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow
+                        data-row={key}
+                        className={differs ? "bg-destructive/10" : undefined}
+                      >
+                        <TableCell className={cell} data-side="worker" dir={dir}>
+                          {worker[key]}
+                        </TableCell>
+                        <TableCell className={cell} data-side="browser" dir={dir}>
+                          {browser ? browser[key] : "…"}
+                        </TableCell>
+                      </TableRow>
+                    </Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        </section>
+      ))}
     </div>
   );
 }

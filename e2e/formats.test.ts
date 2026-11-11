@@ -10,7 +10,7 @@ const page = browser("prod");
 
 /** Load the formats page and return the rows where the browser differs from the Worker. */
 async function differences(p: Page, locale: string) {
-  await p.goto(`/${locale}/formats`);
+  await p.goto(`/${locale}/docs/formats`);
   await untilText(p, '[data-testid="formats-match"]', "not", "…");
   return p.$$eval("tr[data-row]", (rows) =>
     rows
@@ -43,14 +43,14 @@ test("Temporal rows match with the polyfill too (Safari's path)", async () => {
 
 test("in your time zone: the browser's own zone, after hydration", async () => {
   const p = await page({ timezoneId: "America/New_York", locale: "en-US" });
-  await p.goto("/en-US/formats");
+  await p.goto("/en-US/docs/formats");
   await seeText(p, "your-time", "In your time zone: Saturday, July 4, 2026 at 11:30:45 AM EDT");
 });
 
 test("ar-EG: a number typed in Arabic digits, read back and formatted by the Worker", async () => {
   const p = await page();
   const errors = collectErrors(p);
-  await p.goto("/ar-EG/formats");
+  await p.goto("/ar-EG/docs/formats");
   await untilText(p, '[data-testid="formats-match"]', "not", "…");
   await p.getByTestId("try-number").fill("٢٬٥٠٠٫٧٥");
   await p.getByTestId("try-server").click();

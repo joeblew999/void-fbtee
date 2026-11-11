@@ -20,11 +20,14 @@ test('"/" always redirects to the source language, whatever the browser asks for
 });
 
 test("page head: lang, dir, hreflang alternates with x-default, i18n meta", async () => {
-  const html = await (await get("/ar-EG/formats")).text();
-  expect(html).toContain('<html lang="ar-EG" dir="rtl"');
+  const html = await (await get("/ar-EG/docs/formats")).text();
+  // The <html> attributes, in any order (Void's own, class and data-theme, come first).
+  const htmlTag = html.match(/<html\b[^>]*>/)?.[0] ?? "";
+  expect(htmlTag).toContain('lang="ar-EG"');
+  expect(htmlTag).toContain('dir="rtl"');
   for (const l of LOCALES)
-    expect(html).toContain(`hreflang="${l}" href="${url("prod")}/${l}/formats"`);
-  expect(html).toContain(`hreflang="x-default" href="${url("prod")}/en-US/formats"`);
+    expect(html).toContain(`hreflang="${l}" href="${url("prod")}/${l}/docs/formats"`);
+  expect(html).toContain(`hreflang="x-default" href="${url("prod")}/en-US/docs/formats"`);
   const meta = html.match(/<meta name="void-fbtee" content="([^"]*)"/)?.[1];
   const i18n = JSON.parse(meta!.replaceAll("&quot;", '"'));
   expect(i18n).toMatchObject({ locale: "ar-EG", dir: "rtl" });

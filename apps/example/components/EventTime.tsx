@@ -39,5 +39,5 @@ export function EventTime({ startsAt }: { startsAt: string }) {
   );
 }
 
-// Default export: Markdown pages import it as an island (pages/<locale>/tour/index.md).
+// Default export: Markdown pages import it as an island (pages/<locale>/docs/tour.md).
 export default EventTime;

@@ -7,23 +7,20 @@ import { Link, useLocale, useLocales } from "void-fbtee/react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const PAGES = ["", "/tour", "/events", "/formats", "/docs"] as const;
+const PAGES = ["", "/events", "/docs"] as const;
 
 function label(page: (typeof PAGES)[number]) {
   switch (page) {
     case "":
       return <fbt desc="Navigation: the home page">Home</fbt>;
-    case "/tour":
-      return <fbt desc="Navigation: the tour of the events app">Tour</fbt>;
     case "/events":
-      return <fbt desc="Navigation: the events people post and book">Events</fbt>;
-    case "/formats":
-      return <fbt desc="Navigation: the page that shows every Intl format">Formats</fbt>;
+      return <fbt desc="Navigation: the demo, the events app people post and book in">Demo</fbt>;
     case "/docs":
       return <fbt desc="Navigation: the documentation">Docs</fbt>;
   }
 }
 
+// nav-home, nav-events (the demo), nav-docs.
 const testId = (page: string) => `nav-${page.slice(1) || "home"}`;
 
 export default function SiteHeader() {
@@ -33,10 +30,7 @@ export default function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b bg-background">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 px-4">
-        <Link
-          href={`/${locale}` as never}
-          className="flex h-14 items-center pe-2 font-semibold tracking-tight"
-        >
+        <Link href={`/${locale}` as never} className="flex h-14 items-center pe-2 font-semibold">
           void-fbtee
         </Link>
         <nav className="order-last -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto px-4 pb-2 md:order-none md:mx-0 md:w-auto md:overflow-visible md:p-0">
