@@ -32,7 +32,12 @@ jobs:
       - run: vp run install:browser
       - run: vp check
       - run: vp run check:tools
+      # The tests post events, which Workers AI translates: Void's dev and preview use the real
+      # one on Cloudflare (it has no local version). In CI that needs a token, as Void's AI guide
+      # says; on your machine, `vp run login` instead.
       - run: vp test run
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
   fresh:
     name: fresh install (Vite+ and plain Vite)
