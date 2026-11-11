@@ -1,7 +1,8 @@
 #!/bin/sh
 # Claude cloud sessions only: a keyring for `void deploy`'s Cloudflare sign-in. void stores the
 # sign-in in the system keyring and refuses to without one; a cloud session (Linux) has none.
-# Run by the SessionStart hook in .claude/settings.json. On a Mac, a desktop or a server, which
+# Run by the SessionStart hook in .claude/settings.json, and by scripts/deploy.sh (it restarts the
+# keyring if it has stopped). On a Mac, a desktop or a server, which
 # have their own keyring, it does nothing.
 [ "$CLAUDE_CODE_REMOTE" = "true" ] && [ "$(uname)" = "Linux" ] || exit 0
 
@@ -19,8 +20,8 @@ fi
 # A session bus with an unlocked keyring, started once and reused while it's running.
 alive() { [ -f "$dir/env" ] && (. "$dir/env" && dbus-send --session --print-reply --dest=org.freedesktop.secrets /org/freedesktop/secrets org.freedesktop.DBus.Peer.Ping > /dev/null 2>&1); }
 if ! alive; then
-  # A keyring file left from another daemon may have another password; start from a clean one.
-  rm -f "$HOME/.local/share/keyrings/login.keyring"
+  # The keyring file stays on disk, always with this password, so a restarted daemon still has
+  # the sign-in: this environment stops background programs between an agent's turns.
   address=$(dbus-daemon --session --fork --print-address=1 | head -n 1)
   echo "export DBUS_SESSION_BUS_ADDRESS='$address'" > "$dir/env"
   (. "$dir/env" && printf 'void' | gnome-keyring-daemon --unlock --components=secrets > /dev/null 2>&1)
