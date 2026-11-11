@@ -4,8 +4,11 @@
 # open it on any device and click Allow.
 set -e
 cd "$(dirname "$0")/../apps/example"
-# In a cloud session, the keyring scripts/cloud-keyring.sh started (if the hook's variable is lost).
-if [ -z "$DBUS_SESSION_BUS_ADDRESS" ] && [ -f /tmp/void-keyring/env ]; then . /tmp/void-keyring/env; fi
+# In a Claude cloud session: the keyring, (re)started (background programs don't outlive a turn).
+if [ "$CLAUDE_CODE_REMOTE" = "true" ]; then
+  CLAUDE_ENV_FILE= sh ../../scripts/cloud-keyring.sh > /dev/null
+  . /tmp/void-keyring/env
+fi
 # void's sign-in needs a terminal; with none (an agent's shell), `script` gives it one (Linux).
 if [ -t 0 ] || [ "$(uname)" != "Linux" ]; then
   exec pnpm exec void deploy --platform cloudflare "$@"
