@@ -40,11 +40,12 @@ pnpm run i18n:translate
 - `apps/example`: a Void app using it, in three languages, live at https://void-fbtee-example.gedw99.workers.dev
 - `e2e/`: the browser tests and the fresh-install check
 
-It runs on [Vite+](https://viteplus.dev). Install its `vp` command once per machine
-([guide](https://viteplus.dev/guide/global-cli)); it brings the Node in `.node-version` and the
-pnpm in `package.json`. Then:
+It runs on [Vite+](https://viteplus.dev). [mise](https://mise.jdx.dev) installs what
+`mise.toml` says (Vite+'s `vp`, and the Node in `.node-version`), and `vp` brings the pnpm in
+`package.json`. Then:
 
 ```sh
+mise install
 vp install
 vp run install:browser   # Chromium for the browser tests, once
 vp check                 # format, lint, types
@@ -59,8 +60,8 @@ rebuild it first.
 To deploy the example to Cloudflare, `vp run deploy`. The first time on a machine it asks you to
 sign in (`vp run login` does only that).
 
-In a Claude cloud session, `.claude/hooks/cloud-session.sh` installs `vp` and a keyring for the
-sign-in, so Claude runs the same commands. A new session needs one sign-in: Claude runs
+In a Claude cloud session, `.claude/hooks/cloud-session.sh` runs `mise install` and starts a
+keyring for the sign-in, so Claude runs the same commands. A new session needs one sign-in: Claude runs
 `vp run login` (inside `script`, as void's sign-in wants a terminal), which prints Cloudflare's link, and you click Allow.
 
 ## License
