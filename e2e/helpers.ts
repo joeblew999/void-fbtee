@@ -7,7 +7,7 @@ import {
   type BrowserContextOptions,
   type Page,
 } from "playwright";
-import { afterAll, afterEach, beforeAll, expect, inject } from "vite-plus/test";
+import { afterAll, afterEach, beforeAll, inject } from "vite-plus/test";
 
 export const url = (mode: "prod" | "dev") => inject(mode as never) as string;
 
@@ -36,9 +36,16 @@ export async function text(page: Page, id: string) {
   return el.textContent();
 }
 
-/** Wait until `[data-testid=id]` shows `want` (live reload, hydration). */
+/**
+ * Wait until `[data-testid=id]` shows `want` (live reload, hydration). Playwright's wait, not
+ * Vitest's expect.poll: that gives up after 1s, too soon for a dev server to see a changed file
+ * while other tests share the machine. The test's own timeout still applies.
+ */
 export async function seeText(page: Page, id: string, want: string) {
-  await expect.poll(() => page.getByTestId(id).textContent()).toBe(want);
+  await page.waitForFunction(
+    ([id, want]) => document.querySelector(`[data-testid="${id}"]`)?.textContent === want,
+    [id, want],
+  );
 }
 
 /**

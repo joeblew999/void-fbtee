@@ -41,10 +41,12 @@ test("removing and putting back a locale's catalog", async () => {
   const errors = collectErrors(p);
   await p.goto("/ar-EG");
   await p.waitForLoadState("networkidle");
+  // Removing a catalog reloads the page; let that load finish before the next change.
+  const reloaded = p.waitForEvent("load");
   renameSync(file, file + ".off");
   try {
+    await reloaded;
     await seeText(p, "title", "i18n for Void apps");
-    // Removing a catalog reloads the page; let that load finish before the next change.
     await p.waitForLoadState("networkidle");
   } finally {
     renameSync(file + ".off", file);
@@ -58,17 +60,17 @@ test("the browser console names each string a page shows untranslated", async ()
   const file = catalog("th-TH");
   const original = readFileSync(file, "utf8");
   const p = await page();
-  const warnings: string[] = [];
-  p.on("console", (m) => m.type() === "warning" && warnings.push(m.text()));
   try {
     const json = JSON.parse(original);
     delete json.translations[TITLE];
     writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
+    const warned = p.waitForEvent(
+      "console",
+      (m) => m.text() === 'void-fbtee: no th-TH translation for "i18n for Void apps"',
+    );
     await p.goto("/th-TH");
+    await warned;
     await seeText(p, "title", "i18n for Void apps");
-    await expect
-      .poll(() => warnings)
-      .toContain('void-fbtee: no th-TH translation for "i18n for Void apps"');
   } finally {
     writeFileSync(file, original);
   }

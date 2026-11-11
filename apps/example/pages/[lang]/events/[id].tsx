@@ -23,15 +23,24 @@ function useLiveEvent(id: string, left: number) {
   const [live, setLive] = useState(Infinity);
   useEffect(() => {
     const stream = connectLiveStream("/api/live");
-    void stream.subscribe({
-      id: "event",
-      topic: `event:${id}`,
-      onEvent: (event) => {
-        if (event.type === "seats") setLive((event.data as { left: number }).left);
-        if (event.type === "translated") void router.refresh();
-      },
-    });
-    return () => stream.close();
+    let closed = false;
+    stream
+      .subscribe({
+        id: "event",
+        topic: `event:${id}`,
+        onEvent: (event) => {
+          if (event.type === "seats") setLive((event.data as { left: number }).left);
+          if (event.type === "translated") void router.refresh();
+        },
+      })
+      // Closed by this effect's cleanup before subscribing finished: not an error.
+      .catch((error: unknown) => {
+        if (!closed) throw error;
+      });
+    return () => {
+      closed = true;
+      stream.close();
+    };
   }, [id, router]);
   return Math.min(left, live);
 }
