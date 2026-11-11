@@ -40,8 +40,6 @@ export function sectionTitle(id: SectionId): ReactNode {
       return <fbt desc="Formats section: facts about this page's language">This language</fbt>;
     case "supported":
       return <fbt desc="Formats section: everything this Intl supports">Supported values</fbt>;
-    case "temporal":
-      return <fbt desc="Formats section: dates with Temporal">Temporal</fbt>;
     case "strings":
       return (
         <fbt desc="Formats section: translated strings with fbtee">Translated strings (fbtee)</fbt>

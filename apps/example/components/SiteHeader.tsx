@@ -3,7 +3,7 @@
 // no JavaScript, so it works on markdown pages too. One row on desktop; on a phone the
 // page links move to a second row that scrolls sideways.
 import { fbt } from "fbtee";
-import { Link, useLocale, useLocales } from "void-fbtee/react";
+import { Formatted, Link, useLocale, useLocales } from "void-fbtee/react";
 import { buttonVariants } from "@/components/ui/button";
 import { REPO } from "@/lib/project";
 import { cn } from "@/lib/utils";
@@ -66,9 +66,11 @@ export default function SiteHeader() {
               )}
               data-testid={`to-${l.locale}`}
             >
-              {new Intl.DisplayNames(l.locale, { type: "language" }).of(
-                new Intl.Locale(l.locale).language,
-              )}
+              <Formatted>
+                {new Intl.DisplayNames(l.locale, { type: "language" }).of(
+                  new Intl.Locale(l.locale).language,
+                )!}
+              </Formatted>
             </Link>
           ))}
           <a

@@ -30,6 +30,12 @@ const WHEN: Intl.DateTimeFormatOptions = {
 const SWIM = "2027-03-06T19:00:00Z"; // Harbour sunrise swim: 6:00 on 7 March in Sydney
 
 /**
+ * When the tests' events start: already past, so on the live site they never show in the list of
+ * upcoming events (its loader lists only those still to come), yet posting and booking run for real.
+ */
+const TEST_START = "2026-01-01T20:00";
+
+/**
  * Post a new event through the app's form, so a test that books has its own seats on any database
  * (a fresh local one or the live site's). Returns its path without the language, "/events/<id>".
  */
@@ -39,7 +45,7 @@ async function postEvent(seats: number): Promise<string> {
   await started(p);
   await p.getByTestId("event-title-input").fill(`Test event ${crypto.randomUUID().slice(0, 8)}`);
   await p.getByTestId("event-description-input").fill("Posted by the tests.");
-  await p.getByTestId("event-local-input").fill("2027-04-01T20:00");
+  await p.getByTestId("event-local-input").fill(TEST_START);
   await p.getByTestId("event-seats-input").fill(String(seats));
   await p.getByTestId("event-post").click();
   await p.waitForURL(/\/events\/[0-9a-f-]{36}$/);
@@ -76,7 +82,7 @@ test("ar-EG: post an event (a missing title first)", async () => {
   await seeText(p, "error-title", "أعطِها عنوانًا.");
   await p.getByTestId("event-title-input").fill("أمسية شعر");
   await p.getByTestId("event-description-input").fill("قراءات شعرية على السطح.");
-  await p.getByTestId("event-local-input").fill("2027-04-01T20:00");
+  await p.getByTestId("event-local-input").fill(TEST_START);
   await p.getByTestId("event-post").click();
   await p.waitForURL(/\/ar-EG\/events\/[0-9a-f-]{36}$/);
   await seeText(p, "event-title", "أمسية شعر");

@@ -1,9 +1,9 @@
-// "Format on the server": the formats page posts what the visitor typed, written their language's
-// way, and the Worker reads it back as a plain number and formats it again with its own Intl.
+// "Format on the server": the formats page posts the number the visitor typed, already read back
+// to a plain number in the browser (neutral data, never formatted text), and the Worker formats
+// it with its own Intl. null is a number that didn't read.
 // The validator is the route's input type; the page calls it with Void's typed fetch.
 import { defineHandler } from "void";
 import { z } from "zod";
-import { parseNumber } from "../../lib/parse-number";
 import { tryIt } from "../../lib/try-it";
 
 export const POST = defineHandler.withValidator({
@@ -16,7 +16,7 @@ export const POST = defineHandler.withValidator({
         return false;
       }
     }),
-    number: z.string().max(100),
+    number: z.number().nullable(),
     text: z.string().max(1000),
   }),
-})((c, { body }) => tryIt(body.locale, parseNumber(body.locale, body.number), body.text));
+})((c, { body }) => tryIt(body.locale, body.number ?? NaN, body.text));

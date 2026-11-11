@@ -49,8 +49,13 @@ test.skipIf(!!process.env.E2E_URL)(
     expect(worker.length).toBeGreaterThan(0);
     // One copy of fbtee's per-request state (plan #1, decision 2).
     expect(worker.filter((f) => read(f).includes("runWithFbtee"))).toHaveLength(1);
-    // App code uses the polyfill on the server (decision 17), never the native global.
-    expect(worker.filter((f) => /globalThis\.Temporal\b/.test(read(f)))).toEqual([]);
+    // App code uses the polyfill on the server (decision 17), never the native global. The one
+    // exception is the Temporal reference page (lib/temporal.ts), which runs Cloudflare's own
+    // beside the polyfill to compare them: the only file reading it must be the one with its rows.
+    const rows = 'Temporal.Instant.from("2026-12-24T12:30:00Z").epochMilliseconds';
+    expect(
+      worker.filter((f) => /globalThis\.Temporal\b/.test(read(f)) && !read(f).includes(rows)),
+    ).toEqual([]);
     // Cloudflare's temporal flag reaches the Worker config `void deploy` uploads (decision 15).
     const config = JSON.parse(
       read(join(EXAMPLE, ".cloudflare/output/v0/workers/default/worker.config.json")),

@@ -49,6 +49,22 @@ is `A وB وC`: no commas). `{ type: "disjunction" }` gives the "or" lists.
 **Right-to-left locales** (`ar-EG`): void-fbtee sets `<html dir="rtl">`, so write natural text with
 no direction marks (U+200E, U+200F).
 
+## Dates, numbers and names in components
+
+Data stays neutral: a time is a UTC instant or a `Temporal.ZonedDateTime` with its zone name, a
+number is a number, money is a number with a currency code. Never store, send or compare
+formatted text. A form sends neutral values too (a `datetime-local` gives `"2026-04-01T20:00"`;
+read a number typed the language's way back to a number in the browser before sending it).
+
+Text formatted while rendering (`Intl`, `toLocaleString`) goes in `<Formatted>` from
+`void-fbtee/react`: `<Formatted>{new Intl.NumberFormat(locale).format(n)}</Formatted>`, inside an
+`<fbt:param>` too. The server formats it; the browser keeps the server's text through hydration,
+since each browser engine has its own locale data (Safari writes some values differently from
+Chrome and the Worker), and a mismatch is React error 418. A list that comes from `Intl` (such as
+`Intl.supportedValuesOf("timeZone")`) comes from the loader, not the browser. What only the
+browser knows: `useTimeZone()` and `useNow()` (the server's value while hydrating, then the
+browser's), and `useHydrated()` for anything else of the browser's own.
+
 ## Markdown pages
 
 Pages under `pages/<source locale>/` have a copy per locale at the same path under

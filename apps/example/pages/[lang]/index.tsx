@@ -4,7 +4,7 @@
 import { Suspense, use, useState } from "react";
 import { fbt, list } from "fbtee";
 import { ArrowRight } from "lucide-react";
-import { Link, useLocale, useLocales } from "void-fbtee/react";
+import { Formatted, Link, useLocale, useLocales } from "void-fbtee/react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AddIt, Closing, Features, GitHubButton } from "@/components/HomeSections";
@@ -137,7 +137,7 @@ function CodeWindow({ count, late }: Props) {
           ))}
         </div>
         <span className="hidden shrink-0 px-4 text-xs text-muted-foreground sm:inline">
-          {languageName(locale)}
+          <Formatted>{languageName(locale)}</Formatted>
         </span>
       </figcaption>
       <pre
@@ -185,7 +185,10 @@ function Hero(props: Props) {
         <p className="mt-6 max-w-xl text-lg text-pretty text-muted-foreground" data-testid="intro">
           <fbt desc="Home page introduction; languages is a list of language names">
             Strings by fbtee, dates by Temporal, and everything else by the platform's own Intl.
-            This example is in <fbt:param name="languages">{listText(names)}</fbt:param>.
+            This example is in{" "}
+            <fbt:param name="languages">
+              <Formatted>{listText(names)}</Formatted>
+            </fbt:param>.
           </fbt>
         </p>
         <div className="mt-10 flex flex-wrap gap-3">

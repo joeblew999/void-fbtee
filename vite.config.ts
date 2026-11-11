@@ -23,9 +23,13 @@ export default defineConfig({
       // Every browser test against what Cloudflare's Workers Builds deployed for this commit: production
       // for main, the branch's Preview otherwise (e2e/deployed.ts). What CI runs: no Cloudflare login.
       "test:deployed": { command: "vpx e2e/deployed.ts", cache: false },
-      // The formats page in every language, Chromium and WebKit (e2e/formats/): its own run, as it
-      // grows with each language. CI runs it against the deployed site (test:deployed).
-      "test:formats": { command: "vp test run --config e2e/formats/vite.config.ts", cache: false },
+      // Every page in every language, in Chromium and WebKit (Safari's engine), and the Formats and
+      // Temporal pages' engine checks (e2e/browsers/): its own run, as it grows with each language.
+      // CI runs it against the deployed site (test:deployed); not part of `vp test run`.
+      "test:browsers": {
+        command: "vp test run --config e2e/browsers/vite.config.ts",
+        cache: false,
+      },
       "test:fresh": { command: "vpx e2e/fresh/check.ts", cache: false },
       // Vite+'s, Void's and void-fbtee's setup commands, run again: fails if any changes a file.
       "check:tools": { command: "node e2e/check-tools.mjs", cache: false },

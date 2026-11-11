@@ -11,7 +11,9 @@
 // useLocale and <fbt> still work there; see install.ts and client.ts.
 //
 // Formatting: use JavaScript's Intl with useLocale().locale, as fbtee's README says ("Formatting
-// Numbers and Dates"), and fbtee's list() for lists inside strings.
+// Numbers and Dates"), and fbtee's list() for lists inside strings. Data stays neutral (UTC
+// instants with zone names, plain numbers with currency codes); text formatted while rendering
+// goes in <Formatted>, so it's formatted once for the screen: by the server, kept by the browser.
 import { use, useContext, useSyncExternalStore, type ReactNode, type ComponentProps } from "react";
 import { Link as VoidLink, SharedContext } from "@void/react";
 import { Temporal } from "temporal-polyfill";
@@ -19,6 +21,39 @@ import config from "virtual:void-fbtee/config";
 import { localeFromPath, type Locale } from "./locales";
 import { install, documentI18n } from "./install";
 import type { SharedI18n } from "./middleware";
+
+/**
+ * Text formatted while rendering (Intl, or Temporal's toLocaleString), in a <span>. The server
+ * formats it first. Each browser engine ships its own locale data and can write the same value
+ * differently (Safari's WebKit against V8, which Chrome and the Worker share), which would break
+ * hydration (React error 418). So the browser keeps the server's text, and React only replaces it
+ * when the value itself changes, such as a time "in your time" once the browser knows the zone.
+ * It works one level deep (React's suppressHydrationWarning): the text must be the span's child.
+ */
+export function Formatted({
+  children,
+  ...props
+}: Omit<ComponentProps<"span">, "children" | "suppressHydrationWarning"> & {
+  children: string | number;
+}) {
+  return (
+    <span {...props} suppressHydrationWarning>
+      {children}
+    </span>
+  );
+}
+
+/**
+ * False on the server and while hydrating, true after: for what only the browser can work out
+ * (its own engine's formatting, its clock, its zone), so the first render matches the server's.
+ */
+export function useHydrated(): boolean {
+  return useSyncExternalStore(
+    noSubscribe,
+    () => true,
+    () => false,
+  );
+}
 
 /** The page's locale, direction and the server's "now", as the middleware set them. */
 export function useLocale(): SharedI18n {

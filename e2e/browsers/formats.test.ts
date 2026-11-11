@@ -1,14 +1,12 @@
-// The formats page, every language, in Chromium and WebKit: its own run (`vp run test:formats`, and
-// in CI against the deployed site), apart from `vp test run`, because it grows with every language.
-// Every row is formatted by the Worker (the loader) and again by the browser. In Chromium (V8 with
-// ICU, as the Worker) they must be identical: what rendering with Intl on the server and hydrating
-// in the browser depends on (plan #1, decision 49). WebKit has Apple's locale data, so some rows
-// differ there by design: it must load without errors, and its differences are reported, not
-// listed here (no per-language list to keep up as languages are added).
+// The Formats page, every language, in Chromium and WebKit. Each row is formatted by the Worker
+// (the loader: the text the app's pages show) and again by the browser after hydration. Each
+// engine ships its own locale data, so rows can differ, by design: the page must load without
+// errors in each, and the rows that differ go to the report (and the GitHub job's summary), not
+// a list kept here, so a new language needs no change. Hydration itself is pages.test.ts.
 import { appendFileSync } from "node:fs";
 import { describe, expect, test } from "vite-plus/test";
 import type { Page } from "playwright";
-import { browser, collectErrors, seeText, text, untilText } from "../helpers";
+import { browser, collectErrors, seeText, untilText } from "../helpers";
 import { LOCALES } from "../locales";
 
 const page = browser("prod");
@@ -28,31 +26,23 @@ async function differences(p: Page, locale: string) {
   );
 }
 
-for (const locale of LOCALES) {
-  test(`${locale}: every row the same on the Worker and in the browser`, async () => {
-    const p = await page();
-    const errors = collectErrors(p);
-    expect(await differences(p, locale)).toEqual([]);
-    expect(await p.locator("tr[data-row]").count()).toBeGreaterThan(130);
-    expect(errors).toEqual([]);
+for (const engine of ["chromium", "webkit"] as const) {
+  describe(engine, () => {
+    const open = browser("prod", engine);
+    for (const locale of LOCALES) {
+      test(`${locale}: no errors; engine differences reported`, async () => {
+        const p = await open();
+        const errors = collectErrors(p);
+        const differs = (await differences(p, locale)).filter(
+          ([row]) => !row!.startsWith("supported/"),
+        );
+        expect(await p.locator("tr[data-row]").count()).toBeGreaterThan(100);
+        expect(errors).toEqual([]);
+        report(`${engine}, ${locale}`, differs);
+      });
+    }
   });
 }
-
-describe("WebKit", () => {
-  const safari = browser("prod", "webkit");
-  for (const locale of LOCALES) {
-    test(`${locale}: no errors; engine differences reported`, async () => {
-      const p = await safari();
-      const errors = collectErrors(p);
-      const differs = (await differences(p, locale)).filter(
-        ([row]) => !row!.startsWith("supported/"),
-      );
-      expect(await p.locator("tr[data-row]").count()).toBeGreaterThan(130);
-      expect(errors).toEqual([]);
-      report(`WebKit, ${locale}`, differs);
-    });
-  }
-});
 
 /** Print the rows that differ, and add them to the GitHub job's summary when run there. */
 function report(title: string, rows: (string | null | undefined)[][]) {
@@ -69,21 +59,13 @@ function report(title: string, rows: (string | null | undefined)[][]) {
     );
 }
 
-test("Temporal rows match with the polyfill too (Safari's path)", async () => {
-  const p = await page();
-  await p.addInitScript(() => delete (globalThis as { Temporal?: unknown }).Temporal);
-  const diff = await differences(p, "th-TH");
-  expect(diff).toEqual([]);
-  expect(await text(p, "formats-title")).toBe("รูปแบบ");
-});
-
 test("in your time zone: the browser's own zone, after hydration", async () => {
   const p = await page({ timezoneId: "America/New_York", locale: "en-US" });
   await p.goto("/en-US/docs/formats");
   await seeText(p, "your-time", "In your time zone: Saturday, July 4, 2026 at 11:30:45 AM EDT");
 });
 
-test("ar-EG: a number typed in Arabic digits, read back and formatted by the Worker", async () => {
+test("ar-EG: a number typed in Arabic digits, read back in the browser, formatted by the Worker", async () => {
   const p = await page();
   const errors = collectErrors(p);
   await p.goto("/ar-EG/docs/formats");

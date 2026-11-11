@@ -8,7 +8,7 @@
 //   <Fmt langs />                                   this app's languages (void-fbtee's list), each
 //                                                   named in the reader's
 // The span carries the kind and value, so a test can check every one on every page.
-import { useLocale, useLocales, useNow, useTimeZone } from "void-fbtee/react";
+import { Formatted, useLocale, useLocales, useNow, useTimeZone } from "void-fbtee/react";
 import { fmt, type FmtProps } from "@/lib/fmt";
 
 export default function Fmt({
@@ -28,8 +28,8 @@ export default function Fmt({
   const zone = useTimeZone();
   const now = useNow();
   return (
-    <span data-fmt={JSON.stringify(props)} className="font-medium">
+    <Formatted data-fmt={JSON.stringify(props)} className="font-medium">
       {fmt(props, locale, zone, now.toString())}
-    </span>
+    </Formatted>
   );
 }

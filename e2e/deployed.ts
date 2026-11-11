@@ -54,11 +54,11 @@ const [, worker, preview] =
   /\/services\/view\/([^/]+)\/production\/(?:previews\/([^/]+)\/)?builds\//.exec(run.details_url)!;
 const url = `https://${preview ? `${preview}-` : ""}${worker}.${subdomain}.workers.dev`;
 console.log(`test:deployed: testing ${url}\n`);
-// The browser tests, then the formats page's (e2e/formats/), one after the other.
+// The browser tests, then every page in Chromium and WebKit (e2e/browsers/), one after the other.
 const env = { ...process.env, E2E_URL: url };
 for (const args of [
   ["test", "run", "e2e"],
-  ["test", "run", "--config", "e2e/formats/vite.config.ts"],
+  ["test", "run", "--config", "e2e/browsers/vite.config.ts"],
 ]) {
   const code = await new Promise<number | null>((done) =>
     spawn("vp", args, { stdio: "inherit", env }).on("close", done),

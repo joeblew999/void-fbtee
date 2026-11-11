@@ -12,6 +12,8 @@ import pages from "@void/md/pages";
 import { Link, useLocale } from "void-fbtee/react";
 import { SECTIONS } from "@/lib/formats";
 import { sectionTitle } from "@/lib/formats-titles";
+import { TEMPORAL_SECTIONS } from "@/lib/temporal";
+import { temporalTitle } from "@/lib/temporal-titles";
 import { cn } from "@/lib/utils";
 
 interface Entry {
@@ -40,6 +42,7 @@ function sidebar(title: (slug: string) => ReactNode) {
           slug: "formats",
           title: <fbt desc="Navigation: the page that shows every Intl format">Formats</fbt>,
         },
+        { slug: "temporal", title: "Temporal" },
       ],
     },
     {
@@ -60,6 +63,8 @@ interface Heading {
 /** "On this page" for the docs pages that aren't markdown (markdown pages list their own). */
 const OUTLINES: Record<string, () => Heading[]> = {
   formats: () => SECTIONS.map((s) => ({ depth: 2, slug: s.id, text: sectionTitle(s.id) })),
+  temporal: () =>
+    TEMPORAL_SECTIONS.map((s) => ({ depth: 2, slug: s.id, text: temporalTitle(s.id) })),
 };
 
 /** This language's docs: the sidebar, and the markdown page at the current path (if it is one). */

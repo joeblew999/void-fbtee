@@ -607,18 +607,6 @@
       ],
       "types": []
     },
-    "LhxZTrRS+y9HK17fYWCi7g==": {
-      "description": "Formats section: dates with Temporal",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Temporal",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "e/f/c9uEWgjABfIvCg1SnQ==": {
       "description": "Formats section: translated strings with fbtee",
       "status": "translated",
@@ -638,18 +626,6 @@
       "translations": [
         {
           "translation": "التنسيقات",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "RpKRzJVandAX+19QKPKCcw==": {
-      "description": "Formats page introduction",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "كل صف هو استدعاء واحد لـ Intl الخاص بالمنصة، بلغة هذه الصفحة. نفّذه الـ Worker قبل إرسال الصفحة، ثم نفّذه متصفحك مرة أخرى.",
           "variations": {}
         }
       ],
@@ -1399,18 +1375,6 @@
       ],
       "types": []
     },
-    "mlUsmLsMcHJirdFKd5pLoA==": {
-      "description": "Note under an event: shown as written while it is being translated",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "لغة الكتابة: {language}. جارٍ الترجمة…",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "daTaaxWObSJle3RqqEYtlQ==": {
       "description": "Home page button: open the events app, the live demo",
       "status": "translated",
@@ -1963,13 +1927,337 @@
       ],
       "types": []
     },
-    "mxCKYNLxFaKMZAJAH9rSOw==": {
+    "7Rm9wekHe7oI7S1XZgTOIA==": {
+      "description": "Temporal section: exact moments in time, in UTC",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "اللحظات",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9cM8w6iS33H8Q2+5x793YA==": {
+      "description": "Temporal section: one moment in different time zones",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المناطق الزمنية",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "W8bv1EfOqqzacAKoqNeimA==": {
+      "description": "Temporal section: daylight saving, when clocks go forward or back",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تغيير الساعة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iNKxEYi3z2/VaGrx97bbTw==": {
+      "description": "Temporal section: dates, months, weeks and comparing",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تواريخ التقويم",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TYWTDpqlDJyvlxzxhv56xA==": {
+      "description": "Temporal section: lengths of time between dates",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المدد",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sMNqyduQ6FJKDXcaacBubA==": {
+      "description": "Formats page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "كل صف هو استدعاء واحد لـ Intl الخاص بالمنصة، بلغة هذه الصفحة. نفّذه الـ Worker قبل إرسال الصفحة، وهذا هو النص الذي تعرضه صفحات هذا التطبيق. ثم نفّذه متصفحك مرة أخرى بمحركه الخاص.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "R4/AvJwYkzRDtA05Fh8dfA==": {
       "description": "Formats page: what a highlighted row means",
       "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "الصف المميَّز هو حيث ينسّق محرك متصفحك بشكل مختلف، فلكل محرك بيانات اللغات الخاصة به. أما قوائم القيم المدعومة في النهاية فهي خاصة بكل محرك، لذا لا تتم مقارنتها.",
+          "translation": "الصف المميَّز هو حيث يكتب محرك متصفحك القيمة بشكل مختلف، فلكل محرك بيانات اللغات الخاصة به. تعرض الصفحات نص الخادم، لذا لا تعتمد على تطابق الاثنين. أما قوائم القيم المدعومة في النهاية فهي خاصة بكل محرك، لذا لا تتم مقارنتها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uf52IScFDECmh/bEfLha4Q==": {
+      "description": "How many Temporal rows the browser's own Temporal got the same as the Worker",
+      "status": "translated",
+      "tokens": [
+        "total"
+      ],
+      "translations": [
+        {
+          "translation": "Temporal الخاص بمتصفحك: {same} من {total} متطابقة.",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "Your browser's own Temporal: {same} of {total} the same.",
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "Your browser's own Temporal: {same} of {total} the same.",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "Your browser's own Temporal: {same} of {total} the same.",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "Your browser's own Temporal: {same} of {total} the same.",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "Your browser's own Temporal: {same} of {total} the same.",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "2xLRymCBC6CIAHj3ozPOjw==": {
+      "description": "The visitor's browser has no Temporal of its own",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لا يحتوي متصفحك على Temporal خاص به.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tI0QvUJqhhk8IJMdGyOetg==": {
+      "description": "How many Temporal rows the polyfill in the browser got the same as the Worker",
+      "status": "translated",
+      "tokens": [
+        "total"
+      ],
+      "translations": [
+        {
+          "translation": "الـ polyfill في متصفحك: {same} من {total} متطابقة.",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "The polyfill in your browser: {same} of {total} the same.",
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "The polyfill in your browser: {same} of {total} the same.",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "The polyfill in your browser: {same} of {total} the same.",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "The polyfill in your browser: {same} of {total} the same.",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "The polyfill in your browser: {same} of {total} the same.",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "zZ84or5CNgB2ITAlmViyDw==": {
+      "description": "Temporal table column: the result on the Cloudflare Worker, with the polyfill",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Worker",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9ScYgwZCVdYOiiihIPP1+w==": {
+      "description": "Temporal table column: the result with the browser's own Temporal",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الخاص بالمتصفح",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GXfZHVblXwd5gpWPHpDAow==": {
+      "description": "Temporal table column: the result with the polyfill, in the browser",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الـ polyfill في المتصفح",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mlUsmLsMcHJirdFKd5pLoA==": {
+      "description": "Note under an event: shown as written while it is being translated",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لغة الكتابة: {language}. جارٍ الترجمة…",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BlWJFal7rcGLRz0ZSdGkWw==": {
+      "description": "Temporal page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يتولى Temporal الحساب على التواريخ والأوقات. كل نتيجة قيمة محايدة، لا نص للعرض على الشاشة، لذا يجب أن تخرج متطابقة في كل مكان. نُفّذ كل صف على الـ Worker بحزمة temporal-polyfill وبـ Temporal الخاص بـ Cloudflare، ثم مرة أخرى في متصفحك: بـ Temporal الخاص به، وبالـ polyfill. الصف المميَّز خلل حقيقي، وتُظهر أعمدته صاحبه.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eby8Rng5M82X/f3ibpBoxw==": {
+      "description": "The Worker has no Temporal of its own (Cloudflare's compatibility flag is off)",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لا يحتوي الـ Worker على Temporal خاص به.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KRmEAWj02Qv0x/D81sVeZA==": {
+      "description": "How many Temporal rows Cloudflare's own Temporal got the same as the polyfill",
+      "status": "translated",
+      "tokens": [
+        "total"
+      ],
+      "translations": [
+        {
+          "translation": "Temporal الخاص بـ Cloudflare: {same} من {total} متطابقة.",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "Cloudflare's own Temporal: {same} of {total} the same.",
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "Cloudflare's own Temporal: {same} of {total} the same.",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "Cloudflare's own Temporal: {same} of {total} the same.",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "Cloudflare's own Temporal: {same} of {total} the same.",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "Cloudflare's own Temporal: {same} of {total} the same.",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "n0Xi+iYVgvGqrDoNTYZgRg==": {
+      "description": "Temporal page: why the Worker always uses the polyfill",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تستخدم شيفرة void-fbtee على الـ Worker الـ polyfill دائمًا، لا Temporal الخاص بـ Cloudflare، الذي صدر معطوبًا ذات مرة؛ ويُظهر عموده حاله اليوم. يدعم الـ polyfill تقويمَي ISO والميلادي؛ أما السنة البوذية التايلاندية فتأتي من Intl، في صفحة التنسيقات.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "x6LVLyyNL10mxiVhesdONg==": {
+      "description": "Temporal table column: the result with Cloudflare's own Temporal, on the Worker",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الخاص بـ Cloudflare",
           "variations": {}
         }
       ],

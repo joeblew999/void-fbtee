@@ -1,12 +1,12 @@
-// Every row of the formats page: one call to the platform's own Intl (or Temporal, or fbtee), in
-// the page's language. The page runs each row twice, in the loader on the Worker and again in the
-// browser, and shows both; the e2e test checks they're identical. The same code runs both times.
+// Every row of the formats page: one call to the platform's own Intl (or fbtee), in the page's
+// language. The page runs each row in the loader on the Worker, which is the text a void-fbtee
+// app's pages show, and again in the browser after hydration, to show where its engine's own
+// locale data writes it differently. The same code runs both times.
 //
 // What it covers follows go-htmx4's /formats page (joeblew999/go-htmx4, views/formats.gsx at
-// 7f0afab, 2026-11-07), plus Temporal and fbtee. Times are in a named zone, so the Worker and the
-// browser format the same thing; "in your time zone" is the browser's alone (useTimeZone).
+// 7f0afab, 2026-11-07), plus fbtee. Temporal has its own page (lib/temporal.ts). Times are in a
+// named zone, so both format the same moment; "in your time zone" is the browser's alone.
 import { fbt, list } from "fbtee";
-import { Temporal } from "temporal-polyfill";
 
 export type SectionId =
   | "dates"
@@ -24,7 +24,6 @@ export type SectionId =
   | "segments"
   | "locale"
   | "supported"
-  | "temporal"
   | "strings";
 
 export interface Row {
@@ -408,41 +407,6 @@ export const SECTIONS: { id: SectionId; rows: Row[] }[] = [
         return `${values.length}: ${values.join(", ")}`;
       }),
     ),
-  },
-  {
-    id: "temporal",
-    rows: [
-      custom(
-        "zoned",
-        `Temporal.ZonedDateTime.from("2026-12-24T19:30[Asia/Bangkok]").toLocaleString(lang, { dateStyle: "full", timeStyle: "short" })`,
-        (l) =>
-          Temporal.ZonedDateTime.from("2026-12-24T19:30[Asia/Bangkok]").toLocaleString(l, {
-            dateStyle: "full",
-            timeStyle: "short",
-          }),
-      ),
-      custom(
-        "plain-date",
-        `Temporal.PlainDate.from("2026-07-04").toLocaleString(lang, { dateStyle: "long" })`,
-        (l) => Temporal.PlainDate.from("2026-07-04").toLocaleString(l, { dateStyle: "long" }),
-      ),
-      custom(
-        "until",
-        `new Intl.DurationFormat(lang, { style: "long" }).format(Temporal.PlainDate.from("2026-07-04").until("2026-12-24", { largestUnit: "months" }))`,
-        (l) =>
-          new Intl.DurationFormat(l, { style: "long" }).format(
-            Temporal.PlainDate.from("2026-07-04").until("2026-12-24", { largestUnit: "months" }),
-          ),
-      ),
-      custom(
-        "add",
-        `Temporal.ZonedDateTime.from("2026-03-28T12:00[Europe/London]").add({ days: 1 }).toLocaleString(lang, { timeStyle: "full" })`,
-        (l) =>
-          Temporal.ZonedDateTime.from("2026-03-28T12:00[Europe/London]")
-            .add({ days: 1 })
-            .toLocaleString(l, { timeStyle: "full" }),
-      ),
-    ],
   },
   {
     id: "strings",

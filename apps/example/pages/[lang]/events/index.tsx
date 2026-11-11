@@ -13,10 +13,11 @@ import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Textarea } from "@/components/ui/textarea";
 import type { Props } from "./index.server";
 
-const ZONES = Intl.supportedValuesOf("timeZone");
-
-/** The form, starting in the reader's zone (Events remounts it once the browser knows it). */
-function PostEvent({ zone }: { zone: string }) {
+/**
+ * The form, starting in the reader's zone (Events remounts it once the browser knows it), with
+ * the server's zones. What it sends is neutral: the picker's "2026-04-01T20:00" and a zone name.
+ */
+function PostEvent({ zone, zones }: { zone: string; zones: string[] }) {
   const { locale } = useLocale();
   const form = useForm(
     "/[lang]/events",
@@ -91,7 +92,7 @@ function PostEvent({ zone }: { zone: string }) {
                 value={form.data.time_zone}
                 onChange={(e) => form.setData("time_zone", e.target.value)}
               >
-                {[...new Set(["UTC", ...ZONES])].map((z) => (
+                {[...new Set(["UTC", ...zones])].map((z) => (
                   <NativeSelectOption key={z} value={z}>
                     {z}
                   </NativeSelectOption>
@@ -122,7 +123,7 @@ function PostEvent({ zone }: { zone: string }) {
   );
 }
 
-export default function Events({ events }: Props) {
+export default function Events({ events, zones }: Props) {
   const { locale } = useLocale();
   // "UTC" until hydration, then the browser's zone; nothing has been typed into the form yet.
   const zone = useTimeZone();
@@ -156,7 +157,7 @@ export default function Events({ events }: Props) {
           </li>
         ))}
       </ul>
-      <PostEvent key={zone} zone={zone} />
+      <PostEvent key={zone} zone={zone} zones={zones} />
     </div>
   );
 }

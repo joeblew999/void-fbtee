@@ -1,9 +1,9 @@
 // An event's start: on the clock where it happens, on the reader's own clock (when that's a
 // different zone), and how far off it is. Times in the reader's zone show in UTC until hydration
-// (useTimeZone), as the formats page's do.
+// (useTimeZone), as the formats page's do. Each text is <Formatted>: the server's, kept by the browser.
 import { fbt } from "fbtee";
 import { Temporal } from "temporal-polyfill";
-import { useLocale, useNow, useTimeZone } from "void-fbtee/react";
+import { Formatted, useLocale, useNow, useTimeZone } from "void-fbtee/react";
 import { relativeDays } from "@/lib/relative-days";
 
 const WHEN: Intl.DateTimeFormatOptions = {
@@ -24,16 +24,21 @@ export function EventTime({ startsAt }: { startsAt: string }) {
     new Intl.DateTimeFormat(locale, { ...WHEN, timeZone }).format(start.epochMilliseconds);
   return (
     <div className="grid gap-1 text-sm">
-      <div data-testid="event-local">{at(start.timeZoneId)}</div>
+      <div data-testid="event-local">
+        <Formatted>{at(start.timeZoneId)}</Formatted>
+      </div>
       {reader !== start.timeZoneId && (
         <div className="text-muted-foreground" data-testid="event-yours">
           <fbt desc="An event's start time on the reader's own clock">
-            Your time: <fbt:param name="time">{at(reader)}</fbt:param>
+            Your time:{" "}
+            <fbt:param name="time">
+              <Formatted>{at(reader)}</Formatted>
+            </fbt:param>
           </fbt>
         </div>
       )}
       <div className="text-muted-foreground" data-testid="event-when">
-        {relativeDays(locale, start.withTimeZone(reader), now)}
+        <Formatted>{relativeDays(locale, start.withTimeZone(reader), now)}</Formatted>
       </div>
     </div>
   );

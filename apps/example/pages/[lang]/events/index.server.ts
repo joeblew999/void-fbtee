@@ -22,7 +22,12 @@ export const loader = defineHandler(async (c) => {
     .leftJoin(event_texts, and(eq(event_texts.event_id, events.id), eq(event_texts.locale, locale)))
     .where(gte(events.starts_at_utc, new Date().toISOString()))
     .orderBy(asc(events.starts_at_utc));
-  return { events: rows.map(({ event, text }) => ({ ...event, text })) };
+  // The zones the form offers: the Worker's, as it checks them. Engines list different ones (Safari
+  // keeps old names too), so the browser doesn't make its own list.
+  return {
+    events: rows.map(({ event, text }) => ({ ...event, text })),
+    zones: Intl.supportedValuesOf("timeZone"),
+  };
 });
 
 export const action = defineHandler.withValidator({ body: newEventSchema })(async (c, { body }) => {

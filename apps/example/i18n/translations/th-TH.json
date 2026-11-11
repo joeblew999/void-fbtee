@@ -445,18 +445,6 @@
       ],
       "types": []
     },
-    "LhxZTrRS+y9HK17fYWCi7g==": {
-      "description": "Formats section: dates with Temporal",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Temporal",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "e/f/c9uEWgjABfIvCg1SnQ==": {
       "description": "Formats section: translated strings with fbtee",
       "status": "translated",
@@ -476,18 +464,6 @@
       "translations": [
         {
           "translation": "รูปแบบ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "RpKRzJVandAX+19QKPKCcw==": {
-      "description": "Formats page introduction",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "แต่ละแถวคือการเรียก Intl ของแพลตฟอร์มหนึ่งครั้ง ในภาษาของหน้านี้ Worker เรียกก่อนส่งหน้านี้มา แล้วเบราว์เซอร์ของคุณเรียกอีกครั้ง",
           "variations": {}
         }
       ],
@@ -1141,18 +1117,6 @@
       ],
       "types": []
     },
-    "mlUsmLsMcHJirdFKd5pLoA==": {
-      "description": "Note under an event: shown as written while it is being translated",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เขียนเป็นภาษา{language} กำลังแปล…",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "daTaaxWObSJle3RqqEYtlQ==": {
       "description": "Home page button: open the events app, the live demo",
       "status": "translated",
@@ -1705,13 +1669,229 @@
       ],
       "types": []
     },
-    "mxCKYNLxFaKMZAJAH9rSOw==": {
+    "7Rm9wekHe7oI7S1XZgTOIA==": {
+      "description": "Temporal section: exact moments in time, in UTC",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ช่วงเวลาที่แน่นอน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9cM8w6iS33H8Q2+5x793YA==": {
+      "description": "Temporal section: one moment in different time zones",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เขตเวลา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "W8bv1EfOqqzacAKoqNeimA==": {
+      "description": "Temporal section: daylight saving, when clocks go forward or back",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "การปรับนาฬิกา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iNKxEYi3z2/VaGrx97bbTw==": {
+      "description": "Temporal section: dates, months, weeks and comparing",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "วันที่ในปฏิทิน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TYWTDpqlDJyvlxzxhv56xA==": {
+      "description": "Temporal section: lengths of time between dates",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ระยะเวลา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sMNqyduQ6FJKDXcaacBubA==": {
+      "description": "Formats page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แต่ละแถวคือการเรียก Intl ของแพลตฟอร์มหนึ่งครั้ง ในภาษาของหน้านี้ Worker เรียกก่อนส่งหน้านี้มา ซึ่งเป็นข้อความที่หน้าต่างๆ ของแอปนี้แสดง แล้วเบราว์เซอร์ของคุณเรียกอีกครั้งด้วยเอนจินของตัวเอง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "R4/AvJwYkzRDtA05Fh8dfA==": {
       "description": "Formats page: what a highlighted row means",
       "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "แถวที่ไฮไลต์คือจุดที่เอนจินของเบราว์เซอร์คุณจัดรูปแบบต่างออกไป เพราะแต่ละเอนจินมีข้อมูลภาษาของตัวเอง รายการค่าที่รองรับท้ายหน้าเป็นของแต่ละเอนจินเอง จึงไม่นำมาเทียบกัน",
+          "translation": "แถวที่ไฮไลต์คือจุดที่เอนจินของเบราว์เซอร์คุณเขียนต่างออกไป เพราะแต่ละเอนจินมีข้อมูลภาษาของตัวเอง หน้าต่างๆ แสดงข้อความจากเซิร์ฟเวอร์ จึงไม่ต้องพึ่งให้ทั้งสองตรงกัน รายการค่าที่รองรับท้ายหน้าเป็นของแต่ละเอนจินเอง จึงไม่นำมาเทียบกัน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uf52IScFDECmh/bEfLha4Q==": {
+      "description": "How many Temporal rows the browser's own Temporal got the same as the Worker",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Temporal ของเบราว์เซอร์คุณเอง: เหมือนกัน {same} จาก {total}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2xLRymCBC6CIAHj3ozPOjw==": {
+      "description": "The visitor's browser has no Temporal of its own",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เบราว์เซอร์ของคุณไม่มี Temporal ในตัว",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tI0QvUJqhhk8IJMdGyOetg==": {
+      "description": "How many Temporal rows the polyfill in the browser got the same as the Worker",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "polyfill ในเบราว์เซอร์ของคุณ: เหมือนกัน {same} จาก {total}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zZ84or5CNgB2ITAlmViyDw==": {
+      "description": "Temporal table column: the result on the Cloudflare Worker, with the polyfill",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Worker",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9ScYgwZCVdYOiiihIPP1+w==": {
+      "description": "Temporal table column: the result with the browser's own Temporal",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ของเบราว์เซอร์เอง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GXfZHVblXwd5gpWPHpDAow==": {
+      "description": "Temporal table column: the result with the polyfill, in the browser",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "polyfill ในเบราว์เซอร์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mlUsmLsMcHJirdFKd5pLoA==": {
+      "description": "Note under an event: shown as written while it is being translated",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เขียนเป็นภาษา{language} กำลังแปล…",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BlWJFal7rcGLRz0ZSdGkWw==": {
+      "description": "Temporal page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Temporal ทำหน้าที่คำนวณวันที่และเวลา ผลลัพธ์แต่ละรายการเป็นค่ากลาง ไม่ใช่ข้อความสำหรับแสดงบนหน้าจอ จึงต้องออกมาเหมือนกันทุกที่ แต่ละแถวรันบน Worker ด้วยแพ็กเกจ temporal-polyfill และด้วย Temporal ของ Cloudflare เอง และรันอีกครั้งในเบราว์เซอร์ของคุณ ทั้งด้วย Temporal ของเบราว์เซอร์เองและด้วย polyfill แถวที่ไฮไลต์คือบั๊กจริง และคอลัมน์จะบอกว่าเป็นของใคร",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eby8Rng5M82X/f3ibpBoxw==": {
+      "description": "The Worker has no Temporal of its own (Cloudflare's compatibility flag is off)",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Worker ไม่มี Temporal ในตัว",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KRmEAWj02Qv0x/D81sVeZA==": {
+      "description": "How many Temporal rows Cloudflare's own Temporal got the same as the polyfill",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Temporal ของ Cloudflare เอง: เหมือนกัน {same} จาก {total}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "n0Xi+iYVgvGqrDoNTYZgRg==": {
+      "description": "Temporal page: why the Worker always uses the polyfill",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "โค้ดของ void-fbtee บน Worker ใช้ polyfill เสมอ ไม่ใช้ Temporal ของ Cloudflare เอง ซึ่งเคยออกมาแบบใช้งานไม่ได้ คอลัมน์ของมันแสดงว่าตอนนี้เป็นอย่างไร polyfill รองรับปฏิทิน ISO และเกรกอเรียน ส่วนปีพุทธศักราชมาจาก Intl ในหน้ารูปแบบ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "x6LVLyyNL10mxiVhesdONg==": {
+      "description": "Temporal table column: the result with Cloudflare's own Temporal, on the Worker",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ของ Cloudflare เอง",
           "variations": {}
         }
       ],

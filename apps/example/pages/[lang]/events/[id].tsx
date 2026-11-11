@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { fbt } from "fbtee";
 import { Form, useForm, useRouter } from "@void/react";
 import { connectLiveStream } from "void/live/client";
-import { Link, useLocale, useTimeZone } from "void-fbtee/react";
+import { Formatted, Link, useLocale, useTimeZone } from "void-fbtee/react";
 import { EventTime } from "@/components/EventTime";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -140,7 +140,10 @@ export default function Event({ event, text, left }: Props) {
         <details className="text-muted-foreground text-sm">
           <summary data-testid="event-translated">
             <fbt desc="Note under an event: its text was machine-translated from this language">
-              Translated by machine from <fbt:param name="language">{written}</fbt:param>
+              Translated by machine from{" "}
+              <fbt:param name="language">
+                <Formatted>{written!}</Formatted>
+              </fbt:param>
             </fbt>
           </summary>
           <div className="mt-2 grid gap-1" lang={event.locale} data-testid="event-original">
@@ -152,7 +155,10 @@ export default function Event({ event, text, left }: Props) {
       {!text && event.locale !== locale && (
         <p className="text-muted-foreground text-sm" data-testid="event-translating">
           <fbt desc="Note under an event: shown as written while it is being translated">
-            Written in <fbt:param name="language">{written}</fbt:param>. Translating…
+            Written in{" "}
+            <fbt:param name="language">
+              <Formatted>{written!}</Formatted>
+            </fbt:param>. Translating…
           </fbt>
         </p>
       )}
