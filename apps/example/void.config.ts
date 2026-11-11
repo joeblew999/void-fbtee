@@ -4,7 +4,12 @@ import { defineConfig } from "void/config";
 export default defineConfig({
   routing: {
     typedRoutes: true,
+    // Cache prerendered pages (the docs and the island page) at the edge; set here so a
+    // non-interactive deploy doesn't stop to ask.
+    isr: true,
   },
+  // The Worker's name on Cloudflare: void-fbtee-example.<subdomain>.workers.dev.
+  cloudflare: { name: "void-fbtee-example" },
   worker: {
     compatibility_date: "2026-02-24",
     // Native Temporal in the worker (Cloudflare's `temporal` flag; default for dates from 2026-12-01).
