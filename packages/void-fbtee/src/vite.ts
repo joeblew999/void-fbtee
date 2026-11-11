@@ -5,8 +5,11 @@
 // - Server environments: resolves `fbtee/server` to fbtee's per-request (AsyncLocalStorage) build.
 //   fbtee only exports it under the `node` condition, and workerd isn't `node`. (decision 1)
 // - Server environments don't pre-bundle fbtee, so `fbtee` and `fbtee/server` share one core. (2)
-// - Server environments resolve `temporal-polyfill` to the polyfill's own code, never
-//   "native if present": Cloudflare's native Temporal once shipped broken (workerd#6907). (12)
+// - Server environments resolve `temporal-polyfill` to Cloudflare's own Temporal (the `temporal`
+//   compatibility flag, which init adds and check requires), so no polyfill code goes in the
+//   worker. It once shipped broken (workerd#6907, July 2026, with no flag); the flag's version is
+//   documented and its Temporal.Now reads Date.now()'s clock. The browser keeps the polyfill's
+//   own "native if present". (12)
 // - Builds each locale's catalog in-process from i18n/translations/<locale>.json and the app's
 //   source (plus fbtee's built-in strings), as `virtual:void-fbtee/catalogs`. Nothing generated
 //   goes in git. (5) Shared with the void-fbtee command: catalogs.ts.
@@ -66,6 +69,15 @@ const CONFIG_ID = "virtual:void-fbtee/config";
 const CATALOGS_ID = "virtual:void-fbtee/catalogs";
 const CATALOG_PREFIX = "virtual:void-fbtee/catalog/";
 const TEXTS_ID = "virtual:void-fbtee/texts";
+/** What `temporal-polyfill` is on the server: the runtime's own Temporal (Cloudflare's flag). */
+const SERVER_TEMPORAL_ID = "\0void-fbtee:server-temporal";
+const SERVER_TEMPORAL = `const Temporal = globalThis.Temporal;
+if (!Temporal)
+  throw new Error('void-fbtee: no Temporal on the server. Add Cloudflare\\'s "temporal" compatibility flag (void.config.ts: worker.compatibility_flags), or run void-fbtee init.');
+export { Temporal };
+export const Intl = globalThis.Intl;
+export const toTemporalInstant = Date.prototype.toTemporalInstant;
+`;
 
 // Void builds the browser and the worker as separate Vite builds, each with its own copy of the
 // plugin; report once per app and command in this process.
@@ -161,9 +173,7 @@ export default function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         return "\0" + id;
       if (this.environment.name === "client") return;
       if (id === "fbtee/server") return fbteeServer;
-      if (id === "temporal-polyfill") {
-        return this.resolve("temporal-polyfill/implementation", undefined, { skipSelf: true });
-      }
+      if (id === "temporal-polyfill") return SERVER_TEMPORAL_ID;
     },
     transform: {
       filter: { id: { include: /\.[jt]sx?$/, exclude: /node_modules|^\0/ }, code: /fbt|fbs/ },
@@ -174,6 +184,7 @@ export default function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       },
     },
     load(id) {
+      if (id === SERVER_TEMPORAL_ID) return SERVER_TEMPORAL;
       if (id === "\0" + CONFIG_ID)
         return `export default ${JSON.stringify({ ...config, fallbackLocales: options.fallbackLocales })};`;
       if (id === "\0" + CATALOGS_ID) {

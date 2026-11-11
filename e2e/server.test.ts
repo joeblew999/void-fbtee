@@ -61,19 +61,33 @@ test("the middleware leaves files and API routes alone", async () => {
 // It reads the build on disk, which the tests make only when they run the site themselves: against a
 // deployed site (E2E_URL: test:deployed, test:production) there is no build of this commit here.
 test.skipIf(!!process.env.E2E_URL)(
-  "built worker: one fbtee core, no native Temporal in app code, temporal flag on",
+  "built worker: one fbtee core, Cloudflare's own Temporal (no polyfill but the Temporal page's), temporal flag on",
   () => {
     const read = (f: string) => readFileSync(f, "utf8");
     const worker = globSync(join(EXAMPLE, "dist/ssr/**/*.js"));
     expect(worker.length).toBeGreaterThan(0);
     // One copy of fbtee's per-request state (plan #1, decision 2).
     expect(worker.filter((f) => read(f).includes("runWithFbtee"))).toHaveLength(1);
-    // App code uses the polyfill on the server (decision 17), never the native global. The one
-    // exception is the Temporal reference page (lib/temporal.ts), which runs Cloudflare's own
-    // beside the polyfill to compare them: the only file reading it must be the one with its rows.
-    const rows = 'Temporal.Instant.from("2026-12-24T12:30:00Z").epochMilliseconds';
+    // The app's code gets Cloudflare's own Temporal (void-fbtee's Vite plugin, decision 12): the
+    // polyfill's code is in the worker only for the Temporal reference page, which runs it beside
+    // Cloudflare's to compare. So every file that imports the polyfill is the page's rows
+    // (lib/temporal.ts) or imports them.
     expect(
-      worker.filter((f) => /globalThis\.Temporal\b/.test(read(f)) && !read(f).includes(rows)),
+      worker.filter((f) => read(f).includes("void-fbtee: no Temporal on the server")),
+    ).toHaveLength(1);
+    const name = (f: string) => f.split("/").pop()!;
+    const polyfill = worker.filter((f) => read(f).includes("Mismatching Calendars")).map(name);
+    expect(polyfill.length).toBeGreaterThan(0);
+    const rows = worker
+      .filter((f) =>
+        read(f).includes('Temporal.Instant.from("2026-12-24T12:30:00Z").epochMilliseconds'),
+      )
+      .map(name);
+    const importers = worker.filter(
+      (f) => !polyfill.includes(name(f)) && polyfill.some((p) => read(f).includes(p)),
+    );
+    expect(
+      importers.filter((f) => !rows.includes(name(f)) && !rows.some((r) => read(f).includes(r))),
     ).toEqual([]);
     // Cloudflare's temporal flag reaches the Worker config `void deploy` uploads (decision 15).
     const config = JSON.parse(

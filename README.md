@@ -107,7 +107,7 @@ from this repo. In the app's `package.json`:
 
 ```json
 "dependencies": {
-  "void-fbtee": "github:joeblew999/void-fbtee#v0.1.0&path:/packages/void-fbtee"
+  "void-fbtee": "github:joeblew999/void-fbtee#v0.3.0&path:/packages/void-fbtee"
 }
 ```
 

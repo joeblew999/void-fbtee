@@ -1669,18 +1669,6 @@
         28
       ]
     },
-    "zZ84or5CNgB2ITAlmViyDw==": {
-      "description": "Temporal table column: the result on the Cloudflare Worker, with the polyfill",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Worker",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "9ScYgwZCVdYOiiihIPP1+w==": {
       "description": "Temporal table column: the result with the browser's own Temporal",
       "status": "translated",
@@ -1712,90 +1700,6 @@
       "translations": [
         {
           "translation": "لغة الكتابة: {language}. جارٍ الترجمة…",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "BlWJFal7rcGLRz0ZSdGkWw==": {
-      "description": "Temporal page introduction",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يتولى Temporal الحساب على التواريخ والأوقات. كل نتيجة قيمة محايدة، لا نص للعرض على الشاشة، لذا يجب أن تخرج متطابقة في كل مكان. نُفّذ كل صف على الـ Worker بحزمة temporal-polyfill وبـ Temporal الخاص بـ Cloudflare، ثم مرة أخرى في متصفحك: بـ Temporal الخاص به، وبالـ polyfill. الصف المميَّز خلل حقيقي، وتُظهر أعمدته صاحبه.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "eby8Rng5M82X/f3ibpBoxw==": {
-      "description": "The Worker has no Temporal of its own (Cloudflare's compatibility flag is off)",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "لا يحتوي الـ Worker على Temporal خاص به.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "KRmEAWj02Qv0x/D81sVeZA==": {
-      "description": "How many Temporal rows Cloudflare's own Temporal got the same as the polyfill",
-      "status": "translated",
-      "tokens": [
-        "total"
-      ],
-      "translations": [
-        {
-          "translation": "Temporal الخاص بـ Cloudflare: {same} من {total} متطابقة.",
-          "variations": {
-            "0": 16
-          }
-        },
-        {
-          "translation": "Cloudflare's own Temporal: {same} of {total} the same.",
-          "variations": {
-            "0": 4
-          }
-        },
-        {
-          "translation": "Cloudflare's own Temporal: {same} of {total} the same.",
-          "variations": {
-            "0": 8
-          }
-        },
-        {
-          "translation": "Cloudflare's own Temporal: {same} of {total} the same.",
-          "variations": {
-            "0": 20
-          }
-        },
-        {
-          "translation": "Cloudflare's own Temporal: {same} of {total} the same.",
-          "variations": {
-            "0": 12
-          }
-        },
-        {
-          "translation": "Cloudflare's own Temporal: {same} of {total} the same.",
-          "variations": {
-            "0": 24
-          }
-        }
-      ],
-      "types": [
-        28
-      ]
-    },
-    "x6LVLyyNL10mxiVhesdONg==": {
-      "description": "Temporal table column: the result with Cloudflare's own Temporal, on the Worker",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "الخاص بـ Cloudflare",
           "variations": {}
         }
       ],
@@ -2179,18 +2083,6 @@
       ],
       "types": []
     },
-    "1rA5kZaaFtul9ec1fvtHxw==": {
-      "description": "Temporal page: why the Worker always uses the polyfill",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تستخدم شيفرة void-fbtee على الـ Worker الـ polyfill دائمًا، لا Temporal الخاص بـ Cloudflare، الذي صدر معطوبًا ذات مرة؛ ويُظهر عموده حاله اليوم. يدعم الـ polyfill تقويمَي ISO والميلادي؛ أما السنة البوذية التايلاندية فتأتي من Intl، في صفحة التنسيقات.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "o+M4dP3r8NzgvqEoGp7ZZA==": {
       "description": "Heading of the box showing an event exactly as it's saved in the database",
       "status": "translated",
@@ -2210,6 +2102,102 @@
       "translations": [
         {
           "translation": "كما حُفظت تمامًا، بأي لغة قرأتها. كل ما في الأعلى مكتوب منها، بلغتك وبحسب ساعتك.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "D2yEBA4I7UmiEXupRwmiOw==": {
+      "description": "Temporal page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يتولى Temporal الحساب على التواريخ والأوقات. كل نتيجة قيمة محايدة، لا نص للعرض على الشاشة، لذا يجب أن تخرج متطابقة في كل مكان. نُفّذ كل صف على الـ Worker بـ Temporal الخاص بـ Cloudflare، الذي يستخدمه هذا التطبيق هناك، وبحزمة temporal-polyfill، ثم مرة أخرى في متصفحك: بـ Temporal الخاص به، وبالـ polyfill. الصف المميَّز خلل حقيقي، وتُظهر أعمدته صاحبه.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4Kbft/ENivNWEOtkOOYDbg==": {
+      "description": "How many Temporal rows the polyfill on the Worker got the same as Cloudflare's own Temporal",
+      "status": "translated",
+      "tokens": [
+        "total"
+      ],
+      "translations": [
+        {
+          "translation": "الـ polyfill على الـ Worker: {same} من {total} متطابقة.",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "The polyfill on the Worker: {same} of {total} the same.",
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "The polyfill on the Worker: {same} of {total} the same.",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "The polyfill on the Worker: {same} of {total} the same.",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "The polyfill on the Worker: {same} of {total} the same.",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "The polyfill on the Worker: {same} of {total} the same.",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "mTDc+BXpwQqqK+pea+yfZw==": {
+      "description": "Temporal page: which Temporal runs where",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "على الـ Worker يستخدم هذا التطبيق Temporal الخاص بـ Cloudflare (علَم التوافق temporal)؛ وفي المتصفح، Temporal الخاص بالمتصفح، أو الـ polyfill حيث لا يوجد، كما على أجهزة iPhone اليوم. يدعم الـ polyfill تقويمَي ISO والميلادي؛ أما السنة البوذية التايلاندية فتأتي من Intl، في صفحة Intl.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RkWXhR3tYA1Vv/Zrw5M2Og==": {
+      "description": "Temporal table column: the result on the Cloudflare Worker, with Cloudflare's own Temporal (what the app runs)",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Worker",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MuzALXpJPjg9z2HTAWBe3w==": {
+      "description": "Temporal table column: the result with the polyfill, on the Worker",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الـ polyfill على الـ Worker",
           "variations": {}
         }
       ],

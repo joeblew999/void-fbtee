@@ -1,6 +1,6 @@
 {
   "name": "void-fbtee",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "i18n for Void apps: fbtee strings, Temporal dates and Intl formatting, with a Vite plugin, Void middleware and React helpers",
   "license": "MIT",
   "bin": {

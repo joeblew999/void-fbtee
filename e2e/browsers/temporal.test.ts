@@ -17,8 +17,8 @@ for (const e of ENGINES) {
       const errors = collectErrors(p);
       await p.goto(`/${SOURCE}/docs/temporal`);
       await untilText(p, '[data-testid="temporal-polyfill"]', "not", "");
-      // Each row's four results: the polyfill on the Worker (the reference), Cloudflare's own,
-      // the browser's own and the polyfill in the browser; "—" where there's no Temporal of its own.
+      // Each row's four results: Cloudflare's own on the Worker (the reference: what the app runs),
+      // the polyfill on the Worker, the browser's own and the polyfill in the browser; "—" where there's no Temporal of its own.
       const rows = await p.$$eval("tr[data-row]", (rs) =>
         rs.map((r) => ({
           row: (r as HTMLElement).dataset.row,
@@ -36,7 +36,7 @@ for (const e of ENGINES) {
       const has = (side: string) =>
         !rows.some((r) => r.results.some(([s, t]) => s === side && t === "—"));
       console.log(
-        `${e.name}: Cloudflare's own Temporal ${has("worker-own") ? "yes" : "no"}, the browser's own ${has("own") ? "yes" : "no"}`,
+        `${e.name}: Cloudflare's own Temporal ${has("worker") ? "yes" : "no"}, the browser's own ${has("own") ? "yes" : "no"}`,
       );
       expect(differs).toEqual([]);
       expect(errors).toEqual([]);

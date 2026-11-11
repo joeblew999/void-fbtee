@@ -1369,18 +1369,6 @@
       ],
       "types": []
     },
-    "zZ84or5CNgB2ITAlmViyDw==": {
-      "description": "Temporal table column: the result on the Cloudflare Worker, with the polyfill",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Worker",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "9ScYgwZCVdYOiiihIPP1+w==": {
       "description": "Temporal table column: the result with the browser's own Temporal",
       "status": "translated",
@@ -1412,54 +1400,6 @@
       "translations": [
         {
           "translation": "เขียนเป็นภาษา{language} กำลังแปล…",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "BlWJFal7rcGLRz0ZSdGkWw==": {
-      "description": "Temporal page introduction",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Temporal ทำหน้าที่คำนวณวันที่และเวลา ผลลัพธ์แต่ละรายการเป็นค่ากลาง ไม่ใช่ข้อความสำหรับแสดงบนหน้าจอ จึงต้องออกมาเหมือนกันทุกที่ แต่ละแถวรันบน Worker ด้วยแพ็กเกจ temporal-polyfill และด้วย Temporal ของ Cloudflare เอง และรันอีกครั้งในเบราว์เซอร์ของคุณ ทั้งด้วย Temporal ของเบราว์เซอร์เองและด้วย polyfill แถวที่ไฮไลต์คือบั๊กจริง และคอลัมน์จะบอกว่าเป็นของใคร",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "eby8Rng5M82X/f3ibpBoxw==": {
-      "description": "The Worker has no Temporal of its own (Cloudflare's compatibility flag is off)",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Worker ไม่มี Temporal ในตัว",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "KRmEAWj02Qv0x/D81sVeZA==": {
-      "description": "How many Temporal rows Cloudflare's own Temporal got the same as the polyfill",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Temporal ของ Cloudflare เอง: เหมือนกัน {same} จาก {total}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "x6LVLyyNL10mxiVhesdONg==": {
-      "description": "Temporal table column: the result with Cloudflare's own Temporal, on the Worker",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ของ Cloudflare เอง",
           "variations": {}
         }
       ],
@@ -1813,18 +1753,6 @@
       ],
       "types": []
     },
-    "1rA5kZaaFtul9ec1fvtHxw==": {
-      "description": "Temporal page: why the Worker always uses the polyfill",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "โค้ดของ void-fbtee บน Worker ใช้ polyfill เสมอ ไม่ใช้ Temporal ของ Cloudflare เอง ซึ่งเคยออกมาแบบใช้งานไม่ได้ คอลัมน์ของมันแสดงว่าตอนนี้เป็นอย่างไร polyfill รองรับปฏิทิน ISO และเกรกอเรียน ส่วนปีพุทธศักราชมาจาก Intl ในหน้ารูปแบบ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "o+M4dP3r8NzgvqEoGp7ZZA==": {
       "description": "Heading of the box showing an event exactly as it's saved in the database",
       "status": "translated",
@@ -1844,6 +1772,66 @@
       "translations": [
         {
           "translation": "ตรงตามที่บันทึกไว้ ไม่ว่าคุณจะอ่านเป็นภาษาใด ทุกอย่างด้านบนเขียนขึ้นจากข้อมูลนี้ ตามภาษาและนาฬิกาของคุณ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "D2yEBA4I7UmiEXupRwmiOw==": {
+      "description": "Temporal page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Temporal ทำหน้าที่คำนวณวันที่และเวลา ผลลัพธ์แต่ละรายการเป็นค่ากลาง ไม่ใช่ข้อความสำหรับแสดงบนหน้าจอ จึงต้องออกมาเหมือนกันทุกที่ แต่ละแถวรันบน Worker ด้วย Temporal ของ Cloudflare เอง ซึ่งแอปนี้ใช้อยู่ที่นั่น และด้วยแพ็กเกจ temporal-polyfill และรันอีกครั้งในเบราว์เซอร์ของคุณ ทั้งด้วย Temporal ของเบราว์เซอร์เองและด้วย polyfill แถวที่ไฮไลต์คือบั๊กจริง และคอลัมน์จะบอกว่าเป็นของใคร",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4Kbft/ENivNWEOtkOOYDbg==": {
+      "description": "How many Temporal rows the polyfill on the Worker got the same as Cloudflare's own Temporal",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "polyfill บน Worker: เหมือนกัน {same} จาก {total}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mTDc+BXpwQqqK+pea+yfZw==": {
+      "description": "Temporal page: which Temporal runs where",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "บน Worker แอปนี้ใช้ Temporal ของ Cloudflare เอง (ผ่าน compatibility flag ชื่อ temporal) ส่วนในเบราว์เซอร์ใช้ของเบราว์เซอร์เอง หรือใช้ polyfill หากไม่มี เช่นบน iPhone ในปัจจุบัน polyfill รองรับปฏิทิน ISO และเกรกอเรียน ส่วนปีพุทธศักราชมาจาก Intl ในหน้า Intl",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RkWXhR3tYA1Vv/Zrw5M2Og==": {
+      "description": "Temporal table column: the result on the Cloudflare Worker, with Cloudflare's own Temporal (what the app runs)",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Worker",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MuzALXpJPjg9z2HTAWBe3w==": {
+      "description": "Temporal table column: the result with the polyfill, on the Worker",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "polyfill บน Worker",
           "variations": {}
         }
       ],

@@ -1,10 +1,11 @@
 // Every row of the Temporal page (pages/[lang]/docs/temporal.tsx): date and time arithmetic with
 // Temporal, each result a neutral value (an ISO string, a number), never text for the screen.
-// Each row takes the Temporal to run with, so the page runs it three ways: on the Worker (the
-// loader, with temporal-polyfill: void-fbtee's Vite plugin always uses it there), and in the
-// browser after hydration, once with the browser's own Temporal (if it has one) and once with the
-// polyfill. Neutral results don't depend on locale data, so all three must be identical; where
-// one differs, the difference says which implementation has the bug. Formatting is on the Intl page.
+// Each row takes the Temporal to run with, so the page runs it four ways: on the Worker (the
+// loader) with Cloudflare's own Temporal (what the app runs there: void-fbtee's Vite plugin) and
+// with temporal-polyfill, and in the browser after hydration with its own Temporal (if it has
+// one) and with the polyfill (what today's iPhones run). Neutral results don't depend on locale
+// data, so all four must be identical; where one differs, it names the implementation with the
+// bug. Formatting is on the Intl page.
 import { Temporal as Polyfill } from "temporal-polyfill/implementation";
 
 /** A Temporal: the polyfill's or the platform's own (globalThis.Temporal), the same API. */
