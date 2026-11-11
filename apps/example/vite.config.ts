@@ -6,7 +6,7 @@ import voidFbtee from "void-fbtee/vite";
 
 export default defineConfig({
   plugins: [
-    voidFbtee({ sourceLocale: "en-US", locales: ["en-US", "th-TH", "de-DE", "ar-EG", "pl-PL"] }),
+    voidFbtee({ sourceLocale: "en-US", locales: ["en-US", "ar-EG", "th-TH"] }),
     voidPlugin(),
     voidReact({ react: { compiler: true } }),
     voidMarkdown(),

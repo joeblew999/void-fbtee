@@ -1,11 +1,9 @@
 // What void-fbtee hands fbtee's runtime, checked with fbtee's real runtime: regional locales fall
-// back per message (de-AT -> de -> source text) in the browser and on the server, and "/" picks
-// a locale by fbtee's own matching.
+// back per message (de-AT -> de -> source text) in the browser and on the server.
 import { describe, expect, test } from "vite-plus/test";
 import { collectSync, transformSync, translateSync } from "@nkzw/fbtee-compiler";
 import { fbt, runWithFbtee, setupLocaleContext } from "fbtee/server";
 import { resolveLocales } from "../src/locales";
-import { bestLocale } from "../src/negotiate";
 import { allTranslations, localeContextOptions, type CatalogLoaders } from "../src/runtime";
 
 const SOURCE = `import { fbt } from "fbtee";
@@ -67,17 +65,5 @@ describe("de-AT falls back to de, then the source text", () => {
       return strings();
     });
     expect(out).toEqual(DE_AT);
-  });
-});
-
-describe('"/" picks a locale by fbtee\'s matching', () => {
-  test.each([
-    ["de-AT,en;q=0.5", "de-AT"],
-    ["de-CH,en;q=0.5", "de"], // the parent language, not the first German region listed
-    ["en;q=0.2, de", "de"], // by weight
-    ["fr-FR", "en-US"], // nothing matches: the source locale
-    [null, "en-US"],
-  ])("%s -> %s", (header, locale) => {
-    expect(bestLocale(header, config).locale).toBe(locale);
   });
 });

@@ -1,7 +1,7 @@
 // fbtee's runtime options from the app's config, for the browser (setupLocaleContext) and the
-// server (runWithFbtee). fbtee does the work: loading a locale's fallback catalogs, falling back
-// per message (de-AT -> de -> source text) and matching locales. This only hands it the app's
-// locales and catalogs.
+// server (runWithFbtee). fbtee does the work: loading a locale's fallback catalogs and falling
+// back per message (de-AT -> de -> source text). This only hands it the app's locales and
+// catalogs.
 import type { FallbackLocales, LocaleContextProps, TranslationDictionary } from "fbtee";
 import type { LocaleConfig } from "./locales";
 
@@ -42,19 +42,3 @@ export async function allTranslations(catalogs: CatalogLoaders): Promise<Transla
   const modules = await Promise.all(Object.values(catalogs).map((load) => load()));
   return Object.assign({}, ...modules.map((m) => m.default));
 }
-
-/** The tags of an Accept-Language header, most wanted first. */
-export function acceptedLocales(header: string | null | undefined): string[] {
-  return (header ?? "")
-    .split(",")
-    .map((part, i) => {
-      const [tag = "", ...params] = part.trim().split(";");
-      const q = params.map((p) => p.trim()).find((p) => p.startsWith("q="));
-      return { tag: tag.trim(), q: q ? Number(q.slice(2)) : 1, i };
-    })
-    .filter((w) => w.tag && w.tag !== "*" && w.q > 0)
-    .sort((a, b) => b.q - a.q || a.i - b.i)
-    .map((w) => w.tag);
-}
-
-export { availableLanguages };

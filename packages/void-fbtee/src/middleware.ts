@@ -3,13 +3,13 @@
 //
 //   export { default } from "void-fbtee/middleware";
 //
-// - The locale comes from the first URL segment (/th-TH/...). "/" redirects to the best locale
-//   for Accept-Language, by fbtee's own matching (negotiate.ts), uncached and per-browser.
+// - The locale comes from the first URL segment (/th-TH/...). "/" redirects to the source
+//   locale: one URL per language, as Google wants, and never a redirect by the visitor's language.
 // - fbtee's per-request state is held by fbtee itself in AsyncLocalStorage (runWithFbtee), so
 //   text rendered after the shell streams in the right language too. It gets every catalog, so
 //   fbtee falls back per message (de-AT -> de -> source text) as its README describes.
 // - shared.i18n = { locale, dir, now }: the browser gets the same "now" the server rendered with.
-// - <html lang dir>, hreflang alternates and <meta name="void-fbtee"> (the same i18n data, for
+// - <html lang dir>, hreflang alternates (plus x-default, the source locale) and <meta name="void-fbtee"> (the same i18n data, for
 //   islands) go into headDefaults.
 import { defineMiddleware } from "void";
 import { runWithFbtee } from "fbtee/server";
@@ -17,7 +17,6 @@ import { Temporal } from "temporal-polyfill";
 import config from "virtual:void-fbtee/config";
 import catalogs from "virtual:void-fbtee/catalogs";
 import { localeFromPath, META_NAME, type Dir } from "./locales";
-import { bestLocale } from "./negotiate";
 import { allTranslations } from "./runtime";
 
 export interface SharedI18n {
@@ -36,13 +35,11 @@ export default defineMiddleware(async (c, next) => {
   const light = LIGHT.test(path);
 
   const found = localeFromPath(path, config);
-  if (!found && path === "/" && !light) {
-    const best = bestLocale(c.req.header("accept-language"), config);
-    c.header("Cache-Control", "private, no-store");
-    c.header("Vary", "Accept-Language");
-    return c.redirect(`/${best.segment}`, 302);
-  }
-  const current = found ?? config.locales.find((l) => l.locale === config.sourceLocale)!;
+  const source = config.locales.find((l) => l.locale === config.sourceLocale)!;
+  // Always the source language, never chosen by the visitor's language: Google's crawler sends no
+  // Accept-Language, and redirecting by language hides the other versions from it.
+  if (!found && path === "/" && !light) return c.redirect(`/${source.segment}`, 301);
+  const current = found ?? source;
   const i18n: SharedI18n = {
     locale: current.locale,
     dir: current.dir,
@@ -50,10 +47,13 @@ export default defineMiddleware(async (c, next) => {
   };
   const rest = found ? path.slice(found.segment.length + 1) : path;
   const origin = new URL(c.req.url).origin;
-  const alternates = config.locales.map((l) => ({
+  const alternates = [
+    ...config.locales.map((l) => ({ hreflang: l.locale, segment: l.segment })),
+    { hreflang: "x-default", segment: source.segment },
+  ].map(({ hreflang, segment }) => ({
     rel: "alternate",
-    hreflang: l.locale,
-    href: `${origin}/${l.segment}${rest}`,
+    hreflang,
+    href: `${origin}/${segment}${rest}`,
   }));
   const shared = (c.get("shared" as never) ?? {}) as Record<string, unknown>;
   const head = (c.get("headDefaults" as never) ?? {}) as {

@@ -24,11 +24,11 @@ export default function Signup({ seats }: { seats: number }) {
       >
         <fbt desc="Button that takes one seat">Take a seat</fbt>
       </button>
-      <Link href="/de-DE/about" data-testid="signup-to-de">
-        Deutsch
+      <Link href="/ar-EG/about" data-testid="signup-to-ar">
+        العربية
       </Link>{" "}
-      <Link href={`/${locale}/blog`} data-testid="signup-to-blog">
-        Blog
+      <Link href={`/${locale}/docs` as never} data-testid="signup-to-docs">
+        <fbt desc="Navigation: the documentation">Docs</fbt>
       </Link>
     </section>
   );

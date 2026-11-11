@@ -99,10 +99,14 @@ for (const target of targets) {
   );
 
   // The example's locales; init adds the plugin, middleware, flags, scripts and peers.
-  run(app.pm, ["exec", "--", "void-fbtee", "init", "--locales", "th-TH,de-DE,ar-EG,pl-PL"], dir);
+  run(app.pm, ["exec", "--", "void-fbtee", "init", "--locales", "ar-EG,th-TH"], dir);
   run(app.pm, app.install, dir);
-  for (const item of ["pages", "components", "routes", "lib", "i18n", "db", "public"])
-    cpSync(join(root, "apps/example", item), join(dir, item), { recursive: true });
+  // dereference: the example's English docs are symlinks to the package's docs/.
+  for (const item of ["pages", "components", "routes", "lib", "i18n", "public"])
+    cpSync(join(root, "apps/example", item), join(dir, item), {
+      recursive: true,
+      dereference: true,
+    });
   checkOwnDependencies(dir, installed);
 
   run(app.pm, ["exec", "--", "void-fbtee", "check"], dir);
@@ -195,7 +199,7 @@ async function checkDev(target, dir, app) {
       } catch {}
       if (html === undefined) await new Promise((r) => setTimeout(r, 100));
     }
-    check(html?.includes("สวัสดีชาวโลก"), `${target}: dev serves /th-TH in Thai`);
+    check(html?.includes("i18n สำหรับแอป Void"), `${target}: dev serves /th-TH in Thai`);
     const ar = await (await fetch(`${base}/ar-EG/about`)).text();
     check(
       ar.includes('<html lang="ar-EG" dir="rtl"') && ar.includes("احجز مقعدًا"),

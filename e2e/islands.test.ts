@@ -1,4 +1,4 @@
-// Production build: island pages and markdown pages. Each island hydrates on its own, without
+// Production build: island pages and markdown pages (the docs). Each island hydrates on its own, without
 // the layout or Void's shared data, and must render in the page's language from its first render.
 import { expect, test } from "vite-plus/test";
 import { browser, collectErrors, hydrated, seeText, text, watchTexts } from "./helpers";
@@ -34,28 +34,20 @@ test("ar-EG: right-to-left, Arabic digits and Arabic text in islands", async () 
   expect(errors).toEqual([]);
 });
 
-test("markdown post: the frontmatter island in the page's language", async () => {
+test("docs: the package's own docs as markdown pages, one set per language", async () => {
   const p = await page();
-  const errors = collectErrors(p);
-  await p.goto("/th-TH/blog/hello");
-  await hydrated(p);
-  await p.getByTestId("post-like").click();
-  await seeText(p, "post-like", "ถูกใจ (1)");
-  expect(await text(p, "post-date")).toBe("1 พฤศจิกายน 2569");
-  expect(await text(p, "post-minutes")).toBe("4 นาที");
-  expect(errors).toEqual([]);
-});
-
-test("blog index lists only the page's language's posts", async () => {
-  const p = await page();
-  for (const locale of ["th-TH", "ar-EG"]) {
-    await p.goto(`/${locale}/blog`);
-    const links = p.getByTestId("blog-posts").locator("a");
+  for (const locale of ["en-US", "th-TH", "ar-EG"]) {
+    await p.goto(`/${locale}/docs`);
+    const links = p.getByTestId("docs-pages").locator("a");
     await links.first().waitFor();
-    expect(await links.evaluateAll((as) => as.map((a) => a.getAttribute("href")))).toEqual([
-      `/${locale}/blog/hello`,
-    ]);
+    expect(await links.evaluateAll((as) => as.map((a) => a.getAttribute("href")))).toEqual(
+      ["markdown-pages", "setup", "strings"].map((page) => `/${locale}/docs/${page}`),
+    );
   }
+  await p.goto("/th-TH/docs/strings");
+  expect(await p.locator("h1").textContent()).toContain("การแปลข้อความในแอป Void");
+  await p.goto("/en-US/docs/strings");
+  expect(await p.locator("h1").textContent()).toContain("Translating strings in a Void app");
 });
 
 test("useNow(): the server's now while hydrating, the browser's clock after", async () => {
@@ -76,9 +68,9 @@ test("void-fbtee's Link inside an island (no Void router there)", async () => {
   const errors = collectErrors(p);
   await p.goto("/th-TH/about");
   await hydrated(p, "_Signup");
-  await p.getByTestId("signup-to-de").click();
-  await p.waitForURL("**/de-DE/about");
-  await seeText(p, "about-title", "Tisch in Sekunden buchen");
-  expect(await p.locator("html").getAttribute("lang")).toBe("de-DE");
+  await p.getByTestId("signup-to-ar").click();
+  await p.waitForURL("**/ar-EG/about");
+  await seeText(p, "about-title", "احجز طاولة في ثوانٍ");
+  expect(await p.locator("html").getAttribute("lang")).toBe("ar-EG");
   expect(errors).toEqual([]);
 });
