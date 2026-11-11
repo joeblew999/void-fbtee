@@ -55,6 +55,8 @@ The tasks are in `vite.config.ts` and `apps/example/vite.config.ts`.
 - A deploy applies new database migrations. Void saves a restore point first and prints how to go
   back.
 - `vp run test:production` tests the URL the last `vp run deploy` reported.
+- Logs: each deploy's is in `~/.void/logs/` (Void's), each test run's results in
+  `test-results/junit.xml`, and `vp run --last-details` shows the last task run.
 - Each commit is checked first (`vp check --fix`, a hook `vp install` sets up). CI runs
   `vp check` and `vp test run`.
 
