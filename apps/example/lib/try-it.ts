@@ -1,4 +1,4 @@
-// What the formats page's "Try it" shows for a number and some text: the same on the Worker (the
+// What the "Try it" page shows for a number and some text: the same on the Worker (the
 // API route) and in the browser.
 export function tryIt(locale: string, value: number, text: string) {
   const n = (options?: Intl.NumberFormatOptions) =>

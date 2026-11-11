@@ -230,10 +230,10 @@ function Pages() {
       ),
     },
     {
-      href: `/${locale}/docs/formats`,
-      title: <fbt desc="Home card title: the formats page">Formats</fbt>,
+      href: `/${locale}/docs/intl`,
+      title: "Intl",
       text: (
-        <fbt desc="Home card text: what the formats page shows">
+        <fbt desc="Home card text: what the Intl page shows">
           Every Intl format, run on the Worker and in your browser, side by side.
         </fbt>
       ),

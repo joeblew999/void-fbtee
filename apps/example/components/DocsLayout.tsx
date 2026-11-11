@@ -10,8 +10,8 @@ import { fbt } from "fbtee";
 import { ChevronDown } from "lucide-react";
 import pages from "@void/md/pages";
 import { Link, useLocale } from "void-fbtee/react";
-import { SECTIONS } from "@/lib/formats";
-import { sectionTitle } from "@/lib/formats-titles";
+import { SECTIONS } from "@/lib/intl";
+import { sectionTitle } from "@/lib/intl-titles";
 import { TEMPORAL_SECTIONS } from "@/lib/temporal";
 import { temporalTitle } from "@/lib/temporal-titles";
 import { cn } from "@/lib/utils";
@@ -38,10 +38,7 @@ function sidebar(title: (slug: string) => ReactNode) {
     {
       name: <fbt desc="Docs sidebar group: reference pages">Reference</fbt>,
       entries: [
-        {
-          slug: "formats",
-          title: <fbt desc="Navigation: the page that shows every Intl format">Formats</fbt>,
-        },
+        { slug: "intl", title: "Intl" },
         { slug: "temporal", title: "Temporal" },
       ],
     },
@@ -49,7 +46,17 @@ function sidebar(title: (slug: string) => ReactNode) {
       name: (
         <fbt desc="Docs sidebar group: the events app that demonstrates void-fbtee">The demo</fbt>
       ),
-      entries: entries("tour"),
+      entries: [
+        ...entries("tour"),
+        {
+          slug: "try-it",
+          title: (
+            <fbt desc="Docs sidebar: the page where you type a number and text and see them formatted">
+              Try it
+            </fbt>
+          ),
+        },
+      ],
     },
   ];
 }
@@ -62,7 +69,7 @@ interface Heading {
 
 /** "On this page" for the docs pages that aren't markdown (markdown pages list their own). */
 const OUTLINES: Record<string, () => Heading[]> = {
-  formats: () => SECTIONS.map((s) => ({ depth: 2, slug: s.id, text: sectionTitle(s.id) })),
+  intl: () => SECTIONS.map((s) => ({ depth: 2, slug: s.id, text: sectionTitle(s.id) })),
   temporal: () =>
     TEMPORAL_SECTIONS.map((s) => ({ depth: 2, slug: s.id, text: temporalTitle(s.id) })),
 };

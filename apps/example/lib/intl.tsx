@@ -1,4 +1,4 @@
-// Every row of the formats page: one call to the platform's own Intl (or fbtee), in the page's
+// Every row of the Intl page: one call to the platform's own Intl (or fbtee), in the page's
 // language. The page runs each row in the loader on the Worker, which is the text a void-fbtee
 // app's pages show, and again in the browser after hydration, to show where its engine's own
 // locale data writes it differently. The same code runs both times.
@@ -418,7 +418,7 @@ export const SECTIONS: { id: SectionId; rows: Row[] }[] = [
           () =>
             fbt(
               [fbt.plural("night", n, { many: "nights", showCount: "yes" })],
-              "A number of nights, on the formats page",
+              "A number of nights, on the Intl page",
             ),
         ),
       ),
@@ -439,7 +439,7 @@ export const SECTIONS: { id: SectionId; rows: Row[] }[] = [
                 new Intl.NumberFormat(l, { style: "currency", currency: "THB" }).format(1234.5),
               ),
             ],
-            "A price, on the formats page",
+            "A price, on the Intl page",
           ),
       ),
     ],

@@ -1,18 +1,16 @@
-// The formats page, a reference: every Intl call the example knows, in the page's language. The
+// The Intl page, a reference: every Intl call the example knows, in the page's language. The
 // Worker's column (the loader) is the text a void-fbtee app's pages show; the browser's, run after
-// hydration, shows where its engine's own locale data writes it differently. Pages don't depend
+// hydration, shows where its engine's own locale data writes it differently, every such row
+// highlighted (lib/differs.ts), with invisible characters shown by name and, for the supported
+// values, only what differs. Pages don't depend
 // on the two agreeing: text formatted while rendering is <Formatted>, the server's kept. "Your
 // time zone" and the time in it are the browser's alone: empty until it knows the zone. Temporal
 // is on its own page (docs/temporal).
-import { Fragment, useState, useSyncExternalStore } from "react";
-import { fbs, fbt } from "fbtee";
-import { fetch } from "void/client";
-import { Formatted, useHydrated, useLocale, useTimeZone } from "void-fbtee/react";
+import { Fragment, useSyncExternalStore } from "react";
+import { fbt } from "fbtee";
+import { Formatted, useLocale, useTimeZone } from "void-fbtee/react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -21,12 +19,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { INSTANT, runAll, SECTIONS, ZONE } from "../../../lib/formats";
-import { sectionTitle } from "../../../lib/formats-titles";
-import { parseNumber } from "../../../lib/parse-number";
-import { tryIt } from "../../../lib/try-it";
+import { INSTANT, runAll, SECTIONS, ZONE } from "../../../lib/intl";
+import { sectionTitle } from "../../../lib/intl-titles";
 import { cn } from "@/lib/utils";
-import type { Props } from "./formats.server";
+import { DIFFERS_ROW, listDifference, showInvisible } from "../../../lib/differs";
+import type { Props } from "./intl.server";
 
 // The browser's rows: none while hydrating (the server sent none), then computed once.
 const noSubscribe = () => () => {};
@@ -45,22 +42,40 @@ function useBrowserRows(locale: string): Record<string, string> | null {
 /** A row listing an engine's supported values (the "supported" section), not a format. */
 const isInventory = (key: string) => key.startsWith("supported/");
 
-export default function FormatsPage({ worker }: Props) {
+/** The browser's side of a supported-values row that differs: only what's not in both lists. */
+function ListDifference({ worker, browser }: { worker: string; browser: string }) {
+  const { onlyWorker, onlyBrowser } = listDifference(worker, browser);
+  return (
+    <>
+      {browser.split(":")[0]}.{" "}
+      {onlyWorker.length > 0 && (
+        <fbt desc="Intl page: supported values the Worker has and the browser doesn't">
+          Only on the Worker: <fbt:param name="values">{onlyWorker.join(", ")}</fbt:param>.
+        </fbt>
+      )}{" "}
+      {onlyBrowser.length > 0 && (
+        <fbt desc="Intl page: supported values the browser has and the Worker doesn't">
+          Only in your browser: <fbt:param name="values">{onlyBrowser.join(", ")}</fbt:param>.
+        </fbt>
+      )}
+    </>
+  );
+}
+
+export default function IntlPage({ worker }: Props) {
   const { locale, dir } = useLocale();
   const browser = useBrowserRows(locale);
-  // The rows that format something. The "supported" rows list each engine's own inventory
-  // (Intl.supportedValuesOf), which differs between engines by design, so they're shown, not compared.
-  const keys = Object.keys(worker).filter((k) => !isInventory(k));
+  const keys = Object.keys(worker);
   const same = browser ? keys.filter((k) => browser[k] === worker[k]).length : 0;
   const number = (n: number) => new Intl.NumberFormat(locale).format(n);
   return (
     <div className="min-w-0 space-y-6">
       <div className="space-y-2">
-        <h1 className="text-3xl font-medium" data-testid="formats-title">
-          <fbt desc="Formats page heading">Formats</fbt>
+        <h1 className="text-3xl font-medium" data-testid="intl-title">
+          Intl
         </h1>
         <p className="text-muted-foreground">
-          <fbt desc="Formats page introduction">
+          <fbt desc="Intl page introduction">
             Each row is one call to the platform's own Intl, in this page's language. The Worker ran
             it before sending the page: that's the text this app's pages show. Your browser ran it
             again with its own engine.
@@ -72,7 +87,7 @@ export default function FormatsPage({ worker }: Props) {
           {browser && (
             <Badge
               variant={same === keys.length ? "secondary" : "outline"}
-              data-testid="formats-match"
+              data-testid="intl-match"
             >
               <fbt desc="How many rows the browser formatted exactly as the Worker did">
                 <fbt:param name="same">{number(same)}</fbt:param> of{" "}
@@ -85,18 +100,17 @@ export default function FormatsPage({ worker }: Props) {
           )}
         </div>
         <p className="text-sm text-pretty text-muted-foreground">
-          <fbt desc="Formats page: what a highlighted row means">
+          <fbt desc="Intl page: what a highlighted row means">
             A highlighted row is where your browser's engine writes it differently: each engine
             ships its own locale data. Pages show the server's text, so they don't depend on the two
-            agreeing. The supported-value lists at the end are each engine's own, so they aren't
-            compared.
+            agreeing. In a highlighted row, characters that print as nothing are shown by name, such
+            as ⟨RLM⟩, and the supported-value lists show only what differs.
           </fbt>
         </p>
       </div>
       <PageFacts />
-      <TryIt />
       <p className="text-sm text-muted-foreground">
-        <fbt desc="Where the times on the formats page are shown">
+        <fbt desc="Where the times on the Intl page are shown">
           The times below are <fbt:param name="instant">{INSTANT}</fbt:param>, shown in{" "}
           <fbt:param name="zone">{ZONE}</fbt:param>.
         </fbt>
@@ -114,12 +128,10 @@ export default function FormatsPage({ worker }: Props) {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-1/2">
-                    <fbt desc="Formats table column: the result on the Cloudflare Worker">
-                      Worker
-                    </fbt>
+                    <fbt desc="Intl table column: the result on the Cloudflare Worker">Worker</fbt>
                   </TableHead>
                   <TableHead>
-                    <fbt desc="Formats table column: the result in the visitor's browser">
+                    <fbt desc="Intl table column: the result in the visitor's browser">
                       Your browser
                     </fbt>
                   </TableHead>
@@ -128,8 +140,7 @@ export default function FormatsPage({ worker }: Props) {
               <TableBody>
                 {section.rows.map((row) => {
                   const key = `${section.id}/${row.id}`;
-                  const differs =
-                    browser !== null && !isInventory(key) && browser[key] !== worker[key];
+                  const differs = browser !== null && browser[key] !== worker[key];
                   const cell = "whitespace-normal break-words align-top";
                   return (
                     <Fragment key={key}>
@@ -143,14 +154,22 @@ export default function FormatsPage({ worker }: Props) {
                       </TableRow>
                       <TableRow
                         data-row={key}
-                        className={differs ? "bg-brand/10" : undefined}
+                        className={differs ? DIFFERS_ROW : undefined}
                         data-differs={differs || undefined}
                       >
                         <TableCell className={cell} data-side="worker" dir={dir}>
-                          {worker[key]}
+                          {differs ? showInvisible(worker[key]!) : worker[key]}
                         </TableCell>
                         <TableCell className={cell} data-side="browser" dir={dir}>
-                          {browser ? browser[key] : "…"}
+                          {!browser ? (
+                            "…"
+                          ) : !differs ? (
+                            browser[key]
+                          ) : isInventory(key) ? (
+                            <ListDifference worker={worker[key]!} browser={browser[key]!} />
+                          ) : (
+                            showInvisible(browser[key]!)
+                          )}
                         </TableCell>
                       </TableRow>
                     </Fragment>
@@ -175,7 +194,7 @@ function PageFacts() {
     <Card>
       <CardHeader>
         <CardTitle>
-          <fbt desc="Formats card heading: facts about this page's language">This page</fbt>
+          <fbt desc="Intl card heading: facts about this page's language">This page</fbt>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -241,100 +260,5 @@ function YourTimeZone() {
         </fbt>
       )}
     </p>
-  );
-}
-
-type TryItResult = ReturnType<typeof tryIt>;
-
-/**
- * A number typed your language's way and some text, formatted by the Worker and by the browser.
- * The browser reads the number back first (parseNumber), so what goes to the Worker is neutral:
- * 2500.75, not "٢٬٥٠٠٫٧٥". The browser's column waits for hydration, as it's the browser's own.
- */
-function TryIt() {
-  const { locale } = useLocale();
-  const [numberText, setNumberText] = useState(() =>
-    new Intl.NumberFormat(locale).format(1234567.891),
-  );
-  const [text, setText] = useState(() =>
-    String(
-      fbs("Void apps speak every language. Intl does the rest.", "Sample text to split into words"),
-    ),
-  );
-  const [worker, setWorker] = useState<TryItResult | null>(null);
-  const hydrated = useHydrated();
-  const value = parseNumber(locale, numberText);
-  const browser = tryIt(locale, value, text);
-  async function formatOnServer() {
-    const number = Number.isNaN(value) ? null : value;
-    setWorker(await fetch("/api/format", { method: "POST", body: { locale, number, text } }));
-  }
-  const rows: [string, (r: TryItResult) => unknown][] = [
-    ["value", (r) => r.value],
-    ...Object.keys(browser.formats).map((k): [string, (r: TryItResult) => unknown] => [
-      k,
-      (r) => (r.formats as Record<string, string>)[k],
-    ]),
-    ["characters", (r) => r.characters],
-    ["words", (r) => r.words.join(" · ")],
-  ];
-  return (
-    <Card data-testid="try-it">
-      <CardHeader>
-        <CardTitle>
-          <fbt desc="Formats section where the visitor types a number and text">Try it</fbt>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="grid gap-2">
-            <Label htmlFor="try-number">
-              <fbt desc="Input label: a number, written the visitor's way">
-                A number, written your way
-              </fbt>
-            </Label>
-            <Input
-              id="try-number"
-              data-testid="try-number"
-              value={numberText}
-              onChange={(e) => setNumberText(e.target.value)}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="try-text">
-              <fbt desc="Input label: any text">Some text</fbt>
-            </Label>
-            <Input
-              id="try-text"
-              data-testid="try-text"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-            />
-          </div>
-        </div>
-        <Button type="button" data-testid="try-server" onClick={formatOnServer}>
-          <fbt desc="Button: send the number and text to the server to format">
-            Format on the server
-          </fbt>
-        </Button>
-        <Table>
-          <TableBody>
-            {rows.map(([name, get]) => (
-              <TableRow key={name} data-try={name}>
-                <TableHead dir="ltr" className="w-40">
-                  {name}
-                </TableHead>
-                <TableCell data-side="worker" className="whitespace-normal">
-                  {worker ? String(get(worker)) : "—"}
-                </TableCell>
-                <TableCell data-side="browser" className="whitespace-normal">
-                  {hydrated ? String(get(browser)) : "…"}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
   );
 }

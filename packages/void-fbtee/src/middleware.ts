@@ -25,7 +25,7 @@ export interface SharedI18n {
   dir: Dir;
   /** The server's "now" for this response, as an ISO instant. */
   now: string;
-  /** This page's path without the locale prefix ("/formats" for /th-TH/formats; "" for /th-TH):
+  /** This page's path without the locale prefix ("/docs/intl" for /th-TH/docs/intl; "" for /th-TH):
    * `/${locale.segment}${path}` is the same page in another language. */
   path: string;
 }

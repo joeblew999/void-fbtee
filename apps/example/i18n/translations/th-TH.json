@@ -193,42 +193,6 @@
       ],
       "types": []
     },
-    "dPy3hYVB2dPFPscaAj2iKg==": {
-      "description": "A number of nights, on the formats page",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "{number} คืน",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "xuQWvx85gGX4t7Bab6ti4w==": {
-      "description": "A number of nights, on the formats page",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "1 คืน",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "UJgtSaU7QF5dQDZ9H/zZKQ==": {
-      "description": "A price, on the formats page",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ราคา: {price}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "bICo0CAkktQ7e4c4PRH+mA==": {
       "description": "Navigation: the home page",
       "status": "translated",
@@ -236,18 +200,6 @@
       "translations": [
         {
           "translation": "หน้าแรก",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "R4jcqfitTaXQtBWXOulzug==": {
-      "description": "Navigation: the page that shows every Intl format",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "รูปแบบ",
           "variations": {}
         }
       ],
@@ -265,210 +217,6 @@
       ],
       "types": []
     },
-    "xK8CcaNhoEbqq8Qdaj0Eeg==": {
-      "description": "Formats section: dates and times",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "วันที่และเวลา",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "8oGPmzModUg11hNZQiv4+Q==": {
-      "description": "Formats section: named time zones",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เขตเวลา",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "XZnQSCvU+4YgGV4ORBLegw==": {
-      "description": "Formats section: date ranges",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ช่วงวันที่",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "mm/jPxkw86Qjbod+p65slA==": {
-      "description": "Formats section: relative time, like 'yesterday'",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เวลาสัมพัทธ์",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "6bOPt/Bs423FOYAGDYQ8gA==": {
-      "description": "Formats section: numbers",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ตัวเลข",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "zzVuqAcjcshE0Ke/M7RYEw==": {
-      "description": "Formats section: money",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "สกุลเงิน",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "4ljxiVRFN6owV7G215FsTQ==": {
-      "description": "Formats section: units of measure",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "หน่วยวัด",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "pV95SXQv9uiFI9Wjcs49ZQ==": {
-      "description": "Formats section: plural rules",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "กฎพหูพจน์",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "tJNkWf4dL4jw/Q8LKbNQUA==": {
-      "description": "Formats section: lists of items",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "รายการ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "q0uxRTPxZ7YwDSZrG7NxHw==": {
-      "description": "Formats section: lengths of time",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ระยะเวลา",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "GADYUc99MpTtUWHaHrKG8g==": {
-      "description": "Formats section: names of languages, regions and currencies",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ชื่อ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Ye4CwOD9q9/iJMz08ThWVw==": {
-      "description": "Formats section: sorting text",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "การเรียงลำดับ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "EEoCQOG8umwoJ/5mErZwnA==": {
-      "description": "Formats section: splitting text into characters, words and sentences",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "การแบ่งข้อความ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "xArmyAbDLEvGLr5K6C5T8w==": {
-      "description": "Formats section: facts about this page's language",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ภาษานี้",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "iPPyqPwaRvOMWTeK7jE39g==": {
-      "description": "Formats section: everything this Intl supports",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ค่าที่รองรับ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "e/f/c9uEWgjABfIvCg1SnQ==": {
-      "description": "Formats section: translated strings with fbtee",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ข้อความที่แปลแล้ว (fbtee)",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "TzX1YJ+LOB5Dhl6SX8ZtkA==": {
-      "description": "Formats page heading",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "รูปแบบ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "FbSCJUsAz2v5ZsAnATiLFw==": {
       "description": "How many rows the browser formatted exactly as the Worker did",
       "status": "translated",
@@ -476,42 +224,6 @@
       "translations": [
         {
           "translation": "{same} จาก {total} แถวตรงกันในเบราว์เซอร์ของคุณ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Xhms5s6vepo0G7BKN0GyEg==": {
-      "description": "Where the times on the formats page are shown",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เวลาด้านล่างคือ {instant} แสดงตามเขตเวลา {zone}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "gZ38nGkAxQ9wR2vGJ/GUJg==": {
-      "description": "Formats table column: the result on the Cloudflare Worker",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Worker",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "wrFQCxDO/GnUEJd23Lia+g==": {
-      "description": "Formats table column: the result in the visitor's browser",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เบราว์เซอร์ของคุณ",
           "variations": {}
         }
       ],
@@ -613,18 +325,6 @@
       ],
       "types": []
     },
-    "CxtRZr/o8ROqM3C6xmkC9A==": {
-      "description": "Formats section where the visitor types a number and text",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ลองเลย",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "s9vH7nv/Pm4TLjvtmxE9sA==": {
       "description": "Input label: a number, written the visitor's way",
       "status": "translated",
@@ -692,42 +392,6 @@
       "translations": [
         {
           "translation": "เอกสาร",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "p55uU35UBaT1/WQUayZJzg==": {
-      "description": "Formats card heading: facts about this page's language",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "หน้านี้",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "7QKKwA/9MV4zWs9oQu2l8A==": {
-      "description": "Home card title: the formats page",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "รูปแบบ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "GSdxSpabhOQBFrHpWqai1g==": {
-      "description": "Home card text: what the formats page shows",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "รูปแบบ Intl ทุกแบบ ทำงานบน Worker และในเบราว์เซอร์ของคุณ แสดงเทียบกัน",
           "variations": {}
         }
       ],
@@ -1657,18 +1321,6 @@
       ],
       "types": []
     },
-    "XpENML4mulBCjQ8ncsWiHA==": {
-      "description": "Home feature fact: the same calls run on the server and in the browser",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เรียกใช้แบบเดียวกันทั้งบน Worker และในเบราว์เซอร์ หน้ารูปแบบแสดงจุดที่แต่ละเอนจินต่างกัน",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "7Rm9wekHe7oI7S1XZgTOIA==": {
       "description": "Temporal section: exact moments in time, in UTC",
       "status": "translated",
@@ -1724,30 +1376,6 @@
       "translations": [
         {
           "translation": "ระยะเวลา",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "sMNqyduQ6FJKDXcaacBubA==": {
-      "description": "Formats page introduction",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "แต่ละแถวคือการเรียก Intl ของแพลตฟอร์มหนึ่งครั้ง ในภาษาของหน้านี้ Worker เรียกก่อนส่งหน้านี้มา ซึ่งเป็นข้อความที่หน้าต่างๆ ของแอปนี้แสดง แล้วเบราว์เซอร์ของคุณเรียกอีกครั้งด้วยเอนจินของตัวเอง",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "R4/AvJwYkzRDtA05Fh8dfA==": {
-      "description": "Formats page: what a highlighted row means",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "แถวที่ไฮไลต์คือจุดที่เอนจินของเบราว์เซอร์คุณเขียนต่างออกไป เพราะแต่ละเอนจินมีข้อมูลภาษาของตัวเอง หน้าต่างๆ แสดงข้อความจากเซิร์ฟเวอร์ จึงไม่ต้องพึ่งให้ทั้งสองตรงกัน รายการค่าที่รองรับท้ายหน้าเป็นของแต่ละเอนจินเอง จึงไม่นำมาเทียบกัน",
           "variations": {}
         }
       ],
@@ -1873,7 +1501,379 @@
       ],
       "types": []
     },
-    "n0Xi+iYVgvGqrDoNTYZgRg==": {
+    "x6LVLyyNL10mxiVhesdONg==": {
+      "description": "Temporal table column: the result with Cloudflare's own Temporal, on the Worker",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ของ Cloudflare เอง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HdWPrfsdTRgAEswLDzP6jw==": {
+      "description": "Intl page section: dates and times",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "วันที่และเวลา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NAVMNt0rU2zRY2HuQWN6Dg==": {
+      "description": "Intl page section: named time zones",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เขตเวลา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iAyMA8ajZdv5cK2svUN0Vg==": {
+      "description": "Intl page section: date ranges",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ช่วงวันที่",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+TOlgrXkyPMWSXZKyRlS+w==": {
+      "description": "Intl page section: relative time, like 'yesterday'",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เวลาสัมพัทธ์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0KCj8z+wYa63EFv4pp9wmA==": {
+      "description": "Intl page section: numbers",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ตัวเลข",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "X/se3Q0ZI1heP8tXSPjNPg==": {
+      "description": "Intl page section: money",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สกุลเงิน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3Q1wjlBRENu/8nmQrTUgvA==": {
+      "description": "Intl page section: units of measure",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หน่วยวัด",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MWxlHWYq0z1cm9kcERdSKQ==": {
+      "description": "Intl page section: plural rules",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "กฎพหูพจน์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VHVT7JXkqkp+6qIpnPs9kw==": {
+      "description": "Intl page section: lists of items",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "รายการ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "brgbZ/o1V3RDVj1WtYgeaQ==": {
+      "description": "Intl page section: lengths of time",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ระยะเวลา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Fc6FHwPPPhlwRVfromiO2w==": {
+      "description": "Intl page section: names of languages, regions and currencies",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ชื่อ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jghKjiykM8i3o5EMnx+Msw==": {
+      "description": "Intl page section: sorting text",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "การเรียงลำดับ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "E4i3y6o3djN0v+lysBFF8w==": {
+      "description": "Intl page section: splitting text into characters, words and sentences",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "การแบ่งข้อความ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eOZtLRhZGqOon7h+CJOGGw==": {
+      "description": "Intl page section: facts about this page's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ภาษานี้",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nT3fkcmM8muxDK7KF6ai0A==": {
+      "description": "Intl page section: everything this Intl supports",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ค่าที่รองรับ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VAr4ThQ83quLMmdpLL3Tig==": {
+      "description": "Intl page section: translated strings with fbtee",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ข้อความที่แปลแล้ว (fbtee)",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gi0X6ltCIDT8dCC+9MsHYA==": {
+      "description": "A number of nights, on the Intl page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{number} คืน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dnovwbPDT9HPYhWQC5XDMQ==": {
+      "description": "A number of nights, on the Intl page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "1 คืน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eOge5YhaIboyjqmL9qPTEQ==": {
+      "description": "A price, on the Intl page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ราคา: {price}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uaP7us5gKCyIzYfiWk85Yw==": {
+      "description": "Docs sidebar: the page where you type a number and text and see them formatted",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ลองเลย",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1MRfK1NgI+jnW+SPgLHuJw==": {
+      "description": "Home feature fact: the same calls run on the server and in the browser",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เรียกใช้แบบเดียวกันทั้งบน Worker และในเบราว์เซอร์ หน้ารูปแบบแสดงจุดที่แต่ละเอนจินต่างกัน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LvCtq/SyGAUwL/CVauN+3A==": {
+      "description": "Home card text: what the Intl page shows",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "รูปแบบ Intl ทุกแบบ ทำงานบน Worker และในเบราว์เซอร์ของคุณ แสดงเทียบกัน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JMUFEsR2aVIYLh5D8SwgUw==": {
+      "description": "Intl page: supported values the Worker has and the browser doesn't",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "มีเฉพาะบน Worker: {values}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/OwgldRgQFQTO49MR6gfCA==": {
+      "description": "Intl page: supported values the browser has and the Worker doesn't",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "มีเฉพาะในเบราว์เซอร์ของคุณ: {values}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vPMkXbm9YaPzpmLXKomnWg==": {
+      "description": "Intl page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แต่ละแถวคือการเรียก Intl ของแพลตฟอร์มหนึ่งครั้ง ในภาษาของหน้านี้ Worker เรียกก่อนส่งหน้านี้มา ซึ่งเป็นข้อความที่หน้าต่างๆ ของแอปนี้แสดง แล้วเบราว์เซอร์ของคุณเรียกอีกครั้งด้วยเอนจินของตัวเอง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AkpZ1lW8bkl83HoztVPFlA==": {
+      "description": "Intl page: what a highlighted row means",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แถวที่ไฮไลต์คือจุดที่เอนจินของเบราว์เซอร์คุณเขียนต่างออกไป เพราะแต่ละเอนจินมีข้อมูลภาษาของตัวเอง หน้าต่างๆ แสดงข้อความจากเซิร์ฟเวอร์ จึงไม่ต้องพึ่งให้ทั้งสองตรงกัน รายการค่าที่รองรับท้ายหน้าเป็นของแต่ละเอนจินเอง จึงไม่นำมาเทียบกัน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jGvk/eFwEkjOdG/NBrvu8g==": {
+      "description": "Where the times on the Intl page are shown",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เวลาด้านล่างคือ {instant} แสดงตามเขตเวลา {zone}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bI9+IfmZSx+xtqq32csdGQ==": {
+      "description": "Intl table column: the result on the Cloudflare Worker",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Worker",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tlFl+QX0jrzG2InxhL2YYg==": {
+      "description": "Intl table column: the result in the visitor's browser",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เบราว์เซอร์ของคุณ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uhvT565/vxdeCui5rwFKwg==": {
+      "description": "Intl card heading: facts about this page's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หน้านี้",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1rA5kZaaFtul9ec1fvtHxw==": {
       "description": "Temporal page: why the Worker always uses the polyfill",
       "status": "translated",
       "tokens": [],
@@ -1885,13 +1885,25 @@
       ],
       "types": []
     },
-    "x6LVLyyNL10mxiVhesdONg==": {
-      "description": "Temporal table column: the result with Cloudflare's own Temporal, on the Worker",
+    "yMg3uj422mMWylgkTUvDHg==": {
+      "description": "Try it page heading: type a number and text, see them formatted",
       "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "ของ Cloudflare เอง",
+          "translation": "ลองเลย",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "f2BjA+SGmdSYF5dkcy50Eg==": {
+      "description": "Try it page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "พิมพ์ตัวเลขตามแบบที่ภาษาของคุณเขียน และข้อความใดก็ได้ เบราว์เซอร์ของคุณจะอ่านตัวเลขกลับเป็นตัวเลขธรรมดา และนั่นคือสิ่งที่ส่งไปยัง Worker ข้อมูลเดินทางเป็นค่ากลาง ไม่ใช่ข้อความที่จัดรูปแบบแล้ว จากนั้นทั้งสองฝั่งจัดรูปแบบด้วย Intl ของตัวเอง",
           "variations": {}
         }
       ],

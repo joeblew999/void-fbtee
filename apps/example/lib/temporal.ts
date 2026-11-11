@@ -4,7 +4,7 @@
 // loader, with temporal-polyfill: void-fbtee's Vite plugin always uses it there), and in the
 // browser after hydration, once with the browser's own Temporal (if it has one) and once with the
 // polyfill. Neutral results don't depend on locale data, so all three must be identical; where
-// one differs, the difference says which implementation has the bug. Formatting is on Formats.
+// one differs, the difference says which implementation has the bug. Formatting is on the Intl page.
 import { Temporal as Polyfill } from "temporal-polyfill/implementation";
 
 /** A Temporal: the polyfill's or the platform's own (globalThis.Temporal), the same API. */

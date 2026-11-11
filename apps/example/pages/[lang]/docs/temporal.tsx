@@ -3,7 +3,7 @@
 // Cloudflare's own Temporal, and in the browser after hydration, with its own and with the
 // polyfill. Neutral results must match everywhere, so a highlighted row is a real bug, and its
 // columns say whose. The reference is the polyfill on the Worker: what void-fbtee's code runs.
-// Formatting is on Formats.
+// Formatting is on the Intl page.
 import { Fragment, useSyncExternalStore } from "react";
 import { fbt } from "fbtee";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ import {
 import { ownTemporal, Polyfill, runTemporal, TEMPORAL_SECTIONS } from "../../../lib/temporal";
 import { temporalTitle } from "../../../lib/temporal-titles";
 import { cn } from "@/lib/utils";
+import { DIFFERS_ROW } from "../../../lib/differs";
 import type { Props } from "./temporal.server";
 
 type Rows = Record<string, string>;
@@ -163,7 +164,7 @@ export default function TemporalPage({ worker }: Props) {
           <fbt desc="Temporal page: why the Worker always uses the polyfill">
             void-fbtee's code on the Worker always uses the polyfill, not Cloudflare's own Temporal,
             which once shipped broken; its column shows how it does today. The polyfill handles the
-            ISO and Gregorian calendars; the Thai Buddhist year comes from Intl, on Formats.
+            ISO and Gregorian calendars; the Thai Buddhist year comes from Intl, on the Intl page.
           </fbt>
         </p>
       </div>
@@ -216,7 +217,7 @@ export default function TemporalPage({ worker }: Props) {
                       </TableRow>
                       <TableRow
                         data-row={key}
-                        className={differs ? "bg-brand/10" : undefined}
+                        className={differs ? DIFFERS_ROW : undefined}
                         data-differs={differs || undefined}
                       >
                         {columns.map((c) => (

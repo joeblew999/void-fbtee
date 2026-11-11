@@ -1,4 +1,4 @@
-// "Format on the server": the formats page posts the number the visitor typed, already read back
+// "Format on the server": the Try it page posts the number the visitor typed, already read back
 // to a plain number in the browser (neutral data, never formatted text), and the Worker formats
 // it with its own Intl. null is a number that didn't read.
 // The validator is the route's input type; the page calls it with Void's typed fetch.

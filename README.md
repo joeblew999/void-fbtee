@@ -56,7 +56,7 @@ vp run test:deployed     # every test against what Cloudflare deployed for this 
                          # test:browsers (what CI runs; CLOUDFLARE_WORKERS_SUBDOMAIN=gedw99)
 vp run test:browsers     # every page in every language in Chromium, WebKit and WebKit as today's
                          # iPhones have it (no built-in Temporal): no errors, fits a phone; and
-                         # the Formats and Temporal pages' engine checks. It grows with each
+                         # the Intl and Temporal pages' engine checks. It grows with each
                          # language, so it's not in vp test run, whose tests use a fixed few
                          # languages (each for what it exercises); CI runs it
 ```
