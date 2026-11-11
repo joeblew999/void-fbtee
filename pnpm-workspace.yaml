@@ -26,3 +26,8 @@ peerDependencyRules:
     - vite
   allowedVersions:
     vite: "*"
+permissions:
+  fbtee:
+    skills: false
+  void:
+    skills: false
