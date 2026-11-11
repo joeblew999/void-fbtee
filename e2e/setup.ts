@@ -57,8 +57,7 @@ async function start(args: string[], port: number, url: string): Promise<ChildPr
 }
 
 export default async function setup(project: TestProject) {
-  // `vp run deploy:test` (e2e/live.ts): the read-only tests against the URL Void deployed to, with
-  // no local build or servers.
+  // `vp run test:live` (e2e/live.ts): the tests against the deployed site, no local build or servers.
   if (process.env.E2E_URL) {
     project.provide("prod" as never, process.env.E2E_URL as never);
     return;

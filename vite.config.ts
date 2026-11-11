@@ -14,9 +14,8 @@ export default defineConfig({
       // Chromium for the browser tests (once per machine).
       "install:browser": { command: "playwright install --with-deps chromium", cache: false },
       // void-fbtee installed into fresh `void init` apps, as a user's app installs it.
-      // Deploy the example (Void's deploy), then run the browser tests against the URL Void
-      // reports; test:live runs them again on that URL, with no deploy (e2e/live.ts).
-      "deploy:test": { command: "vpx e2e/live.ts --deploy", cache: false },
+      // Every browser test against the deployed site, at the URL Void reported on the last deploy
+      // (e2e/live.ts). Deploying and testing are separate: `vp run deploy`, then this.
       "test:live": { command: "vpx e2e/live.ts", cache: false },
       "test:fresh": { command: "vpx e2e/fresh/check.ts", cache: false },
       // Vite+'s, Void's and void-fbtee's setup commands, run again: fails if any changes a file.
@@ -29,7 +28,8 @@ export default defineConfig({
       },
       // The example's tasks (apps/example/vite.config.ts), runnable from the root.
       login: { command: "vp run example#login", cache: false },
-      deploy: { command: "vp run example#deploy", cache: false },
+      // The example's deploy, saving the URL Void reports for test:live (e2e/deploy.ts).
+      deploy: { command: "vpx e2e/deploy.ts", cache: false },
       "deploy:atomic": { command: "vp run example#deploy:atomic", cache: false },
     },
   },
