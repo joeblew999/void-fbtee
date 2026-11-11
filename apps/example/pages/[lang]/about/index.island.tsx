@@ -13,10 +13,10 @@ export default function About() {
   return (
     <main>
       <Nav page="/about" />
-      <h1 data-testid="about-title">
+      <h1 className="mb-2 text-3xl font-semibold" data-testid="about-title">
         <fbt desc="Marketing page heading">Book a table in seconds</fbt>
       </h1>
-      <p data-testid="about-static-date">
+      <p className="mb-6 text-muted-foreground" data-testid="about-static-date">
         {launch.toLocaleString(locale, { dateStyle: "full", timeStyle: "short" })}
       </p>
       <Signup seats={4} />

@@ -50,6 +50,33 @@ test("docs: markdown pages, one set per language", async () => {
   expect(await p.locator("h1").textContent()).toContain("Translating strings in a Void app");
 });
 
+test("shadcn's menu in an island opens the language's way: from the right in Arabic", async () => {
+  const p = await page();
+  const errors = collectErrors(p);
+  const edges = async (locale: string) => {
+    await p.goto(`/${locale}/about`);
+    await hydrated(p, "_Signup");
+    await p.getByTestId("signup-menu").click();
+    const menu = p.getByTestId("signup-menu-content");
+    await menu.waitFor();
+    const t = (await p.getByTestId("signup-menu").boundingBox())!;
+    const m = (await menu.boundingBox())!;
+    const dir = await menu.getAttribute("dir");
+    await p.keyboard.press("Escape");
+    return { start: Math.round(m.x - t.x), end: Math.round(m.x + m.width - (t.x + t.width)), dir };
+  };
+  // The menu starts where the trigger starts: its left edge in English, its right edge in Arabic.
+  expect((await edges("en-US")).start).toBe(0);
+  const ar = await edges("ar-EG");
+  expect(ar.end).toBe(0);
+  expect(ar.dir).toBe("rtl");
+  // Choosing from the menu works in the island, with Arabic digits.
+  await p.getByTestId("signup-menu").click();
+  await p.getByTestId("signup-seats-2").click();
+  await seeText(p, "signup-text", "تبقّى مقعدان");
+  expect(errors).toEqual([]);
+});
+
 test("useNow(): the server's now while hydrating, the browser's clock after", async () => {
   // A cached page carries an old "now". With the browser's clock on 20 December, the countdown
   // first matches the server HTML, then counts from the browser's day: 4 days to 24 December.

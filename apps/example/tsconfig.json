@@ -9,7 +9,11 @@
     "skipLibCheck": true,
     "types": ["void/env", "fbtee/ReactTypes"],
     "jsx": "react-jsx",
-    "lib": ["ES2025", "DOM", "DOM.Iterable"]
+    "lib": ["ES2025", "DOM", "DOM.Iterable"],
+    "paths": {
+      "@/*": ["./*"],
+      "void/routes": ["./.void/routes.d.ts"]
+    }
   },
   "include": [
     "src",

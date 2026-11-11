@@ -804,6 +804,18 @@
         }
       ],
       "types": []
+    },
+    "0dUvJl6QCwFvbjqUd5l/Ww==": {
+      "description": "Menu button: choose how many seats are left",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ที่นั่ง",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

@@ -4,6 +4,19 @@
 import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { fbs, fbt } from "fbtee";
 import { useLocale, useTimeZone } from "void-fbtee/react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import Nav from "../../components/Nav";
 import { INSTANT, runAll, SECTIONS, ZONE, type SectionId } from "../../lib/formats";
 import { parseNumber } from "../../lib/parse-number";
@@ -69,8 +82,6 @@ function useBrowserRows(locale: string): Record<string, string> | null {
   );
 }
 
-const LONG: SectionId[] = ["supported", "segments", "locale"];
-
 export default function FormatsPage({ worker }: Props) {
   const { locale, dir } = useLocale();
   const browser = useBrowserRows(locale);
@@ -80,17 +91,21 @@ export default function FormatsPage({ worker }: Props) {
   return (
     <main>
       <Nav page="/formats" />
-      <h1 data-testid="formats-title">
+      <h1 className="mb-2 text-3xl font-semibold" data-testid="formats-title">
         <fbt desc="Formats page heading">Formats</fbt>
       </h1>
-      <p>
+      <p className="mb-4 text-muted-foreground">
         <fbt desc="Formats page introduction">
           Each row is one call to the platform's own Intl, in this page's language. The Worker ran
           it before sending the page; your browser ran it again.
         </fbt>
       </p>
       <PageFacts />
-      <p data-testid="formats-match">
+      <Badge
+        variant={browser && same === keys.length ? "secondary" : "outline"}
+        className="mb-4"
+        data-testid="formats-match"
+      >
         {browser ? (
           <fbt desc="How many rows the browser formatted exactly as the Worker did">
             <fbt:param name="same">{number(same)}</fbt:param> of{" "}
@@ -102,56 +117,68 @@ export default function FormatsPage({ worker }: Props) {
         ) : (
           "…"
         )}
-      </p>
+      </Badge>
       <TryIt />
       <YourTimeZone />
-      <p>
+      <p className="mb-4 text-sm text-muted-foreground">
         <fbt desc="Where the times on the formats page are shown">
           The times below are <fbt:param name="instant">{INSTANT}</fbt:param>, shown in{" "}
           <fbt:param name="zone">{ZONE}</fbt:param>.
         </fbt>
       </p>
       {SECTIONS.map((section) => (
-        <section key={section.id} data-section={section.id}>
-          <h2>{title(section.id)}</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>
-                  <fbt desc="Formats table column: the code that was run">Call</fbt>
-                </th>
-                <th>
-                  <fbt desc="Formats table column: the result on the Cloudflare Worker">Worker</fbt>
-                </th>
-                <th>
-                  <fbt desc="Formats table column: the result in the visitor's browser">
-                    Your browser
-                  </fbt>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {section.rows.map((row) => {
-                const key = `${section.id}/${row.id}`;
-                const differs = browser !== null && browser[key] !== worker[key];
-                const cls = LONG.includes(section.id) ? "long" : undefined;
-                return (
-                  <tr key={key} data-row={key} className={differs ? "differs" : undefined}>
-                    <td dir="ltr">
-                      <code>{row.code.replace(/\blang\b/g, JSON.stringify(locale))}</code>
-                    </td>
-                    <td className={cls} data-side="worker" dir={dir}>
-                      {worker[key]}
-                    </td>
-                    <td className={cls} data-side="browser" dir={dir}>
-                      {browser ? browser[key] : "…"}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </section>
+        <Card key={section.id} data-section={section.id} className="mb-6">
+          <CardHeader>
+            <CardTitle>{title(section.id)}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table className="table-fixed">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-2/5">
+                    <fbt desc="Formats table column: the code that was run">Call</fbt>
+                  </TableHead>
+                  <TableHead>
+                    <fbt desc="Formats table column: the result on the Cloudflare Worker">
+                      Worker
+                    </fbt>
+                  </TableHead>
+                  <TableHead>
+                    <fbt desc="Formats table column: the result in the visitor's browser">
+                      Your browser
+                    </fbt>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {section.rows.map((row) => {
+                  const key = `${section.id}/${row.id}`;
+                  const differs = browser !== null && browser[key] !== worker[key];
+                  const cell = "whitespace-normal break-words align-top";
+                  return (
+                    <TableRow
+                      key={key}
+                      data-row={key}
+                      className={differs ? "bg-destructive/10" : undefined}
+                    >
+                      <TableCell dir="ltr" className={cell}>
+                        <code className="font-mono text-xs">
+                          {row.code.replace(/\blang\b/g, JSON.stringify(locale))}
+                        </code>
+                      </TableCell>
+                      <TableCell className={cell} data-side="worker" dir={dir}>
+                        {worker[key]}
+                      </TableCell>
+                      <TableCell className={cell} data-side="browser" dir={dir}>
+                        {browser ? browser[key] : "…"}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       ))}
     </main>
   );
@@ -164,28 +191,31 @@ function PageFacts() {
   const tag = new Intl.Locale(locale);
   const resolved = new Intl.DateTimeFormat(locale, { timeStyle: "short" }).resolvedOptions();
   return (
-    <dl className="page-facts" data-testid="page-facts">
-      <dt>
+    <dl
+      className="mb-4 grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 text-sm"
+      data-testid="page-facts"
+    >
+      <dt className="text-muted-foreground">
         <fbt desc="Page fact: the page's language">Language</fbt>
       </dt>
       <dd>{`${locale} (${tag.maximize().toString()})`}</dd>
-      <dt>
+      <dt className="text-muted-foreground">
         <fbt desc="Page fact: left-to-right or right-to-left">Direction</fbt>
       </dt>
       <dd>{dir}</dd>
-      <dt>
+      <dt className="text-muted-foreground">
         <fbt desc="Page fact: the language's calendar">Calendar</fbt>
       </dt>
       <dd>{resolved.calendar}</dd>
-      <dt>
+      <dt className="text-muted-foreground">
         <fbt desc="Page fact: the language's digits">Digits</fbt>
       </dt>
       <dd>{resolved.numberingSystem}</dd>
-      <dt>
+      <dt className="text-muted-foreground">
         <fbt desc="Page fact: 12- or 24-hour clock">Clock</fbt>
       </dt>
       <dd>{resolved.hourCycle}</dd>
-      <dt>
+      <dt className="text-muted-foreground">
         <fbt desc="Page fact: the visitor's time zone, from their browser">Your time zone</fbt>
       </dt>
       <dd data-testid="page-zone">{zone}</dd>
@@ -203,7 +233,7 @@ function YourTimeZone() {
     timeZone: zone,
   }).format(new Date(INSTANT));
   return (
-    <p data-testid="your-time">
+    <p className="mb-4" data-testid="your-time">
       <fbt desc="The same moment in the visitor's own time zone">
         In your time zone: <fbt:param name="time">{text}</fbt:param>
       </fbt>
@@ -244,40 +274,62 @@ function TryIt() {
     ["words", (r) => r.words.join(" · ")],
   ];
   return (
-    <section data-testid="try-it">
-      <h2>
-        <fbt desc="Formats section where the visitor types a number and text">Try it</fbt>
-      </h2>
-      <label>
-        <fbt desc="Input label: a number, written the visitor's way">
-          A number, written your way
-        </fbt>{" "}
-        <input
-          data-testid="try-number"
-          value={numberText}
-          onChange={(e) => setNumberText(e.target.value)}
-        />
-      </label>{" "}
-      <label>
-        <fbt desc="Input label: any text">Some text</fbt>{" "}
-        <input data-testid="try-text" value={text} onChange={(e) => setText(e.target.value)} />
-      </label>{" "}
-      <button type="button" data-testid="try-server" onClick={formatOnServer}>
-        <fbt desc="Button: send the number and text to the server to format">
-          Format on the server
-        </fbt>
-      </button>
-      <table>
-        <tbody>
-          {rows.map(([name, get]) => (
-            <tr key={name} data-try={name}>
-              <th dir="ltr">{name}</th>
-              <td data-side="worker">{worker ? String(get(worker)) : "—"}</td>
-              <td data-side="browser">{String(get(browser))}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </section>
+    <Card data-testid="try-it" className="mb-6">
+      <CardHeader>
+        <CardTitle>
+          <fbt desc="Formats section where the visitor types a number and text">Try it</fbt>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-2">
+            <Label htmlFor="try-number">
+              <fbt desc="Input label: a number, written the visitor's way">
+                A number, written your way
+              </fbt>
+            </Label>
+            <Input
+              id="try-number"
+              data-testid="try-number"
+              value={numberText}
+              onChange={(e) => setNumberText(e.target.value)}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="try-text">
+              <fbt desc="Input label: any text">Some text</fbt>
+            </Label>
+            <Input
+              id="try-text"
+              data-testid="try-text"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+            />
+          </div>
+        </div>
+        <Button type="button" data-testid="try-server" onClick={formatOnServer}>
+          <fbt desc="Button: send the number and text to the server to format">
+            Format on the server
+          </fbt>
+        </Button>
+        <Table>
+          <TableBody>
+            {rows.map(([name, get]) => (
+              <TableRow key={name} data-try={name}>
+                <TableHead dir="ltr" className="w-40">
+                  {name}
+                </TableHead>
+                <TableCell data-side="worker" className="whitespace-normal">
+                  {worker ? String(get(worker)) : "—"}
+                </TableCell>
+                <TableCell data-side="browser" className="whitespace-normal">
+                  {String(get(browser))}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }
