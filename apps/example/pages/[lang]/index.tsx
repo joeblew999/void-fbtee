@@ -32,6 +32,15 @@ function Pages() {
   const { locale } = useLocale();
   const cards = [
     {
+      href: `/${locale}/events`,
+      title: <fbt desc="Home card title: the events app">Events</fbt>,
+      text: (
+        <fbt desc="Home card text: what the events app shows">
+          Post an event, book a seat: every time on the event's clock and on yours.
+        </fbt>
+      ),
+    },
+    {
       href: `/${locale}/formats`,
       title: <fbt desc="Home card title: the formats page">Formats</fbt>,
       text: (

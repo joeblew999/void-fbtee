@@ -12,7 +12,10 @@
     "lib": ["ES2025", "DOM", "DOM.Iterable"],
     "paths": {
       "@/*": ["./*"],
-      "void/routes": ["./.void/routes.d.ts"]
+      "void/routes": ["./.void/routes.d.ts"],
+      "void/db": ["./.void/db.d.ts"],
+      "@schema": ["./db/schema.ts"],
+      "@schema/*": ["./db/schema/*"]
     }
   },
   "include": [
@@ -27,5 +30,5 @@
     "db",
     "i18n"
   ],
-  "files": ["./.void/routes.d.ts"]
+  "files": ["./.void/routes.d.ts", "./.void/db.d.ts"]
 }

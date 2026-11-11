@@ -4,6 +4,7 @@
 //   - vp config: Vite+'s project setup (hooks, and the Vite+ section of AGENTS.md)
 //   - void init --tsconfig: Void's setup step that runs without questions (tsconfig, AGENTS.md, skills)
 //   - void-fbtee init: this package's own setup, on the example (it only adds what's missing)
+//   - void db generate: a migration for any table change not migrated yet (there should be none)
 //   - vp fmt: the formatter, so a tool's formatting isn't counted as a change
 import { execFileSync } from "node:child_process";
 import { join, resolve } from "node:path";
@@ -21,6 +22,7 @@ const before = state();
 run(root, "vp", "config");
 run(example, "vp", "exec", "void", "init", "--tsconfig");
 run(example, "vp", "exec", "void-fbtee", "init", "--locales", "ar-EG,th-TH");
+run(example, "vp", "exec", "void", "db", "generate");
 run(root, "vp", "fmt");
 const after = state();
 if (after !== before) {

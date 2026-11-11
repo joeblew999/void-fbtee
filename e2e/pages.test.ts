@@ -57,7 +57,7 @@ test("every page fits a phone's width, in every language", async () => {
   });
   const wide: string[] = [];
   for (const locale of ["en-US", "ar-EG", "th-TH"])
-    for (const path of ["", "/formats", "/about", "/docs", "/docs/strings"]) {
+    for (const path of ["", "/tour", "/events", "/formats", "/about", "/docs", "/docs/strings"]) {
       await p.goto(`/${locale}${path}`);
       const { layout, content } = await p.evaluate(() => ({
         layout: window.innerWidth,

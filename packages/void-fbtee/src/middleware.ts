@@ -30,6 +30,15 @@ export interface SharedI18n {
   path: string;
 }
 
+/**
+ * The same page in every language: `localizedPaths("/events")` is ["/en-US/events",
+ * "/th-TH/events", …]. For anything that acts on all of them, such as clearing Void's page cache
+ * after a change (`revalidate({ paths: localizedPaths(…) })` from void/isr).
+ */
+export function localizedPaths(path: string): string[] {
+  return config.locales.map((l) => `/${l.segment}${path}`);
+}
+
 // Void's own endpoints, API routes and file requests: no catalog, no fbtee state. They still get
 // shared.i18n, because Void renders its not-found page (through the app's layout) for them.
 const LIGHT = /^\/(__void|api)(\/|$)|\.[a-z0-9]+$/i;

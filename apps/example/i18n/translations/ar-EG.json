@@ -1128,6 +1128,288 @@
         }
       ],
       "types": []
+    },
+    "sSw++VHCYLbGRvCqi93qhQ==": {
+      "description": "An event's start time on the reader's own clock",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "بتوقيتك: {time}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5/TdMDxCRFAzrR+6DJ8ppw==": {
+      "description": "Navigation: the events people post and book",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الفعاليات",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WHNLr3T+RwGJg0fnjocoaw==": {
+      "description": "Home card title: the events app",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الفعاليات",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YhBzwGXrssZ0QtoNnlUq+A==": {
+      "description": "Home card text: what the events app shows",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "انشر فعالية واحجز مقعدًا: كل موعد بتوقيت مكان الفعالية وبتوقيتك.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cpTLVzYwVvfyuSoDp7Wrtw==": {
+      "description": "Link back to the list of events",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "كل الفعاليات",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fWba9x96UoFvV1W4cYEeUQ==": {
+      "description": "How many seats an event has",
+      "status": "translated",
+      "tokens": [
+        "number"
+      ],
+      "translations": [
+        {
+          "translation": "لا مقاعد",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "مقعدان",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "{number} مقاعد",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "{number} مقعدًا",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "{number} مقعد",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "b9/Y9FU3gUlroFBo6g4TMA==": {
+      "description": "How many seats an event has",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مقعد واحد",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PHHeMDyaiacbVYUaBw9ZQQ==": {
+      "description": "Note under an event: the language its organiser wrote it in",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لغة الكتابة: {language}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "88bXloxtPp7U7Ddof/il7g==": {
+      "description": "Heading of the form for posting a new event",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "انشر فعالية",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mZ8hYu9qPvbwglMhY1pg6Q==": {
+      "description": "Form label: the event's title",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "العنوان",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ezNp5IBUD7GsPJV5F848Gw==": {
+      "description": "Form error: the title is missing",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "أعطِها عنوانًا.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nTTFEVGn7nrf4dlWq2uxhA==": {
+      "description": "Form label: what the event is about",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "عمّ تدور",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yEkGnkX/XlLgee4iOvmiHw==": {
+      "description": "Form error: the description is missing",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "اكتب عمّ تدور.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "a7jnMImYOSMl7XdQpP7X+g==": {
+      "description": "Form label: when the event starts, on the clock where it happens",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تبدأ (بالتوقيت المحلي)",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "N+4hyhcPzHyhQ4Rx/nkZpA==": {
+      "description": "Form error: no start time",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "متى تبدأ؟",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BqEWnqF/4jf7cITy9pZWeQ==": {
+      "description": "Form label: the time zone where the event happens",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المنطقة الزمنية",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "T/SL1yySYQJS4mBmPyecUQ==": {
+      "description": "Form label: how many seats the event has",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المقاعد",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jhuD83yE9J7dpA0O1SWAYQ==": {
+      "description": "Form error: seats must be 1 or more",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مقعد واحد على الأقل.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ls+ihApHfjE1F0bHA1Kn7w==": {
+      "description": "Button: post the new event",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "انشرها",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DoSLC5Ng7v/JBh0E5Muy/g==": {
+      "description": "Heading of the events page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الفعاليات القادمة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4pdkn8KuYw3MG5sQyQkf7A==": {
+      "description": "Navigation: the tour of the events app",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "جولة",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

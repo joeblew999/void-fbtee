@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1794373393243,
+      "tag": "20261111050313_wooden_mastermind",
+      "breakpoints": true
+    }
+  ]
+}

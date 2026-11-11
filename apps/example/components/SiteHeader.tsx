@@ -7,12 +7,16 @@ import { Link, useLocale, useLocales } from "void-fbtee/react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const PAGES = ["", "/formats", "/about", "/docs"] as const;
+const PAGES = ["", "/tour", "/events", "/formats", "/about", "/docs"] as const;
 
 function label(page: (typeof PAGES)[number]) {
   switch (page) {
     case "":
       return <fbt desc="Navigation: the home page">Home</fbt>;
+    case "/tour":
+      return <fbt desc="Navigation: the tour of the events app">Tour</fbt>;
+    case "/events":
+      return <fbt desc="Navigation: the events people post and book">Events</fbt>;
     case "/formats":
       return <fbt desc="Navigation: the page that shows every Intl format">Formats</fbt>;
     case "/about":

@@ -1,0 +1,54 @@
+// Production build: the events app's own part. Each event's start on its city's clock and on the
+// reader's, in the reader's language; an event posted in Arabic, then read in English. Void's
+// forms, database and cache are Void's to test; this checks what void-fbtee and the app add.
+import { expect, test } from "vite-plus/test";
+import { browser, collectErrors, seeText } from "./helpers";
+
+const page = browser("prod");
+const WHEN: Intl.DateTimeFormatOptions = {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  hour: "numeric",
+  minute: "2-digit",
+  timeZoneName: "longGeneric",
+};
+const SWIM = "2027-03-06T19:00:00Z"; // Harbour sunrise swim: 6:00 on 7 March in Sydney
+const at = (locale: string, timeZone: string) =>
+  new Intl.DateTimeFormat(locale, { ...WHEN, timeZone }).format(new Date(SWIM));
+
+test("th-TH, in New York: Sydney's clock, the reader's, and how far off, in Thai", async () => {
+  const p = await page({ timezoneId: "America/New_York" });
+  const errors = collectErrors(p);
+  await p.clock.install({ time: new Date("2027-03-05T12:00:00Z") });
+  await p.goto("/th-TH/events");
+  const swim = p
+    .getByTestId("events-list")
+    .locator("li")
+    .filter({ hasText: "Harbour sunrise swim" });
+  await expect
+    .poll(() => swim.getByTestId("event-yours").textContent())
+    .toContain(at("th-TH", "America/New_York"));
+  expect(await swim.getByTestId("event-local").textContent()).toBe(at("th-TH", "Australia/Sydney"));
+  expect(await swim.getByTestId("event-when").textContent()).toBe("พรุ่งนี้");
+  expect(errors).toEqual([]);
+});
+
+test("ar-EG: post an event (a missing title first), then read it in English", async () => {
+  const p = await page({ timezoneId: "Africa/Cairo" });
+  const errors = collectErrors(p);
+  await p.goto("/ar-EG/events");
+  // Void's form works once the page has hydrated.
+  await p.waitForLoadState("networkidle");
+  await p.getByTestId("event-post").click();
+  await seeText(p, "error-title", "أعطِها عنوانًا.");
+  await p.getByTestId("event-title-input").fill("أمسية شعر");
+  await p.getByTestId("event-description-input").fill("قراءات شعرية على السطح.");
+  await p.getByTestId("event-local-input").fill("2027-04-01T20:00");
+  await p.getByTestId("event-post").click();
+  await p.waitForURL(/\/ar-EG\/events\/[0-9a-f-]{36}$/);
+  await seeText(p, "event-title", "أمسية شعر");
+  await p.goto(p.url().replace("/ar-EG/", "/en-US/"));
+  await seeText(p, "event-written-in", "Written in Arabic (Egypt)");
+  expect(errors).toEqual([]);
+});

@@ -29,6 +29,8 @@ async function start(args: string[], url: string): Promise<ChildProcess> {
 }
 
 export default async function setup(project: TestProject) {
+  // The sample events (apps/example/db/seed.ts), on a fresh local database: Void's seed.
+  run(["exec", "void", "db", "seed", "--yes"], EXAMPLE);
   // The example's build, and before it void-fbtee's (Vite+'s transitive run: -t).
   run(["run", "-t", "example#build"], root);
   const prod = `http://localhost:${PORTS.prod}`;
