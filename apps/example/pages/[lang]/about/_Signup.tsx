@@ -1,10 +1,10 @@
 // An island: hydrates on its own, with only its props. No layout, no Void router.
 import { useState } from "react";
 import { fbt } from "fbtee";
-import { Link, useIntl } from "void-fbtee/react";
+import { Link, useLocale } from "void-fbtee/react";
 
 export default function Signup({ seats }: { seats: number }) {
-  const intl = useIntl();
+  const { locale } = useLocale();
   // void-fbtee's Link inside an island, where there is no Void router (a language switcher).
   const [count, setCount] = useState(seats);
   return (
@@ -16,7 +16,7 @@ export default function Signup({ seats }: { seats: number }) {
           </fbt:plural>
         </fbt>
       </p>
-      <p data-testid="signup-number">{intl.number(count * 1234.5)}</p>
+      <p data-testid="signup-number">{new Intl.NumberFormat(locale).format(count * 1234.5)}</p>
       <button
         data-testid="signup-take"
         type="button"
@@ -27,7 +27,7 @@ export default function Signup({ seats }: { seats: number }) {
       <Link href="/de-DE/about" data-testid="signup-to-de">
         Deutsch
       </Link>{" "}
-      <Link href={`/${intl.locale}/blog`} data-testid="signup-to-blog">
+      <Link href={`/${locale}/blog`} data-testid="signup-to-blog">
         Blog
       </Link>
     </section>

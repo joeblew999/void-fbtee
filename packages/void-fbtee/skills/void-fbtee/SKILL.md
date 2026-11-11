@@ -17,7 +17,9 @@ The docs ship next to this skill, in `node_modules/void-fbtee/docs/`. Commands: 
 2. Translate every entry with `"status": "new"` by fbtee's own skill:
    `node_modules/fbtee/skills/fbtee-translate/SKILL.md`. Follow its steps 3 to 5 (match the
    locale's existing style, read each description and the source, keep placeholders exactly, then
-   mark the entry done). In these catalogs a finished entry has `"status": "translated"`.
+   mark the entry done). In these catalogs a finished entry has `"status": "translated"`. A string
+   with a count has one line per plural form; fill each in that form's grammar
+   (`docs/strings.md`, "Plurals").
 3. Then read `docs/strings.md` for what's specific to Void apps: fbtee's built-in strings,
    right-to-left locales, and the source locale.
 

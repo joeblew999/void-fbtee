@@ -20,6 +20,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
+import type { FallbackLocales } from "fbtee";
 import { resolveLocales, type LocaleConfig, type LocaleInput } from "./locales";
 import {
   DEFAULT_SRC,
@@ -47,6 +48,12 @@ export interface VoidFbteeOptions {
    * own built-in strings included. Never fails the dev server. Default false: the build reports.
    */
   failOnMissing?: boolean;
+  /**
+   * fbtee's own `fallbackLocales` option, passed to fbtee as is: catalogs to try after a
+   * locale's natural parents (de-AT -> de) and before the source text. See fbtee's README,
+   * "Locale Matching and Fallback".
+   */
+  fallbackLocales?: FallbackLocales;
 }
 
 /** What the plugin exposes on its `api`, for the void-fbtee command (read with resolveConfig). */
@@ -167,7 +174,8 @@ export default function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       },
     },
     load(id) {
-      if (id === "\0" + CONFIG_ID) return `export default ${JSON.stringify(config)};`;
+      if (id === "\0" + CONFIG_ID)
+        return `export default ${JSON.stringify({ ...config, fallbackLocales: options.fallbackLocales })};`;
       if (id === "\0" + CATALOGS_ID) {
         const entries = config.locales
           .filter((l) => l.locale !== config.sourceLocale)

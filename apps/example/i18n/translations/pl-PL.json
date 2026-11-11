@@ -16,14 +16,32 @@
     "W2S4HeMOJcq2xOy3+nXfaw==": {
       "description": "Text rendered from deferred loader data",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
-          "translation": "Później: pozostałe noce: {number}",
-          "variations": {}
+          "translation": "Później: zostały {number} noce",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "Później: zostało {number} nocy",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "Później: zostało {number} nocy",
+          "variations": {
+            "0": 24
+          }
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "HEbq6lwochMG+bINu8ib4w==": {
       "description": "Text rendered from deferred loader data",
@@ -52,14 +70,32 @@
     "d20AdENCUCFEupNI3bkyqg==": {
       "description": "How many nights are booked",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
-          "translation": "Liczba zarezerwowanych nocy: {number}",
-          "variations": {}
+          "translation": "Zarezerwowano {number} noce",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "Zarezerwowano {number} nocy",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "Zarezerwowano {number} nocy",
+          "variations": {
+            "0": 24
+          }
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "firIdTpNp5HR3/x49jpnZA==": {
       "description": "How many nights are booked",
@@ -112,14 +148,32 @@
     "tM77ujLuxM2vdLYjDoWThA==": {
       "description": "Seats left, island",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
-          "translation": "Pozostałe miejsca: {number}",
-          "variations": {}
+          "translation": "Zostały {number} miejsca",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "Zostało {number} miejsc",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "Zostało {number} miejsca",
+          "variations": {
+            "0": 24
+          }
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "l617jlL65guL4frUlrxOCw==": {
       "description": "Seats left, island",
@@ -172,26 +226,74 @@
     "IYUmtYxQtGdt1MucjXrsVA==": {
       "description": "Label with meaning 'at least number'",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
           "translation": "{number}+",
-          "variations": {}
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "{number}+",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "{number}+",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "{number}+",
+          "variations": {
+            "0": 24
+          }
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "ZIF1WhVQwt7WZJvFTEbMWw==": {
       "description": "Label with meaning 'less than number'",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
           "translation": "<{number}",
-          "variations": {}
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "<{number}",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "<{number}",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "<{number}",
+          "variations": {
+            "0": 24
+          }
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "Oc/9PrbjfyLHS60BXceD1A==": {
       "description": "A list of items of various types, for example: \"San Francisco; London; Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",

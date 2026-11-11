@@ -8,7 +8,10 @@
 // installed before the page's modules even run; then this returns at once.)
 //
 // Islands (.island.tsx pages, and .md pages) hydrate each island on its own, without the layout.
-// useLocale/useIntl and <fbt> still work there; see install.ts and client.ts.
+// useLocale and <fbt> still work there; see install.ts and client.ts.
+//
+// Formatting: use JavaScript's Intl with useLocale().locale, as fbtee's README says ("Formatting
+// Numbers and Dates"), and fbtee's list() for lists inside strings.
 import { use, useContext, useSyncExternalStore, type ReactNode, type ComponentProps } from "react";
 import { Link as VoidLink, SharedContext } from "@void/react";
 import { Temporal } from "temporal-polyfill";
@@ -68,53 +71,3 @@ const serverNow = (iso: string) => {
   if (!instant) serverInstants.set(iso, (instant = Temporal.Instant.from(iso)));
   return instant;
 };
-
-type Formattable =
-  | Temporal.ZonedDateTime
-  | Temporal.PlainDate
-  | Temporal.PlainDateTime
-  | Temporal.PlainTime
-  | Temporal.PlainYearMonth
-  | Temporal.PlainMonthDay;
-
-/**
- * Formatting for the page's locale. Same text on the server and in the browser:
- * - times carry their own time zone (a ZonedDateTime), never the viewer's or the server's;
- * - "now" is the server's, from the middleware;
- * - Temporal values format with their own toLocaleString (the polyfill doesn't patch Intl).
- */
-export function useIntl() {
-  const { locale, now } = useLocale();
-  const nowInstant = Temporal.Instant.from(now);
-  return {
-    locale,
-    /** The server's "now" for this response. */
-    now: nowInstant,
-    date: (value: Formattable, options?: Intl.DateTimeFormatOptions) =>
-      value.toLocaleString(locale, options),
-    number: (value: number | bigint, options?: Intl.NumberFormatOptions) =>
-      new Intl.NumberFormat(locale, options).format(value),
-    list: (items: string[], options?: Intl.ListFormatOptions) =>
-      new Intl.ListFormat(locale, options).format(items),
-    duration: (value: Temporal.Duration | string, options?: Intl.DurationFormatOptions) =>
-      new Intl.DurationFormat(locale, options).format(
-        typeof value === "string" ? Temporal.Duration.from(value) : value,
-      ),
-    /**
-     * "tomorrow", "in 44 days": calendar days from now to a time, in that time's own zone.
-     * `from` defaults to the server's "now"; pass useNow() on prerendered pages.
-     */
-    relativeDays: (
-      to: Temporal.ZonedDateTime,
-      options?: Intl.RelativeTimeFormatOptions,
-      from: Temporal.Instant = nowInstant,
-    ) => {
-      const today = from.toZonedDateTimeISO(to.timeZoneId).toPlainDate();
-      const days = today.until(to.toPlainDate()).days;
-      return new Intl.RelativeTimeFormat(locale, { numeric: "auto", ...options }).format(
-        days,
-        "day",
-      );
-    },
-  };
-}

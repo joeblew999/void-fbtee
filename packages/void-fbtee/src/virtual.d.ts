@@ -1,11 +1,11 @@
 // Modules the void-fbtee Vite plugin makes at the app's build time.
 declare module "virtual:void-fbtee/config" {
-  const config: import("./locales").LocaleConfig;
+  const config: import("./runtime").RuntimeConfig;
   export default config;
 }
 declare module "virtual:void-fbtee/catalogs" {
-  /** One lazy loader per translated locale; each resolves to fbtee's translation table. */
-  const catalogs: Record<string, () => Promise<{ default: Record<string, unknown> }>>;
+  /** One lazy loader per translated locale; each resolves to { [locale]: fbtee's table }. */
+  const catalogs: import("./runtime").CatalogLoaders;
   export default catalogs;
 }
 declare module "virtual:void-fbtee/texts" {

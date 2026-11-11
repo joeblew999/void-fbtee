@@ -15,6 +15,7 @@ import {
   translateSync,
 } from "@nkzw/fbtee-compiler";
 import type { LocaleConfig } from "./locales";
+import { addPluralForms, pluralSlots } from "./plurals";
 
 export const DEFAULT_SRC = [
   "pages/**/*.{ts,tsx,js,jsx}",
@@ -118,7 +119,8 @@ const translatedLocales = (p: Project) =>
 
 /**
  * What `void-fbtee prepare` writes: every translated locale's catalog after fbtee's own
- * prepare-translations (new strings marked "new", finished ones kept, stale ones removed).
+ * prepare-translations (new strings marked "new", finished ones kept, stale ones removed), plus a
+ * line for each plural form the locale needs (plurals.ts).
  */
 export function prepared(p: Project): { locale: string; json: string; existed: boolean }[] {
   const { phrases } = collect(p);
@@ -128,7 +130,13 @@ export function prepared(p: Project): { locale: string; json: string; existed: b
     return existsSync(file) ? { locale, existingJson: readFileSync(file, "utf8") } : { locale };
   });
   const out = prepareTranslationsBatchSync(JSON.stringify({ phrases }), inputs);
-  return out.map((json, i) => ({ locale: locales[i]!, json, existed: !!inputs[i]!.existingJson }));
+  // fbtee's prepare leaves plural forms out; add a line for each form the locale needs.
+  const slots = pluralSlots(phrases);
+  return out.map((json, i) => ({
+    locale: locales[i]!,
+    json: addPluralForms(json, slots, locales[i]!),
+    existed: !!inputs[i]!.existingJson,
+  }));
 }
 
 export interface LocaleMissing {
