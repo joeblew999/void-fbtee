@@ -52,23 +52,23 @@
     "@nkzw/eslint-plugin-fbtee": "5.0.0",
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",
-    "@void/react": "1.7.0",
+    "@void/react": "catalog:",
     "fbtee": "5.0.0",
     "hono": "4.13.17",
     "react": "19.3.1",
     "temporal-polyfill": "1.0.8",
     "typescript": "7.0.2",
-    "vite": "npm:@voidzero-dev/vite-plus-core@1.5.1",
-    "vite-plus": "1.5.1",
-    "void": "1.7.0"
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "void": "catalog:"
   },
   "peerDependencies": {
-    "@void/react": "1.7.0",
+    "@void/react": "^1.7.0",
     "fbtee": "5.0.0",
     "hono": "^4.11.0",
     "react": "^19.2.0",
     "temporal-polyfill": "^1.0.8",
     "vite": "*",
-    "void": "1.7.0"
+    "void": "^1.7.0"
   }
 }

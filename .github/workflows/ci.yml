@@ -31,6 +31,7 @@ jobs:
       - run: vp install --no-frozen-lockfile
       - run: vp run install:browser
       - run: vp check
+      - run: vp run check:tools
       - run: vp test run
 
   fresh:
@@ -45,3 +46,28 @@ jobs:
       - uses: jdx/mise-action@v5.2.7
       - run: vp install --no-frozen-lockfile
       - run: vp run test:fresh
+
+  # A release when packages/void-fbtee/package.json has a version with no tag yet: the tag and the
+  # GitHub release (notes written by GitHub from the commits). Apps pin it in their dependency:
+  # github:joeblew999/void-fbtee#v<version>&path:/packages/void-fbtee
+  release:
+    name: release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [ci, fresh]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Release the package's version, if it's new
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(jq -r .version packages/void-fbtee/package.json)
+          if gh release view "v$version" > /dev/null 2>&1; then
+            echo "v$version is already released"
+          else
+            gh release create "v$version" --target "$GITHUB_SHA" --generate-notes --title "v$version"
+          fi

@@ -3,6 +3,9 @@
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
+  staged: {
+    "*": "vp check --fix",
+  },
   // `vp run <task>` from anywhere in the repo.
   run: {
     tasks: {
@@ -12,15 +15,22 @@ export default defineConfig({
       "install:browser": { command: "playwright install --with-deps chromium", cache: false },
       // void-fbtee installed into fresh `void init` apps, as a user's app installs it.
       "test:fresh": { command: "node e2e/fresh/check.mjs", cache: false },
+      // Vite+'s, Void's and void-fbtee's setup commands, run again: fails if any changes a file.
+      "check:tools": { command: "node e2e/check-tools.mjs", cache: false },
+      // Upgrade Vite+ to the vp in mise.toml (change it there, `mise install`, then this): the
+      // catalog's pins and the Vite+ section of AGENTS.md. Then vp check, vp test run.
+      "upgrade:vite-plus": {
+        command: "vp migrate --agent agents --no-editor --no-hooks --no-interactive",
+        cache: false,
+      },
       // The example's tasks (apps/example/vite.config.ts), runnable from the root.
       login: { command: "vp run example#login", cache: false },
       deploy: { command: "vp run example#deploy", cache: false },
     },
   },
   lint: {
-    // e2e/fresh/<toolchain>/: what `void init` wrote, kept as it wrote it (no node_modules there).
-    // e2e/fresh/app/: pages copied into those apps, linted and type-checked there.
-    ignorePatterns: ["e2e/fresh/vite-plus/**", "e2e/fresh/vite/**", "e2e/fresh/app/**"],
+    // e2e/fresh/app/: pages copied into the fresh apps, linted and type-checked there.
+    ignorePatterns: ["e2e/fresh/app/**"],
     plugins: ["typescript", "react"],
     // What `void-fbtee init` asks a workspace's root config for: fbtee's rules and void-fbtee's own.
     jsPlugins: ["@nkzw/eslint-plugin-fbtee", "void-fbtee/lint"],
@@ -34,15 +44,9 @@ export default defineConfig({
     },
   },
   fmt: {
-    // Written by tools, not by hand: fbtee (catalogs), drizzle (migrations), void init (AGENTS.md
-    // and the fresh-install apps in e2e/fresh/).
-    ignorePatterns: [
-      "**/i18n/translations/**",
-      "**/db/migrations/**",
-      "**/AGENTS.md",
-      "e2e/fresh/vite-plus/**",
-      "e2e/fresh/vite/**",
-    ],
+    // Written by tools, not by hand: fbtee (catalogs), drizzle (migrations), Void, Vite+ and
+    // void-fbtee (AGENTS.md).
+    ignorePatterns: ["**/i18n/translations/**", "**/db/migrations/**", "**/AGENTS.md"],
   },
   // `vp test run`: the package's unit tests, and the browser tests on the example (e2e/), which
   // Vitest runs with Playwright's library, as voidzero-dev/void does. e2e/setup.ts builds once

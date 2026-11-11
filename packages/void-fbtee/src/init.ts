@@ -111,6 +111,8 @@ export async function init(o: InitOptions): Promise<InitResult> {
   const pkg = readJson(at("package.json"));
   const vitePlus = !!(pkg.devDependencies?.["vite-plus"] ?? pkg.dependencies?.["vite-plus"]);
   const versions = testedVersions();
+  // In a workspace, Vite+ runs lint from the root, so fbtee's lint plugin and its rules live there.
+  const wsRoot = workspaceRoot(o.root);
 
   // 1. The peers void-fbtee needs in the app, at the versions void-fbtee is tested with.
   //    void-fbtee itself is already a dependency (it's installed to run init), so it's left as is.
@@ -118,7 +120,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
     ["fbtee", "dependencies"],
     ["temporal-polyfill", "dependencies"],
   ];
-  if (vitePlus) need.push(["@nkzw/eslint-plugin-fbtee", "devDependencies"]);
+  if (vitePlus && !wsRoot) need.push(["@nkzw/eslint-plugin-fbtee", "devDependencies"]);
   const added = need.filter(([name]) => !pkg.dependencies?.[name] && !pkg.devDependencies?.[name]);
   for (const [name, field] of added) (pkg[field] ??= {})[name] = versions[name];
 
@@ -187,11 +189,17 @@ export async function init(o: InitOptions): Promise<InitResult> {
         `${viteConfig}: added voidFbtee({ sourceLocale: "${o.sourceLocale}", locales: [${o.locales.map((l) => `"${l}"`).join(", ")}] }) first in plugins`,
       );
     }
-    const wsRoot = workspaceRoot(o.root);
     if (vitePlus && wsRoot) {
-      todo.push(
-        `${join(wsRoot, "vite.config.ts")}: Vite+ only reads lint settings from the workspace's root config. Add lint: { jsPlugins: ["@nkzw/eslint-plugin-fbtee", "void-fbtee/lint"], rules: ${JSON.stringify(LINT_RULES)} }`,
-      );
+      const rootConfig = join(wsRoot, "vite.config.ts");
+      const rootPkg = readJson(join(wsRoot, "package.json"));
+      if (!(existsSync(rootConfig) && readFileSync(rootConfig, "utf8").includes("void-fbtee/lint")))
+        todo.push(
+          `${rootConfig}: Vite+ only reads lint settings from the workspace's root config. Add lint: { jsPlugins: ["@nkzw/eslint-plugin-fbtee", "void-fbtee/lint"], rules: ${JSON.stringify(LINT_RULES)} }`,
+        );
+      if (!rootPkg.devDependencies?.["@nkzw/eslint-plugin-fbtee"])
+        todo.push(
+          `${join(wsRoot, "package.json")}: add "@nkzw/eslint-plugin-fbtee": "${versions["@nkzw/eslint-plugin-fbtee"]}" to devDependencies (lint runs from the workspace root)`,
+        );
     } else if (vitePlus && !code.includes("void-fbtee/lint")) {
       // Only Vite+'s defineConfig knows `lint`, so the import moves to vite-plus (as `vp migrate`
       // does to config files). Plain-Vite apps get the same checks from `void-fbtee check`.
@@ -293,7 +301,8 @@ export async function init(o: InitOptions): Promise<InitResult> {
     done.push(`${agent.skillsDir}/void-fbtee: linked void-fbtee's skill for ${agent.name}`);
   }
 
-  const pm = packageManager(o.root);
+  // Vite+ apps run everything through vp (it picks the package manager itself).
+  const pm = vitePlus ? "vp" : packageManager(o.root);
   if (added.length) todo.unshift(`${pm} install (for the added dependencies)`);
   todo.push(`${pm} run i18n:prepare (makes each locale's catalog), then ${pm} run i18n:translate`);
   return { done, todo };

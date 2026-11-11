@@ -6,13 +6,14 @@ It works the Void way: a Vite plugin, a Void middleware and a layout provider. I
 
 ## Add it to a Void app
 
-It isn't on npm. An app installs it straight from this GitHub repo, with pnpm.
+It isn't on npm. An app installs a release straight from this GitHub repo, with pnpm. The
+releases are listed at https://github.com/joeblew999/void-fbtee/releases.
 
-In the app's `package.json`:
+In the app's `package.json` (with the release you want):
 
 ```json
 "dependencies": {
-  "void-fbtee": "github:joeblew999/void-fbtee#path:/packages/void-fbtee"
+  "void-fbtee": "github:joeblew999/void-fbtee#v0.1.0&path:/packages/void-fbtee"
 }
 ```
 
@@ -23,7 +24,7 @@ allowBuilds:
   "void-fbtee@git+https://github.com/joeblew999/void-fbtee.git": true
 ```
 
-Then:
+Then (in a Vite+ app, `vp` in place of `pnpm`):
 
 ```sh
 pnpm install
@@ -52,10 +53,11 @@ vp check                 # format, lint, types
 vp test run              # every test
 ```
 
-CI runs those same commands. The repo's tasks are in `vite.config.ts` and
-`apps/example/vite.config.ts`; `vp run` lists them. Changes to the package reach the example by
-themselves: `vp run dev` rebuilds the package on save, and the example's `build` and `deploy`
-rebuild it first.
+CI runs those same commands, and `vp run check:tools` (below). The repo's tasks are in
+`vite.config.ts` and `apps/example/vite.config.ts`; `vp run` lists them. Changes to the package
+reach the example by themselves: `vp run dev` rebuilds the package on save, and the example's
+build (`vp run -t example#build`) and `vp run deploy` build it first. Each commit is checked first
+(`vp staged`, a Vite+ commit hook that `vp install` sets up).
 
 To deploy the example to Cloudflare, `vp run deploy`. The first time on a machine it asks you to
 sign in (`vp run login` does only that). Then:
@@ -67,6 +69,36 @@ sign in (`vp run login` does only that). Then:
 In a Claude cloud session, `.claude/hooks/cloud-session.sh` runs `mise install` and starts a
 keyring for the sign-in, so Claude runs the same commands. A new session needs one sign-in: Claude runs
 `vp run login` (inside `script`, as void's sign-in wants a terminal), which prints Cloudflare's link, and you click Allow.
+
+## Tools that set this repo up
+
+Vite+, Void and void-fbtee each write setup into the repo, and own those parts:
+
+- **Vite+** (`vp migrate`, `vp config`): the version pins in `pnpm-workspace.yaml`'s catalog, the
+  Vite+ section of `AGENTS.md`, and the commit hook (`.vite-hooks/pre-commit`).
+- **Void** (`void init`): the example's `build` script, its `tsconfig.json` entries, Void's section
+  of `apps/example/AGENTS.md`, and its skills for Claude Code.
+- **void-fbtee** (`void-fbtee init`): the example's `i18n:*` scripts, void-fbtee's section of
+  `apps/example/AGENTS.md`, and its skill.
+
+`vp run check:tools` runs them all again and fails if any of them changes a file, so a new release
+that wants something different shows what it wants.
+
+## Upgrading
+
+- **Vite+:** change its version in `mise.toml`, then `mise install` and `vp run upgrade:vite-plus`.
+  pnpm won't install a release less than a day old, so upgrade a day after it comes out.
+- **Void:** change `void`, `@void/md` and `@void/react` in the catalog in `pnpm-workspace.yaml`,
+  then `vp install`. Run `vp run check:tools` to see what the new Void wants, and `void init` in
+  `apps/example` (it asks about the database: D1) to refresh its section of `AGENTS.md`.
+- **Node:** change `.node-version`, then `mise install`.
+
+Then `vp check`, `vp test run` and `vp run test:fresh`.
+
+## Releasing
+
+Raise `version` in `packages/void-fbtee/package.json` and push to main. Once CI passes, it tags
+`v<version>` and makes the GitHub release.
 
 ## License
 

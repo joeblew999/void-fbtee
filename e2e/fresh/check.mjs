@@ -8,10 +8,11 @@
 //   node e2e/fresh/check.mjs vite-plus    a `void init --toolchain vite-plus` app
 //   node e2e/fresh/check.mjs vite         a `void init --toolchain vite` app
 //
-// e2e/fresh/<toolchain>/ holds what `void init` made (package.json with exact versions,
-// vite.config.ts with @void/md added, void.config.ts, tsconfig.json, AGENTS.md). Both use pnpm:
-// a git dependency on a folder inside a repo (`path:`) is a pnpm feature npm doesn't have. There
-// are no lockfiles in this repo; pnpm would insist on one in CI unless told otherwise.
+// Each app is made fresh by `void init`, the Void version this repo pins
+// (apps/example/node_modules/.bin/void), in an empty folder, as a user starts one. Both use
+// pnpm: a git dependency on a folder inside a repo (`path:`) is a pnpm feature npm doesn't have.
+// The plain-Vite app gets a pnpm-workspace.yaml first, which is how `void init` picks pnpm for a
+// new app (otherwise npm). There are no lockfiles in this repo; pnpm would insist on one in CI.
 import { execFileSync, spawn } from "node:child_process";
 import {
   cpSync,
@@ -45,6 +46,9 @@ const APPS = {
 // The builds `void init` allows on Vite+ (its pnpm-workspace.yaml), for the plain-Vite app too.
 const VOID_INIT_BUILDS = { "better-sqlite3": false, esbuild: true, sharp: true, workerd: true };
 
+const VOID = join(root, "apps/example/node_modules/.bin/void");
+const VOID_INIT = ["init", "--framework", "react", "--starter", "static", "--deploy", "none"];
+
 const run = (cmd, args, cwd, options = {}) => {
   console.error(`\n$ (${cwd.replace(root, ".")}) ${cmd} ${args.join(" ")}`);
   return execFileSync(cmd, args, {
@@ -74,10 +78,12 @@ for (const target of targets) {
   if (!app) throw new Error(`usage: node e2e/fresh/check.mjs [vite-plus|vite] (got ${target})`);
   const dir = join(work, `fresh-${target}`);
   rmSync(dir, { recursive: true, force: true });
-  cpSync(join(root, "e2e/fresh", target), dir, { recursive: true });
+  mkdirSync(dir, { recursive: true });
   // Its own git repo, as a real app is: tools that honour .gitignore (Oxlint) would otherwise
   // skip it, since this repo ignores .e2e-work/.
   run("git", ["init", "--quiet"], dir);
+  if (target === "vite") allowBuild(dir); // pnpm, for `void init` (see the top of this file)
+  run(VOID, [...VOID_INIT, "--toolchain", target], dir);
   allowBuild(dir, `void-fbtee@${repo}`);
   const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
   pkg.dependencies["void-fbtee"] = dependency;
@@ -111,14 +117,17 @@ for (const target of targets) {
   await checkDev(target, dir, app);
 }
 
-/** The README's allowBuilds line (pnpm only runs an approved git dependency's build). */
+/**
+ * pnpm-workspace.yaml's allowBuilds: with `spec`, the README's line (pnpm only runs an approved
+ * git dependency's build); without, the file `void init` writes on Vite+, for the plain-Vite app.
+ */
 function allowBuild(dir, spec) {
   const file = join(dir, "pnpm-workspace.yaml");
-  if (existsSync(file)) {
+  if (spec) {
     const text = readFileSync(file, "utf8");
     writeFileSync(file, text.replace("allowBuilds:\n", `allowBuilds:\n  "${spec}": true\n`));
   } else {
-    const builds = Object.entries({ [spec]: true, ...VOID_INIT_BUILDS });
+    const builds = Object.entries(VOID_INIT_BUILDS);
     writeFileSync(file, `allowBuilds:\n${builds.map(([k, v]) => `  "${k}": ${v}`).join("\n")}\n`);
   }
 }

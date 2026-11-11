@@ -37,8 +37,9 @@ export async function text(page: Page, id: string) {
 }
 
 /** Wait until `[data-testid=id]` shows `want` (live reload, hydration). */
-export const seeText = (page: Page, id: string, want: string, timeout = 5000) =>
-  expect.poll(() => page.getByTestId(id).textContent(), { timeout }).toBe(want);
+export async function seeText(page: Page, id: string, want: string, timeout = 5000) {
+  await expect.poll(() => page.getByTestId(id).textContent(), { timeout }).toBe(want);
+}
 
 /**
  * Wait for an island (by the end of its name; any island without one) to hydrate. Each island

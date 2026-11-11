@@ -2,12 +2,15 @@
   "name": "void-fbtee-repo",
   "private": true,
   "type": "module",
+  "scripts": {
+    "prepare": "vp config"
+  },
   "devDependencies": {
     "@nkzw/eslint-plugin-fbtee": "5.0.0",
     "@types/node": "26.6.6",
     "playwright": "1.65.0",
-    "vite": "npm:@voidzero-dev/vite-plus-core@1.5.1",
-    "vite-plus": "1.5.1",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
     "void-fbtee": "workspace:*"
   },
   "packageManager": "pnpm@12.18.0"

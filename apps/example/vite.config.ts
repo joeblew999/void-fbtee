@@ -7,14 +7,13 @@ import voidFbtee from "void-fbtee/vite";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  // `vp run <task>` here (or `vp run example#<task>` from anywhere). Each first rebuilds void-fbtee
-  // (its `build`), so the example always runs the package as it is in the repo.
+  // `vp run <task>` here (or `vp run example#<task>` from anywhere). `build` is Void's script in
+  // package.json; `vp run -t example#build` builds void-fbtee first.
   run: {
     tasks: {
-      build: { command: "vp build", dependsOn: [{ task: "build", from: "dependencies" }] },
       // Sign in to Cloudflare (void keeps the sign-in in the system keyring).
       login: { command: "void cloudflare login", cache: false },
-      // Deploy to Cloudflare: https://void-fbtee-example.gedw99.workers.dev
+      // Deploy to Cloudflare: https://void-fbtee-example.gedw99.workers.dev (void-fbtee built first).
       deploy: {
         command: "void deploy --platform cloudflare",
         cache: false,

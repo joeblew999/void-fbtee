@@ -26,5 +26,6 @@
     "queues",
     "db",
     "i18n"
-  ]
+  ],
+  "files": ["./.void/routes.d.ts"]
 }
