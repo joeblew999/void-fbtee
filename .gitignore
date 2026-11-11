@@ -7,8 +7,6 @@ dist/
 .e2e-work/
 source_strings.json
 .enum_manifest.json
-test-results/
-playwright-report/
 # No lockfiles: dependencies are pinned exactly in package.json instead (plan #1).
 pnpm-lock.yaml
 package-lock.json

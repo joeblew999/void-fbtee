@@ -22,9 +22,9 @@ Every day:
 ```sh
 vp run dev               # develop: the package rebuilds on save, the example runs
 vp check                 # format, lint, types
-vp test run              # every test, on a local build; log: test-results/junit.xml
+vp test run              # every test, on a local build; report: .vitest/index.html
 vp run deploy            # deploy the example to production (Cloudflare); log: ~/.void/logs/
-vp run test:production   # every test, against production; log: test-results/junit.xml
+vp run test:production   # every test, against production; report: .vitest/index.html
 ```
 
 Translations (from `apps/example`):
