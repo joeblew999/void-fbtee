@@ -34,7 +34,7 @@ test("ar-EG: right-to-left, Arabic digits and Arabic text in islands", async () 
   expect(errors).toEqual([]);
 });
 
-test("docs: the package's own docs as markdown pages, one set per language", async () => {
+test("docs: markdown pages, one set per language", async () => {
   const p = await page();
   for (const locale of ["en-US", "th-TH", "ar-EG"]) {
     await p.goto(`/${locale}/docs`);

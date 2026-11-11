@@ -38,7 +38,7 @@ const AGENTS_BLOCK = `${AGENTS_START}
 ## void-fbtee (i18n)
 
 - This app is translated with [void-fbtee](https://github.com/joeblew999/void-fbtee): fbtee strings, Temporal dates, Intl formatting.
-- For anything about translations, read \`${SKILL}\` first; it routes to the guides in \`node_modules/void-fbtee/docs/\`.
+- For anything about translations, read \`${SKILL}\` first.
 - To translate new strings and pages, run the \`i18n:translate\` script (or ask: "translate the app"). To see what's missing, run \`i18n:check\`.
 
 ${AGENTS_END}`;

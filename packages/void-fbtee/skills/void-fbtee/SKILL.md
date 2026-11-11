@@ -5,8 +5,8 @@ description: Translate a Void app that uses void-fbtee (fbtee strings in i18n/tr
 
 # Translate a Void app with void-fbtee
 
-The docs ship next to this skill, in `node_modules/void-fbtee/docs/`. Commands: `void-fbtee --help`
-(run them through the app's package manager, e.g. `pnpm exec void-fbtee check`).
+Commands: `void-fbtee --help` (run them through the app's package manager, e.g.
+`pnpm exec void-fbtee check`).
 
 ## Strings
 
@@ -17,16 +17,49 @@ The docs ship next to this skill, in `node_modules/void-fbtee/docs/`. Commands: 
 2. Translate every entry with `"status": "new"` by fbtee's own skill:
    `node_modules/fbtee/skills/fbtee-translate/SKILL.md`. Follow its steps 3 to 5 (match the
    locale's existing style, read each description and the source, keep placeholders exactly, then
-   mark the entry done). In these catalogs a finished entry has `"status": "translated"`. A string
-   with a count has one line per plural form; fill each in that form's grammar
-   (`docs/strings.md`, "Plurals").
-3. Then read `docs/strings.md` for what's specific to Void apps: fbtee's built-in strings,
-   right-to-left locales, and the source locale.
+   mark the entry done).
+3. What's specific to void-fbtee apps is below.
+
+**Where things are.** Catalogs: `i18n/translations/<locale>.json`, one per locale except the source
+locale; `prepare` writes them, you edit them, nothing else under `i18n/`. Locales:
+`voidFbtee({ sourceLocale, locales })` in `vite.config.ts`. The source locale (the code's language)
+has no catalog: its text comes from the code.
+
+**A finished entry.** Set the text in `translations[0].translation`, keep every `{placeholder}`
+exactly as written, and change `"status": "new"` to `"status": "translated"`. Leave `tokens`,
+`types` and the hash keys as they are.
+
+**Plurals.** A string with a count has one line per plural form the language uses (`prepare` adds
+them; fbtee's own prepare-translations doesn't). Each line's `variations` names its form by
+fbtee's code: 16 zero, 4 one, 8 two, 20 few, 12 many, 24 other. Write each line in that form's
+grammar; the form a count falls in is `new Intl.PluralRules(locale).select(n)`, the rule fbtee's
+runtime uses. A form may leave out `{number}` where the language does (Arabic two: "ليلتان").
+Don't add or remove lines. A `<fbt:plural>` also comes as a separate entry for exactly 1 ("1 night"
+next to "{number} nights"): translate both.
+
+**fbtee's built-in strings.** Every catalog has 12 from fbtee (`fbtee/Strings.json`): how `list()`
+joins items and number labels ("{number}+"). Use the locale's own conventions; for the list
+strings, CLDR's, which `Intl.ListFormat` prints (`new Intl.ListFormat("ar-EG").format(["A","B","C"])`
+is `A وB وC`: no commas). `{ type: "disjunction" }` gives the "or" lists.
+
+**Right-to-left locales** (`ar-EG`): void-fbtee sets `<html dir="rtl">`, so write natural text with
+no direction marks (U+200E, U+200F).
 
 ## Markdown pages
 
-Pages under `pages/<source locale>/` (blog posts, marketing pages) have a copy per locale under
-`pages/<locale>/`. Read `docs/markdown-pages.md` before translating one.
+Pages under `pages/<source locale>/` have a copy per locale at the same path under
+`pages/<locale>/` (the locale's URL segment). Translate the whole file:
+
+- **Translate:** headings, paragraphs, lists, link text, image alt text, and frontmatter values
+  meant for people (`title`, `description`). Keep the keys, and values that are data (dates,
+  numbers, slugs, file names).
+- **Keep exactly:** the `<script>` block at the top (first in the file; its import paths stay the
+  same), components and islands with their props, code blocks, inline code, URLs, HTML
+  attributes, and the page's structure (same headings in the same order).
+- **translatedFrom:** each translated page records the original it came from in its frontmatter.
+  Don't write it yourself: `void-fbtee translate` records it, and after a hand translation run
+  `void-fbtee stamp pages/<locale>/<path>.md`. For a page `check` reports out of date, compare it
+  with the original and change only what changed.
 
 ## Finish
 
@@ -36,4 +69,16 @@ itself. Report one line per file: done, or what's left and why.
 
 ## Setup problems
 
-If check reports `setup:` problems, read `docs/setup.md`. `void-fbtee init` fixes most of them.
+If check reports `setup:` problems, `void-fbtee init` fixes most of them (it only adds what's
+missing; where it can't safely edit a file it prints the line to add). The pieces:
+
+- `voidFbtee({ sourceLocale, locales })` from `void-fbtee/vite`, first in `plugins` in
+  `vite.config.ts`.
+- `middleware/99.i18n.ts`: `export { default } from "void-fbtee/middleware";`.
+- `pages/layout.tsx` wraps its children in `<I18nProvider>` from `void-fbtee/react`.
+- `worker: { compatibility_flags: ["temporal"] }` in `void.config.ts`.
+- tsconfig: `"fbtee/ReactTypes"` in `compilerOptions.types`; `"lib"` with `ES2025`, `DOM`,
+  `DOM.Iterable`.
+- Vite+: `lint.jsPlugins` with `@nkzw/eslint-plugin-fbtee` and `void-fbtee/lint` in the
+  workspace root's `vite.config.ts` (`init` prints the rules).
+- Scripts `i18n:prepare`, `i18n:check`, `i18n:translate`; a void-fbtee section in `AGENTS.md`.
