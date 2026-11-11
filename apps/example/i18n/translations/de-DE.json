@@ -64,26 +64,50 @@
     "IYUmtYxQtGdt1MucjXrsVA==": {
       "description": "Label with meaning 'at least number'",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
           "translation": "{number}+",
-          "variations": {}
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "{number}+",
+          "variations": {
+            "0": 24
+          }
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "ZIF1WhVQwt7WZJvFTEbMWw==": {
       "description": "Label with meaning 'less than number'",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
           "translation": "<{number}",
-          "variations": {}
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "<{number}",
+          "variations": {
+            "0": 24
+          }
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "Oc/9PrbjfyLHS60BXceD1A==": {
       "description": "A list of items of various types, for example: \"San Francisco; London; Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",

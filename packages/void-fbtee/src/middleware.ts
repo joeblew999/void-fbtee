@@ -4,9 +4,10 @@
 //   export { default } from "void-fbtee/middleware";
 //
 // - The locale comes from the first URL segment (/th-TH/...). "/" redirects to the best locale
-//   for Accept-Language, uncached and per-browser.
+//   for Accept-Language, by fbtee's own matching (negotiate.ts), uncached and per-browser.
 // - fbtee's per-request state is held by fbtee itself in AsyncLocalStorage (runWithFbtee), so
-//   text rendered after the shell streams in the right language too.
+//   text rendered after the shell streams in the right language too. It gets every catalog, so
+//   fbtee falls back per message (de-AT -> de -> source text) as its README describes.
 // - shared.i18n = { locale, dir, now }: the browser gets the same "now" the server rendered with.
 // - <html lang dir>, hreflang alternates and <meta name="void-fbtee"> (the same i18n data, for
 //   islands) go into headDefaults.
@@ -15,7 +16,9 @@ import { runWithFbtee } from "fbtee/server";
 import { Temporal } from "temporal-polyfill";
 import config from "virtual:void-fbtee/config";
 import catalogs from "virtual:void-fbtee/catalogs";
-import { localeFromPath, negotiate, META_NAME, type Dir } from "./locales";
+import { localeFromPath, META_NAME, type Dir } from "./locales";
+import { bestLocale } from "./negotiate";
+import { allTranslations } from "./runtime";
 
 export interface SharedI18n {
   locale: string;
@@ -34,7 +37,7 @@ export default defineMiddleware(async (c, next) => {
 
   const found = localeFromPath(path, config);
   if (!found && path === "/" && !light) {
-    const best = negotiate(c.req.header("accept-language"), config);
+    const best = bestLocale(c.req.header("accept-language"), config);
     c.header("Cache-Control", "private, no-store");
     c.header("Vary", "Accept-Language");
     return c.redirect(`/${best.segment}`, 302);
@@ -69,14 +72,10 @@ export default defineMiddleware(async (c, next) => {
       meta: [...(head.meta ?? []), { name: META_NAME, content: JSON.stringify(i18n) }],
     } as never,
   );
-  // No catalog for light requests, but still inside fbtee state, so a not-found page with <fbt> renders.
-  const sourceLocale = config.sourceLocale;
-  if (light)
-    return runWithFbtee({ locale: current.locale, sourceLocale, translations: {} }, () => next());
-  const load = catalogs[current.locale];
-  const translations = load ? (await load()).default : {};
-  await runWithFbtee(
-    { locale: current.locale, sourceLocale, translations: translations as never },
-    () => next(),
+  // No catalogs for light requests, but still inside fbtee state, so a not-found page with <fbt> renders.
+  const { sourceLocale, fallbackLocales } = config;
+  const translations = light ? {} : await allTranslations(catalogs);
+  return runWithFbtee({ locale: current.locale, sourceLocale, fallbackLocales, translations }, () =>
+    next(),
   );
 });

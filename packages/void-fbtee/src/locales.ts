@@ -53,28 +53,5 @@ export function localeFromPath(path: string, config: LocaleConfig): Locale | und
   return config.locales.find((l) => l.segment === segment);
 }
 
-/** The best locale for an Accept-Language header: exact tag first, then the same language. */
-export function negotiate(acceptLanguage: string | undefined | null, config: LocaleConfig): Locale {
-  const wanted = (acceptLanguage ?? "")
-    .split(",")
-    .map((part) => {
-      const [tag, ...params] = part.trim().split(";");
-      const q = params.find((p) => p.trim().startsWith("q="));
-      return { tag: tag?.trim() ?? "", q: q ? Number(q.trim().slice(2)) : 1 };
-    })
-    .filter((w) => w.tag && w.tag !== "*" && w.q > 0)
-    .sort((a, b) => b.q - a.q);
-  for (const { tag } of wanted) {
-    const exact = config.locales.find((l) => l.locale.toLowerCase() === tag.toLowerCase());
-    if (exact) return exact;
-    const language = tag.split("-")[0]!.toLowerCase();
-    const sameLanguage = config.locales.find(
-      (l) => l.locale.split("-")[0]!.toLowerCase() === language,
-    );
-    if (sameLanguage) return sameLanguage;
-  }
-  return config.locales.find((l) => l.locale === config.sourceLocale)!;
-}
-
 /** Name of the <meta> tag the middleware writes the page's i18n data into, for islands. */
 export const META_NAME = "void-fbtee";

@@ -16,14 +16,44 @@
     "W2S4HeMOJcq2xOy3+nXfaw==": {
       "description": "Text rendered from deferred loader data",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
-          "translation": "لاحقًا: عدد الليالي المتبقية {number}",
-          "variations": {}
+          "translation": "لاحقًا: لم تتبقَّ أي ليلة",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "لاحقًا: تبقّت ليلتان",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "لاحقًا: تبقّت {number} ليالٍ",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "لاحقًا: تبقّت {number} ليلة",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "لاحقًا: تبقّت {number} ليلة",
+          "variations": {
+            "0": 24
+          }
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "HEbq6lwochMG+bINu8ib4w==": {
       "description": "Text rendered from deferred loader data",
@@ -52,14 +82,44 @@
     "d20AdENCUCFEupNI3bkyqg==": {
       "description": "How many nights are booked",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
-          "translation": "عدد الليالي التي حجزتها: {number}",
-          "variations": {}
+          "translation": "لم تحجز أي ليلة",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "حجزت ليلتين",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "حجزت {number} ليالٍ",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "حجزت {number} ليلة",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "حجزت {number} ليلة",
+          "variations": {
+            "0": 24
+          }
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "firIdTpNp5HR3/x49jpnZA==": {
       "description": "How many nights are booked",
@@ -112,14 +172,44 @@
     "tM77ujLuxM2vdLYjDoWThA==": {
       "description": "Seats left, island",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
-          "translation": "المقاعد المتبقية: {number}",
-          "variations": {}
+          "translation": "لم يتبقَّ أي مقعد",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "تبقّى مقعدان",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "تبقّت {number} مقاعد",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "تبقّى {number} مقعدًا",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "تبقّى {number} مقعد",
+          "variations": {
+            "0": 24
+          }
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "l617jlL65guL4frUlrxOCw==": {
       "description": "Seats left, island",
@@ -172,26 +262,98 @@
     "IYUmtYxQtGdt1MucjXrsVA==": {
       "description": "Label with meaning 'at least number'",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
           "translation": "{number}+",
-          "variations": {}
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "{number}+",
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "{number}+",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "{number}+",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "{number}+",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "{number}+",
+          "variations": {
+            "0": 24
+          }
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "ZIF1WhVQwt7WZJvFTEbMWw==": {
       "description": "Label with meaning 'less than number'",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
           "translation": "<{number}",
-          "variations": {}
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "<{number}",
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "<{number}",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "<{number}",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "<{number}",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "<{number}",
+          "variations": {
+            "0": 24
+          }
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "Oc/9PrbjfyLHS60BXceD1A==": {
       "description": "A list of items of various types, for example: \"San Francisco; London; Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",

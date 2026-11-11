@@ -3,16 +3,17 @@
 // if the page was prerendered and cached.
 import { fbt } from "fbtee";
 import { Temporal } from "temporal-polyfill";
-import { useIntl, useNow } from "void-fbtee/react";
+import { useLocale, useNow } from "void-fbtee/react";
+import { relativeDays } from "../../../lib/relative-days";
 
 export default function Countdown({ launch }: { launch: string }) {
-  const intl = useIntl();
+  const { locale } = useLocale();
   const now = useNow();
   const at = Temporal.ZonedDateTime.from(launch);
   return (
     <p data-testid="countdown">
       <fbt desc="When the launch is, relative to today">
-        Launch: <fbt:param name="when">{intl.relativeDays(at, undefined, now)}</fbt:param>
+        Launch: <fbt:param name="when">{relativeDays(locale, at, now)}</fbt:param>
       </fbt>
     </p>
   );

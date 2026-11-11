@@ -1,6 +1,6 @@
 // Marketing page in islands mode: static HTML, only <Signup> hydrates.
 import { fbt } from "fbtee";
-import { useIntl } from "void-fbtee/react";
+import { useLocale } from "void-fbtee/react";
 import { Temporal } from "temporal-polyfill";
 import Signup from "./_Signup" with { island: "load" };
 import Countdown from "./_Countdown" with { island: "visible" };
@@ -8,14 +8,14 @@ import Countdown from "./_Countdown" with { island: "visible" };
 const launch = Temporal.ZonedDateTime.from("2026-12-24T19:30:00+07:00[Asia/Bangkok]");
 
 export default function About() {
-  const intl = useIntl();
+  const { locale } = useLocale();
   return (
     <main>
       <h1 data-testid="about-title">
         <fbt desc="Marketing page heading">Book a table in seconds</fbt>
       </h1>
       <p data-testid="about-static-date">
-        {intl.date(launch, { dateStyle: "full", timeStyle: "short" })}
+        {launch.toLocaleString(locale, { dateStyle: "full", timeStyle: "short" })}
       </p>
       <Signup seats={4} />
       <Countdown launch={launch.toString()} />
