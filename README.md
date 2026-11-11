@@ -38,7 +38,7 @@ pnpm run i18n:translate
 ## This repo
 
 - `packages/void-fbtee`: the package
-- `apps/example`: a Void app using it, in three languages, live at https://void-fbtee-example.gedw99.workers.dev
+- `apps/example`: a Void app using it, in three languages, in production at https://void-fbtee-example.gedw99.workers.dev
 - `e2e/`: the browser tests and the fresh-install check
 
 It runs on [Vite+](https://viteplus.dev). Install its `vp` once per machine
