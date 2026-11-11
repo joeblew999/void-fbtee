@@ -11,7 +11,6 @@ const page = browser("dev");
 const catalog = (locale: string) => join(EXAMPLE, "i18n/translations", `${locale}.json`);
 // The home page heading, "i18n for Void apps".
 const TITLE = "GT3+qur89p160RfLJ/9CmQ==";
-const RELOAD = 20_000;
 
 test("smoke: a translated page and an island", async () => {
   const p = await page();
@@ -35,12 +34,12 @@ test("editing a catalog updates the server and the open page", async () => {
     const json = JSON.parse(original);
     json.translations[TITLE].translations[0].translation = "i18n (แก้แล้ว)";
     writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
-    await seeText(p, "title", "i18n (แก้แล้ว)", RELOAD);
+    await seeText(p, "title", "i18n (แก้แล้ว)");
     expect(await (await fetch(url("dev") + "/th-TH")).text()).toContain("i18n (แก้แล้ว)");
   } finally {
     writeFileSync(file, original);
   }
-  await seeText(p, "title", "i18n สำหรับแอป Void", RELOAD);
+  await seeText(p, "title", "i18n สำหรับแอป Void");
   // The home page has a defer() line (plan #1, decision 8).
   expect(errors.filter((e) => !VOID_DEFER_MESSAGE.test(e))).toEqual([]);
 });
@@ -53,13 +52,13 @@ test("removing and putting back a locale's catalog", async () => {
   await p.waitForLoadState("networkidle");
   renameSync(file, file + ".off");
   try {
-    await seeText(p, "title", "i18n for Void apps", RELOAD);
+    await seeText(p, "title", "i18n for Void apps");
     // Removing a catalog reloads the page; let that load finish before the next change.
     await p.waitForLoadState("networkidle");
   } finally {
     renameSync(file + ".off", file);
   }
-  await seeText(p, "title", "تدويل تطبيقات Void", RELOAD);
+  await seeText(p, "title", "تدويل تطبيقات Void");
   // The home page has a defer() line (plan #1, decision 8).
   expect(errors.filter((e) => !VOID_DEFER_MESSAGE.test(e))).toEqual([]);
 });
@@ -75,12 +74,12 @@ test("the browser console names each string a page shows untranslated", async ()
     delete json.translations[TITLE];
     writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
     await p.goto("/th-TH");
-    await seeText(p, "title", "i18n for Void apps", RELOAD);
+    await seeText(p, "title", "i18n for Void apps");
     await expect
       .poll(() => warnings)
       .toContain('void-fbtee: no th-TH translation for "i18n for Void apps"');
   } finally {
     writeFileSync(file, original);
   }
-  await seeText(p, "title", "i18n สำหรับแอป Void", RELOAD);
+  await seeText(p, "title", "i18n สำหรับแอป Void");
 });

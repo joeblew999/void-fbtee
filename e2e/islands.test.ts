@@ -36,14 +36,16 @@ test("ar-EG: right-to-left, Arabic digits and Arabic text in islands", async () 
 
 test("docs: markdown pages, one set per language", async () => {
   const p = await page();
-  for (const locale of ["en-US", "th-TH", "ar-EG"]) {
+  const sidebar = async (locale: string) => {
     await p.goto(`/${locale}/docs`);
     const links = p.getByTestId("docs-pages").locator("a");
     await links.first().waitFor();
-    expect(await links.evaluateAll((as) => as.map((a) => a.getAttribute("href")))).toEqual(
-      ["markdown-pages", "setup", "strings"].map((page) => `/${locale}/docs/${page}`),
-    );
-  }
+    return links.evaluateAll((as) => as.map((a) => a.getAttribute("href")!));
+  };
+  // Each language's sidebar lists its own pages, and the same pages in every language.
+  const english = (await sidebar("en-US")).map((h) => h.replace("/en-US/", "/"));
+  for (const locale of ["th-TH", "ar-EG"])
+    expect((await sidebar(locale)).map((h) => h.replace(`/${locale}/`, "/"))).toEqual(english);
   await p.goto("/th-TH/docs/strings");
   expect(await p.locator("h1").textContent()).toContain("การแปลข้อความในแอป Void");
   await p.goto("/en-US/docs/strings");

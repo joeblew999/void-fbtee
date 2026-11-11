@@ -9,12 +9,11 @@ const root = join(import.meta.dirname, "..");
 export const EXAMPLE = join(root, "apps/example");
 const PORTS = { prod: 4273, dev: 5273 };
 
-const run = (args: string[], cwd: string) =>
-  execFileSync("pnpm", ["exec", ...args], { cwd, stdio: "inherit" });
+const run = (args: string[], cwd: string) => execFileSync("vp", args, { cwd, stdio: "inherit" });
 
 /** Start a server and wait until it answers; --strictPort makes a taken port fail, not move. */
 async function start(args: string[], url: string): Promise<ChildProcess> {
-  const child = spawn("pnpm", ["exec", ...args, "--strictPort"], {
+  const child = spawn("vp", [...args, "--strictPort"], {
     cwd: EXAMPLE,
     stdio: ["ignore", "ignore", "inherit"],
     detached: true,
@@ -31,17 +30,17 @@ async function start(args: string[], url: string): Promise<ChildProcess> {
 
 export default async function setup(project: TestProject) {
   // The example's build, and before it void-fbtee's (Vite+'s transitive run: -t).
-  run(["vp", "run", "-t", "example#build"], root);
+  run(["run", "-t", "example#build"], root);
   const prod = `http://localhost:${PORTS.prod}`;
   const dev = `http://localhost:${PORTS.dev}`;
   const servers = [
-    await start(["vp", "preview", "--port", String(PORTS.prod)], `${prod}/en-US`),
-    await start(["vp", "dev", "--port", String(PORTS.dev)], `${dev}/en-US`),
+    await start(["preview", "--port", String(PORTS.prod)], `${prod}/en-US`),
+    await start(["dev", "--port", String(PORTS.dev)], `${dev}/en-US`),
   ];
   project.provide("prod" as never, prod as never);
   project.provide("dev" as never, dev as never);
   return () => {
-    // Each server runs in its own process group (detached): stop pnpm and what it started.
+    // Each server runs in its own process group (detached): stop vp and what it started.
     for (const s of servers) if (s.pid) process.kill(-s.pid, "SIGTERM");
   };
 }

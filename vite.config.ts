@@ -60,9 +60,6 @@ export default defineConfig({
           include: ["e2e/*.test.ts"],
           globalSetup: ["e2e/setup.ts"],
           pool: "forks",
-          // Browser tests wait on page loads and dev reloads; Vitest's 5 s default is for unit
-          // tests (void's integration project sets its own too).
-          testTimeout: 60_000,
         },
       },
     ],
