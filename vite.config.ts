@@ -69,6 +69,8 @@ export default defineConfig({
           // happens leaves the test unfinished, and its name says where.
           testTimeout: 0,
           hookTimeout: 0,
+          // One file after another, in order.
+          fileParallelism: false,
         },
       },
     ],
