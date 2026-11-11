@@ -84,12 +84,7 @@ for (const target of targets) {
   run(app.pm, app.install, dir);
 
   const installed = realpathSync(join(dir, "node_modules/void-fbtee"));
-  for (const f of [
-    "dist/vite.mjs",
-    "dist/lint.mjs",
-    "skills/void-fbtee/SKILL.md",
-    "docs/strings.md",
-  ])
+  for (const f of ["dist/vite.mjs", "dist/lint.mjs", "skills/void-fbtee/SKILL.md"])
     check(existsSync(join(installed, f)), `${target}: the package has ${f}`);
   check(
     run(app.pm, ["exec", "--", "void-fbtee", "--help"], dir, { capture: true }).includes(
@@ -101,7 +96,6 @@ for (const target of targets) {
   // The example's locales; init adds the plugin, middleware, flags, scripts and peers.
   run(app.pm, ["exec", "--", "void-fbtee", "init", "--locales", "ar-EG,th-TH"], dir);
   run(app.pm, app.install, dir);
-  // dereference: the example's English docs are symlinks to the package's docs/.
   for (const item of ["pages", "components", "routes", "lib", "i18n", "public"])
     cpSync(join(root, "apps/example", item), join(dir, item), {
       recursive: true,

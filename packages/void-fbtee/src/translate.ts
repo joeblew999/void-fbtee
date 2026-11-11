@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import { catalogFile, missing, type Project } from "./catalogs";
 import { markdownHash, markdownPages, TRANSLATED_FROM, type MarkdownPage } from "./check";
 
-/** void-fbtee's own folder (dist/ is one level down), where skills/ and docs/ ship. */
+/** void-fbtee's own folder (dist/ is one level down), where skills/ ships. */
 export const packageDir = () => dirname(dirname(fileURLToPath(import.meta.url)));
 
 /** The skill as the app sees it: through node_modules if it's installed there. */

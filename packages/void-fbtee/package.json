@@ -8,8 +8,7 @@
   },
   "files": [
     "dist",
-    "skills",
-    "docs"
+    "skills"
   ],
   "type": "module",
   "exports": {

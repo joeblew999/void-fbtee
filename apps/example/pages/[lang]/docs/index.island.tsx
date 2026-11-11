@@ -1,6 +1,5 @@
-// The docs index for one language: void-fbtee's own docs, as markdown pages under
-// /<locale>/docs/ (Void's @void/md pages list). The English pages are the package's docs/ files
-// themselves; the other languages are their translations.
+// The docs index for one language: void-fbtee's docs, as markdown pages under /<locale>/docs/
+// (Void's @void/md pages list). English is the original; the other languages are translations.
 import { fbt } from "fbtee";
 import pages from "@void/md/pages";
 import { useLocale } from "void-fbtee/react";
