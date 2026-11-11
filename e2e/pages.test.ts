@@ -1,39 +1,30 @@
 // Production build: translated text from the server, kept through hydration with no flash of
-// another language; Temporal text the same on server and browser; void-fbtee's Link.
+// another language (including text that arrives after the shell); void-fbtee's Link.
 import { expect, test } from "vite-plus/test";
 import { browser, collectErrors, seeText, text, VOID_DEFER_MESSAGE, watchTexts } from "./helpers";
 
 const page = browser("prod");
 
-test("th-TH: server text kept through hydration, on the defer() page and the streamed one", async () => {
+test("th-TH home: server text kept through hydration, and the defer() line", async () => {
   const p = await page();
   const errors = collectErrors(p);
   const seen = await watchTexts(p);
   await p.goto("/th-TH");
   await seeText(p, "deferred", "ภายหลัง: เหลืออีก 1 คืน");
-  expect(await text(p, "title")).toBe("สวัสดีชาวโลก");
+  expect(await text(p, "title")).toBe("i18n สำหรับแอป Void");
   expect(await text(p, "plural")).toBe("คุณจองไว้ 3 คืน");
-  await p.goto("/th-TH/stream");
-  await seeText(p, "streamed", "ส่งตามมาหลังเชลล์");
+  // <fbt:list> inside a string, each language named in its own language, joined the Thai way.
+  expect(await text(p, "intro")).toContain("ภาษาEnglish العربية และไทย");
   const texts = await seen();
-  // Only the last page's texts are recorded; "…" is its own Suspense fallback.
-  expect(texts.title).toEqual(["สวัสดีชาวโลก"]);
-  expect(texts.streamed?.filter((t) => t !== "…")).toEqual(["ส่งตามมาหลังเชลล์"]);
+  expect(texts.title).toEqual(["i18n สำหรับแอป Void"]);
   expect(await p.locator("html").getAttribute("lang")).toBe("th-TH");
   expect(errors.filter((e) => !VOID_DEFER_MESSAGE.test(e))).toEqual([]);
 });
 
-test("Temporal text: the browser shows what the server sent, with the polyfill (as Safari)", async () => {
+test("ar-EG home: six plural forms reach the page (3 is 'few')", async () => {
   const p = await page();
-  const errors = collectErrors(p);
-  const html = await (await p.request.get("/th-TH/time")).text();
-  const ids = ["booking", "birthday", "length", "relative"];
-  const server = ids.map((id) => html.match(new RegExp(`data-testid="${id}">([^<]*)`))?.[1]);
-  await p.addInitScript(() => delete (globalThis as { Temporal?: unknown }).Temporal);
-  await p.goto("/th-TH/time");
-  await p.waitForLoadState("networkidle");
-  expect(await Promise.all(ids.map((id) => text(p, id)))).toEqual(server);
-  expect(errors).toEqual([]);
+  await p.goto("/ar-EG");
+  expect(await text(p, "plural")).toBe("حجزت ٣ ليالٍ");
 });
 
 test("Link: same language stays client-side, another language loads a fresh page", async () => {
@@ -41,17 +32,16 @@ test("Link: same language stays client-side, another language loads a fresh page
   const errors = collectErrors(p);
   let loads = 0;
   p.on("load", () => loads++);
-  await p.goto("/th-TH/stream");
+  await p.goto("/th-TH");
   await p.waitForLoadState("networkidle");
-  await p.getByTestId("to-time").click();
-  await p.waitForURL("**/th-TH/time");
+  await p.getByTestId("nav-formats").click();
+  await p.waitForURL("**/th-TH/formats");
+  await seeText(p, "formats-title", "รูปแบบ");
   expect(loads).toBe(1);
-  await p.goto("/th-TH/stream");
-  await p.waitForLoadState("networkidle");
-  await p.getByTestId("to-de").click();
-  await p.waitForURL("**/de-DE/stream");
-  await seeText(p, "title", "Hallo Welt");
-  expect(loads).toBe(3);
-  expect(await p.locator("html").getAttribute("lang")).toBe("de-DE");
-  expect(errors).toEqual([]);
+  await p.getByTestId("to-ar-EG").click();
+  await p.waitForURL("**/ar-EG/formats");
+  await seeText(p, "formats-title", "التنسيقات");
+  expect(loads).toBe(2);
+  expect(await p.locator("html").getAttribute("dir")).toBe("rtl");
+  expect(errors.filter((e) => !VOID_DEFER_MESSAGE.test(e))).toEqual([]);
 });

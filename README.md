@@ -27,7 +27,7 @@ Then:
 
 ```sh
 pnpm install
-pnpm exec void-fbtee init --locales th-TH,de-DE
+pnpm exec void-fbtee init --locales ar-EG,th-TH
 pnpm install
 pnpm run i18n:translate
 ```

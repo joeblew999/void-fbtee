@@ -16,7 +16,7 @@ import { use, useContext, useSyncExternalStore, type ReactNode, type ComponentPr
 import { Link as VoidLink, SharedContext } from "@void/react";
 import { Temporal } from "temporal-polyfill";
 import config from "virtual:void-fbtee/config";
-import { localeFromPath } from "./locales";
+import { localeFromPath, type Locale } from "./locales";
 import { install, documentI18n } from "./install";
 import type { SharedI18n } from "./middleware";
 
@@ -29,6 +29,11 @@ export function useLocale(): SharedI18n {
   if (!i18n)
     throw new Error("void-fbtee: shared.i18n is missing. Is middleware/99.i18n.ts set up?");
   return i18n;
+}
+
+/** Every locale the app serves, as configured in voidFbtee(): for a list of language links. */
+export function useLocales(): Locale[] {
+  return config.locales;
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
@@ -61,6 +66,19 @@ export function useNow(): Temporal.Instant {
   // React renders getServerSnapshot while hydrating, then re-renders with getSnapshot.
   return useSyncExternalStore(noSubscribe, browserNow, () => serverNow(now));
 }
+
+/**
+ * The viewer's time zone, for times shown "in your time". Only the browser knows it, so the server
+ * renders such times in UTC; while hydrating this is "UTC" too (the same text as the HTML), then
+ * the browser's own zone. A time that belongs to a place carries its own zone instead (a
+ * ZonedDateTime) and needs none of this.
+ */
+export function useTimeZone(): string {
+  return useSyncExternalStore(noSubscribe, browserZone, () => "UTC");
+}
+
+let zone: string | undefined;
+const browserZone = () => (zone ??= new Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC");
 
 const noSubscribe = () => () => {};
 let browserInstant: Temporal.Instant | undefined;

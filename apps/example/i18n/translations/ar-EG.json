@@ -1,18 +1,6 @@
 {
   "fb-locale": "ar-EG",
   "translations": {
-    "aUCfk9oc1MN7PJ4I0BHyug==": {
-      "description": "Like button on a blog post, with the number of likes",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "إعجاب ({count})",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "W2S4HeMOJcq2xOy3+nXfaw==": {
       "description": "Text rendered from deferred loader data",
       "status": "translated",
@@ -67,18 +55,6 @@
       ],
       "types": []
     },
-    "kpz/9JXVX1WbALbJcnrUZg==": {
-      "description": "Page title of the i18n spike",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "مرحبًا بالعالم",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "d20AdENCUCFEupNI3bkyqg==": {
       "description": "How many nights are booked",
       "status": "translated",
@@ -128,30 +104,6 @@
       "translations": [
         {
           "translation": "حجزت ليلة واحدة",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "kZ8tUgypNFMb+56B/BsSUA==": {
-      "description": "Text rendered in a server Suspense boundary after the shell",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "أُرسل بعد هيكل الصفحة",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "wxiY4YJ+LFjXL3IUKtVA2g==": {
-      "description": "Blog index heading",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "المدونة",
           "variations": {}
         }
       ],
@@ -242,18 +194,6 @@
       "translations": [
         {
           "translation": "احجز طاولة في ثوانٍ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "rJHk3Us1pHbxaGJ6GPfxRQ==": {
-      "description": "Label next to a night count",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "الليالي المحجوزة",
           "variations": {}
         }
       ],
@@ -470,6 +410,624 @@
       "translations": [
         {
           "translation": "{list of items}، {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dPy3hYVB2dPFPscaAj2iKg==": {
+      "description": "A number of nights, on the formats page",
+      "status": "translated",
+      "tokens": [
+        "number"
+      ],
+      "translations": [
+        {
+          "translation": "لا ليالٍ",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "ليلتان",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "{number} ليالٍ",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "{number} ليلة",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "{number} ليلة",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "xuQWvx85gGX4t7Bab6ti4w==": {
+      "description": "A number of nights, on the formats page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ليلة واحدة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UJgtSaU7QF5dQDZ9H/zZKQ==": {
+      "description": "A price, on the formats page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "السعر: {price}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bICo0CAkktQ7e4c4PRH+mA==": {
+      "description": "Navigation: the home page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الرئيسية",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "R4jcqfitTaXQtBWXOulzug==": {
+      "description": "Navigation: the page that shows every Intl format",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "التنسيقات",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EvLnLmDKXa53JMBjhXgIFw==": {
+      "description": "Navigation: the page made of islands",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الجزر",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "W7Yb3H5AslnfMK0Pjn0PJA==": {
+      "description": "Navigation: the documentation",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "التوثيق",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xK8CcaNhoEbqq8Qdaj0Eeg==": {
+      "description": "Formats section: dates and times",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "التواريخ والأوقات",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8oGPmzModUg11hNZQiv4+Q==": {
+      "description": "Formats section: named time zones",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المناطق الزمنية",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XZnQSCvU+4YgGV4ORBLegw==": {
+      "description": "Formats section: date ranges",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "نطاقات التواريخ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mm/jPxkw86Qjbod+p65slA==": {
+      "description": "Formats section: relative time, like 'yesterday'",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الوقت النسبي",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6bOPt/Bs423FOYAGDYQ8gA==": {
+      "description": "Formats section: numbers",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الأرقام",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zzVuqAcjcshE0Ke/M7RYEw==": {
+      "description": "Formats section: money",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "العملات",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4ljxiVRFN6owV7G215FsTQ==": {
+      "description": "Formats section: units of measure",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "وحدات القياس",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pV95SXQv9uiFI9Wjcs49ZQ==": {
+      "description": "Formats section: plural rules",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "قواعد الجمع",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tJNkWf4dL4jw/Q8LKbNQUA==": {
+      "description": "Formats section: lists of items",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "القوائم",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "q0uxRTPxZ7YwDSZrG7NxHw==": {
+      "description": "Formats section: lengths of time",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المدد الزمنية",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GADYUc99MpTtUWHaHrKG8g==": {
+      "description": "Formats section: names of languages, regions and currencies",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الأسماء",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Ye4CwOD9q9/iJMz08ThWVw==": {
+      "description": "Formats section: sorting text",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الترتيب",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EEoCQOG8umwoJ/5mErZwnA==": {
+      "description": "Formats section: splitting text into characters, words and sentences",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تقسيم النص",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xArmyAbDLEvGLr5K6C5T8w==": {
+      "description": "Formats section: facts about this page's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "هذه اللغة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iPPyqPwaRvOMWTeK7jE39g==": {
+      "description": "Formats section: everything this Intl supports",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "القيم المدعومة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LhxZTrRS+y9HK17fYWCi7g==": {
+      "description": "Formats section: dates with Temporal",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Temporal",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "e/f/c9uEWgjABfIvCg1SnQ==": {
+      "description": "Formats section: translated strings with fbtee",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "النصوص المترجمة (fbtee)",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TzX1YJ+LOB5Dhl6SX8ZtkA==": {
+      "description": "Formats page heading",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "التنسيقات",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RpKRzJVandAX+19QKPKCcw==": {
+      "description": "Formats page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "كل صف هو استدعاء واحد لـ Intl الخاص بالمنصة، بلغة هذه الصفحة. نفّذه الـ Worker قبل إرسال الصفحة، ثم نفّذه متصفحك مرة أخرى.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FbSCJUsAz2v5ZsAnATiLFw==": {
+      "description": "How many rows the browser formatted exactly as the Worker did",
+      "status": "translated",
+      "tokens": [
+        "total"
+      ],
+      "translations": [
+        {
+          "translation": "{same} من {total} صف متطابقة في متصفحك.",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "{same} من صف واحد متطابق في متصفحك.",
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "{same} من صفّين متطابقة في متصفحك.",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "{same} من {total} صفوف متطابقة في متصفحك.",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "{same} من {total} صفًا متطابقة في متصفحك.",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "{same} من {total} صف متطابقة في متصفحك.",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "Xhms5s6vepo0G7BKN0GyEg==": {
+      "description": "Where the times on the formats page are shown",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الأوقات أدناه هي {instant}، معروضة بتوقيت {zone}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sZwEotiBXWMmEcE7PyEKvA==": {
+      "description": "Formats table column: the code that was run",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الاستدعاء",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gZ38nGkAxQ9wR2vGJ/GUJg==": {
+      "description": "Formats table column: the result on the Cloudflare Worker",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الـ Worker",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wrFQCxDO/GnUEJd23Lia+g==": {
+      "description": "Formats table column: the result in the visitor's browser",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "متصفحك",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jFQA2JEUnikrWL/p4Txfag==": {
+      "description": "Page fact: the page's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "اللغة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CkCU4bauyg+jVEHoa2Fk9A==": {
+      "description": "Page fact: left-to-right or right-to-left",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الاتجاه",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "J1Y2wDzg2yV7wkG38nZwzA==": {
+      "description": "Page fact: the language's calendar",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "التقويم",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xRd4pHgDdS7AC2KFL8Hn+Q==": {
+      "description": "Page fact: the language's digits",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الأرقام",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oQw0ZzJP066VQTZfxnXdIg==": {
+      "description": "Page fact: 12- or 24-hour clock",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الساعة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6KalcWskNHrHPq/AqqMSZw==": {
+      "description": "Page fact: the visitor's time zone, from their browser",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "منطقتك الزمنية",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "35eUzHEgHoZEQ3Zuj5MDGA==": {
+      "description": "The same moment in the visitor's own time zone",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "بتوقيتك المحلي: {time}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jykOBYvEl6d3aJ2EOKWUtg==": {
+      "description": "Sample text to split into words",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تطبيقات Void تتحدث كل اللغات. وIntl يتولى الباقي.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CxtRZr/o8ROqM3C6xmkC9A==": {
+      "description": "Formats section where the visitor types a number and text",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "جرّبه",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "s9vH7nv/Pm4TLjvtmxE9sA==": {
+      "description": "Input label: a number, written the visitor's way",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "رقم، بطريقتك في الكتابة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0FRkzfQzZT20XMBogIPnDw==": {
+      "description": "Input label: any text",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "أي نص",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BIgbdupV3Hu8VKWr6212Yw==": {
+      "description": "Button: send the number and text to the server to format",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "نسّقه على الخادم",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GT3+qur89p160RfLJ/9CmQ==": {
+      "description": "Home page heading",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تدويل تطبيقات Void",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2PraAVUpYGeGFRtoUfZbqQ==": {
+      "description": "Home page introduction; languages is a list of language names",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "النصوص بواسطة fbtee، والتواريخ بواسطة Temporal، وكل ما عدا ذلك بواسطة Intl الخاص بالمنصة. هذا المثال متاح بـ{languages}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5w2wB/LokLMrSJDX7ET7xQ==": {
+      "description": "Docs index heading",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "التوثيق",
           "variations": {}
         }
       ],

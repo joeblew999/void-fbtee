@@ -1,9 +1,4 @@
 import { defineHandler } from "void";
 
-export const GET = defineHandler(() => {
-  return {
-    message: "Hello from Void",
-    framework: "React",
-    database: "D1",
-  };
-});
+// An API route: the void-fbtee middleware leaves it alone (no catalogs, no locale prefix).
+export const GET = defineHandler(() => ({ message: "Hello from Void" }));

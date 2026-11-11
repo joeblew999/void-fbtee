@@ -16,8 +16,8 @@ export function browser(mode: "prod" | "dev") {
     for (const c of contexts.splice(0)) await c.close();
   });
   afterAll(() => b?.close());
-  return async (): Promise<Page> => {
-    const context = await b.newContext({ baseURL: url(mode) });
+  return async (options: { timezoneId?: string; locale?: string } = {}): Promise<Page> => {
+    const context = await b.newContext({ baseURL: url(mode), ...options });
     contexts.push(context);
     return context.newPage();
   };

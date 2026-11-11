@@ -2,6 +2,7 @@
 import { fbt } from "fbtee";
 import { useLocale } from "void-fbtee/react";
 import { Temporal } from "temporal-polyfill";
+import Nav from "../../../components/Nav";
 import Signup from "./_Signup" with { island: "load" };
 import Countdown from "./_Countdown" with { island: "visible" };
 
@@ -11,6 +12,7 @@ export default function About() {
   const { locale } = useLocale();
   return (
     <main>
+      <Nav page="/about" />
       <h1 data-testid="about-title">
         <fbt desc="Marketing page heading">Book a table in seconds</fbt>
       </h1>
