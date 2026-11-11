@@ -57,6 +57,9 @@ export default defineConfig({
   // Vitest runs with Playwright's library, as voidzero-dev/void does. e2e/setup.ts builds once
   // and starts the production preview.
   test: {
+    // Every run's results in a file too (Vitest's own reporters): test-results/, which git ignores.
+    reporters: ["default", "junit"],
+    outputFile: { junit: "test-results/junit.xml" },
     projects: [
       "packages/void-fbtee",
       {
