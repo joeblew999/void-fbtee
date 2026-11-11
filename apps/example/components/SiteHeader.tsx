@@ -31,7 +31,7 @@ export default function SiteHeader() {
   const locales = useLocales();
   const current = PAGES.findLast((p) => (p === "" ? path === "" : path.startsWith(p))) ?? "";
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b bg-background">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 px-4">
         <Link
           href={`/${locale}` as never}
@@ -63,10 +63,12 @@ export default function SiteHeader() {
               hrefLang={l.locale}
               lang={l.locale}
               aria-current={l.locale === locale ? "true" : undefined}
-              className={buttonVariants({
-                variant: l.locale === locale ? "outline" : "ghost",
-                size: "sm",
-              })}
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "sm" }),
+                l.locale === locale
+                  ? "text-foreground underline decoration-brand decoration-2 underline-offset-8"
+                  : "text-muted-foreground",
+              )}
               data-testid={`to-${l.locale}`}
             >
               {new Intl.DisplayNames(l.locale, { type: "language" }).of(

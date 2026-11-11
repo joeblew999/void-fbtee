@@ -919,18 +919,6 @@
       ],
       "types": []
     },
-    "toZs8GPjojr+z/WYHXg3Ow==": {
-      "description": "Footer: the tools this example is built with (names, not translated)",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "مبني باستخدام Void وVite+ وfbtee وTemporal وshadcn/ui.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "p55uU35UBaT1/WQUayZJzg==": {
       "description": "Formats card heading: facts about this page's language",
       "status": "translated",
@@ -1442,6 +1430,30 @@
       "translations": [
         {
           "translation": "لغة الكتابة: {language}. جارٍ الترجمة…",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "daTaaxWObSJle3RqqEYtlQ==": {
+      "description": "Home page button: open the events app, the live demo",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "جرّب عرض الفعاليات",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LB5qRS7mqSOz2AWaPF1rHw==": {
+      "description": "Footer: the tools this example is built with; tools is a list of their names",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مبني باستخدام {tools}.",
           "variations": {}
         }
       ],

@@ -23,7 +23,7 @@ test("th-TH home: server text kept through hydration, and the defer() line", asy
   expect(await text(p, "title")).toBe("i18n สำหรับแอป Void");
   expect(await text(p, "plural")).toBe("คุณจองไว้ 3 คืน");
   // <fbt:list> inside a string, each language named in its own language, joined the Thai way.
-  expect(await text(p, "intro")).toContain("ภาษาEnglish العربية และไทย");
+  expect(await text(p, "intro")).toContain("ภาษา English العربية และไทย");
   const texts = await seen();
   expect(texts.title).toEqual(["i18n สำหรับแอป Void"]);
   expect(await p.locator("html").getAttribute("lang")).toBe("th-TH");

@@ -703,7 +703,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "ข้อความโดย fbtee วันที่โดย Temporal และที่เหลือทั้งหมดโดย Intl ของแพลตฟอร์มเอง ตัวอย่างนี้มีภาษา{languages}",
+          "translation": "ข้อความโดย fbtee วันที่โดย Temporal และที่เหลือทั้งหมดโดย Intl ของแพลตฟอร์มเอง ตัวอย่างนี้มีภาษา {languages}",
           "variations": {}
         }
       ],
@@ -716,18 +716,6 @@
       "translations": [
         {
           "translation": "เอกสาร",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "toZs8GPjojr+z/WYHXg3Ow==": {
-      "description": "Footer: the tools this example is built with (names, not translated)",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "สร้างด้วย Void, Vite+, fbtee, Temporal และ shadcn/ui",
           "variations": {}
         }
       ],
@@ -1184,6 +1172,30 @@
       "translations": [
         {
           "translation": "เขียนเป็นภาษา{language} กำลังแปล…",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "daTaaxWObSJle3RqqEYtlQ==": {
+      "description": "Home page button: open the events app, the live demo",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ลองเดโมกิจกรรม",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LB5qRS7mqSOz2AWaPF1rHw==": {
+      "description": "Footer: the tools this example is built with; tools is a list of their names",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สร้างด้วย {tools}",
           "variations": {}
         }
       ],

@@ -23,6 +23,7 @@
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
+  --color-brand: var(--brand);
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
@@ -84,46 +85,64 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+/* The site's palette, after Void's own site (void.cloud): a near-black ground with a touch of blue,
+   white ink, and one violet accent (--brand). The layout turns it on with the "dark" class. */
 .dark {
-  --background: oklch(0.145 0 0);
+  color-scheme: dark;
+  --background: oklch(0.2 0.012 275);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
+  --card: oklch(0.225 0.012 275);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: oklch(0.225 0.012 275);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.2 0.012 275);
+  --secondary: oklch(0.27 0.014 275);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  --muted: oklch(0.25 0.012 275);
+  --muted-foreground: oklch(0.74 0.012 275);
+  --accent: oklch(0.27 0.014 275);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.68 0.19 285);
+  --brand: oklch(0.68 0.19 285);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
+  --radius: 0.375rem;
+  --sidebar: oklch(0.225 0.012 275);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary: oklch(0.68 0.19 285);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent: oklch(0.27 0.014 275);
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.68 0.19 285);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  /* The page behind the layout (overscroll, the strip under a short page) in the site's ground. */
   body {
-    @apply bg-background text-foreground;
+    background: oklch(0.2 0.012 275);
+    @apply text-foreground;
+  }
+  .dark ::selection {
+    background: color-mix(in oklch, var(--brand) 45%, transparent);
+  }
+  /* Headings a touch tight, as Void's; never in right-to-left scripts, whose letters join. */
+  h1,
+  h2 {
+    letter-spacing: -0.025em;
+  }
+  [dir="rtl"] :is(h1, h2) {
+    letter-spacing: normal;
   }
   html {
     @apply font-sans;
@@ -136,8 +155,8 @@
   --vmd-font-body: var(--font-sans);
   --vmd-text: var(--foreground);
   --vmd-text-muted: var(--muted-foreground);
-  --vmd-link: var(--primary);
-  --vmd-link-hover: var(--primary);
+  --vmd-link: var(--brand);
+  --vmd-link-hover: var(--foreground);
   --vmd-border: var(--border);
   --vmd-bg-soft: var(--muted);
 }
