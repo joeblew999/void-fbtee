@@ -4,6 +4,7 @@ import { Suspense, use } from "react";
 import { fbt, list } from "fbtee";
 import { useLocales } from "void-fbtee/react";
 import Nav from "../../components/Nav";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Props } from "./index.server";
 
 // fbtee's list(), joined to plain text first. A list inside a string (<fbt:list>, or list() in an
@@ -35,26 +36,32 @@ export default function HomePage({ count, late }: Props) {
   return (
     <main>
       <Nav page="" />
-      <h1 data-testid="title">
-        <fbt desc="Home page heading">i18n for Void apps</fbt>
-      </h1>
-      <p data-testid="intro">
-        <fbt desc="Home page introduction; languages is a list of language names">
-          Strings by fbtee, dates by Temporal, and everything else by the platform's own Intl. This
-          example is in <fbt:param name="languages">{listText(names)}</fbt:param>.
-        </fbt>
-      </p>
-      <p data-testid="plural">
-        <fbt desc="How many nights are booked">
-          You booked{" "}
-          <fbt:plural count={count} many="nights" showCount="yes">
-            night
-          </fbt:plural>
-        </fbt>
-      </p>
-      <Suspense fallback={<p>…</p>}>
-        <Slow late={late} />
-      </Suspense>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-3xl" data-testid="title">
+            <fbt desc="Home page heading">i18n for Void apps</fbt>
+          </CardTitle>
+          <CardDescription data-testid="intro">
+            <fbt desc="Home page introduction; languages is a list of language names">
+              Strings by fbtee, dates by Temporal, and everything else by the platform's own Intl.
+              This example is in <fbt:param name="languages">{listText(names)}</fbt:param>.
+            </fbt>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <p data-testid="plural">
+            <fbt desc="How many nights are booked">
+              You booked{" "}
+              <fbt:plural count={count} many="nights" showCount="yes">
+                night
+              </fbt:plural>
+            </fbt>
+          </p>
+          <Suspense fallback={<p>…</p>}>
+            <Slow late={late} />
+          </Suspense>
+        </CardContent>
+      </Card>
     </main>
   );
 }

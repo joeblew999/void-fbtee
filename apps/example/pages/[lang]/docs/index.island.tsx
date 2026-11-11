@@ -4,6 +4,7 @@ import { fbt } from "fbtee";
 import pages from "@void/md/pages";
 import { useLocale } from "void-fbtee/react";
 import Nav from "../../../components/Nav";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function DocsIndex() {
   const { locale } = useLocale();
@@ -11,16 +12,24 @@ export default function DocsIndex() {
   return (
     <main>
       <Nav page="/docs" />
-      <h1 data-testid="docs-title">
-        <fbt desc="Docs index heading">Documentation</fbt>
-      </h1>
-      <ul data-testid="docs-pages">
-        {docs.map((p) => (
-          <li key={p.path}>
-            <a href={p.path}>{p.title}</a>
-          </li>
-        ))}
-      </ul>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-3xl" data-testid="docs-title">
+            <fbt desc="Docs index heading">Documentation</fbt>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul className="list-disc space-y-1 ps-6" data-testid="docs-pages">
+            {docs.map((p) => (
+              <li key={p.path}>
+                <a className="underline-offset-4 hover:underline" href={p.path}>
+                  {p.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
     </main>
   );
 }

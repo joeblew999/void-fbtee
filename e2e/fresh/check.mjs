@@ -16,6 +16,7 @@ import { execFileSync, spawn } from "node:child_process";
 import {
   cpSync,
   existsSync,
+  mkdirSync,
   readdirSync,
   readFileSync,
   realpathSync,
@@ -96,11 +97,9 @@ for (const target of targets) {
   // The example's locales; init adds the plugin, middleware, flags, scripts and peers.
   run(app.pm, ["exec", "--", "void-fbtee", "init", "--locales", "ar-EG,th-TH"], dir);
   run(app.pm, app.install, dir);
-  for (const item of ["pages", "components", "routes", "lib", "i18n", "public"])
-    cpSync(join(root, "apps/example", item), join(dir, item), {
-      recursive: true,
-      dereference: true,
-    });
+  // void-fbtee's own pages (e2e/fresh/app/) and the example's translations of their strings.
+  cpSync(join(import.meta.dirname, "app/pages"), join(dir, "pages"), { recursive: true });
+  cpSync(join(root, "apps/example/i18n"), join(dir, "i18n"), { recursive: true });
   checkOwnDependencies(dir, installed);
 
   run(app.pm, ["exec", "--", "void-fbtee", "check"], dir);
@@ -153,7 +152,8 @@ function checkOwnDependencies(dir, installed) {
 
 /** init's lint wiring, in Vite+ itself: the example passes, a showCount="no" probe fails. */
 function checkLint(dir) {
-  run("pnpm", ["exec", "vp", "lint", "pages", "components"], dir);
+  run("pnpm", ["exec", "vp", "lint", "pages"], dir);
+  mkdirSync(join(dir, "components"), { recursive: true });
   const probe = join(dir, "components/_LintProbe.tsx");
   writeFileSync(
     probe,

@@ -11,7 +11,7 @@ export default function Countdown({ launch }: { launch: string }) {
   const now = useNow();
   const at = Temporal.ZonedDateTime.from(launch);
   return (
-    <p data-testid="countdown">
+    <p className="text-lg" data-testid="countdown">
       <fbt desc="When the launch is, relative to today">
         Launch: <fbt:param name="when">{relativeDays(locale, at, now)}</fbt:param>
       </fbt>

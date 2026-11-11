@@ -4,7 +4,8 @@ import { defineConfig } from "vite-plus";
 export default defineConfig({
   lint: {
     // e2e/fresh/<toolchain>/: what `void init` wrote, kept as it wrote it (no node_modules there).
-    ignorePatterns: ["e2e/fresh/vite-plus/**", "e2e/fresh/vite/**"],
+    // e2e/fresh/app/: pages copied into those apps, linted and type-checked there.
+    ignorePatterns: ["e2e/fresh/vite-plus/**", "e2e/fresh/vite/**", "e2e/fresh/app/**"],
     plugins: ["typescript", "react"],
     // What `void-fbtee init` asks a workspace's root config for: fbtee's rules and void-fbtee's own.
     jsPlugins: ["@nkzw/eslint-plugin-fbtee", "void-fbtee/lint"],
