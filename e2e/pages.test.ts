@@ -58,16 +58,25 @@ test("every page fits a phone's width, in every language", async () => {
     hasTouch: true,
     deviceScaleFactor: 3,
   });
-  const wide: string[] = [];
-  for (const locale of LOCALES)
-    for (const path of ["", "/tour", "/events", "/formats", "/docs", "/docs/strings"]) {
-      await p.goto(`/${locale}${path}`);
-      const { layout, content } = await p.evaluate(() => ({
+  // Each page in its own tab of the same phone, all at once.
+  const paths = LOCALES.flatMap((locale) =>
+    ["", "/tour", "/events", "/formats", "/docs", "/docs/strings"].map(
+      (path) => `/${locale}${path}`,
+    ),
+  );
+  const wide = await Promise.all(
+    paths.map(async (path) => {
+      const tab = await p.context().newPage();
+      await tab.goto(path);
+      const { layout, content } = await tab.evaluate(() => ({
         layout: window.innerWidth,
         content: document.documentElement.scrollWidth,
       }));
-      if (layout !== 390 || content > 390)
-        wide.push(`/${locale}${path}: laid out ${layout}px, content ${content}px`);
-    }
-  expect(wide).toEqual([]);
+      await tab.close();
+      return layout !== 390 || content > 390
+        ? `${path}: laid out ${layout}px, content ${content}px`
+        : [];
+    }),
+  );
+  expect(wide.flat()).toEqual([]);
 });
