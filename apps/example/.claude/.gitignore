@@ -1,2 +1,3 @@
-# Links into node_modules, made by `void init` and `void-fbtee init` (machine-specific paths).
+# Links into node_modules (machine-specific paths), made again on each install: the example's
+# postinstall runs `void init --tsconfig` and `void-fbtee init`.
 skills/

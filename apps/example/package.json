@@ -6,7 +6,7 @@
     "dev": "vp dev",
     "build": "vp build",
     "preview": "vp preview",
-    "postinstall": "void prepare",
+    "postinstall": "void prepare && void init --tsconfig && void-fbtee init",
     "i18n:prepare": "void-fbtee prepare",
     "i18n:check": "void-fbtee check",
     "i18n:translate": "void-fbtee translate"
