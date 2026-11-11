@@ -30,8 +30,8 @@ async function start(args: string[], url: string): Promise<ChildProcess> {
 }
 
 export default async function setup(project: TestProject) {
-  run(["vp", "run", "void-fbtee#build"], root);
-  run(["vp", "build"], EXAMPLE);
+  // The example's build task, which builds void-fbtee first (apps/example/vite.config.ts).
+  run(["vp", "run", "example#build"], root);
   const prod = `http://localhost:${PORTS.prod}`;
   const dev = `http://localhost:${PORTS.dev}`;
   const servers = [

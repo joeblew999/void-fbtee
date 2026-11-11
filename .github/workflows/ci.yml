@@ -1,0 +1,53 @@
+# The same commands as on your machine. setup-vp (Vite+'s own action) installs vp, the Node in
+# .node-version and the pnpm in package.json; then the vp commands run. Laid out like
+# voidzero-dev/void's ci.yml: read-only permissions, pinned actions, the fresh-install check as its
+# own job.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: check and test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+        with:
+          node-version-file: .node-version
+          run-install: false
+      # No lockfiles in this repo, so the install mustn't insist on one (it does in CI by default).
+      - run: vp install --no-frozen-lockfile
+      - run: vp run install:browser
+      - run: vp check
+      - run: vp test run
+
+  fresh:
+    name: fresh install (Vite+ and plain Vite)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+        with:
+          node-version-file: .node-version
+          run-install: false
+      - run: vp install --no-frozen-lockfile
+      - run: vp run test:fresh

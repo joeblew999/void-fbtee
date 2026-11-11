@@ -4,7 +4,20 @@
       {
         "matcher": "startup|resume",
         "hooks": [
-          { "type": "command", "command": "sh \"$CLAUDE_PROJECT_DIR/scripts/cloud-keyring.sh\"" }
+          {
+            "type": "command",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/cloud-session.sh\""
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/cloud-session.sh\""
+          }
         ]
       }
     ]

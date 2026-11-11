@@ -1,7 +1,22 @@
-// Root Vite+ config: format, lint and type-check settings for the whole repo.
+// Root Vite+ config: the repo's tasks, and format, lint, type-check and test settings.
+// Built-in commands: `vp check` (format, lint, types) and `vp test run` (all tests). CI runs those two.
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
+  // `vp run <task>` from anywhere in the repo.
+  run: {
+    tasks: {
+      // The package rebuilding on save, and the example's dev server, together.
+      dev: { command: "vp run -r --parallel dev", cache: false },
+      // Chromium for the browser tests (once per machine).
+      "install:browser": { command: "playwright install --with-deps chromium", cache: false },
+      // void-fbtee installed into fresh `void init` apps, as a user's app installs it.
+      "test:fresh": { command: "node e2e/fresh/check.mjs", cache: false },
+      // The example's tasks (apps/example/vite.config.ts), runnable from the root.
+      login: { command: "vp run example#login", cache: false },
+      deploy: { command: "vp run example#deploy", cache: false },
+    },
+  },
   lint: {
     // e2e/fresh/<toolchain>/: what `void init` wrote, kept as it wrote it (no node_modules there).
     // e2e/fresh/app/: pages copied into those apps, linted and type-checked there.

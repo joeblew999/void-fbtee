@@ -1,8 +1,0 @@
-# mise.toml: the Node runtime and pnpm for this repo. Everything else is a package.json
-# script (pnpm run dev, test, test:fresh, test:browser, ci), so each tool lives in one place.
-[tools]
-node = "24.22.2"
-pnpm = "12.18.0"
-
-[env]
-_.path = ["{{config_root}}/node_modules/.bin"]

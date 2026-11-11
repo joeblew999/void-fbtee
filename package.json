@@ -2,14 +2,6 @@
   "name": "void-fbtee-repo",
   "private": true,
   "type": "module",
-  "scripts": {
-    "dev": "vp run -r --parallel dev",
-    "test": "vp test run",
-    "test:fresh": "node e2e/fresh/check.mjs",
-    "test:browser": "playwright install --with-deps chromium",
-    "ci": "vp check && vp test run",
-    "deploy": "sh scripts/deploy.sh"
-  },
   "devDependencies": {
     "@nkzw/eslint-plugin-fbtee": "5.0.0",
     "@types/node": "26.6.6",
