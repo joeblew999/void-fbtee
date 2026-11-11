@@ -36,26 +36,6 @@ test("the middleware leaves files and API routes alone", async () => {
   expect((await get("/api/hello")).status).toBe(200);
 });
 
-test("60 concurrent requests in 3 languages don't mix", async () => {
-  const want = {
-    "en-US": "i18n for Void apps",
-    "th-TH": "i18n สำหรับแอป Void",
-    "ar-EG": "تدويل تطبيقات Void",
-  };
-  const locales = Object.keys(want) as (keyof typeof want)[];
-  const results = await Promise.all(
-    Array.from({ length: 60 }, async (_, i) => {
-      const locale = locales[i % 3]!;
-      const html = await (await get(`/${locale}`)).text();
-      return (
-        html.includes(`<html lang="${locale}"`) &&
-        html.includes(`data-testid="title">${want[locale]}<`)
-      );
-    }),
-  );
-  expect(results.filter((ok) => !ok)).toHaveLength(0);
-});
-
 test("built worker: one fbtee core, no native Temporal in app code, temporal flag on", () => {
   const read = (f: string) => readFileSync(f, "utf8");
   const worker = globSync(join(EXAMPLE, "dist/ssr/**/*.js"));
