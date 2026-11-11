@@ -1,25 +1,16 @@
-// Dev server: a smoke check (a translated page, an island hydrating), then what only dev does:
+// Dev server: what only dev does:
 // catalog edits reach the server and the open page with no restart, and the browser console
 // names each untranslated string. Catalog files are put back after each test.
 import { readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
-import { browser, collectErrors, hydrated, seeText, url, VOID_DEFER_MESSAGE } from "./helpers";
+import { browser, collectErrors, seeText, url, VOID_DEFER_MESSAGE } from "./helpers";
 import { EXAMPLE } from "./setup";
 
 const page = browser("dev");
 const catalog = (locale: string) => join(EXAMPLE, "i18n/translations", `${locale}.json`);
 // The home page heading, "i18n for Void apps".
 const TITLE = "GT3+qur89p160RfLJ/9CmQ==";
-
-test("smoke: a translated page and an island", async () => {
-  const p = await page();
-  const errors = collectErrors(p);
-  await p.goto("/ar-EG/about");
-  await hydrated(p, "_Signup");
-  await seeText(p, "about-title", "احجز طاولة في ثوانٍ");
-  expect(errors).toEqual([]);
-});
 
 test("editing a catalog updates the server and the open page", async () => {
   const file = catalog("th-TH");

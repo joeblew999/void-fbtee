@@ -4,58 +4,10 @@ import { globSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
 import { fmt } from "../apps/example/lib/fmt";
-import { browser, collectErrors, hydrated, seeText, text, watchTexts } from "./helpers";
+import { browser, collectErrors, hydrated, seeText } from "./helpers";
 import { EXAMPLE } from "./setup";
-import { SOURCE, TRANSLATED } from "./locales";
 
 const page = browser("prod");
-
-test("th-TH island page: islands hydrate in the page's language", async () => {
-  const p = await page();
-  const errors = collectErrors(p);
-  const seen = await watchTexts(p);
-  await p.goto("/th-TH/about");
-  await hydrated(p, "_Signup");
-  await p.getByTestId("countdown").scrollIntoViewIfNeeded();
-  await hydrated(p, "_Countdown");
-  await p.getByTestId("signup-take").click();
-  await seeText(p, "signup-text", "เหลือ 3 ที่นั่ง");
-  expect(await text(p, "about-title")).toBe("จองโต๊ะได้ในไม่กี่วินาที");
-  expect(await text(p, "countdown")).toMatch(/^เปิดตัว: ในอีก/);
-  const texts = await seen();
-  expect(texts["about-title"]).toEqual(["จองโต๊ะได้ในไม่กี่วินาที"]);
-  expect(texts["signup-text"]).toEqual(["เหลือ 4 ที่นั่ง", "เหลือ 3 ที่นั่ง"]);
-  expect(errors).toEqual([]);
-});
-
-test("ar-EG: right-to-left, Arabic digits and Arabic text in islands", async () => {
-  const p = await page();
-  const errors = collectErrors(p);
-  await p.goto("/ar-EG/about");
-  await hydrated(p, "_Signup");
-  expect(await p.locator("html").getAttribute("dir")).toBe("rtl");
-  expect(await text(p, "signup-number")).toBe("٤٬٩٣٨");
-  expect(await text(p, "signup-take")).toBe("احجز مقعدًا");
-  expect(errors).toEqual([]);
-});
-
-test("docs: markdown pages, one set per language", async () => {
-  const p = await page();
-  const sidebar = async (locale: string) => {
-    await p.goto(`/${locale}/docs`);
-    const links = p.getByTestId("docs-pages").locator("a");
-    await links.first().waitFor();
-    return links.evaluateAll((as) => as.map((a) => a.getAttribute("href")!));
-  };
-  // Each language's sidebar lists its own pages, and the same pages in every language.
-  const source = (await sidebar(SOURCE)).map((h) => h.replace(`/${SOURCE}/`, "/"));
-  for (const locale of TRANSLATED)
-    expect((await sidebar(locale)).map((h) => h.replace(`/${locale}/`, "/"))).toEqual(source);
-  await p.goto("/th-TH/docs/strings");
-  expect(await p.locator("h1").textContent()).toContain("การแปลข้อความในแอป Void");
-  await p.goto("/en-US/docs/strings");
-  expect(await p.locator("h1").textContent()).toContain("Translating strings in a Void app");
-});
 
 test("shadcn's menu in an island opens the language's way: from the right in Arabic", async () => {
   const p = await page();

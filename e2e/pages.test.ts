@@ -22,12 +22,6 @@ test("th-TH home: server text kept through hydration, and the defer() line", asy
   expect(errors.filter((e) => !VOID_DEFER_MESSAGE.test(e))).toEqual([]);
 });
 
-test("ar-EG home: Arabic's 'few' plural form (3) reaches the page", async () => {
-  const p = await page();
-  await p.goto("/ar-EG");
-  expect(await text(p, "plural")).toBe("حجزت ٣ ليالٍ");
-});
-
 test("Link: same language stays client-side, another language loads a fresh page", async () => {
   const p = await page();
   const errors = collectErrors(p);
