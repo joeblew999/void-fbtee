@@ -1033,18 +1033,6 @@
       ],
       "types": []
     },
-    "XrZbF/1kCVzdQSUsXFfG6g==": {
-      "description": "Home feature fact: the demo translates what people post with Workers AI",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ในเดโม สิ่งที่ผู้คนโพสต์จะแปลโดย Workers AI",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "6uTUKKFe9hZt2kh1Xrj86A==": {
       "description": "Home feature title: right-to-left languages",
       "status": "translated",
@@ -1328,18 +1316,6 @@
       "translations": [
         {
           "translation": "polyfill ในเบราว์เซอร์",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "mlUsmLsMcHJirdFKd5pLoA==": {
-      "description": "Note under an event: shown as written while it is being translated",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เขียนเป็นภาษา{language} กำลังแปล…",
           "variations": {}
         }
       ],
@@ -1789,18 +1765,6 @@
       ],
       "types": []
     },
-    "VFbC7WsL80DNiDgdV47lrQ==": {
-      "description": "Events page description, for search results",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "กิจกรรมที่โพสต์ในภาษาใดก็ได้ แต่ละรายการแปลเป็นภาษาอื่น ๆ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "8HurGTye1LRfqN9IRDn7fA==": {
       "description": "Docs index description, for search results",
       "status": "translated",
@@ -1837,13 +1801,37 @@
       ],
       "types": []
     },
-    "C8qujLAP0EmQt87MMq8SfA==": {
+    "yQWkaSa7g32Txe088/rP+w==": {
+      "description": "Note under an event shown as its poster wrote it, in another language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เขียนเป็นภาษา{language}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/aRZulxMqHQep4BC9smXmg==": {
+      "description": "Events page description, for search results",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "กิจกรรมที่โพสต์ในภาษาใดก็ได้ แต่ละรายการแสดงตามเวลาในเมืองของกิจกรรมและตามเวลาของคุณ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DvAw+ULA31GrsaHftMjhDQ==": {
       "description": "Post-an-event page description, for search results",
       "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "โพสต์กิจกรรมเป็นภาษาของคุณ ตามเวลาในเมืองของคุณ แล้วจะแปลเป็นภาษาอื่น ๆ ให้",
+          "translation": "โพสต์กิจกรรมเป็นภาษาของคุณ ตามเวลาในเมืองของคุณ แล้วทุกคนจะเห็นตามเวลาของตัวเอง",
           "variations": {}
         }
       ],

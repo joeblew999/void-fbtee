@@ -187,9 +187,6 @@ function features(lang: Lang): Feature[] {
         <fbt key="2" desc="Home feature fact: translations are files in the app's repository">
           Translations are files in your repo, ready to review.
         </fbt>,
-        <fbt key="3" desc="Home feature fact: the demo translates what people post with Workers AI">
-          In the demo, what people post is translated by Workers AI.
-        </fbt>,
       ],
     },
     {

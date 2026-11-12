@@ -39,7 +39,7 @@ Every day:
 
 ```sh
 vp run dev               # develop: the package rebuilds on save; the example runs with Void's
-                         # local D1, KV, queue and live updates (Workers AI is Cloudflare's)
+                         # local D1, KV and live updates
 vp check                 # format, lint, types
 vp test run              # every test, on a local build; report: .vitest/index.html
 vp run deploy            # deploy the example to production (Cloudflare), with no downtime:
@@ -111,8 +111,7 @@ How we test, and why it isn't Void's testing guide: Void's guide
 covers unit tests in Node, with bindings such as D1 and KV replaced by `vi.mock()`. Ours run the
 real thing with nothing faked: the example's own build on Cloudflare's local runtime
 (`vp test run`), or the deployed site (`vp run test:deployed`). Formatting can only be tested on
-the Worker's own `Intl`, not Node's, which differs. `vp test run` needs a Cloudflare login (or
-`CLOUDFLARE_API_TOKEN`), because the example's Workers AI runs on Cloudflare even locally. The
+the Worker's own `Intl`, not Node's, which differs. The
 package's own tests (`packages/void-fbtee/test/`) are plain tests of its commands, in Node.
 
 The tasks are in `vite.config.ts` and `apps/example/vite.config.ts`.

@@ -1261,18 +1261,6 @@
       ],
       "types": []
     },
-    "XrZbF/1kCVzdQSUsXFfG6g==": {
-      "description": "Home feature fact: the demo translates what people post with Workers AI",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "في العرض التوضيحي، يترجم Workers AI ما ينشره الناس.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "6uTUKKFe9hZt2kh1Xrj86A==": {
       "description": "Home feature title: right-to-left languages",
       "status": "translated",
@@ -1628,18 +1616,6 @@
       "translations": [
         {
           "translation": "الـ polyfill في المتصفح",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "mlUsmLsMcHJirdFKd5pLoA==": {
-      "description": "Note under an event: shown as written while it is being translated",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "لغة الكتابة: {language}. جارٍ الترجمة…",
           "variations": {}
         }
       ],
@@ -2155,18 +2131,6 @@
       ],
       "types": []
     },
-    "VFbC7WsL80DNiDgdV47lrQ==": {
-      "description": "Events page description, for search results",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "فعاليات منشورة بأي لغة، وكل منها مترجم إلى اللغات الأخرى.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "8HurGTye1LRfqN9IRDn7fA==": {
       "description": "Docs index description, for search results",
       "status": "translated",
@@ -2203,13 +2167,37 @@
       ],
       "types": []
     },
-    "C8qujLAP0EmQt87MMq8SfA==": {
+    "yQWkaSa7g32Txe088/rP+w==": {
+      "description": "Note under an event shown as its poster wrote it, in another language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مكتوبة باللغة {language}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/aRZulxMqHQep4BC9smXmg==": {
+      "description": "Events page description, for search results",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "فعاليات منشورة بأي لغة، كل منها على توقيت مدينتها وعلى توقيتك.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DvAw+ULA31GrsaHftMjhDQ==": {
       "description": "Post-an-event page description, for search results",
       "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "انشر فعالية بلغتك، على توقيت مدينتك، وستُترجم إلى اللغات الأخرى.",
+          "translation": "انشر فعالية بلغتك، على توقيت مدينتك، وسيراها كل شخص على توقيته.",
           "variations": {}
         }
       ],

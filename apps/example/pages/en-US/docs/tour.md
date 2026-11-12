@@ -49,8 +49,8 @@ it.
 :::
 
 > [!NOTE] The language is saved too
-> Each event records the language it was written in, so a reader in another language can see it
-> translated, and the original.
+> Each event records the language it was written in, so a reader's browser and screen reader read
+> it in that language, whatever language the page around it is in.
 
 ## Every time, twice {#times}
 

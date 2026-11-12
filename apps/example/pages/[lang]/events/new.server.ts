@@ -5,7 +5,6 @@ import { events, newEventSchema, startsAt } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { db } from "void/db";
-import { queues } from "void/queues";
 import { revalidate } from "void/isr";
 import { localizedPaths } from "void-fbtee/middleware";
 import { z } from "zod";
@@ -33,8 +32,6 @@ export const action = defineHandler.withValidator({
       ...startsAt(body.local, body.time_zone),
     })
     .returning({ id: events.id });
-  // Translated into the other languages after this (queues/translate.ts).
-  await queues.translate.send({ eventId: created.id });
   await revalidate({ paths: localizedPaths("/events") });
   return c.redirect({
     pathname: "/[lang]/events/[id]",
@@ -49,7 +46,7 @@ export const head = defineHead(() => ({
       name: "description",
       content: String(
         fbs(
-          "Post an event in your own language, on your city's clock; it's translated into the others.",
+          "Post an event in your own language, on your city's clock; everyone sees it on their own.",
           "Post-an-event page description, for search results",
         ),
       ),

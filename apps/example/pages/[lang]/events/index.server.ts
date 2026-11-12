@@ -1,5 +1,5 @@
-// Upcoming events: only those not yet started, each with its title in the page's language where it
-// has been translated. Posting one is its own page (new.server.ts), which clears this list.
+// Upcoming events: only those not yet started, each with its title in the page's language where a
+// translation is stored (the sample events). Posting one is its own page (new.server.ts), which clears this list.
 import { event_texts, events } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
@@ -27,7 +27,7 @@ export const head = defineHead(() => ({
       name: "description",
       content: String(
         fbs(
-          "Events posted in any language, each translated into the others.",
+          "Events posted in any language, each on its own city's clock and on yours.",
           "Events page description, for search results",
         ),
       ),

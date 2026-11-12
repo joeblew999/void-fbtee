@@ -4,7 +4,7 @@
 import { routeUrl } from "void/routes";
 import { Fragment, useEffect, useState } from "react";
 import { fbt } from "fbtee";
-import { Form, useForm, useRouter } from "@void/react";
+import { Form, useForm } from "@void/react";
 import { connectLiveStream } from "void/live/client";
 import { Formatted, Link, useLocale, useTimeZone } from "void-fbtee/react";
 import { EventTime } from "@/components/EventTime";
@@ -15,12 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Props } from "./[id].server";
 
-/**
- * The event's live stream: the seats left (seats only go down, so the lower count wins), and
- * reloading the page's data when its translations arrive (queues/translate.ts).
- */
+/** The event's live stream: the seats left (seats only go down, so the lower count wins). */
 function useLiveEvent(id: string, left: number) {
-  const router = useRouter();
   const [live, setLive] = useState(Infinity);
   useEffect(() => {
     const stream = connectLiveStream("/api/live");
@@ -31,7 +27,6 @@ function useLiveEvent(id: string, left: number) {
         topic: `event:${id}`,
         onEvent: (event) => {
           if (event.type === "seats") setLive((event.data as { left: number }).left);
-          if (event.type === "translated") void router.refresh();
         },
       })
       // Closed by this effect's cleanup before subscribing finished: not an error.
@@ -42,7 +37,7 @@ function useLiveEvent(id: string, left: number) {
       closed = true;
       stream.close();
     };
-  }, [id, router]);
+  }, [id]);
   return Math.min(left, live);
 }
 
@@ -161,7 +156,7 @@ export default function Event({ event, text, left }: Props) {
   // The browser's zone once known (null before); nothing has been typed into the form yet.
   const zone = useTimeZone();
   const seatsLeft = useLiveEvent(event.id, left);
-  // In the page's language once translated; until then, as written.
+  // In the page's language where a translation is stored (the sample events); else as written.
   const shown = text ?? event;
   const textLang = text ? locale : event.locale;
   const written = new Intl.DisplayNames(locale, { type: "language" }).of(event.locale);
@@ -197,12 +192,12 @@ export default function Event({ event, text, left }: Props) {
         </details>
       )}
       {!text && event.locale !== locale && (
-        <p className="text-muted-foreground text-sm" data-testid="event-translating">
-          <fbt desc="Note under an event: shown as written while it is being translated">
+        <p className="text-muted-foreground text-sm" data-testid="event-written-in">
+          <fbt desc="Note under an event shown as its poster wrote it, in another language">
             Written in{" "}
             <fbt:param name="language">
               <Formatted>{written!}</Formatted>
-            </fbt:param>. Translating…
+            </fbt:param>.
           </fbt>
         </p>
       )}
