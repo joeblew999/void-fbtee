@@ -38,24 +38,47 @@ the whole; this is the whole, to approve and do as one piece of work.
 - **No Open Graph image tool in Void yet:** Satori-based image generation is an open Void request
   (voidzero-dev/void#442).
 
+## Answered (2026-11-12)
+
+1. **Markdown pages can get their Open Graph tags from their own frontmatter**, with no
+   `.server.ts` per page per language: `@void/md/pages` (each page's path, title, frontmatter)
+   resolves on the server as well as in the browser (`packages/md/src/plugin.ts`, the
+   `@void/md/pages` virtual module; the docs layout already reads it while the page renders). What
+   reads it for the head (app middleware, or void-fbtee's when the app has @void/md) is item 1
+   below.
+2. **No established library builds Open Graph tags as a plain `HeadDescriptor`:** unhead's
+   `useSeoMeta` builds the set but needs unhead's own head manager, which Void doesn't use. So a
+   small function in void-fbtee (it knows the language, canonical URL and `og:locale`) is the
+   honest option, not a reinvented library.
+3. **Preview pictures:** `satori` (0.63.2, updated 2026-10-20) and `@vercel/og` (1.0.3,
+   2026-09-22) are current; `workers-og` (0.0.27, 2025-06-12) isn't. But Satori's right-to-left
+   support has been broken (vercel/satori#745: Arabic "rendered left-aligned with incorrect word
+   ordering", still open when found) and Thai/Arabic shaping came in another change (#735);
+   whether 0.63.2 has either is unknown. A Thai and an Arabic picture must be rendered and looked
+   at before choosing it; if they're wrong, static pictures per language, made once.
+
 ## To decide (by Claude, reasons with each)
 
-1. **Code pages** (home, events, docs index, Intl, Temporal): each `head()` returns
-   `og:title`/`og:description`/`og:type` and `twitter:*` from its own translated strings, as in
-   Void's example. To keep that one line per page instead of a copy of eight tags, void-fbtee may
-   export a small function that turns `{ title, description, image }` into the full set for the
-   page's language (it knows the language, the canonical URL and `og:locale`). Check first whether
-   an established library does this for a plain `HeadDescriptor` (e.g. unhead's `useSeoMeta`
-   builds the same set but needs unhead's own head manager, which Void doesn't use).
-2. **Markdown pages:** a companion `.server.ts` per page that reads the page's frontmatter, or a
-   feature request to Void to map frontmatter to Open Graph. Decide after reading how a `head()`
-   in a markdown page's `.server.ts` can get its frontmatter.
-3. **`og:image`:** one static picture per language now (1200×630, in `public/`), made the same
-   way as the icons if a standard tool can; per-page pictures when Void's #442 lands.
-4. **Manifest per language:** one file per language, linked from each language's pages, with the
-   name and description translated through the same catalogs.
-5. **`og:locale:alternate`:** report the de-duplication to Void (with the user's OK), the way
-   #802 was.
+1. **Who writes the tags:** code pages from their own `head()` (Void's example), through one
+   void-fbtee function so each page adds one line; markdown pages from their frontmatter, read
+   from `@void/md/pages` by the middleware (void-fbtee's, with @void/md optional, as `void-fbtee/lint`
+   treats Vite+).
+2. **`og:image`:** per item 3 above.
+3. **Manifest per language:** one per language, linked from that language's pages, name and
+   description through the same catalogs.
+4. **`og:locale:alternate`:** report Void's de-duplication (with the user's OK), as #802 was.
+
+## Also in this work (left out of the first draft)
+
+- **Structured data** (JSON-LD, schema.org): `WebSite` with `inLanguage` on every page, `Event`
+  for each event page (name, start with its time zone, place), so search can show events.
+- **`noindex`** on the not-found and error pages, and those pages translated
+  (`plans/brisk-copper-wren.md` item 3, done together).
+- **`color-scheme`** (`dark`), and `apple-mobile-web-app-title`.
+- **Offline (service worker)**: a separate trial of vite-plugin-pwa with Void, reported before
+  anything is added; not done blind.
+- **Checked from outside:** each language's page through a link-preview validator and Google's
+  Rich Results test, not only our own tests.
 
 ## Proof
 
