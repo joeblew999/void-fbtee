@@ -30,10 +30,16 @@ docs. One commit per item; pushed together when you say.
        test asserts the answer comes from that route, not a redirect to a language page; the exact
        status is read off the running server before the line is written.
 
-3. [ ] **Middleware name: say why it's unnumbered.** Void's convention is numbered files
-       (`01.logger.ts`); ours is `middleware/i18n.ts` on purpose (it runs last). One line in that
-       file says so. No rename.
-       Backed by: Void `docs/reference/structure.md` "middleware/".
+3. [ ] **Middleware numbered: `middleware/99.i18n.ts`.** Void orders middleware by the number in
+       the file name; an unnumbered file gets order Infinity, so ours already runs last, but only by
+       a rule you'd have to look up. Ours must run after the app's own middleware, because it merges
+       into the `shared` and head data they set (`packages/void-fbtee/src/middleware.ts:77-92`), so it
+       becomes `99.i18n.ts`, leaving 01-98 for the app. Package change: `init` creates
+       `99.i18n.ts` (`init.ts:152`), its tests, `check.ts:103`, `react.tsx:64`, `middleware.ts:2`,
+       SKILL.md, and the setup page in all three languages. An app that keeps `i18n.ts` still works
+       (the check finds the re-export by content).
+       Backed by: Void `docs/reference/structure.md` "middleware/" ("Numeric prefixes control
+       execution order"); `packages/void/src/router/scan.ts` `parseMiddlewareDefinitions` (ee4eaa7).
 
 4. [ ] **No references into the closed plan issue.** About eleven comments point to "plan #1" or a
        decision number (`packages/void-fbtee/src/vite.ts:6,7,12,20`, `init.ts:222`, `react.tsx:81`,
@@ -101,7 +107,7 @@ docs. One commit per item; pushed together when you say.
         Needs 1.8.0: it fixed app tests failing because Void started a Worker under Vitest.
         Backed by: Void `docs/guide/testing.md`; Void 1.8.0 release notes.
 
-`packages/void-fbtee/skills/void-fbtee/SKILL.md` is updated with each package change (items 5, 6, 8).
+`packages/void-fbtee/skills/void-fbtee/SKILL.md` is updated with each package change (items 3, 5, 6, 8).
 
 ## Not in this plan
 
