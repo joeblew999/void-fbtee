@@ -100,13 +100,17 @@ test("every link, on every page reachable in each language, leads to a page", as
     while (queue.length) {
       const page = queue.shift()!;
       const html = await (await get(page)).text();
-      for (const [, link] of html.matchAll(/href="(\/[^"#?]*)/g)) {
-        if (link!.startsWith("//") || /\.[a-z0-9]+$/i.test(link!) || seen.has(link!)) continue;
-        seen.add(link!);
-        const res = await get(link!, { redirect: "manual" });
-        if (res.status !== 200) broken.push(`${page} → ${link}: ${res.status}`);
+      // Every link on the site, relative ones (as markdown pages write theirs) resolved against
+      // the page as the browser does; not other sites, mail and the like, or files.
+      for (const [, href] of html.matchAll(/href="([^"#?]+)/g)) {
+        if (/^([a-z]+:|\/\/)/i.test(href!)) continue;
+        const link = new URL(href!, `https://site${page}`).pathname;
+        if (/\.[a-z0-9]+$/i.test(link) || seen.has(link)) continue;
+        seen.add(link);
+        const res = await get(link, { redirect: "manual" });
+        if (res.status !== 200) broken.push(`${page} → ${href} (${link}): ${res.status}`);
         // Follow this language's own pages; the other languages' are reached from their home.
-        else if (link === `/${l}` || link!.startsWith(`/${l}/`)) queue.push(link!);
+        else if (link === `/${l}` || link.startsWith(`/${l}/`)) queue.push(link);
       }
     }
     expect(seen.size, l).toBeGreaterThan(10);

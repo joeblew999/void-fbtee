@@ -81,8 +81,10 @@ refreshes the page in every language.
 Links are built with Void's `routeUrl()` from `void/routes` and the page's `lang` (from
 `useLocale()`), so Void's typed routes check each one: `routeUrl("/[lang]/events", { params: { lang } })`
 for a page under `pages/[lang]/`, and ``routeUrl(`/${lang}/docs/tour`)`` for a markdown page (a
-route per language, a real page in every registered language). A link written as a plain string
-isn't checked. A language Void doesn't have gets the not-found page from the middleware.
+route per language, a real page in every registered language). Don't write a link as a plain
+string: Void checks plain strings too, but the app's `pages/[lang]/` makes every `/…` path look like
+a page (its type is `/${string}`), so a wrong one passes. A language Void doesn't have gets the
+not-found page from the middleware.
 
 ## Markdown pages
 
@@ -94,8 +96,10 @@ Pages under `pages/<source locale>/` have a copy per locale at the same path und
   numbers, slugs, file names).
 - **Keep exactly:** the `<script>` block at the top (first in the file; its import paths stay the
   same), components and islands with their props, code blocks, inline code, URLs, HTML
-  attributes, and the page's structure (same headings in the same order). One exception: a link
-  to another page of the site points to that page in the copy's language (`/th-TH/events`).
+  attributes, and the page's structure (same headings in the same order). That includes links to
+  the site's own pages: they're written relative (`../events`, or `./other.md` for a markdown
+  page, which @void/md turns into its route), so the copy's links stay in its language as they
+  are. In an original, write them that way, never with the language (`/en-US/events`).
 - **Dates, times, numbers:** a page shows them through a component that formats them with `Intl`
   (an island, with the value as a prop), not as written-out text. Leave the component as it is;
   if the original has one written out, keep it as written and say so in your summary.

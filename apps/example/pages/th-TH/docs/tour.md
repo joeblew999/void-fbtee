@@ -7,7 +7,7 @@ import Fmt from "../../../src/components/Fmt.tsx" with { island: "load" }
 
 title: ทัวร์
 description: โพสต์กิจกรรม จองที่นั่ง และดูทุกเวลาตามนาฬิกาของกิจกรรมและของคุณ
-translatedFrom: "a479ee11cee5"
+translatedFrom: "819fe6b5cb39"
 ---
 
 # กิจกรรมที่รู้ว่าตอนนี้ที่คุณอยู่เป็นเวลาเท่าไร
@@ -45,4 +45,4 @@ translatedFrom: "a479ee11cee5"
 - อีกนานเท่าไร: <Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
 - ชื่อภาษาในภาษาของคุณ: <Fmt langs />
 
-[ดูกิจกรรมที่กำลังจะมาถึง](/th-TH/events)
+[ดูกิจกรรมที่กำลังจะมาถึง](../events)

@@ -27,13 +27,22 @@ interface Entry {
 }
 
 /**
- * The sidebar: its groups, and the pages in each, in reading order. Markdown pages are Void routes
- * per language (`/${lang}/docs/tour`, a real page in every registered language); Intl and
- * Temporal are pages under [lang]. How to set up and use void-fbtee is in its own README and
- * skill, with the package; these pages show it at work.
+ * The sidebar: its groups, and the pages in each. Intl and Temporal are pages under [lang]. The
+ * markdown pages are this language's own files under pages/<lang>/docs/, from @void/md's pages
+ * list, as Void's guide builds a sidebar (pages-routing/markdown.md, "Building a Sidebar"): a
+ * page added or translated appears with its own title, with no list to keep here. How to set up
+ * and use void-fbtee is in its own README and skill, with the package; these pages show it at work.
  */
-function sidebar(lang: Lang, title: (slug: string) => ReactNode) {
-  const md = (slug: string, href: RouteUrl): Entry => ({ slug, href, title: title(slug) });
+function sidebar(lang: Lang) {
+  const prefix = `/${lang}/docs/`;
+  const markdown = pages
+    .filter((p) => p.path.startsWith(prefix))
+    // The path of a page Void found: a route by definition (Void's pages list has no route type).
+    .map((p): Entry => ({
+      slug: p.path.slice(prefix.length),
+      title: p.title,
+      href: p.path as RouteUrl,
+    }));
   return [
     {
       name: <fbt desc="Docs sidebar group: reference pages">Reference</fbt>,
@@ -50,7 +59,7 @@ function sidebar(lang: Lang, title: (slug: string) => ReactNode) {
       name: (
         <fbt desc="Docs sidebar group: the events app that demonstrates void-fbtee">The demo</fbt>
       ),
-      entries: [md("tour", routeUrl(`/${lang}/docs/tour`))],
+      entries: markdown,
     },
   ];
 }
@@ -71,10 +80,9 @@ const OUTLINES: Record<string, () => Heading[]> = {
 /** This language's docs: the sidebar, and the markdown page at the current path (if it is one). */
 export function useDocs() {
   const { lang, path } = useLocale();
-  const md = (slug: string) => pages.find((p) => p.path === `/${lang}/docs/${slug}`);
-  const groups = sidebar(lang, (slug) => md(slug)?.title ?? slug);
+  const groups = sidebar(lang);
   const current = path.replace(/^\/docs\/?/, "");
-  const page = md(current);
+  const page = pages.find((p) => p.path === `/${lang}/docs/${current}`);
   const headings: readonly Heading[] | undefined = page?.headings ?? OUTLINES[current]?.();
   return { groups, current, page, headings };
 }

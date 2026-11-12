@@ -36,7 +36,6 @@ const file = (name: string) => (
 
 /** How to add it: the commands in a terminal window, beside a line on what they do. */
 export function AddIt() {
-  const { lang } = useLocale();
   return (
     <section className="grid items-center gap-10 border-t py-16 lg:grid-cols-[1fr_1.1fr]">
       <div>
@@ -290,7 +289,6 @@ export function GitHubButton({ className }: { className?: string }) {
 
 /** The close: the claim again, and the way to start. */
 export function Closing() {
-  const { lang } = useLocale();
   return (
     <section className="border-t pt-20 pb-12">
       <h2 className="text-4xl font-medium text-balance md:text-5xl">

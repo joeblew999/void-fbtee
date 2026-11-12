@@ -7,7 +7,7 @@ import Fmt from "../../../src/components/Fmt.tsx" with { island: "load" }
 
 title: جولة
 description: انشر فعالية، احجز مقعدًا، وشاهد كل موعد بتوقيت مكان الفعالية وبتوقيتك.
-translatedFrom: "a479ee11cee5"
+translatedFrom: "819fe6b5cb39"
 ---
 
 # فعاليات تعرف كم الساعة عندك
@@ -44,4 +44,4 @@ translatedFrom: "a479ee11cee5"
 - كم بقي عليه: <Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
 - أسماء اللغات، بلغتك: <Fmt langs />
 
-[شاهد الفعاليات القادمة](/ar-EG/events)
+[شاهد الفعاليات القادمة](../events)

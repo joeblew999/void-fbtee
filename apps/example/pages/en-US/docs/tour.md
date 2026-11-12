@@ -46,4 +46,4 @@ this page's language:
 - How far off it is: <Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
 - Languages, named in yours: <Fmt langs />
 
-[See the upcoming events](/en-US/events)
+[See the upcoming events](../events)
