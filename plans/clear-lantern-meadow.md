@@ -52,6 +52,8 @@ needs 1.8.0: every Void fact below was checked in the `v1.7.0` tag of voidzero-d
 | Open Graph, Twitter, `theme-color`, `color-scheme` meta tags                                 | `unhead` (`unhead/utils`, `unpackMeta`)             | 3.4.3, 2026-10-13, MIT                    | A pure function: `{ ogTitle, ogUrl, ogImage: {…}, twitterCard, … }` → `{ property \| name, content }[]`, Void's `meta` shape; knows which tags are `property` vs `name`; typed. Run and checked; needs none of unhead's head manager (`unhead/utils` imports only its own files, under 10 KB). |
 | Structured data (JSON-LD)                                                                    | `schema-dts` (Google)                               | 2.1.0, 2026-10-02                         | Types only (devDependency): `WebSite`, `Event` objects checked against schema.org.                                                                                                                                                                                                             |
 | Icons                                                                                        | `@vite-pwa/assets-generator`                        | 2.0.0, 2026-10-25                         | In use (`vp run icons`).                                                                                                                                                                                                                                                                       |
+| Manifest types                                                                               | `@types/web-app-manifest`                           | 1.0.9, 2026-10-04, MIT                    | Types for what the manifest route returns.                                                                                                                                                                                                                                                     |
+| `robots.txt`                                                                                 | none: the plain file in `public/`                   |                                           | `vite-plugin-robots-ts` (2.1.7, 2026-11-10) and the rest only write out text you give them.                                                                                                                                                                                                    |
 | Preview picture (one, fixed)                                                                 | `sharp`                                             | already installed with the icon generator | Renders the picture's SVG to PNG once, like the icons.                                                                                                                                                                                                                                         |
 | Sitemap XML                                                                                  | `fast-xml-builder`                                  | 1.3.1, 2026-08-14, MIT                    | Pure JS, runs on Workers; tried. `sitemap` (10.0.0) needs Node streams and files, which the Worker doesn't have.                                                                                                                                                                               |
 | Preview pictures per page, maybe later                                                       | `@cf-wasm/og` (Satori + resvg packaged for Workers) | 0.5.0, 2026-08-01                         | Solves what #442 says is hard on Workers. Only after Thai and Arabic render right.                                                                                                                                                                                                             |
@@ -101,11 +103,24 @@ account) is left out: there isn't one.
    by absolute URL with `og:image:type`. `og:image:alt` is "void-fbtee",
    a name: not translated. Per-page pictures maybe later with `@cf-wasm/og`, after Thai and Arabic
    are rendered and look right.
-3. **One manifest, translated in place**: Chrome and Edge 148 read `*_localized` fields
-   (`name_localized`, `description_localized`, …) in one manifest (Chrome blog 2026-04-24, MDN
-   `*_localized`). Add `id`, `lang`, `dir` and `description_localized` for each language from the
-   catalogs; the name stays a name. `start_url` `/` redirects to the source language, so an
-   installed app opens in English: said in the README.
+3. **One manifest, translated in place, served by a route** (decided with the user): Chrome and
+   Edge 148 read `*_localized` fields (`name_localized`, `description_localized`, …) in one
+   manifest (Chrome blog 2026-04-24, MDN `*_localized`).
+   - **A route, not a file:** `routes/manifest.webmanifest.ts` answers `/manifest.webmanifest`
+     (the same naming rule as the sitemap) with `application/manifest+json`, building
+     `description_localized` for each language from the catalogs as it answers, so it can't
+     drift from them. `public/manifest.webmanifest` goes. Cached by Void like the sitemap; a
+     deploy brings new catalogs, so nothing needs clearing.
+   - **Fields:** today's (name, short name, description, start page, standalone, colours, icons)
+     plus `id`, `lang`, `dir` and `description_localized`; the name stays a name.
+   - **Types:** `@types/web-app-manifest` (1.0.9, 2026-10-04, MIT) for the manifest; it has
+     `lang` and `dir` but no `*_localized`, so the route adds those to the type itself.
+   - `start_url` `/` redirects to the source language, so an installed app opens in English:
+     said in the README.
+   - **Not `vite-plugin-pwa`** (2.0.0, 2026-10-03): it writes one fixed manifest at build, its
+     manifest type has no `*_localized`, it always brings a service worker (`workbox-build`;
+     offline is out of this plan), and it adds its links by rewriting `index.html`, which Void's
+     server-rendered pages don't use.
 4. **Sitemap: made when it's requested, by a server route; checked 2026-11-12:**
    - **Why not at build:** visitors post events after every deploy; a build-time sitemap would
      miss them from the first new post.
