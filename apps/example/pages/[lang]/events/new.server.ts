@@ -40,7 +40,8 @@ export const action = defineHandler.withValidator({
       ...startsAt(body.local, body.time_zone),
     })
     .returning({ id: events.id });
-  await revalidate({ paths: localizedPaths("/events") });
+  // The list in every language, and the sitemap, which lists the new event.
+  await revalidate({ paths: [...localizedPaths("/events"), "/sitemap.xml"] });
   return c.redirect({
     pathname: "/[lang]/events/[id]",
     params: { lang: params.lang, id: created.id },

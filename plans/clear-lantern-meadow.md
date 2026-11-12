@@ -162,7 +162,11 @@ account) is left out: there isn't one.
    - **Google's rules** (Search Central, "Build and submit a sitemap"): one file up to 50,000 URLs
      or 50 MB uncompressed, else a sitemap index; values entity-escaped. Far under the limit
      here; an index when events approach it.
-   - **`robots.txt`** gains `Sitemap: <site>/sitemap.xml`.
+   - **Built 2026-11-12:** `routes/sitemap.xml.ts` as above (the posting form left out: nothing
+     to find); `robots.txt` became a route too (`routes/robots.txt.ts`), since its `Sitemap:` line
+     needs a full address and a file in `public/` would name one site for every host (dev, Worker
+     Previews). Both cached by `routing.revalidate`; posting clears the sitemap. Live: MISS then
+     HIT; a posted event in the sitemap at once; 13 server tests passed on the deployed site.
    - The hreflang in the sitemap and in the pages come from the same void-fbtee function, so
      they can't disagree.
 5. **Structured data** through one escaping helper in the package (`jsonLd(obj)`: `JSON.stringify`

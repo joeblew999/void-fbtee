@@ -18,8 +18,13 @@ export default defineConfig({
     alwaysUseHttps: true,
     // Cache times for the routes, which have no page to export one: Void decides whether to
     // cache a path before it runs any code (packages/isr/src/runtime.ts, handleIsrInternal, Void
-    // 1.7.0). The manifest only changes with a deploy, which clears the cache.
-    revalidate: { "/manifest.webmanifest": 31_536_000 },
+    // 1.7.0). The manifest only changes with a deploy, which clears the cache; the sitemap also
+    // with a new event, which clears it (pages/[lang]/events/new.server.ts).
+    revalidate: {
+      "/manifest.webmanifest": 31_536_000,
+      "/robots.txt": 31_536_000,
+      "/sitemap.xml": 31_536_000,
+    },
   },
   // On every page (Void's site-wide head defaults). The viewport tag makes phones lay a page out at
   // their own width; without it they lay it out 980px wide and shrink it. The site is always dark:

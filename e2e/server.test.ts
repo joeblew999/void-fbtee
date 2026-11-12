@@ -293,6 +293,41 @@ test("the site's icons, web app manifest and robots.txt", async () => {
     expect(html, link).toContain(link);
 });
 
+// routes/sitemap.xml.ts and routes/robots.txt.ts, by Google's rules: every page in every language,
+// each listing all its languages and x-default; dates only where something records a real change.
+test("the sitemap: every page in every language, with its alternates; robots.txt points to it", async () => {
+  const res = await get("/sitemap.xml");
+  expect(res.headers.get("content-type")).toMatch(/^application\/xml/);
+  const xml = await res.text();
+  const entries = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map(([, u]) => ({
+    loc: new URL(u.match(/<loc>(.*?)<\/loc>/)![1]).pathname,
+    lastmod: u.match(/<lastmod>(.*?)<\/lastmod>/)?.[1],
+    alternates: [...u.matchAll(/hreflang="([^"]+)"/g)].map(([, h]) => h),
+  }));
+  for (const l of LOCALES)
+    for (const page of ["", "/docs", "/docs/intl", "/docs/temporal", "/events", "/docs/tour"])
+      expect(
+        entries.map((e) => e.loc),
+        `${l}${page}`,
+      ).toContain(`/${l}${page}`);
+  for (const e of entries) {
+    expect(e.alternates.sort(), e.loc).toEqual([...LOCALES, "x-default"].sort());
+    expect((await get(e.loc)).status, e.loc).toBe(200);
+  }
+  // No date where nothing records one: the app's own pages.
+  for (const l of LOCALES)
+    for (const page of ["", "/docs", "/docs/intl"])
+      expect(entries.find((e) => e.loc === `/${l}${page}`)?.lastmod, `${l}${page}`).toBeUndefined();
+  // The tour's is its frontmatter's `updated`; an event's, a date-time.
+  expect(entries.find((e) => e.loc === `/${SOURCE}/docs/tour`)?.lastmod).toMatch(
+    /^\d{4}-\d{2}-\d{2}$/,
+  );
+  for (const e of entries.filter((e) => /\/events\/[0-9a-f-]{36}$/.test(e.loc)))
+    expect(e.lastmod, e.loc).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/);
+  const robots = await (await get("/robots.txt")).text();
+  expect(robots).toMatch(/^Sitemap: https?:\/\/[^/]+\/sitemap\.xml$/m);
+});
+
 test("the middleware leaves files and API routes alone", async () => {
   // The file itself, not a page: on Cloudflare the Worker sees every request first, and
   // pages/[lang]/ matches /void.svg (a page came back with 200 before the middleware handed files
