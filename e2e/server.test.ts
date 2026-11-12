@@ -296,6 +296,32 @@ test("link previews: the site's picture, name and card on every page; og:url its
   expect([bytes.getUint32(16), bytes.getUint32(20)]).toEqual([1200, 630]);
 });
 
+// Structured data (schema.org JSON-LD, through jsonLd from void-fbtee/head): the site on each
+// language's home page, and each event on its page, in the language it's shown in.
+test("structured data: WebSite on each home page, Event on an event's page", async () => {
+  const data = (html: string) =>
+    [...html.matchAll(/<script type="application\/ld\+json">([^<]*)<\/script>/g)].map(([, json]) =>
+      JSON.parse(json!),
+    );
+  for (const l of LOCALES)
+    expect(data(await (await get(`/${l}`)).text()), l).toEqual([
+      expect.objectContaining({ "@type": "WebSite", url: `${SITE}/${l}`, inLanguage: l }),
+    ]);
+  // A sample event (db/migrations/*_sample_events.sql): the swim, 6:00 on 7 March in Sydney.
+  const list = await (await get(`/${SOURCE}/events`)).text();
+  const swim = list.match(
+    /href="(\/en-US\/events\/[0-9a-f-]{36})"(?:(?!href=)[^])*?Harbour sunrise swim/,
+  )?.[1];
+  expect(swim).toBeTruthy();
+  expect(data(await (await get(swim!.replace("/en-US/", "/th-TH/"))).text())).toEqual([
+    expect.objectContaining({
+      "@type": "Event",
+      startDate: "2027-03-07T06:00:00+11:00",
+      url: `${SITE}${swim!.replace("/en-US/", "/th-TH/")}`,
+    }),
+  ]);
+});
+
 test("the site's icons, web app manifest and robots.txt", async () => {
   const files = {
     "/favicon.ico": /^image\/(x-icon|vnd\.microsoft\.icon)/,

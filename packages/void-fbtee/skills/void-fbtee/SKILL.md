@@ -32,7 +32,11 @@ and description to link previews (`og:title`, `og:description`):
 Where the title is the page's heading, use the heading's own text and description: it's then the
 same entry, translated once. A markdown page's title and description are its frontmatter's
 `title` and `description`, translated with the page; the middleware gives them to link previews.
-So a translated markdown copy keeps a translated `title` and `description` in its frontmatter.
+So a translated markdown copy keeps a translated `title` and `description` in its frontmatter. Structured data for search engines (schema.org JSON-LD) goes in the same `head()` as
+`script: [jsonLd({ "@context": "https://schema.org", "@type": "Event", … })]` (`jsonLd` from
+`void-fbtee/head`), never a script's `innerHTML` written by hand: Void writes it into the page as
+it is, and `jsonLd` escapes what visitors typed so it can't end the script. Its text in the
+language the page shows it in (`inLanguage`).
 
 **Where things are.** Catalogs: `i18n/translations/<locale>.json`, one per locale except the source
 locale; `prepare` writes them, you edit them, nothing else under `i18n/`. Locales:

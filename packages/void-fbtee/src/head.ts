@@ -42,3 +42,22 @@ export function pageHead(page: { title: unknown; description: unknown }): {
   const description = String(page.description);
   return { title, meta: meta({ description, ogTitle: title, ogDescription: description }) };
 }
+
+/**
+ * Structured data for search engines (schema.org JSON-LD), as a script entry for a page's head:
+ * `script: [jsonLd({ "@context": "https://schema.org", "@type": "Event", … })]`. Void writes a
+ * script's innerHTML into the page as it is (packages/void/src/pages/head.ts, Void 1.7.0), and the
+ * data often holds what visitors typed, so `<`, `>` and `&` are written as JSON's \u escapes (the
+ * same data to a JSON reader, never `</script>` to the HTML parser), and so are U+2028 and U+2029.
+ */
+// Built from a string: written as a regex literal, the formatter turns \u2028 and \u2029 into the
+// characters themselves, which end a line in the middle of the regex.
+const UNSAFE = new RegExp("[<>&\\u2028\\u2029]", "g");
+
+export function jsonLd(data: object): { type: string; innerHTML: string } {
+  const json = JSON.stringify(data).replace(
+    UNSAFE,
+    (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`,
+  );
+  return { type: "application/ld+json", innerHTML: json };
+}

@@ -84,6 +84,10 @@ meta: [
 
 The picture's address in full, and a new name for a new picture: sharing apps keep one a long time.
 
+Structured data for search engines (schema.org JSON-LD) goes in a page's `head()` through
+`jsonLd` from `void-fbtee/head`, which escapes it so text a visitor typed can't end the script:
+`script: [jsonLd({ "@context": "https://schema.org", "@type": "Event", name, startDate, … })]`.
+
 ## Using it
 
 How to write translated strings, format dates and numbers in components, build typed links, give

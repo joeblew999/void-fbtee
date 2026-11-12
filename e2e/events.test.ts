@@ -85,6 +85,31 @@ test('a page left open past midnight: "tomorrow" becomes "today" with no reload'
   expect(errors).toEqual([]);
 });
 
+test("an event named </script><script>…: its structured data holds the name, and runs nothing", async () => {
+  const p = await page();
+  const errors = collectErrors(p);
+  const name = "</script><script>window.pwned = 1</script> & party";
+  await p.goto(`/${SOURCE}/events/new`);
+  await started(p);
+  await p.getByTestId("event-title-input").fill(name);
+  await p.getByTestId("event-description-input").fill("Posted by the tests.");
+  await p.getByTestId("event-local-input").fill(TEST_START);
+  await p.getByTestId("event-post").click();
+  await p.waitForURL(/\/events\/[0-9a-f-]{36}$/);
+  // The page as the server sends it, as a search engine reads it: Void updates titles and meta
+  // tags when moving between pages in the browser, not scripts (its head guide), so this one
+  // comes with a full load.
+  await p.reload();
+  await started(p);
+  await seeText(p, "event-title", name);
+  expect(await p.evaluate(() => (window as { pwned?: number }).pwned)).toBeUndefined();
+  const data = JSON.parse(
+    (await p.locator('script[type="application/ld+json"]').textContent()) ?? "{}",
+  );
+  expect(data).toMatchObject({ "@type": "Event", name });
+  expect(errors).toEqual([]);
+});
+
 test("ar-EG: post an event (a missing title first); it is saved neutral and reads the same in English", async () => {
   const p = await page({ timezoneId: "Africa/Cairo" });
   const errors = collectErrors(p);

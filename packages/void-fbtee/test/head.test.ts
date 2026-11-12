@@ -1,7 +1,7 @@
 // void-fbtee/head: unhead's unpackMeta in Void's meta shape, and a page's title and description
 // for search results and link previews. Pure functions: no app.
 import { expect, test } from "vite-plus/test";
-import { meta, pageHead } from "../src/head";
+import { jsonLd, meta, pageHead } from "../src/head";
 
 test("meta: Open Graph as property, the rest as name, every value text, empty ones left out", () => {
   expect(
@@ -31,4 +31,12 @@ test("pageHead: the title and description, and the same two for link previews", 
       { property: "og:description", content: "คำอธิบาย" },
     ],
   });
+});
+
+test("jsonLd: what a visitor typed can't end the script, and it reads back the same", () => {
+  const name = "</script><script>alert(1)</script> & " + String.fromCharCode(0x2028);
+  const { type, innerHTML } = jsonLd({ "@type": "Event", name });
+  expect(type).toBe("application/ld+json");
+  expect(innerHTML).not.toMatch(new RegExp("[<>&\\u2028\\u2029]"));
+  expect(JSON.parse(innerHTML)).toEqual({ "@type": "Event", name });
 });

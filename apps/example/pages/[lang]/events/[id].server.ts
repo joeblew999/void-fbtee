@@ -4,8 +4,10 @@ import { defineHandler, defineHead, type InferProps } from "void";
 import { and, count, db, eq, sql } from "void/db";
 import { revalidate as clearCache } from "void/isr";
 import { z } from "zod";
-import { pageHead } from "void-fbtee/head";
-import { localizedPaths } from "void-fbtee/middleware";
+import type { Event as SchemaEvent, WithContext } from "schema-dts";
+import { Temporal } from "temporal-polyfill";
+import { jsonLd, pageHead } from "void-fbtee/head";
+import { localizedPaths, siteOrigin } from "void-fbtee/middleware";
 import { eventTopic, live } from "../../../src/live";
 
 export type Props = InferProps<typeof loader>;
@@ -63,8 +65,30 @@ export const action = defineHandler.withValidator({ params, body: bookSchema })(
   // No return: Void reruns the loader, so the page shows the new count.
 });
 
-// The event's own title and description, in the page's language where translated.
-export const head = defineHead<Props>((_c, { event, text }) => {
+// The event's own title and description, in the page's language where translated, and the event
+// described for search engines (schema.org's Event, which Google shows as an event in results). Its
+// start with its UTC offset and no zone name (schema.org's DateTime is ISO 8601), as Temporal
+// writes it with timeZoneName "never". The text in the language it's shown in.
+export const head = defineHead<Props>((c, { event, text }) => {
+  const { locale, lang } = c.get("i18n");
   const shown = text ?? event;
-  return pageHead({ title: shown.title, description: shown.description });
+  const data: WithContext<SchemaEvent> = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: shown.title,
+    description: shown.description,
+    startDate: Temporal.ZonedDateTime.from(event.starts_at).toString({ timeZoneName: "never" }),
+    eventStatus: "https://schema.org/EventScheduled",
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    inLanguage: text ? locale : event.locale,
+    url: `${siteOrigin(c)}/${lang}/events/${event.id}`,
+    // Where it is, when the organiser said: the venue as they wrote it.
+    ...(event.venue
+      ? { location: { "@type": "Place", name: event.venue, address: event.venue } }
+      : {}),
+  };
+  return {
+    ...pageHead({ title: shown.title, description: shown.description }),
+    script: [jsonLd(data)],
+  };
 });
