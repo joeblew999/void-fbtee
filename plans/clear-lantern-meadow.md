@@ -115,6 +115,43 @@ makes models, migrations, routes, middleware, SSR, crons and queues only.
 4. **`og:locale:alternate` left out**: Void's de-duplication is documented, by design; at most a
    feature request to Void later, with the user's OK.
 
+## The package's part (it's a Vite plugin and a Vite+ package used by other apps)
+
+Everything above is shown in the example, but what's per-language is void-fbtee's, so the
+package delivers it, `init` sets it up, `check` checks it, and the fresh apps prove it, as for
+the rest of the package. The site-wide tags (name, picture, icons) are each app's own brand:
+`init` doesn't invent them; the package README says how to add them in `void.config.ts`.
+
+1. **A new entry, `void-fbtee/head`**: `pageHead({ title, description })` returns the page's
+   title, description and `og:title`/`og:description` as one `HeadDescriptor`, for a page's
+   `head()`. Built by `vp pack` as a new entry in `packages/void-fbtee/vite.config.ts`, so
+   tsdown writes its `exports` line; publint and attw check it on every build; the fresh check's
+   tarball inspection ("every export … is in it") covers it.
+2. **The middleware** adds `og:url` (the canonical address) beside canonical, hreflang and
+   `og:locale`; and for markdown pages `og:title`/`og:description` from their frontmatter.
+3. **`@void/md` as an optional peer**, as `vite-plus` is: the plugin gives the middleware a
+   `virtual:void-fbtee/md-pages` module that is the app's `@void/md/pages` when the app has
+   `@void/md` (resolved from the app, as `virtual:void-fbtee/hono-route` resolves Hono from
+   beside Void) and an empty list when it doesn't. The fresh check's import check already skips
+   optional peers the app hasn't installed.
+4. **`check`** reports a translated markdown copy without the `title` or `description` its
+   original has (Void makes the page's head and now its Open Graph tags from them); code pages'
+   titles are strings, already reported when untranslated.
+5. **`init` stays as it is:** the middleware's new tags need no setup, `void-fbtee/head` is
+   used in pages rather than set up, and `robots.txt` and the site-wide tags are the app's own.
+6. **Docs that ship:** SKILL.md (pages use `pageHead()` in `head()`; markdown copies keep a
+   translated `title` and `description`), the package README (the site-wide tags in
+   `void.config.ts`, the picture, the icons with `@vite-pwa/assets-generator`).
+7. **Tests:** a package test for `pageHead()`; the in-memory plugin test (`test/plugin.test.ts`)
+   for `virtual:void-fbtee/md-pages` with and without `@void/md`; the fresh apps (pnpm and npm, Vite+
+   and plain Vite) check that each language's page carries canonical, `og:url`, `og:locale`, and
+   `og:title` in that language from a page using `pageHead()`. Each new check shown to fail when
+   what it guards is broken.
+8. **Release notes:** the new `void-fbtee/head` entry and the optional `@void/md` peer.
+9. **Offline trial (separate):** if `vite-plugin-pwa` is ever used, it's another Vite plugin in
+   the app's `plugins` beside `voidFbtee()` (which stays first); the trial reports how the two
+   compose in Void's environments before anything is added.
+
 ## Also in this work (left out of the first draft)
 
 - **Structured data** (JSON-LD, schema.org) through head `script` entries: `WebSite` with
