@@ -35,8 +35,8 @@ the whole; this is the whole, to approve and do as one piece of work.
   `description` only (`packages/void/src/router/compile.ts` 1123–1135). A markdown page gets other
   tags only through a companion `.server.ts` with `head()` (supported: markdown.md, "File
   Structure"), or through a change in Void.
-- **No Open Graph image tool in Void yet:** Satori-based image generation is an open Void request
-  (voidzero-dev/void#442).
+- **No Open Graph image tool in Void yet:** Satori-based `void/og` is a community request
+  (voidzero-dev/void#442) with an open, unmerged pull request (#688), checked 2026-11-12.
 
 ## Answered (2026-11-12)
 
@@ -70,9 +70,11 @@ the whole; this is the whole, to approve and do as one piece of work.
    picture fits every language: the preview's title and description already come in the page's
    language from its own tags. 1200×630, made once and kept in `public/` (made the same way as
    the icons if a standard tool can, else from an SVG). Only `og:image:alt` is translated. Per-page
-   pictures (an event's name on its page) later, through Void's planned Satori support
-   (voidzero-dev/void#442), only after a Thai and an Arabic picture are rendered and look right
-   (item 3 above).
+   pictures (an event's name on its page) maybe later, if Void takes up `void/og`: requested in
+   voidzero-dev/void#442 (opened 2026-10-15 by someone outside the Void team, still open; it
+   notes recent Satori versions don't run on Workers out of the box) with an open pull request,
+   #688, not merged (both checked 2026-11-12). Only after a Thai and an Arabic picture are
+   rendered and look right (item 3 above).
 3. **Manifest per language:** one per language, linked from that language's pages, name and
    description through the same catalogs.
 4. **`og:locale:alternate`:** report Void's de-duplication (with the user's OK), as #802 was.
