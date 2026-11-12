@@ -176,38 +176,48 @@ account) is left out: there isn't one.
 7. **`og:locale:alternate` left out** (§1); at most a feature request to Void later, with the
    user's OK. Facebook's locale list uses `ar_AR`, not `ar_EG`; low impact, noted.
 
-8. **Made when asked for, and cached: no generated files where a route can do it** (the user,
-   2026-11-12). Void's page cache (ISR, `docs/guide/edge/revalidation.md`, Void 1.7.0) does the
-   caching; nothing new is built for it.
-   - **Today** only the markdown docs are cached (`x-isr-cache: HIT` on `/en-US/docs/tour`,
-     checked live 2026-11-12); the home, events and code docs pages have no cache time, so every
-     visit renders them, although the app already clears them on every write (posting:
-     `pages/[lang]/events/index.server.ts` 50; booking: `events/[id].server.ts` 55; translations
-     arriving: `queues/translate.ts` 62).
-   - **Tied to the deploy:** "deploys clear the ISR cache" (revalidation guide, "Per-path
-     revalidation"), so a cache time of `31536000` means "until the next deploy". Every page and
-     route whose content only a deploy changes gets it: the home pages, the code docs pages, the
-     markdown docs, `/manifest.webmanifest`, `/sitemap.xml` (also cleared on writes, below).
-   - **Cleared when data changes:** the event pages and `/sitemap.xml` cached until the deploy
-     too, and cleared by the writes that change them: posting clears the events lists and the
-     sitemap, booking clears that event's pages (seats left), translations arriving clear that
-     event's pages and the sitemap. `/sitemap.xml` is added to the existing `revalidate()` calls.
-   - **Changed by time alone:** the events list shows only events not yet started
-     (`events/index.server.ts` 22, `gte(starts_at_utc, now)`), so it changes with no write. It gets
-     a short cache time, 60 seconds; Void serves the cached page while it renders the new one in
-     the background, so no visitor waits, and an event drops off the list within a minute of
-     starting.
-   - **Set in one place:** `routing.revalidate` in `void.config.ts`, a pattern per path (first
-     match wins), so the cache times are visible together; not spread over pages.
+8. **Caching, done first, the Void way** (the user, 2026-11-12: caching before anything else).
+   Void has two tools, both in Void 1.7.0 (`docs/guide/edge/prerendering.md`,
+   `docs/guide/edge/revalidation.md`), and nothing new is built:
+   - **Prerendering, for pages only a deploy changes:** `export const prerender = true` in the
+     page's `.server.ts`. Void renders it once per deploy, before traffic reaches the new version,
+     and keeps it until the next deploy ("Prerendered pages default to a one-year revalidate TTL.
+     Deploys clear the ISR cache."). Markdown pages are prerendered automatically (today's
+     `x-isr-cache: HIT` on `/en-US/docs/tour`, checked live 2026-11-12). A page with a URL param
+     needs `getPrerenderPaths()`, and every page here sits under `[lang]`, so each lists its
+     languages.
+   - **Revalidation, for pages made from data:** `export const revalidate = <seconds>` (the cache
+     time), and `revalidate({ paths })` from `void/isr` wherever the data changes. Void serves the
+     cached page while it renders a fresh one, so nobody waits.
+   - **Each page, checked in its code 2026-11-12:**
+
+     | Page                                             | Changes when                                            | How                                                                                                                                                |
+     | ------------------------------------------------ | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+     | Home (`pages/[lang]/index`)                      | a deploy (its `defer` is a fixed demo)                  | prerender                                                                                                                                          |
+     | Docs home, Intl, Temporal (`pages/[lang]/docs`)  | a deploy (fixed dates; no current time)                 | prerender                                                                                                                                          |
+     | Markdown docs                                    | a deploy                                                | prerendered already                                                                                                                                |
+     | Events list (`events/index`)                     | a post, and time (only events not yet started, line 22) | `revalidate = 60`; cleared on posting (already, line 50)                                                                                           |
+     | An event (`events/[id]`)                         | a booking (seats left), translations arriving           | `revalidate = 31536000` (until the deploy); cleared on booking (already, line 55) and when translations arrive (already, `queues/translate.ts` 62) |
+     | `/sitemap.xml`, `/manifest.webmanifest` (routes) | a post or translations (sitemap); a deploy (manifest)   | `x-revalidate: 31536000` on the response; the sitemap added to the posting and translation `revalidate()` calls                                    |
+
+     Today none but the markdown pages are cached: no page sets a cache time.
+
+   - **In the pages, not one list in `void.config.ts`:** prerendering is a page's own export, so
+     both settings sit beside the page they're about.
+   - **void-fbtee's part:** a `langParams()` export, each language as `{ lang }` typed as
+     `PageParams<"/:lang">[]` (Void's `void/routes`), so a page's `getPrerenderPaths` is
+     `export const getPrerenderPaths = langParams;`, and adding a language prerenders it
+     everywhere. Beside `localizedPaths()` in `void-fbtee/middleware`.
    - **Never cached, by Void's rules:** `/api/*`; requests with a cookie or `Authorization`;
      responses with `Set-Cookie`, `Cache-Control: private`/`no-store`, or `Vary` on a request
      header. void-fbtee's middleware must never add one of those to a page, or the page silently
-     stops being cached: a test checks the response headers.
-   - **Files in `public/`** (icons, the preview picture, `robots.txt`) are Void's static files,
-     cached until the next deploy (`docs/guide/edge/static-assets.md`); they stay files, since
-     drawing PNGs needs `sharp`, which doesn't run on Workers.
-   - **Proof:** after the deploy, each page and route answers `x-isr-cache: HIT` on its second
-     visit; after posting an event, the list and sitemap show it at once.
+     stops being cached: a test checks the headers.
+   - **Files in `public/`** (icons, the preview picture, `robots.txt`): Void's static files, cached
+     until the next deploy (`docs/guide/edge/static-assets.md`); they stay files, since drawing
+     PNGs needs `sharp`, which doesn't run on Workers.
+   - **Proof:** after the deploy, the prerendered pages answer `x-isr-cache: HIT` on their first
+     visit, the others on their second; a new event shows in the list and the sitemap at once; a
+     booking changes the seats left at once.
 
 ## 5. The package's part (Void add-on, Vite plugin, Vite+ package)
 
