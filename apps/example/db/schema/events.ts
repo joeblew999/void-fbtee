@@ -18,6 +18,8 @@ export const events = sqliteTable("events", {
   // The same moment in UTC ("…Z"), for sorting and for "upcoming".
   starts_at_utc: text("starts_at_utc").notNull(),
   seats: integer("seats").notNull(),
+  // Where it happens, in the organiser's words ("Riverside Park, by the bandstand"); optional.
+  venue: text("venue"),
   // The language the organiser wrote the title and description in.
   locale: text("locale").notNull(),
   createdAt: text("created_at")
@@ -52,8 +54,9 @@ export const newEventSchema = createInsertSchema(events, {
   title: (s) => s.trim().min(1).max(120),
   description: (s) => s.trim().min(1).max(2000),
   seats: (s) => s.int().min(1).max(10_000),
+  venue: (s) => s.trim().max(200),
 })
-  .pick({ title: true, description: true, seats: true })
+  .pick({ title: true, description: true, seats: true, venue: true })
   .extend({ local: z.string().refine(isLocalTime), time_zone: z.string().refine(isZone) });
 
 /** The row for a new event: its start in its own zone, and the same moment in UTC. */

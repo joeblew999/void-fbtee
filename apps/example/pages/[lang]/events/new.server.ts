@@ -28,6 +28,7 @@ export const action = defineHandler.withValidator({
       title: body.title,
       description: body.description,
       seats: body.seats,
+      venue: body.venue || null,
       locale,
       ...startsAt(body.local, body.time_zone),
     })

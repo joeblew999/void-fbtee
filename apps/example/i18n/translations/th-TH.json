@@ -1836,6 +1836,30 @@
         }
       ],
       "types": []
+    },
+    "cL5JMpI7L0qvqM9nTfTOUQ==": {
+      "description": "Where an event happens, as its organiser wrote it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สถานที่: {venue}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jRRRckE2inw09CelDkWvtw==": {
+      "description": "Form label: where the event happens (optional)",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สถานที่ (ไม่บังคับ)",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

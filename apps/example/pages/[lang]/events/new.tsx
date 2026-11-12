@@ -21,7 +21,7 @@ function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
   const { lang } = useLocale();
   const form = useForm(
     "/[lang]/events/new",
-    { title: "", description: "", local: "", time_zone: zone ?? "", seats: 20 },
+    { title: "", description: "", venue: "", local: "", time_zone: zone ?? "", seats: 20 },
     { params: { lang } },
   );
   const error = (field: keyof typeof form.errors, message: React.ReactNode) =>
@@ -60,6 +60,17 @@ function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
               "description",
               <fbt desc="Form error: the description is missing">Say what it's about.</fbt>,
             )}
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="event-venue">
+              <fbt desc="Form label: where the event happens (optional)">Where (optional)</fbt>
+            </Label>
+            <Input
+              id="event-venue"
+              data-testid="event-venue-input"
+              value={form.data.venue ?? ""}
+              onChange={(e) => form.setData("venue", e.target.value)}
+            />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2">

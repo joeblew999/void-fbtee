@@ -167,6 +167,13 @@ export default function Event({ event, text, left }: Props) {
         {shown.title}
       </h1>
       <EventTime startsAt={event.starts_at} />
+      {event.venue && (
+        <p className="text-sm" data-testid="event-venue">
+          <fbt desc="Where an event happens, as its organiser wrote it">
+            Where: <fbt:param name="venue">{event.venue}</fbt:param>
+          </fbt>
+        </p>
+      )}
       <p className="max-w-prose" lang={textLang} data-testid="event-description">
         {shown.description}
       </p>
