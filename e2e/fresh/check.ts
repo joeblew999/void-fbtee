@@ -358,7 +358,9 @@ async function checkDev(target: string, dir: string, app: App) {
  * build per system (@nkzw/oxc-transform-fbtee-binding-*).
  */
 function checkMacLockfile(target: string, dir: string) {
-  const mac = ["--os=darwin", "--cpu=arm64"];
+  // Only the lockfile a Mac writes: install scripts (workerd's checks its build) run on the Mac,
+  // against its own builds, so not here. `npm ci` below runs them, as Linux CI does.
+  const mac = ["--os=darwin", "--cpu=arm64", "--ignore-scripts"];
   rmSync(join(dir, "node_modules"), { recursive: true, force: true });
   rmSync(join(dir, "package-lock.json"), { force: true });
   run("npm", ["install", ...mac], dir);
