@@ -42,7 +42,9 @@ export default defineConfig({
   // shadcn's "@/" import alias (tsconfig.json "paths" says the same for TypeScript).
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
   plugins: [
-    voidFbtee({ sourceLocale, locales }),
+    // site: the deployed address, so the dev server and Worker Previews name it in canonical,
+    // hreflang, og:url and the sitemap (Void's deploy summary shows it).
+    voidFbtee({ sourceLocale, locales, site: "https://void-fbtee-example.gedw99.workers.dev" }),
     voidPlugin(),
     voidReact({ react: { compiler: true } }),
     voidMarkdown(),

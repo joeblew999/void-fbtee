@@ -19,19 +19,27 @@ test('"/" always redirects to the source language, whatever the browser asks for
   }
 });
 
-test("page head: lang, dir, hreflang alternates with x-default, canonical, og:locale, i18n meta", async () => {
+// voidFbtee({ site }) in apps/example/vite.config.ts: every copy of the site (this one, the dev
+// server, a Worker Preview) names the deployed address.
+const SITE = "https://void-fbtee-example.gedw99.workers.dev";
+
+test("page head: lang, dir, hreflang alternates with x-default, canonical, og:url, og:locale, i18n meta", async () => {
   const html = await (await get("/ar-EG/docs/intl")).text();
   // The <html> attributes, in any order (Void's own, class and data-theme, come first).
   const htmlTag = html.match(/<html\b[^>]*>/)?.[0] ?? "";
   expect(htmlTag).toContain('lang="ar-EG"');
   expect(htmlTag).toContain('dir="rtl"');
-  for (const l of LOCALES)
-    expect(html).toContain(`hreflang="${l}" href="${url("prod")}/${l}/docs/intl"`);
-  expect(html).toContain(`hreflang="x-default" href="${url("prod")}/en-US/docs/intl"`);
+  for (const l of LOCALES) expect(html).toContain(`hreflang="${l}" href="${SITE}/${l}/docs/intl"`);
+  expect(html).toContain(`hreflang="x-default" href="${SITE}/en-US/docs/intl"`);
   // Its own address as canonical, and Open Graph's locale as language_TERRITORY (no
   // og:locale:alternate: Void keeps one meta tag per property, src/middleware.ts says more).
-  expect(html).toContain(`rel="canonical" href="${url("prod")}/ar-EG/docs/intl"`);
+  expect(html).toContain(`rel="canonical" href="${SITE}/ar-EG/docs/intl"`);
   expect(html.match(/<link rel="canonical"/g)).toHaveLength(1);
+  expect(html).toContain(`property="og:url" content="${SITE}/ar-EG/docs/intl"`);
+  // Not on a page outside the languages: the same path under each language isn't a page.
+  const outside = await (await get("/no-such-page")).text();
+  expect(outside).not.toContain("hreflang=");
+  expect(outside).not.toContain('rel="canonical"');
   expect(html).toContain('property="og:locale" content="ar_EG"');
   const meta = html.match(/<meta name="void-fbtee" content="([^"]*)"/)?.[1];
   const i18n = JSON.parse(meta!.replaceAll("&quot;", '"'));

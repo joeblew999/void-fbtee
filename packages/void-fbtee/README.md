@@ -53,6 +53,18 @@ vp run i18n:translate
 `init` adds only what's missing, so it's safe to run again. `void-fbtee check` lists anything
 untranslated or not set up, and `void-fbtee --help` lists the commands.
 
+Then give it the site's own address, so every copy of the site (the dev server, a Worker Preview)
+names the real one in each page's canonical, hreflang and `og:url`, and in the sitemap
+(`siteOrigin()` from `void-fbtee/middleware`). In the app's `vite.config.ts`:
+
+```ts
+voidFbtee({ sourceLocale, locales, site: "https://example.com" });
+```
+
+`https://`, the host alone (no path, no trailing slash). Without it, each page uses the address
+its request came to. A change to `voidFbtee()`'s options needs the dev server restarted: Vite reads
+the plugin once, when it starts.
+
 ## Using it
 
 How to write translated strings, format dates and numbers in components, build typed links, give

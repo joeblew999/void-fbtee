@@ -47,6 +47,21 @@ describe("its shape", () => {
   });
 });
 
+describe("the site option", () => {
+  test("an https address of a host alone, or none", () => {
+    expect(() => voidFbtee({ ...options, site: "https://example.com" })).not.toThrow();
+    expect(() => voidFbtee(options)).not.toThrow();
+    for (const site of [
+      "http://example.com",
+      "https://example.com/",
+      "https://example.com/blog",
+      "example.com",
+      "https://example.com?x=1",
+    ])
+      expect(() => voidFbtee({ ...options, site }), site).toThrow(/https address of a host alone/);
+  });
+});
+
 describe("per environment", () => {
   let client: string;
   let browser: string;

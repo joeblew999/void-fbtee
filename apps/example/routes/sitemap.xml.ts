@@ -11,7 +11,7 @@ import XMLBuilder from "fast-xml-builder";
 import { defineHandler } from "void";
 import { db, eq, max } from "void/db";
 import { routeUrl } from "void/routes";
-import { appLocales, langParams } from "void-fbtee/middleware";
+import { appLocales, langParams, siteOrigin } from "void-fbtee/middleware";
 
 /** One page in every language: its address in each, and its last real change where there is one. */
 type Page = { urls: Record<string, string>; lastmod?: (locale: string) => string | undefined };
@@ -25,7 +25,7 @@ const newest = (...dates: (string | null | undefined)[]) =>
     .at(-1);
 
 export const GET = defineHandler(async (c) => {
-  const origin = new URL(c.req.url).origin;
+  const origin = siteOrigin(c);
   const locales = appLocales();
   const langs = langParams();
   // The same page in each language, by locale.

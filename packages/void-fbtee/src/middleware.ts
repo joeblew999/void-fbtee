@@ -86,6 +86,15 @@ export async function inEveryLocale<T>(
   );
 }
 
+/**
+ * The site's own address: `voidFbtee({ site })`, or else the one this request came to. For anything
+ * that writes full addresses (a sitemap, robots.txt's Sitemap line), so they match the pages'
+ * canonical and hreflang.
+ */
+export function siteOrigin(c: { req: { url: string } }): string {
+  return config.site ?? new URL(c.req.url).origin;
+}
+
 /** The app's languages (`voidFbtee({ locales })`), for server code that works per language. */
 export function appLocales(): string[] {
   return config.locales.map((l) => l.locale);
@@ -120,15 +129,19 @@ const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (
     now: Temporal.Now.instant().toString(),
     path: rest,
   };
-  const origin = new URL(c.req.url).origin;
-  const alternates = [
-    ...config.locales.map((l) => ({ hreflang: l.locale, segment: l.segment })),
-    { hreflang: "x-default", segment: source.segment },
-  ].map(({ hreflang, segment }) => ({
-    rel: "alternate",
-    hreflang,
-    href: `${origin}/${segment}${rest}`,
-  }));
+  const origin = siteOrigin(c);
+  // Only on a page in one of the languages: anywhere else (a page with no language in its path)
+  // the same path under each language isn't a page.
+  const alternates = !found
+    ? []
+    : [
+        ...config.locales.map((l) => ({ hreflang: l.locale, segment: l.segment })),
+        { hreflang: "x-default", segment: source.segment },
+      ].map(({ hreflang, segment }) => ({
+        rel: "alternate",
+        hreflang,
+        href: `${origin}/${segment}${rest}`,
+      }));
   c.set("i18n", i18n);
   const shared = (c.get("shared") ?? {}) as Record<string, unknown>;
   const head = c.get("headDefaults") ?? {};
@@ -142,7 +155,10 @@ const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (
   const page = found
     ? {
         link: [{ rel: "canonical", href: `${origin}/${found.segment}${rest}` }],
-        meta: [{ property: "og:locale", content: found.locale.replace("-", "_") }],
+        meta: [
+          { property: "og:locale", content: found.locale.replace("-", "_") },
+          { property: "og:url", content: `${origin}/${found.segment}${rest}` },
+        ],
       }
     : { link: [], meta: [] };
   c.set("headDefaults", {

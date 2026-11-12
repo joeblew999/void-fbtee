@@ -57,6 +57,13 @@ export interface VoidFbteeOptions {
    * "Locale Matching and Fallback".
    */
   fallbackLocales?: FallbackLocales;
+  /**
+   * The site's own address, e.g. "https://example.com": each page's canonical, hreflang and og:url
+   * are built from it, so a copy of the site at another address (the dev server, a Worker
+   * Preview) still names the real one. `https://`, host only: no path, no trailing slash. Without
+   * it, the address each request came to.
+   */
+  site?: string;
 }
 
 /** What the plugin exposes on its `api`, for the void-fbtee command (read with resolveConfig). */
@@ -94,8 +101,21 @@ export const toTemporalInstant = Date.prototype.toTemporalInstant;
 // plugin; report once per app and command in this process.
 const reportedRuns = new Set<string>();
 
+/** voidFbtee({ site }) must be an https address of a host alone, as canonical URLs are built on it. */
+function checkSite(site: string): void {
+  let url: URL | undefined;
+  try {
+    url = new URL(site);
+  } catch {}
+  if (!url || url.protocol !== "https:" || url.origin !== site)
+    throw new Error(
+      `voidFbtee({ site }): "${site}" isn't an https address of a host alone, e.g. "https://example.com" (no path, no trailing slash)`,
+    );
+}
+
 export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   const config: LocaleConfig = resolveLocales(options.sourceLocale, options.locales);
+  if (options.site !== undefined) checkSite(options.site);
   const translationsDir = options.translations ?? DEFAULT_TRANSLATIONS;
   const src = options.src ?? DEFAULT_SRC;
   const require = createRequire(import.meta.url);
@@ -209,7 +229,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       handler(id) {
         if (id === SERVER_TEMPORAL_ID) return SERVER_TEMPORAL;
         if (id === "\0" + CONFIG_ID)
-          return `export default ${JSON.stringify({ ...config, fallbackLocales: options.fallbackLocales })};`;
+          return `export default ${JSON.stringify({ ...config, fallbackLocales: options.fallbackLocales, site: options.site })};`;
         if (id === "\0" + CATALOGS_ID) {
           const entries = config.locales
             .filter((l) => l.locale !== config.sourceLocale)

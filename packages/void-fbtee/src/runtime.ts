@@ -9,6 +9,8 @@ import type { LocaleConfig } from "./locales";
 export interface RuntimeConfig extends LocaleConfig {
   /** fbtee's own fallbackLocales option, passed through as is. */
   fallbackLocales?: FallbackLocales;
+  /** voidFbtee({ site }): the site's own address, or none. */
+  site?: string;
 }
 
 /** One lazy loader per translated locale; each resolves to { [locale]: fbtee's table }. */
