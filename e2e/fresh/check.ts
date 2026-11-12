@@ -151,9 +151,18 @@ function checkOwnDependencies(dir: string, installed: string) {
     for (const m of code.matchAll(/(?:from|import)\s*\(?\s*"([^".][^"]*)"/g)) specifiers.add(m[1]);
   }
   const outside: string[] = [];
+  // An optional peer the app hasn't installed is left out: the part that imports it isn't loaded
+  // there (vite-plus: only Vite+'s linter loads void-fbtee/lint).
+  const own = JSON.parse(readFileSync(join(installed, "package.json"), "utf8"));
+  const appPkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
+  const optional = (name: string) =>
+    own.peerDependenciesMeta?.[name]?.optional &&
+    !appPkg.dependencies?.[name] &&
+    !appPkg.devDependencies?.[name];
   for (const spec of specifiers) {
     if (spec.startsWith("node:") || spec.startsWith("virtual:")) continue;
     const name = spec.startsWith("@") ? spec.split("/").slice(0, 2).join("/") : spec.split("/")[0];
+    if (optional(name)) continue;
     // Node's lookup: the first node_modules/<name> walking up from the package's folder.
     let found: string | undefined;
     for (let d = installed; !found; d = dirname(d)) {
