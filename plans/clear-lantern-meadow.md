@@ -1,171 +1,179 @@
 # plans/clear-lantern-meadow.md
 
 Every page's metadata for link previews, search and home screens, complete and in each page's
-language, done the way Void lays head tags out. Written 2026-11-12, after `fb26cfc`, which added
-only icons, the manifest, `robots.txt`, the canonical link and `og:locale`. That was a part, not
-the whole; this is the whole, to approve and do as one piece of work.
+language, made by existing libraries wherever one does the job, and delivered by void-fbtee as a
+Void add-on, Vite plugin and Vite+ package. Rewritten 2026-11-12 after an independent review (17
+findings) and a library search; it replaces the earlier drafts. To approve, then do as one piece
+of work.
 
-## What a page needs, and what's there
+## 0. First: Void 1.8.0
 
-| Tag                                                             | Where it comes from                                      | Today                                               |
-| --------------------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------- |
-| `<title>`, `description`                                        | the page's `head()` (code pages), frontmatter (markdown) | there, translated                                   |
-| canonical                                                       | void-fbtee middleware                                    | there                                               |
-| `hreflang` alternates, `x-default`                              | void-fbtee middleware                                    | there                                               |
-| `og:locale`                                                     | void-fbtee middleware                                    | there                                               |
-| `og:locale:alternate` (one per other language)                  | —                                                        | impossible in Void 1.8.0: one meta tag per property |
-| `og:title`, `og:description`                                    | the page's own title and description                     | missing                                             |
-| `og:url` (same as canonical), `og:type`, `og:site_name`         | per page / per site                                      | missing                                             |
-| `og:image`, `og:image:width`, `og:image:height`, `og:image:alt` | a picture, its alt text translated                       | missing (no picture)                                |
-| `twitter:card`, title, description, image                       | as Open Graph                                            | missing                                             |
-| `apple-mobile-web-app-title`                                    | site name                                                | missing                                             |
-| manifest `name`, `short_name`, `description`, `lang`, `dir`     | per language                                             | English only                                        |
-| icons, `theme-color`, `robots.txt`                              | `void.config.ts`, `public/`                              | there                                               |
+The repo pins Void 1.7.0 (`pnpm-workspace.yaml` catalog: `void`, `@void/md`, `@void/react`). This
+work needs 1.8.0 (released 2026-11-12): the `_not-found`/`_error` pages
+(`docs/guide/pages-routing/errors.md`) don't exist in 1.7.0, and every Void line cited here is
+1.8.0's. So: the catalog to 1.8.0, `vp install`, `vp run check:tools`, the tests; the package's
+peer range `void ^1.7.0` checked against what it then uses (`plans/brisk-copper-wren.md` item 2).
 
-## What Void and Vite+ give (full sweep, 2026-11-12)
-
-Every page of Void 1.8.0's docs (106 files under `docs/`) searched for sitemap, robots, llms,
-JSON-LD, noindex, favicon, manifest, `og:`, twitter, canonical, hreflang, i18n, locale, `public/`,
-`_headers`, `titleTemplate`, `headDefaults`, `script`; the matches read; `void gen`'s generators
-and Void's packages' source searched too; and Vite+'s docs (`node_modules/vite-plus/docs`).
-
-**Void gives (and this work uses):**
+## 1. What Void and Vite+ give (full sweep of Void 1.8.0's docs and source, 2026-11-12)
 
 - **One head system, three layers** (`docs/guide/pages-routing/head.md`): `head` in
-  `void.config.ts` (site-wide: the icon links, `theme-color`, `color-scheme`), `headDefaults` in
-  middleware (void-fbtee: `lang`/`dir`, hreflang, canonical, `og:locale`), and the page's
-  `head()` or, for markdown, its frontmatter. Page wins; `link` and `script` are concatenated.
-- **Meta tags de-duplicate by `name`/`property`**, documented in the head guide's precedence
-  table: by design, so `og:locale:alternate` (one tag per other language) can't be expressed. A
-  feature request to Void at most, not a bug report.
-- **`script` entries take `innerHTML` and any attribute**: structured data goes in as
-  `{ type: "application/ld+json", innerHTML: JSON.stringify(…) }`, the Void way. Scripts are
-  rendered on the server only (not re-applied on client-side navigation), which is what search
-  engines read.
-- **Titles, meta tags and links update on client-side navigation**, so the Open Graph tags follow
-  the page.
-- **Markdown pages:** frontmatter `title` and `description` only (`head.md`, "Markdown pages";
-  `packages/void/src/router/compile.ts` 1123–1135).
-- **`public/`:** files served as they are, cached until the next deploy
-  (`docs/guide/edge/static-assets.md`); with middleware, application code runs first
-  ("Navigation and middleware"), which is why void-fbtee hands unknown one-segment paths to
-  Void's not-found handler. `.webmanifest` is served as `application/manifest+json`
-  (`packages/edge/src/static.ts`).
-- **Not-found and error pages** (`_not-found`, `_error`, `docs/guide/pages-routing/errors.md`)
-  answer with their real status (404, 500), so search engines don't index them: no `noindex`
-  needed.
+  `void.config.ts` (fixed for the site), `headDefaults` in middleware (per request), the page's
+  `head()` or a markdown page's frontmatter. Page wins; `link` and `script` lists are joined from
+  all layers (`packages/void/src/pages/head.ts`, `resolveHead`).
+- **Meta tags de-duplicate by `name`/`property`**, by design (head guide's precedence table). So
+  `og:locale:alternate` (one per other language) can't go through the head API; HTMLRewriter
+  after `next()` could add it, which isn't worth it. Left out.
+- **`script` entries** take `innerHTML` and any attribute, rendered on the server only; Void writes
+  `innerHTML` as given, unescaped (`head.ts` 160–166).
+- **Titles, meta tags and links update on client-side navigation**; scripts don't.
+- **Markdown pages:** `<title>` and `description` from frontmatter `title`/`description` only
+  (`packages/void/src/router/compile.ts` 1123–1135; `packages/void/src/pages/scan.ts` 706–719).
+- **`@void/md/pages`** exists only inside the void-md plugin (its `resolveId`/`load`,
+  `packages/md/src/plugin.ts` 288, 365); `@void/md`'s `package.json` exports `./pages` as types
+  only. Its `title` falls back to the first heading (`markdown.md` 251); `frontmatter.title`
+  doesn't.
+- **`public/`** served and cached until the next deploy (`docs/guide/edge/static-assets.md`); with
+  middleware, app code runs first ("Navigation and middleware"), hence void-fbtee's hand-off of
+  unknown one-segment paths to Void's not-found handler. `.webmanifest` served as
+  `application/manifest+json` (`packages/edge/src/static.ts`).
+- **`routing.alwaysUseHttps`** (`docs/reference/config.md` 372) redirects `http` to `https`.
+- **Not-found pages answer 404** (checked live: `/nope/x`, `/xx-XX/events`), so they aren't
+  indexed; no `noindex`. Caveat: a failure in a deferred loader after the page has started
+  streaming (the home page uses `defer`) can't change the 200 already sent.
+- **Void doesn't give:** tag helpers, structured data helpers, icons, manifest, preview pictures
+  (`void/og` is a community request, voidzero-dev/void#442, opened 2026-10-15, with an unmerged
+  pull request #688), sitemap, link checking. `void gen` makes models, migrations, routes,
+  middleware, SSR, crons, queues only.
+- **Vite+ gives nothing here**: the build and tool layer; `public/` is Vite's, served by Void.
 
-**Void doesn't give:** icon or manifest generation, Open Graph or Twitter tag helpers, preview
-pictures (only the community request #442 below), structured data helpers, a sitemap. `void gen`
-makes models, migrations, routes, middleware, SSR, crons and queues only.
+## 2. Libraries, one per job (npm versions and dates checked 2026-11-12)
 
-**Vite+ gives nothing here:** it's the build and tool layer; `public/` is Vite's, served by Void.
+| Job                                                                                          | Library                                             | Version, updated                          | Why it fits                                                                                                                                                                                                                                                                                    |
+| -------------------------------------------------------------------------------------------- | --------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Open Graph, Twitter, `theme-color`, `color-scheme` meta tags                                 | `unhead` (`unhead/utils`, `unpackMeta`)             | 3.4.3, 2026-10-13, MIT                    | A pure function: `{ ogTitle, ogUrl, ogImage: {…}, twitterCard, … }` → `{ property \| name, content }[]`, Void's `meta` shape; knows which tags are `property` vs `name`; typed. Run and checked; needs none of unhead's head manager (`unhead/utils` imports only its own files, under 10 KB). |
+| Structured data (JSON-LD)                                                                    | `schema-dts` (Google)                               | 2.1.0, 2026-10-02                         | Types only (devDependency): `WebSite`, `Event` objects checked against schema.org.                                                                                                                                                                                                             |
+| Icons                                                                                        | `@vite-pwa/assets-generator`                        | 2.0.0, 2026-10-25                         | In use (`vp run icons`).                                                                                                                                                                                                                                                                       |
+| Preview picture (one, fixed)                                                                 | `sharp`                                             | already installed with the icon generator | Renders the picture's SVG to PNG once, like the icons.                                                                                                                                                                                                                                         |
+| Sitemap with language alternates                                                             | `sitemap`                                           | 10.0.0, 2026-10-19                        | Writes `xhtml:link` hreflang alternates. Decided below.                                                                                                                                                                                                                                        |
+| Preview pictures per page, maybe later                                                       | `@cf-wasm/og` (Satori + resvg packaged for Workers) | 0.5.0, 2026-08-01                         | Solves what #442 says is hard on Workers. Only after Thai and Arabic render right.                                                                                                                                                                                                             |
+| Checking: search audits (title, description, hreflang, canonical, `robots.txt`, `lang`, alt) | `lighthouse` / `@lhci/cli`                          | 13.6.0, 2026-11-12 / 0.16.1, 2026-11-11   | Runs unattended against the preview or deployed site.                                                                                                                                                                                                                                          |
+| Checking: previews as sharing apps read them                                                 | `open-graph-scraper`                                | 6.13.0, 2026-10-29                        | Reads `og:`/`twitter:` from a page.                                                                                                                                                                                                                                                            |
+| Checking: icon set                                                                           | `@realfavicongenerator/check-favicon`               | 0.9.3, 2026-09-19                         | Checks a site's icons and manifest.                                                                                                                                                                                                                                                            |
+| Checking: links, markdown included                                                           | `linkinator`                                        | 8.1.0, 2026-08-29                         | Crawls every link; catches markdown dead links Void doesn't.                                                                                                                                                                                                                                   |
 
-## Answered (2026-11-12)
+Ruled out: `@unhead/schema-org` (a plugin for unhead's head manager), `@unhead/react`,
+`react-helmet-async`, `next-seo`, `@nuxtjs/seo`, `astro-seo` (each a framework's own head system);
+stale: `workers-og` (2025-06), `og-img` (2024), `vite-plugin-sitemap` (2025-05),
+`vite-plugin-robots` (2024), `vite-plugin-favicons-inject` (2023), `generate-robotstxt` (2022),
+`broken-link-checker` (2022). Nuxt SEO's module list (robots, sitemap, og-image, schema-org,
+link-checker, site-config, ai-ready, skew-protection) was the checklist for this plan.
 
-1. **Markdown pages can get their Open Graph tags from their own frontmatter**, with no
-   `.server.ts` per page per language: `@void/md/pages` (each page's path, title, frontmatter)
-   resolves on the server as well as in the browser (`packages/md/src/plugin.ts`, the
-   `@void/md/pages` virtual module; the docs layout already reads it while the page renders). What
-   reads it for the head (app middleware, or void-fbtee's when the app has @void/md) is item 1
-   below.
-2. **No established library builds Open Graph tags as a plain `HeadDescriptor`:** unhead's
-   `useSeoMeta` builds the set but needs unhead's own head manager, which Void doesn't use. So a
-   small function in void-fbtee (it knows the language, canonical URL and `og:locale`) is the
-   honest option, not a reinvented library.
-3. **Preview pictures:** `satori` (0.63.2, updated 2026-10-20) and `@vercel/og` (1.0.3,
-   2026-09-22) are current; `workers-og` (0.0.27, 2025-06-12) isn't. But Satori's right-to-left
-   support has been broken (vercel/satori#745: Arabic "rendered left-aligned with incorrect word
-   ordering", still open when found) and Thai/Arabic shaping came in another change (#735);
-   whether 0.63.2 has either is unknown. A Thai and an Arabic picture must be rendered and looked
-   at before choosing it; if they're wrong, static pictures per language, made once.
+## 3. What each page gets, and from where
 
-## Decided (by Claude, 2026-11-12, reasons with each)
+| Tags                                                                                                                                                                             | Where                                                                      | How                                                        |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `<title>`, `description`                                                                                                                                                         | page `head()` / frontmatter                                                | there, translated                                          |
+| `og:title`, `og:description`                                                                                                                                                     | page `head()`; markdown: middleware from `frontmatter.title`/`description` | `unpackMeta`                                               |
+| canonical, hreflang, `x-default`, `og:url`, `og:locale`                                                                                                                          | void-fbtee middleware                                                      | `og:url` via `unpackMeta`; one fixed site address, `https` |
+| `og:site_name`, `og:type`, `og:image` (+ `:width`, `:height`, `:type`, `:alt`), `twitter:card`, `twitter:image:alt`, `theme-color`, `color-scheme`, `apple-mobile-web-app-title` | `void.config.ts` `head`, once                                              | `unpackMeta`; `og:image` an absolute URL                   |
+| `WebSite` JSON-LD                                                                                                                                                                | each language's home page `head()`                                         | `schema-dts` types, escaped                                |
+| `Event` JSON-LD                                                                                                                                                                  | each event page's `head()`                                                 | `schema-dts` types, escaped                                |
+| icons, manifest, `robots.txt`, sitemap                                                                                                                                           | `public/` and `void.config.ts`                                             | as below                                                   |
 
-1. **Who writes which tags**, each at the one layer that knows it:
-   - **`void.config.ts` `head`, once for the site** (they never change): `og:site_name`,
-     `og:type` (`website`), `og:image` with `og:image:width`/`height`/`alt` (the picture has only
-     the name on it, so its alt text, "void-fbtee", is a name and isn't translated),
-     `twitter:card` (`summary_large_image`), `apple-mobile-web-app-title`, `color-scheme`.
-   - **void-fbtee middleware, per language** (it knows the language and the address): canonical,
-     hreflang, `og:locale` (there today), and `og:url`, the same address as the canonical.
-   - **Each code page's `head()`**: `og:title` and `og:description` from its own translated
-     strings, through one small void-fbtee function that returns its title, description and
-     those two tags together, so a page adds no extra lines (Void's own example puts `og:title`
-     in the page's `head()`).
-   - **Markdown pages**: `og:title` and `og:description` from their frontmatter, added by
-     void-fbtee's middleware from `@void/md/pages` when the app has `@void/md` (optional, as
-     `void-fbtee/lint` treats Vite+), since a markdown page has no `head()` of its own.
-   - **No `twitter:title`/`description`/`image`**: X reads the `og:` tags when its own are missing
-     (X's "About Cards", via specification.website's Open Graph page, checked 2026-11-12).
-2. **`og:image`: decided (2026-11-12, with the user): one picture for the whole site**, as most
-   sites do (one site-wide picture is the norm; per-page pictures are for things shared on their
-   own, such as posts and products). No sentence on it, only the name "void-fbtee" (a name, not
-   translated) and the globe from `public/favicon.svg` on the site's background, so the same
-   picture fits every language: the preview's title and description already come in the page's
-   language from its own tags. 1200×630, made once and kept in `public/` (made the same way as
-   the icons if a standard tool can, else from an SVG). Only `og:image:alt` is translated. Per-page
-   pictures (an event's name on its page) maybe later, if Void takes up `void/og`: requested in
-   voidzero-dev/void#442 (opened 2026-10-15 by someone outside the Void team, still open; it
-   notes recent Satori versions don't run on Workers out of the box) with an open pull request,
-   #688, not merged (both checked 2026-11-12). Only after a Thai and an Arabic picture are
-   rendered and look right (item 3 above).
-3. **One manifest, not one per language**: its only visible words are the app's name, a name
-   that isn't translated; one manifest is what multilingual sites normally have.
-4. **`og:locale:alternate` left out**: Void's de-duplication is documented, by design; at most a
-   feature request to Void later, with the user's OK.
+`twitter:title`/`description`/`image` aren't added: X reads the `og:` ones. `twitter:image:alt`
+is (X doesn't fall back to `og:image:alt`).
 
-## The package's part (it's a Vite plugin and a Vite+ package used by other apps)
+## 4. Decisions (by Claude unless marked, reasons with each)
 
-Everything above is shown in the example, but what's per-language is void-fbtee's, so the
-package delivers it, `init` sets it up, `check` checks it, and the fresh apps prove it, as for
-the rest of the package. The site-wide tags (name, picture, icons) are each app's own brand:
-`init` doesn't invent them; the package README says how to add them in `void.config.ts`.
+1. **The site's own address is fixed**, not taken from the request: today an `http://` request gets
+   an `http://` canonical (checked live). `routing.alwaysUseHttps: true` in `void.config.ts`, and
+   void-fbtee takes the production address as an option of `voidFbtee()` (`site`), used for
+   canonical, hreflang and `og:url`. Worker Previews (`<branch>-…workers.dev`) answer with
+   `X-Robots-Tag: noindex` so they never compete with the site.
+2. **Preview picture: one for the whole site** (decided with the user): the name "void-fbtee" and
+   the globe on the site's background, 1200×630, no other words, so it fits every language. Made
+   from an SVG with its text as paths (so fonts can't differ between machines) by `sharp`, kept in
+   `public/` with a version in its name (`og-1.png`; previews are cached for a long time), linked
+   by absolute URL with `og:image:type`. `og:image:alt` and `twitter:image:alt` are "void-fbtee",
+   a name: not translated. Per-page pictures maybe later with `@cf-wasm/og`, after Thai and Arabic
+   are rendered and look right.
+3. **One manifest, translated in place**: Chrome and Edge 148 read `*_localized` fields
+   (`name_localized`, `description_localized`, …) in one manifest (Chrome blog 2026-04-24, MDN
+   `*_localized`). Add `id`, `lang`, `dir` and `description_localized` for each language from the
+   catalogs; the name stays a name. `start_url` `/` redirects to the source language, so an
+   installed app opens in English: said in the README.
+4. **Sitemap: yes**, now that `sitemap` does it: every page in every language with its alternates,
+   written at build from Void's page list and the languages, and a `Sitemap:` line in
+   `robots.txt`. Search engines find pages from it; `hreflang` stays in the pages too.
+5. **Structured data** through one escaping helper in the package (`jsonLd(obj)`: `JSON.stringify`
+   with `<`, U+2028 and U+2029 escaped), never raw `innerHTML`: event names come from visitors.
+   `WebSite` on each language's home page (Google reads it only on a site's root home page, here a
+   redirect, so it may be ignored: harmless). `Event` with `name`, `startDate` (Temporal
+   `toString({ timeZoneName: "never" })`: the offset, no `[Zone]`), `location` as a `Place` with
+   an `address`, `eventStatus`, `eventAttendanceMode`, `inLanguage`.
+6. **hreflang only on pages in a language**: today the middleware adds alternates to every path,
+   pointing at pages that don't exist for paths outside a language (`middleware.ts` 92–99, 119).
+7. **`og:locale:alternate` left out** (§1); at most a feature request to Void later, with the
+   user's OK. Facebook's locale list uses `ar_AR`, not `ar_EG`; low impact, noted.
 
-1. **A new entry, `void-fbtee/head`**: `pageHead({ title, description })` returns the page's
-   title, description and `og:title`/`og:description` as one `HeadDescriptor`, for a page's
-   `head()`. Built by `vp pack` as a new entry in `packages/void-fbtee/vite.config.ts`, so
-   tsdown writes its `exports` line; publint and attw check it on every build; the fresh check's
-   tarball inspection ("every export … is in it") covers it.
-2. **The middleware** adds `og:url` (the canonical address) beside canonical, hreflang and
-   `og:locale`; and for markdown pages `og:title`/`og:description` from their frontmatter.
-3. **`@void/md` as an optional peer**, as `vite-plus` is: the plugin gives the middleware a
-   `virtual:void-fbtee/md-pages` module that is the app's `@void/md/pages` when the app has
-   `@void/md` (resolved from the app, as `virtual:void-fbtee/hono-route` resolves Hono from
-   beside Void) and an empty list when it doesn't. The fresh check's import check already skips
-   optional peers the app hasn't installed.
-4. **`check`** reports a translated markdown copy without the `title` or `description` its
-   original has (Void makes the page's head and now its Open Graph tags from them); code pages'
-   titles are strings, already reported when untranslated.
-5. **`init` stays as it is:** the middleware's new tags need no setup, `void-fbtee/head` is
-   used in pages rather than set up, and `robots.txt` and the site-wide tags are the app's own.
-6. **Docs that ship:** SKILL.md (pages use `pageHead()` in `head()`; markdown copies keep a
-   translated `title` and `description`), the package README (the site-wide tags in
-   `void.config.ts`, the picture, the icons with `@vite-pwa/assets-generator`).
-7. **Tests:** a package test for `pageHead()`; the in-memory plugin test (`test/plugin.test.ts`)
-   for `virtual:void-fbtee/md-pages` with and without `@void/md`; the fresh apps (pnpm and npm, Vite+
-   and plain Vite) check that each language's page carries canonical, `og:url`, `og:locale`, and
-   `og:title` in that language from a page using `pageHead()`. Each new check shown to fail when
-   what it guards is broken.
-8. **Release notes:** the new `void-fbtee/head` entry and the optional `@void/md` peer.
-9. **Offline trial (separate):** if `vite-plugin-pwa` is ever used, it's another Vite plugin in
-   the app's `plugins` beside `voidFbtee()` (which stays first); the trial reports how the two
-   compose in Void's environments before anything is added.
+## 5. The package's part (Void add-on, Vite plugin, Vite+ package)
 
-## Also in this work (left out of the first draft)
+What's per language is void-fbtee's; the site's brand (name, picture, icons) is each app's.
 
-- **Structured data** (JSON-LD, schema.org) through head `script` entries: `WebSite` with
-  `inLanguage` on every page, `Event` for each event page (name, start with its time zone,
-  place), so search can show events.
-- **The not-found and error pages translated** (`plans/brisk-copper-wren.md` item 3, done
-  together; no `noindex`, their 404/500 status keeps them out of search).
-- **Offline (service worker)**: a separate trial of vite-plugin-pwa with Void, reported before
-  anything is added; not done blind.
-- **Checked from outside:** each language's page through a link-preview validator and Google's
-  Rich Results test, not only our own tests.
+1. **`voidFbtee({ site })`**: the production address (decision 1). `init` asks for it, or leaves a
+   todo when it can't tell.
+2. **A new entry, `void-fbtee/head`**: `pageHead({ title, description })` (accepting `fbs` results,
+   as pages pass today) returns the title, description, `og:title`, `og:description` through
+   `unpackMeta`; and `jsonLd(obj)` (decision 5). `unhead` becomes a dependency; `schema-dts` a
+   devDependency. Built by `vp pack` as a new entry (`packages/void-fbtee/vite.config.ts`), so
+   tsdown writes its `exports` line, and publint, attw and `unused` check it on every build.
+3. **The middleware**: canonical, hreflang and `og:url` from `site`; hreflang only when the path
+   has a language; for markdown pages `og:title`/`og:description` from `frontmatter.title` and
+   `frontmatter.description` (trailing slashes normalised when matching paths).
+4. **Markdown pages without a peer on `@void/md`**: the plugin checks, in `configResolved`, whether
+   a plugin named `void-md` is in the app's plugins (as void-md itself detects its adapters,
+   `packages/md/src/plugin.ts` 215). Its `virtual:void-fbtee/md-pages` then loads
+   `export { default } from "@void/md/pages"`, else `export default []`. No peer declared (a
+   declared, never-imported peer fails the `unused` check). The virtual module's type in
+   `src/virtual.d.ts` is the package's own (`path`, `frontmatter`), so the built types don't
+   reach for `@void/md`. `@void/md` a devDependency, for the test.
+5. **The sitemap**: written at build by the plugin (it knows the languages; Void's page list gives
+   the routes), with `sitemap`. Exact hook decided when written (a Vite `generateBundle` in the
+   client environment, if Void's page list is reachable there; else a `vp run` script).
+6. **`check`** reports a translated markdown copy without the `title` or `description` its
+   original has.
+7. **`init`** adds the `site` option (item 1); the rest needs no setup.
+8. **Docs that ship:** SKILL.md (pages use `pageHead()`; `jsonLd()` for structured data; markdown
+   copies keep a translated `title` and `description`), package README (`site`, the site-wide tags
+   in `void.config.ts`, the picture, the icons, the manifest's `*_localized` fields, the sitemap).
+9. **Release:** version 0.3.0 → 0.4.0 (new entry, new option, new dependency), the install tag in
+   the package README updated (README "Releasing").
+10. **Dev note**: void-md refreshes its pages list through `server.moduleGraph` (`plugin.ts` 252);
+    if the worker keeps a stale `og:title` after a frontmatter edit until restart, say so in the
+    README rather than work around it.
 
-## Proof
+## 6. Proof
 
-A server test reads every page in every language and checks the whole table above against that
-language's own strings; one tag removed shows it failing. Then `vp check`, `vp test run`,
-`void deploy`, and the live pages checked with a link-preview check.
+- **Package tests:** `pageHead()`; `jsonLd()` with `</script>` and U+2028 in a value; the
+  in-memory plugin test (`test/plugin.test.ts`) for `virtual:void-fbtee/md-pages` with and
+  without void-md in the plugins; the sitemap.
+- **Server tests (example):** every page in every language: the whole table in §3 against that
+  language's strings; an event posted with `</script><script>` in its name doesn't break out;
+  hreflang absent outside a language; `http` redirected to `https` where Void does it.
+- **Fresh apps** (pnpm and npm, Vite+ and plain Vite): each language's page has canonical,
+  `og:url` and `og:locale`, and `og:title` in that language from an `index.server.ts` using
+  `pageHead()` (added to `e2e/fresh/app/pages/[lang]/`).
+- **Outside tools, unattended, as one task (`vp run check:site`), not in every test run** (CI stays
+  lean): `lighthouse` (SEO category) and `linkinator` over the site, `open-graph-scraper` on each
+  language's page, `check-favicon`; run at the end of this work against the deployed site, and
+  whenever the head or the pages change. Google's Rich Results Test and Facebook's sharing debugger need a person: a one-off check
+  after the deploy, by hand.
+- Each new check shown to fail when what it guards is broken. Then `vp check`, `vp test run`,
+  `vp run test:fresh`, `void deploy` from here, and the live pages checked.
+
+## Not in this plan
+
+- Offline support (a service worker, `vite-plugin-pwa`): its own trial, reported before anything
+  is added; how it composes with `voidFbtee()` in Void's environments is unknown.
+- Per-page preview pictures (decision 2).
+- `llms.txt` (an AI-readable summary of the site): worth its own small plan once the docs settle.
