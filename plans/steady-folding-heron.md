@@ -197,6 +197,26 @@ docs. One commit per item; pushed together when you say.
         in a Void app, as Vite asks. Not yet: a README in the package's own folder, for when it
         goes on npm (it's installed from git, where the repo's README shows).
 
+13. [x] **Vite+'s layer** (Vite+ 1.6.0's own docs, `node_modules/vite-plus/docs`, read
+        2026-11-12). The package sits in three layers, each with its own rules: Vite (the plugin,
+        item 12), Vite+ (the toolchain around it: lint, pack, check, create) and Void (items 10-11).
+        Vite+ findings: - `vp create` makes new projects from templates or Bingo generators, and `vp migrate`'s rules
+        are all Vite+'s own: neither lets a package add to an existing app, so `void-fbtee init`
+        stays our command. - `vp pack` (tsdown) has package checks, off by default: now on. `publint`, Are the Types
+        Wrong? (`esm-only` profile, as the package is ES modules only) and unused dependencies,
+        on every build; both pass. `exports` stay written by hand and are checked. The unused
+        `hono` dev dependency went. - The lint rule now uses Vite+'s authoring API (`vite-plus/lint/plugins`, `docs/guide/lint.md`):
+        `definePlugin` and `defineRule` pass their input through and give it Oxlint's real types,
+        instead of our own stand-ins. Its own test uses Vite+'s `RuleTester`
+        (`vite-plus/lint/plugins-dev`), proved to fail when the rule is broken. `vite-plus` is an
+        optional peer: only Vite+'s linter loads the rule. - `vp check` formats, and `init`'s files didn't pass: `JSON.stringify`'s arrays, magicast's
+        print, dependencies appended out of order. `init` now runs the app's own `vp fmt` on
+        exactly the files it wrote, keeps dependencies in name order, and writes
+        `voidFbtee({ sourceLocale, locales })`. The fresh check formats the app first (Void
+        1.7.0's `void init` leaves five files Vite+ 1.6's formatter would change), then requires
+        `vp fmt --check` to be clean after `void-fbtee init`. - `vp migrate` is how a project upgrades Vite+ (`docs/guide/upgrade-project.md`), run
+        directly: the README's task for it couldn't work and is gone (plans/brisk-copper-wren.md).
+
 ## Not in this plan
 
 - The upgrade to Void 1.8.0 and Vite+ 1.6, then the two items that need it: `plans/brisk-copper-wren.md`.
