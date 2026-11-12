@@ -212,6 +212,15 @@ account) is left out: there isn't one.
    - **Where copies live:** each Cloudflare location's own cache first, then Workers KV, keyed by
      the deployment's id (`htmlEdgeKey(host, pathname, deploymentId, …)`, same file): that's how
      a deploy "clears" the cache; the new version just never sees the old copies.
+   - **Times relative to now are safe in a cached copy** (checked 2026-11-12): "tomorrow", "in
+     44 days" come only from `EventTime` and `Fmt`, which show them once the browser knows the
+     reader's zone, through `useNow()` (`packages/void-fbtee/src/react.tsx` 99), which switches
+     to the browser's clock on load. The only server-side "now" is the events list's query
+     (`events/index.server.ts` 22), hence its 60 seconds.
+   - **`https` first:** the canonical is built from the request's origin today
+     (`middleware.ts`), so a copy cached from one `http://` visit would hand everyone an `http`
+     canonical. `routing.alwaysUseHttps: true` (decision 1) goes in with the caching, in the same
+     step.
    - **Not known yet, found out by trying:** whether prerendering a page with a loader works
      through void-fbtee's middleware the way markdown pages already do (they're prerendered and
      right in all three languages live, which suggests so). The first step of this work is
