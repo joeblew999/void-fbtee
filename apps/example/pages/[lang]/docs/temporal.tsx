@@ -1,5 +1,5 @@
 // The Temporal page, a reference: date and time arithmetic with Temporal, each result a neutral
-// value (lib/temporal.ts), run four ways: on the Worker (the loader) with Cloudflare's own
+// value (src/lib/temporal.ts), run four ways: on the Worker (the loader) with Cloudflare's own
 // Temporal and with the polyfill, and in the browser after hydration, with its own and with the
 // polyfill. Neutral results must match everywhere, so a highlighted row is a real bug, and its
 // columns say whose. The reference is Cloudflare's own Temporal: what the app runs on the Worker.
@@ -15,10 +15,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ownTemporal, Polyfill, runTemporal, TEMPORAL_SECTIONS } from "../../../lib/temporal";
-import { temporalTitle } from "../../../lib/temporal-titles";
+import { ownTemporal, Polyfill, runTemporal, TEMPORAL_SECTIONS } from "@/lib/temporal";
+import { temporalTitle } from "@/lib/temporal-titles";
 import { cn } from "@/lib/utils";
-import { DIFFERS_ROW } from "../../../lib/differs";
+import { DIFFERS_ROW } from "@/lib/differs";
 import type { Props } from "./temporal.server";
 
 type Rows = Record<string, string>;

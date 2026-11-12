@@ -1,6 +1,6 @@
 import { defineHandler, type InferProps } from "void";
 import type { SharedI18n } from "void-fbtee/middleware";
-import { runAll } from "../../../lib/intl";
+import { runAll } from "@/lib/intl";
 
 export type Props = InferProps<typeof loader>;
 

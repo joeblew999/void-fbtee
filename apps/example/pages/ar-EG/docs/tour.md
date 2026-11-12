@@ -1,12 +1,12 @@
 <script>
-import EventTime from "../../../components/EventTime.tsx" with { island: "load" }
+import EventTime from "../../../src/components/EventTime.tsx" with { island: "load" }
 </script>
 
 ---
 
 title: جولة
 description: انشر فعالية، احجز مقعدًا، وشاهد كل موعد بتوقيت مكان الفعالية وبتوقيتك.
-translatedFrom: "ba857c9315e2"
+translatedFrom: "a3f4ffdb20fb"
 ---
 
 # فعاليات تعرف كم الساعة عندك

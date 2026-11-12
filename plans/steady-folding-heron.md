@@ -18,8 +18,11 @@ docs. One commit per item; pushed together when you say.
 
 ### A. Structure: files where Void puts them, nothing on screen changes
 
-1. [ ] **Shared code in `src/`.** Today it's in three places: `components/`, `lib/` and `src/`.
+1. [x] **Shared code in `src/`.** Today it's in three places: `components/`, `lib/` and `src/`.
        Move `components/` and `lib/` under `src/` (and update `components.json`'s aliases).
+       Done: `@/` now points at `./src` (shadcn's setup for a `src/` app: `tsconfig.json` "paths",
+       `vite.config.ts` alias), so the 46 `@/` imports and `components.json` didn't change; the
+       relative imports in pages and markdown did, and the copies were re-stamped.
        Backed by: Void `docs/reference/structure.md` ("`src/`: Shared application code such as
        components, utilities, and types").
 

@@ -11,7 +11,7 @@
     "jsx": "react-jsx",
     "lib": ["ES2025", "DOM", "DOM.Iterable"],
     "paths": {
-      "@/*": ["./*"],
+      "@/*": ["./src/*"],
       "void/routes": ["./.void/routes.d.ts"],
       "void/db": ["./.void/db.d.ts"],
       "@schema": ["./db/schema.ts"],
@@ -19,17 +19,6 @@
       "void/queues": ["./.void/queues.d.ts"]
     }
   },
-  "include": [
-    "src",
-    "components",
-    "lib",
-    "pages",
-    "routes",
-    "middleware",
-    "crons",
-    "queues",
-    "db",
-    "i18n"
-  ],
+  "include": ["src", "pages", "routes", "middleware", "crons", "queues", "db", "i18n"],
   "files": ["./.void/routes.d.ts", "./.void/db.d.ts", "./.void/queues.d.ts"]
 }

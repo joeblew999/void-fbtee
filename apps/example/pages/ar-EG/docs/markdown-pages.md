@@ -1,10 +1,10 @@
 <script>
-import Fmt from "../../../components/Fmt.tsx" with { island: "load" }
+import Fmt from "../../../src/components/Fmt.tsx" with { island: "load" }
 </script>
 
 ---
 
-translatedFrom: "1e12b63a34e3"
+translatedFrom: "b7b5180c754c"
 ---
 
 # ترجمة صفحات markdown
@@ -40,7 +40,7 @@ translatedFrom: "1e12b63a34e3"
 `<EventTime startsAt="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />`: يظهر بلغة القارئ، بتوقيت مكان
 الفعالية وبتوقيته.
 
-ولقيمة واحدة يوجد `<Fmt>` (`components/Fmt.tsx`). هذه الصفحة تستخدمه، فكل سطر أدناه منسّق لك بلغة
+ولقيمة واحدة يوجد `<Fmt>` (`src/components/Fmt.tsx`). هذه الصفحة تستخدمه، فكل سطر أدناه منسّق لك بلغة
 هذه الصفحة:
 
 - رقم: <Fmt num="1234567.891" />

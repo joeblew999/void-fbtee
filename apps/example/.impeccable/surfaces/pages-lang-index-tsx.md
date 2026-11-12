@@ -2,7 +2,7 @@
 version: 1
 slug: "pages-lang-index-tsx"
 primary_target: "pages/[lang]/index.tsx"
-related_targets: ["components/SiteHeader.tsx", "pages/layout.tsx"]
+related_targets: ["src/components/SiteHeader.tsx", "pages/layout.tsx"]
 ---
 
 Scope: the home page (pages/[lang]/index.tsx), visitor mode Persuade; the header and tokens reach every page.

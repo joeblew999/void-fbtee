@@ -1,12 +1,12 @@
 <script>
-import EventTime from "../../../components/EventTime.tsx" with { island: "load" }
+import EventTime from "../../../src/components/EventTime.tsx" with { island: "load" }
 </script>
 
 ---
 
 title: ทัวร์
 description: โพสต์กิจกรรม จองที่นั่ง และดูทุกเวลาตามนาฬิกาของกิจกรรมและของคุณ
-translatedFrom: "ba857c9315e2"
+translatedFrom: "a3f4ffdb20fb"
 ---
 
 # กิจกรรมที่รู้ว่าตอนนี้ที่คุณอยู่เป็นเวลาเท่าไร

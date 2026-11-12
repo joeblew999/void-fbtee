@@ -1,4 +1,4 @@
-// The text for a <Fmt> value (components/Fmt.tsx), in one language: plain Intl, no React, so the
+// The text for a <Fmt> value (src/components/Fmt.tsx), in one language: plain Intl, no React, so the
 // tests format each value the same way the page does.
 import { Temporal } from "temporal-polyfill";
 import { relativeDays } from "./relative-days";

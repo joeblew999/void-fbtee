@@ -1,5 +1,5 @@
 import { defineHandler, type InferProps } from "void";
-import { ownTemporal, Polyfill, runTemporal } from "../../../lib/temporal";
+import { ownTemporal, Polyfill, runTemporal } from "@/lib/temporal";
 
 export type Props = InferProps<typeof loader>;
 

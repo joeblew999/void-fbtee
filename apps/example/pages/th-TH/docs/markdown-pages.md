@@ -1,10 +1,10 @@
 <script>
-import Fmt from "../../../components/Fmt.tsx" with { island: "load" }
+import Fmt from "../../../src/components/Fmt.tsx" with { island: "load" }
 </script>
 
 ---
 
-translatedFrom: "1e12b63a34e3"
+translatedFrom: "b7b5180c754c"
 ---
 
 # การแปลหน้า markdown
@@ -41,7 +41,7 @@ translatedFrom: "1e12b63a34e3"
 `<EventTime startsAt="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />`: แสดงเป็นภาษาของผู้อ่าน
 ตามนาฬิกาของกิจกรรมและของผู้อ่าน
 
-สำหรับค่าเดียวมี `<Fmt>` (`components/Fmt.tsx`) หน้านี้ใช้มัน ทุกบรรทัดด้านล่างจึงจัดรูปแบบให้คุณ
+สำหรับค่าเดียวมี `<Fmt>` (`src/components/Fmt.tsx`) หน้านี้ใช้มัน ทุกบรรทัดด้านล่างจึงจัดรูปแบบให้คุณ
 เป็นภาษาของหน้านี้:
 
 - ตัวเลข: <Fmt num="1234567.891" />

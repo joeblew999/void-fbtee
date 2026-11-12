@@ -1,7 +1,7 @@
 // The Intl page, a reference: every Intl call the example knows, in the page's language. The
 // Worker's column (the loader) is the text a void-fbtee app's pages show; the browser's, run after
 // hydration, shows where its engine's own locale data writes it differently, every such row
-// highlighted (lib/differs.ts), with invisible characters shown by name and, for the supported
+// highlighted (src/lib/differs.ts), with invisible characters shown by name and, for the supported
 // values, only what differs. Pages don't depend
 // on the two agreeing: text formatted while rendering is <Formatted>, the server's kept. "Your
 // time zone" and the time in it are the browser's alone: empty until it knows the zone. Temporal
@@ -19,10 +19,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { INSTANT, runAll, SECTIONS, ZONE } from "../../../lib/intl";
-import { sectionTitle } from "../../../lib/intl-titles";
+import { INSTANT, runAll, SECTIONS, ZONE } from "@/lib/intl";
+import { sectionTitle } from "@/lib/intl-titles";
 import { cn } from "@/lib/utils";
-import { DIFFERS_ROW, listDifference, showInvisible } from "../../../lib/differs";
+import { DIFFERS_ROW, listDifference, showInvisible } from "@/lib/differs";
 import type { Props } from "./intl.server";
 
 // The browser's rows: none while hydrating (the server sent none), then computed once.

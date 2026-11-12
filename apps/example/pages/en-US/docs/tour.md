@@ -1,5 +1,5 @@
 <script>
-import EventTime from "../../../components/EventTime.tsx" with { island: "load" }
+import EventTime from "../../../src/components/EventTime.tsx" with { island: "load" }
 </script>
 
 ---

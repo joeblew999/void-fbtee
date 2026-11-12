@@ -1,5 +1,5 @@
 <script>
-import Fmt from "../../../components/Fmt.tsx" with { island: "load" }
+import Fmt from "../../../src/components/Fmt.tsx" with { island: "load" }
 </script>
 
 # Translating markdown pages
@@ -36,7 +36,7 @@ hand, and it can't show the reader's own time. Put the value in a component that
 `<EventTime startsAt="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />`: it shows in the reader's
 language, on the event's clock and on theirs.
 
-For a single value there's `<Fmt>` (`components/Fmt.tsx`). This page uses it, so each line below
+For a single value there's `<Fmt>` (`src/components/Fmt.tsx`). This page uses it, so each line below
 is formatted for you, in this page's language:
 
 - A number: <Fmt num="1234567.891" />

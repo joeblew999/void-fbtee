@@ -36,7 +36,7 @@ export default defineConfig({
     },
   },
   // shadcn's "@/" import alias (tsconfig.json "paths" says the same for TypeScript).
-  resolve: { alias: { "@": fileURLToPath(new URL(".", import.meta.url)) } },
+  resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
   plugins: [
     voidFbtee({ sourceLocale: "en-US", locales: ["en-US", "ar-EG", "th-TH"] }),
     voidPlugin(),
