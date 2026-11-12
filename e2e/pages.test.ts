@@ -36,6 +36,8 @@ test("Link: same language stays client-side, another language loads a fresh page
   p.on("load", () => loads++);
   await p.goto("/th-TH");
   await started(p);
+  // The menu names the page it opens.
+  expect(await p.getByTestId("nav-events").textContent()).toBe("กิจกรรม");
   await p.getByTestId("nav-events").click();
   await p.waitForURL("**/th-TH/events");
   await seeText(p, "events-title", "กิจกรรมที่กำลังจะมาถึง");
@@ -43,6 +45,7 @@ test("Link: same language stays client-side, another language loads a fresh page
   await p.getByTestId("to-ar-EG").click();
   await p.waitForURL("**/ar-EG/events");
   await seeText(p, "events-title", "الفعاليات القادمة");
+  expect(await p.getByTestId("nav-events").textContent()).toBe("الفعاليات");
   expect(loads).toBe(2);
   expect(await p.locator("html").getAttribute("dir")).toBe("rtl");
   expect(errors.filter((e) => !VOID_DEFER_MESSAGE.test(e))).toEqual([]);

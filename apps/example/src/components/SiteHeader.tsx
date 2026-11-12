@@ -20,13 +20,13 @@ function label(page: (typeof PAGES)[number]) {
     case "/[lang]":
       return <fbt desc="Navigation: the home page">Home</fbt>;
     case "/[lang]/events":
-      return <fbt desc="Navigation: the demo, the events app people post and book in">Demo</fbt>;
+      return <fbt desc="Navigation: the list of events people post and book">Events</fbt>;
     case "/[lang]/docs":
       return <fbt desc="Navigation: the documentation">Docs</fbt>;
   }
 }
 
-// nav-home, nav-events (the demo), nav-docs.
+// nav-home, nav-events, nav-docs.
 const testId = (page: (typeof PAGES)[number]) => `nav-${rest(page).slice(1) || "home"}`;
 
 export default function SiteHeader() {

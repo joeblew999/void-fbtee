@@ -1,138 +1,30 @@
-// Upcoming events, each on its own city's clock and the reader's, and a form to post one: Void's
-// useForm and Form, typed from the action in index.server.ts.
+// Upcoming events, each on its own city's clock and the reader's. Posting one is its own page
+// (new.tsx).
 import { routeUrl } from "void/routes";
 import { fbt } from "fbtee";
-import { Form, useForm } from "@void/react";
-import { Link, useLocale, useTimeZone } from "void-fbtee/react";
+import { Link, useLocale } from "void-fbtee/react";
 import { EventTime } from "@/components/EventTime";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
-import { Textarea } from "@/components/ui/textarea";
 import type { Props } from "./index.server";
 
-/**
- * The form, starting in the reader's zone (Events remounts it once the browser knows it), with
- * the server's zones. What it sends is neutral: the picker's "2026-04-01T20:00" and a zone name.
- */
-function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
-  const { lang } = useLocale();
-  const form = useForm(
-    "/[lang]/events",
-    { title: "", description: "", local: "", time_zone: zone ?? "", seats: 20 },
-    { params: { lang } },
-  );
-  const error = (field: keyof typeof form.errors, message: React.ReactNode) =>
-    form.errors[field] && (
-      <p className="text-destructive text-sm" data-testid={`error-${field}`}>
-        {message}
-      </p>
-    );
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          <fbt desc="Heading of the form for posting a new event">Post an event</fbt>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Form form={form} className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="event-title">
-              <fbt desc="Form label: the event's title">Title</fbt>
-            </Label>
-            <Input
-              id="event-title"
-              data-testid="event-title-input"
-              value={form.data.title}
-              onChange={(e) => form.setData("title", e.target.value)}
-            />
-            {error("title", <fbt desc="Form error: the title is missing">Give it a title.</fbt>)}
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="event-description">
-              <fbt desc="Form label: what the event is about">What it's about</fbt>
-            </Label>
-            <Textarea
-              id="event-description"
-              data-testid="event-description-input"
-              value={form.data.description}
-              onChange={(e) => form.setData("description", e.target.value)}
-            />
-            {error(
-              "description",
-              <fbt desc="Form error: the description is missing">Say what it's about.</fbt>,
-            )}
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="grid gap-2">
-              <Label htmlFor="event-local">
-                <fbt desc="Form label: when the event starts, on the clock where it happens">
-                  Starts, local time
-                </fbt>
-              </Label>
-              <Input
-                id="event-local"
-                type="datetime-local"
-                data-testid="event-local-input"
-                value={form.data.local}
-                onChange={(e) => form.setData("local", e.target.value)}
-              />
-              {error("local", <fbt desc="Form error: no start time">When does it start?</fbt>)}
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="event-zone">
-                <fbt desc="Form label: the time zone where the event happens">Time zone</fbt>
-              </Label>
-              <NativeSelect
-                id="event-zone"
-                data-testid="event-zone-input"
-                value={form.data.time_zone}
-                onChange={(e) => form.setData("time_zone", e.target.value)}
-              >
-                {[...new Set([...(zone ? [] : [""]), "UTC", ...zones])].map((z) => (
-                  <NativeSelectOption key={z} value={z}>
-                    {z}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-            </div>
-          </div>
-          <div className="grid gap-2 sm:max-w-40">
-            <Label htmlFor="event-seats">
-              <fbt desc="Form label: how many seats the event has">Seats</fbt>
-            </Label>
-            <Input
-              id="event-seats"
-              type="number"
-              min={1}
-              data-testid="event-seats-input"
-              value={form.data.seats}
-              onChange={(e) => form.setData("seats", e.target.valueAsNumber)}
-            />
-            {error("seats", <fbt desc="Form error: seats must be 1 or more">At least 1 seat.</fbt>)}
-          </div>
-          <Button type="submit" disabled={form.pending} data-testid="event-post" className="w-fit">
-            <fbt desc="Button: post the new event">Post it</fbt>
-          </Button>
-        </Form>
-      </CardContent>
-    </Card>
-  );
-}
-
-export default function Events({ events, zones }: Props) {
+export default function Events({ events }: Props) {
   const { locale, lang } = useLocale();
-  // The browser's zone once known (null before); nothing has been typed into the form yet.
-  const zone = useTimeZone();
   return (
     <div className="grid gap-8">
-      <h1 className="text-3xl font-medium" data-testid="events-title">
-        <fbt desc="Heading of the events page">Upcoming events</fbt>
-      </h1>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-3xl font-medium" data-testid="events-title">
+          <fbt desc="Heading of the events page">Upcoming events</fbt>
+        </h1>
+        <Link
+          href={routeUrl("/[lang]/events/new", { params: { lang } })}
+          className={buttonVariants()}
+          data-testid="post-link"
+        >
+          <fbt desc="Heading of the form for posting a new event">Post an event</fbt>
+        </Link>
+      </div>
       <ul className="grid gap-4" data-testid="events-list">
         {events.map((e) => (
           <li key={e.id}>
@@ -161,7 +53,6 @@ export default function Events({ events, zones }: Props) {
           </li>
         ))}
       </ul>
-      <PostEvent key={zone} zone={zone} zones={zones} />
     </div>
   );
 }

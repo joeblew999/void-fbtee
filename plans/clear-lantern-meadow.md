@@ -191,14 +191,15 @@ account) is left out: there isn't one.
      cached page while it renders a fresh one, so nobody waits.
    - **Each page, checked in its code 2026-11-12:**
 
-     | Page                                             | Changes when                                            | How                                                                                                                                                |
-     | ------------------------------------------------ | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-     | Home (`pages/[lang]/index`)                      | a deploy (its `defer` is a fixed demo)                  | prerender                                                                                                                                          |
-     | Docs home, Intl, Temporal (`pages/[lang]/docs`)  | a deploy (fixed dates; no current time)                 | prerender                                                                                                                                          |
-     | Markdown docs                                    | a deploy                                                | prerendered already                                                                                                                                |
-     | Events list (`events/index`)                     | a post, and time (only events not yet started, line 22) | `revalidate = 60`; cleared on posting (already, line 50)                                                                                           |
-     | An event (`events/[id]`)                         | a booking (seats left), translations arriving           | `revalidate = 31536000` (until the deploy); cleared on booking (already, line 55) and when translations arrive (already, `queues/translate.ts` 62) |
-     | `/sitemap.xml`, `/manifest.webmanifest` (routes) | a post or translations (sitemap); a deploy (manifest)   | an entry each in `routing.revalidate` (`void.config.ts`), `31536000`; the sitemap added to the posting and translation `revalidate()` calls        |
+     | Page                                                       | Changes when                                             | How                                                                                                                                                |
+     | ---------------------------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+     | Home (`pages/[lang]/index`)                                | a deploy (its `defer` is a fixed demo)                   | prerender                                                                                                                                          |
+     | Docs home, Intl, Temporal (`pages/[lang]/docs`)            | a deploy (fixed dates; no current time)                  | prerender                                                                                                                                          |
+     | Markdown docs                                              | a deploy                                                 | prerendered already                                                                                                                                |
+     | Events list (`events/index`)                               | a post, and time (only events not yet started, line 16)  | `revalidate = 60`; cleared on posting (already, `events/new.server.ts` 38)                                                                         |
+     | Posting form (`events/new`, its own page since 2026-11-12) | a deploy (the form, and the Worker's list of time zones) | prerender                                                                                                                                          |
+     | An event (`events/[id]`)                                   | a booking (seats left), translations arriving            | `revalidate = 31536000` (until the deploy); cleared on booking (already, line 55) and when translations arrive (already, `queues/translate.ts` 62) |
+     | `/sitemap.xml`, `/manifest.webmanifest` (routes)           | a post or translations (sitemap); a deploy (manifest)    | an entry each in `routing.revalidate` (`void.config.ts`), `31536000`; the sitemap added to the posting and translation `revalidate()` calls        |
 
      Today none but the markdown pages are cached: no page sets a cache time.
 
@@ -216,7 +217,7 @@ account) is left out: there isn't one.
      44 days" come only from `EventTime` and `Fmt`, which show them once the browser knows the
      reader's zone, through `useNow()` (`packages/void-fbtee/src/react.tsx` 99), which switches
      to the browser's clock on load. The only server-side "now" is the events list's query
-     (`events/index.server.ts` 22), hence its 60 seconds.
+     (`events/index.server.ts` 16), hence its 60 seconds.
    - **`https` first:** the canonical is built from the request's origin today
      (`middleware.ts`), so a copy cached from one `http://` visit would hand everyone an `http`
      canonical. `routing.alwaysUseHttps: true` (decision 1) goes in with the caching, in the same

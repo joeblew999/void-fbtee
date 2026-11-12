@@ -1021,18 +1021,6 @@
       ],
       "types": []
     },
-    "lj5ks/Yl+iuw6sPFsjQRtw==": {
-      "description": "Navigation: the demo, the events app people post and book in",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "عرض توضيحي",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "r4IKuw5azKxSmaT1to8Vxg==": {
       "description": "Home page section heading: how to install void-fbtee",
       "status": "translated",
@@ -2198,6 +2186,30 @@
       "translations": [
         {
           "translation": "آخر تحديث {date}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Ue5dcvdFRm8wi6R55yKkZA==": {
+      "description": "Navigation: the list of events people post and book",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الفعاليات",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "C8qujLAP0EmQt87MMq8SfA==": {
+      "description": "Post-an-event page description, for search results",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "انشر فعالية بلغتك، على توقيت مدينتك، وستُترجم إلى اللغات الأخرى.",
           "variations": {}
         }
       ],

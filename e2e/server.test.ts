@@ -143,7 +143,15 @@ test("the tour: every @void/md feature, in every language, every title in that l
 });
 
 test("every page has a title and a description, in its own language", async () => {
-  const pages = ["", "/events", "/docs", "/docs/intl", "/docs/temporal", "/docs/tour"];
+  const pages = [
+    "",
+    "/events",
+    "/events/new",
+    "/docs",
+    "/docs/intl",
+    "/docs/temporal",
+    "/docs/tour",
+  ];
   const head = async (path: string) => {
     const html = await (await get(path)).text();
     return {
@@ -159,6 +167,26 @@ test("every page has a title and a description, in its own language", async () =
       expect(got.description, `${l}${page}`).not.toBe("");
       if (l !== SOURCE) expect(got.description, `${l}${page}`).not.toBe(source.description);
     }
+  }
+});
+
+// Posting is its own page: the list links to it, and /events/new is that page in every language,
+// never read as an event's id (in Void's routing a static segment beats [id]).
+test("the events list links to /events/new, the form for posting one", async () => {
+  const heading: Record<string, string> = {
+    "en-US": "Post an event",
+    "th-TH": "โพสต์กิจกรรม",
+    "ar-EG": "انشر فعالية",
+  };
+  for (const l of LOCALES) {
+    const list = await (await get(`/${l}/events`)).text();
+    expect(list, `${l}: the list links to the form`).toContain(`href="/${l}/events/new"`);
+    expect(list, `${l}: the form isn't on the list`).not.toContain('data-testid="event-post"');
+    const res = await get(`/${l}/events/new`);
+    expect(res.status, `${l}/events/new`).toBe(200);
+    const form = await res.text();
+    expect(form).toContain('data-testid="event-post"');
+    expect(form).toMatch(new RegExp(`data-testid="new-event-title"[^>]*>${heading[l]}<`));
   }
 });
 

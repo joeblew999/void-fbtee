@@ -793,18 +793,6 @@
       ],
       "types": []
     },
-    "lj5ks/Yl+iuw6sPFsjQRtw==": {
-      "description": "Navigation: the demo, the events app people post and book in",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เดโม",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "r4IKuw5azKxSmaT1to8Vxg==": {
       "description": "Home page section heading: how to install void-fbtee",
       "status": "translated",
@@ -1832,6 +1820,30 @@
       "translations": [
         {
           "translation": "อัปเดตเมื่อ {date}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Ue5dcvdFRm8wi6R55yKkZA==": {
+      "description": "Navigation: the list of events people post and book",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "กิจกรรม",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "C8qujLAP0EmQt87MMq8SfA==": {
+      "description": "Post-an-event page description, for search results",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "โพสต์กิจกรรมเป็นภาษาของคุณ ตามเวลาในเมืองของคุณ แล้วจะแปลเป็นภาษาอื่น ๆ ให้",
           "variations": {}
         }
       ],

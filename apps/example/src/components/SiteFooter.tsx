@@ -52,7 +52,7 @@ export default function SiteFooter() {
         >
           <li>
             <Link href={routeUrl("/[lang]/events", { params: { lang } })} className={linkClass}>
-              <fbt desc="Navigation: the demo, the events app people post and book in">Demo</fbt>
+              <fbt desc="Navigation: the list of events people post and book">Events</fbt>
             </Link>
           </li>
           <li>

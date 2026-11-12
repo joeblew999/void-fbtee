@@ -41,7 +41,7 @@ const TEST_START = "2026-01-01T20:00";
  */
 async function postEvent(seats: number): Promise<string> {
   const p = await page();
-  await p.goto(`/${SOURCE}/events`);
+  await p.goto(`/${SOURCE}/events/new`);
   await started(p);
   await p.getByTestId("event-title-input").fill(`Test event ${crypto.randomUUID().slice(0, 8)}`);
   await p.getByTestId("event-description-input").fill("Posted by the tests.");
@@ -75,7 +75,7 @@ test("th-TH, in New York: Sydney's clock, the reader's, and how far off, in Thai
 test("ar-EG: post an event (a missing title first); it is saved neutral and reads the same in English", async () => {
   const p = await page({ timezoneId: "Africa/Cairo" });
   const errors = collectErrors(p);
-  await p.goto("/ar-EG/events");
+  await p.goto("/ar-EG/events/new");
   // Void's form works once the page has hydrated.
   await started(p);
   await p.getByTestId("event-post").click();
