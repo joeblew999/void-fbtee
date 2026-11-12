@@ -34,55 +34,58 @@ Today's `e2e/fresh/check.ts` falls short: it installs from a git commit, not the
 tarball; only with pnpm; checks nothing in the tarball; and only against the versions this repo
 pins.
 
+## What's realistic
+
+Done as Void does it, plus what's cheap and caught real problems on 2026-11-12, and nothing more:
+
+- Void tests npm and pnpm, on plain Vite and on Vite+. So do we. Yarn, Bun and macOS are left
+  out, as Void leaves them out; one is added when someone hits a problem there.
+- No local registry: Void needs one because its packages depend on each other by version; we
+  publish one package, so installing the packed tarball file tests the same thing.
+- From fbtee (nkzw-tech/fbtee at 16efaf5, 2026-11-11, `packages/vite-plugin-fbtee/test/e2e.mjs`):
+  the plugin is also tested in memory through Vite's own `build()`, which takes seconds.
+- Not Node's module resolution (`nodenext`) for the package: the template is a plain library;
+  ours is a Vite plugin with JSX and virtual modules, built by Vite.
+
 ## A. The package, shaped as a Vite+ package
 
 Against Vite+'s library template:
 
-1. [ ] **A `LICENSE` file in the package** (in the tarball). There's none; Void requires one in
-       every package.
-2. [ ] **A README in the package's own folder**, short: what it is, install, `void-fbtee init`,
-       links to the docs. It's what npm shows, and what's in `node_modules/void-fbtee`.
-3. [ ] **`exports` written by tsdown from the entries** (`pack.exports: true`, as the template
-       does), with `./package.json` exported. One source for the entries; publint and attw check
-       the result on every build. This replaces the hand-written `exports` (my earlier choice,
-       which the template doesn't follow).
-4. [ ] **The template's `package.json` pieces:** `publishConfig.access: "public"`, a
+1. [ ] **`LICENSE` and a short README in the package's own folder**, in the tarball (Void requires
+       a LICENSE in every package; fbtee ships both in each). The README: what it is, install,
+       `void-fbtee init`, links to the docs.
+2. [ ] **`exports` written by tsdown from the entries** (`pack.exports: true`, as the template),
+       with `./package.json` exported, replacing the hand-written ones; publint and attw check
+       the result on every build.
+3. [ ] **The template's `package.json` pieces:** `publishConfig.access: "public"`, a
        `prepublishOnly` build, a `check` script.
-5. [ ] **The template's `tsconfig` strictness:** `verbatimModuleSyntax`, `isolatedModules`,
-       `noUnusedLocals`, and Node's own resolution (`module`/`moduleResolution: "nodenext"`,
-       with `.ts` extensions on relative imports, which the template allows). Whatever the
-       stricter checks find gets fixed.
+4. [ ] **Stricter TypeScript checks from the template:** `verbatimModuleSyntax`,
+       `isolatedModules`, `noUnusedLocals`. Whatever they find gets fixed.
 
-## B. The conformance test, Void's way
+## B. The tests
 
-`e2e/fresh/` becomes this; `vp run test:fresh` runs it locally exactly as CI does.
-
-6. [ ] **The real tarball, inspected:** packed as npm would publish it, then checked as Void
-       checks its own (`inspectPackage`), plus: every `exports` entry resolves inside the
-       tarball, `files` holds `dist`, `skills`, `README.md` and `LICENSE` and nothing else.
-7. [ ] **Installed from a local registry,** as from npm: the tarball served read-only beside
-       npm, so each app installs `void-fbtee` by version. The git install (how apps install it
-       today) stays as one case.
-8. [ ] **Every package manager on every toolchain:** npm, pnpm, Yarn and Bun, each on plain Vite
-       and on Vite+, as `void init` makes them. Clean environment, strict peer dependencies,
-       strict engines. Only combinations `void init` itself supports; any it doesn't is written
-       down with why.
-9. [ ] **In each app, what a developer gets:** `void-fbtee init`; `void-fbtee check`; build and
-       types; on Vite+ the whole `vp check` and the lint rule; the dev server in Thai and Arabic.
-       And the Void parts, in a new app rather than only in our example: a link to a page that
-       doesn't exist fails the type check; `/xx-XX/...` is not found; `/` redirects with 301.
-10. [ ] **Against the newest Vite+ and Void too** (the ecosystem-CI direction): the same suite
-        with the newest installable releases rather than the repo's pins, on a weekly schedule
-        and by hand, so a new release that breaks void-fbtee shows up before an app finds it.
+5. [ ] **The plugin in memory, through Vite's own `build()`** (as fbtee tests its plugin): its
+       hook filters, the server-only swaps per environment, the virtual modules. In
+       `packages/void-fbtee/test/`, run by `vp test`.
+6. [ ] **The fresh check installs the real tarball:** packed as npm would publish it, checked as
+       Void checks its own (description, MIT license, https homepage and bugs, a `LICENSE`, no
+       `workspace:`/`catalog:` versions, only `dist`, `skills`, `README.md`, `LICENSE`), then
+       installed from the file. The git install stays as one case, since that's how apps install
+       it today.
+7. [ ] **npm and pnpm, each on plain Vite and on Vite+:** four apps, as `void init` makes them,
+       with a clean environment, strict peer dependencies and strict engines (as Void's).
+8. [ ] **In each app, the Void parts too:** a link to a page that doesn't exist fails the type
+       check; `/xx-XX/...` is not found; `/` redirects with 301. Beside what's there now (init,
+       check, build and types, Vite+'s `vp check` and lint rule, Thai and Arabic in dev).
+9. [ ] **The fresh check weekly too**, on a schedule in `.github/workflows/fresh.yml`: new apps
+       get the newest Vite+ and Void, so a release that breaks void-fbtee shows up within a week,
+       as Vite+ 1.6.0 did on 2026-11-12.
 
 ## C. Then the example and the docs
 
-11. [ ] **Whatever A and B change in how the package is used** goes into the example, the
+10. [ ] **Whatever A and B change in how the package is used** goes into the example, the
         README's "Add it to a Void app", the skill and the setup pages (all three languages).
-        The example keeps the package as a workspace dependency, as Void's own playgrounds do;
-        the new apps of B are where it's used as a stranger uses it.
-12. [ ] **CI:** `.github/workflows/fresh.yml` runs B's matrix on its usual changes; a scheduled
-        workflow runs item 10.
+        The example keeps the package as a workspace dependency, as Void's own playgrounds do.
 
 ## Not in this plan
 
@@ -91,6 +94,6 @@ Against Vite+'s library template:
 
 ## Verification
 
-Locally, in the background: `vp check`, `vp test run`, `vp run test:fresh` (the full matrix).
-Each check is first shown to fail when what it guards is broken (as the lint rule's test was).
-After the push: CI's runs pass, and the scheduled newest-versions run passes once.
+Locally, in the background: `vp check`, `vp test run`, `vp run test:fresh` (four apps). Each new
+check is first shown to fail when what it guards is broken (as the lint rule's test was). After
+the push: CI's runs pass.
