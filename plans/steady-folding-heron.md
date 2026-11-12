@@ -154,6 +154,26 @@ docs. One commit per item; pushed together when you say.
 
 `packages/void-fbtee/skills/void-fbtee/SKILL.md` is updated with each package change (items 3, 5, 6, 8).
 
+### E. Where the package does what Void already does
+
+10. [x] **Each piece of the package checked against Void's own code** (2026-11-12, at ee4eaa7),
+        done when found rather than put off. Changed: - The not-found rule for an unknown language refused every path under no language, so an
+        app's own route outside `/api` (`/webhook`) would have got 404. Now only when the route
+        that will answer is a page whose first segment is a parameter, found as Void finds it:
+        Hono's `matchedRoutes` after the middleware (`packages/void/src/runtime/routing-pages.ts:75-86`),
+        from Void's own Hono, resolved beside Void as Void does (`void/dist/index.mjs:4632`).
+        Proved with a throwaway route. - `"/"` to the source language moved from middleware code to Void's config redirect
+        (`routing.redirects`, 301, `docs/guide/edge/redirects.md`), which runs before any app
+        code. `init` adds it, `check` requires it.
+        Kept, with why: - The `<meta>` for islands: Void hydrates an island with only its props and frontmatter, no
+        shared data (`packages/react/src/plugin-islands.ts:27-44`). - `Link`: Void doesn't re-apply `<html lang dir>` on client navigation (`head.md:133`), so
+        a link into another language must reload (`reloadDocument`); Void's `Link` works without
+        a router (`runtime/link.tsx`). - `useNow`, `useTimeZone`, `<Formatted>`, `useHydrated`: Void has nothing for these
+        (`@void/react` exports `Form`, `Link`, `useRouter`, `useParams`, `useShared`, `useForm`,
+        `useNavigation`, `useIslandForm`).
+        Already Void's way: `<html lang dir>` and hreflang through `headDefaults`, `c.get("i18n")`
+        through `CloudContextVariables`, titles through `head()`, catalogs as virtual modules.
+
 ## Not in this plan
 
 - The upgrade to Void 1.8.0 and Vite+ 1.6, then the two items that need it: `plans/brisk-copper-wren.md`.
