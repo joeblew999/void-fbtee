@@ -12,6 +12,12 @@ installs nothing under a day old, so it can be installed from about 01:00 UTC on
 
 ## First: the upgrade
 
+Found 2026-11-12: Vite+ 1.6.0 (published 2026-11-11 04:16 UTC) became installable this morning,
+before Void 1.8.0 will be. Since then `vp run test:fresh` fails on its Vite+ app: a new app gets
+Vite+ core 1.6.0 while this repo pins 1.5.1 ("Expected @voidzero-dev/vite-plus-core@1.5.1, but
+found 1.6.0"). The plain-Vite app passes. CI doesn't run test:fresh, so nothing else is affected
+until the upgrade.
+
 1. [ ] **Void 1.8.0 and Vite+ 1.6**, by the README's "Upgrading" steps: `vp upgrade && vp run
        upgrade:vite-plus`; the three Void packages to 1.8.0 in `pnpm-workspace.yaml`'s catalog;
        `vp install`; `vp run check:tools`; then `vp check`, `vp test run`, `vp run test:fresh`.
