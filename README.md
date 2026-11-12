@@ -121,6 +121,21 @@ The tasks are in `vite.config.ts` and `apps/example/vite.config.ts`.
 - Each commit is checked first (`vp check --fix`, a hook `vp install` sets up). CI runs
   `vp check`, the package's tests, then `vp run test:deployed`.
 
+### Checking the live site by hand
+
+Two checks only a person can run: each reads one live page the way its owner's crawler does. Paste
+in a page's address, e.g. an event's (from https://void-fbtee-example.gedw99.workers.dev/en-US/events)
+or a language's home page (https://void-fbtee-example.gedw99.workers.dev/th-TH).
+
+- **Google's Rich Results Test**, https://search.google.com/test/rich-results: the structured data
+  (the site on each home page, the event on each event page) and whether Google could show it as a
+  rich result. No sign-in.
+- **Facebook's Sharing Debugger**, https://developers.facebook.com/tools/debug/: the link preview
+  (picture, title, description) as Facebook builds it. Needs a Facebook sign-in. "Scrape Again"
+  makes Facebook read the page afresh, after the picture or a title changes.
+
+Run them after a change to the head tags or the picture.
+
 ## Upgrading
 
 - **Vite+:** `vp upgrade && vp migrate`, a day after a release (pnpm won't install
