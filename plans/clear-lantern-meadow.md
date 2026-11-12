@@ -69,19 +69,23 @@ link-checker, site-config, ai-ready, skew-protection) was the checklist for this
 
 ## 3. What each page gets, and from where
 
-| Tags                                                                                                                                                                             | Where                                                                      | How                                                        |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `<title>`, `description`                                                                                                                                                         | page `head()` / frontmatter                                                | there, translated                                          |
-| `og:title`, `og:description`                                                                                                                                                     | page `head()`; markdown: middleware from `frontmatter.title`/`description` | `unpackMeta`                                               |
-| canonical, hreflang, `x-default`, `og:url`, `og:locale`                                                                                                                          | void-fbtee middleware                                                      | `og:url` via `unpackMeta`; one fixed site address, `https` |
-| `og:site_name`, `og:type`, `og:image` (+ `:width`, `:height`, `:type`, `:alt`), `twitter:card`, `twitter:image:alt`, `theme-color`, `color-scheme`, `apple-mobile-web-app-title` | `void.config.ts` `head`, once                                              | `unpackMeta`; `og:image` an absolute URL                   |
-| `WebSite` JSON-LD                                                                                                                                                                | each language's home page `head()`                                         | `schema-dts` types, escaped                                |
-| `Event` JSON-LD                                                                                                                                                                  | each event page's `head()`                                                 | `schema-dts` types, escaped                                |
-| icons, manifest, `robots.txt`                                                                                                                                                    | `public/` and `void.config.ts`                                             | as below                                                   |
-| sitemap                                                                                                                                                                          | the app's route `routes/sitemap.xml.ts`, with void-fbtee's language part   | decision 4                                                 |
+| Tags                                                                                                                                                        | Where                                                                      | How                                                        |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `<title>`, `description`                                                                                                                                    | page `head()` / frontmatter                                                | there, translated                                          |
+| `og:title`, `og:description`                                                                                                                                | page `head()`; markdown: middleware from `frontmatter.title`/`description` | `unpackMeta`                                               |
+| canonical, hreflang, `x-default`, `og:url`, `og:locale`                                                                                                     | void-fbtee middleware                                                      | `og:url` via `unpackMeta`; one fixed site address, `https` |
+| `og:site_name`, `og:type`, `og:image` (+ `:width`, `:height`, `:type`, `:alt`), `twitter:card`, `theme-color`, `color-scheme`, `apple-mobile-web-app-title` | `void.config.ts` `head`, once                                              | `unpackMeta`; `og:image` an absolute URL                   |
+| `WebSite` JSON-LD                                                                                                                                           | each language's home page `head()`                                         | `schema-dts` types, escaped                                |
+| `Event` JSON-LD                                                                                                                                             | each event page's `head()`                                                 | `schema-dts` types, escaped                                |
+| icons, manifest, `robots.txt`                                                                                                                               | `public/` and `void.config.ts`                                             | as below                                                   |
+| sitemap                                                                                                                                                     | the app's route `routes/sitemap.xml.ts`, with void-fbtee's language part   | decision 4                                                 |
 
-`twitter:title`/`description`/`image` aren't added: X reads the `og:` ones. `twitter:image:alt`
-is (X doesn't fall back to `og:image:alt`).
+X cards: only `twitter:card` (`summary_large_image`). X reads the `og:` tags for everything
+else: its cards reference lists `og:title`, `og:description`, `og:image` and `og:image:alt` as
+the fallbacks for `twitter:title`, `twitter:description`, `twitter:image` and
+`twitter:image:alt`, while without `twitter:card` "a summary card may be rendered" (the small one,
+no big picture) (developer.x.com/cards/markup, checked 2026-11-12). `twitter:site` (the site's X
+account) is left out: there isn't one.
 
 ## 4. Decisions (by Claude unless marked, reasons with each)
 
@@ -94,7 +98,7 @@ is (X doesn't fall back to `og:image:alt`).
    the globe on the site's background, 1200×630, no other words, so it fits every language. Made
    from an SVG with its text as paths (so fonts can't differ between machines) by `sharp`, kept in
    `public/` with a version in its name (`og-1.png`; previews are cached for a long time), linked
-   by absolute URL with `og:image:type`. `og:image:alt` and `twitter:image:alt` are "void-fbtee",
+   by absolute URL with `og:image:type`. `og:image:alt` is "void-fbtee",
    a name: not translated. Per-page pictures maybe later with `@cf-wasm/og`, after Thai and Arabic
    are rendered and look right.
 3. **One manifest, translated in place**: Chrome and Edge 148 read `*_localized` fields
