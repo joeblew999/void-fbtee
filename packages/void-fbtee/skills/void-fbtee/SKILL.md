@@ -67,6 +67,11 @@ hydrating, then the reader's zone, so render a time "in your time" as nothing un
 its space), never a stand-in such as UTC. `useNow()` is the server's "now" while hydrating, then
 the browser's; `useHydrated()` is for anything else of the browser's own.
 
+The page's language: `useLocale()` in components; `c.get("i18n")` in loaders and actions
+(typed, no cast: `const { locale } = c.get("i18n")`). Both are
+`{ locale, dir, now, path }`. After a change, `revalidate({ paths: localizedPaths("/events") })`
+refreshes the page in every language.
+
 ## Markdown pages
 
 Pages under `pages/<source locale>/` have a copy per locale at the same path under

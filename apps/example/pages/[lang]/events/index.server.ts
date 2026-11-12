@@ -5,16 +5,13 @@ import { defineHandler, type InferProps } from "void";
 import { and, asc, db, eq, gte } from "void/db";
 import { queues } from "void/queues";
 import { revalidate } from "void/isr";
-import { localizedPaths, type SharedI18n } from "void-fbtee/middleware";
+import { localizedPaths } from "void-fbtee/middleware";
 
 export type Props = InferProps<typeof loader>;
 
-const i18n = (c: { get: (key: never) => unknown }) =>
-  (c.get("shared" as never) as { i18n: SharedI18n }).i18n;
-
 // Each event with its title in the page's language, where it has been translated.
 export const loader = defineHandler(async (c) => {
-  const { locale } = i18n(c);
+  const { locale } = c.get("i18n");
   const rows = await db
     .select({ event: events, text: event_texts })
     .from(events)
@@ -30,7 +27,7 @@ export const loader = defineHandler(async (c) => {
 });
 
 export const action = defineHandler.withValidator({ body: newEventSchema })(async (c, { body }) => {
-  const { locale } = i18n(c);
+  const { locale } = c.get("i18n");
   const [created] = await db
     .insert(events)
     .values({

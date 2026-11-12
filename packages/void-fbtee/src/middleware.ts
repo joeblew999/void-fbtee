@@ -9,7 +9,7 @@
 // - fbtee's per-request state is held by fbtee itself in AsyncLocalStorage (runWithFbtee), so
 //   text rendered after the shell streams in the right language too. It gets every catalog, so
 //   fbtee falls back per message (de-AT -> de -> source text) as its README describes.
-// - shared.i18n = { locale, dir, now, path }: the browser gets the same "now" the server rendered
+// - c.get("i18n") and shared.i18n = { locale, dir, now, path }: the browser gets the same "now" the server rendered
 //   with; path is the page without its locale prefix, for links to it in other languages.
 // - <html lang dir>, hreflang alternates (plus x-default, the source locale) and <meta name="void-fbtee"> (the same i18n data, for
 //   islands) go into headDefaults.
@@ -29,6 +29,15 @@ export interface SharedI18n {
   /** This page's path without the locale prefix ("/docs/intl" for /th-TH/docs/intl; "" for /th-TH):
    * `/${locale.segment}${path}` is the same page in another language. */
   path: string;
+}
+
+// `c.get("i18n")` in loaders and actions, typed (Void's "Context
+// Variables"). Its own name, not `shared`: `shared` is the app's to type, and two declarations of
+// one property with different types don't merge.
+declare module "void" {
+  interface CloudContextVariables {
+    i18n: SharedI18n;
+  }
 }
 
 /**
@@ -76,23 +85,17 @@ export default defineMiddleware(async (c, next) => {
     hreflang,
     href: `${origin}/${segment}${rest}`,
   }));
-  const shared = (c.get("shared" as never) ?? {}) as Record<string, unknown>;
-  const head = (c.get("headDefaults" as never) ?? {}) as {
-    htmlAttrs?: Record<string, string>;
-    link?: unknown[];
-    meta?: unknown[];
-  };
-  c.set("shared" as never, { ...shared, i18n } as never);
-  c.set(
-    "headDefaults" as never,
-    {
-      ...head,
-      htmlAttrs: { ...head.htmlAttrs, lang: current.locale, dir: current.dir },
-      link: [...(head.link ?? []), ...alternates],
-      // Islands hydrate without Void's shared data, so they read i18n from here (install.ts).
-      meta: [...(head.meta ?? []), { name: META_NAME, content: JSON.stringify(i18n) }],
-    } as never,
-  );
+  c.set("i18n", i18n);
+  const shared = (c.get("shared") ?? {}) as Record<string, unknown>;
+  const head = c.get("headDefaults") ?? {};
+  c.set("shared", { ...shared, i18n });
+  c.set("headDefaults", {
+    ...head,
+    htmlAttrs: { ...head.htmlAttrs, lang: current.locale, dir: current.dir },
+    link: [...(head.link ?? []), ...alternates],
+    // Islands hydrate without Void's shared data, so they read i18n from here (install.ts).
+    meta: [...(head.meta ?? []), { name: META_NAME, content: JSON.stringify(i18n) }],
+  });
   // No catalogs for light requests, but still inside fbtee state, so a not-found page with <fbt> renders.
   const { sourceLocale, fallbackLocales } = config;
   const translations = light ? {} : await allTranslations(catalogs);

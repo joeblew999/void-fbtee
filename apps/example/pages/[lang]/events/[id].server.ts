@@ -3,7 +3,7 @@ import { bookings, bookSchema, event_texts, events } from "@schema";
 import { defineHandler, type InferProps } from "void";
 import { and, count, db, eq, sql } from "void/db";
 import { revalidate } from "void/isr";
-import { localizedPaths, type SharedI18n } from "void-fbtee/middleware";
+import { localizedPaths } from "void-fbtee/middleware";
 import { eventTopic, live } from "../../../src/live";
 
 export type Props = InferProps<typeof loader>;
@@ -18,7 +18,7 @@ const booked = (id: string) =>
 // The event, its title and description in the page's language where translated, seats left.
 export const loader = defineHandler(async (c) => {
   const id = c.req.param("id")!;
-  const { locale } = (c.get("shared" as never) as { i18n: SharedI18n }).i18n;
+  const { locale } = c.get("i18n");
   const [event] = await db.select().from(events).where(eq(events.id, id));
   if (!event) return c.notFound();
   const [text] = await db
@@ -30,7 +30,7 @@ export const loader = defineHandler(async (c) => {
 
 export const action = defineHandler.withValidator({ body: bookSchema })(async (c, { body }) => {
   const id = c.req.param("id")!;
-  const { locale } = (c.get("shared" as never) as { i18n: SharedI18n }).i18n;
+  const { locale } = c.get("i18n");
   // One statement, so two people can't take the last seat: the row goes in only while the event
   // has fewer bookings than seats. D1 runs each statement on the primary, one at a time.
   const result = await db.run(sql`

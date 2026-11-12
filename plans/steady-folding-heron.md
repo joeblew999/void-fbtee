@@ -70,10 +70,16 @@ docs. One commit per item; pushed together when you say.
        link on each language's home, docs and events pages is fetched and must answer 200.
        Backed by: playgrounds write typed links with no casts (`react-pages/pages/users/index.tsx:27`).
 
-6. [ ] **The page's language read without casts.** `c.get("shared" as never)` in
+6. [x] **The page's language read without casts.** `c.get("shared" as never)` in
        `events/index.server.ts:14`, `events/[id].server.ts:22,34`, `docs/intl.server.ts:9`, and
-       the package's own five in `packages/void-fbtee/src/middleware.ts:77-92`. The package
-       augments `CloudContextVariables` so `c.get(...)` is typed.
+       the package's own five in `packages/void-fbtee/src/middleware.ts:77-92`.
+       Done, differently from first written: the package doesn't type `shared`, because `shared` is
+       the app's to type and two declarations of one property with different types don't merge.
+       It adds its own typed variable instead, `i18n` in `CloudContextVariables`, so loaders and
+       actions read `const { locale } = c.get("i18n")`; `shared.i18n` stays for pages. The
+       package's casts went too: Void already types `headDefaults` and allows any other name
+       (`packages/void/src/runtime/handler.ts:36-41`). SKILL.md says how server code
+       reads the language.
        Backed by: Void `docs/guide/type-safety.md` "Context Variables",
        `docs/guide/pages-routing/layouts.md` "Shared Data".
 
