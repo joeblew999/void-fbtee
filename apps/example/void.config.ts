@@ -12,6 +12,10 @@ export default defineConfig({
     // and redirecting by language would hide the other versions from it. void-fbtee check
     // requires it.
     redirects: { "/": { to: "/en-US", status: 301 } },
+    // http:// visits to https:// (a permanent 308), so a cached page can never carry an http
+    // address. Only on Cloudflare: localhost and 127.0.0.1 stay on http (Void's
+    // guide/edge/redirects.md, "HTTP to HTTPS").
+    alwaysUseHttps: true,
   },
   // On every page (Void's site-wide head defaults). The viewport tag makes phones lay a page out at
   // their own width; without it they lay it out 980px wide and shrink it. The site is always dark:
