@@ -60,7 +60,7 @@ test("wires void-fbtee into a Vite+ app, and a second run changes nothing", asyn
   expect(locales).toContain(`export const locales = ["en-US", "de-DE"] as const;`);
   expect(locales).toContain("interface VoidFbteeRegister");
   expect(vite).toMatch(
-    /import \{ (locales, sourceLocale|sourceLocale, locales) \} from "\.\/src\/locales";|import \{ locales \} from "\.\/src\/locales";/,
+    /import \{ (locales, sourceLocale|sourceLocale, locales) \} from "\.\/src\/locales\.ts";/,
   );
   expect(vite).toContain("voidFbtee({");
   expect(vite).toMatch(/voidFbtee\(\{\s*sourceLocale(: sourceLocale)?,\s*locales(: locales)?/);

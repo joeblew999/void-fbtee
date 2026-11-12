@@ -214,8 +214,8 @@ export async function init(o: InitOptions): Promise<InitResult> {
           `src/locales.ts: created, with the languages (${o.locales.join(", ")}) and their type`,
         );
       }
-      mod.imports.$append({ from: "./src/locales", imported: "locales" });
-      mod.imports.$append({ from: "./src/locales", imported: "sourceLocale" });
+      mod.imports.$append({ from: "./src/locales.ts", imported: "locales" });
+      mod.imports.$append({ from: "./src/locales.ts", imported: "sourceLocale" });
       addVitePlugin(mod, {
         from: "void-fbtee/vite",
         imported: "default",

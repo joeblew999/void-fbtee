@@ -4,7 +4,7 @@ import { voidPlugin } from "void";
 import { voidReact } from "@void/react/plugin";
 import { voidMarkdown } from "@void/md/plugin";
 import voidFbtee from "void-fbtee/vite";
-import { locales, sourceLocale } from "./src/locales";
+import { locales, sourceLocale } from "./src/locales.ts";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
