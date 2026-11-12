@@ -17,12 +17,15 @@ import { dirname, join, relative } from "node:path";
 import { builders, generateCode, loadFile, type ProxifiedModule } from "magicast";
 import { addVitePlugin, getDefaultExportOptions } from "magicast/helpers";
 import { DEFAULT_TRANSLATIONS } from "./catalogs";
+import { checkSite } from "./site";
 import { packageManager } from "./translate";
 
 export interface InitOptions {
   root: string;
   sourceLocale: string;
   locales: string[];
+  /** The site's own address, for voidFbtee({ site }); checked as the plugin checks it. */
+  site?: string;
 }
 
 export interface InitResult {
@@ -124,6 +127,7 @@ function workspaceRoot(root: string): string | undefined {
 }
 
 export async function init(o: InitOptions): Promise<InitResult> {
+  if (o.site !== undefined) checkSite(o.site);
   // The files init writes, to format with the app's own formatter at the end (Vite+ apps).
   const written = new Set<string>();
   const done: string[] = [];
@@ -232,14 +236,23 @@ export async function init(o: InitOptions): Promise<InitResult> {
         from: "void-fbtee/plugin",
         imported: "voidFbtee",
         constructor: "voidFbtee",
-        options: builders.raw("{ sourceLocale, locales }"),
+        options: builders.raw(
+          o.site
+            ? `{ sourceLocale, locales, site: ${JSON.stringify(o.site)} }`
+            : "{ sourceLocale, locales }",
+        ),
         index: 0,
       });
       changed = true;
       done.push(
-        `${viteConfig}: added voidFbtee({ sourceLocale, locales }) first in plugins, from src/locales.ts`,
+        `${viteConfig}: added voidFbtee({ sourceLocale, locales${o.site ? ", site" : ""} }) first in plugins, from src/locales.ts`,
       );
     }
+    // The site's own address, for each page's canonical, hreflang and og:url (else each request's).
+    if (!o.site && !/\bsite\s*:/.test(generateCode(mod).code))
+      todo.push(
+        `${viteConfig}: add the site's address to voidFbtee(), e.g. voidFbtee({ sourceLocale, locales, site: "https://example.com" }), so every copy of the site names it in canonical, hreflang and og:url (or run init with --site)`,
+      );
     if (vitePlus && wsRoot) {
       const rootConfig = join(wsRoot, "vite.config.ts");
       const rootPkg = readJson(join(wsRoot, "package.json"));

@@ -57,6 +57,23 @@ export function markdownPages(p: Project): MarkdownPage[] {
     );
 }
 
+/**
+ * The frontmatter fields a translated copy must keep because its original has them: `title` and
+ * `description` are the page's <title>, its search result text and its link preview (Void reads
+ * them, and void-fbtee's middleware gives them to og:title and og:description). A copy without
+ * one has none of those in its language. Returns the missing ones.
+ */
+export function missingHead(original: string, copy: string): string[] {
+  const fields = (text: string) => {
+    const yaml = text.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? "";
+    return new Set(
+      [...yaml.matchAll(/^(title|description):[ \t]*(\S.*)$/gm)].map(([, key]) => key!),
+    );
+  };
+  const has = fields(copy);
+  return [...fields(original)].filter((key) => !has.has(key));
+}
+
 /** A markdown page's `<script>` block, frontmatter and fenced code blocks, split from its text. */
 function splitPage(text: string) {
   const script = text.match(/<script\b[\s\S]*?<\/script>/)?.[0];
@@ -212,7 +229,16 @@ export function check(p: Project): string[] {
           `pages: ${page.locale}: ${rel(page.file)}: differs from the original where it must match: ${differ}`,
         );
     }
-    if (page.state !== "missing") untitledIn(page.locale, page.file);
+    if (page.state !== "missing") {
+      untitledIn(page.locale, page.file);
+      for (const key of missingHead(
+        readFileSync(page.original, "utf8"),
+        readFileSync(page.file, "utf8"),
+      ))
+        problems.push(
+          `pages: ${page.locale}: ${rel(page.file)}: no ${key} in its frontmatter, though the original has one, so its search result and link preview have none: translate it`,
+        );
+    }
   }
   return problems;
 }

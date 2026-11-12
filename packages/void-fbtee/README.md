@@ -30,7 +30,7 @@ It isn't on npm yet: an app installs a
 
 ```json
 "dependencies": {
-  "void-fbtee": "github:joeblew999/void-fbtee#v0.3.0&path:/packages/void-fbtee"
+  "void-fbtee": "github:joeblew999/void-fbtee#v0.4.0&path:/packages/void-fbtee"
 }
 ```
 
@@ -62,7 +62,8 @@ voidFbtee({ sourceLocale, locales, site: "https://example.com" });
 ```
 
 `https://`, the host alone (no path, no trailing slash). Without it, each page uses the address
-its request came to. A change to `voidFbtee()`'s options needs the dev server restarted: Vite reads
+its request came to. With it, a copy at another address answers `X-Robots-Tag: noindex`, so it
+stays out of search results. `void-fbtee init --site https://example.com` adds it. A change to `voidFbtee()`'s options needs the dev server restarted: Vite reads
 the plugin once, when it starts.
 
 Link previews (WhatsApp, Facebook, LinkedIn, Slack, X) need each page's title and description,
@@ -82,7 +83,11 @@ meta: [
 ],
 ```
 
-The picture's address in full, and a new name for a new picture: sharing apps keep one a long time.
+The picture's address in full, and a new name for a new picture: sharing apps keep one a long time. An
+installed app's name and description can be translated in one manifest (`*_localized`, Chrome and
+Edge 148); the example's `routes/manifest.webmanifest.ts` builds it from the catalogs with
+`inEveryLocale` from `void-fbtee/middleware`. Its start page is `/`, which goes to the source
+language: the browser picks the manifest's text by the reader's language, not a start page.
 
 Structured data for search engines (schema.org JSON-LD) goes in a page's `head()` through
 `jsonLd` from `void-fbtee/head`, which escapes it so text a visitor typed can't end the script:

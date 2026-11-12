@@ -132,7 +132,9 @@ or a language's home page (https://void-fbtee-example.gedw99.workers.dev/th-TH).
   rich result. No sign-in.
 - **Facebook's Sharing Debugger**, https://developers.facebook.com/tools/debug/: the link preview
   (picture, title, description) as Facebook builds it. Needs a Facebook sign-in. "Scrape Again"
-  makes Facebook read the page afresh, after the picture or a title changes.
+  makes Facebook read the page afresh, after the picture or a title changes. It covers Instagram,
+  Messenger and WhatsApp too: they use the same crawler and the same tags (links in Instagram
+  captions never show a preview; DMs and Story links do).
 
 Run them after a change to the head tags or the picture.
 

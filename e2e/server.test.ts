@@ -36,6 +36,10 @@ test("page head: lang, dir, hreflang alternates with x-default, canonical, og:ur
   expect(html).toContain(`rel="canonical" href="${SITE}/ar-EG/docs/intl"`);
   expect(html.match(/<link rel="canonical"/g)).toHaveLength(1);
   expect(html).toContain(`property="og:url" content="${SITE}/ar-EG/docs/intl"`);
+  // A copy at another address (this test's local build, a Worker Preview, the dev server) stays
+  // out of search results; the site itself doesn't.
+  const robots = (await get("/ar-EG/docs/intl")).headers.get("x-robots-tag");
+  expect(robots).toBe(new URL(url("prod")).origin === SITE ? null : "noindex");
   // Not on a page outside the languages: the same path under each language isn't a page.
   const outside = await (await get("/no-such-page")).text();
   expect(outside).not.toContain("hreflang=");

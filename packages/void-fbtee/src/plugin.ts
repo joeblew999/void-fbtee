@@ -36,6 +36,7 @@ import {
   runtimeTexts,
   type Project,
 } from "./catalogs";
+import { checkSite } from "./site";
 
 export interface VoidFbteeOptions {
   /** The language the app's <fbt> strings are written in, e.g. "en-US". */
@@ -102,18 +103,6 @@ export const toTemporalInstant = Date.prototype.toTemporalInstant;
 // Void builds the browser and the worker as separate Vite builds, each with its own copy of the
 // plugin; report once per app and command in this process.
 const reportedRuns = new Set<string>();
-
-/** voidFbtee({ site }) must be an https address of a host alone, as canonical URLs are built on it. */
-function checkSite(site: string): void {
-  let url: URL | undefined;
-  try {
-    url = new URL(site);
-  } catch {}
-  if (!url || url.protocol !== "https:" || url.origin !== site)
-    throw new Error(
-      `voidFbtee({ site }): "${site}" isn't an https address of a host alone, e.g. "https://example.com" (no path, no trailing slash)`,
-    );
-}
 
 export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   const config: LocaleConfig = resolveLocales(options.sourceLocale, options.locales);

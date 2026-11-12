@@ -15,7 +15,7 @@ import { VOID_INIT_DIR } from "./void-init";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vite-plus/test";
 import type { Project } from "../src/catalogs";
-import { check, markdownPages } from "../src/check";
+import { check, markdownPages, missingHead } from "../src/check";
 import { loadProject, prepare } from "../src/commands";
 import { init } from "../src/init";
 import { stamp, translateTask } from "../src/translate";
@@ -194,4 +194,14 @@ test("init links the skill for Claude Code like void init, once", async () => {
   } finally {
     rmSync(app, { recursive: true, force: true });
   }
+});
+
+test("check: a translated markdown copy keeps the original's title and description", () => {
+  const original =
+    "---\ntitle: Tour\ndescription: Post an event.\nupdated: 2026-11-12\n---\n\n# Tour\n";
+  expect(missingHead(original, "---\ntitle: ทัวร์\ndescription: โพสต์กิจกรรม\n---\n")).toEqual([]);
+  expect(missingHead(original, "---\ntitle: ทัวร์\n---\n")).toEqual(["description"]);
+  expect(missingHead(original, "---\ntitle:\n---\n# ทัวร์\n")).toEqual(["title", "description"]);
+  // The original without them asks nothing of its copies.
+  expect(missingHead("# Tour\n", "# ทัวร์\n")).toEqual([]);
 });

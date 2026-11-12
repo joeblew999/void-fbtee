@@ -48,6 +48,7 @@ Options:
   --root <dir>              The app's folder (default: the current folder).
   --source-locale <locale>  init: the language the code is written in (default en-US).
   --locales <list>          init: comma-separated locales, source first (default: the source only).
+  --site <address>          init: the site's own address, e.g. https://example.com (voidFbtee({ site })).
 `;
 
 async function main() {
@@ -57,6 +58,7 @@ async function main() {
       root: { type: "string" },
       "source-locale": { type: "string" },
       locales: { type: "string" },
+      site: { type: "string" },
       help: { type: "boolean", short: "h" },
     },
   });
@@ -74,7 +76,7 @@ async function main() {
       .map((l) => l.trim())
       .filter(Boolean);
     const locales = [sourceLocale, ...rest.filter((l) => l !== sourceLocale)];
-    const { done, todo } = await init({ root, sourceLocale, locales });
+    const { done, todo } = await init({ root, sourceLocale, locales, site: values.site });
     for (const line of done) console.log(`✓ ${line}`);
     if (!done.length) console.log("void-fbtee is already wired in; nothing to change");
     if (todo.length) console.log("\nnext:");

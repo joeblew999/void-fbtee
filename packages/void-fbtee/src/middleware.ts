@@ -205,9 +205,14 @@ const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (
   const own = /^\/(__void|api)(\/|$)/.test(path);
   const answering = found || own ? undefined : answeringRoute(c);
   const madeUp = answering !== undefined && /^\/:[^/]+/.test(answering);
-  return runWithFbtee({ locale: current.locale, sourceLocale, fallbackLocales, translations }, () =>
-    madeUp ? c.notFound() : next(),
+  const response = await runWithFbtee(
+    { locale: current.locale, sourceLocale, fallbackLocales, translations },
+    () => (madeUp ? c.notFound() : next()),
   );
+  // A copy of the site at another address (a Worker Preview, the dev server): kept out of search
+  // results, so it never competes with the site itself. Only when the app names its site.
+  if (config.site && new URL(c.req.url).origin !== config.site) c.header("X-Robots-Tag", "noindex");
+  return response;
 });
 
 export default middleware;
