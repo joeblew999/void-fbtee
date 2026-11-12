@@ -19,7 +19,8 @@ const WHEN: Intl.DateTimeFormatOptions = {
 export function EventTime({ startsAt }: { startsAt: string }) {
   const { locale } = useLocale();
   const reader = useTimeZone();
-  const now = useNow();
+  // Once a minute, so "tomorrow" becomes "today" on a page left open past midnight.
+  const now = useNow({ updateInterval: 60_000 });
   const start = Temporal.ZonedDateTime.from(startsAt);
   const at = (timeZone: string) =>
     new Intl.DateTimeFormat(locale, { ...WHEN, timeZone }).format(start.epochMilliseconds);

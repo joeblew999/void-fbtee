@@ -72,6 +72,19 @@ test("th-TH, in New York: Sydney's clock, the reader's, and how far off, in Thai
   expect(errors).toEqual([]);
 });
 
+test('a page left open past midnight: "tomorrow" becomes "today" with no reload', async () => {
+  const p = await page({ timezoneId: "Australia/Sydney" });
+  const errors = collectErrors(p);
+  // 23:59 on 6 March in Sydney; the swim starts at 6:00 on 7 March.
+  await p.clock.install({ time: new Date("2027-03-06T12:59:00Z") });
+  await goToEvent(p, "en-US", "Harbour sunrise swim");
+  await untilText(p, 'article [data-testid="event-when"]', "is", "tomorrow");
+  // useNow({ updateInterval: 60_000 }) reads the clock again each minute.
+  await p.clock.runFor(120_000);
+  await untilText(p, 'article [data-testid="event-when"]', "is", "today");
+  expect(errors).toEqual([]);
+});
+
 test("ar-EG: post an event (a missing title first); it is saved neutral and reads the same in English", async () => {
   const p = await page({ timezoneId: "Africa/Cairo" });
   const errors = collectErrors(p);

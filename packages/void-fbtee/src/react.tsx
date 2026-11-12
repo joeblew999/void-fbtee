@@ -14,7 +14,14 @@
 // Numbers and Dates"), and fbtee's list() for lists inside strings. Data stays neutral (UTC
 // instants with zone names, plain numbers with currency codes); text formatted while rendering
 // goes in <Formatted>, so it's formatted once for the screen: by the server, kept by the browser.
-import { use, useContext, useSyncExternalStore, type ReactNode, type ComponentProps } from "react";
+import {
+  use,
+  useCallback,
+  useContext,
+  useSyncExternalStore,
+  type ReactNode,
+  type ComponentProps,
+} from "react";
 import { Link as VoidLink, SharedContext } from "@void/react";
 import { Temporal } from "temporal-polyfill";
 import config from "virtual:void-fbtee/config";
@@ -93,13 +100,27 @@ export function Link(props: ComponentProps<typeof VoidLink>) {
 /**
  * "Now" that stays right on cached pages. The first render uses the server's "now", so it hydrates
  * with the same text; then it switches to the browser's clock. Use it for anything relative to
- * now on prerendered pages: Void prerenders markdown pages and loader-free island pages at
- * deploy and caches them, so the server's "now" there is the deploy time.
+ * now: a page from Void's page cache was rendered long before it's read, so the server's "now" in
+ * it is old. With `updateInterval` (milliseconds) it reads the clock again that often, so a page
+ * left open moves on ("tomorrow" becomes "today" after midnight), as next-intl's useNow does;
+ * without it, the clock is read once.
  */
-export function useNow(): Temporal.Instant {
+export function useNow(options?: { updateInterval?: number }): Temporal.Instant {
   const { now } = useLocale();
+  const interval = options?.updateInterval;
+  const subscribe = useCallback(
+    (changed: () => void) => {
+      if (!interval) return () => {};
+      const timer = setInterval(() => {
+        browserInstant = Temporal.Now.instant();
+        changed();
+      }, interval);
+      return () => clearInterval(timer);
+    },
+    [interval],
+  );
   // React renders getServerSnapshot while hydrating, then re-renders with getSnapshot.
-  return useSyncExternalStore(noSubscribe, browserNow, () => serverNow(now));
+  return useSyncExternalStore(subscribe, browserNow, () => serverNow(now));
 }
 
 /**

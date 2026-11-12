@@ -71,7 +71,8 @@ Chrome and the Worker), and a mismatch is React error 418. A list that comes fro
 browser knows is formatted only by the browser: `useTimeZone()` is null on the server and while
 hydrating, then the reader's zone, so render a time "in your time" as nothing until then (keep
 its space), never a stand-in such as UTC. `useNow()` is the server's "now" while hydrating, then
-the browser's; `useHydrated()` is for anything else of the browser's own.
+the browser's (`useNow({ updateInterval: 60_000 })` reads it again each minute, for a page left
+open); `useHydrated()` is for anything else of the browser's own.
 
 The page's language: `useLocale()` in components; `c.get("i18n")` in loaders and actions
 (typed, no cast: `const { locale } = c.get("i18n")`). Both are

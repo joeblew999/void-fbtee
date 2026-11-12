@@ -26,7 +26,8 @@ export default function Fmt({
     }),
   };
   const zone = useTimeZone();
-  const now = useNow();
+  // Once a minute, so "tomorrow" becomes "today" on a page left open past midnight.
+  const now = useNow({ updateInterval: 60_000 });
   return (
     <Formatted data-fmt={JSON.stringify(props)} className="font-medium">
       {/* yours and ago need the reader's zone: nothing until the browser knows it. */}
