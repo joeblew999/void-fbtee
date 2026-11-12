@@ -4,7 +4,7 @@
 // on 127.0.0.1 (so a server left by a stopped run can't block this one), and stop it at the end.
 import { execFileSync, spawn, type ChildProcess } from "node:child_process";
 import { once } from "node:events";
-import { createServer, type AddressInfo } from "node:net";
+import { connect, createServer, type AddressInfo } from "node:net";
 import { join } from "node:path";
 import { stripVTControlCharacters } from "node:util";
 import type { TestProject } from "vite-plus/test/node";
@@ -59,12 +59,35 @@ async function start(args: string[], port: number, url: string): Promise<ChildPr
   return child;
 }
 
+// The example's dev server (`vp run dev`): apps/example/vite.config.ts, server.port.
+const DEV_PORT = 5173;
+
+/** Whether something answers on the dev server's port. */
+function devServerRunning(): Promise<boolean> {
+  return new Promise((resolve) => {
+    const socket = connect({ host: "localhost", port: DEV_PORT });
+    socket.once("connect", () => {
+      socket.destroy();
+      resolve(true);
+    });
+    socket.once("error", () => resolve(false));
+  });
+}
+
 export default async function setup(project: TestProject) {
   // `vp run test:production` (e2e/production.ts): the tests against production (the deployed site), no local build or servers.
   if (process.env.E2E_URL) {
     project.provide("prod" as never, process.env.E2E_URL as never);
     return;
   }
+  // The tests share two things with the dev server: the local database (reset below) and the
+  // package's dist/ (rebuilt below, emptied first). Run while it's up, they wipe its data and break
+  // its pages, so they stop here instead.
+  if (await devServerRunning())
+    throw new Error(
+      `the dev server is running (port ${DEV_PORT}): stop vp run dev before running the tests, ` +
+        "or they would reset its database and rebuild the package under it",
+    );
   // A fresh local database with every migration, the sample events' one included.
   run(["exec", "void", "db", "reset", "--yes"], EXAMPLE);
   // The example's build, and before it void-fbtee's (Vite+'s transitive run: -t).
