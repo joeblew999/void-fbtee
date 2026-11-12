@@ -34,6 +34,11 @@ export default defineConfig({
       "test:fresh": { command: "vpx e2e/fresh/check.ts", cache: false },
       // Vite+'s, Void's and void-fbtee's setup commands, run again: fails if any changes a file.
       "check:tools": { command: "node e2e/check-tools.mjs", cache: false },
+      // In a Claude cloud session: the dev server (vp run dev) on a public https address through
+      // Tailscale Funnel, so any browser can open it without deploying (e2e/tailscale.ts). On a
+      // Mac, open http://localhost:5173 instead.
+      "tailscale:login": { command: "vpx e2e/tailscale.ts login", cache: false },
+      "tailscale:logout": { command: "vpx e2e/tailscale.ts logout", cache: false },
       // The example's tasks (apps/example/vite.config.ts), runnable from the root.
       login: { command: "vp run example#login", cache: false },
       status: { command: "vp run example#status", cache: false },

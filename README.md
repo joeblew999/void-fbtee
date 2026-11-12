@@ -16,7 +16,11 @@ All from the repo root.
 Once per machine:
 
 ```sh
-curl -fsSL https://vite.plus | bash   # Vite+'s vp; it runs the Node in .node-version
+curl -fsSL https://vite.plus | bash   # Vite+'s vp; open a new terminal after it
+vp env on                             # the Node in .node-version for everything, package scripts
+                                      # included, ahead of any other Node on the machine (Void
+                                      # needs Node 24.22+; without this, vp install fails where an
+                                      # older Node comes first, as in a Claude cloud session)
 vp install                            # dependencies; Void generates its types and links its
                                       # skills for coding agents
 vp run install:browser                # Chromium and WebKit (Safari's engine) for the tests
@@ -56,6 +60,19 @@ vp run test:browsers     # every page in every language in Chromium, WebKit and 
                          # language, so it's not in vp test run, whose tests use a fixed few
                          # languages (each for what it exercises); CI runs it
 ```
+
+In a Claude cloud session, to open the dev server in your own browser without deploying:
+
+```sh
+vp run dev                # in one terminal: the dev server, on http://localhost:5173
+vp run tailscale:login    # in another: puts it on a public https://void-fbtee-<machine>.<tailnet>.ts.net
+                          # address through Tailscale Funnel. Prints a Tailscale sign-in link and
+                          # waits for it. Tailscale is downloaded into .tailscale/ (Linux only)
+vp run tailscale:logout   # takes it off again; remove the machine at
+                          # https://login.tailscale.com/admin/machines
+```
+
+On a Mac, just open http://localhost:5173.
 
 Translations (from `apps/example`):
 

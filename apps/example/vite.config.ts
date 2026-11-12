@@ -36,6 +36,9 @@ export default defineConfig({
       },
     },
   },
+  // The dev server always on 5173 (stops if it's taken, rather than moving), where
+  // `vp run tailscale:login` points Tailscale Funnel; and its public *.ts.net address let in.
+  server: { port: 5173, strictPort: true, allowedHosts: [".ts.net"] },
   // shadcn's "@/" import alias (tsconfig.json "paths" says the same for TypeScript).
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
   plugins: [

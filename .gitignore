@@ -10,3 +10,5 @@ source_strings.json
 pnpm-lock.yaml
 package-lock.json
 .vitest/
+# Tailscale for the cloud-session dev server (vp run tailscale:login): its download, state and log.
+.tailscale/
