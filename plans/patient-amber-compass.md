@@ -69,7 +69,7 @@ Against Vite+'s library template:
 
 ## B. The tests
 
-5. [ ] **The plugin in memory, through Vite's own `build()`** (as fbtee tests its plugin): its
+5. [x] **The plugin in memory, through Vite's own `build()`** (as fbtee tests its plugin): its
        hook filters, the server-only swaps per environment, the virtual modules. In
        `packages/void-fbtee/test/`, run by `vp test`.
 6. [ ] **The fresh check installs the real tarball:** packed as npm would publish it, checked as
