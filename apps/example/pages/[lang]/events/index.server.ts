@@ -6,6 +6,7 @@ import { and, asc, db, eq, gte } from "void/db";
 import { queues } from "void/queues";
 import { revalidate } from "void/isr";
 import { localizedPaths } from "void-fbtee/middleware";
+import { z } from "zod";
 
 export type Props = InferProps<typeof loader>;
 
@@ -26,7 +27,10 @@ export const loader = defineHandler(async (c) => {
   };
 });
 
-export const action = defineHandler.withValidator({ body: newEventSchema })(async (c, { body }) => {
+export const action = defineHandler.withValidator({
+  params: z.object({ lang: z.string() }),
+  body: newEventSchema,
+})(async (c, { params, body }) => {
   const { locale } = c.get("i18n");
   const [created] = await db
     .insert(events)
@@ -43,6 +47,6 @@ export const action = defineHandler.withValidator({ body: newEventSchema })(asyn
   await revalidate({ paths: localizedPaths("/events") });
   return c.redirect({
     pathname: "/[lang]/events/[id]",
-    params: { lang: c.req.param("lang")!, id: created.id },
+    params: { lang: params.lang, id: created.id },
   });
 });

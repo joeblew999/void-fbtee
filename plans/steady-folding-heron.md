@@ -83,8 +83,10 @@ docs. One commit per item; pushed together when you say.
        Backed by: Void `docs/guide/type-safety.md` "Context Variables",
        `docs/guide/pages-routing/layouts.md` "Shared Data".
 
-7. [ ] **Route parameters validated.** `c.req.param("id")!` and `c.req.param("lang")!` in
+7. [x] **Route parameters validated.** `c.req.param("id")!` and `c.req.param("lang")!` in
        `events/[id].server.ts:21,33` and `events/index.server.ts:50` become `withValidator({ params })`.
+       Done: zod, as the schema uses; Void validates `c.req.param()`, what the code read before
+       (`packages/void/src/runtime/validator.ts:212-219`, ee4eaa7).
        Backed by: playground `spa/routes/api/users/[id].ts`.
 
 ### C. Feature

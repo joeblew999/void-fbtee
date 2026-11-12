@@ -3,10 +3,14 @@ import { bookings, bookSchema, event_texts, events } from "@schema";
 import { defineHandler, type InferProps } from "void";
 import { and, count, db, eq, sql } from "void/db";
 import { revalidate } from "void/isr";
+import { z } from "zod";
 import { localizedPaths } from "void-fbtee/middleware";
 import { eventTopic, live } from "../../../src/live";
 
 export type Props = InferProps<typeof loader>;
+
+// The page's URL parameter: /<lang>/events/<id>.
+const params = z.object({ id: z.string() });
 
 const booked = (id: string) =>
   db
@@ -16,8 +20,7 @@ const booked = (id: string) =>
     .then(([row]) => row.n);
 
 // The event, its title and description in the page's language where translated, seats left.
-export const loader = defineHandler(async (c) => {
-  const id = c.req.param("id")!;
+export const loader = defineHandler.withValidator({ params })(async (c, { params: { id } }) => {
   const { locale } = c.get("i18n");
   const [event] = await db.select().from(events).where(eq(events.id, id));
   if (!event) return c.notFound();
@@ -28,8 +31,10 @@ export const loader = defineHandler(async (c) => {
   return { event, text: text ?? null, left: event.seats - (await booked(id)) };
 });
 
-export const action = defineHandler.withValidator({ body: bookSchema })(async (c, { body }) => {
-  const id = c.req.param("id")!;
+export const action = defineHandler.withValidator({ params, body: bookSchema })(async (
+  c,
+  { params: { id }, body },
+) => {
   const { locale } = c.get("i18n");
   // One statement, so two people can't take the last seat: the row goes in only while the event
   // has fewer bookings than seats. D1 runs each statement on the primary, one at a time.
