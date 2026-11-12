@@ -65,6 +65,20 @@ fbtee's compiler is native code, installed already built for your system by your
 manager. fbtee builds it for macOS (Apple Silicon and Intel), Windows (x64 and ARM) and Linux
 (x64 and ARM, glibc and musl).
 
+On Vite+, `init` adds fbtee's lint rules (`@nkzw/eslint-plugin-fbtee`). They use typescript-eslint,
+which doesn't support TypeScript 7 yet ([typescript-eslint#12518](https://github.com/typescript-eslint/typescript-eslint/issues/12518)),
+so your package manager warns of an unmet `typescript` peer. The rules work. With pnpm's
+`strictPeerDependencies`, allow it in `pnpm-workspace.yaml`:
+
+```yaml
+peerDependencyRules:
+  allowedVersions:
+    "@typescript-eslint/utils>typescript": "7"
+    "@typescript-eslint/typescript-estree>typescript": "7"
+    "@typescript-eslint/project-service>typescript": "7"
+    "@typescript-eslint/tsconfig-utils>typescript": "7"
+```
+
 ## License
 
 MIT

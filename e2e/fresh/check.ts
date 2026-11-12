@@ -219,7 +219,18 @@ function strict(dir: string, pm: Pm) {
   }
   const file = join(dir, "pnpm-workspace.yaml");
   const text = existsSync(file) ? readFileSync(file, "utf8") : "";
-  writeFileSync(file, `${text.trimEnd()}\nstrictPeerDependencies: true\nengineStrict: true\n`);
+  // One known gap, allowed by name so any other unmet peer still fails: fbtee's lint plugin
+  // (which init adds on Vite+) uses typescript-eslint, whose packages want TypeScript below 6.1,
+  // and a new Void app has TypeScript 7 (typescript-eslint#12518; it waits on TypeScript 7.1's
+  // API). The rules work: checkLint runs one.
+  const ts7 = ["utils", "typescript-estree", "project-service", "tsconfig-utils"].map(
+    (p) => `    "@typescript-eslint/${p}>typescript": "7"`,
+  );
+  writeFileSync(
+    file,
+    `${text.trimEnd()}\nstrictPeerDependencies: true\nengineStrict: true\n` +
+      `peerDependencyRules:\n  allowedVersions:\n${ts7.join("\n")}\n`,
+  );
 }
 
 function npmVersion(): string {
