@@ -12,26 +12,29 @@ installs nothing under a day old, so it can be installed from about 01:00 UTC on
 
 ## First: the upgrade
 
-Found 2026-11-12: Vite+ 1.6.0 (published 2026-11-11 04:16 UTC) became installable this morning,
-before Void 1.8.0 will be. Since then `vp run test:fresh` fails on its Vite+ app: a new app gets
-Vite+ core 1.6.0 while this repo pins 1.5.1 ("Expected @voidzero-dev/vite-plus-core@1.5.1, but
-found 1.6.0"). The plain-Vite app passes. CI doesn't run test:fresh, so nothing else is affected
-until the upgrade.
+1. [x] **Vite+ 1.6.0**, done 2026-11-12, once it was installable (published 2026-11-11 04:16
+       UTC): it broke `test:fresh`'s Vite+ app, whose new app got 1.6.0 while this repo pinned
+       1.5.1. By Vite+'s documented way (`docs/guide/upgrade-project.md`): `vp upgrade && vp
+       migrate`, which also pins `vitest` to the 5.1.0 it bundles. The README's old step,
+       `vp run upgrade:vite-plus`, couldn't upgrade (a task runs the project's own, older `vp`),
+       so that task is gone and the README says `vp migrate`. Then `vp run check:tools`,
+       `vp check`, `vp test run` (47) and `vp run test:fresh` (both apps) passed.
 
-1. [ ] **Void 1.8.0 and Vite+ 1.6**, by the README's "Upgrading" steps: `vp upgrade && vp run
-       upgrade:vite-plus`; the three Void packages to 1.8.0 in `pnpm-workspace.yaml`'s catalog;
-       `vp install`; `vp run check:tools`; then `vp check`, `vp test run`, `vp run test:fresh`.
-       Backed by: README "Upgrading"; Vite+ `docs/guide/upgrade-project.md` (`vp migrate`); Void
-       1.8.0 release notes (https://github.com/voidzero-dev/void/releases/tag/v1.8.0).
+2. [ ] **Void 1.8.0**, from 2026-11-13 ~01:00 UTC (published 2026-11-12 00:58 UTC; pnpm installs
+       nothing under a day old): the three Void packages to 1.8.0 in `pnpm-workspace.yaml`'s
+       catalog, `vp install`, `vp run check:tools`, then `vp check`, `vp test run`,
+       `vp run test:fresh`.
+       Backed by: README "Upgrading"; Void 1.8.0 release notes
+       (https://github.com/voidzero-dev/void/releases/tag/v1.8.0).
 
 ## Then: what needs Void 1.8.0
 
-2. [ ] **Translated not-found and error pages**, inside our layout (header, language switcher):
+3. [ ] **Translated not-found and error pages**, inside our layout (header, language switcher):
        `_not-found` and `_error` components. Unknown events and URLs get Void's default page today.
        Needs 1.8.0: `_not-found` and `_error` are new in it.
        Backed by: Void 1.8.0 release notes; `docs/guide/pages-routing/errors.md`.
 
-3. [ ] **Three small unit tests of pure code**, run by `vp test` in seconds, beside the code in
+4. [ ] **Three small unit tests of pure code**, run by `vp test` in seconds, beside the code in
        `apps/example/src/`: `parseNumber`; `startsAt` with the event schema, including a time that
        doesn't exist on a clock-change day; `showInvisible` and `listDifference`. Real code,
        nothing mocked. Not `relativeDays` or `fmt`: they format, so they need the Worker.
