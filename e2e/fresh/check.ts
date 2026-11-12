@@ -86,7 +86,12 @@ const check = (ok: unknown, what: string) => {
   console.error(`✓ ${what}`);
 };
 const exec = (pm: Pm, ...args: string[]): [Pm, string[]] => [pm, ["exec", "--", ...args]];
-const install = (pm: Pm): [Pm, string[]] => [pm, ["install"]];
+// These installs follow edits to package.json, as on a developer's machine; under CI (set, as in
+// GitHub Actions) pnpm would otherwise refuse to update the lockfile.
+const install = (pm: Pm): [Pm, string[]] => [
+  pm,
+  pm === "pnpm" ? ["install", "--no-frozen-lockfile"] : ["install"],
+];
 
 const pending = execFileSync("git", ["status", "--porcelain", "packages/void-fbtee"], {
   cwd: root,
