@@ -102,9 +102,15 @@ is (X doesn't fall back to `og:image:alt`).
    `*_localized`). Add `id`, `lang`, `dir` and `description_localized` for each language from the
    catalogs; the name stays a name. `start_url` `/` redirects to the source language, so an
    installed app opens in English: said in the README.
-4. **Sitemap: yes**, now that `sitemap` does it: every page in every language with its alternates,
-   written at build from Void's page list and the languages, and a `Sitemap:` line in
-   `robots.txt`. Search engines find pages from it; `hreflang` stays in the pages too.
+4. **Sitemap: yes, made when it's requested, not at build.** Visitors post events after every
+   deploy, so a sitemap built at deploy time would miss them from the first new post. A server
+   route, `routes/sitemap.xml.ts`, lists the fixed pages, the markdown pages (`@void/md/pages`) and
+   the events (from the database), each in every language with its hreflang alternates, cached by
+   Void's revalidation (`docs/guide/edge/revalidation.md`) so it isn't rebuilt on every request;
+   and a `Sitemap:` line in `robots.txt`. This is how dynamic sites normally do it (Next.js's
+   `app/sitemap.ts` is such a route). Before choosing `sitemap` (built on Node streams), check it
+   runs on Cloudflare Workers with the Worker's Node compatibility; if not, a small XML builder
+   that does, never hand-written XML.
 5. **Structured data** through one escaping helper in the package (`jsonLd(obj)`: `JSON.stringify`
    with `<`, U+2028 and U+2029 escaped), never raw `innerHTML`: event names come from visitors.
    `WebSite` on each language's home page (Google reads it only on a site's root home page, here a
@@ -137,9 +143,10 @@ What's per language is void-fbtee's; the site's brand (name, picture, icons) is 
    declared, never-imported peer fails the `unused` check). The virtual module's type in
    `src/virtual.d.ts` is the package's own (`path`, `frontmatter`), so the built types don't
    reach for `@void/md`. `@void/md` a devDependency, for the test.
-5. **The sitemap**: written at build by the plugin (it knows the languages; Void's page list gives
-   the routes), with `sitemap`. Exact hook decided when written (a Vite `generateBundle` in the
-   client environment, if Void's page list is reachable there; else a `vp run` script).
+5. **The sitemap's part in the package**: void-fbtee gives what's about languages, a function that
+   turns a page's path into its entry in every language with the alternates
+   (`void-fbtee/head` or its own entry, decided when written); the app's route
+   (`routes/sitemap.xml.ts`) adds its own pages and data, here the events.
 6. **`check`** reports a translated markdown copy without the `title` or `description` its
    original has.
 7. **`init`** adds the `site` option (item 1); the rest needs no setup.
@@ -156,7 +163,7 @@ What's per language is void-fbtee's; the site's brand (name, picture, icons) is 
 
 - **Package tests:** `pageHead()`; `jsonLd()` with `</script>` and U+2028 in a value; the
   in-memory plugin test (`test/plugin.test.ts`) for `virtual:void-fbtee/md-pages` with and
-  without void-md in the plugins; the sitemap.
+  without void-md in the plugins; the sitemap entries in every language.
 - **Server tests (example):** every page in every language: the whole table in §3 against that
   language's strings; an event posted with `</script><script>` in its name doesn't break out;
   hreflang absent outside a language; `http` redirected to `https` where Void does it.
