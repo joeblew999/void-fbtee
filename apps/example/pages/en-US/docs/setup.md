@@ -6,7 +6,7 @@ it can't safely edit a file, it prints the line to add. These are the pieces, fo
 
 - **Vite plugin:** `voidFbtee({ sourceLocale, locales })` from `void-fbtee/vite`, first in
   `plugins` in `vite.config.ts` (before `voidPlugin()`).
-- **Middleware:** `middleware/i18n.ts` with `export { default } from "void-fbtee/middleware";`.
+- **Middleware:** `middleware/99.i18n.ts` with `export { default } from "void-fbtee/middleware";`.
   It reads the locale from the URL and sets `<html lang dir>`.
 - **Layout:** `pages/layout.tsx` wraps its children in `<I18nProvider>` from `void-fbtee/react`.
 - **Temporal:** `worker: { compatibility_flags: ["temporal"] }` in `void.config.ts`, for

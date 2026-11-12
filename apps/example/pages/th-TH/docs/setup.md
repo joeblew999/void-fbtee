@@ -1,5 +1,5 @@
 ---
-translatedFrom: "e45abb630e08"
+translatedFrom: "17c00e7e4bf9"
 ---
 
 # การตั้งค่า void-fbtee ในแอป Void
@@ -9,7 +9,7 @@ translatedFrom: "e45abb630e08"
 
 - **ปลั๊กอิน Vite:** `voidFbtee({ sourceLocale, locales })` จาก `void-fbtee/vite` เป็นตัวแรกใน
   `plugins` ใน `vite.config.ts` (ก่อน `voidPlugin()`)
-- **มิดเดิลแวร์:** `middleware/i18n.ts` ที่มี `export { default } from "void-fbtee/middleware";`
+- **มิดเดิลแวร์:** `middleware/99.i18n.ts` ที่มี `export { default } from "void-fbtee/middleware";`
   ทำหน้าที่อ่านภาษาจาก URL และตั้งค่า `<html lang dir>`
 - **เลย์เอาต์:** `pages/layout.tsx` ครอบเนื้อหาด้วย `<I18nProvider>` จาก `void-fbtee/react`
 - **Temporal:** `worker: { compatibility_flags: ["temporal"] }` ใน `void.config.ts` สำหรับ

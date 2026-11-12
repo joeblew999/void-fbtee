@@ -33,7 +33,7 @@ docs. One commit per item; pushed together when you say.
        test asserts the answer comes from that route, not a redirect to a language page; the exact
        status is read off the running server before the line is written.
 
-3. [ ] **Middleware numbered: `middleware/99.i18n.ts`.** Void orders middleware by the number in
+3. [x] **Middleware numbered: `middleware/99.i18n.ts`.** Void orders middleware by the number in
        the file name; an unnumbered file gets order Infinity, so ours already runs last, but only by
        a rule you'd have to look up. Ours must run after the app's own middleware, because it merges
        into the `shared` and head data they set (`packages/void-fbtee/src/middleware.ts:77-92`), so it

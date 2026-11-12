@@ -1,5 +1,5 @@
 ---
-translatedFrom: "e45abb630e08"
+translatedFrom: "17c00e7e4bf9"
 ---
 
 # إعداد void-fbtee في تطبيق Void
@@ -9,7 +9,7 @@ translatedFrom: "e45abb630e08"
 
 - **إضافة Vite:** `voidFbtee({ sourceLocale, locales })` من `void-fbtee/vite`، أولًا في
   `plugins` داخل `vite.config.ts` (قبل `voidPlugin()`).
-- **الوسيط (middleware):** `middleware/i18n.ts` ويحتوي `export { default } from "void-fbtee/middleware";`.
+- **الوسيط (middleware):** `middleware/99.i18n.ts` ويحتوي `export { default } from "void-fbtee/middleware";`.
   يقرأ اللغة من الرابط ويضبط `<html lang dir>`.
 - **التخطيط:** يغلّف `pages/layout.tsx` محتواه بـ `<I18nProvider>` من `void-fbtee/react`.
 - **Temporal:** `worker: { compatibility_flags: ["temporal"] }` في `void.config.ts`، من أجل

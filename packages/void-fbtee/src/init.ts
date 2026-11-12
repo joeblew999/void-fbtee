@@ -52,8 +52,8 @@ export default function Layout({ children }: { children: ReactNode }) {
 }
 `;
 
-const MIDDLEWARE = `// Locale from the URL, fbtee's per-request state, <html lang dir>. Unnumbered, so Void runs it after any
-// numbered middleware (01.auth.ts and the like).
+const MIDDLEWARE = `// Locale from the URL, fbtee's per-request state, <html lang dir>. 99 so Void runs it after the
+// app's own middleware (01.auth.ts and the like): it adds to the shared and head data they set.
 export { default } from "void-fbtee/middleware";
 `;
 
@@ -149,8 +149,8 @@ export async function init(o: InitOptions): Promise<InitResult> {
     );
   if (!hasMw) {
     mkdirSync(mwDir, { recursive: true });
-    writeFileSync(join(mwDir, "i18n.ts"), MIDDLEWARE);
-    done.push("middleware/i18n.ts: created");
+    writeFileSync(join(mwDir, "99.i18n.ts"), MIDDLEWARE);
+    done.push("middleware/99.i18n.ts: created");
   }
 
   // 4. Root layout.

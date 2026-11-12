@@ -100,7 +100,8 @@ missing; where it can't safely edit a file it prints the line to add). The piece
 
 - `voidFbtee({ sourceLocale, locales })` from `void-fbtee/vite`, first in `plugins` in
   `vite.config.ts`.
-- `middleware/i18n.ts`: `export { default } from "void-fbtee/middleware";`.
+- `middleware/99.i18n.ts`: `export { default } from "void-fbtee/middleware";`. The 99 makes Void run
+  it after the app's own middleware (01-98), since it adds to the shared and head data they set.
 - `pages/layout.tsx` wraps its children in `<I18nProvider>` from `void-fbtee/react`.
 - `worker: { compatibility_flags: ["temporal"] }` in `void.config.ts`.
 - tsconfig: `"fbtee/ReactTypes"` in `compilerOptions.types`; `"lib"` with `ES2025`, `DOM`,
