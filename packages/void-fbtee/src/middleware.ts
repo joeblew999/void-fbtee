@@ -101,12 +101,24 @@ const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (
   const shared = (c.get("shared") ?? {}) as Record<string, unknown>;
   const head = c.get("headDefaults") ?? {};
   c.set("shared", { ...shared, i18n });
+  // On a page in one of the languages: its own address as canonical (each language version is its
+  // own canonical; one pointing at another language makes search engines ignore its hreflang), and
+  // Open Graph's locale in its language_TERRITORY form (en_US, not en-US), so link previews are in
+  // the page's language (ogp.me, og:locale). Not og:locale:alternate: it's one tag per other
+  // language, and Void keeps one meta tag per property (resolveHead, packages/void/src/pages/head.ts
+  // in Void 1.8.0), so only the last would be left.
+  const page = found
+    ? {
+        link: [{ rel: "canonical", href: `${origin}/${found.segment}${rest}` }],
+        meta: [{ property: "og:locale", content: found.locale.replace("-", "_") }],
+      }
+    : { link: [], meta: [] };
   c.set("headDefaults", {
     ...head,
     htmlAttrs: { ...head.htmlAttrs, lang: current.locale, dir: current.dir },
-    link: [...(head.link ?? []), ...alternates],
+    link: [...(head.link ?? []), ...alternates, ...page.link],
     // Islands hydrate without Void's shared data, so they read i18n from here (install.ts).
-    meta: [...(head.meta ?? []), { name: META_NAME, content: JSON.stringify(i18n) }],
+    meta: [...(head.meta ?? []), ...page.meta, { name: META_NAME, content: JSON.stringify(i18n) }],
   });
   // No catalogs for light requests, but still inside fbtee state, so a not-found page with <fbt> renders.
   const { sourceLocale, fallbackLocales } = config;
@@ -117,7 +129,12 @@ const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (
   // Void finds the answering route (matchedRoutes after this middleware, as Void's own
   // packages/void/src/runtime/routing-pages.ts does), so the app's own routes (/webhook) are left
   // alone. c.notFound() runs the app's not-found handler (docs/guide/pages-routing/errors.md).
-  const answering = found || light ? undefined : answeringRoute(c);
+  // Files too (/void.svg, /robots.txt): on Cloudflare, an app with middleware sends every request
+  // to the Worker first (Void's asset-worker-bypass.ts), where [lang] matches them; Void's
+  // not-found handler serves the file if there is one ("Dynamic page patterns also match real
+  // files", packages/void/src/runtime/routing-pages.ts), else the not-found page.
+  const own = /^\/(__void|api)(\/|$)/.test(path);
+  const answering = found || own ? undefined : answeringRoute(c);
   const madeUp = answering !== undefined && /^\/:[^/]+/.test(answering);
   return runWithFbtee({ locale: current.locale, sourceLocale, fallbackLocales, translations }, () =>
     madeUp ? c.notFound() : next(),

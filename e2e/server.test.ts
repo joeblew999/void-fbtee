@@ -19,7 +19,7 @@ test('"/" always redirects to the source language, whatever the browser asks for
   }
 });
 
-test("page head: lang, dir, hreflang alternates with x-default, i18n meta", async () => {
+test("page head: lang, dir, hreflang alternates with x-default, canonical, og:locale, i18n meta", async () => {
   const html = await (await get("/ar-EG/docs/intl")).text();
   // The <html> attributes, in any order (Void's own, class and data-theme, come first).
   const htmlTag = html.match(/<html\b[^>]*>/)?.[0] ?? "";
@@ -28,6 +28,11 @@ test("page head: lang, dir, hreflang alternates with x-default, i18n meta", asyn
   for (const l of LOCALES)
     expect(html).toContain(`hreflang="${l}" href="${url("prod")}/${l}/docs/intl"`);
   expect(html).toContain(`hreflang="x-default" href="${url("prod")}/en-US/docs/intl"`);
+  // Its own address as canonical, and Open Graph's locale as language_TERRITORY (no
+  // og:locale:alternate: Void keeps one meta tag per property, src/middleware.ts says more).
+  expect(html).toContain(`rel="canonical" href="${url("prod")}/ar-EG/docs/intl"`);
+  expect(html.match(/<link rel="canonical"/g)).toHaveLength(1);
+  expect(html).toContain('property="og:locale" content="ar_EG"');
   const meta = html.match(/<meta name="void-fbtee" content="([^"]*)"/)?.[1];
   const i18n = JSON.parse(meta!.replaceAll("&quot;", '"'));
   expect(i18n).toMatchObject({ locale: "ar-EG", dir: "rtl" });
@@ -186,8 +191,47 @@ test("every link, on every page reachable in each language, leads to a page", as
   expect(broken).toEqual([]);
 });
 
+// What every site needs, from public/ (icons made by `vp run icons`) and void.config.ts's head:
+// each file served as itself, with its own type, and linked from every page.
+test("the site's icons, web app manifest and robots.txt", async () => {
+  const files = {
+    "/favicon.ico": /^image\/(x-icon|vnd\.microsoft\.icon)/,
+    "/favicon.svg": /^image\/svg\+xml/,
+    "/apple-touch-icon-180x180.png": /^image\/png/,
+    "/pwa-192x192.png": /^image\/png/,
+    "/pwa-512x512.png": /^image\/png/,
+    "/maskable-icon-512x512.png": /^image\/png/,
+    "/manifest.webmanifest": /^application\/manifest\+json/,
+    "/robots.txt": /^text\/plain/,
+  };
+  for (const [file, type] of Object.entries(files)) {
+    const res = await get(file);
+    expect(res.status, file).toBe(200);
+    expect(res.headers.get("content-type"), file).toMatch(type);
+  }
+  const manifest = await (await get("/manifest.webmanifest")).json();
+  for (const icon of manifest.icons)
+    expect((await get(icon.src)).headers.get("content-type"), icon.src).toMatch(/^image\/png/);
+  const html = await (await get("/th-TH")).text();
+  for (const link of [
+    'href="/favicon.ico"',
+    'href="/favicon.svg"',
+    'rel="apple-touch-icon"',
+    'rel="manifest" href="/manifest.webmanifest"',
+    'name="theme-color"',
+  ])
+    expect(html, link).toContain(link);
+});
+
 test("the middleware leaves files and API routes alone", async () => {
-  expect((await get("/void.svg")).status).toBe(200);
+  // The file itself, not a page: on Cloudflare the Worker sees every request first, and
+  // pages/[lang]/ matches /void.svg (a page came back with 200 before the middleware handed files
+  // to Void's not-found handler, which serves them). A file that isn't there is not found.
+  const svg = await get("/void.svg");
+  expect(svg.status).toBe(200);
+  expect(svg.headers.get("content-type")).toMatch(/^image\/svg\+xml/);
+  expect(await svg.text()).toMatch(/^\s*<svg/);
+  expect((await get("/no-such-file.svg")).status).toBe(404);
   // An empty POST to the live stream's control route (routes/api/live.ts): Void's live code
   // rejects the missing body itself, with its own JSON (packages/void/src/runtime/live.ts,
   // readControlRequest), so the request reached the route rather than a redirect or not-found page.

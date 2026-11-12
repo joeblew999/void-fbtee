@@ -3,13 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vp dev",
     "build": "vp build",
-    "preview": "vp preview",
-    "postinstall": "void prepare && void init --tsconfig && void-fbtee init",
-    "i18n:prepare": "void-fbtee prepare",
+    "dev": "vp dev",
     "i18n:check": "void-fbtee check",
-    "i18n:translate": "void-fbtee translate"
+    "i18n:prepare": "void-fbtee prepare",
+    "i18n:translate": "void-fbtee translate",
+    "icons": "pwa-assets-generator",
+    "postinstall": "void prepare && void init --tsconfig && void-fbtee init",
+    "preview": "vp preview"
   },
   "dependencies": {
     "@base-ui/react": "1.9.0",
@@ -31,6 +32,7 @@
     "@tailwindcss/vite": "4.3.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "@vite-pwa/assets-generator": "2.0.0",
     "@void/react": "catalog:",
     "cf": "1.0.0-beta.26",
     "oxc-transform-react": "0.156.0",

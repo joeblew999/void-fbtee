@@ -24,6 +24,16 @@ export default defineConfig({
     meta: [
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      // The browser's bar and the installed app in the site's own background colour.
+      { name: "theme-color", content: "#14161c" },
+    ],
+    // The icons made from public/favicon.svg (`vp run icons`, pwa-assets.config.ts): the head links
+    // @vite-pwa/assets-generator prints for its minimal-2023 preset, and the web app manifest.
+    link: [
+      { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+      { rel: "icon", href: "/favicon.svg", sizes: "any", type: "image/svg+xml" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon-180x180.png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
     ],
   },
   // The Worker's name on Cloudflare: void-fbtee-example.<subdomain>.workers.dev.
