@@ -87,15 +87,15 @@ for (const target of targets) {
   run("git", ["init", "--quiet"], dir);
   if (target === "vite") allowBuild(dir); // pnpm, for `void init` (see the top of this file)
   run(VOID, [...VOID_INIT, "--toolchain", target], dir);
-  // Formatted as a Vite+ developer would first (void init's own output isn't, under Vite+ 1.6:
-  // package.json, pages/style.css, tsconfig.json, vite.config.ts, void.config.ts), so anything
-  // unformatted after void-fbtee init is void-fbtee's.
-  if (target === "vite-plus") run("pnpm", ["exec", "vp", "fmt"], dir);
   allowBuild(dir, `void-fbtee@${repo}`);
   const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
   pkg.dependencies["void-fbtee"] = dependency;
   writeFileSync(join(dir, "package.json"), JSON.stringify(pkg, null, 2) + "\n");
   run(app.pm, app.install, dir);
+  // Formatted as a Vite+ developer would first (void init's own output isn't, under Vite+ 1.6:
+  // package.json, pages/style.css, tsconfig.json, vite.config.ts, void.config.ts), so anything
+  // unformatted after void-fbtee init is void-fbtee's.
+  if (target === "vite-plus") run("pnpm", ["exec", "vp", "fmt"], dir);
 
   const installed = realpathSync(join(dir, "node_modules/void-fbtee"));
   for (const f of ["dist/plugin.mjs", "dist/lint.mjs", "skills/void-fbtee/SKILL.md"])

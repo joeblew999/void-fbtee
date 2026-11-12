@@ -1,6 +1,7 @@
 // `void-fbtee init`: wires void-fbtee into a `void init` app. Each step only
 // adds what's missing, so running it twice changes nothing. Where it can't edit a file safely it
 // prints the exact lines to add instead of guessing. Config files are edited with magicast.
+import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
 import {
   existsSync,
@@ -123,6 +124,8 @@ function workspaceRoot(root: string): string | undefined {
 }
 
 export async function init(o: InitOptions): Promise<InitResult> {
+  // The files init writes, to format with the app's own formatter at the end (Vite+ apps).
+  const written = new Set<string>();
   const done: string[] = [];
   const todo: string[] = [];
   const at = (f: string) => join(o.root, f);
@@ -145,6 +148,11 @@ export async function init(o: InitOptions): Promise<InitResult> {
   if (vitePlus && !wsRoot) need.push(["@nkzw/eslint-plugin-fbtee", "devDependencies"]);
   const added = need.filter(([name]) => !pkg.dependencies?.[name] && !pkg.devDependencies?.[name]);
   for (const [name, field] of added) (pkg[field] ??= {})[name] = versions[name];
+  // In name order, as package managers keep them.
+  for (const field of new Set(added.map(([, f]) => f)))
+    pkg[field] = Object.fromEntries(
+      Object.entries(pkg[field] as Record<string, string>).sort(([a], [b]) => a.localeCompare(b)),
+    );
 
   // 2. Scripts.
   const scripts = {
@@ -156,6 +164,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
   for (const [k, v] of newScripts) (pkg.scripts ??= {})[k] = v;
   if (added.length || newScripts.length) {
     writeJson(at("package.json"), pkg);
+    written.add("package.json");
     if (added.length) done.push(`package.json: added ${added.map(([n]) => n).join(", ")}`);
     if (newScripts.length)
       done.push(`package.json: added scripts ${newScripts.map(([k]) => k).join(", ")}`);
@@ -171,6 +180,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
   if (!hasMw) {
     mkdirSync(mwDir, { recursive: true });
     writeFileSync(join(mwDir, "99.i18n.ts"), MIDDLEWARE);
+    written.add("middleware/99.i18n.ts");
     done.push("middleware/99.i18n.ts: created");
   }
 
@@ -179,6 +189,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
   if (!layout) {
     mkdirSync(at("pages"), { recursive: true });
     writeFileSync(at("pages/layout.tsx"), LAYOUT);
+    written.add("pages/layout.tsx");
     done.push("pages/layout.tsx: created, with <I18nProvider>");
   } else if (!readFileSync(at(layout), "utf8").includes("I18nProvider")) {
     todo.push(
@@ -210,6 +221,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
       if (!existsSync(at("src/locales.ts"))) {
         mkdirSync(at("src"), { recursive: true });
         writeFileSync(at("src/locales.ts"), localesFile(o.sourceLocale, o.locales));
+        written.add("src/locales.ts");
         done.push(
           `src/locales.ts: created, with the languages (${o.locales.join(", ")}) and their type`,
         );
@@ -220,7 +232,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
         from: "void-fbtee/plugin",
         imported: "voidFbtee",
         constructor: "voidFbtee",
-        options: { sourceLocale: builders.raw("sourceLocale"), locales: builders.raw("locales") },
+        options: builders.raw("{ sourceLocale, locales }"),
         index: 0,
       });
       changed = true;
@@ -255,6 +267,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
       done.push(`${viteConfig}: added fbtee's and void-fbtee's lint rules (Vite+ lint.jsPlugins)`);
     }
     if (changed) writeModule(mod, at(viteConfig));
+    if (changed) written.add(viteConfig);
   }
 
   // 6. void.config.ts: Cloudflare's temporal flag (native Temporal in the worker), and "/" sent to
@@ -285,6 +298,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
       done.push(`${voidConfig}: added the redirect from "/" to /${o.sourceLocale} (301)`);
     }
     if (changed) writeModule(mod, at(voidConfig));
+    if (changed) written.add(voidConfig);
   }
 
   // 7. tsconfig.json: fbtee's JSX types, ES2025 (Temporal, Intl.DurationFormat) and the DOM.
@@ -312,6 +326,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
         }
       if (changed) {
         writeJson(at("tsconfig.json"), ts);
+        written.add("tsconfig.json");
         done.push(`tsconfig.json: added fbtee's JSX types and ES2025 + DOM libraries`);
       }
     }
@@ -328,6 +343,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
   const current = existsSync(agents) ? readFileSync(agents, "utf8") : "";
   if (!current.includes(AGENTS_START)) {
     writeFileSync(agents, (current ? current.trimEnd() + "\n\n" : "") + AGENTS_BLOCK + "\n");
+    written.add("AGENTS.md");
     done.push("AGENTS.md: added void-fbtee's section for coding agents");
   }
 
@@ -350,6 +366,17 @@ export async function init(o: InitOptions): Promise<InitResult> {
     mkdirSync(dirname(link), { recursive: true });
     symlinkSync(want, link, process.platform === "win32" ? "junction" : "dir");
     done.push(`${agent.skillsDir}/void-fbtee: linked void-fbtee's skill for ${agent.name}`);
+  }
+
+  // Vite+ apps check formatting (`vp check`), so what init wrote is formatted by the app's own
+  // formatter and settings, `vp fmt`, rather than left as JSON.stringify and magicast print it.
+  const toFormat = [...written].filter((f) => existsSync(at(f)));
+  if (vitePlus && toFormat.length) {
+    try {
+      execFileSync("vp", ["fmt", ...toFormat], { cwd: o.root, stdio: "ignore" });
+    } catch {
+      todo.push(`vp fmt ${toFormat.join(" ")} (init couldn't run it)`);
+    }
   }
 
   // Vite+ apps run everything through vp (it picks the package manager itself).
