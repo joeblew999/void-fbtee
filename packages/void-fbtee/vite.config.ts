@@ -15,6 +15,13 @@ export default defineConfig({
     format: ["esm"],
     dts: true,
     deps: { neverBundle: [/^virtual:void-fbtee\//] },
+    // Checks of the package as the people who install it get it, on every build: publint (the
+    // package as npm would publish it), Are the Types Wrong? (its types resolve for every
+    // consumer; ES modules only, so the esm-only profile), and dependencies declared but unused.
+    // package.json's exports stay written by hand and are checked here.
+    publint: true,
+    attw: { profile: "esm-only" },
+    unused: true,
   },
   // `vp test`: the package's own tests, on test/fixture (a tiny app; each test works on a copy),
   // and init's on apps `void init` makes (test/void-init.ts).

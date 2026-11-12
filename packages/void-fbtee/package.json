@@ -68,15 +68,17 @@
     "magicast": "0.5.5"
   },
   "devDependencies": {
+    "@arethetypeswrong/core": "0.18.5",
     "@nkzw/eslint-plugin-fbtee": "5.0.0",
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",
     "@void/react": "catalog:",
     "fbtee": "5.0.0",
-    "hono": "4.13.17",
+    "publint": "0.3.25",
     "react": "19.3.1",
     "temporal-polyfill": "1.0.8",
     "typescript": "7.0.2",
+    "unplugin-unused": "0.6.0",
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "void": "catalog:"
@@ -87,7 +89,13 @@
     "react": "^19.2.0",
     "temporal-polyfill": "^1.0.8",
     "vite": "^8.0.0",
+    "vite-plus": "^1.6.0",
     "void": "^1.7.0"
+  },
+  "peerDependenciesMeta": {
+    "vite-plus": {
+      "optional": true
+    }
   },
   "engines": {
     "node": "^24.22.0 || >=26.12.0"

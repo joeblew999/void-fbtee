@@ -117,7 +117,10 @@ for (const target of targets) {
   run(app.pm, [...app.cli, "build"], dir);
   run(app.pm, ["exec", "--", "tsc", "--noEmit"], dir);
   check(true, `${target}: builds and typechecks`);
-  if (target === "vite-plus") checkLint(dir);
+  if (target === "vite-plus") {
+    checkLint(dir);
+    checkVpCheck(dir);
+  }
   await checkDev(target, dir, app);
 }
 
@@ -188,6 +191,13 @@ function checkLint(dir: string) {
     output.includes("void-fbtee(no-show-count-no)"),
     `vp lint reports void-fbtee(no-show-count-no)`,
   );
+}
+
+/** The whole app passes `vp check` (format, lint, types) right after init: what a Vite+ developer
+ * runs, so nothing init wrote may fail it. */
+function checkVpCheck(dir: string) {
+  run("pnpm", ["exec", "vp", "check"], dir);
+  check(true, "vite-plus: vp check passes on the app init set up");
 }
 
 /** The dev server serves translated pages, and an Arabic page right-to-left. */
