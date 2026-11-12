@@ -6,15 +6,14 @@ Void add-on, Vite plugin and Vite+ package. Rewritten 2026-11-12 after an indepe
 findings) and a library search; it replaces the earlier drafts. To approve, then do as one piece
 of work.
 
-## 0. First: Void 1.8.0
+## 0. On Void 1.7.0
 
-The repo pins Void 1.7.0 (`pnpm-workspace.yaml` catalog: `void`, `@void/md`, `@void/react`). This
-work needs 1.8.0 (released 2026-11-12): the `_not-found`/`_error` pages
-(`docs/guide/pages-routing/errors.md`) don't exist in 1.7.0, and every Void line cited here is
-1.8.0's. So: the catalog to 1.8.0, `vp install`, `vp run check:tools`, the tests; the package's
-peer range `void ^1.7.0` checked against what it then uses (`plans/brisk-copper-wren.md` item 2).
+The repo pins Void 1.7.0 (`pnpm-workspace.yaml` catalog: `void`, `@void/md`, `@void/react`), and
+this work stays on it: the upgrade to 1.8.0 can't happen yet (the user, 2026-11-12). Nothing here
+needs 1.8.0: every Void fact below was checked in the `v1.7.0` tag of voidzero-dev/void on
+2026-11-12, and line numbers are 1.7.0's. 1.8.0's `_not-found`/`_error` pages aren't used.
 
-## 1. What Void and Vite+ give (full sweep of Void 1.8.0's docs and source, 2026-11-12)
+## 1. What Void and Vite+ give (Void 1.7.0's docs and source, checked 2026-11-12)
 
 - **One head system, three layers** (`docs/guide/pages-routing/head.md`): `head` in
   `void.config.ts` (fixed for the site), `headDefaults` in middleware (per request), the page's
@@ -24,19 +23,19 @@ peer range `void ^1.7.0` checked against what it then uses (`plans/brisk-copper-
   `og:locale:alternate` (one per other language) can't go through the head API; HTMLRewriter
   after `next()` could add it, which isn't worth it. Left out.
 - **`script` entries** take `innerHTML` and any attribute, rendered on the server only; Void writes
-  `innerHTML` as given, unescaped (`head.ts` 160–166).
+  `innerHTML` as given, unescaped (`head.ts` 162–165).
 - **Titles, meta tags and links update on client-side navigation**; scripts don't.
 - **Markdown pages:** `<title>` and `description` from frontmatter `title`/`description` only
-  (`packages/void/src/router/compile.ts` 1123–1135; `packages/void/src/pages/scan.ts` 706–719).
+  (`packages/void/src/router/compile.ts` 1054–1060; `packages/void/src/pages/scan.ts` 563–572).
 - **`@void/md/pages`** exists only inside the void-md plugin (its `resolveId`/`load`,
   `packages/md/src/plugin.ts` 288, 365); `@void/md`'s `package.json` exports `./pages` as types
-  only. Its `title` falls back to the first heading (`markdown.md` 251); `frontmatter.title`
+  only. Its `title` falls back to the first heading (`docs/guide/pages-routing/markdown.md` 251); `frontmatter.title`
   doesn't.
 - **`public/`** served and cached until the next deploy (`docs/guide/edge/static-assets.md`); with
   middleware, app code runs first ("Navigation and middleware"), hence void-fbtee's hand-off of
   unknown one-segment paths to Void's not-found handler. `.webmanifest` served as
   `application/manifest+json` (`packages/edge/src/static.ts`).
-- **`routing.alwaysUseHttps`** (`docs/reference/config.md` 372) redirects `http` to `https`.
+- **`routing.alwaysUseHttps`** (`docs/reference/config.md` 371) redirects `http` to `https`.
 - **Not-found pages answer 404** (checked live: `/nope/x`, `/xx-XX/events`), so they aren't
   indexed; no `noindex`. Caveat: a failure in a deferred loader after the page has started
   streaming (the home page uses `defer`) can't change the 200 already sent.
