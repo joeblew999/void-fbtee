@@ -116,6 +116,18 @@ The tasks are in `vite.config.ts` and `apps/example/vite.config.ts`.
 
 Then `vp check`, `vp test run` and `vp run test:fresh`.
 
+## Reported to Void
+
+Problems in Void that this repo works around. After upgrading Void, check whether each is fixed,
+and if so remove what depends on it.
+
+- [voidzero-dev/void#802](https://github.com/voidzero-dev/void/issues/802) (2026-11-12, Void
+  1.8.0): `@void/md` in right-to-left and translated pages. Heading anchors and the copy button
+  are placed with physical `left`/`right`; the copy button's label is fixed in English
+  ("Copy Code"); task lists come out as text. What depends on it: the heading-anchor rule at the
+  end of `apps/example/pages/style.css` (remove it when fixed), and the tour's numbered "Try it"
+  list and the note in `e2e/server.test.ts` (a task list, and checks for it, when they work).
+
 ## Releasing
 
 Raise `version` in `packages/void-fbtee/package.json`, and the tag in the install line of

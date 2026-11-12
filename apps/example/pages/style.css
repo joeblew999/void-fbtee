@@ -164,8 +164,9 @@
   overflow-wrap: anywhere;
 }
 
-/* @void/md 1.7.0 places heading anchors with physical left (float: left; margin-left), so in
-   right-to-left pages they stick out past the left edge. The same, in logical directions. */
+/* @void/md (1.7.0 and 1.8.0) places heading anchors with physical left (float: left; margin-left),
+   so in right-to-left pages they stick out past the left edge. The same, in logical directions.
+   Reported as voidzero-dev/void#802: remove this when it's fixed. */
 .void-md .header-anchor {
   float: inline-start;
   margin-left: 0;

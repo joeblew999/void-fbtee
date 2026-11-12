@@ -72,8 +72,8 @@ test("booking an event that doesn't exist is not found, not sold out", async () 
 // The tour uses every feature @void/md has (packages/md/src/compile.ts in Void 1.8.0), so each is
 // seen working in every language. Each box's title is written in the page's language: @void/md
 // marks a box left with its English default title ("TIP", "WARNING") custom-block-title-default.
-// Not here: task lists (the theme styles them, the compiler doesn't make them) and snippet
-// imports (removed from @void/md).
+// Not here: task lists (the theme styles them, the compiler doesn't make them; reported as
+// voidzero-dev/void#802) and snippet imports (removed from @void/md).
 test("the tour: every @void/md feature, in every language, every title in that language", async () => {
   const features = {
     "containers: tip, info, warning, danger, details": [
