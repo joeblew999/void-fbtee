@@ -1,6 +1,6 @@
 # plans/patient-amber-compass.md: conformance, tested the way each layer tests it
 
-Status: waiting for approval. Written 2026-11-12.
+Status: approved 2026-11-12, in progress. Written 2026-11-12.
 
 ## Context
 
@@ -51,16 +51,21 @@ Done as Void does it, plus what's cheap and caught real problems on 2026-11-12, 
 
 Against Vite+'s library template:
 
-1. [ ] **`LICENSE` and a short README in the package's own folder**, in the tarball (Void requires
+1. [x] **`LICENSE` and a short README in the package's own folder**, in the tarball (Void requires
        a LICENSE in every package; fbtee ships both in each). The README: what it is, install,
        `void-fbtee init`, links to the docs.
-2. [ ] **`exports` written by tsdown from the entries** (`pack.exports: true`, as the template),
+2. [x] **`exports` written by tsdown from the entries** (`pack.exports: true`, as the template),
        with `./package.json` exported, replacing the hand-written ones; publint and attw check
        the result on every build.
-3. [ ] **The template's `package.json` pieces:** `publishConfig.access: "public"`, a
+       Done: tsdown writes them as plain paths (TypeScript finds each `.d.mts` beside its
+       `.mjs`); the command is left out (`exclude: ["cli"]`: it's run, not imported).
+3. [x] **The template's `package.json` pieces:** `publishConfig.access: "public"`, a
        `prepublishOnly` build, a `check` script.
-4. [ ] **Stricter TypeScript checks from the template:** `verbatimModuleSyntax`,
+4. [x] **Stricter TypeScript checks from the template:** `verbatimModuleSyntax`,
        `isolatedModules`, `noUnusedLocals`. Whatever they find gets fixed.
+       Done: for the package's own code (proved: an unused local and a type imported as a value
+       each fail). The test fixture is an app, with its own `tsconfig.json`: an `fbt` import is
+       needed for `<fbt>` but unused to TypeScript, so apps can't use `noUnusedLocals`.
 
 ## B. The tests
 

@@ -6,19 +6,8 @@ i18n for [Void](https://void.cloud) apps: strings translated with
 [fbtee](https://github.com/nkzw-tech/fbtee), dates and times with Temporal, numbers and lists with
 the browser's own `Intl`.
 
-It's a Void add-on, built the way Void's own `@void/md` and `@void/react` are: a Vite plugin
-(`import { voidFbtee } from "void-fbtee/plugin"`) plus the parts a Void app uses at run time
-(`void-fbtee/middleware`, `void-fbtee/react`). The Vite plugin works only in a Void app: it swaps
-modules in Void's server environment (Cloudflare's own Temporal, fbtee's per-request build, Void's
-own Hono), and the rest goes where Void looks for it (`middleware/99.i18n.ts`, `void.config.ts`),
-which `void-fbtee init` sets up and `void-fbtee check` checks. React only, as fbtee is.
-
-The rule it follows is the one for dates in a database: data stays neutral (UTC instants with zone
-names, plain numbers with currency codes), both to the browser and back, and is formatted once,
-for the screen. The server formats a page's text and the browser keeps it (`<Formatted>`), because
-each browser engine ships its own locale data and writes some values differently. What only the
-browser knows, such as the reader's own time zone, the browser formats, once it knows it: the
-server leaves that space empty rather than showing a stand-in.
+How to add it to a Void app and use it: [packages/void-fbtee/README.md](packages/void-fbtee/README.md).
+This README is for working on the repo.
 
 ## Commands
 
@@ -116,35 +105,6 @@ The tasks are in `vite.config.ts` and `apps/example/vite.config.ts`.
 - Each commit is checked first (`vp check --fix`, a hook `vp install` sets up). CI runs
   `vp check`, the package's tests, then `vp run test:deployed`.
 
-## Add it to a Void app
-
-It isn't on npm: an app installs a [release](https://github.com/joeblew999/void-fbtee/releases)
-from this repo. In the app's `package.json`:
-
-```json
-"dependencies": {
-  "void-fbtee": "github:joeblew999/void-fbtee#v0.3.0&path:/packages/void-fbtee"
-}
-```
-
-In its `pnpm-workspace.yaml` (pnpm only builds a git dependency you allow):
-
-```yaml
-allowBuilds:
-  "void-fbtee@git+https://github.com/joeblew999/void-fbtee.git": true
-```
-
-Then:
-
-```sh
-vp install
-vp exec void-fbtee init --locales ar-EG,th-TH
-vp install
-vp run i18n:translate
-```
-
-`init` adds only what's missing. `void-fbtee --help` lists its commands.
-
 ## Upgrading
 
 - **Vite+:** `vp upgrade && vp migrate`, a day after a release (pnpm won't install
@@ -158,7 +118,8 @@ Then `vp check`, `vp test run` and `vp run test:fresh`.
 
 ## Releasing
 
-Raise `version` in `packages/void-fbtee/package.json` and push to main. When CI passes, it tags
+Raise `version` in `packages/void-fbtee/package.json`, and the tag in the install line of
+`packages/void-fbtee/README.md`, and push to main. When CI passes, it tags
 `v<version>` and makes the GitHub release.
 
 ## License

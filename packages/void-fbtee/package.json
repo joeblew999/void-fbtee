@@ -31,36 +31,24 @@
   ],
   "type": "module",
   "exports": {
-    "./plugin": {
-      "types": "./dist/plugin.d.mts",
-      "default": "./dist/plugin.mjs"
-    },
-    "./middleware": {
-      "types": "./dist/middleware.d.mts",
-      "default": "./dist/middleware.mjs"
-    },
-    "./react": {
-      "types": "./dist/react.d.mts",
-      "default": "./dist/react.mjs"
-    },
-    "./locales": {
-      "types": "./dist/locales.d.mts",
-      "default": "./dist/locales.mjs"
-    },
-    "./client": {
-      "types": "./dist/client.d.mts",
-      "default": "./dist/client.mjs"
-    },
-    "./lint": {
-      "types": "./dist/lint.d.mts",
-      "default": "./dist/lint.mjs"
-    }
+    "./client": "./dist/client.mjs",
+    "./lint": "./dist/lint.mjs",
+    "./locales": "./dist/locales.mjs",
+    "./middleware": "./dist/middleware.mjs",
+    "./plugin": "./dist/plugin.mjs",
+    "./react": "./dist/react.mjs",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "dev": "vp pack --watch --no-clean",
     "build": "vp pack",
     "test": "vp test",
-    "prepare": "vp pack"
+    "prepare": "vp pack",
+    "check": "vp check",
+    "prepublishOnly": "vp run build"
   },
   "dependencies": {
     "@nkzw/fbtee-compiler": "5.0.0",

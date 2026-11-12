@@ -18,7 +18,10 @@ export default defineConfig({
     // Checks of the package as the people who install it get it, on every build: publint (the
     // package as npm would publish it), Are the Types Wrong? (its types resolve for every
     // consumer; ES modules only, so the esm-only profile), and dependencies declared but unused.
-    // package.json's exports stay written by hand and are checked here.
+    // package.json's exports are written from the entries (as Vite+'s library template does),
+    // so they can't drift from them, and checked by the two above.
+    // The command (bin) is run, not imported, so it isn't an export.
+    exports: { exclude: ["cli"] },
     publint: true,
     attw: { profile: "esm-only" },
     unused: true,
