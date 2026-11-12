@@ -74,6 +74,14 @@ const SERVER_TEMPORAL_ID = "\0void-fbtee:server-temporal";
 // Hono's route helper, as Void's own copy of Hono: matchedRoutes reads Hono's request internals, so
 // it must be the Hono Void runs on. Void resolves "hono/route" from its own files; so does this.
 const HONO_ROUTE_ID = "virtual:void-fbtee/hono-route";
+// Hook filters (Vite's api-plugin "Hook Filters"): the hooks only run for these ids, not every module.
+// Each handler still checks the id itself, as Vite advises for versions without filters.
+const RESOLVE_FILTER = /^(?:virtual:void-fbtee\/|fbtee\/server$|temporal-polyfill$)/;
+const LOAD_FILTER = /^\0(?:virtual:void-fbtee\/|void-fbtee:)/;
+
+/** The browser's environment, by Vite's own flag (an environment's name can be anything). */
+const isClient = (env: { config: { consumer: "client" | "server" } } | undefined) =>
+  env?.config.consumer === "client";
 const SERVER_TEMPORAL = `const Temporal = globalThis.Temporal;
 if (!Temporal)
   throw new Error('void-fbtee: no Temporal on the server. Add Cloudflare\\'s "temporal" compatibility flag (void.config.ts: worker.compatibility_flags), or run void-fbtee init.');
@@ -129,7 +137,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
     // near its 10-listener warning on the watcher.
     watchChange(file, { event }) {
       const dir = join(root, translationsDir);
-      if (!devServer || this.environment?.name !== "client" || !file.startsWith(dir)) return;
+      if (!devServer || !isClient(this.environment) || !file.startsWith(dir)) return;
       // A catalog added or removed: the virtual catalog modules change, so reload. An edit is a
       // normal hot update (the file is a watched dependency of its catalog module).
       if (event !== "update") {
@@ -148,13 +156,14 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           : "void-fbtee: all strings translated",
       );
     },
-    configEnvironment(name) {
+    configEnvironment(name, env) {
       // The virtual modules must reach void-fbtee's own files, so it is never pre-bundled.
       // Its own imports are then not scanned, so the browser's are listed here; otherwise Vite
       // finds them on the first page load and reloads mid-page (504 "Outdated Optimize Dep").
       // void/pages-server: Void's island wrapper imports it in the browser and Void 1.7.0 doesn't
       // list it, so the first island page after a cold start hit the same reload.
-      if (name === "client") {
+      // Vite's own default: an environment is the browser's only if it's "client" or says so.
+      if ((env.consumer ?? (name === "client" ? "client" : "server")) === "client") {
         return {
           optimizeDeps: {
             exclude: ["void-fbtee"],
@@ -166,59 +175,65 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         optimizeDeps: { exclude: ["fbtee", "void-fbtee"], include: ["fbtee > invariant"] },
       };
     },
-    async resolveId(id) {
-      if (
-        id === CONFIG_ID ||
-        id === CATALOGS_ID ||
-        id === TEXTS_ID ||
-        id.startsWith(CATALOG_PREFIX)
-      )
-        return "\0" + id;
-      if (this.environment.name === "client") return;
-      if (id === "fbtee/server") return fbteeServer;
-      if (id === "temporal-polyfill") return SERVER_TEMPORAL_ID;
-      if (id === HONO_ROUTE_ID) {
-        const voidEntry = await this.resolve("void", join(root, "package.json"));
-        const route = voidEntry && (await this.resolve("hono/route", voidEntry.id));
-        if (!route) throw new Error("void-fbtee: can't find Hono's route helper beside Void.");
-        return route;
-      }
+    resolveId: {
+      filter: { id: RESOLVE_FILTER },
+      async handler(id) {
+        if (
+          id === CONFIG_ID ||
+          id === CATALOGS_ID ||
+          id === TEXTS_ID ||
+          id.startsWith(CATALOG_PREFIX)
+        )
+          return "\0" + id;
+        if (isClient(this.environment)) return;
+        if (id === "fbtee/server") return fbteeServer;
+        if (id === "temporal-polyfill") return SERVER_TEMPORAL_ID;
+        if (id === HONO_ROUTE_ID) {
+          const voidEntry = await this.resolve("void", join(root, "package.json"));
+          const route = voidEntry && (await this.resolve("hono/route", voidEntry.id));
+          if (!route) throw new Error("void-fbtee: can't find Hono's route helper beside Void.");
+          return route;
+        }
+      },
     },
     transform: {
       filter: { id: { include: /\.[jt]sx?$/, exclude: /node_modules|^\0/ }, code: /fbt|fbs/ },
       handler(code, id) {
-        if (this.environment.name !== "client" || !id.startsWith(root)) return;
+        if (!isClient(this.environment) || !id.startsWith(root)) return;
         // Appended: imports run before the module body wherever they are, and line numbers stay put.
         return { code: `${code}\nimport "void-fbtee/client";`, map: null };
       },
     },
-    load(id) {
-      if (id === SERVER_TEMPORAL_ID) return SERVER_TEMPORAL;
-      if (id === "\0" + CONFIG_ID)
-        return `export default ${JSON.stringify({ ...config, fallbackLocales: options.fallbackLocales })};`;
-      if (id === "\0" + CATALOGS_ID) {
-        const entries = config.locales
-          .filter((l) => l.locale !== config.sourceLocale)
-          .map(
-            (l) =>
-              `${JSON.stringify(l.locale)}: () => import(${JSON.stringify(CATALOG_PREFIX + l.locale)})`,
-          );
-        return `export default {${entries.join(",")}};`;
-      }
-      // Dev only: each string's source text, so the browser can name what it shows untranslated.
-      if (id === "\0" + TEXTS_ID)
-        return `export default ${command === "serve" ? JSON.stringify(runtimeTexts(project())) : "{}"};`;
-      if (id.startsWith("\0" + CATALOG_PREFIX)) {
-        const locale = id.slice(1 + CATALOG_PREFIX.length);
-        const file = catalogFile(project(), locale);
-        // A locale with no translations file yet gets an empty catalog. Only existing files are
-        // watched: in the browser build Vite turns watch files into imports. A new file is picked
-        // up by the folder watcher in configureServer.
-        if (!existsSync(file)) return `export default {};`;
-        this.addWatchFile(file);
-        for (const f of collect(project()).files) this.addWatchFile(f);
-        return `export default ${JSON.stringify({ [locale]: runtimeCatalog(project(), locale) })};`;
-      }
+    load: {
+      filter: { id: LOAD_FILTER },
+      handler(id) {
+        if (id === SERVER_TEMPORAL_ID) return SERVER_TEMPORAL;
+        if (id === "\0" + CONFIG_ID)
+          return `export default ${JSON.stringify({ ...config, fallbackLocales: options.fallbackLocales })};`;
+        if (id === "\0" + CATALOGS_ID) {
+          const entries = config.locales
+            .filter((l) => l.locale !== config.sourceLocale)
+            .map(
+              (l) =>
+                `${JSON.stringify(l.locale)}: () => import(${JSON.stringify(CATALOG_PREFIX + l.locale)})`,
+            );
+          return `export default {${entries.join(",")}};`;
+        }
+        // Dev only: each string's source text, so the browser can name what it shows untranslated.
+        if (id === "\0" + TEXTS_ID)
+          return `export default ${command === "serve" ? JSON.stringify(runtimeTexts(project())) : "{}"};`;
+        if (id.startsWith("\0" + CATALOG_PREFIX)) {
+          const locale = id.slice(1 + CATALOG_PREFIX.length);
+          const file = catalogFile(project(), locale);
+          // A locale with no translations file yet gets an empty catalog. Only existing files are
+          // watched: in the browser build Vite turns watch files into imports. A new file is picked
+          // up by the folder watcher in configureServer.
+          if (!existsSync(file)) return `export default {};`;
+          this.addWatchFile(file);
+          for (const f of collect(project()).files) this.addWatchFile(f);
+          return `export default ${JSON.stringify({ [locale]: runtimeCatalog(project(), locale) })};`;
+        }
+      },
     },
   };
 

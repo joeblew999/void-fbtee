@@ -6,6 +6,13 @@ i18n for [Void](https://void.cloud) apps: strings translated with
 [fbtee](https://github.com/nkzw-tech/fbtee), dates and times with Temporal, numbers and lists with
 the browser's own `Intl`.
 
+It's a Void add-on, built the way Void's own `@void/md` and `@void/react` are: a Vite plugin
+(`import { voidFbtee } from "void-fbtee/plugin"`) plus the parts a Void app uses at run time
+(`void-fbtee/middleware`, `void-fbtee/react`). The Vite plugin works only in a Void app: it swaps
+modules in Void's server environment (Cloudflare's own Temporal, fbtee's per-request build, Void's
+own Hono), and the rest goes where Void looks for it (`middleware/99.i18n.ts`, `void.config.ts`),
+which `void-fbtee init` sets up and `void-fbtee check` checks. React only, as fbtee is.
+
 The rule it follows is the one for dates in a database: data stays neutral (UTC instants with zone
 names, plain numbers with currency codes), both to the browser and back, and is formatted once,
 for the screen. The server formats a page's text and the browser keeps it (`<Formatted>`), because

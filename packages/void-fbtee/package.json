@@ -1,8 +1,27 @@
 {
   "name": "void-fbtee",
   "version": "0.3.0",
-  "description": "i18n for Void apps: fbtee strings, Temporal dates and Intl formatting, with a Vite plugin, Void middleware and React helpers",
+  "description": "i18n for Void apps, as a Void add-on: fbtee strings, Temporal dates and Intl formatting, with a Vite plugin, Void middleware and React helpers",
+  "keywords": [
+    "cloudflare-workers",
+    "fbtee",
+    "i18n",
+    "intl",
+    "temporal",
+    "vite-plugin",
+    "void",
+    "void-add-on"
+  ],
+  "homepage": "https://void-fbtee-example.gedw99.workers.dev",
+  "bugs": {
+    "url": "https://github.com/joeblew999/void-fbtee/issues"
+  },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joeblew999/void-fbtee.git",
+    "directory": "packages/void-fbtee"
+  },
   "bin": {
     "void-fbtee": "./dist/cli.mjs"
   },
@@ -69,5 +88,8 @@
     "temporal-polyfill": "^1.0.8",
     "vite": "^8.0.0",
     "void": "^1.7.0"
+  },
+  "engines": {
+    "node": "^24.22.0 || >=26.12.0"
   }
 }

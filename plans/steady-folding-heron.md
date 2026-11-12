@@ -185,6 +185,18 @@ docs. One commit per item; pushed together when you say.
         home page's sample and the fresh-install check follow. A breaking change: the next release
         says so.
 
+12. [x] **The Vite plugin, by Vite's own rules** (vite.dev/guide/api-plugin, read 2026-11-12;
+        Rolldown's plugin conventions; Vite's types for `consumer`). Already right: a factory, a
+        clear `name`, `virtual:void-fbtee/…` ids resolved with `\0`, `api` for other plugins,
+        tests. Changed: hook filters on `resolveId` and `load` (only `transform` had one), so they
+        run only for void-fbtee's ids; the browser's environment judged by Vite's own flag,
+        `this.environment.config.consumer === "client"`, not its name (a name can be anything;
+        Void's newer code does the same, `plugin-env-schema.ts:157`); the `vite-plugin` keyword
+        and the package metadata Void's add-ons carry (`repository`, `homepage`, `bugs`,
+        `engines` as Void's); and the README says what it is and why its Vite plugin works only
+        in a Void app, as Vite asks. Not yet: a README in the package's own folder, for when it
+        goes on npm (it's installed from git, where the repo's README shows).
+
 ## Not in this plan
 
 - The upgrade to Void 1.8.0 and Vite+ 1.6, then the two items that need it: `plans/brisk-copper-wren.md`.
