@@ -1,3 +1,8 @@
+---
+title: "Setting up void-fbtee in a Void app"
+description: "What void-fbtee init adds to a Void app, piece by piece, for when void-fbtee check reports a setup problem."
+---
+
 # Setting up void-fbtee in a Void app
 
 `void-fbtee init` does all of this and only adds what's missing, so it's safe to run again. Where

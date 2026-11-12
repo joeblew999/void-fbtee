@@ -2,6 +2,12 @@
 import Fmt from "../../../src/components/Fmt.tsx" with { island: "load" }
 </script>
 
+---
+
+title: "Translating markdown pages"
+description: "Markdown pages are translated as whole files, one copy per language: where they are, and how they're checked and kept up to date."
+---
+
 # Translating markdown pages
 
 Markdown pages (`@void/md`) are translated as whole files: one copy per locale.

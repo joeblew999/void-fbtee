@@ -2202,6 +2202,42 @@
         }
       ],
       "types": []
+    },
+    "gZfypIjul0vN+hl5z0+ocw==": {
+      "description": "Home page description, for search results",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تطبيق Void تجريبي بثلاث لغات: فعاليات تُنشر وتُحجز، ووثائق تشرح كيف يتم ذلك.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VFbC7WsL80DNiDgdV47lrQ==": {
+      "description": "Events page description, for search results",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "فعاليات منشورة بأي لغة، وكل منها مترجم إلى اللغات الأخرى.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bebntP3SMEcXEUDbODQFlQ==": {
+      "description": "Docs index description, for search results",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "كيف يترجم void-fbtee تطبيق Void: الإعداد، والنصوص، وصفحات markdown، وIntl وTemporal الخاصان بالمنصة.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

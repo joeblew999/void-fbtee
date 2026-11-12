@@ -1,7 +1,8 @@
 // Upcoming events (the loader), and posting one (the action). The action clears this list from
 // Void's page cache in every language, then goes to the new event's page.
 import { event_texts, events, newEventSchema, startsAt } from "@schema";
-import { defineHandler, type InferProps } from "void";
+import { defineHandler, defineHead, type InferProps } from "void";
+import { fbs } from "fbtee";
 import { and, asc, db, eq, gte } from "void/db";
 import { queues } from "void/queues";
 import { revalidate } from "void/isr";
@@ -50,3 +51,18 @@ export const action = defineHandler.withValidator({
     params: { lang: params.lang, id: created.id },
   });
 });
+
+export const head = defineHead(() => ({
+  title: String(fbs("Upcoming events", "Heading of the events page")),
+  meta: [
+    {
+      name: "description",
+      content: String(
+        fbs(
+          "Events posted in any language, each translated into the others.",
+          "Events page description, for search results",
+        ),
+      ),
+    },
+  ],
+}));

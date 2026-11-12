@@ -91,10 +91,18 @@ docs. One commit per item; pushed together when you say.
 
 ### C. Feature
 
-8. [ ] **A translated `<title>` and description on every page.** None has one today, in any
-       language (checked on the live site). A `head` export per page (`defineHead`), with a small
-       helper in `void-fbtee` so the text is translated like everything else.
-       Backed by: Void `docs/guide/pages-routing/head.md`; playground `react-pages/pages/users/[id].server.ts`.
+8. [x] **A translated `<title>` and description on every page.** Checked on the live site
+       2026-11-12: only the tour has one (from its frontmatter); no other page has either.
+       Done, with no package helper: `head()` (`defineHead`) runs inside void-fbtee's per-request
+       state, so `String(fbs(...))` is translated like any other string. Titles reuse the page
+       headings' own strings, and the Intl and Temporal descriptions reuse the page intros, so
+       they were already translated; three new descriptions, translated into Thai and Arabic. An
+       event's page shows the event's own title and description in the page's language. The
+       three docs pages without frontmatter got `title` and `description` in all three
+       languages. `titleTemplate: "%s · void-fbtee"` in `void.config.ts`. A new everyday test
+       (`e2e/server.test.ts`) checks every page in every language; SKILL.md says how.
+       Backed by: Void `docs/guide/pages-routing/head.md` (head(), markdown frontmatter,
+       titleTemplate); playground `react-pages/pages/users/[id].server.ts`.
 
 ### D. Docs
 

@@ -1,5 +1,7 @@
 ---
-translatedFrom: "17c00e7e4bf9"
+title: "إعداد void-fbtee في تطبيق Void"
+description: "ما يضيفه void-fbtee init إلى تطبيق Void جزءًا جزءًا، لحين يبلّغ void-fbtee check عن مشكلة setup."
+translatedFrom: "9fae6ac774b8"
 ---
 
 # إعداد void-fbtee في تطبيق Void

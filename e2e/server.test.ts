@@ -53,6 +53,27 @@ test("the server never shows a stand-in for the reader's own time: those lines c
   }
 });
 
+test("every page has a title and a description, in its own language", async () => {
+  const pages = ["", "/events", "/docs", "/docs/intl", "/docs/temporal", "/docs/setup"];
+  pages.push("/docs/strings", "/docs/markdown-pages", "/docs/tour");
+  const head = async (path: string) => {
+    const html = await (await get(path)).text();
+    return {
+      title: html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "",
+      description: html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? "",
+    };
+  };
+  for (const page of pages) {
+    const source = await head(`/${SOURCE}${page}`);
+    for (const l of LOCALES) {
+      const got = l === SOURCE ? source : await head(`/${l}${page}`);
+      expect(got.title, `${l}${page}`).toMatch(/. · void-fbtee$/);
+      expect(got.description, `${l}${page}`).not.toBe("");
+      if (l !== SOURCE) expect(got.description, `${l}${page}`).not.toBe(source.description);
+    }
+  }
+});
+
 // Typed routes can't catch a wrong link here: with pages under [lang], Void's route types include
 // `/${string}`, which TypeScript matches to any path. So every link on the main pages is fetched.
 test("every link on the main pages leads to a page", async () => {

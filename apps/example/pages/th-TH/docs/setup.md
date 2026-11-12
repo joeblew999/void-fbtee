@@ -1,5 +1,7 @@
 ---
-translatedFrom: "17c00e7e4bf9"
+title: "การตั้งค่า void-fbtee ในแอป Void"
+description: "สิ่งที่ void-fbtee init เพิ่มให้แอป Void ทีละส่วน สำหรับเมื่อ void-fbtee check รายงานปัญหา setup"
+translatedFrom: "9fae6ac774b8"
 ---
 
 # การตั้งค่า void-fbtee ในแอป Void

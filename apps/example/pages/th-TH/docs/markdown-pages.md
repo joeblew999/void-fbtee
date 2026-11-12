@@ -4,7 +4,9 @@ import Fmt from "../../../src/components/Fmt.tsx" with { island: "load" }
 
 ---
 
-translatedFrom: "b7b5180c754c"
+title: "การแปลหน้า markdown"
+description: "หน้า markdown แปลทั้งไฟล์ หนึ่งสำเนาต่อภาษา: อยู่ที่ไหน ตรวจอย่างไร และอัปเดตอย่างไร"
+translatedFrom: "cb927d3366c0"
 ---
 
 # การแปลหน้า markdown

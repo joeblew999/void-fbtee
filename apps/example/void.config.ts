@@ -13,6 +13,8 @@ export default defineConfig({
   // `class="dark"` for the site's palette (pages/style.css), `data-theme="dark"` for @void/md's
   // markdown and code colours, which otherwise follow the device's light or dark setting.
   head: {
+    // Every title, then the site's name (the name isn't translated).
+    titleTemplate: "%s · void-fbtee",
     htmlAttrs: { class: "dark", "data-theme": "dark" },
     meta: [
       { charset: "utf-8" },

@@ -1,5 +1,7 @@
 ---
-translatedFrom: "9ae84294da01"
+title: "การแปลข้อความในแอป Void"
+description: "การเติมแคตตาล็อก fbtee ของแอป Void: สิ่งที่เฉพาะสำหรับแอปที่ใช้ void-fbtee"
+translatedFrom: "8544aec912e6"
 ---
 
 # การแปลข้อความในแอป Void

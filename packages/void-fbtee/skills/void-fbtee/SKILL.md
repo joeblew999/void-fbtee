@@ -24,6 +24,12 @@ here, by this skill.
    mark the entry done).
 3. What's specific to void-fbtee apps is below.
 
+**Page titles and descriptions.** A page's `head()` (Void's `defineHead`, in its `.server.ts`)
+runs inside void-fbtee's per-request state, so its text is `String(fbs("…", "…"))` and is in the
+catalogs like any other string. Where the title is the page's heading, use the heading's own text
+and description: it's then the same entry, translated once. A markdown page's title and
+description are its frontmatter's `title` and `description`, translated with the page.
+
 **Where things are.** Catalogs: `i18n/translations/<locale>.json`, one per locale except the source
 locale; `prepare` writes them, you edit them, nothing else under `i18n/`. Locales:
 `voidFbtee({ sourceLocale, locales })` in `vite.config.ts`. The source locale (the code's language)

@@ -1836,6 +1836,42 @@
         }
       ],
       "types": []
+    },
+    "gZfypIjul0vN+hl5z0+ocw==": {
+      "description": "Home page description, for search results",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แอป Void ตัวอย่างในสามภาษา: กิจกรรมให้โพสต์และจอง และเอกสารว่าทำอย่างไร",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VFbC7WsL80DNiDgdV47lrQ==": {
+      "description": "Events page description, for search results",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "กิจกรรมที่โพสต์ในภาษาใดก็ได้ แต่ละรายการแปลเป็นภาษาอื่น ๆ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bebntP3SMEcXEUDbODQFlQ==": {
+      "description": "Docs index description, for search results",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "void-fbtee แปลแอป Void อย่างไร: การตั้งค่า ข้อความ หน้า markdown และ Intl กับ Temporal ของแพลตฟอร์ม",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

@@ -1,6 +1,6 @@
 // One event, by its id, with its seats left (the loader), and booking a seat (the action).
 import { bookings, bookSchema, event_texts, events } from "@schema";
-import { defineHandler, type InferProps } from "void";
+import { defineHandler, defineHead, type InferProps } from "void";
 import { and, count, db, eq, sql } from "void/db";
 import { revalidate } from "void/isr";
 import { z } from "zod";
@@ -50,4 +50,10 @@ export const action = defineHandler.withValidator({ params, body: bookSchema })(
   await revalidate({ paths: localizedPaths(`/events/${id}`) });
   await live.publish(eventTopic(id), { left }, { type: "seats" });
   // No return: Void reruns the loader, so the page shows the new count.
+});
+
+// The event's own title and description, in the page's language where translated.
+export const head = defineHead<Props>((_c, { event, text }) => {
+  const shown = text ?? event;
+  return { title: shown.title, meta: [{ name: "description", content: shown.description }] };
 });

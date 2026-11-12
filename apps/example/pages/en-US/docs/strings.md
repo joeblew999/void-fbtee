@@ -1,3 +1,8 @@
+---
+title: "Translating strings in a Void app"
+description: "Filling a Void app's fbtee catalogs: what's specific to apps that use void-fbtee."
+---
+
 # Translating strings in a Void app
 
 How to fill an fbtee catalog entry is in fbtee's own skill,

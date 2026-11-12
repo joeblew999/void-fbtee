@@ -1,5 +1,7 @@
 ---
-translatedFrom: "9ae84294da01"
+title: "ترجمة النصوص في تطبيق Void"
+description: "ملء كتالوجات fbtee لتطبيق Void: ما يخص التطبيقات التي تستخدم void-fbtee."
+translatedFrom: "8544aec912e6"
 ---
 
 # ترجمة النصوص في تطبيق Void
