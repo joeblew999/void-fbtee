@@ -88,7 +88,7 @@ Now and then:
 ```sh
 vp run deploy:atomic     # only when Void's deploy asks for it (a Durable Object changed)
 vp run test:fresh        # after changing the package or its dependencies
-vp upgrade && vp run upgrade:vite-plus   # upgrade Vite+, then vp check, vp test run
+vp upgrade && vp migrate   # upgrade Vite+, then vp check, vp test run
 ```
 
 ## What's here
@@ -147,8 +147,9 @@ vp run i18n:translate
 
 ## Upgrading
 
-- **Vite+:** `vp upgrade && vp run upgrade:vite-plus`, a day after a release (pnpm won't install
-  anything newer).
+- **Vite+:** `vp upgrade && vp migrate`, a day after a release (pnpm won't install
+  anything newer). `vp migrate` itself, not through a `vp run` task: a task runs the project's own
+  `vp`, the version being replaced (Vite+'s `docs/guide/upgrade-project.md`).
 - **Void:** change `void`, `@void/md` and `@void/react` in `pnpm-workspace.yaml`'s catalog, then
   `vp install` and `vp run check:tools`, which shows what the new Void wants.
 - **Node:** change `.node-version`.

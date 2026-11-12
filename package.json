@@ -11,6 +11,7 @@
     "playwright": "1.65.0",
     "vite": "catalog:",
     "vite-plus": "catalog:",
+    "vitest": "catalog:",
     "void-fbtee": "workspace:*"
   },
   "packageManager": "pnpm@12.18.0"

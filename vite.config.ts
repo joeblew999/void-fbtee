@@ -34,12 +34,6 @@ export default defineConfig({
       "test:fresh": { command: "vpx e2e/fresh/check.ts", cache: false },
       // Vite+'s, Void's and void-fbtee's setup commands, run again: fails if any changes a file.
       "check:tools": { command: "node e2e/check-tools.mjs", cache: false },
-      // Move the project to the global vp's version (`vp upgrade` first): the catalog's pins and
-      // the Vite+ section of AGENTS.md. Then vp check, vp test run.
-      "upgrade:vite-plus": {
-        command: "vp migrate",
-        cache: false,
-      },
       // The example's tasks (apps/example/vite.config.ts), runnable from the root.
       login: { command: "vp run example#login", cache: false },
       status: { command: "vp run example#status", cache: false },
