@@ -273,7 +273,13 @@ What's per language is void-fbtee's; the site's brand (name, picture, icons) is 
    in `void.config.ts`, the picture, the icons, the manifest's `*_localized` fields, the sitemap).
 9. **Release:** version 0.3.0 → 0.4.0 (new entry, new option, new dependency), the install tag in
    the package README updated (README "Releasing").
-10. **Dev note**: void-md refreshes its pages list through `server.moduleGraph` (`plugin.ts` 252);
+10. **`useNow()` keeps time on open pages** (the user, 2026-11-12): today it reads the browser's
+    clock once (`browserNow`, `packages/void-fbtee/src/react.tsx` 121), so a page left open
+    overnight still says "tomorrow". `useNow({ updateInterval })` re-reads it every so many
+    milliseconds, as next-intl's `useNow` does (next-intl docs, "Now value", checked
+    2026-11-12); without the option, as today. `EventTime` and `Fmt` pass one minute. A test
+    shows the text changing when the clock moves past midnight.
+11. **Dev note**: void-md refreshes its pages list through `server.moduleGraph` (`plugin.ts` 252);
     if the worker keeps a stale `og:title` after a frontmatter edit until restart, say so in the
     README rather than work around it.
 
