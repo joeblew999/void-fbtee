@@ -170,6 +170,33 @@ test("every page has a title and a description, in its own language", async () =
   }
 });
 
+// Void's page cache skips any response with Set-Cookie, or a Vary on a request header other than
+// its own X-VoidPages ones (docs/guide/edge/revalidation.md, "How revalidation works"): silently,
+// the page just stops being cached. void-fbtee's middleware runs on every page, so it must add
+// neither.
+test("no page sets a cookie or varies by a request header, so Void can cache it", async () => {
+  const pages = [
+    "",
+    "/events",
+    "/events/new",
+    "/docs",
+    "/docs/intl",
+    "/docs/temporal",
+    "/docs/tour",
+  ];
+  const voids = new Set(["x-voidpages", "x-voidpages-version"]);
+  for (const l of LOCALES)
+    for (const page of pages) {
+      const res = await get(`/${l}${page}`);
+      expect(res.headers.get("set-cookie"), `${l}${page}`).toBeNull();
+      const vary = (res.headers.get("vary") ?? "")
+        .split(",")
+        .map((h) => h.trim().toLowerCase())
+        .filter((h) => h && !voids.has(h));
+      expect(vary, `${l}${page}`).toEqual([]);
+    }
+});
+
 // Posting is its own page: the list links to it, and /events/new is that page in every language,
 // never read as an event's id (in Void's routing a static segment beats [id]).
 test("the events list links to /events/new, the form for posting one", async () => {
