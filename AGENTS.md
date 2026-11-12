@@ -1,6 +1,6 @@
 # void-fbtee
 
-- Set up: install Vite+'s `vp` (`curl -fsSL https://vite.plus | bash`), then `vp install`.
+- Set up: install Vite+'s `vp` (`curl -fsSL https://vite.plus | bash`), then `vp env on` (so package scripts use `.node-version`'s Node, not an older one already on the machine), then `vp install`.
 - What's here, the tasks, deploying and upgrading: README.md.
 - `packages/void-fbtee/skills/void-fbtee/SKILL.md` ships to apps that use the package: keep it matching the code.
 - Commit to main; push only when asked.
