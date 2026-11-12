@@ -74,6 +74,12 @@ Against Vite+'s library template:
        it today.
 7. [ ] **npm and pnpm, each on plain Vite and on Vite+:** four apps, as `void init` makes them,
        with a clean environment, strict peer dependencies and strict engines (as Void's).
+       The npm app also gets a lockfile made as on a Mac (npm's `--os=darwin --cpu=arm64`), then
+       `npm ci` and a build on Linux: a Mac developer with Linux CI, where npm can skip the right
+       build of fbtee's native compiler (npm/cli#4828, open since 2022; related fixes still open
+       in October 2026). pnpm records every system's build (this repo's `pnpm-lock.yaml` lists
+       all 8, checked 2026-11-12). If npm fails there, the plugin says plainly why and how to fix
+       it (reinstall without the old lockfile), and the package README says so for npm users.
 8. [ ] **In each app, the Void parts too:** a link to a page that doesn't exist fails the type
        check; `/xx-XX/...` is not found; `/` redirects with 301. Beside what's there now (init,
        check, build and types, Vite+'s `vp check` and lint rule, Thai and Arabic in dev).
