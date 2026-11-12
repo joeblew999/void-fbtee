@@ -1,6 +1,7 @@
 # plans/steady-folding-heron.md: the example and the package, the Void way
 
-Status: waiting for approval. Written 2026-11-12.
+Status: done 2026-11-12, items 1-9. The upgrade and what needs Void 1.8.0 moved to
+`plans/brisk-copper-wren.md`. Written and approved 2026-11-12.
 
 ## Context
 
@@ -8,8 +9,8 @@ An audit of the example app and the package against Void's own docs (void 1.8.0,
 26 playground apps (voidzero-dev/void at ee4eaa7, read 2026-11-12) found the places where we differ
 from how Void does things. The code is mostly right, and pages mode is used as Void designs it
 (loaders and actions beside each page, validators from the schema). These are the gaps. Each item
-says what changes, where, and what backs it. Ticked off in this file in the same commit as the code. Order: on Void 1.7.0
-structure, then types, then the feature, then docs; the upgrade last; then only what needs Void 1.8.0.
+says what changes, where, and what backs it. Ticked off in this file in the same commit as the code. Order: structure,
+then types, then the feature, then docs.
 
 ## First: on Void 1.7.0, in this order
 
@@ -118,38 +119,18 @@ docs. One commit per item; pushed together when you say.
        login, because Workers AI runs on Cloudflare even locally.
        Backed by: Void `docs/guide/testing.md` (new in 1.8.0; the docs can be read before upgrading).
 
-## Then: the upgrade, last
-
-- [ ] **Void 1.8.0 and Vite+ 1.6**, by the README's "Upgrading" steps, from 2026-11-13 ~01:00 UTC
-      (pnpm installs nothing under a day old). `vp upgrade && vp run upgrade:vite-plus`; the three
-      Void packages to 1.8.0 in `pnpm-workspace.yaml`'s catalog; `vp install`; `vp run check:tools`;
-      then `vp check`, `vp test run`, `vp run test:fresh`, `vp run test:browsers`.
-      Backed by: README "Upgrading"; Vite+ `docs/guide/upgrade-project.md` (`vp migrate`).
-
-## After the upgrade: what needs Void 1.8.0
-
-10. [ ] **Translated not-found and error pages**, inside our layout (header, language switcher):
-        `_not-found` and `_error` components. Unknown events and URLs get Void's default page today.
-        Needs 1.8.0: `_not-found` and `_error` are new in it.
-        Backed by: Void 1.8.0 release notes; `docs/guide/pages-routing/errors.md`.
-
-11. [ ] **Three small unit tests of pure code**, run by `vp test` in seconds, beside the code in
-        `src/` (after item 1): `parseNumber`; `startsAt` with the event schema, including a time
-        that doesn't exist on a clock-change day; `showInvisible` and `listDifference`. Real code,
-        nothing mocked. Not `relativeDays` or `fmt`: they format, so they need the Worker.
-        Needs 1.8.0: it fixed app tests failing because Void started a Worker under Vitest.
-        Backed by: Void `docs/guide/testing.md`; Void 1.8.0 release notes.
-
 `packages/void-fbtee/skills/void-fbtee/SKILL.md` is updated with each package change (items 3, 5, 6, 8).
 
 ## Not in this plan
 
+- The upgrade to Void 1.8.0 and Vite+ 1.6, then the two items that need it: `plans/brisk-copper-wren.md`.
 - An API layer or an MCP route for the example: undecided.
 - Reports to ICU (Thai time-zone pattern) and Cloudflare (shortened city names).
 - The v0.3.0 release notes: text to paste on GitHub.
 
 ## Verification
 
-`vp check`, `vp test run`, `vp run test:fresh`, `vp run test:browsers` locally, all in the
-background; the live site after the push: every page has a translated title, an unknown event
-shows our translated not-found page, and CI's run against the deployed site passes.
+Done 2026-11-12, locally, all in the background: `vp check`; `vp test run` (45 tests, 10 files,
+the three new ones included); `vp run test:fresh` (both toolchains; `init` creates
+`middleware/99.i18n.ts`). After the push: CI's `vp run test:deployed` against the deployed site,
+which includes `test:browsers`.
