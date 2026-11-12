@@ -87,6 +87,10 @@ for (const target of targets) {
   run("git", ["init", "--quiet"], dir);
   if (target === "vite") allowBuild(dir); // pnpm, for `void init` (see the top of this file)
   run(VOID, [...VOID_INIT, "--toolchain", target], dir);
+  // Formatted as a Vite+ developer would first (void init's own output isn't, under Vite+ 1.6:
+  // package.json, pages/style.css, tsconfig.json, vite.config.ts, void.config.ts), so anything
+  // unformatted after void-fbtee init is void-fbtee's.
+  if (target === "vite-plus") run("pnpm", ["exec", "vp", "fmt"], dir);
   allowBuild(dir, `void-fbtee@${repo}`);
   const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
   pkg.dependencies["void-fbtee"] = dependency;
@@ -119,7 +123,7 @@ for (const target of targets) {
   check(true, `${target}: builds and typechecks`);
   if (target === "vite-plus") {
     checkLint(dir);
-    checkVpCheck(dir);
+    checkFormatting(target, dir);
   }
   await checkDev(target, dir, app);
 }
@@ -193,11 +197,27 @@ function checkLint(dir: string) {
   );
 }
 
-/** The whole app passes `vp check` (format, lint, types) right after init: what a Vite+ developer
- * runs, so nothing init wrote may fail it. */
-function checkVpCheck(dir: string) {
-  run("pnpm", ["exec", "vp", "check"], dir);
-  check(true, "vite-plus: vp check passes on the app init set up");
+/** The files `vp fmt --check` (what `vp check` runs first) reports as unformatted. */
+function unformatted(dir: string): string[] {
+  let out = "";
+  try {
+    out = execFileSync("pnpm", ["exec", "vp", "fmt", "--check"], {
+      cwd: dir,
+      encoding: "utf8",
+      stdio: "pipe",
+    });
+  } catch (error) {
+    const e = error as { stdout?: string; stderr?: string };
+    out = `${e.stdout}${e.stderr}`;
+  }
+  return [...out.matchAll(/^(\S+) \(\d+ms\)$/gm)].map((m) => m[1]!).sort();
+}
+
+/** After void-fbtee init, `vp fmt --check` (what `vp check` runs first) is clean: nothing init
+ * wrote or changed fails a Vite+ developer's `vp check`. */
+function checkFormatting(target: string, dir: string) {
+  const files = unformatted(dir);
+  check(!files.length, `${target}: everything init wrote is formatted ${files.join(", ")}`);
 }
 
 /** The dev server serves translated pages, and an Arabic page right-to-left. */
