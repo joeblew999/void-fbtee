@@ -18,6 +18,7 @@ import { runWithFbtee } from "fbtee/server";
 import { Temporal } from "temporal-polyfill";
 import config from "virtual:void-fbtee/config";
 import catalogs from "virtual:void-fbtee/catalogs";
+import { matchedRoutes } from "virtual:void-fbtee/hono-route";
 import { localeFromPath, META_NAME, type Dir, type Lang } from "./locales";
 import { allTranslations } from "./runtime";
 
@@ -61,6 +62,14 @@ export function appLocales(): string[] {
 // shared.i18n, because Void renders its not-found page (through the app's layout) for them.
 const LIGHT = /^\/(__void|api)(\/|$)|\.[a-z0-9]+$/i;
 
+/** The path of the route that will answer this request: the first one after the middleware that
+ * isn't itself middleware (those match every path). */
+function answeringRoute(c: { req: { routeIndex: number } }): string | undefined {
+  return matchedRoutes(c)
+    .slice(c.req.routeIndex + 1)
+    .find((r) => r.path !== "*" && r.path !== "/*")?.path;
+}
+
 export default defineMiddleware(async (c, next) => {
   const path = c.req.path;
   const light = LIGHT.test(path);
@@ -102,10 +111,15 @@ export default defineMiddleware(async (c, next) => {
   // No catalogs for light requests, but still inside fbtee state, so a not-found page with <fbt> renders.
   const { sourceLocale, fallbackLocales } = config;
   const translations = light ? {} : await allTranslations(catalogs);
-  // A page under no language of the app's (/xx-XX/events, /nope) doesn't exist: Void's not-found
-  // page, in the source language, rather than a copy of the page under a made-up language.
-  // c.notFound() runs the app's not-found handler (Void's docs/guide/pages-routing/errors.md).
+  // A page under [lang] for a language the app doesn't have (/xx-XX/events, /nope) doesn't exist:
+  // Void's not-found page, in the source language, rather than a copy of the page under a made-up
+  // language. Only when the route that will answer is one whose first segment is a parameter, as
+  // Void finds the answering route (matchedRoutes after this middleware, as Void's own
+  // packages/void/src/runtime/routing-pages.ts does), so the app's own routes (/webhook) are left
+  // alone. c.notFound() runs the app's not-found handler (docs/guide/pages-routing/errors.md).
+  const answering = found || light ? undefined : answeringRoute(c);
+  const madeUp = answering !== undefined && /^\/:[^/]+/.test(answering);
   return runWithFbtee({ locale: current.locale, sourceLocale, fallbackLocales, translations }, () =>
-    found || light ? next() : c.notFound(),
+    madeUp ? c.notFound() : next(),
   );
 });

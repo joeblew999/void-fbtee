@@ -13,3 +13,9 @@ declare module "virtual:void-fbtee/texts" {
   const texts: Record<string, string>;
   export default texts;
 }
+declare module "virtual:void-fbtee/hono-route" {
+  /** Hono's matchedRoutes (hono/route), from the Hono Void runs on. Server only. */
+  export const matchedRoutes: (
+    c: unknown,
+  ) => Array<{ path: string; method: string; handler: Function }>;
+}

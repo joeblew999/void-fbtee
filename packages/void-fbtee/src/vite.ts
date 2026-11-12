@@ -71,6 +71,9 @@ const CATALOG_PREFIX = "virtual:void-fbtee/catalog/";
 const TEXTS_ID = "virtual:void-fbtee/texts";
 /** What `temporal-polyfill` is on the server: the runtime's own Temporal (Cloudflare's flag). */
 const SERVER_TEMPORAL_ID = "\0void-fbtee:server-temporal";
+// Hono's route helper, as Void's own copy of Hono: matchedRoutes reads Hono's request internals, so
+// it must be the Hono Void runs on. Void resolves "hono/route" from its own files; so does this.
+const HONO_ROUTE_ID = "virtual:void-fbtee/hono-route";
 const SERVER_TEMPORAL = `const Temporal = globalThis.Temporal;
 if (!Temporal)
   throw new Error('void-fbtee: no Temporal on the server. Add Cloudflare\\'s "temporal" compatibility flag (void.config.ts: worker.compatibility_flags), or run void-fbtee init.');
@@ -174,6 +177,12 @@ export default function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       if (this.environment.name === "client") return;
       if (id === "fbtee/server") return fbteeServer;
       if (id === "temporal-polyfill") return SERVER_TEMPORAL_ID;
+      if (id === HONO_ROUTE_ID) {
+        const voidEntry = await this.resolve("void", join(root, "package.json"));
+        const route = voidEntry && (await this.resolve("hono/route", voidEntry.id));
+        if (!route) throw new Error("void-fbtee: can't find Hono's route helper beside Void.");
+        return route;
+      }
     },
     transform: {
       filter: { id: { include: /\.[jt]sx?$/, exclude: /node_modules|^\0/ }, code: /fbt|fbs/ },
