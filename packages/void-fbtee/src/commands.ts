@@ -3,7 +3,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import { loadConfigFromFile } from "vite";
 import { catalogFile, prepared, type Project } from "./catalogs";
-import type { VoidFbteeApi } from "./vite";
+import type { VoidFbteeApi } from "./plugin";
 
 /**
  * The app as the void-fbtee plugin in its vite.config.ts sees it. Vite only loads the config file

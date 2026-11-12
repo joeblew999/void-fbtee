@@ -174,6 +174,17 @@ docs. One commit per item; pushed together when you say.
         Already Void's way: `<html lang dir>` and hreflang through `headDefaults`, `c.get("i18n")`
         through `CloudContextVariables`, titles through `head()`, catalogs as virtual modules.
 
+11. [x] **void-fbtee is a Void add-on, packaged as Void's own are.** Void has no plugin API for
+        others (`docs/reference/api/plugin.md`: only `voidPlugin()`); its add-ons `@void/md` and
+        `@void/react` are Void-only packages with a Vite plugin at `./plugin`, as a named export
+        (`voidMarkdown`, `voidReact`), runtime parts beside it, and `vite` (`^8.0.0`) and `void`
+        as peers. void-fbtee is the same kind of thing (its middleware, React side, types and
+        setup are all Void's), so: `import { voidFbtee } from "void-fbtee/plugin"` (was the default
+        export of `void-fbtee/vite`, removed), `src/plugin.ts`, `vite` peer `^8.0.0`, and no `hono`
+        peer (Hono comes from Void's own copy). `init`, `check`, the docs in three languages, the
+        home page's sample and the fresh-install check follow. A breaking change: the next release
+        says so.
+
 ## Not in this plan
 
 - The upgrade to Void 1.8.0 and Vite+ 1.6, then the two items that need it: `plans/brisk-copper-wren.md`.

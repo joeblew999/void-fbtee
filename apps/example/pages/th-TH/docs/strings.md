@@ -1,7 +1,7 @@
 ---
 title: "การแปลข้อความในแอป Void"
 description: "การเติมแคตตาล็อก fbtee ของแอป Void: สิ่งที่เฉพาะสำหรับแอปที่ใช้ void-fbtee"
-translatedFrom: "8544aec912e6"
+translatedFrom: "3f7b97e004af"
 ---
 
 # การแปลข้อความในแอป Void
@@ -13,8 +13,8 @@ translatedFrom: "8544aec912e6"
 
 - **แค็ตตาล็อก:** `i18n/translations/<locale>.json` หนึ่งไฟล์ต่อหนึ่งภาษา ยกเว้นภาษาต้นทาง
   `void-fbtee prepare` เขียนไฟล์เหล่านี้ คุณเป็นคนแก้ไข อย่าแก้สิ่งอื่นใต้ `i18n/`
-- **ภาษา:** `voidFbtee({ sourceLocale, locales })` ใน `vite.config.ts` ภาษาที่เขียนเป็นอ็อบเจ็กต์
-  ตั้งค่า `segment` ของ URL และทิศทางข้อความ `dir` ได้
+- **ภาษา:** อยู่ใน `src/locales.ts` และส่งให้ `voidFbtee({ sourceLocale, locales })` ใน
+  `vite.config.ts` ภาษาที่เขียนเป็นอ็อบเจ็กต์ตั้งค่า `segment` ของ URL และทิศทางข้อความ `dir` ได้
 - **ภาษาต้นทาง:** ภาษาที่ใช้เขียนโค้ด (`sourceLocale`) ไม่มีแค็ตตาล็อก ข้อความของมันมาจากโค้ด
 
 ## รายการที่เสร็จแล้ว

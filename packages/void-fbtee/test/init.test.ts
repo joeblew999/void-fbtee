@@ -54,7 +54,7 @@ test("wires void-fbtee into a Vite+ app, and a second run changes nothing", asyn
 
   const vite = read(root, "vite.config.ts");
   expect(vite).toContain(`import { defineConfig } from "vite-plus";`);
-  expect(vite).toContain(`import voidFbtee from "void-fbtee/vite";`);
+  expect(vite).toContain(`import { voidFbtee } from "void-fbtee/plugin";`);
   // The languages once, in src/locales.ts, registered for void-fbtee's types; vite.config.ts uses them.
   const locales = read(root, "src/locales.ts");
   expect(locales).toContain(`export const locales = ["en-US", "de-DE"] as const;`);

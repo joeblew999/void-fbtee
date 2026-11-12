@@ -117,7 +117,7 @@ missing; where it can't safely edit a file it prints the line to add). The piece
 
 - `src/locales.ts`: the languages once (`export const locales = [...] as const`) and their type
   registered (`declare global { interface VoidFbteeRegister { locales: typeof locales } }`).
-- `voidFbtee({ sourceLocale, locales })` from `void-fbtee/vite`, first in `plugins` in
+- `voidFbtee({ sourceLocale, locales })` from `void-fbtee/plugin`, first in `plugins` in
   `vite.config.ts`. Its `locales` is imported from `src/locales.ts`.
 - `middleware/99.i18n.ts`: `export { default } from "void-fbtee/middleware";`. The 99 makes Void run
   it after the app's own middleware (01-98), since it adds to the shared and head data they set.

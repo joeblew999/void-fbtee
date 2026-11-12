@@ -86,7 +86,7 @@ export const toTemporalInstant = Date.prototype.toTemporalInstant;
 // plugin; report once per app and command in this process.
 const reportedRuns = new Set<string>();
 
-export default function voidFbtee(options: VoidFbteeOptions): Plugin[] {
+export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   const config: LocaleConfig = resolveLocales(options.sourceLocale, options.locales);
   const translationsDir = options.translations ?? DEFAULT_TRANSLATIONS;
   const src = options.src ?? DEFAULT_SRC;

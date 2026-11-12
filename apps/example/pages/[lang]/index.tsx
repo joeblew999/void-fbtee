@@ -56,14 +56,12 @@ const FILES = [
   { name: "index.tsx", code: CODE },
   {
     name: "vite.config.ts",
-    code: `import voidFbtee from "void-fbtee/vite";
+    code: `import { voidFbtee } from "void-fbtee/plugin";
+import { locales, sourceLocale } from "./src/locales.ts";
 
 export default defineConfig({
   plugins: [
-    voidFbtee({
-      sourceLocale: "en-US",
-      locales: ["en-US", "ar-EG", "th-TH"],
-    }),
+    voidFbtee({ sourceLocale, locales }),
     voidPlugin(),
   ],
 });`,

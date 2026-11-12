@@ -3,7 +3,7 @@ import { defineConfig } from "vite-plus";
 import { voidPlugin } from "void";
 import { voidReact } from "@void/react/plugin";
 import { voidMarkdown } from "@void/md/plugin";
-import voidFbtee from "void-fbtee/vite";
+import { voidFbtee } from "void-fbtee/plugin";
 import { locales, sourceLocale } from "./src/locales.ts";
 import tailwindcss from "@tailwindcss/vite";
 

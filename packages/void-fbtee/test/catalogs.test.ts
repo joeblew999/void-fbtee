@@ -4,7 +4,7 @@ import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:f
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vite-plus/test";
 import { build } from "vite";
-import voidFbtee from "../src/vite";
+import { voidFbtee } from "../src/plugin";
 import { collect, missing, runtimeCatalog, runtimeTexts, type Project } from "../src/catalogs";
 import { resolveLocales } from "../src/locales";
 

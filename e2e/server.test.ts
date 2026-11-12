@@ -134,9 +134,9 @@ test.skipIf(!!process.env.E2E_URL)(
     const worker = globSync(join(EXAMPLE, "dist/ssr/**/*.js"));
     expect(worker.length).toBeGreaterThan(0);
     // One copy of fbtee's per-request state: the Vite plugin keeps fbtee out of the server's
-    // pre-bundling, so `fbtee` and `fbtee/server` share one core (packages/void-fbtee/src/vite.ts).
+    // pre-bundling, so `fbtee` and `fbtee/server` share one core (packages/void-fbtee/src/plugin.ts).
     expect(worker.filter((f) => read(f).includes("runWithFbtee"))).toHaveLength(1);
-    // The app's code gets Cloudflare's own Temporal (void-fbtee's Vite plugin, vite.ts): the
+    // The app's code gets Cloudflare's own Temporal (void-fbtee's Vite plugin, plugin.ts): the
     // polyfill's code is in the worker only for the Temporal reference page, which runs it beside
     // Cloudflare's to compare. So every file that imports the polyfill is the page's rows
     // (src/lib/temporal.ts) or imports them.

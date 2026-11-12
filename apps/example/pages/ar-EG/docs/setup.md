@@ -1,7 +1,7 @@
 ---
 title: "إعداد void-fbtee في تطبيق Void"
 description: "ما يضيفه void-fbtee init إلى تطبيق Void جزءًا جزءًا، لحين يبلّغ void-fbtee check عن مشكلة setup."
-translatedFrom: "8bb780714c62"
+translatedFrom: "3f5c58afd3a5"
 ---
 
 # إعداد void-fbtee في تطبيق Void
@@ -12,7 +12,7 @@ translatedFrom: "8bb780714c62"
 - **اللغات:** `src/locales.ts` يحوي القائمة مرة واحدة (`export const locales = [...] as const`)
   ويسجّل نوعها (`declare global { interface VoidFbteeRegister }`)، فتفحص المسارات المُنمّطة في Void كل رابط
   يُبنى من لغة الصفحة. ويستوردها `vite.config.ts`.
-- **إضافة Vite:** `voidFbtee({ sourceLocale, locales })` من `void-fbtee/vite`، أولًا في
+- **إضافة Vite:** `voidFbtee({ sourceLocale, locales })` من `void-fbtee/plugin`، أولًا في
   `plugins` داخل `vite.config.ts` (قبل `voidPlugin()`).
 - **الوسيط (middleware):** `middleware/99.i18n.ts` ويحتوي `export { default } from "void-fbtee/middleware";`.
   يقرأ اللغة من الرابط ويضبط `<html lang dir>`.

@@ -193,7 +193,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
   );
   if (!viteConfig) {
     todo.push(
-      `no vite.config.ts found: add voidFbtee() from "void-fbtee/vite" first in its plugins`,
+      `no vite.config.ts found: add voidFbtee() from "void-fbtee/plugin" first in its plugins`,
     );
   } else {
     const mod = await loadFile(at(viteConfig));
@@ -202,11 +202,11 @@ export async function init(o: InitOptions): Promise<InitResult> {
     const ownLocales =
       existsSync(at("src/locales.ts")) &&
       !readFileSync(at("src/locales.ts"), "utf8").includes("VoidFbteeRegister");
-    if (ownLocales && !code.includes("void-fbtee/vite"))
+    if (ownLocales && !code.includes("void-fbtee/plugin"))
       todo.push(
-        `src/locales.ts is the app's own: add voidFbtee({ sourceLocale, locales }) from "void-fbtee/vite" first in ${viteConfig}'s plugins, with the languages declared once and registered as in void-fbtee's SKILL.md`,
+        `src/locales.ts is the app's own: add voidFbtee({ sourceLocale, locales }) from "void-fbtee/plugin" first in ${viteConfig}'s plugins, with the languages declared once and registered as in void-fbtee's SKILL.md`,
       );
-    else if (!code.includes("void-fbtee/vite")) {
+    else if (!code.includes("void-fbtee/plugin")) {
       if (!existsSync(at("src/locales.ts"))) {
         mkdirSync(at("src"), { recursive: true });
         writeFileSync(at("src/locales.ts"), localesFile(o.sourceLocale, o.locales));
@@ -217,8 +217,8 @@ export async function init(o: InitOptions): Promise<InitResult> {
       mod.imports.$append({ from: "./src/locales.ts", imported: "locales" });
       mod.imports.$append({ from: "./src/locales.ts", imported: "sourceLocale" });
       addVitePlugin(mod, {
-        from: "void-fbtee/vite",
-        imported: "default",
+        from: "void-fbtee/plugin",
+        imported: "voidFbtee",
         constructor: "voidFbtee",
         options: { sourceLocale: builders.raw("sourceLocale"), locales: builders.raw("locales") },
         index: 0,

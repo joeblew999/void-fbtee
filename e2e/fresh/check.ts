@@ -94,7 +94,7 @@ for (const target of targets) {
   run(app.pm, app.install, dir);
 
   const installed = realpathSync(join(dir, "node_modules/void-fbtee"));
-  for (const f of ["dist/vite.mjs", "dist/lint.mjs", "skills/void-fbtee/SKILL.md"])
+  for (const f of ["dist/plugin.mjs", "dist/lint.mjs", "skills/void-fbtee/SKILL.md"])
     check(existsSync(join(installed, f)), `${target}: the package has ${f}`);
   check(
     run(app.pm, ["exec", "--", "void-fbtee", "--help"], dir, { capture: true }).includes(

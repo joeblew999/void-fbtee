@@ -1,7 +1,7 @@
 ---
 title: "การตั้งค่า void-fbtee ในแอป Void"
 description: "สิ่งที่ void-fbtee init เพิ่มให้แอป Void ทีละส่วน สำหรับเมื่อ void-fbtee check รายงานปัญหา setup"
-translatedFrom: "8bb780714c62"
+translatedFrom: "3f5c58afd3a5"
 ---
 
 # การตั้งค่า void-fbtee ในแอป Void
@@ -12,7 +12,7 @@ translatedFrom: "8bb780714c62"
 - **ภาษา:** `src/locales.ts` มีรายการภาษาเพียงที่เดียว (`export const locales = [...] as const`)
   และลงทะเบียนชนิดของมัน (`declare global { interface VoidFbteeRegister }`) ลิงก์ที่สร้างจากภาษาของหน้าจึงถูกตรวจ
   โดย typed routes ของ Void และ `vite.config.ts` นำเข้ารายการนี้
-- **ปลั๊กอิน Vite:** `voidFbtee({ sourceLocale, locales })` จาก `void-fbtee/vite` เป็นตัวแรกใน
+- **ปลั๊กอิน Vite:** `voidFbtee({ sourceLocale, locales })` จาก `void-fbtee/plugin` เป็นตัวแรกใน
   `plugins` ใน `vite.config.ts` (ก่อน `voidPlugin()`)
 - **มิดเดิลแวร์:** `middleware/99.i18n.ts` ที่มี `export { default } from "void-fbtee/middleware";`
   ทำหน้าที่อ่านภาษาจาก URL และตั้งค่า `<html lang dir>`

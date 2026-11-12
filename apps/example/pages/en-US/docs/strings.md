@@ -13,8 +13,9 @@ use void-fbtee.
 
 - **Catalogs:** `i18n/translations/<locale>.json`, one per locale except the source locale.
   `void-fbtee prepare` writes them; you edit them. Don't edit anything else under `i18n/`.
-- **Locales:** `voidFbtee({ sourceLocale, locales })` in `vite.config.ts`. A locale written as an
-  object can set its URL `segment` and its text direction `dir`.
+- **Locales:** in `src/locales.ts`, given to `voidFbtee({ sourceLocale, locales })` in
+  `vite.config.ts`. A locale written as an object can set its URL `segment` and its text
+  direction `dir`.
 - **Source locale:** the language the code is written in (`sourceLocale`). It has no catalog:
   its text comes from the code.
 

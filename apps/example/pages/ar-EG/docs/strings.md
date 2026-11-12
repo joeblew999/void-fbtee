@@ -1,7 +1,7 @@
 ---
 title: "ترجمة النصوص في تطبيق Void"
 description: "ملء كتالوجات fbtee لتطبيق Void: ما يخص التطبيقات التي تستخدم void-fbtee."
-translatedFrom: "8544aec912e6"
+translatedFrom: "3f7b97e004af"
 ---
 
 # ترجمة النصوص في تطبيق Void
@@ -13,8 +13,8 @@ translatedFrom: "8544aec912e6"
 
 - **الفهارس:** `i18n/translations/<locale>.json`، ملف لكل لغة ما عدا لغة المصدر.
   يكتبها `void-fbtee prepare`، وأنت تعدّلها. لا تعدّل أي شيء آخر تحت `i18n/`.
-- **اللغات:** `voidFbtee({ sourceLocale, locales })` في `vite.config.ts`. اللغة المكتوبة ككائن
-  يمكنها ضبط `segment` الخاص بالرابط واتجاه النص `dir`.
+- **اللغات:** في `src/locales.ts`، وتُمرَّر إلى `voidFbtee({ sourceLocale, locales })` في
+  `vite.config.ts`. اللغة المكتوبة ككائن يمكنها ضبط `segment` الخاص بالرابط واتجاه النص `dir`.
 - **لغة المصدر:** اللغة التي كُتبت بها الشيفرة (`sourceLocale`). ليس لها فهرس: نصوصها تأتي من الشيفرة.
 
 ## مُدخل مكتمل

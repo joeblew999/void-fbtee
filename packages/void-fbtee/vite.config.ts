@@ -4,7 +4,7 @@ import { defineConfig } from "vite-plus";
 export default defineConfig({
   pack: {
     entry: {
-      vite: "src/vite.ts",
+      plugin: "src/plugin.ts",
       middleware: "src/middleware.ts",
       react: "src/react.tsx",
       locales: "src/locales.ts",

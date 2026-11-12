@@ -1,6 +1,6 @@
 // Test fixture: an app whose only plugin is void-fbtee, for `loadProject` (Vite's own loader).
 import { defineConfig } from "vite";
-import voidFbtee from "void-fbtee/vite";
+import { voidFbtee } from "void-fbtee/plugin";
 
 export default defineConfig({
   plugins: [

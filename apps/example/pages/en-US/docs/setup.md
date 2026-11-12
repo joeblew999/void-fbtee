@@ -12,7 +12,7 @@ it can't safely edit a file, it prints the line to add. These are the pieces, fo
 - **Languages:** `src/locales.ts`, with the list once (`export const locales = [...] as const`)
   and its type registered (`declare global { interface VoidFbteeRegister }`), so a link built from the page's
   language is checked by Void's typed routes. `vite.config.ts` imports it.
-- **Vite plugin:** `voidFbtee({ sourceLocale, locales })` from `void-fbtee/vite`, first in
+- **Vite plugin:** `voidFbtee({ sourceLocale, locales })` from `void-fbtee/plugin`, first in
   `plugins` in `vite.config.ts` (before `voidPlugin()`).
 - **Middleware:** `middleware/99.i18n.ts` with `export { default } from "void-fbtee/middleware";`.
   It reads the locale from the URL and sets `<html lang dir>`.
