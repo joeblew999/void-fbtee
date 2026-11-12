@@ -111,10 +111,26 @@ is (X doesn't fall back to `og:image:alt`).
      middleware lets it through (the answering route isn't a `[lang]` page).
    - **What it lists:** the app's code pages, written in the route with `routeUrl()` so each is
      type-checked (Void has no public runtime list of routes; `virtual:void-routes` is internal);
-     markdown pages from `@void/md/pages` (it resolves on the server); events from the database,
-     each with its `updatedAt` as `<lastmod>`. Every entry in every language, each listing all
-     the languages including itself, plus `x-default`. No `<lastmod>` where there's no honest
-     date (markdown, code pages); no `changefreq`/`priority` (Google ignores them).
+     markdown pages from `@void/md/pages` (it resolves on the server, and each entry carries its
+     `frontmatter`: `MdPage` in `@void/md` 1.7.0's `dist/plugin-*.d.mts`); events from the
+     database. Every entry in every language, each listing all the languages including itself,
+     plus `x-default`. No `changefreq`/`priority` (Google ignores them).
+   - **`<lastmod>`: only real content changes, never when the page was drawn.** Google uses it
+     only if it is "consistently and verifiably accurate", and either trusts a site's dates or
+     ignores them all (Search Central's sitemap page, as quoted by Yoast and Search Engine
+     Journal, checked 2026-11-12; Google's own page refuses fetching). So, per kind of page:
+     - **An event** (dynamic): the newest `updated_at` of its `events` row and its `event_texts`
+       rows (`apps/example/db/schema/events.ts`, `event_texts.ts`), since translations arrive
+       after the post. Not the render time: the page redraws on every visit (the "starts in"
+       countdown, seats left), and that isn't a change. Nothing edits an event yet; whatever
+       edits one later must set `updated_at`.
+     - **The events list:** the newest of those dates across all events: it changes when an event
+       is posted or changes, and only then.
+     - **A markdown page** (static): its frontmatter's `updated`, the date the docs layout already
+       shows (`apps/example/src/components/DocsLayout.tsx`, `Updated`); each language's copy has
+       its own.
+     - **A code page** (static): no `<lastmod>`: there's no honest date, and Google's advice is to
+       leave it out rather than give a wrong one.
    - **Cached by Void, cleared when events change:** a long entry for `/sitemap.xml` in
      `routing.revalidate` (or `x-revalidate` on the response), and `revalidate({ paths:
      ["/sitemap.xml"] })` from `void/isr` wherever an event is created or changed
