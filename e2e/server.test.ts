@@ -69,6 +69,74 @@ test("booking an event that doesn't exist is not found, not sold out", async () 
   expect(res.status).toBe(404);
 });
 
+// The tour uses every feature @void/md has (packages/md/src/compile.ts in Void 1.8.0), so each is
+// seen working in every language. Each box's title is written in the page's language: @void/md
+// marks a box left with its English default title ("TIP", "WARNING") custom-block-title-default.
+// Not here: task lists (the theme styles them, the compiler doesn't make them) and snippet
+// imports (removed from @void/md).
+test("the tour: every @void/md feature, in every language, every title in that language", async () => {
+  const features = {
+    "containers: tip, info, warning, danger, details": [
+      'class="tip custom-block"',
+      'class="info custom-block"',
+      'class="warning custom-block"',
+      'class="danger custom-block"',
+      'class="details custom-block"',
+    ],
+    "alerts: note, tip, important, warning, caution": [
+      "note custom-block github-alert",
+      "tip custom-block github-alert",
+      "important custom-block github-alert",
+      "warning custom-block github-alert",
+      "caution custom-block github-alert",
+    ],
+    "code: highlighted, line numbers, marked lines": [
+      'class="shiki',
+      "line-numbers",
+      "highlighted",
+    ],
+    "code: diff, focus, error, warning": [
+      "diff add",
+      "diff remove",
+      "has-focused",
+      "highlighted error",
+      "highlighted warning",
+    ],
+    "contents, table, footnote": ["table-of-contents", "<table", 'class="footnotes"'],
+    "HTML: kbd, mark, definition list": ["<kbd>", "<mark>", "<dl>"],
+    "image (lazy), emoji, attributes": [
+      'loading="lazy"',
+      "🎉",
+      'class="lead"',
+      'id="times"',
+      'id="stored"',
+    ],
+    "a .md link, a client script, the layout's useFrontmatter()": [
+      'href="./tour#times"',
+      "data-your-zone",
+      'data-testid="docs-updated"',
+    ],
+  };
+  const updated = { "en-US": "Updated", "th-TH": "อัปเดตเมื่อ", "ar-EG": "آخر تحديث" } as Record<
+    string,
+    string
+  >;
+  for (const l of LOCALES) {
+    const html = await (await get(`/${l}/docs/tour`)).text();
+    for (const [what, marks] of Object.entries(features))
+      expect(
+        marks.filter((m) => !html.includes(m)),
+        `${l}: ${what}`,
+      ).toEqual([]);
+    expect(html, `${l}: a box with its English default title`).not.toContain(
+      "custom-block-title-default",
+    );
+    expect(html, `${l}: the details box's own title`).not.toMatch(/<summary>\s*Details/);
+    expect(html, `${l}: [[toc]] left as text`).not.toContain("[[toc]]");
+    expect(html, `${l}: "updated" from the frontmatter, in this language`).toContain(updated[l]);
+  }
+});
+
 test("every page has a title and a description, in its own language", async () => {
   const pages = ["", "/events", "/docs", "/docs/intl", "/docs/temporal", "/docs/tour"];
   const head = async (path: string) => {

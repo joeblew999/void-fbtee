@@ -781,30 +781,6 @@
       ],
       "types": []
     },
-    "kNJtK2JlSeD8N9dlqguLyA==": {
-      "description": "Docs: label on the link to the previous page",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "หน้าก่อนหน้า",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "L7hD7JxSeUhLF9soMEVkHQ==": {
-      "description": "Docs: label on the link to the next page",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "หน้าถัดไป",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "gbekjQeH7R7EhnLqCjXXBQ==": {
       "description": "Docs: the menu of documentation pages on a phone",
       "status": "translated",
@@ -1844,6 +1820,18 @@
       "translations": [
         {
           "translation": "void-fbtee ในการใช้งานจริง: Intl และ Temporal ของแพลตฟอร์มในทุกภาษา และเดโมกิจกรรม",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dKSYWmpq+J+1CQmajCFyNw==": {
+      "description": "Docs: when this page was last changed; date is a date, written out",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "อัปเดตเมื่อ {date}",
           "variations": {}
         }
       ],

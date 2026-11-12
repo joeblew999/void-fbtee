@@ -19,6 +19,7 @@ import { ownTemporal, Polyfill, runTemporal, TEMPORAL_SECTIONS } from "@/lib/tem
 import { temporalTitle } from "@/lib/temporal-titles";
 import { cn } from "@/lib/utils";
 import { DIFFERS_ROW } from "@/lib/differs";
+import { PageSections } from "@/components/PageSections";
 import type { Props } from "./temporal.server";
 
 type Rows = Record<string, string>;
@@ -167,6 +168,9 @@ export default function TemporalPage({ worker }: Props) {
           </fbt>
         </p>
       </div>
+      <PageSections
+        sections={TEMPORAL_SECTIONS.map((s) => ({ id: s.id, title: temporalTitle(s.id) }))}
+      />
       {TEMPORAL_SECTIONS.map((section) => (
         <section
           key={section.id}

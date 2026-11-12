@@ -82,8 +82,73 @@ test("check reports a copy whose components or their values differ from the orig
   write("pages/en-US/blog/hello.md", original);
   write("pages/de-DE/blog/hello.md", original.replace('money="1299"', 'money="1300"'));
   stamp(p, join(root, "pages/de-DE/blog/hello.md"));
-  expect(check(p).filter((l) => l.includes("components differ"))).toEqual([
-    'pages: de-DE: pages/de-DE/blog/hello.md: components differ: lacks <Fmt money="1299" currency="THB" />; has <Fmt money="1300" currency="THB" /> that the original doesn\'t',
+  expect(check(p).filter((l) => l.includes("must match"))).toEqual([
+    'pages: de-DE: pages/de-DE/blog/hello.md: differs from the original where it must match: lacks <Fmt money="1299" currency="THB" />; has <Fmt money="1300" currency="THB" /> that the original doesn\'t',
+  ]);
+});
+
+// What a copy must keep from the original besides its components: @void/md's markers, ids,
+// footnote labels, code and link targets (relative, so the same in every copy).
+const RICH = [
+  "# Hello {#hello}",
+  "",
+  "[[toc]]",
+  "",
+  "::: tip A tip",
+  "Text.[^n]",
+  ":::",
+  "",
+  "> [!NOTE] A note",
+  "> Text.",
+  "",
+  "```ts {1}",
+  "const a = 1; // [!code ++]",
+  "```",
+  "",
+  "[Events](../events)",
+  "",
+  "[^n]: A footnote.",
+  "",
+].join("\n");
+
+test("check reports a copy that loses or changes what it must keep", () => {
+  write("pages/en-US/blog/rich.md", RICH);
+  const cases: [string, string, string][] = [
+    ["a box's marker", "::: tip A tip", "::: info Ein Tipp"],
+    ["an alert's marker", "> [!NOTE] A note", "> [!TIP] Ein Hinweis"],
+    ["a heading id", "{#hello}", "{#hallo}"],
+    ["[[toc]]", "[[toc]]", ""],
+    ["a footnote label", "[^n]:", "[^m]:"],
+    ["the code", "const a = 1;", "const a = 2;"],
+    ["a link's target", "(../events)", "(/de-DE/events)"],
+  ];
+  for (const [what, from, to] of cases) {
+    write("pages/de-DE/blog/rich.md", RICH.replace(from, to));
+    stamp(p, join(root, "pages/de-DE/blog/rich.md"));
+    expect(
+      check(p).filter((l) => l.includes("rich.md") && l.includes("must match")),
+      what,
+    ).toHaveLength(1);
+  }
+  // Translated text alone is fine.
+  write(
+    "pages/de-DE/blog/rich.md",
+    RICH.replace("A tip", "Ein Tipp").replace("Text.", "Text auf Deutsch."),
+  );
+  stamp(p, join(root, "pages/de-DE/blog/rich.md"));
+  expect(check(p).filter((l) => l.includes("de-DE/blog/rich.md"))).toEqual([]);
+});
+
+test("check reports a box or alert without a title, in the original and in a copy", () => {
+  const bare = RICH.replace("::: tip A tip", "::: tip").replace("> [!NOTE] A note", "> [!NOTE]");
+  write("pages/en-US/blog/rich.md", bare);
+  write("pages/de-DE/blog/rich.md", bare);
+  stamp(p, join(root, "pages/de-DE/blog/rich.md"));
+  expect(check(p).filter((l) => l.includes("has no title"))).toEqual([
+    "pages: en-US: pages/en-US/blog/rich.md: ::: tip has no title, so it shows @void/md's English one: give it a title",
+    "pages: en-US: pages/en-US/blog/rich.md: > [!NOTE] has no title, so it shows @void/md's English one: give it a title",
+    "pages: de-DE: pages/de-DE/blog/rich.md: ::: tip has no title, so it shows @void/md's English one: give it a title",
+    "pages: de-DE: pages/de-DE/blog/rich.md: > [!NOTE] has no title, so it shows @void/md's English one: give it a title",
   ]);
 });
 

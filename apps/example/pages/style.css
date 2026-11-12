@@ -173,3 +173,8 @@
   padding-right: 0;
   padding-inline-end: 0.23em;
 }
+
+/* A markdown paragraph given the lead class ({.lead}, @void/md's attributes): the intro. */
+.void-md .lead {
+  font-size: 1.125rem;
+}

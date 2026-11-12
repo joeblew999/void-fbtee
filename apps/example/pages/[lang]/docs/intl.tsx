@@ -23,6 +23,7 @@ import { INSTANT, runAll, SECTIONS, ZONE } from "@/lib/intl";
 import { sectionTitle } from "@/lib/intl-titles";
 import { cn } from "@/lib/utils";
 import { DIFFERS_ROW, listDifference, showInvisible } from "@/lib/differs";
+import { PageSections } from "@/components/PageSections";
 import type { Props } from "./intl.server";
 
 // The browser's rows: none while hydrating (the server sent none), then computed once.
@@ -115,6 +116,7 @@ export default function IntlPage({ worker }: Props) {
           <fbt:param name="zone">{ZONE}</fbt:param>.
         </fbt>
       </p>
+      <PageSections sections={SECTIONS.map((s) => ({ id: s.id, title: sectionTitle(s.id) }))} />
       {SECTIONS.map((section) => (
         <section
           key={section.id}

@@ -57,16 +57,55 @@ export function markdownPages(p: Project): MarkdownPage[] {
     );
 }
 
+/** A markdown page's `<script>` block, frontmatter and fenced code blocks, split from its text. */
+function splitPage(text: string) {
+  const script = text.match(/<script\b[\s\S]*?<\/script>/)?.[0];
+  let body = script ? text.replace(script, "") : text;
+  body = body.replace(/^\s*---\n[\s\S]*?\n---[ \t]*$/m, "");
+  const fence = /^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1[ \t]*$/gm;
+  const code = [...body.matchAll(fence)].map((m) => m[0]);
+  return { script, code, text: body.replace(fence, "") };
+}
+
 /**
- * What a translated copy must keep exactly as the original has it: the `<script>` block and every
- * component tag (`<Fmt num="1234567.891" />`), props and all, whitespace collapsed.
+ * What a translated copy must keep exactly as the original has it, whitespace collapsed: the
+ * `<script>` block, every component tag (`<Fmt num="1234567.891" />`), props and all, the code
+ * blocks, @void/md's markers (`::: tip`, `> [!NOTE]`, `[[toc]]`), attributes (`{#times}`),
+ * footnote labels (`[^dst]`) and link targets. The rest is text to translate.
  */
 export function keptParts(text: string): string[] {
   const squash = (s: string) => s.replace(/\s+/g, " ").trim();
-  const script = text.match(/<script\b[\s\S]*?<\/script>/)?.[0];
-  const body = script ? text.replace(script, "") : text;
-  const tags = [...body.matchAll(/<[A-Z][\w.]*\b[^>]*>/g)].map((m) => squash(m[0]));
-  return [...(script ? [squash(script)] : []), ...tags].sort();
+  const page = splitPage(text);
+  const all = (re: RegExp, as: (m: RegExpMatchArray) => string = (m) => m[0]) =>
+    [...page.text.matchAll(re)].map(as);
+  return [
+    ...(page.script ? [page.script] : []),
+    ...page.code,
+    ...all(/<[A-Z][\w.]*\b[^>]*>/g),
+    ...all(/^:::[ \t]*(\w+)/gm, (m) => `::: ${m[1]}`),
+    ...all(/^>[ \t]*\[!(\w+)\]/gm, (m) => `> [!${m[1]!.toUpperCase()}]`),
+    ...all(/\[\[toc\]\]/g),
+    ...all(/\{[.#][^{}\n]*\}/g),
+    ...all(/\[\^[^\]\s]+\]/g),
+    ...all(/\]\(([^)\s]+)\)/g, (m) => `(${m[1]})`),
+  ]
+    .map(squash)
+    .sort();
+}
+
+/**
+ * The boxes and alerts (`::: tip`, `> [!NOTE]`) a page leaves without a title. @void/md shows
+ * its own English default there ("TIP", "NOTE"), which no translation can change; the original
+ * gives each one a title, and each copy translates it.
+ */
+export function untitled(text: string): string[] {
+  const { text: body } = splitPage(text);
+  return [
+    ...[...body.matchAll(/^:::[ \t]*(tip|info|warning|danger|details)[ \t]*$/gm)].map(
+      (m) => `::: ${m[1]}`,
+    ),
+    ...[...body.matchAll(/^>[ \t]*\[!(\w+)\][ \t]*$/gm)].map((m) => `> [!${m[1]!.toUpperCase()}]`),
+  ];
 }
 
 /** The parts the copy lacks and the ones it has that the original doesn't, as one line. */
@@ -144,7 +183,16 @@ export function check(p: Project): string[] {
   }
 
   // Markdown pages: every page in every locale, translated from the current original.
-  for (const page of markdownPages(p)) {
+  const pages = markdownPages(p);
+  const untitledIn = (locale: string, file: string) => {
+    for (const box of untitled(readFileSync(file, "utf8")))
+      problems.push(
+        `pages: ${locale}: ${rel(file)}: ${box} has no title, so it shows @void/md's English one: give it a title`,
+      );
+  };
+  for (const original of new Set(pages.map((page) => page.original)))
+    untitledIn(p.config.sourceLocale, original);
+  for (const page of pages) {
     const what = {
       ok: "",
       missing: "not translated yet",
@@ -152,16 +200,19 @@ export function check(p: Project): string[] {
       unrecorded: `doesn't record which original it was translated from (${TRANSLATED_FROM})`,
     }[page.state];
     if (what) problems.push(`pages: ${page.locale}: ${rel(page.file)}: ${what}`);
-    // Components and the script block are data, the same in every copy (an out-of-date copy is
-    // reported above, and is redone from the original anyway).
+    // What keptParts() lists is the same in every copy (an out-of-date copy is reported above,
+    // and is redone from the original anyway).
     if (page.state === "ok" || page.state === "unrecorded") {
       const differ = partsDiffer(
         readFileSync(page.original, "utf8"),
         readFileSync(page.file, "utf8"),
       );
       if (differ)
-        problems.push(`pages: ${page.locale}: ${rel(page.file)}: components differ: ${differ}`);
+        problems.push(
+          `pages: ${page.locale}: ${rel(page.file)}: differs from the original where it must match: ${differ}`,
+        );
     }
+    if (page.state !== "missing") untitledIn(page.locale, page.file);
   }
   return problems;
 }

@@ -1009,30 +1009,6 @@
       ],
       "types": []
     },
-    "kNJtK2JlSeD8N9dlqguLyA==": {
-      "description": "Docs: label on the link to the previous page",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "الصفحة السابقة",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "L7hD7JxSeUhLF9soMEVkHQ==": {
-      "description": "Docs: label on the link to the next page",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "الصفحة التالية",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "gbekjQeH7R7EhnLqCjXXBQ==": {
       "description": "Docs: the menu of documentation pages on a phone",
       "status": "translated",
@@ -2210,6 +2186,18 @@
       "translations": [
         {
           "translation": "void-fbtee أثناء العمل: Intl وTemporal الخاصان بالمنصة بكل اللغات، وعرض الفعاليات التجريبي.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dKSYWmpq+J+1CQmajCFyNw==": {
+      "description": "Docs: when this page was last changed; date is a date, written out",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "آخر تحديث {date}",
           "variations": {}
         }
       ],

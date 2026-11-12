@@ -100,6 +100,13 @@ Pages under `pages/<source locale>/` have a copy per locale at the same path und
   the site's own pages: they're written relative (`../events`, or `./other.md` for a markdown
   page, which @void/md turns into its route), so the copy's links stay in its language as they
   are. In an original, write them that way, never with the language (`/en-US/events`).
+- **Boxes and alerts** (`::: tip …`, `> [!NOTE] …`): translate the title after the marker, and
+  keep the marker (`tip`, `[!NOTE]`) as it is. The original gives every one a title (@void/md's
+  own default titles are English: "TIP", "WARNING", "Details"); `void-fbtee check` reports one
+  without, in the original or a copy.
+- **Also keep exactly:** heading ids (`{#times}`, so `#times` links work in every copy) and other
+  `{…}` attributes, footnote labels (`[^dst]`; translate the footnote's text), the keys in
+  `<kbd>`, and code blocks with their meta (`{4} :line-numbers`) and `// [!code …]` comments.
 - **Dates, times, numbers:** a page shows them through a component that formats them with `Intl`
   (an island, with the value as a prop), not as written-out text. Leave the component as it is;
   if the original has one written out, keep it as written and say so in your summary.
