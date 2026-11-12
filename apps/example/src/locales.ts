@@ -4,8 +4,8 @@
 export const sourceLocale = "en-US";
 export const locales = ["en-US", "ar-EG", "th-TH"] as const;
 
-declare module "void-fbtee/locales" {
-  interface Register {
+declare global {
+  interface VoidFbteeRegister {
     locales: typeof locales;
   }
 }

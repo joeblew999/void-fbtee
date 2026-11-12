@@ -11,14 +11,19 @@ export type LocaleInput = string | { locale: string; segment?: string; dir?: Dir
  * built from the page's language is checked by Void's typed routes like any other:
  *
  *   export const locales = ["en-US", "ar-EG", "th-TH"] as const;
- *   declare module "void-fbtee/locales" {
- *     interface Register { locales: typeof locales }
+ *   declare global {
+ *     interface VoidFbteeRegister { locales: typeof locales }
  *   }
  *
- * The same list goes to voidFbtee({ locales }). Unregistered, a language is any string.
+ * The same list goes to voidFbtee({ locales }). Unregistered, a language is any string. A global
+ * interface, as Void does for its generated bindings (packages/void/src/runtime/handler.ts): the
+ * package's built types move a module's interface into a shared chunk, where augmenting the
+ * module can't reach it.
  */
-// oxlint-disable-next-line no-empty-interface
-export interface Register {}
+declare global {
+  // oxlint-disable-next-line no-empty-interface
+  interface VoidFbteeRegister {}
+}
 
 type SegmentOf<L> = L extends string
   ? L
@@ -29,7 +34,9 @@ type SegmentOf<L> = L extends string
       : never;
 
 /** A language's URL segment ("th-TH" in /th-TH/events): one of the registered languages. */
-export type Lang = Register extends { locales: readonly (infer L)[] } ? SegmentOf<L> : string;
+export type Lang = VoidFbteeRegister extends { locales: readonly (infer L)[] }
+  ? SegmentOf<L>
+  : string;
 
 export interface Locale {
   /** BCP 47 tag, e.g. "th-TH". Also the catalog name: i18n/translations/th-TH.json. */

@@ -66,8 +66,8 @@ const localesFile = (
 export const sourceLocale = ${JSON.stringify(sourceLocale)};
 export const locales = [${locales.map((l) => JSON.stringify(l)).join(", ")}] as const;
 
-declare module "void-fbtee/locales" {
-  interface Register {
+declare global {
+  interface VoidFbteeRegister {
     locales: typeof locales;
   }
 }
@@ -201,7 +201,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
     let changed = false;
     const ownLocales =
       existsSync(at("src/locales.ts")) &&
-      !readFileSync(at("src/locales.ts"), "utf8").includes("void-fbtee/locales");
+      !readFileSync(at("src/locales.ts"), "utf8").includes("VoidFbteeRegister");
     if (ownLocales && !code.includes("void-fbtee/vite"))
       todo.push(
         `src/locales.ts is the app's own: add voidFbtee({ sourceLocale, locales }) from "void-fbtee/vite" first in ${viteConfig}'s plugins, with the languages declared once and registered as in void-fbtee's SKILL.md`,

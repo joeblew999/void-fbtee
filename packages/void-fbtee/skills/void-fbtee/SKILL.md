@@ -116,7 +116,7 @@ If check reports `setup:` problems, `void-fbtee init` fixes most of them (it onl
 missing; where it can't safely edit a file it prints the line to add). The pieces:
 
 - `src/locales.ts`: the languages once (`export const locales = [...] as const`) and their type
-  registered (`declare module "void-fbtee/locales" { interface Register { locales: typeof locales } }`).
+  registered (`declare global { interface VoidFbteeRegister { locales: typeof locales } }`).
 - `voidFbtee({ sourceLocale, locales })` from `void-fbtee/vite`, first in `plugins` in
   `vite.config.ts`. Its `locales` is imported from `src/locales.ts`.
 - `middleware/99.i18n.ts`: `export { default } from "void-fbtee/middleware";`. The 99 makes Void run

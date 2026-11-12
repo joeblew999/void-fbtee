@@ -23,7 +23,7 @@ import { allTranslations } from "./runtime";
 
 export interface SharedI18n {
   locale: string;
-  /** The language's URL segment, typed as one of the app's (Register in void-fbtee/locales): the
+  /** The language's URL segment, typed as one of the app's (VoidFbteeRegister, in void-fbtee/locales): the
    * `lang` of `routeUrl("/[lang]/events", { params: { lang } })`, and of `/${lang}/docs/tour`. */
   lang: Lang;
   dir: Dir;

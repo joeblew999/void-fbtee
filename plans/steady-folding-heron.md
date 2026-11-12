@@ -86,8 +86,9 @@ docs. One commit per item; pushed together when you say.
        (`docs/guide/server-routing.md`), and a folder per language for written pages
        (`docs/guide/edge/rewrites.md`). What was wrong was the language typed as `string`. The app
        declares its languages once, in `src/locales.ts`, and registers their type with the package
-       (`declare module "void-fbtee/locales" { interface Register { ... } }`, the pattern Void uses for
-       `CloudContextVariables`); `vite.config.ts` gives the same list to `voidFbtee()`. Then
+       (a global interface, `VoidFbteeRegister`, as Void does for its generated bindings in
+       `packages/void/src/runtime/handler.ts:43-50`: the fresh install showed that augmenting
+       `void-fbtee/locales` can't reach an interface the build moved into a shared chunk); `vite.config.ts` gives the same list to `voidFbtee()`. Then
        `useLocale().lang` is `"en-US" | "ar-EG" | "th-TH"`, and every link is a direct `routeUrl()`
        call: `routeUrl("/[lang]/events", { params: { lang } })`, ``routeUrl(`/${lang}/docs/tour`)``.
        Proved on the real code: a missing app page, a missing docs page, and a link without its

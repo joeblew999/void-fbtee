@@ -10,7 +10,7 @@ it can't safely edit a file, it prints the line to add. These are the pieces, fo
 `void-fbtee check` reports a `setup:` problem.
 
 - **Languages:** `src/locales.ts`, with the list once (`export const locales = [...] as const`)
-  and its type registered (`declare module "void-fbtee/locales"`), so a link built from the page's
+  and its type registered (`declare global { interface VoidFbteeRegister }`), so a link built from the page's
   language is checked by Void's typed routes. `vite.config.ts` imports it.
 - **Vite plugin:** `voidFbtee({ sourceLocale, locales })` from `void-fbtee/vite`, first in
   `plugins` in `vite.config.ts` (before `voidPlugin()`).
