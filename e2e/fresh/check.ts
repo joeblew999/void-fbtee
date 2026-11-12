@@ -1,18 +1,20 @@
-// `vp run test:fresh`: void-fbtee installed into fresh `void init` apps the way an app installs
-// it: as a git dependency, built by pnpm (the README's two lines). It installs from this checkout's
-// last commit rather than from GitHub, so commit first. Like voidzero-dev/void's packed-consumer
-// smoke check, it uses no browser: the package's contents, a real `void-fbtee init`, the CLI, a
-// build, TypeScript and a few requests to the dev server. Work happens in .vitest/ (git ignores it).
+// `vp run test:fresh`: void-fbtee as a developer receives it, in fresh `void init` apps, the way
+// voidzero-dev/void tests its own packages before publishing (.github/workflows/prepublish-test.yml,
+// .github/scripts/packed-consumer.mjs, at ee4eaa7): the package packed as npm would publish it, the
+// tarball checked as Void checks its own, then installed into a new app with npm and with pnpm, on
+// plain Vite and on Vite+, with a clean environment and strict settings. No local registry: Void
+// needs one for packages that depend on each other by version; this is one package, so the
+// tarball file is installed. Plus the git install apps use today (pnpm). Work happens in .vitest/
+// (git ignores it). It installs this checkout's last commit, so commit packages/void-fbtee first.
 //
-//   vpx e2e/fresh/check.ts              both apps
-//   vpx e2e/fresh/check.ts vite-plus    a `void init --toolchain vite-plus` app
-//   vpx e2e/fresh/check.ts vite         a `void init --toolchain vite` app
+//   vpx e2e/fresh/check.ts                 every app
+//   vpx e2e/fresh/check.ts npm-vite-plus   one (pnpm-vite-plus, npm-vite-plus, pnpm-vite,
+//                                          npm-vite, git)
 //
-// Each app is made fresh by `void init`, the Void version this repo pins
-// (apps/example/node_modules/.bin/void), in an empty folder, as a user starts one. Both use
-// pnpm: a git dependency on a folder inside a repo (`path:`) is a pnpm feature npm doesn't have.
-// The plain-Vite app gets a pnpm-workspace.yaml first, which is how `void init` picks pnpm for a
-// new app (otherwise npm). There are no lockfiles in this repo; pnpm would insist on one in CI.
+// Each app is made by `void init`, the Void version this repo pins (apps/example's), in an empty
+// folder. `void init` picks the package manager from the folder (packages/void/src/cli/init.ts):
+// on Vite+ pnpm unless package.json says npm (`packageManager`); on plain Vite npm unless there's a
+// pnpm-workspace.yaml.
 import { execFileSync, spawn } from "node:child_process";
 import {
   cpSync,
@@ -27,45 +29,65 @@ import {
 import { dirname, join, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "../..");
+const pkgDir = join(root, "packages/void-fbtee");
 // The example's languages, from its voidFbtee() (e2e/locales.ts).
 const { TRANSLATED } = await import("../locales");
 const work = join(root, ".vitest");
-const targets = process.argv[2] ? [process.argv[2]] : ["vite-plus", "vite"];
-type App = { pm: string; install: string[]; cli: string[]; port: number };
-const APPS: Record<string, App> = {
-  "vite-plus": {
-    pm: "pnpm",
-    install: ["install", "--no-frozen-lockfile"],
-    cli: ["exec", "vp"],
-    port: 5274,
-  },
-  vite: {
-    pm: "pnpm",
-    install: ["install", "--no-frozen-lockfile"],
-    cli: ["exec", "vite"],
-    port: 5275,
-  },
-};
-// The builds `void init` allows on Vite+ (its pnpm-workspace.yaml), for the plain-Vite app too.
-const VOID_INIT_BUILDS = { "better-sqlite3": false, esbuild: true, sharp: true, workerd: true };
 
+type Pm = "npm" | "pnpm";
+type App = {
+  pm: Pm;
+  toolchain: "vite" | "vite-plus";
+  /** The packed tarball, or the git dependency apps use today (a shorter check). */
+  source: "tarball" | "git";
+  port: number;
+};
+const APPS: Record<string, App> = {
+  "pnpm-vite-plus": { pm: "pnpm", toolchain: "vite-plus", source: "tarball", port: 5274 },
+  "npm-vite-plus": { pm: "npm", toolchain: "vite-plus", source: "tarball", port: 5276 },
+  "pnpm-vite": { pm: "pnpm", toolchain: "vite", source: "tarball", port: 5275 },
+  "npm-vite": { pm: "npm", toolchain: "vite", source: "tarball", port: 5277 },
+  git: { pm: "pnpm", toolchain: "vite-plus", source: "git", port: 5278 },
+};
+const targets = process.argv[2] ? [process.argv[2]] : Object.keys(APPS);
+
+// The builds `void init` allows on Vite+ (its pnpm-workspace.yaml), for the plain-Vite pnpm app too.
+const VOID_INIT_BUILDS = { "better-sqlite3": false, esbuild: true, sharp: true, workerd: true };
 const VOID = join(root, "apps/example/node_modules/.bin/void");
 const VOID_INIT = ["init", "--framework", "react", "--starter", "static", "--deploy", "none"];
+
+// A clean environment, as Void's: no tokens, logins or tool settings of this machine's.
+const env: NodeJS.ProcessEnv = { ...process.env, CI: "true" };
+for (const key of Object.keys(env))
+  if (/^(VOID_|VP_|CLOUDFLARE_|CF_|WRANGLER_|NPM_TOKEN$|NODE_AUTH_TOKEN$)/i.test(key))
+    delete env[key];
 
 const run = (cmd: string, args: string[], cwd: string, options: { capture?: boolean } = {}) => {
   console.error(`\n$ (${cwd.replace(root, ".")}) ${cmd} ${args.join(" ")}`);
   return execFileSync(cmd, args, {
     cwd,
+    env,
     stdio: ["ignore", options.capture ? "pipe" : 2, 2],
     encoding: "utf8",
   });
+};
+/** A command expected to fail: its output, or "" if it didn't fail. */
+const failing = (cmd: string, args: string[], cwd: string) => {
+  try {
+    execFileSync(cmd, args, { cwd, env, encoding: "utf8", stdio: "pipe" });
+    return "";
+  } catch (error) {
+    const e = error as { stdout?: string; stderr?: string };
+    return `${e.stdout}${e.stderr}` || "failed";
+  }
 };
 const check = (ok: unknown, what: string) => {
   if (!ok) throw new Error(`fresh check failed: ${what}`);
   console.error(`✓ ${what}`);
 };
+const exec = (pm: Pm, ...args: string[]): [Pm, string[]] => [pm, ["exec", "--", ...args]];
+const install = (pm: Pm): [Pm, string[]] => [pm, ["install"]];
 
-// The README's two lines, pointed at this checkout's last commit instead of GitHub.
 const pending = execFileSync("git", ["status", "--porcelain", "packages/void-fbtee"], {
   cwd: root,
   encoding: "utf8",
@@ -74,58 +96,127 @@ if (pending.trim())
   throw new Error(`commit packages/void-fbtee first; this installs the last commit:\n${pending}`);
 const sha = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
 const repo = `git+file://${root}`;
-const dependency = `${repo}#${sha}&path:/packages/void-fbtee`;
+
+// The package as npm would publish it, packed once (pnpm, which writes the catalog's versions in).
+const packDir = join(work, "fresh-pack");
+const tarball = targets.some((t) => APPS[t]?.source === "tarball") ? pack() : "";
 
 for (const target of targets) {
   const app = APPS[target];
-  if (!app) throw new Error(`usage: vpx e2e/fresh/check.ts [vite-plus|vite] (got ${target})`);
+  if (!app) throw new Error(`usage: vpx e2e/fresh/check.ts [${Object.keys(APPS).join("|")}]`);
   const dir = join(work, `fresh-${target}`);
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(dir, { recursive: true });
   // Its own git repo, as a real app is: tools that honour .gitignore (Oxlint) would otherwise
   // skip it, since this repo ignores .vitest/.
   run("git", ["init", "--quiet"], dir);
-  if (target === "vite") allowBuild(dir); // pnpm, for `void init` (see the top of this file)
-  run(VOID, [...VOID_INIT, "--toolchain", target], dir);
-  allowBuild(dir, `void-fbtee@${repo}`);
+  if (app.toolchain === "vite" && app.pm === "pnpm") allowBuild(dir);
+  if (app.toolchain === "vite-plus" && app.pm === "npm")
+    writeFileSync(
+      join(dir, "package.json"),
+      JSON.stringify({ name: target, private: true, packageManager: `npm@${npmVersion()}` }) + "\n",
+    );
+  run(VOID, [...VOID_INIT, "--toolchain", app.toolchain], dir);
+  check(
+    existsSync(join(dir, app.pm === "npm" ? "package-lock.json" : "pnpm-lock.yaml")),
+    `${target}: void init made a ${app.pm} app`,
+  );
+  strict(dir, app.pm);
+
   const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
-  pkg.dependencies["void-fbtee"] = dependency;
+  if (app.source === "git") {
+    allowBuild(dir, `void-fbtee@${repo}`);
+    pkg.dependencies["void-fbtee"] = `${repo}#${sha}&path:/packages/void-fbtee`;
+  } else pkg.dependencies["void-fbtee"] = `file:${tarball}`;
   writeFileSync(join(dir, "package.json"), JSON.stringify(pkg, null, 2) + "\n");
-  run(app.pm, app.install, dir);
+  run(...install(app.pm), dir);
   // Formatted as a Vite+ developer would first (void init's own output isn't, under Vite+ 1.6:
   // package.json, pages/style.css, tsconfig.json, vite.config.ts, void.config.ts), so anything
   // unformatted after void-fbtee init is void-fbtee's.
-  if (target === "vite-plus") run("pnpm", ["exec", "vp", "fmt"], dir);
+  if (app.toolchain === "vite-plus") run(...exec(app.pm, "vp", "fmt"), dir);
 
   const installed = realpathSync(join(dir, "node_modules/void-fbtee"));
-  for (const f of ["dist/plugin.mjs", "dist/lint.mjs", "skills/void-fbtee/SKILL.md"])
-    check(existsSync(join(installed, f)), `${target}: the package has ${f}`);
   check(
-    run(app.pm, ["exec", "--", "void-fbtee", "--help"], dir, { capture: true }).includes(
-      "translate",
-    ),
+    run(...exec(app.pm, "void-fbtee", "--help"), dir, { capture: true }).includes("translate"),
     `${target}: void-fbtee --help`,
   );
-
   // The example's languages (its translations are copied in below); init adds the plugin,
   // middleware, flags, scripts and peers.
-  run(app.pm, ["exec", "--", "void-fbtee", "init", "--locales", TRANSLATED.join(",")], dir);
-  run(app.pm, app.install, dir);
+  run(...exec(app.pm, "void-fbtee", "init", "--locales", TRANSLATED.join(",")), dir);
+  run(...install(app.pm), dir);
   // void-fbtee's own pages (e2e/fresh/app/) and the example's translations of their strings.
   cpSync(join(import.meta.dirname, "app/pages"), join(dir, "pages"), { recursive: true });
   cpSync(join(root, "apps/example/i18n"), join(dir, "i18n"), { recursive: true });
-  checkOwnDependencies(dir, installed);
+  checkOwnDependencies(target, dir, installed);
 
-  run(app.pm, ["exec", "--", "void-fbtee", "check"], dir);
+  run(...exec(app.pm, "void-fbtee", "check"), dir);
   check(true, `${target}: void-fbtee check passes`);
-  run(app.pm, [...app.cli, "build"], dir);
-  run(app.pm, ["exec", "--", "tsc", "--noEmit"], dir);
+  run(...exec(app.pm, app.toolchain === "vite-plus" ? "vp" : "vite", "build"), dir);
+  run(...exec(app.pm, "tsc", "--noEmit"), dir);
   check(true, `${target}: builds and typechecks`);
-  if (target === "vite-plus") {
-    checkLint(dir);
-    checkFormatting(target, dir);
+  if (app.source === "git") continue;
+
+  checkTypes(target, dir, app.pm);
+  if (app.toolchain === "vite-plus") {
+    checkLint(target, dir, app.pm);
+    checkFormatting(target, dir, app.pm);
   }
   await checkDev(target, dir, app);
+  if (target === "npm-vite-plus") checkMacLockfile(target, dir);
+}
+
+/** The package as npm would publish it, checked as Void checks its own (packed-registry.mjs,
+ * inspectPackage), plus: only what it should hold, and every export and the command in it. */
+function pack(): string {
+  rmSync(packDir, { recursive: true, force: true });
+  mkdirSync(packDir, { recursive: true });
+  run("pnpm", ["pack", "--pack-destination", packDir], pkgDir);
+  const file = readdirSync(packDir).find((f) => f.endsWith(".tgz"));
+  if (!file) throw new Error("pnpm pack made no tarball");
+  const tgz = join(packDir, file);
+  const manifest = JSON.parse(
+    execFileSync("tar", ["-xOf", tgz, "package/package.json"], { encoding: "utf8" }),
+  );
+  const files = execFileSync("tar", ["-tf", tgz], { encoding: "utf8" }).trim().split("\n");
+  const https = (u: unknown) => typeof u === "string" && u.startsWith("https://");
+  check(manifest.description?.trim(), "tarball: a description");
+  check(manifest.license === "MIT", "tarball: MIT license");
+  check(https(manifest.homepage) && https(manifest.bugs?.url), "tarball: https homepage and bugs");
+  check(files.includes("package/LICENSE"), "tarball: LICENSE");
+  check(files.includes("package/README.md"), "tarball: README.md");
+  const unpacked = ["dependencies", "peerDependencies", "optionalDependencies", "devDependencies"]
+    .flatMap((f) => Object.entries((manifest[f] ?? {}) as Record<string, string>))
+    .filter(([, v]) => /^(workspace:|catalog:|link:|file:)/.test(v));
+  check(!unpacked.length, `tarball: no workspace or catalog versions ${unpacked.join(" ")}`);
+  const stray = files.filter(
+    (f) => !/^package\/(dist\/|skills\/|README\.md$|LICENSE$|package\.json$)/.test(f),
+  );
+  check(!stray.length, `tarball: only dist, skills, README.md, LICENSE ${stray.join(" ")}`);
+  const targetsOf = (v: unknown): string[] =>
+    typeof v === "string" ? [v] : Object.values((v ?? {}) as object).flatMap(targetsOf);
+  const missing = [
+    ...targetsOf(manifest.exports),
+    ...Object.values((manifest.bin ?? {}) as Record<string, string>),
+  ]
+    .map((p) => `package/${p.replace(/^\.\//, "")}`)
+    .filter((p) => !files.includes(p));
+  check(!missing.length, `tarball: every export and the command is in it ${missing.join(" ")}`);
+  return tgz;
+}
+
+/** Strict settings, as Void's: engines must match, and (pnpm) peers must be met. */
+function strict(dir: string, pm: Pm) {
+  if (pm === "npm") {
+    writeFileSync(join(dir, ".npmrc"), "engine-strict=true\naudit=false\nfund=false\n");
+    return;
+  }
+  const file = join(dir, "pnpm-workspace.yaml");
+  const text = existsSync(file) ? readFileSync(file, "utf8") : "";
+  writeFileSync(file, `${text.trimEnd()}\nstrictPeerDependencies: true\nengineStrict: true\n`);
+}
+
+function npmVersion(): string {
+  return execFileSync("npm", ["--version"], { env, encoding: "utf8" }).trim();
 }
 
 /**
@@ -144,11 +235,11 @@ function allowBuild(dir: string, spec?: string) {
 }
 
 /** Every package void-fbtee's built code imports resolves inside the app (not in this repo's). */
-function checkOwnDependencies(dir: string, installed: string) {
+function checkOwnDependencies(target: string, dir: string, installed: string) {
   const specifiers = new Set<string>();
   for (const f of readdirSync(join(installed, "dist")).filter((f) => f.endsWith(".mjs"))) {
     const code = readFileSync(join(installed, "dist", f), "utf8");
-    for (const m of code.matchAll(/(?:from|import)\s*\(?\s*"([^".][^"]*)"/g)) specifiers.add(m[1]);
+    for (const m of code.matchAll(/(?:from|import)\s*\(?\s*"([^".][^"]*)"/g)) specifiers.add(m[1]!);
   }
   const outside: string[] = [];
   // An optional peer the app hasn't installed is left out: the part that imports it isn't loaded
@@ -161,7 +252,7 @@ function checkOwnDependencies(dir: string, installed: string) {
     !appPkg.devDependencies?.[name];
   for (const spec of specifiers) {
     if (spec.startsWith("node:") || spec.startsWith("virtual:")) continue;
-    const name = spec.startsWith("@") ? spec.split("/").slice(0, 2).join("/") : spec.split("/")[0];
+    const name = spec.startsWith("@") ? spec.split("/").slice(0, 2).join("/") : spec.split("/")[0]!;
     if (optional(name)) continue;
     // Node's lookup: the first node_modules/<name> walking up from the package's folder.
     let found: string | undefined;
@@ -175,67 +266,63 @@ function checkOwnDependencies(dir: string, installed: string) {
   }
   check(
     !outside.length,
-    `void-fbtee's ${specifiers.size} imports resolve inside the app ${outside.join(", ")}`,
+    `${target}: void-fbtee's ${specifiers.size} imports resolve inside the app ${outside.join(", ")}`,
   );
 }
 
+/** Void's typed routes and void-fbtee's languages in a new app, as in the example: a link to a page
+ * that exists type-checks; a missing page, and a language the app hasn't, don't. */
+function checkTypes(target: string, dir: string, pm: Pm) {
+  const probe = join(dir, "src/_TypesProbe.ts");
+  const write = (body: string) =>
+    writeFileSync(
+      probe,
+      `import { routeUrl } from "void/routes";\nimport type { Lang } from "void-fbtee/locales";\n${body}\n`,
+    );
+  const tsc = () => failing(...exec(pm, "tsc", "--noEmit"), dir);
+  write(`export const home = routeUrl("/[lang]", { params: { lang: "th-TH" satisfies Lang } });`);
+  check(!tsc(), `${target}: a link to a page that exists type-checks`);
+  write(`export const bad = routeUrl("/[lang]/no-such-page", { params: { lang: "th-TH" } });`);
+  check(tsc().includes("_TypesProbe"), `${target}: a link to a missing page fails the type check`);
+  write(`export const lang: Lang = "xx-XX";\nexport const u = routeUrl;`);
+  check(tsc().includes("_TypesProbe"), `${target}: a language the app hasn't fails the type check`);
+  rmSync(probe);
+}
+
 /** init's lint wiring, in Vite+ itself: the example passes, a showCount="no" probe fails. */
-function checkLint(dir: string) {
-  run("pnpm", ["exec", "vp", "lint", "pages"], dir);
+function checkLint(target: string, dir: string, pm: Pm) {
+  run(...exec(pm, "vp", "lint", "pages"), dir);
   mkdirSync(join(dir, "components"), { recursive: true });
   const probe = join(dir, "components/_LintProbe.tsx");
   writeFileSync(
     probe,
     `import { fbt } from "fbtee";\nexport const Probe = ({ n }: { n: number }) => (\n  <fbt desc="Lint probe: a count of nights">\n    <fbt:plural count={n} many="nights" showCount="no">night</fbt:plural>\n  </fbt>\n);\n`,
   );
-  let output = "";
-  try {
-    execFileSync("pnpm", ["exec", "vp", "lint", "components/_LintProbe.tsx"], {
-      cwd: dir,
-      encoding: "utf8",
-      stdio: "pipe",
-    });
-  } catch (error) {
-    const e = error as { stdout?: string; stderr?: string };
-    output = `${e.stdout}${e.stderr}`;
-  }
+  const output = failing(...exec(pm, "vp", "lint", "components/_LintProbe.tsx"), dir);
   rmSync(probe);
   check(
     output.includes("void-fbtee(no-show-count-no)"),
-    `vp lint reports void-fbtee(no-show-count-no)`,
+    `${target}: vp lint reports void-fbtee(no-show-count-no)`,
   );
-}
-
-/** The files `vp fmt --check` (what `vp check` runs first) reports as unformatted. */
-function unformatted(dir: string): string[] {
-  let out = "";
-  try {
-    out = execFileSync("pnpm", ["exec", "vp", "fmt", "--check"], {
-      cwd: dir,
-      encoding: "utf8",
-      stdio: "pipe",
-    });
-  } catch (error) {
-    const e = error as { stdout?: string; stderr?: string };
-    out = `${e.stdout}${e.stderr}`;
-  }
-  return [...out.matchAll(/^(\S+) \(\d+ms\)$/gm)].map((m) => m[1]!).sort();
 }
 
 /** After void-fbtee init, `vp fmt --check` (what `vp check` runs first) is clean: nothing init
  * wrote or changed fails a Vite+ developer's `vp check`. */
-function checkFormatting(target: string, dir: string) {
-  const files = unformatted(dir);
+function checkFormatting(target: string, dir: string, pm: Pm) {
+  const out = failing(...exec(pm, "vp", "fmt", "--check"), dir);
+  const files = [...out.matchAll(/^(\S+) \(\d+ms\)$/gm)].map((m) => m[1]!).sort();
   check(!files.length, `${target}: everything init wrote is formatted ${files.join(", ")}`);
 }
 
-/** The dev server serves translated pages, and an Arabic page right-to-left. */
+/** The dev server: translated pages, an Arabic page right-to-left, "/" to the source language,
+ * and a language the app hasn't not found. */
 async function checkDev(target: string, dir: string, app: App) {
-  const server = spawn(app.pm, [...app.cli, "dev", "--port", String(app.port), "--strictPort"], {
-    cwd: dir,
-    stdio: ["ignore", "ignore", "inherit"],
-    detached: true,
-  });
+  const cli = app.toolchain === "vite-plus" ? "vp" : "vite";
+  const server = spawn(
+    app.pm,
+    ["exec", "--", cli, "dev", "--port", String(app.port), "--strictPort"],
+    { cwd: dir, env, stdio: ["ignore", "ignore", "inherit"], detached: true },
+  );
   const base = `http://localhost:${app.port}`;
   try {
     let html;
@@ -252,7 +339,36 @@ async function checkDev(target: string, dir: string, app: App) {
       ar.includes('<html lang="ar-EG" dir="rtl"') && ar.includes("تدويل تطبيقات Void"),
       `${target}: dev serves /ar-EG right-to-left, in Arabic`,
     );
+    const home = await fetch(`${base}/`, { redirect: "manual" });
+    check(
+      home.status === 301 && home.headers.get("location")?.endsWith("/en-US"),
+      `${target}: "/" redirects to /en-US (301)`,
+    );
+    const madeUp = await fetch(`${base}/xx-XX`, { redirect: "manual" });
+    check(madeUp.status === 404, `${target}: a language the app hasn't (/xx-XX) is not found`);
   } finally {
     if (server.pid) process.kill(-server.pid, "SIGTERM");
   }
+}
+
+/**
+ * A Mac developer with Linux CI, on npm: the lockfile is written as on a Mac (npm's --os/--cpu),
+ * including a later install with node_modules present (where npm/cli#4828 drops other systems'
+ * builds of native packages), then `npm ci` and a build here. fbtee's compiler is native code, one
+ * build per system (@nkzw/oxc-transform-fbtee-binding-*).
+ */
+function checkMacLockfile(target: string, dir: string) {
+  const mac = ["--os=darwin", "--cpu=arm64"];
+  rmSync(join(dir, "node_modules"), { recursive: true, force: true });
+  rmSync(join(dir, "package-lock.json"), { force: true });
+  run("npm", ["install", ...mac], dir);
+  run("npm", ["install", ...mac, "ms@2.1.3"], dir);
+  rmSync(join(dir, "node_modules"), { recursive: true, force: true });
+  const ci = failing("npm", ["ci"], dir);
+  check(
+    !ci,
+    `${target}: npm ci with a lockfile made on a Mac ${ci.split("\n").slice(-3).join(" ")}`,
+  );
+  const build = failing(...exec("npm", "vp", "build"), dir);
+  check(!build, `${target}: and it builds ${build.split("\n").slice(-5).join(" ")}`);
 }
