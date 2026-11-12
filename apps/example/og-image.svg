@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- The link preview picture (og:image): the site's background, the globe from favicon.svg,
+       and the name, no other words, so it suits every language. Rendered to public/og-1.png by
+       `vp run og-image` (scripts/og-image.ts). -->
+  <rect width="1200" height="630" fill="#14161c"/>
+  <g transform="translate(232 219) scale(3)">
+    <rect width="64" height="64" rx="14" fill="#8f81ff"/>
+    <g fill="none" stroke="#14161c" stroke-width="4" stroke-linecap="round">
+      <circle cx="32" cy="32" r="18"/>
+      <ellipse cx="32" cy="32" rx="8" ry="18"/>
+      <path d="M14 32h36"/>
+    </g>
+  </g>
+  <text x="472" y="351" fill="#ffffff" font-family="DejaVu Sans, Helvetica, Arial, sans-serif"
+        font-size="88" font-weight="600">void-fbtee</text>
+</svg>

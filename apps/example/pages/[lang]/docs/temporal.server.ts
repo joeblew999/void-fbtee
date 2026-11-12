@@ -1,5 +1,6 @@
 import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
+import { pageHead } from "void-fbtee/head";
 import { ownTemporal, Polyfill, runTemporal } from "@/lib/temporal";
 import { langParams } from "void-fbtee/middleware";
 
@@ -21,17 +22,12 @@ export const loader = defineHandler(() => {
 });
 
 // The intro's own string as the description, so it's translated once.
-export const head = defineHead(() => ({
-  title: "Temporal",
-  meta: [
-    {
-      name: "description",
-      content: String(
-        fbs(
-          "Temporal does the arithmetic on dates and times. Each result is a neutral value, not text for the screen, so it must come out the same everywhere. Each row ran on the Worker with Cloudflare's own Temporal, which this app uses there, and with the temporal-polyfill package, and again in your browser: with its own Temporal, and with the polyfill. A highlighted row is a real bug, and its columns show whose.",
-          "Temporal page introduction",
-        ),
-      ),
-    },
-  ],
-}));
+export const head = defineHead(() =>
+  pageHead({
+    title: "Temporal",
+    description: fbs(
+      "Temporal does the arithmetic on dates and times. Each result is a neutral value, not text for the screen, so it must come out the same everywhere. Each row ran on the Worker with Cloudflare's own Temporal, which this app uses there, and with the temporal-polyfill package, and again in your browser: with its own Temporal, and with the polyfill. A highlighted row is a real bug, and its columns show whose.",
+      "Temporal page introduction",
+    ),
+  }),
+);

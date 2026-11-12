@@ -76,6 +76,8 @@ const CONFIG_ID = "virtual:void-fbtee/config";
 const CATALOGS_ID = "virtual:void-fbtee/catalogs";
 const CATALOG_PREFIX = "virtual:void-fbtee/catalog/";
 const TEXTS_ID = "virtual:void-fbtee/texts";
+/** The app's markdown pages (@void/md's own list), or none when the app doesn't use @void/md. */
+const MD_PAGES_ID = "virtual:void-fbtee/md-pages";
 /** What `temporal-polyfill` is on the server: the runtime's own Temporal (Cloudflare's flag). */
 const SERVER_TEMPORAL_ID = "\0void-fbtee:server-temporal";
 // Hono's route helper, as Void's own copy of Hono: matchedRoutes reads Hono's request internals, so
@@ -124,6 +126,9 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   let root = process.cwd();
   let command: "build" | "serve" = "serve";
   let devServer: ViteDevServer | undefined;
+  // Whether the app uses @void/md, as void-md tells its own adapters (by plugin name): no peer
+  // dependency on it, which an app without markdown pages would have to install anyway.
+  let hasMarkdown = false;
   const project = (): Project => ({ root, config, translations: translationsDir, src });
 
   const api: VoidFbteeApi = { options, project };
@@ -135,6 +140,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
     configResolved(resolved) {
       root = resolved.root;
       command = resolved.command;
+      hasMarkdown = resolved.plugins.some((p) => p.name === "void-md");
     },
     // Once per run (the first environment to start): the dev server warns, a build reports, and
     // with failOnMissing a build fails, so `void deploy` (which runs `vite build`) can't ship gaps.
@@ -202,6 +208,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           id === CONFIG_ID ||
           id === CATALOGS_ID ||
           id === TEXTS_ID ||
+          id === MD_PAGES_ID ||
           id.startsWith(CATALOG_PREFIX)
         )
           return "\0" + id;
@@ -239,6 +246,10 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
             );
           return `export default {${entries.join(",")}};`;
         }
+        // @void/md's pages list exists only inside its plugin, so it's re-exported only when the
+        // app has it.
+        if (id === "\0" + MD_PAGES_ID)
+          return hasMarkdown ? `export { default } from "@void/md/pages";` : "export default [];";
         // Dev only: each string's source text, so the browser can name what it shows untranslated.
         if (id === "\0" + TEXTS_ID)
           return `export default ${command === "serve" ? JSON.stringify(runtimeTexts(project())) : "{}"};`;

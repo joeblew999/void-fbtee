@@ -3,6 +3,7 @@
 import { event_texts, events } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
+import { pageHead } from "void-fbtee/head";
 import { and, asc, db, eq, gte } from "void/db";
 
 export type Props = InferProps<typeof loader>;
@@ -25,17 +26,12 @@ export const loader = defineHandler(async (c) => {
   };
 });
 
-export const head = defineHead(() => ({
-  title: String(fbs("Upcoming events", "Heading of the events page")),
-  meta: [
-    {
-      name: "description",
-      content: String(
-        fbs(
-          "Events posted in any language, each on its own city's clock and on yours.",
-          "Events page description, for search results",
-        ),
-      ),
-    },
-  ],
-}));
+export const head = defineHead(() =>
+  pageHead({
+    title: fbs("Upcoming events", "Heading of the events page"),
+    description: fbs(
+      "Events posted in any language, each on its own city's clock and on yours.",
+      "Events page description, for search results",
+    ),
+  }),
+);

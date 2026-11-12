@@ -1,5 +1,6 @@
 import { defineHandler, defineHead, defer } from "void";
 import { fbs } from "fbtee";
+import { pageHead } from "void-fbtee/head";
 import type { InferProps } from "void";
 import { langParams } from "void-fbtee/middleware";
 
@@ -25,17 +26,12 @@ export const loader = defineHandler(async () => {
 
 // The tab's title and the search result's text, in the page's language (head() runs inside
 // void-fbtee's per-request state, after the loader). The title is the heading's own string.
-export const head = defineHead(() => ({
-  title: String(fbs("i18n for Void apps", "Home page heading")),
-  meta: [
-    {
-      name: "description",
-      content: String(
-        fbs(
-          "An example Void app in three languages: events to post and book, and docs on how it's done.",
-          "Home page description, for search results",
-        ),
-      ),
-    },
-  ],
-}));
+export const head = defineHead(() =>
+  pageHead({
+    title: fbs("i18n for Void apps", "Home page heading"),
+    description: fbs(
+      "An example Void app in three languages: events to post and book, and docs on how it's done.",
+      "Home page description, for search results",
+    ),
+  }),
+);

@@ -65,6 +65,25 @@ voidFbtee({ sourceLocale, locales, site: "https://example.com" });
 its request came to. A change to `voidFbtee()`'s options needs the dev server restarted: Vite reads
 the plugin once, when it starts.
 
+Link previews (WhatsApp, Facebook, LinkedIn, Slack, X) need each page's title and description,
+which void-fbtee gives them in the page's language (`pageHead` from `void-fbtee/head` in a page's
+`head()`; the frontmatter's on a markdown page), and the site's own tags, which are the app's. Put
+those in `void.config.ts`'s `head`, written with `meta` from `void-fbtee/head` (unhead's readable
+keys):
+
+```ts
+meta: [
+  ...meta({
+    ogSiteName: "Acme",
+    ogType: "website",
+    ogImage: { url: "https://example.com/og-1.png", width: 1200, height: 630, type: "image/png", alt: "Acme" },
+    twitterCard: "summary_large_image",
+  }),
+],
+```
+
+The picture's address in full, and a new name for a new picture: sharing apps keep one a long time.
+
 ## Using it
 
 How to write translated strings, format dates and numbers in components, build typed links, give

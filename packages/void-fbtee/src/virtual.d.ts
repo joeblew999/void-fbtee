@@ -19,3 +19,8 @@ declare module "virtual:void-fbtee/hono-route" {
     c: unknown,
   ) => Array<{ path: string; method: string; handler: Function }>;
 }
+declare module "virtual:void-fbtee/md-pages" {
+  /** The app's markdown pages, from @void/md's own list (its path and frontmatter), or [] without @void/md. */
+  const pages: ReadonlyArray<{ path: string; frontmatter: Record<string, unknown> }>;
+  export default pages;
+}

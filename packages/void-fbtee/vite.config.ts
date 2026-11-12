@@ -25,6 +25,7 @@ export default defineConfig({
       client: "src/client.ts",
       cli: "src/cli.ts",
       lint: "src/lint.ts",
+      head: "src/head.ts",
     },
     format: ["esm"],
     dts: true,

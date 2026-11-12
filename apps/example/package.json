@@ -9,6 +9,7 @@
     "i18n:prepare": "void-fbtee prepare",
     "i18n:translate": "void-fbtee translate",
     "icons": "pwa-assets-generator",
+    "og-image": "vpx scripts/og-image.ts",
     "postinstall": "void prepare && void init --tsconfig && void-fbtee init",
     "preview": "vp preview"
   },
@@ -38,6 +39,7 @@
     "@void/react": "catalog:",
     "cf": "1.0.0-beta.26",
     "oxc-transform-react": "0.156.0",
+    "sharp": "0.35.5",
     "tailwindcss": "4.3.5",
     "typescript": "7.0.2",
     "vite": "catalog:",

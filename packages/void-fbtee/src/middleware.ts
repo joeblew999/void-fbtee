@@ -20,6 +20,8 @@ import { Temporal } from "temporal-polyfill";
 import config from "virtual:void-fbtee/config";
 import catalogs from "virtual:void-fbtee/catalogs";
 import { matchedRoutes } from "virtual:void-fbtee/hono-route";
+import markdownPages from "virtual:void-fbtee/md-pages";
+import { meta, type MetaTag } from "./head";
 import { localeFromPath, META_NAME, type Dir, type Lang } from "./locales";
 import { allTranslations } from "./runtime";
 
@@ -100,6 +102,12 @@ export function appLocales(): string[] {
   return config.locales.map((l) => l.locale);
 }
 
+/** The markdown page at this path, from @void/md's list (a trailing slash makes no difference). */
+function markdownPage(path: string) {
+  const want = path.replace(/\/+$/, "") || "/";
+  return markdownPages.find((p) => (p.path.replace(/\/+$/, "") || "/") === want);
+}
+
 // Void's own endpoints, API routes and file requests: no catalog, no fbtee state. They still get
 // shared.i18n, because Void renders its not-found page (through the app's layout) for them.
 const LIGHT = /^\/(__void|api)(\/|$)|\.[a-z0-9]+$/i;
@@ -152,7 +160,7 @@ const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (
   // the page's language (ogp.me, og:locale). Not og:locale:alternate: it's one tag per other
   // language, and Void keeps one meta tag per property (resolveHead, packages/void/src/pages/head.ts
   // in Void 1.8.0), so only the last would be left.
-  const page = found
+  const page: { link: { rel: string; href: string }[]; meta: MetaTag[] } = found
     ? {
         link: [{ rel: "canonical", href: `${origin}/${found.segment}${rest}` }],
         meta: [
@@ -161,6 +169,19 @@ const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (
         ],
       }
     : { link: [], meta: [] };
+  // A markdown page's title and description for link previews: Void puts its frontmatter's into
+  // <title> and description only (packages/void/src/router/compile.ts), and a markdown page has no
+  // head() of its own. A code page's come from its head() (pageHead from void-fbtee/head).
+  const markdown = found && markdownPage(path);
+  if (markdown) {
+    const { title, description } = markdown.frontmatter;
+    page.meta.push(
+      ...meta({
+        ogTitle: typeof title === "string" ? title : undefined,
+        ogDescription: typeof description === "string" ? description : undefined,
+      }),
+    );
+  }
   c.set("headDefaults", {
     ...head,
     htmlAttrs: { ...head.htmlAttrs, lang: current.locale, dir: current.dir },

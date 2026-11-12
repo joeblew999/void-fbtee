@@ -6,6 +6,7 @@ import { voidMarkdown } from "@void/md/plugin";
 import { voidFbtee } from "void-fbtee/plugin";
 import { locales, sourceLocale } from "./src/locales.ts";
 import tailwindcss from "@tailwindcss/vite";
+import { SITE } from "./src/site";
 
 export default defineConfig({
   // `vp run <task>` here (or `vp run example#<task>` from anywhere). `build` is Void's script in
@@ -43,8 +44,8 @@ export default defineConfig({
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
   plugins: [
     // site: the deployed address, so the dev server and Worker Previews name it in canonical,
-    // hreflang, og:url and the sitemap (Void's deploy summary shows it).
-    voidFbtee({ sourceLocale, locales, site: "https://void-fbtee-example.gedw99.workers.dev" }),
+    // hreflang, og:url and the sitemap.
+    voidFbtee({ sourceLocale, locales, site: SITE }),
     voidPlugin(),
     voidReact({ react: { compiler: true } }),
     voidMarkdown(),

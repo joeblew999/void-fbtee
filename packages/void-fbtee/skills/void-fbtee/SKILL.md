@@ -25,10 +25,14 @@ here, by this skill.
 3. What's specific to void-fbtee apps is below.
 
 **Page titles and descriptions.** A page's `head()` (Void's `defineHead`, in its `.server.ts`)
-runs inside void-fbtee's per-request state, so its text is `String(fbs("…", "…"))` and is in the
-catalogs like any other string. Where the title is the page's heading, use the heading's own text
-and description: it's then the same entry, translated once. A markdown page's title and
-description are its frontmatter's `title` and `description`, translated with the page.
+runs inside void-fbtee's per-request state, so its text is `fbs("…", "…")` and is in the catalogs
+like any other string. Write it with `pageHead` from `void-fbtee/head`, which gives the same title
+and description to link previews (`og:title`, `og:description`):
+`export const head = defineHead(() => pageHead({ title: fbs(…), description: fbs(…) }))`.
+Where the title is the page's heading, use the heading's own text and description: it's then the
+same entry, translated once. A markdown page's title and description are its frontmatter's
+`title` and `description`, translated with the page; the middleware gives them to link previews.
+So a translated markdown copy keeps a translated `title` and `description` in its frontmatter.
 
 **Where things are.** Catalogs: `i18n/translations/<locale>.json`, one per locale except the source
 locale; `prepare` writes them, you edit them, nothing else under `i18n/`. Locales:

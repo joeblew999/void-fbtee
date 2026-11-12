@@ -3,10 +3,12 @@
 // what it does per environment. One module is built for the browser, for a second browser
 // environment named "browser", and for a server environment named "worker": the environment is
 // told by Vite's own `consumer` flag, not its name. Seconds, no app.
-import { cpSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vite-plus/test";
 import { createBuilder, type Plugin, type Rollup } from "vite";
+import { voidMarkdown } from "@void/md/plugin";
+import { voidReact } from "@void/react/plugin";
 import { voidFbtee } from "../src/plugin";
 
 const fixture = join(import.meta.dirname, "fixture");
@@ -107,5 +109,56 @@ describe("per environment", () => {
     const locale = (tag: string) => `["\`]?locale["\`]?\\s*:\\s*["\`]${tag}["\`]`;
     const both = new RegExp(`${locale("en-US")}.*${locale("de-DE")}`, "s");
     for (const code of [client, worker]) expect(code).toMatch(both);
+  });
+});
+
+// virtual:void-fbtee/md-pages: @void/md's own pages list when the app has @void/md's plugin (by its
+// name, "void-md"), so the middleware can give a markdown page's frontmatter to link previews; an
+// empty list without it, so the package needs no peer dependency on @void/md.
+describe("markdown pages", () => {
+  const build = async (plugins: Plugin[]) => {
+    const dir = mkdtempSync(join(import.meta.dirname, ".tmp-"));
+    cpSync(fixture, dir, { recursive: true });
+    mkdirSync(join(dir, "pages/en-US"), { recursive: true });
+    writeFileSync(join(dir, "pages/en-US/hello.md"), "---\ntitle: Hello page\n---\n\n# Hello\n");
+    writeFileSync(
+      join(dir, "src/md.ts"),
+      `import pages from "virtual:void-fbtee/md-pages";\nexport const found = pages.map((p) => p.path + "|" + p.frontmatter.title);\n`,
+    );
+    try {
+      const builder = await createBuilder({
+        root: dir,
+        configFile: false,
+        logLevel: "silent",
+        plugins,
+        environments: {
+          worker: {
+            consumer: "server",
+            build: { write: false, ssr: true, rollupOptions: { input: "src/md.ts" } },
+          },
+        },
+      });
+      const out = (await builder.build(builder.environments.worker!)) as Rollup.RollupOutput;
+      return out.output.map((c) => ("code" in c ? c.code : "")).join("\n");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  };
+
+  test("with @void/md: its pages, each with its frontmatter", async () => {
+    // void-md needs a framework adapter beside it, as in an app (@void/react's).
+    const code = await build([
+      ...voidFbtee(options),
+      ...[voidReact()].flat(),
+      ...[voidMarkdown()].flat(),
+    ] as Plugin[]);
+    expect(code).toContain("/en-US/hello");
+    expect(code).toContain("Hello page");
+  });
+
+  test("without it: none", async () => {
+    const code = await build(voidFbtee(options) as Plugin[]);
+    expect(code).not.toContain("/en-US/hello");
+    expect(code).not.toContain("@void/md");
   });
 });

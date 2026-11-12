@@ -32,6 +32,7 @@
   "type": "module",
   "exports": {
     "./client": "./dist/client.mjs",
+    "./head": "./dist/head.mjs",
     "./lint": "./dist/lint.mjs",
     "./locales": "./dist/locales.mjs",
     "./middleware": "./dist/middleware.mjs",
@@ -53,13 +54,15 @@
   "dependencies": {
     "@nkzw/fbtee-compiler": "5.0.0",
     "@nkzw/vite-plugin-fbtee": "5.0.0",
-    "magicast": "0.5.5"
+    "magicast": "0.5.5",
+    "unhead": "3.4.3"
   },
   "devDependencies": {
     "@arethetypeswrong/core": "0.18.5",
     "@nkzw/eslint-plugin-fbtee": "5.0.0",
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",
+    "@void/md": "catalog:",
     "@void/react": "catalog:",
     "fbtee": "5.0.0",
     "publint": "0.3.25",

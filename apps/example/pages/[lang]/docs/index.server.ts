@@ -1,6 +1,7 @@
 // The docs index's title and description, in the page's language.
 import { defineHead } from "void";
 import { fbs } from "fbtee";
+import { pageHead } from "void-fbtee/head";
 import { langParams } from "void-fbtee/middleware";
 
 // Cached until the next deploy, in every language (Void's prerendering: a one-year cache time,
@@ -10,17 +11,12 @@ import { langParams } from "void-fbtee/middleware";
 export const prerender = true;
 export const getPrerenderPaths = langParams;
 
-export const head = defineHead(() => ({
-  title: String(fbs("Documentation", "Docs index heading")),
-  meta: [
-    {
-      name: "description",
-      content: String(
-        fbs(
-          "void-fbtee at work: the platform's Intl and Temporal in every language, and the events demo.",
-          "Docs index description, for search results",
-        ),
-      ),
-    },
-  ],
-}));
+export const head = defineHead(() =>
+  pageHead({
+    title: fbs("Documentation", "Docs index heading"),
+    description: fbs(
+      "void-fbtee at work: the platform's Intl and Temporal in every language, and the events demo.",
+      "Docs index description, for search results",
+    ),
+  }),
+);

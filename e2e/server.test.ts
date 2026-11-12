@@ -162,10 +162,19 @@ test("every page has a title and a description, in its own language", async () =
   ];
   const head = async (path: string) => {
     const html = await (await get(path)).text();
-    return {
+    const got = {
       title: html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "",
       description: html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? "",
     };
+    // Link previews carry the same two (pageHead, or the middleware for markdown pages), the title
+    // without the site's name, which og:site_name carries.
+    expect(html, `${path}: og:title`).toContain(
+      `property="og:title" content="${got.title.replace(/ · void-fbtee$/, "")}"`,
+    );
+    expect(html, `${path}: og:description`).toContain(
+      `property="og:description" content="${got.description}"`,
+    );
+    return got;
   };
   for (const page of pages) {
     const source = await head(`/${SOURCE}${page}`);
@@ -262,6 +271,31 @@ test("every link, on every page reachable in each language, leads to a page", as
 
 // What every site needs, from public/ (icons made by `vp run icons`) and void.config.ts's head:
 // each file served as itself, with its own type, and linked from every page.
+// void.config.ts's head: one picture, the site's name and X's large card on every page; each page's
+// own address as og:url.
+test("link previews: the site's picture, name and card on every page; og:url its own address", async () => {
+  for (const l of LOCALES)
+    for (const page of ["", "/events", "/docs/tour"]) {
+      const html = await (await get(`/${l}${page}`)).text();
+      for (const tag of [
+        `property="og:image" content="${SITE}/og-1.png"`,
+        'property="og:image:width" content="1200"',
+        'property="og:image:height" content="630"',
+        'property="og:image:type" content="image/png"',
+        'property="og:site_name" content="void-fbtee"',
+        'property="og:type" content="website"',
+        'name="twitter:card" content="summary_large_image"',
+        `property="og:url" content="${SITE}/${l}${page}"`,
+      ])
+        expect(html, `${l}${page}`).toContain(tag);
+    }
+  const picture = await get("/og-1.png");
+  expect(picture.headers.get("content-type")).toMatch(/^image\/png/);
+  // 1200×630, from the PNG's own header (IHDR: width and height at bytes 16 and 20).
+  const bytes = new DataView(await picture.arrayBuffer());
+  expect([bytes.getUint32(16), bytes.getUint32(20)]).toEqual([1200, 630]);
+});
+
 test("the site's icons, web app manifest and robots.txt", async () => {
   const files = {
     "/favicon.ico": /^image\/(x-icon|vnd\.microsoft\.icon)/,

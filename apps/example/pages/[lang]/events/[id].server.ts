@@ -4,6 +4,7 @@ import { defineHandler, defineHead, type InferProps } from "void";
 import { and, count, db, eq, sql } from "void/db";
 import { revalidate as clearCache } from "void/isr";
 import { z } from "zod";
+import { pageHead } from "void-fbtee/head";
 import { localizedPaths } from "void-fbtee/middleware";
 import { eventTopic, live } from "../../../src/live";
 
@@ -65,5 +66,5 @@ export const action = defineHandler.withValidator({ params, body: bookSchema })(
 // The event's own title and description, in the page's language where translated.
 export const head = defineHead<Props>((_c, { event, text }) => {
   const shown = text ?? event;
-  return { title: shown.title, meta: [{ name: "description", content: shown.description }] };
+  return pageHead({ title: shown.title, description: shown.description });
 });

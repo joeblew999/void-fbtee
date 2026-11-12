@@ -4,6 +4,7 @@
 import { events, newEventSchema, startsAt } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
+import { pageHead } from "void-fbtee/head";
 import { db } from "void/db";
 import { revalidate } from "void/isr";
 import { langParams, localizedPaths } from "void-fbtee/middleware";
@@ -48,17 +49,12 @@ export const action = defineHandler.withValidator({
   });
 });
 
-export const head = defineHead(() => ({
-  title: String(fbs("Post an event", "Heading of the form for posting a new event")),
-  meta: [
-    {
-      name: "description",
-      content: String(
-        fbs(
-          "Post an event in your own language, on your city's clock; everyone sees it on their own.",
-          "Post-an-event page description, for search results",
-        ),
-      ),
-    },
-  ],
-}));
+export const head = defineHead(() =>
+  pageHead({
+    title: fbs("Post an event", "Heading of the form for posting a new event"),
+    description: fbs(
+      "Post an event in your own language, on your city's clock; everyone sees it on their own.",
+      "Post-an-event page description, for search results",
+    ),
+  }),
+);
