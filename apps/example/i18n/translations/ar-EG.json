@@ -2226,6 +2226,18 @@
         }
       ],
       "types": []
+    },
+    "vHJBmpHIErvq712eD4hPAw==": {
+      "description": "The site's description, as an installed app shows it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "i18n لتطبيقات Void: نصوص fbtee وتواريخ Temporal وتنسيق Intl.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

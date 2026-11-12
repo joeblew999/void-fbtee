@@ -65,6 +65,27 @@ export function langParams(): { lang: Lang }[] {
   return config.locales.map((l) => ({ lang: l.segment as Lang }));
 }
 
+/**
+ * Something worked out in every language at once, for one response that holds them all (a web app
+ * manifest's translated fields): `fn` runs once per language inside fbtee's state for it, so
+ * `fbs(…)` there is in that language, with the same catalogs and fallbacks as a page. It gets the
+ * language and its text direction. Keyed by locale, in the app's order (the source first).
+ */
+export async function inEveryLocale<T>(
+  fn: (language: { locale: string; dir: Dir }) => T,
+): Promise<Record<string, T>> {
+  const { sourceLocale, fallbackLocales } = config;
+  const translations = await allTranslations(catalogs);
+  return Object.fromEntries(
+    config.locales.map((l) => [
+      l.locale,
+      runWithFbtee({ locale: l.locale, sourceLocale, fallbackLocales, translations }, () =>
+        fn({ locale: l.locale, dir: l.dir }),
+      ),
+    ]),
+  );
+}
+
 /** The app's languages (`voidFbtee({ locales })`), for server code that works per language. */
 export function appLocales(): string[] {
   return config.locales.map((l) => l.locale);

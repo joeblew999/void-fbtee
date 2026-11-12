@@ -16,6 +16,10 @@ export default defineConfig({
     // address. Only on Cloudflare: localhost and 127.0.0.1 stay on http (Void's
     // guide/edge/redirects.md, "HTTP to HTTPS").
     alwaysUseHttps: true,
+    // Cache times for the routes, which have no page to export one: Void decides whether to
+    // cache a path before it runs any code (packages/isr/src/runtime.ts, handleIsrInternal, Void
+    // 1.7.0). The manifest only changes with a deploy, which clears the cache.
+    revalidate: { "/manifest.webmanifest": 31_536_000 },
   },
   // On every page (Void's site-wide head defaults). The viewport tag makes phones lay a page out at
   // their own width; without it they lay it out 980px wide and shrink it. The site is always dark:

@@ -1860,6 +1860,18 @@
         }
       ],
       "types": []
+    },
+    "vHJBmpHIErvq712eD4hPAw==": {
+      "description": "The site's description, as an installed app shows it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "i18n สำหรับแอป Void: ข้อความด้วย fbtee วันที่ด้วย Temporal และการจัดรูปแบบด้วย Intl",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

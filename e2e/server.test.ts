@@ -273,6 +273,15 @@ test("the site's icons, web app manifest and robots.txt", async () => {
   const manifest = await (await get("/manifest.webmanifest")).json();
   for (const icon of manifest.icons)
     expect((await get(icon.src)).headers.get("content-type"), icon.src).toMatch(/^image\/png/);
+  // Made from the catalogs (routes/manifest.webmanifest.ts): the source language's description,
+  // and every other language's, translated, with its direction.
+  expect(manifest).toMatchObject({ lang: SOURCE, dir: "ltr" });
+  for (const l of LOCALES.filter((l) => l !== SOURCE)) {
+    const d = manifest.description_localized[l];
+    expect(d.lang, l).toBe(l);
+    expect(d.dir, l).toBe(l === "ar-EG" ? "rtl" : "ltr");
+    expect(d.value, `${l}: translated`).not.toBe(manifest.description);
+  }
   const html = await (await get("/th-TH")).text();
   for (const link of [
     'href="/favicon.ico"',
