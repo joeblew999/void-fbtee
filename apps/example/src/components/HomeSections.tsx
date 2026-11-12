@@ -1,6 +1,8 @@
 // The home page's sections after the first screen, as Void's own site (void.cloud) lays out its
 // home: how to add it, what it does (each with its facts and the docs page that explains it), and
 // a closing call. Every fact here is in the docs or the code; nothing is a claim made up for the page.
+import { routeUrl, type RouteUrl } from "void/routes";
+import type { Lang } from "void-fbtee/locales";
 import type { ReactNode } from "react";
 import { fbt } from "fbtee";
 import {
@@ -34,7 +36,7 @@ const file = (name: string) => (
 
 /** How to add it: the commands in a terminal window, beside a line on what they do. */
 export function AddIt() {
-  const { locale } = useLocale();
+  const { lang } = useLocale();
   return (
     <section className="grid items-center gap-10 border-t py-16 lg:grid-cols-[1fr_1.1fr]">
       <div>
@@ -52,7 +54,7 @@ export function AddIt() {
           </fbt>
         </p>
         <Link
-          href={`/${locale}/docs/setup`}
+          href={routeUrl(`/${lang}/docs/setup`)}
           className="group mt-6 inline-flex items-center gap-2 font-medium text-brand"
         >
           <fbt desc="Home page link to the setup page of the docs">Read the full setup</fbt>
@@ -95,17 +97,17 @@ interface Feature {
   icon: ReactNode;
   title: ReactNode;
   facts: ReactNode[];
-  /** The docs page that explains it, under /<locale>/docs/. */
-  page: string;
+  /** The docs page that explains it, built by routeUrl (checked by Void's typed routes). */
+  href: RouteUrl;
 }
 
-function features(): Feature[] {
+function features(lang: Lang): Feature[] {
   const icon = "size-5 text-brand";
   return [
     {
       icon: <Languages className={icon} aria-hidden />,
       title: <fbt desc="Home feature title: translated strings">Strings, by fbtee</fbt>,
-      page: "strings",
+      href: routeUrl(`/${lang}/docs/strings`),
       facts: [
         <fbt key="1" desc="Home feature fact about translated strings">
           Mark text with fbt in your components; each language gets a catalog file.
@@ -121,7 +123,7 @@ function features(): Feature[] {
     {
       icon: <CalendarClock className={icon} aria-hidden />,
       title: <fbt desc="Home feature title: dates and times">Dates and times, by Temporal</fbt>,
-      page: "tour",
+      href: routeUrl(`/${lang}/docs/tour`),
       facts: [
         <fbt key="1" desc="Home feature fact about times and time zones">
           Every time shown on its place's clock and on the reader's.
@@ -141,7 +143,7 @@ function features(): Feature[] {
           Numbers and the rest, by Intl
         </fbt>
       ),
-      page: "intl",
+      href: routeUrl("/[lang]/docs/intl", { params: { lang } }),
       facts: [
         <fbt key="1" desc="Home feature fact about the Intl formats">
           Numbers, money, units, lists and names from the platform's own Intl.
@@ -159,7 +161,7 @@ function features(): Feature[] {
       title: (
         <fbt desc="Home feature title: translated markdown pages">Markdown pages, translated</fbt>
       ),
-      page: "markdown-pages",
+      href: routeUrl(`/${lang}/docs/markdown-pages`),
       facts: [
         <fbt key="1" desc="Home feature fact about where translated markdown pages are">
           One copy of each page per language, under pages/ and the language.
@@ -177,7 +179,7 @@ function features(): Feature[] {
       title: (
         <fbt desc="Home feature title: machine translation">Translated by AI, checked by you</fbt>
       ),
-      page: "setup",
+      href: routeUrl(`/${lang}/docs/setup`),
       facts: [
         <fbt key="1" desc="Home feature fact about the translate command (vp run i18n:translate)">
           vp run i18n:translate hands the work to Claude Code, with void-fbtee's skill.
@@ -197,7 +199,7 @@ function features(): Feature[] {
           Every language, right to left too
         </fbt>
       ),
-      page: "strings#right-to-left-locales",
+      href: routeUrl(`/${lang}/docs/strings`, { hash: "right-to-left-locales" }),
       facts: [
         <fbt
           key="1"
@@ -218,7 +220,7 @@ function features(): Feature[] {
 
 /** What it does: six features in a ruled grid, each with its facts and the docs page on it. */
 export function Features() {
-  const { locale } = useLocale();
+  const { lang } = useLocale();
   return (
     <section className="border-t py-16">
       <h2 className="max-w-2xl text-3xl font-medium text-balance md:text-4xl">
@@ -228,8 +230,8 @@ export function Features() {
       </h2>
       {/* 1px rules between cells at any column count: the grid's colour shows through 1px gaps. */}
       <div className="mt-10 grid gap-px border-y bg-border sm:grid-cols-2 lg:grid-cols-3">
-        {features().map((f) => (
-          <article key={f.page} className="flex flex-col bg-background p-6">
+        {features(lang).map((f) => (
+          <article key={f.href} className="flex flex-col bg-background p-6">
             {f.icon}
             <h3 className="mt-4 text-lg font-medium">{f.title}</h3>
             <ul className="mt-3 flex-1 space-y-2 text-sm text-muted-foreground">
@@ -241,7 +243,7 @@ export function Features() {
               ))}
             </ul>
             <Link
-              href={`/${locale}/docs/${f.page}`}
+              href={f.href}
               className="group mt-5 inline-flex items-center gap-2 text-sm font-medium text-brand"
             >
               <fbt desc="Home page: link from a feature to the docs page about it">Read more</fbt>
@@ -271,7 +273,7 @@ export function GitHubButton({ className }: { className?: string }) {
 
 /** The close: the claim again, and the way to start. */
 export function Closing() {
-  const { locale } = useLocale();
+  const { lang } = useLocale();
   return (
     <section className="border-t pt-20 pb-12">
       <h2 className="text-4xl font-medium text-balance md:text-5xl">
@@ -279,7 +281,7 @@ export function Closing() {
       </h2>
       <div className="mt-8 flex flex-wrap gap-3">
         <Link
-          href={`/${locale}/docs/setup`}
+          href={routeUrl(`/${lang}/docs/setup`)}
           className={cn(buttonVariants({ size: "lg" }), "h-11 gap-2 px-5")}
         >
           <fbt desc="Button: start with the setup page of the docs">Get started</fbt>

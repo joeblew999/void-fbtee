@@ -8,6 +8,7 @@ import { queues } from "void/queues";
 import { revalidate } from "void/isr";
 import { localizedPaths } from "void-fbtee/middleware";
 import { z } from "zod";
+import { locales } from "@/locales";
 
 export type Props = InferProps<typeof loader>;
 
@@ -29,7 +30,8 @@ export const loader = defineHandler(async (c) => {
 });
 
 export const action = defineHandler.withValidator({
-  params: z.object({ lang: z.string() }),
+  // One of the app's languages (the middleware has already sent any other to the not-found page).
+  params: z.object({ lang: z.enum(locales) }),
   body: newEventSchema,
 })(async (c, { params, body }) => {
   const { locale } = c.get("i18n");

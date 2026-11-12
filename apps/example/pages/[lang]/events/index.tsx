@@ -1,5 +1,6 @@
 // Upcoming events, each on its own city's clock and the reader's, and a form to post one: Void's
 // useForm and Form, typed from the action in index.server.ts.
+import { routeUrl } from "void/routes";
 import { fbt } from "fbtee";
 import { Form, useForm } from "@void/react";
 import { Link, useLocale, useTimeZone } from "void-fbtee/react";
@@ -18,11 +19,11 @@ import type { Props } from "./index.server";
  * the server's zones. What it sends is neutral: the picker's "2026-04-01T20:00" and a zone name.
  */
 function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
-  const { locale } = useLocale();
+  const { lang } = useLocale();
   const form = useForm(
     "/[lang]/events",
     { title: "", description: "", local: "", time_zone: zone ?? "", seats: 20 },
-    { params: { lang: locale } },
+    { params: { lang } },
   );
   const error = (field: keyof typeof form.errors, message: React.ReactNode) =>
     form.errors[field] && (
@@ -124,7 +125,7 @@ function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
 }
 
 export default function Events({ events, zones }: Props) {
-  const { locale } = useLocale();
+  const { locale, lang } = useLocale();
   // The browser's zone once known (null before); nothing has been typed into the form yet.
   const zone = useTimeZone();
   return (
@@ -135,7 +136,10 @@ export default function Events({ events, zones }: Props) {
       <ul className="grid gap-4" data-testid="events-list">
         {events.map((e) => (
           <li key={e.id}>
-            <Link href={`/${locale}/events/${e.id}`} className="block">
+            <Link
+              href={routeUrl("/[lang]/events/[id]", { params: { lang, id: e.id } })}
+              className="block"
+            >
               <Card className="transition-colors hover:bg-muted/50">
                 <CardHeader className="flex-row items-start justify-between gap-4">
                   <CardTitle lang={e.text ? locale : e.locale} data-testid="event-title">

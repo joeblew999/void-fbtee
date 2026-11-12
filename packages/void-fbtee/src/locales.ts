@@ -6,11 +6,36 @@ export type Dir = "ltr" | "rtl";
 /** One locale as the app configures it: a BCP 47 tag, optionally with its URL segment and direction. */
 export type LocaleInput = string | { locale: string; segment?: string; dir?: Dir };
 
+/**
+ * The app's languages, as types. The app registers its list once, where it's defined, so a URL
+ * built from the page's language is checked by Void's typed routes like any other:
+ *
+ *   export const locales = ["en-US", "ar-EG", "th-TH"] as const;
+ *   declare module "void-fbtee/locales" {
+ *     interface Register { locales: typeof locales }
+ *   }
+ *
+ * The same list goes to voidFbtee({ locales }). Unregistered, a language is any string.
+ */
+// oxlint-disable-next-line no-empty-interface
+export interface Register {}
+
+type SegmentOf<L> = L extends string
+  ? L
+  : L extends { segment: infer S extends string }
+    ? S
+    : L extends { locale: infer T extends string }
+      ? T
+      : never;
+
+/** A language's URL segment ("th-TH" in /th-TH/events): one of the registered languages. */
+export type Lang = Register extends { locales: readonly (infer L)[] } ? SegmentOf<L> : string;
+
 export interface Locale {
   /** BCP 47 tag, e.g. "th-TH". Also the catalog name: i18n/translations/th-TH.json. */
   locale: string;
   /** First URL path segment for this locale, e.g. "th-TH" in /th-TH/bookings. */
-  segment: string;
+  segment: Lang;
   dir: Dir;
 }
 
@@ -35,11 +60,13 @@ export function dirOf(locale: string): Dir {
   return RTL_LANGUAGES.has(new Intl.Locale(locale).language) ? "rtl" : "ltr";
 }
 
-export function resolveLocales(sourceLocale: string, inputs: LocaleInput[]): LocaleConfig {
+export function resolveLocales(sourceLocale: string, inputs: readonly LocaleInput[]): LocaleConfig {
   const locales = inputs.map((input) => {
     const entry = typeof input === "string" ? { locale: input } : input;
     const locale = Intl.getCanonicalLocales(entry.locale)[0]!;
-    return { locale, segment: entry.segment ?? locale, dir: entry.dir ?? dirOf(locale) };
+    // The registered type of the same list (Register), so the segment is one of the app's.
+    const segment = (entry.segment ?? locale) as Lang;
+    return { locale, segment, dir: entry.dir ?? dirOf(locale) };
   });
   if (!locales.some((l) => l.locale === sourceLocale)) {
     throw new Error(`void-fbtee: sourceLocale "${sourceLocale}" is not in locales.`);

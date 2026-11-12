@@ -50,11 +50,20 @@ function snapshot(root: string, dir = root): Record<string, string> {
 test("wires void-fbtee into a Vite+ app, and a second run changes nothing", async () => {
   const root = app("vite-plus");
   const first = await init(options(root));
-  expect(first.done.length).toBe(10);
+  expect(first.done.length).toBe(11);
 
   const vite = read(root, "vite.config.ts");
   expect(vite).toContain(`import { defineConfig } from "vite-plus";`);
   expect(vite).toContain(`import voidFbtee from "void-fbtee/vite";`);
+  // The languages once, in src/locales.ts, registered for void-fbtee's types; vite.config.ts uses them.
+  const locales = read(root, "src/locales.ts");
+  expect(locales).toContain(`export const locales = ["en-US", "de-DE"] as const;`);
+  expect(locales).toContain(`declare module "void-fbtee/locales"`);
+  expect(vite).toMatch(
+    /import \{ (locales, sourceLocale|sourceLocale, locales) \} from "\.\/src\/locales";|import \{ locales \} from "\.\/src\/locales";/,
+  );
+  expect(vite).toContain("voidFbtee({");
+  expect(vite).toMatch(/voidFbtee\(\{\s*sourceLocale(: sourceLocale)?,\s*locales(: locales)?/);
   // First in plugins, before voidPlugin().
   expect(vite.indexOf("voidFbtee({")).toBeLessThan(vite.indexOf("voidPlugin()"));
   expect(vite).toMatch(/jsPlugins: \["@nkzw\/eslint-plugin-fbtee", "void-fbtee\/lint"\]/);

@@ -9,6 +9,8 @@ import type { ReactNode } from "react";
 import { fbt } from "fbtee";
 import { ChevronDown } from "lucide-react";
 import pages from "@void/md/pages";
+import { routeUrl, type RouteUrl } from "void/routes";
+import type { Lang } from "void-fbtee/locales";
 import { Link, useLocale } from "void-fbtee/react";
 import { SECTIONS } from "@/lib/intl";
 import { sectionTitle } from "@/lib/intl-titles";
@@ -17,36 +19,48 @@ import { temporalTitle } from "@/lib/temporal-titles";
 import { cn } from "@/lib/utils";
 
 interface Entry {
-  /** The page under /<locale>/docs/. */
+  /** The page under /<lang>/docs/: which entry is current. */
   slug: string;
   title: ReactNode;
+  /** Its link, built by routeUrl: checked by Void's typed routes. */
+  href: RouteUrl;
 }
 
-/** The sidebar: its groups, and the pages in each, in reading order. */
-function sidebar(title: (slug: string) => ReactNode) {
-  const entries = (...slugs: string[]): Entry[] =>
-    slugs.map((slug) => ({ slug, title: title(slug) }));
+/**
+ * The sidebar: its groups, and the pages in each, in reading order. Markdown pages are Void routes
+ * per language (`/${lang}/docs/setup`, a real page in every registered language); Intl and
+ * Temporal are pages under [lang].
+ */
+function sidebar(lang: Lang, title: (slug: string) => ReactNode) {
+  const md = (slug: string, href: RouteUrl): Entry => ({ slug, href, title: title(slug) });
   return [
     {
       name: <fbt desc="Docs sidebar group: the first page to read">Start here</fbt>,
-      entries: entries("setup"),
+      entries: [md("setup", routeUrl(`/${lang}/docs/setup`))],
     },
     {
       name: <fbt desc="Docs sidebar group: how-to pages">Guides</fbt>,
-      entries: entries("strings", "markdown-pages"),
+      entries: [
+        md("strings", routeUrl(`/${lang}/docs/strings`)),
+        md("markdown-pages", routeUrl(`/${lang}/docs/markdown-pages`)),
+      ],
     },
     {
       name: <fbt desc="Docs sidebar group: reference pages">Reference</fbt>,
       entries: [
-        { slug: "intl", title: "Intl" },
-        { slug: "temporal", title: "Temporal" },
+        { slug: "intl", title: "Intl", href: routeUrl("/[lang]/docs/intl", { params: { lang } }) },
+        {
+          slug: "temporal",
+          title: "Temporal",
+          href: routeUrl("/[lang]/docs/temporal", { params: { lang } }),
+        },
       ],
     },
     {
       name: (
         <fbt desc="Docs sidebar group: the events app that demonstrates void-fbtee">The demo</fbt>
       ),
-      entries: entries("tour"),
+      entries: [md("tour", routeUrl(`/${lang}/docs/tour`))],
     },
   ];
 }
@@ -66,22 +80,17 @@ const OUTLINES: Record<string, () => Heading[]> = {
 
 /** This language's docs: the sidebar, and the markdown page at the current path (if it is one). */
 export function useDocs() {
-  const { locale, path } = useLocale();
-  const md = (slug: string) => pages.find((p) => p.path === `/${locale}/docs/${slug}`);
-  const groups = sidebar((slug) => md(slug)?.title ?? slug);
-  const href = (slug: string) => `/${locale}/docs/${slug}` as const;
+  const { lang, path } = useLocale();
+  const md = (slug: string) => pages.find((p) => p.path === `/${lang}/docs/${slug}`);
+  const groups = sidebar(lang, (slug) => md(slug)?.title ?? slug);
   const current = path.replace(/^\/docs\/?/, "");
   const page = md(current);
   const headings: readonly Heading[] | undefined = page?.headings ?? OUTLINES[current]?.();
-  return { groups, href, current, page, headings };
+  return { groups, current, page, headings };
 }
 
 /** The sidebar's groups and links. */
-function Sidebar({
-  groups,
-  href,
-  current,
-}: Pick<ReturnType<typeof useDocs>, "groups" | "href" | "current">) {
+function Sidebar({ groups, current }: Pick<ReturnType<typeof useDocs>, "groups" | "current">) {
   return (
     <div className="space-y-6">
       {groups.map((g, i) => (
@@ -91,7 +100,7 @@ function Sidebar({
             {g.entries.map((e) => (
               <li key={e.slug}>
                 <Link
-                  href={href(e.slug)}
+                  href={e.href}
                   aria-current={e.slug === current ? "page" : undefined}
                   className={cn(
                     "block py-1 text-sm transition-colors duration-150 hover:text-foreground",
@@ -135,11 +144,7 @@ function Outline({ headings }: { headings: readonly Heading[] }) {
 }
 
 /** The previous and next pages in the sidebar's order. */
-function PrevNext({
-  groups,
-  href,
-  current,
-}: Pick<ReturnType<typeof useDocs>, "groups" | "href" | "current">) {
+function PrevNext({ groups, current }: Pick<ReturnType<typeof useDocs>, "groups" | "current">) {
   const all = groups.flatMap((g) => g.entries);
   const i = all.findIndex((e) => e.slug === current);
   if (i < 0) return null;
@@ -148,7 +153,7 @@ function PrevNext({
   return (
     <nav className="mt-16 grid gap-4 border-t pt-8 sm:grid-cols-2">
       {prev ? (
-        <Link href={href(prev.slug)} className={box} data-testid="docs-prev">
+        <Link href={prev.href} className={box} data-testid="docs-prev">
           <span className="text-xs text-muted-foreground">
             <fbt desc="Docs: label on the link to the previous page">Previous page</fbt>
           </span>
@@ -158,7 +163,7 @@ function PrevNext({
         <span />
       )}
       {next && (
-        <Link href={href(next.slug)} className={cn(box, "text-end")} data-testid="docs-next">
+        <Link href={next.href} className={cn(box, "text-end")} data-testid="docs-next">
           <span className="text-xs text-muted-foreground">
             <fbt desc="Docs: label on the link to the next page">Next page</fbt>
           </span>

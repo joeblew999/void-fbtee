@@ -41,7 +41,7 @@ export interface VoidFbteeOptions {
   /** The language the app's <fbt> strings are written in, e.g. "en-US". */
   sourceLocale: string;
   /** Every locale the app serves, the source locale included. */
-  locales: LocaleInput[];
+  locales: readonly LocaleInput[];
   /** Folder of editable translation files, one <locale>.json each. Default "i18n/translations". */
   translations?: string;
   /** Source files to collect strings from. */

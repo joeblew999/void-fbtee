@@ -1,6 +1,7 @@
 // One event: its title and description in the language the organiser wrote them in (marked with
 // lang, so the browser and screen readers use the right one), its start on both clocks, the seats
 // left (live: every open page sees a booking), and booking a seat with Void's useForm.
+import { routeUrl } from "void/routes";
 import { Fragment, useEffect, useState } from "react";
 import { fbt } from "fbtee";
 import { Form, useForm, useRouter } from "@void/react";
@@ -47,11 +48,11 @@ function useLiveEvent(id: string, left: number) {
 
 /** Booking, in the reader's zone (Event remounts it once the browser knows it). */
 function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut: boolean }) {
-  const { locale } = useLocale();
+  const { lang } = useLocale();
   const form = useForm(
     "/[lang]/events/[id]",
     { name: "", email: "", time_zone: zone ?? "" },
-    { params: { lang: locale, id } },
+    { params: { lang, id } },
   );
   if (form.wasSuccessful)
     return (
@@ -156,24 +157,27 @@ function Stored({ event }: { event: Props["event"] }) {
 }
 
 export default function Event({ event, text, left }: Props) {
-  const { locale } = useLocale();
+  const { locale, lang } = useLocale();
   // The browser's zone once known (null before); nothing has been typed into the form yet.
   const zone = useTimeZone();
   const seatsLeft = useLiveEvent(event.id, left);
   // In the page's language once translated; until then, as written.
   const shown = text ?? event;
-  const lang = text ? locale : event.locale;
+  const textLang = text ? locale : event.locale;
   const written = new Intl.DisplayNames(locale, { type: "language" }).of(event.locale);
   return (
     <article className="grid gap-6">
-      <Link href={`/${locale}/events`} className="text-muted-foreground text-sm">
+      <Link
+        href={routeUrl("/[lang]/events", { params: { lang } })}
+        className="text-muted-foreground text-sm"
+      >
         <fbt desc="Link back to the list of events">All events</fbt>
       </Link>
-      <h1 className="text-3xl font-medium" lang={lang} data-testid="event-title">
+      <h1 className="text-3xl font-medium" lang={textLang} data-testid="event-title">
         {shown.title}
       </h1>
       <EventTime startsAt={event.starts_at} />
-      <p className="max-w-prose" lang={lang} data-testid="event-description">
+      <p className="max-w-prose" lang={textLang} data-testid="event-description">
         {shown.description}
       </p>
       {text && (

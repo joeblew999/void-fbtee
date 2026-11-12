@@ -53,6 +53,22 @@ test("the server never shows a stand-in for the reader's own time: those lines c
   }
 });
 
+test("a page under a language the app doesn't have is not found", async () => {
+  for (const path of ["/xx-XX", "/xx-XX/events", "/xx-XX/docs/intl", "/no-such-page"])
+    expect((await get(path, { redirect: "manual" })).status, path).toBe(404);
+});
+
+test("booking an event that doesn't exist is not found, not sold out", async () => {
+  const res = await get(`/${SOURCE}/events/${crypto.randomUUID()}`, {
+    method: "POST",
+    redirect: "manual",
+    // A page action from the page itself (Void refuses cross-origin ones).
+    headers: { origin: url("prod"), "content-type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ name: "A", email: "a@example.com", time_zone: "Asia/Bangkok" }),
+  });
+  expect(res.status).toBe(404);
+});
+
 test("every page has a title and a description, in its own language", async () => {
   const pages = ["", "/events", "/docs", "/docs/intl", "/docs/temporal", "/docs/setup"];
   pages.push("/docs/strings", "/docs/markdown-pages", "/docs/tour");
@@ -74,23 +90,28 @@ test("every page has a title and a description, in its own language", async () =
   }
 });
 
-// Typed routes can't catch a wrong link here: with pages under [lang], Void's route types include
-// `/${string}`, which TypeScript matches to any path. So every link on the main pages is fetched.
-test("every link on the main pages leads to a page", async () => {
+// Void's typed routes check every link the example builds with routeUrl. This checks the result at
+// run time too, and the one link built at run time (the language switcher): every page reachable
+// from a language's home page, following its links, answers 200.
+test("every link, on every page reachable in each language, leads to a page", async () => {
   const broken: string[] = [];
-  for (const l of LOCALES)
-    for (const start of [`/${l}`, `/${l}/docs`, `/${l}/events`]) {
-      const html = await (await get(start)).text();
-      const links = new Set(
-        [...html.matchAll(/href="(\/[^"#]*)/g)]
-          .map((m) => m[1]!)
-          .filter((h) => !h.startsWith("//") && !/\.[a-z0-9]+$/i.test(h)),
-      );
-      for (const link of links) {
-        const res = await get(link, { redirect: "manual" });
-        if (res.status !== 200) broken.push(`${start} → ${link}: ${res.status}`);
+  for (const l of LOCALES) {
+    const seen = new Set([`/${l}`]);
+    const queue = [`/${l}`];
+    while (queue.length) {
+      const page = queue.shift()!;
+      const html = await (await get(page)).text();
+      for (const [, link] of html.matchAll(/href="(\/[^"#?]*)/g)) {
+        if (link!.startsWith("//") || /\.[a-z0-9]+$/i.test(link!) || seen.has(link!)) continue;
+        seen.add(link!);
+        const res = await get(link!, { redirect: "manual" });
+        if (res.status !== 200) broken.push(`${page} → ${link}: ${res.status}`);
+        // Follow this language's own pages; the other languages' are reached from their home.
+        else if (link === `/${l}` || link!.startsWith(`/${l}/`)) queue.push(link!);
       }
     }
+    expect(seen.size, l).toBeGreaterThan(10);
+  }
   expect(broken).toEqual([]);
 });
 

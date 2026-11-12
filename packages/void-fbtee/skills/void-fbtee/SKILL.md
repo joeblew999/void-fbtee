@@ -78,6 +78,12 @@ The page's language: `useLocale()` in components; `c.get("i18n")` in loaders and
 `{ locale, dir, now, path }`. After a change, `revalidate({ paths: localizedPaths("/events") })`
 refreshes the page in every language.
 
+Links are built with Void's `routeUrl()` from `void/routes` and the page's `lang` (from
+`useLocale()`), so Void's typed routes check each one: `routeUrl("/[lang]/events", { params: { lang } })`
+for a page under `pages/[lang]/`, and ``routeUrl(`/${lang}/docs/tour`)`` for a markdown page (a
+route per language, a real page in every registered language). A link written as a plain string
+isn't checked. A language Void doesn't have gets the not-found page from the middleware.
+
 ## Markdown pages
 
 Pages under `pages/<source locale>/` have a copy per locale at the same path under
@@ -109,8 +115,10 @@ itself. Report one line per file: done, or what's left and why.
 If check reports `setup:` problems, `void-fbtee init` fixes most of them (it only adds what's
 missing; where it can't safely edit a file it prints the line to add). The pieces:
 
+- `src/locales.ts`: the languages once (`export const locales = [...] as const`) and their type
+  registered (`declare module "void-fbtee/locales" { interface Register { locales: typeof locales } }`).
 - `voidFbtee({ sourceLocale, locales })` from `void-fbtee/vite`, first in `plugins` in
-  `vite.config.ts`.
+  `vite.config.ts`. Its `locales` is imported from `src/locales.ts`.
 - `middleware/99.i18n.ts`: `export { default } from "void-fbtee/middleware";`. The 99 makes Void run
   it after the app's own middleware (01-98), since it adds to the shared and head data they set.
 - `pages/layout.tsx` wraps its children in `<I18nProvider>` from `void-fbtee/react`.

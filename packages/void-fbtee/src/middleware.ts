@@ -9,7 +9,7 @@
 // - fbtee's per-request state is held by fbtee itself in AsyncLocalStorage (runWithFbtee), so
 //   text rendered after the shell streams in the right language too. It gets every catalog, so
 //   fbtee falls back per message (de-AT -> de -> source text) as its README describes.
-// - c.get("i18n") and shared.i18n = { locale, dir, now, path }: the browser gets the same "now" the server rendered
+// - c.get("i18n") and shared.i18n = { locale, lang, dir, now, path }: the browser gets the same "now" the server rendered
 //   with; path is the page without its locale prefix, for links to it in other languages.
 // - <html lang dir>, hreflang alternates (plus x-default, the source locale) and <meta name="void-fbtee"> (the same i18n data, for
 //   islands) go into headDefaults.
@@ -18,11 +18,14 @@ import { runWithFbtee } from "fbtee/server";
 import { Temporal } from "temporal-polyfill";
 import config from "virtual:void-fbtee/config";
 import catalogs from "virtual:void-fbtee/catalogs";
-import { localeFromPath, META_NAME, type Dir } from "./locales";
+import { localeFromPath, META_NAME, type Dir, type Lang } from "./locales";
 import { allTranslations } from "./runtime";
 
 export interface SharedI18n {
   locale: string;
+  /** The language's URL segment, typed as one of the app's (Register in void-fbtee/locales): the
+   * `lang` of `routeUrl("/[lang]/events", { params: { lang } })`, and of `/${lang}/docs/tour`. */
+  lang: Lang;
   dir: Dir;
   /** The server's "now" for this response, as an ISO instant. */
   now: string;
@@ -45,8 +48,7 @@ declare module "void" {
  * "/th-TH/events", …]. For anything that acts on all of them, such as clearing Void's page cache
  * after a change (`revalidate({ paths: localizedPaths(…) })` from void/isr).
  */
-export function localizedPaths<P extends `/${string}`>(path: P): `/${string}${P}`[] {
-  // Typed as the page's path under some language, so Void's typed routes accept it as it is.
+export function localizedPaths<P extends `/${string}`>(path: P): `/${Lang}${P}`[] {
   return config.locales.map((l) => `/${l.segment}${path}` as const);
 }
 
@@ -72,6 +74,7 @@ export default defineMiddleware(async (c, next) => {
   const rest = found ? path.slice(found.segment.length + 1) : path;
   const i18n: SharedI18n = {
     locale: current.locale,
+    lang: current.segment,
     dir: current.dir,
     now: Temporal.Now.instant().toString(),
     path: rest,
@@ -99,7 +102,10 @@ export default defineMiddleware(async (c, next) => {
   // No catalogs for light requests, but still inside fbtee state, so a not-found page with <fbt> renders.
   const { sourceLocale, fallbackLocales } = config;
   const translations = light ? {} : await allTranslations(catalogs);
+  // A page under no language of the app's (/xx-XX/events, /nope) doesn't exist: Void's not-found
+  // page, in the source language, rather than a copy of the page under a made-up language.
+  // c.notFound() runs the app's not-found handler (Void's docs/guide/pages-routing/errors.md).
   return runWithFbtee({ locale: current.locale, sourceLocale, fallbackLocales, translations }, () =>
-    next(),
+    found || light ? next() : c.notFound(),
   );
 });

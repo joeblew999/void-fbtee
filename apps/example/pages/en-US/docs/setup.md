@@ -9,6 +9,9 @@ description: "What void-fbtee init adds to a Void app, piece by piece, for when 
 it can't safely edit a file, it prints the line to add. These are the pieces, for when
 `void-fbtee check` reports a `setup:` problem.
 
+- **Languages:** `src/locales.ts`, with the list once (`export const locales = [...] as const`)
+  and its type registered (`declare module "void-fbtee/locales"`), so a link built from the page's
+  language is checked by Void's typed routes. `vite.config.ts` imports it.
 - **Vite plugin:** `voidFbtee({ sourceLocale, locales })` from `void-fbtee/vite`, first in
   `plugins` in `vite.config.ts` (before `voidPlugin()`).
 - **Middleware:** `middleware/99.i18n.ts` with `export { default } from "void-fbtee/middleware";`.

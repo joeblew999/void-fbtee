@@ -3,42 +3,51 @@
 // no JavaScript, so it works on markdown pages too. One row on desktop; on a phone the
 // page links move to a second row that scrolls sideways.
 import { fbt } from "fbtee";
+import { routeUrl } from "void/routes";
 import { Formatted, Link, useLocale, useLocales } from "void-fbtee/react";
 import { buttonVariants } from "@/components/ui/button";
 import { REPO } from "@/lib/project";
 import { cn } from "@/lib/utils";
 
-const PAGES = ["", "/events", "/docs"] as const;
+// The pages, as Void routes: each link is built by routeUrl, so a route that doesn't exist fails
+// the type check.
+const PAGES = ["/[lang]", "/[lang]/events", "/[lang]/docs"] as const;
+// The part after the language, to tell which page is current ("" for the home page).
+const rest = (page: (typeof PAGES)[number]) => page.slice("/[lang]".length);
 
 function label(page: (typeof PAGES)[number]) {
   switch (page) {
-    case "":
+    case "/[lang]":
       return <fbt desc="Navigation: the home page">Home</fbt>;
-    case "/events":
+    case "/[lang]/events":
       return <fbt desc="Navigation: the demo, the events app people post and book in">Demo</fbt>;
-    case "/docs":
+    case "/[lang]/docs":
       return <fbt desc="Navigation: the documentation">Docs</fbt>;
   }
 }
 
 // nav-home, nav-events (the demo), nav-docs.
-const testId = (page: string) => `nav-${page.slice(1) || "home"}`;
+const testId = (page: (typeof PAGES)[number]) => `nav-${rest(page).slice(1) || "home"}`;
 
 export default function SiteHeader() {
-  const { locale, path } = useLocale();
+  const { locale, lang, path } = useLocale();
   const locales = useLocales();
-  const current = PAGES.findLast((p) => (p === "" ? path === "" : path.startsWith(p))) ?? "";
+  const current =
+    PAGES.findLast((p) => (rest(p) === "" ? path === "" : path.startsWith(rest(p)))) ?? "/[lang]";
   return (
     <header className="sticky top-0 z-40 border-b bg-background">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 px-4">
-        <Link href={`/${locale}`} className="flex h-14 items-center pe-2 font-semibold">
+        <Link
+          href={routeUrl("/[lang]", { params: { lang } })}
+          className="flex h-14 items-center pe-2 font-semibold"
+        >
           void-fbtee
         </Link>
         <nav className="order-last -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto px-4 pb-2 md:order-none md:mx-0 md:w-auto md:overflow-visible md:p-0">
           {PAGES.map((page) => (
             <Link
               key={page}
-              href={`/${locale}${page}`}
+              href={routeUrl(page, { params: { lang } })}
               aria-current={page === current ? "page" : undefined}
               className={cn(
                 buttonVariants({ variant: page === current ? "secondary" : "ghost", size: "sm" }),
@@ -54,6 +63,9 @@ export default function SiteHeader() {
           {locales.map((l) => (
             <Link
               key={l.locale}
+              // This page in another language: the one link whose page is known only at run time,
+              // so Void's types can't check it. Every [lang] page exists in every language, and
+              // void-fbtee check fails if a markdown page lacks a copy in one.
               href={`/${l.segment}${path}`}
               hrefLang={l.locale}
               lang={l.locale}

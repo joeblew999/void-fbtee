@@ -7,7 +7,7 @@ import { Link } from "void-fbtee/react";
 import { useDocs } from "@/components/DocsLayout";
 
 export default function DocsIndex() {
-  const { groups, href } = useDocs();
+  const { groups } = useDocs();
   return (
     <div>
       <h1 className="text-4xl font-medium" data-testid="docs-title">
@@ -24,7 +24,7 @@ export default function DocsIndex() {
               {g.entries.map((e) => (
                 <li key={e.slug}>
                   <Link
-                    href={href(e.slug)}
+                    href={e.href}
                     className="group inline-flex items-center gap-2 text-muted-foreground transition-colors duration-150 hover:text-foreground"
                   >
                     {e.title}

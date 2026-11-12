@@ -9,7 +9,8 @@ import { eventTopic, live } from "../../../src/live";
 
 export type Props = InferProps<typeof loader>;
 
-// The page's URL parameter: /<lang>/events/<id>.
+// The page's URL parameter: /<lang>/events/<id>. Whether it's an event is the database's answer:
+// an id that isn't one gets the not-found page (the loader) or a 404 (booking).
 const params = z.object({ id: z.string() });
 
 const booked = (id: string) =>
@@ -43,7 +44,11 @@ export const action = defineHandler.withValidator({ params, body: bookSchema })(
     SELECT ${crypto.randomUUID()}, ${id}, ${body.name}, ${body.email}, ${locale}, ${body.time_zone}
     WHERE (SELECT COUNT(*) FROM ${bookings} WHERE event_id = ${id})
         < (SELECT seats FROM ${events} WHERE id = ${id})`);
-  if (!result.meta.changes) return c.json({ message: "sold out" }, 409);
+  if (!result.meta.changes) {
+    // Nothing went in: the event is full, or there's no such event (the seats compared with nothing).
+    const [found] = await db.select({ id: events.id }).from(events).where(eq(events.id, id));
+    return found ? c.json({ message: "sold out" }, 409) : c.notFound();
+  }
   const [event] = await db.select({ seats: events.seats }).from(events).where(eq(events.id, id));
   const left = event.seats - (await booked(id));
   // This event's page, in every language (the list shows each event's seats, not what's left).

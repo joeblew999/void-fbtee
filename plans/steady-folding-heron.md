@@ -1,6 +1,7 @@
 # plans/steady-folding-heron.md: the example and the package, the Void way
 
-Status: reopened 2026-11-12: items 5 and 7 were hollow (see each). The rest is done. The upgrade
+Status: done 2026-11-12. Items 5 and 7 were first ticked when they checked nothing; reopened and
+done properly (see each). The upgrade
 and what needs Void 1.8.0 moved to `plans/brisk-copper-wren.md`. Written and approved 2026-11-12.
 
 ## Context
@@ -58,7 +59,7 @@ docs. One commit per item; pushed together when you say.
 
 ### B. Types: the casts go, nothing on screen changes
 
-5. [ ] **Typed links: every link checked by the type checker.** `void.config.ts` has `routing.typedRoutes: true`, yet about
+5. [x] **Typed links: every link checked by the type checker.** `void.config.ts` has `routing.typedRoutes: true`, yet about
        15 links were cast `as never` (`SiteHeader.tsx`, `SiteFooter.tsx`, `DocsLayout.tsx`,
        `HomeSections.tsx`, `pages/[lang]/index.tsx`, `docs/index.island.tsx`) and cache paths
        `as RouteUrl[]` (`events/index.server.ts:47`, `events/[id].server.ts:46`, `queues/translate.ts:64`).
@@ -80,6 +81,20 @@ docs. One commit per item; pushed together when you say.
        routes per language (`/en-US/docs/tour`), not under `[lang]`, so their links need their own
        typed way, worked out from Void's types. The "every link leads to a page" test stays, as a
        check at run time beside the types, not instead of them.
+       Done, by structure rather than a helper: the language is a type. Void's own docs show both
+       shapes this app has: `[lang]` as a route parameter for pages built from code
+       (`docs/guide/server-routing.md`), and a folder per language for written pages
+       (`docs/guide/edge/rewrites.md`). What was wrong was the language typed as `string`. The app
+       declares its languages once, in `src/locales.ts`, and registers their type with the package
+       (`declare module "void-fbtee/locales" { interface Register { ... } }`, the pattern Void uses for
+       `CloudContextVariables`); `vite.config.ts` gives the same list to `voidFbtee()`. Then
+       `useLocale().lang` is `"en-US" | "ar-EG" | "th-TH"`, and every link is a direct `routeUrl()`
+       call: `routeUrl("/[lang]/events", { params: { lang } })`, ``routeUrl(`/${lang}/docs/tour`)``.
+       Proved on the real code: a missing app page, a missing docs page, and a link without its
+       language each fail the type check; a docs page missing in one language fails too. The one
+       link built at run time is the language switcher (this page in another language); the
+       comment on it says why it's safe. `init` now writes `src/locales.ts` and imports it in
+       `vite.config.ts`. The link test now crawls every page reachable in each language.
        Backed by: playgrounds write typed links with no casts (`react-pages/pages/users/index.tsx:27`).
 
 6. [x] **The page's language read without casts.** `c.get("shared" as never)` in
@@ -95,12 +110,20 @@ docs. One commit per item; pushed together when you say.
        Backed by: Void `docs/guide/type-safety.md` "Context Variables",
        `docs/guide/pages-routing/layouts.md` "Shared Data".
 
-7. [ ] **Route parameters validated.** `c.req.param("id")!` and `c.req.param("lang")!` in
+7. [x] **Route parameters validated.** `c.req.param("id")!` and `c.req.param("lang")!` in
        `events/[id].server.ts:21,33` and `events/index.server.ts:50` become `withValidator({ params })`.
        Done: zod, as the schema uses; Void validates `c.req.param()`, what the code read before
        (`packages/void/src/runtime/validator.ts:212-219`, ee4eaa7).
        Reopened: `z.string()` only checks they're strings, which they always are. `lang` must be
        one of the app's languages and `id` an event's id format.
+       Done, after finding the real bug: `/xx-XX/events` answered 200, an English copy under a
+       made-up language. Void has no constraint on a route parameter, and a failed validation on a
+       page becomes form errors (422, `packages/void/src/pages/protocol.ts:954-985`), so a URL that
+       isn't a page is the middleware's to refuse: any page under no language of the app's gets
+       `c.notFound()` (Void's `docs/guide/pages-routing/errors.md`). Behind it, `lang` is
+       `z.enum(locales)`, typed as the app's languages. An event id is checked by the database:
+       the page already answered 404, and booking an unknown event answered 409 "sold out"; it's
+       now 404. Tests for both.
        Backed by: playground `spa/routes/api/users/[id].ts`.
 
 ### C. Feature

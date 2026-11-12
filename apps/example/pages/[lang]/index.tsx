@@ -1,6 +1,7 @@
 // The home page: the claim, the fbtee code of one line beside what it renders on this page, and
 // the example's pages. Translated strings with fbtee (a plural, a list in a sentence), and a line
 // that arrives after the shell (a defer() read), which must render in the page's language too.
+import { routeUrl } from "void/routes";
 import { Suspense, use, useState } from "react";
 import { fbt, list } from "fbtee";
 import { ArrowRight } from "lucide-react";
@@ -171,7 +172,7 @@ function CodeWindow({ count, late }: Props) {
 
 /** The first screen: the claim and the way into the demo, beside the code window. */
 function Hero(props: Props) {
-  const { locale } = useLocale();
+  const { lang } = useLocale();
   const names = useLocales().map((l) => languageName(l.locale));
   return (
     <section className="grid items-center gap-12 py-10 md:py-20 lg:grid-cols-[1fr_1.1fr]">
@@ -193,7 +194,7 @@ function Hero(props: Props) {
         </p>
         <div className="mt-10 flex flex-wrap gap-3">
           <Link
-            href={`/${locale}/events`}
+            href={routeUrl("/[lang]/events", { params: { lang } })}
             className={cn(buttonVariants({ size: "lg" }), "h-11 gap-2 px-5")}
             data-testid="try-demo"
           >
@@ -203,7 +204,7 @@ function Hero(props: Props) {
             <ArrowRight className="rtl:-scale-x-100" aria-hidden />
           </Link>
           <Link
-            href={`/${locale}/docs`}
+            href={routeUrl("/[lang]/docs", { params: { lang } })}
             className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 px-5")}
           >
             <fbt desc="Navigation: the documentation">Docs</fbt>
@@ -218,10 +219,10 @@ function Hero(props: Props) {
 
 /** The example's other pages, in a ruled grid: what each is, and the way in. */
 function Pages() {
-  const { locale } = useLocale();
+  const { lang } = useLocale();
   const pages = [
     {
-      href: `/${locale}/events` as const,
+      href: routeUrl("/[lang]/events", { params: { lang } }),
       title: <fbt desc="Home card title: the events app">Events</fbt>,
       text: (
         <fbt desc="Home card text: what the events app shows">
@@ -230,7 +231,7 @@ function Pages() {
       ),
     },
     {
-      href: `/${locale}/docs/intl` as const,
+      href: routeUrl("/[lang]/docs/intl", { params: { lang } }),
       title: "Intl",
       text: (
         <fbt desc="Home card text: what the Intl page shows">
@@ -239,7 +240,7 @@ function Pages() {
       ),
     },
     {
-      href: `/${locale}/docs` as const,
+      href: routeUrl("/[lang]/docs", { params: { lang } }),
       title: <fbt desc="Home card title: the documentation">Docs</fbt>,
       text: (
         <fbt desc="Home card text: what the docs show">

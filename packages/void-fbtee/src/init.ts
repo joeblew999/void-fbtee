@@ -13,7 +13,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { dirname, join, relative } from "node:path";
-import { generateCode, loadFile, type ProxifiedModule } from "magicast";
+import { builders, generateCode, loadFile, type ProxifiedModule } from "magicast";
 import { addVitePlugin, getDefaultExportOptions } from "magicast/helpers";
 import { DEFAULT_TRANSLATIONS } from "./catalogs";
 import { packageManager } from "./translate";
@@ -49,6 +49,27 @@ import { I18nProvider } from "void-fbtee/react";
 
 export default function Layout({ children }: { children: ReactNode }) {
   return <I18nProvider>{children}</I18nProvider>;
+}
+`;
+
+/**
+ * The app's languages, once: vite.config.ts gives this list to voidFbtee(), and its type to
+ * void-fbtee's (Register), so a link built from the page's language is checked by Void's typed
+ * routes.
+ */
+const localesFile = (
+  sourceLocale: string,
+  locales: string[],
+) => `// The app's languages, once: voidFbtee() in vite.config.ts gets this list, and the type below gives
+// the same list to void-fbtee's types, so a link built from the page's language is checked by Void's
+// typed routes (\`/\${lang}/docs/tour\` must be a real page in every language).
+export const sourceLocale = ${JSON.stringify(sourceLocale)};
+export const locales = [${locales.map((l) => JSON.stringify(l)).join(", ")}] as const;
+
+declare module "void-fbtee/locales" {
+  interface Register {
+    locales: typeof locales;
+  }
 }
 `;
 
@@ -165,7 +186,8 @@ export async function init(o: InitOptions): Promise<InitResult> {
     );
   }
 
-  // 5. vite.config.ts: the plugin first; on Vite+ the lint plugins (in the workspace's root config).
+  // 5. vite.config.ts: the plugin first, with the languages from src/locales.ts (made here if
+  // there's none); on Vite+ the lint plugins (in the workspace's root config).
   const viteConfig = ["vite.config.ts", "vite.config.mts", "vite.config.js"].find((f) =>
     existsSync(at(f)),
   );
@@ -177,17 +199,33 @@ export async function init(o: InitOptions): Promise<InitResult> {
     const mod = await loadFile(at(viteConfig));
     const code = generateCode(mod).code;
     let changed = false;
-    if (!code.includes("void-fbtee/vite")) {
+    const ownLocales =
+      existsSync(at("src/locales.ts")) &&
+      !readFileSync(at("src/locales.ts"), "utf8").includes("void-fbtee/locales");
+    if (ownLocales && !code.includes("void-fbtee/vite"))
+      todo.push(
+        `src/locales.ts is the app's own: add voidFbtee({ sourceLocale, locales }) from "void-fbtee/vite" first in ${viteConfig}'s plugins, with the languages declared once and registered as in void-fbtee's SKILL.md`,
+      );
+    else if (!code.includes("void-fbtee/vite")) {
+      if (!existsSync(at("src/locales.ts"))) {
+        mkdirSync(at("src"), { recursive: true });
+        writeFileSync(at("src/locales.ts"), localesFile(o.sourceLocale, o.locales));
+        done.push(
+          `src/locales.ts: created, with the languages (${o.locales.join(", ")}) and their type`,
+        );
+      }
+      mod.imports.$append({ from: "./src/locales", imported: "locales" });
+      mod.imports.$append({ from: "./src/locales", imported: "sourceLocale" });
       addVitePlugin(mod, {
         from: "void-fbtee/vite",
         imported: "default",
         constructor: "voidFbtee",
-        options: { sourceLocale: o.sourceLocale, locales: o.locales },
+        options: { sourceLocale: builders.raw("sourceLocale"), locales: builders.raw("locales") },
         index: 0,
       });
       changed = true;
       done.push(
-        `${viteConfig}: added voidFbtee({ sourceLocale: "${o.sourceLocale}", locales: [${o.locales.map((l) => `"${l}"`).join(", ")}] }) first in plugins`,
+        `${viteConfig}: added voidFbtee({ sourceLocale, locales }) first in plugins, from src/locales.ts`,
       );
     }
     if (vitePlus && wsRoot) {
