@@ -22,21 +22,44 @@ the whole; this is the whole, to approve and do as one piece of work.
 | manifest `name`, `short_name`, `description`, `lang`, `dir`     | per language                                             | English only                                        |
 | icons, `theme-color`, `robots.txt`                              | `void.config.ts`, `public/`                              | there                                               |
 
-## What Void allows (checked in Void 1.8.0's source and docs, 2026-11-12)
+## What Void and Vite+ give (full sweep, 2026-11-12)
 
-- **Precedence:** page `head()` > middleware `headDefaults` > `void.config.ts` `head`
-  (`packages/void/src/pages/head.ts`, `resolveHead`). The middleware runs before the page's head,
-  so it can't see the page's title: tags built from the title belong to the page.
-- **Void's own example puts `og:title` in the page's `head()`** beside the description
-  (`docs/guide/pages-routing/head.md`, "Page titles and metadata").
-- **Meta tags are de-duplicated by `property`/`name`** (`resolveHead`, lines 43–56): a repeated
-  property such as `og:locale:alternate` keeps only the last. A Void limitation, worth reporting.
-- **Markdown pages without a `.server.ts`:** Void makes their head from frontmatter `title` and
-  `description` only (`packages/void/src/router/compile.ts` 1123–1135). A markdown page gets other
-  tags only through a companion `.server.ts` with `head()` (supported: markdown.md, "File
-  Structure"), or through a change in Void.
-- **No Open Graph image tool in Void yet:** Satori-based `void/og` is a community request
-  (voidzero-dev/void#442) with an open, unmerged pull request (#688), checked 2026-11-12.
+Every page of Void 1.8.0's docs (106 files under `docs/`) searched for sitemap, robots, llms,
+JSON-LD, noindex, favicon, manifest, `og:`, twitter, canonical, hreflang, i18n, locale, `public/`,
+`_headers`, `titleTemplate`, `headDefaults`, `script`; the matches read; `void gen`'s generators
+and Void's packages' source searched too; and Vite+'s docs (`node_modules/vite-plus/docs`).
+
+**Void gives (and this work uses):**
+
+- **One head system, three layers** (`docs/guide/pages-routing/head.md`): `head` in
+  `void.config.ts` (site-wide: the icon links, `theme-color`, `color-scheme`), `headDefaults` in
+  middleware (void-fbtee: `lang`/`dir`, hreflang, canonical, `og:locale`), and the page's
+  `head()` or, for markdown, its frontmatter. Page wins; `link` and `script` are concatenated.
+- **Meta tags de-duplicate by `name`/`property`**, documented in the head guide's precedence
+  table: by design, so `og:locale:alternate` (one tag per other language) can't be expressed. A
+  feature request to Void at most, not a bug report.
+- **`script` entries take `innerHTML` and any attribute**: structured data goes in as
+  `{ type: "application/ld+json", innerHTML: JSON.stringify(…) }`, the Void way. Scripts are
+  rendered on the server only (not re-applied on client-side navigation), which is what search
+  engines read.
+- **Titles, meta tags and links update on client-side navigation**, so the Open Graph tags follow
+  the page.
+- **Markdown pages:** frontmatter `title` and `description` only (`head.md`, "Markdown pages";
+  `packages/void/src/router/compile.ts` 1123–1135).
+- **`public/`:** files served as they are, cached until the next deploy
+  (`docs/guide/edge/static-assets.md`); with middleware, application code runs first
+  ("Navigation and middleware"), which is why void-fbtee hands unknown one-segment paths to
+  Void's not-found handler. `.webmanifest` is served as `application/manifest+json`
+  (`packages/edge/src/static.ts`).
+- **Not-found and error pages** (`_not-found`, `_error`, `docs/guide/pages-routing/errors.md`)
+  answer with their real status (404, 500), so search engines don't index them: no `noindex`
+  needed.
+
+**Void doesn't give:** icon or manifest generation, Open Graph or Twitter tag helpers, preview
+pictures (only the community request #442 below), structured data helpers, a sitemap. `void gen`
+makes models, migrations, routes, middleware, SSR, crons and queues only.
+
+**Vite+ gives nothing here:** it's the build and tool layer; `public/` is Vite's, served by Void.
 
 ## Answered (2026-11-12)
 
@@ -77,14 +100,16 @@ the whole; this is the whole, to approve and do as one piece of work.
    rendered and look right (item 3 above).
 3. **Manifest per language:** one per language, linked from that language's pages, name and
    description through the same catalogs.
-4. **`og:locale:alternate`:** report Void's de-duplication (with the user's OK), as #802 was.
+4. **`og:locale:alternate`:** Void's de-duplication is documented, by design: at most a feature
+   request to Void, with the user's OK.
 
 ## Also in this work (left out of the first draft)
 
-- **Structured data** (JSON-LD, schema.org): `WebSite` with `inLanguage` on every page, `Event`
-  for each event page (name, start with its time zone, place), so search can show events.
-- **`noindex`** on the not-found and error pages, and those pages translated
-  (`plans/brisk-copper-wren.md` item 3, done together).
+- **Structured data** (JSON-LD, schema.org) through head `script` entries: `WebSite` with
+  `inLanguage` on every page, `Event` for each event page (name, start with its time zone,
+  place), so search can show events.
+- **The not-found and error pages translated** (`plans/brisk-copper-wren.md` item 3, done
+  together; no `noindex`, their 404/500 status keeps them out of search).
 - **`color-scheme`** (`dark`), and `apple-mobile-web-app-title`.
 - **Offline (service worker)**: a separate trial of vite-plugin-pwa with Void, reported before
   anything is added; not done blind.
