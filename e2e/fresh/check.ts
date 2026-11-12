@@ -226,11 +226,12 @@ function strict(dir: string, pm: Pm) {
   const ts7 = ["utils", "typescript-estree", "project-service", "tsconfig-utils"].map(
     (p) => `    "@typescript-eslint/${p}>typescript": "7"`,
   );
-  writeFileSync(
-    file,
-    `${text.trimEnd()}\nstrictPeerDependencies: true\nengineStrict: true\n` +
-      `peerDependencyRules:\n  allowedVersions:\n${ts7.join("\n")}\n`,
-  );
+  // Into the block `void init` writes on Vite+ (for vite: "*"), or a new one.
+  const block = "peerDependencyRules:\n  allowedVersions:\n";
+  const rules = text.includes(block)
+    ? text.replace(block, `${block}${ts7.join("\n")}\n`)
+    : `${text.trimEnd()}\n${block}${ts7.join("\n")}\n`;
+  writeFileSync(file, `${rules.trimEnd()}\nstrictPeerDependencies: true\nengineStrict: true\n`);
 }
 
 function npmVersion(): string {

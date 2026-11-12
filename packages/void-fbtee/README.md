@@ -68,7 +68,8 @@ manager. fbtee builds it for macOS (Apple Silicon and Intel), Windows (x64 and A
 On Vite+, `init` adds fbtee's lint rules (`@nkzw/eslint-plugin-fbtee`). They use typescript-eslint,
 which doesn't support TypeScript 7 yet ([typescript-eslint#12518](https://github.com/typescript-eslint/typescript-eslint/issues/12518)),
 so your package manager warns of an unmet `typescript` peer. The rules work. With pnpm's
-`strictPeerDependencies`, allow it in `pnpm-workspace.yaml`:
+`strictPeerDependencies`, allow it in `pnpm-workspace.yaml` (in the
+`peerDependencyRules.allowedVersions` that `void init` writes there on Vite+):
 
 ```yaml
 peerDependencyRules:
