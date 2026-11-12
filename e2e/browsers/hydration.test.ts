@@ -22,12 +22,16 @@ const settled = (p: Page) =>
     return islands.length > 0 && islands.every((i) => i.dataset.hydrated === "true");
   });
 
-/** This language's pages, from its links: everything under /<locale>/, one event page. */
+/**
+ * This language's pages, from its links: everything under /<locale>/, one event page. Read over
+ * plain HTTP, not by visiting: a page left mid-load makes WebKit report its cancelled scripts as
+ * errors ("Importing a module script failed"), which would land on the next page checked.
+ */
 async function pages(p: Page, locale: string): Promise<string[]> {
   const found = new Set<string>();
   for (const start of [`/${locale}`, `/${locale}/docs`, `/${locale}/events`]) {
-    await p.goto(start);
-    const links = await p.$$eval("a[href]", (as) => as.map((a) => a.getAttribute("href")!));
+    const html = await (await p.request.get(start)).text();
+    const links = [...html.matchAll(/href="([^"]+)"/g)].map((m) => m[1]!);
     for (const href of [start, ...links])
       if (href === `/${locale}` || href.startsWith(`/${locale}/`)) found.add(href.split("#")[0]!);
   }
@@ -49,6 +53,9 @@ for (const e of ENGINES) {
         expect(paths.length).toBeGreaterThan(5);
         const failed: string[] = [];
         for (const path of paths) {
+          // A blank page between pages: anything the last page reports as it's left (WebKit's
+          // cancelled scripts) comes before the next page's errors are collected.
+          await p.goto("about:blank");
           const errors = collectErrors(p);
           await p.goto(path);
           await settled(p);
