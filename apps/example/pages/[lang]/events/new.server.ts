@@ -6,9 +6,16 @@ import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { db } from "void/db";
 import { revalidate } from "void/isr";
-import { localizedPaths } from "void-fbtee/middleware";
+import { langParams, localizedPaths } from "void-fbtee/middleware";
 import { z } from "zod";
 import { locales } from "@/locales";
+
+// Cached until the next deploy, in every language (Void's prerendering: a one-year cache time,
+// and a deploy clears the cache). Void's own platform also builds it during the deploy; deployed
+// straight to Cloudflare, as here, the first visit after a deploy builds it. Only a deploy
+// changes this page (the form and the Worker's list of time zones are fixed; posting is a POST, never cached).
+export const prerender = true;
+export const getPrerenderPaths = langParams;
 
 export type Props = InferProps<typeof loader>;
 

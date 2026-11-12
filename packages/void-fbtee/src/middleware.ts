@@ -54,6 +54,17 @@ export function localizedPaths<P extends `/${string}`>(path: P): `/${Lang}${P}`[
   return config.locales.map((l) => `/${l.segment}${path}` as const);
 }
 
+/**
+ * Every language as a page's `[lang]` param: `[{ lang: "en-US" }, { lang: "th-TH" }, …]`. For
+ * prerendering a page under `pages/[lang]/` in every language (Void's edge prerendering, which
+ * needs a page's params; it builds the pages during the deploy on Void's platform, and on the
+ * first visit after a deploy on direct Cloudflare):
+ * `export const prerender = true; export const getPrerenderPaths = langParams;`.
+ */
+export function langParams(): { lang: Lang }[] {
+  return config.locales.map((l) => ({ lang: l.segment as Lang }));
+}
+
 /** The app's languages (`voidFbtee({ locales })`), for server code that works per language. */
 export function appLocales(): string[] {
   return config.locales.map((l) => l.locale);

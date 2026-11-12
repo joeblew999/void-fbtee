@@ -1,6 +1,14 @@
 import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { runAll } from "@/lib/intl";
+import { langParams } from "void-fbtee/middleware";
+
+// Cached until the next deploy, in every language (Void's prerendering: a one-year cache time,
+// and a deploy clears the cache). Void's own platform also builds it during the deploy; deployed
+// straight to Cloudflare, as here, the first visit after a deploy builds it. Only a deploy
+// changes this page (every row is a fixed call).
+export const prerender = true;
+export const getPrerenderPaths = langParams;
 
 export type Props = InferProps<typeof loader>;
 

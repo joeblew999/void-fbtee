@@ -76,7 +76,12 @@ the browser's; `useHydrated()` is for anything else of the browser's own.
 The page's language: `useLocale()` in components; `c.get("i18n")` in loaders and actions
 (typed, no cast: `const { locale } = c.get("i18n")`). Both are
 `{ locale, dir, now, path }`. After a change, `revalidate({ paths: localizedPaths("/events") })`
-refreshes the page in every language.
+refreshes the page in every language. A page under `pages/[lang]/` that only a deploy changes is
+prerendered in every language with `export const prerender = true;` and
+`export const getPrerenderPaths = langParams;` in its `.server.ts` (`langParams` from
+`void-fbtee/middleware`): it's cached until the next deploy, in each language. Void's own
+platform also builds it during the deploy; an app deployed straight to Cloudflare builds it on
+the first visit after each deploy (Void 1.7.0).
 
 Links are built with Void's `routeUrl()` from `void/routes` and the page's `lang` (from
 `useLocale()`), so Void's typed routes check each one: `routeUrl("/[lang]/events", { params: { lang } })`

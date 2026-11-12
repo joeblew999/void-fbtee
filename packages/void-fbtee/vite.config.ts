@@ -1,5 +1,19 @@
 // Builds the package with `vp pack` (tsdown). Virtual modules are made by the plugin at the app's build time.
+import { connect } from "node:net";
 import { defineConfig } from "vite-plus";
+
+// The example's dev server (`vp run dev`): apps/example/vite.config.ts, server.port. It runs its
+// own `vp pack --watch --no-clean` and loads dist/ as it goes.
+const DEV_PORT = 5173;
+const devServerRunning = () =>
+  new Promise<boolean>((resolve) => {
+    const socket = connect({ host: "localhost", port: DEV_PORT });
+    socket.once("connect", () => {
+      socket.destroy();
+      resolve(true);
+    });
+    socket.once("error", () => resolve(false));
+  });
 
 export default defineConfig({
   pack: {
@@ -28,6 +42,18 @@ export default defineConfig({
     publint: true,
     attw: { profile: "esm-only" },
     unused: true,
+    // A full build empties dist/ first (tsdown's clean, right after this hook), and the dev
+    // server loads the package from there: its pages fail until it reloads. So a full build stops
+    // while the dev server runs; its own watcher keeps dist/ current anyway.
+    hooks: {
+      async "build:prepare"(ctx) {
+        if (!ctx.options.watch && (await devServerRunning()))
+          throw new Error(
+            `the dev server is running (port ${DEV_PORT}), and it loads the package from dist/, ` +
+              "which a full build empties: its watcher already keeps dist/ current; stop vp run dev to build",
+          );
+      },
+    },
   },
   // `vp test`: the package's own tests, on test/fixture (a tiny app; each test works on a copy),
   // and init's on apps `void init` makes (test/void-init.ts).

@@ -203,6 +203,14 @@ account) is left out: there isn't one.
 
      Today none but the markdown pages are cached: no page sets a cache time.
 
+   - **Found when built (2026-11-12): on direct Cloudflare, Void 1.7.0 doesn't build prerender
+     pages during the deploy.** Only its platform deploy collects them
+     (`packages/void/src/cli/deploy-managed-full.ts`; none of the `deploy-cloudflare-*.ts` files
+     mention prerendering), and the config reference's table says "Deploy-time (platform ISR)". So
+     here `prerender = true` means the one-year cache time: the first visit after a deploy, per
+     language, builds the page (`x-isr-cache: MISS`), every visit after that is `HIT`. Checked live
+     on all fifteen (five pages, three languages). Kept: it's Void's way of saying "only a deploy
+     changes this", and on Void's platform it also builds them ahead.
    - **Pages set their own; routes need `void.config.ts`:** a page's cache time is its own
      export. A route has no page, and Void decides whether to cache a path before it runs any
      code: no cache time from a page or `routing.revalidate` means no caching, and an
