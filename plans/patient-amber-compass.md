@@ -72,12 +72,12 @@ Against Vite+'s library template:
 5. [x] **The plugin in memory, through Vite's own `build()`** (as fbtee tests its plugin): its
        hook filters, the server-only swaps per environment, the virtual modules. In
        `packages/void-fbtee/test/`, run by `vp test`.
-6. [ ] **The fresh check installs the real tarball:** packed as npm would publish it, checked as
+6. [x] **The fresh check installs the real tarball:** packed as npm would publish it, checked as
        Void checks its own (description, MIT license, https homepage and bugs, a `LICENSE`, no
        `workspace:`/`catalog:` versions, only `dist`, `skills`, `README.md`, `LICENSE`), then
        installed from the file. The git install stays as one case, since that's how apps install
        it today.
-7. [ ] **npm and pnpm, each on plain Vite and on Vite+:** four apps, as `void init` makes them,
+7. [x] **npm and pnpm, each on plain Vite and on Vite+:** four apps, as `void init` makes them,
        with a clean environment, strict peer dependencies and strict engines (as Void's).
        The npm app also gets a lockfile made as on a Mac (npm's `--os=darwin --cpu=arm64`), then
        `npm ci` and a build on Linux: a Mac developer with Linux CI, where npm can skip the right
@@ -85,10 +85,10 @@ Against Vite+'s library template:
        in October 2026). pnpm records every system's build (this repo's `pnpm-lock.yaml` lists
        all 8, checked 2026-11-12). If npm fails there, the plugin says plainly why and how to fix
        it (reinstall without the old lockfile), and the package README says so for npm users.
-8. [ ] **In each app, the Void parts too:** a link to a page that doesn't exist fails the type
+8. [x] **In each app, the Void parts too:** a link to a page that doesn't exist fails the type
        check; `/xx-XX/...` is not found; `/` redirects with 301. Beside what's there now (init,
        check, build and types, Vite+'s `vp check` and lint rule, Thai and Arabic in dev).
-9. [ ] **The fresh check weekly too**, on a schedule in `.github/workflows/fresh.yml`: new apps
+9. [x] **The fresh check weekly too**, on a schedule in `.github/workflows/fresh.yml`: new apps
        get the newest Vite+ and Void, so a release that breaks void-fbtee shows up within a week,
        as Vite+ 1.6.0 did on 2026-11-12.
 
@@ -96,7 +96,7 @@ Against Vite+'s library template:
 
 As fbtee (`website/` for docs, `example/` for the demo) and Void (`docs/`, `playground/`) do.
 
-10. [ ] **The package's docs live once, with the package:** its README (developers) and
+10. [x] **The package's docs live once, with the package:** its README (developers) and
         `skills/void-fbtee/SKILL.md` (coding agents, already shipped in it). The example's
         `setup`, `strings` and `markdown-pages` pages are the package's reference docs, repeated
         from SKILL.md and the README in three languages each; they go. The example keeps the
@@ -106,6 +106,25 @@ As fbtee (`website/` for docs, `example/` for the demo) and Void (`docs/`, `play
         dependency, as Void's own playgrounds do; the new apps of B are where it's used as a
         stranger uses it.
 
+## What B and C found (2026-11-12)
+
+The check's first runs found three real problems. First, under `CI=true` (as GitHub Actions sets
+it), the type build copied Hono's types into `dist`, because Void's `defineMiddleware` returns
+Hono's type. The middleware's default export is now typed `ReturnType<typeof defineMiddleware>`,
+and `deps.onlyBundle: []` makes any bundled package a build error; shown to fail when the fix is
+undone. Second, fbtee's lint plugin (added on Vite+) uses typescript-eslint, which wants
+TypeScript below 6.1, while new Void apps have TypeScript 7 (typescript-eslint#12518). The check
+allows exactly those four packages under strict peers, and the package README tells developers.
+Third, `npm install --os=darwin` runs workerd's install script against the Mac build here; the
+Mac-side installs skip scripts, as only the lockfile is the Mac's. The Mac-made lockfile then
+passes `npm ci` and the build on Linux, so npm/cli#4828 doesn't reach fbtee's compiler today: no
+plugin message or README note needed. The docs pages' `<Fmt>` list moved into the tour, so a
+markdown page still runs that island in every language.
+
+Shown to fail when broken: the `Lang` probe (no error once the type isn't registered), the 301
+check (`/` answers 200 without the redirect) and the 404 check (`/xx-XX` answers 500 without the
+middleware). The tarball checks weren't broken on purpose; they caught the problems above.
+
 ## Not in this plan
 
 - Publishing to npm: your decision; this makes the package ready for it.
@@ -113,6 +132,6 @@ As fbtee (`website/` for docs, `example/` for the demo) and Void (`docs/`, `play
 
 ## Verification
 
-Locally, in the background: `vp check`, `vp test run`, `vp run test:fresh` (four apps). Each new
+Locally, in the background: `vp check`, `vp test run`, `vp run test:fresh` (five apps). Each new
 check is first shown to fail when what it guards is broken (as the lint rule's test was). After
 the push: CI's runs pass.
