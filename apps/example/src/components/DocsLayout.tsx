@@ -28,23 +28,13 @@ interface Entry {
 
 /**
  * The sidebar: its groups, and the pages in each, in reading order. Markdown pages are Void routes
- * per language (`/${lang}/docs/setup`, a real page in every registered language); Intl and
- * Temporal are pages under [lang].
+ * per language (`/${lang}/docs/tour`, a real page in every registered language); Intl and
+ * Temporal are pages under [lang]. How to set up and use void-fbtee is in its own README and
+ * skill, with the package; these pages show it at work.
  */
 function sidebar(lang: Lang, title: (slug: string) => ReactNode) {
   const md = (slug: string, href: RouteUrl): Entry => ({ slug, href, title: title(slug) });
   return [
-    {
-      name: <fbt desc="Docs sidebar group: the first page to read">Start here</fbt>,
-      entries: [md("setup", routeUrl(`/${lang}/docs/setup`))],
-    },
-    {
-      name: <fbt desc="Docs sidebar group: how-to pages">Guides</fbt>,
-      entries: [
-        md("strings", routeUrl(`/${lang}/docs/strings`)),
-        md("markdown-pages", routeUrl(`/${lang}/docs/markdown-pages`)),
-      ],
-    },
     {
       name: <fbt desc="Docs sidebar group: reference pages">Reference</fbt>,
       entries: [

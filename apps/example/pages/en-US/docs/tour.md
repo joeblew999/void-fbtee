@@ -1,5 +1,6 @@
 <script>
 import EventTime from "../../../src/components/EventTime.tsx" with { island: "load" }
+import Fmt from "../../../src/components/Fmt.tsx" with { island: "load" }
 </script>
 
 ---
@@ -32,5 +33,17 @@ What you post is saved as plain data, not as text in your language: the start on
 clock with the city's time zone, the same moment in UTC, the number of seats. Each event's page
 shows it under **Stored as**. Switch language at the top: everything on the page changes, except
 that box.
+
+## Formatted for you
+
+Each value below is a `<Fmt>` island (`src/components/Fmt.tsx`), so it's formatted for you, in
+this page's language:
+
+- A number: <Fmt num="1234567.891" />
+- Money: <Fmt money="1299" currency="THB" />
+- A time, on its place's clock: <Fmt when="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+- The same time, on yours: <Fmt yours="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+- How far off it is: <Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+- Languages, named in yours: <Fmt langs />
 
 [See the upcoming events](/en-US/events)

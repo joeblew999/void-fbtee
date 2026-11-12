@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { Link, useLocale } from "void-fbtee/react";
 import { buttonVariants } from "@/components/ui/button";
-import { REPO } from "@/lib/project";
+import { REPO, SETUP, SKILL, type Offsite } from "@/lib/project";
 import { cn } from "@/lib/utils";
 
 /** The install, as the README gives it, after the dependency is added to package.json. */
@@ -53,8 +53,8 @@ export function AddIt() {
             init adds only what's missing, and translate fills in every language.
           </fbt>
         </p>
-        <Link
-          href={routeUrl(`/${lang}/docs/setup`)}
+        <a
+          href={SETUP}
           className="group mt-6 inline-flex items-center gap-2 font-medium text-brand"
         >
           <fbt desc="Home page link to the setup page of the docs">Read the full setup</fbt>
@@ -62,7 +62,7 @@ export function AddIt() {
             className="size-4 transition-transform duration-200 ease-out group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
             aria-hidden
           />
-        </Link>
+        </a>
       </div>
       <figure className="overflow-hidden rounded-lg border bg-card shadow-[0_24px_60px_-24px_rgb(0_0_0/0.6)]">
         <figcaption className="border-b px-4 py-2.5 font-mono text-xs text-muted-foreground">
@@ -97,8 +97,9 @@ interface Feature {
   icon: ReactNode;
   title: ReactNode;
   facts: ReactNode[];
-  /** The docs page that explains it, built by routeUrl (checked by Void's typed routes). */
-  href: RouteUrl;
+  /** What explains it: a page of this site, built by routeUrl (checked by Void's typed routes), or
+   * void-fbtee's own docs (its skill, on GitHub). */
+  href: RouteUrl | Offsite;
 }
 
 function features(lang: Lang): Feature[] {
@@ -107,7 +108,7 @@ function features(lang: Lang): Feature[] {
     {
       icon: <Languages className={icon} aria-hidden />,
       title: <fbt desc="Home feature title: translated strings">Strings, by fbtee</fbt>,
-      href: routeUrl(`/${lang}/docs/strings`),
+      href: `${SKILL}#strings`,
       facts: [
         <fbt key="1" desc="Home feature fact about translated strings">
           Mark text with fbt in your components; each language gets a catalog file.
@@ -161,7 +162,7 @@ function features(lang: Lang): Feature[] {
       title: (
         <fbt desc="Home feature title: translated markdown pages">Markdown pages, translated</fbt>
       ),
-      href: routeUrl(`/${lang}/docs/markdown-pages`),
+      href: `${SKILL}#markdown-pages`,
       facts: [
         <fbt key="1" desc="Home feature fact about where translated markdown pages are">
           One copy of each page per language, under pages/ and the language.
@@ -179,7 +180,7 @@ function features(lang: Lang): Feature[] {
       title: (
         <fbt desc="Home feature title: machine translation">Translated by AI, checked by you</fbt>
       ),
-      href: routeUrl(`/${lang}/docs/setup`),
+      href: SKILL,
       facts: [
         <fbt key="1" desc="Home feature fact about the translate command (vp run i18n:translate)">
           vp run i18n:translate hands the work to Claude Code, with void-fbtee's skill.
@@ -199,7 +200,7 @@ function features(lang: Lang): Feature[] {
           Every language, right to left too
         </fbt>
       ),
-      href: routeUrl(`/${lang}/docs/strings`, { hash: "right-to-left-locales" }),
+      href: `${SKILL}#strings`,
       facts: [
         <fbt
           key="1"
@@ -230,8 +231,8 @@ export function Features() {
       </h2>
       {/* 1px rules between cells at any column count: the grid's colour shows through 1px gaps. */}
       <div className="mt-10 grid gap-px border-y bg-border sm:grid-cols-2 lg:grid-cols-3">
-        {features(lang).map((f) => (
-          <article key={f.href} className="flex flex-col bg-background p-6">
+        {features(lang).map((f, i) => (
+          <article key={i} className="flex flex-col bg-background p-6">
             {f.icon}
             <h3 className="mt-4 text-lg font-medium">{f.title}</h3>
             <ul className="mt-3 flex-1 space-y-2 text-sm text-muted-foreground">
@@ -242,7 +243,7 @@ export function Features() {
                 </li>
               ))}
             </ul>
-            <Link
+            <MoreLink
               href={f.href}
               className="group mt-5 inline-flex items-center gap-2 text-sm font-medium text-brand"
             >
@@ -251,11 +252,27 @@ export function Features() {
                 className="size-4 transition-transform duration-200 ease-out group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
                 aria-hidden
               />
-            </Link>
+            </MoreLink>
           </article>
         ))}
       </div>
     </section>
+  );
+}
+
+/** A page of this site through void-fbtee's Link; void-fbtee's own docs, off the site, as a plain link. */
+function MoreLink({
+  href,
+  ...props
+}: {
+  href: RouteUrl | Offsite;
+  className: string;
+  children: ReactNode;
+}) {
+  return href.startsWith("https://") ? (
+    <a href={href} {...props} />
+  ) : (
+    <Link href={href} {...props} />
   );
 }
 
@@ -280,13 +297,10 @@ export function Closing() {
         <fbt desc="Home page heading">i18n for Void apps</fbt>
       </h2>
       <div className="mt-8 flex flex-wrap gap-3">
-        <Link
-          href={routeUrl(`/${lang}/docs/setup`)}
-          className={cn(buttonVariants({ size: "lg" }), "h-11 gap-2 px-5")}
-        >
+        <a href={SETUP} className={cn(buttonVariants({ size: "lg" }), "h-11 gap-2 px-5")}>
           <fbt desc="Button: start with the setup page of the docs">Get started</fbt>
           <ArrowRight className="rtl:-scale-x-100" aria-hidden />
-        </Link>
+        </a>
         <GitHubButton />
       </div>
     </section>

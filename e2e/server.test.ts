@@ -70,8 +70,7 @@ test("booking an event that doesn't exist is not found, not sold out", async () 
 });
 
 test("every page has a title and a description, in its own language", async () => {
-  const pages = ["", "/events", "/docs", "/docs/intl", "/docs/temporal", "/docs/setup"];
-  pages.push("/docs/strings", "/docs/markdown-pages", "/docs/tour");
+  const pages = ["", "/events", "/docs", "/docs/intl", "/docs/temporal", "/docs/tour"];
   const head = async (path: string) => {
     const html = await (await get(path)).text();
     return {

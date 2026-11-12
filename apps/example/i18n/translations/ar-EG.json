@@ -973,30 +973,6 @@
       ],
       "types": []
     },
-    "CH3XfQbtsw2ACBQd4yLJGg==": {
-      "description": "Docs sidebar group: the first page to read",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ابدأ من هنا",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Qe+vPjeAchOE7rGhN+Pjjw==": {
-      "description": "Docs sidebar group: how-to pages",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "أدلة",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "bJNB5x27sSngKuHm5czO2A==": {
       "description": "Docs sidebar group: reference pages",
       "status": "translated",
@@ -2227,13 +2203,13 @@
       ],
       "types": []
     },
-    "bebntP3SMEcXEUDbODQFlQ==": {
+    "8HurGTye1LRfqN9IRDn7fA==": {
       "description": "Docs index description, for search results",
       "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "كيف يترجم void-fbtee تطبيق Void: الإعداد، والنصوص، وصفحات markdown، وIntl وTemporal الخاصان بالمنصة.",
+          "translation": "void-fbtee أثناء العمل: Intl وTemporal الخاصان بالمنصة بكل اللغات، وعرض الفعاليات التجريبي.",
           "variations": {}
         }
       ],

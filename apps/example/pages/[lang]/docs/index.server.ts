@@ -9,7 +9,7 @@ export const head = defineHead(() => ({
       name: "description",
       content: String(
         fbs(
-          "How void-fbtee translates a Void app: setup, strings, markdown pages, and the platform's Intl and Temporal.",
+          "void-fbtee at work: the platform's Intl and Temporal in every language, and the events demo.",
           "Docs index description, for search results",
         ),
       ),

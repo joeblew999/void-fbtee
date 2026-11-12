@@ -1,12 +1,13 @@
 <script>
 import EventTime from "../../../src/components/EventTime.tsx" with { island: "load" }
+import Fmt from "../../../src/components/Fmt.tsx" with { island: "load" }
 </script>
 
 ---
 
 title: جولة
 description: انشر فعالية، احجز مقعدًا، وشاهد كل موعد بتوقيت مكان الفعالية وبتوقيتك.
-translatedFrom: "a3f4ffdb20fb"
+translatedFrom: "a479ee11cee5"
 ---
 
 # فعاليات تعرف كم الساعة عندك
@@ -31,5 +32,16 @@ translatedFrom: "a3f4ffdb20fb"
 ما تنشره يُحفظ بيانات عادية، لا نصًا بلغتك: موعد البدء بحسب ساعة مدينته مع منطقتها الزمنية، واللحظة نفسها
 بتوقيت UTC، وعدد المقاعد. تعرضها صفحة كل فعالية تحت **محفوظة هكذا**. غيّر اللغة من الأعلى: يتغير كل ما في
 الصفحة، إلا ذلك المربع.
+
+## منسّق لك
+
+كل قيمة أدناه جزيرة `<Fmt>` (`src/components/Fmt.tsx`)، فهي منسّقة لك بلغة هذه الصفحة:
+
+- رقم: <Fmt num="1234567.891" />
+- مبلغ: <Fmt money="1299" currency="THB" />
+- وقت، بتوقيت مكانه: <Fmt when="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+- الوقت نفسه، بتوقيتك: <Fmt yours="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+- كم بقي عليه: <Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+- أسماء اللغات، بلغتك: <Fmt langs />
 
 [شاهد الفعاليات القادمة](/ar-EG/events)

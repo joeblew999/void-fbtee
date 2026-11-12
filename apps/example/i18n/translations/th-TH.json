@@ -745,30 +745,6 @@
       ],
       "types": []
     },
-    "CH3XfQbtsw2ACBQd4yLJGg==": {
-      "description": "Docs sidebar group: the first page to read",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เริ่มที่นี่",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Qe+vPjeAchOE7rGhN+Pjjw==": {
-      "description": "Docs sidebar group: how-to pages",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "คู่มือ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "bJNB5x27sSngKuHm5czO2A==": {
       "description": "Docs sidebar group: reference pages",
       "status": "translated",
@@ -1861,13 +1837,13 @@
       ],
       "types": []
     },
-    "bebntP3SMEcXEUDbODQFlQ==": {
+    "8HurGTye1LRfqN9IRDn7fA==": {
       "description": "Docs index description, for search results",
       "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "void-fbtee แปลแอป Void อย่างไร: การตั้งค่า ข้อความ หน้า markdown และ Intl กับ Temporal ของแพลตฟอร์ม",
+          "translation": "void-fbtee ในการใช้งานจริง: Intl และ Temporal ของแพลตฟอร์มในทุกภาษา และเดโมกิจกรรม",
           "variations": {}
         }
       ],
