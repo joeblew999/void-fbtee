@@ -1,4 +1,4 @@
-// `void-fbtee init`: wires void-fbtee into a `void init` app (plan #3, design 3). Each step only
+// `void-fbtee init`: wires void-fbtee into a `void init` app. Each step only
 // adds what's missing, so running it twice changes nothing. Where it can't edit a file safely it
 // prints the exact lines to add instead of guessing. Config files are edited with magicast.
 import { createRequire } from "node:module";
@@ -219,7 +219,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
     if (changed) writeModule(mod, at(viteConfig));
   }
 
-  // 6. void.config.ts: Cloudflare's temporal flag (native Temporal in the worker, plan #1 #15).
+  // 6. void.config.ts: Cloudflare's temporal flag (native Temporal in the worker).
   const voidConfig = ["void.config.ts", "void.config.mts", "void.config.js"].find((f) =>
     existsSync(at(f)),
   );

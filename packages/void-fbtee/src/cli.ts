@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// The void-fbtee command (plan #3, design 3). Run it in the app's folder, where vite.config.ts is.
+// The void-fbtee command. Run it in the app's folder, where vite.config.ts is.
 //
 //   void-fbtee prepare   write each locale's catalog: new strings marked "new", finished ones kept
 //   void-fbtee check     list what's missing or wrong; exits 1 if anything is

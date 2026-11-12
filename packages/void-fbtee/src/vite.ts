@@ -1,23 +1,23 @@
 // The void-fbtee Vite plugin. Put it first in the app's vite.config.ts plugins.
 //
-// What it does, and why (plan: joeblew999/void-fbtee#1):
+// What it does, and why:
 // - Runs fbtee's own Vite plugin, which compiles <fbt> and fbs.
 // - Server environments: resolves `fbtee/server` to fbtee's per-request (AsyncLocalStorage) build.
-//   fbtee only exports it under the `node` condition, and workerd isn't `node`. (decision 1)
-// - Server environments don't pre-bundle fbtee, so `fbtee` and `fbtee/server` share one core. (2)
+//   fbtee only exports it under the `node` condition, and workerd isn't `node`.
+// - Server environments don't pre-bundle fbtee, so `fbtee` and `fbtee/server` share one core.
 // - Server environments resolve `temporal-polyfill` to Cloudflare's own Temporal (the `temporal`
 //   compatibility flag, which init adds and check requires), so no polyfill code goes in the
 //   worker. It once shipped broken (workerd#6907, July 2026, with no flag); the flag's version is
 //   documented and its Temporal.Now reads Date.now()'s clock. The browser keeps the polyfill's
-//   own "native if present". (12)
+//   own "native if present".
 // - Builds each locale's catalog in-process from i18n/translations/<locale>.json and the app's
 //   source (plus fbtee's built-in strings), as `virtual:void-fbtee/catalogs`. Nothing generated
-//   goes in git. (5) Shared with the void-fbtee command: catalogs.ts.
+//   goes in git. Shared with the void-fbtee command: catalogs.ts.
 // - Reports untranslated strings once per run: a warning in dev, a report in a build, and with
 //   `failOnMissing` a failed build, so `void deploy` (which runs `vite build`) can't ship gaps.
 // - Browser: every app module that uses <fbt> or fbs first imports `void-fbtee/client`, which
 //   installs the page's catalog (top-level await). Islands hydrate without the layout's
-//   I18nProvider, so this is what gives them their strings. (30)
+//   I18nProvider, so this is what gives them their strings.
 import { createRequire } from "node:module";
 import { existsSync } from "node:fs";
 import { join } from "node:path";

@@ -79,7 +79,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
 /**
  * Void's Link, but a link into another language loads a fresh page: Void's client navigation
- * would keep the old language's text and <html lang dir> (plan #1, check 8). It also works
+ * would keep the old language's text and <html lang dir>. It also works
  * inside an island, where there is no Void router: a click is then a normal page load.
  */
 export function Link(props: ComponentProps<typeof VoidLink>) {

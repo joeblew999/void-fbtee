@@ -1,5 +1,5 @@
 // void-fbtee's lint rule, for Vite+ (`lint.jsPlugins: ["void-fbtee/lint"]`) or ESLint. A plain
-// ESLint-format plugin with no imports, so it loads in both (plan #3, design 1).
+// ESLint-format plugin with no imports, so it loads in both.
 //
 //   void-fbtee/no-show-count-no   plurals with showCount="no" drop their count token (fbtee#83)
 

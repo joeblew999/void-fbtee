@@ -124,7 +124,7 @@ export function collectErrors(page: Page): string[] {
 
 /**
  * Void cuts the server stream at the shell on defer() pages, and React reports it (#419 in
- * production). It happens on a page with no fbtee too (plan #1, decision 8), so it's expected
+ * production). It happens on a page with no fbtee too, so it's Void's and not ours: expected
  * there and only there.
  */
 export const VOID_DEFER_MESSAGE = /Switched to client rendering|Minified React error #419/;

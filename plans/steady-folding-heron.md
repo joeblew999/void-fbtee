@@ -44,10 +44,12 @@ docs. One commit per item; pushed together when you say.
        Backed by: Void `docs/reference/structure.md` "middleware/" ("Numeric prefixes control
        execution order"); `packages/void/src/router/scan.ts` `parseMiddlewareDefinitions` (ee4eaa7).
 
-4. [ ] **No references into the closed plan issue.** About eleven comments point to "plan #1" or a
+4. [x] **No references into the closed plan issues.** About eleven comments point to "plan #1" or a
        decision number (`packages/void-fbtee/src/vite.ts:6,7,12,20`, `init.ts:222`, `react.tsx:81`,
        `apps/example/pages/[lang]/index.tsx:15`, `e2e/server.test.ts:69,71,92`, `e2e/helpers.ts:127`;
        lines as of 2026-11-12, before item 1 moves files). Each gets its reason written in place.
+       Done: 18 references (plan #1 and plan #3, and vite.ts's numbered decisions); where the
+       reason was only in the issue, it's now in the sentence.
 
 ### B. Types: the casts go, nothing on screen changes
 

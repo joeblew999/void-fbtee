@@ -1,4 +1,4 @@
-// `void-fbtee translate` and `stamp` (plan #3, design 4). translate gives the work to a coding
+// `void-fbtee translate` and `stamp`. translate gives the work to a coding
 // agent: `claude -p`, with void-fbtee's skill, allowed to read and edit files and nothing else.
 // The skill does the translating; this file only says what's missing and checks the result.
 import { spawn, spawnSync } from "node:child_process";

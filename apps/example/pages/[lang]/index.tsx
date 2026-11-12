@@ -12,7 +12,7 @@ import type { Props } from "./index.server";
 
 // fbtee's list(), joined to plain text first. A list inside a string (<fbt:list>, or list() in an
 // <fbt:param>) renders as one text on the server but as separate pieces in the browser, so
-// hydration fails (seen with fbtee 5.0.0; plan #1, Upstream).
+// hydration fails (seen with fbtee 5.0.0).
 // oxlint-disable-next-line no-base-to-string
 const listText = (items: string[]) => String(list(items));
 

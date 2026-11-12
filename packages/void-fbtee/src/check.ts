@@ -1,4 +1,4 @@
-// What `void-fbtee check` checks, as plain functions (plan #3, design 3). Each problem is one
+// What `void-fbtee check` checks, as plain functions. Each problem is one
 // line a person can act on.
 import { createHash } from "node:crypto";
 import { existsSync, globSync, readdirSync, readFileSync } from "node:fs";

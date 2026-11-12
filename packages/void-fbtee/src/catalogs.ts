@@ -1,6 +1,6 @@
 // The app's strings and catalogs, in-process with fbtee's own compiler. Shared by the Vite
 // plugin (runtime catalogs, missing-translation report) and the void-fbtee command (prepare,
-// check), so they all count "missing" the same way (plan #3).
+// check), so they all count "missing" the same way.
 //
 // - Strings are collected from the app's source plus fbtee's built-in strings
 //   (fbtee/Strings.json), as fbtee's own CLI does by default (--include-default-strings).
