@@ -27,6 +27,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import { parseAst } from "vite";
 
 const root = resolve(import.meta.dirname, "../..");
 const pkgDir = join(root, "packages/void-fbtee");
@@ -253,13 +254,37 @@ function allowBuild(dir: string, spec?: string) {
   }
 }
 
+/** The modules a file imports: import and export-from statements, and import() with a string. */
+function importsOf(code: string): string[] {
+  const found: string[] = [];
+  const walk = (node: unknown): void => {
+    if (!node || typeof node !== "object") return;
+    if (Array.isArray(node)) return node.forEach(walk);
+    const n = node as { type?: string; source?: { type?: string; value?: unknown } };
+    if (
+      (n.type === "ImportDeclaration" ||
+        n.type === "ExportNamedDeclaration" ||
+        n.type === "ExportAllDeclaration" ||
+        n.type === "ImportExpression") &&
+      n.source?.type === "Literal" &&
+      typeof n.source.value === "string"
+    )
+      found.push(n.source.value);
+    for (const value of Object.values(n)) walk(value);
+  };
+  walk(parseAst(code));
+  return found;
+}
+
 /** Every package void-fbtee's built code imports resolves inside the app (not in this repo's). */
 function checkOwnDependencies(target: string, dir: string, installed: string) {
   const specifiers = new Set<string>();
-  for (const f of readdirSync(join(installed, "dist")).filter((f) => f.endsWith(".mjs"))) {
-    const code = readFileSync(join(installed, "dist", f), "utf8");
-    for (const m of code.matchAll(/(?:from|import)\s*\(?\s*"([^".][^"]*)"/g)) specifiers.add(m[1]!);
-  }
+  // Real imports only, read by Vite's own parser: the plugin also holds code it writes into an app
+  // (`export { default } from "@void/md/pages"`, only when the app has @void/md), which is text in
+  // a string, not an import of the package's.
+  for (const f of readdirSync(join(installed, "dist")).filter((f) => f.endsWith(".mjs")))
+    for (const spec of importsOf(readFileSync(join(installed, "dist", f), "utf8")))
+      if (!spec.startsWith(".")) specifiers.add(spec);
   const outside: string[] = [];
   // An optional peer the app hasn't installed is left out: the part that imports it isn't loaded
   // there (vite-plus: only Vite+'s linter loads void-fbtee/lint).
