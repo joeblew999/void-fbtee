@@ -1,7 +1,7 @@
 ---
 title: "إعداد void-fbtee في تطبيق Void"
 description: "ما يضيفه void-fbtee init إلى تطبيق Void جزءًا جزءًا، لحين يبلّغ void-fbtee check عن مشكلة setup."
-translatedFrom: "fb3b0a940850"
+translatedFrom: "8bb780714c62"
 ---
 
 # إعداد void-fbtee في تطبيق Void
@@ -17,6 +17,8 @@ translatedFrom: "fb3b0a940850"
 - **الوسيط (middleware):** `middleware/99.i18n.ts` ويحتوي `export { default } from "void-fbtee/middleware";`.
   يقرأ اللغة من الرابط ويضبط `<html lang dir>`.
 - **التخطيط:** يغلّف `pages/layout.tsx` محتواه بـ `<I18nProvider>` من `void-fbtee/react`.
+- **تحويل الصفحة الرئيسية:** `routing: { redirects: { "/": { to: "/en-US", status: 301 } } }` في
+  `void.config.ts`، بلغتك المصدر: يحوّل Void المسار `/` إليها قبل تشغيل أي كود من التطبيق.
 - **Temporal:** `worker: { compatibility_flags: ["temporal"] }` في `void.config.ts`، من أجل
   Temporal الأصلي في Cloudflare.
 - **TypeScript:** `"fbtee/ReactTypes"` في `compilerOptions.types`، و`"lib"` مع `ES2025`

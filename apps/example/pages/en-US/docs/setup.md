@@ -17,6 +17,8 @@ it can't safely edit a file, it prints the line to add. These are the pieces, fo
 - **Middleware:** `middleware/99.i18n.ts` with `export { default } from "void-fbtee/middleware";`.
   It reads the locale from the URL and sets `<html lang dir>`.
 - **Layout:** `pages/layout.tsx` wraps its children in `<I18nProvider>` from `void-fbtee/react`.
+- **Home redirect:** `routing: { redirects: { "/": { to: "/en-US", status: 301 } } }` in
+  `void.config.ts`, with your source language: Void sends `/` there before any app code runs.
 - **Temporal:** `worker: { compatibility_flags: ["temporal"] }` in `void.config.ts`, for
   Cloudflare's native Temporal.
 - **TypeScript:** `"fbtee/ReactTypes"` in `compilerOptions.types`, and `"lib"` with `ES2025`,

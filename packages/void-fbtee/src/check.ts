@@ -108,9 +108,19 @@ export function check(p: Project): string[] {
     problems.push(`setup: the root layout (pages/layout.tsx) doesn't wrap pages in <I18nProvider>`);
   const voidConfig = firstFile(p.root, ["void.config.ts", "void.config.mts", "void.config.js"]);
   const flag = /compatibility_flags\s*:\s*\[[^\]]*["']temporal["']/;
-  if (!voidConfig || !flag.test(readFileSync(voidConfig, "utf8")))
+  const voidConfigText = voidConfig ? readFileSync(voidConfig, "utf8") : "";
+  if (!flag.test(voidConfigText))
     problems.push(
       `setup: Cloudflare's "temporal" flag is missing (void.config.ts: worker.compatibility_flags)`,
+    );
+  // "/" goes to the source language, by Void's own redirects, permanently.
+  const source = p.config.locales.find((l) => l.locale === p.config.sourceLocale)!.segment;
+  const home = new RegExp(
+    `["']/["']\\s*:\\s*\\{[^}]*to\\s*:\\s*["']/${source}["'][^}]*status\\s*:\\s*301`,
+  );
+  if (!home.test(voidConfigText))
+    problems.push(
+      `setup: "/" doesn't redirect to /${source} (void.config.ts: routing.redirects, "/": { to: "/${source}", status: 301 })`,
     );
 
   // fbtee#83: plurals with showCount="no" lose their count token. (Vite+ apps also get this as a

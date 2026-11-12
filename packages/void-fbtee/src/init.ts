@@ -257,22 +257,34 @@ export async function init(o: InitOptions): Promise<InitResult> {
     if (changed) writeModule(mod, at(viteConfig));
   }
 
-  // 6. void.config.ts: Cloudflare's temporal flag (native Temporal in the worker).
+  // 6. void.config.ts: Cloudflare's temporal flag (native Temporal in the worker), and "/" sent to
+  // the source language by Void's own redirects (before any app code runs).
   const voidConfig = ["void.config.ts", "void.config.mts", "void.config.js"].find((f) =>
     existsSync(at(f)),
   );
   if (!voidConfig) {
-    todo.push(`no void.config.ts found: add worker: { compatibility_flags: ["temporal"] }`);
+    todo.push(
+      `no void.config.ts found: add worker: { compatibility_flags: ["temporal"] } and routing: { redirects: { "/": { to: "/${o.sourceLocale}", status: 301 } } }`,
+    );
   } else {
     const mod = await loadFile(at(voidConfig));
     const options = getDefaultExportOptions(mod);
     options.worker ??= {};
     options.worker.compatibility_flags ??= [];
+    let changed = false;
     if (!options.worker.compatibility_flags.includes("temporal")) {
       options.worker.compatibility_flags.push("temporal");
-      writeModule(mod, at(voidConfig));
+      changed = true;
       done.push(`${voidConfig}: added Cloudflare's "temporal" compatibility flag`);
     }
+    options.routing ??= {};
+    options.routing.redirects ??= {};
+    if (options.routing.redirects["/"] === undefined) {
+      options.routing.redirects["/"] = { to: `/${o.sourceLocale}`, status: 301 };
+      changed = true;
+      done.push(`${voidConfig}: added the redirect from "/" to /${o.sourceLocale} (301)`);
+    }
+    if (changed) writeModule(mod, at(voidConfig));
   }
 
   // 7. tsconfig.json: fbtee's JSX types, ES2025 (Temporal, Intl.DurationFormat) and the DOM.

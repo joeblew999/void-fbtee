@@ -1,7 +1,7 @@
 ---
 title: "การตั้งค่า void-fbtee ในแอป Void"
 description: "สิ่งที่ void-fbtee init เพิ่มให้แอป Void ทีละส่วน สำหรับเมื่อ void-fbtee check รายงานปัญหา setup"
-translatedFrom: "fb3b0a940850"
+translatedFrom: "8bb780714c62"
 ---
 
 # การตั้งค่า void-fbtee ในแอป Void
@@ -17,6 +17,8 @@ translatedFrom: "fb3b0a940850"
 - **มิดเดิลแวร์:** `middleware/99.i18n.ts` ที่มี `export { default } from "void-fbtee/middleware";`
   ทำหน้าที่อ่านภาษาจาก URL และตั้งค่า `<html lang dir>`
 - **เลย์เอาต์:** `pages/layout.tsx` ครอบเนื้อหาด้วย `<I18nProvider>` จาก `void-fbtee/react`
+- **การเปลี่ยนเส้นทางหน้าแรก:** `routing: { redirects: { "/": { to: "/en-US", status: 301 } } }` ใน
+  `void.config.ts` โดยใช้ภาษาต้นฉบับของคุณ Void ส่ง `/` ไปที่นั่นก่อนโค้ดของแอปจะทำงาน
 - **Temporal:** `worker: { compatibility_flags: ["temporal"] }` ใน `void.config.ts` สำหรับ
   Temporal แบบเนทีฟของ Cloudflare
 - **TypeScript:** `"fbtee/ReactTypes"` ใน `compilerOptions.types` และ `"lib"` ที่มี `ES2025`,

@@ -50,7 +50,7 @@ function snapshot(root: string, dir = root): Record<string, string> {
 test("wires void-fbtee into a Vite+ app, and a second run changes nothing", async () => {
   const root = app("vite-plus");
   const first = await init(options(root));
-  expect(first.done.length).toBe(11);
+  expect(first.done.length).toBe(12);
 
   const vite = read(root, "vite.config.ts");
   expect(vite).toContain(`import { defineConfig } from "vite-plus";`);
@@ -71,6 +71,7 @@ test("wires void-fbtee into a Vite+ app, and a second run changes nothing", asyn
   expect(vite.endsWith(");\n")).toBe(true);
 
   expect(read(root, "void.config.ts")).toMatch(/compatibility_flags: \["temporal"\]/);
+  expect(read(root, "void.config.ts")).toMatch(/"\/": \{\s*to: "\/en-US",\s*status: 301,?\s*\}/);
   expect(read(root, "middleware/99.i18n.ts")).toContain(`from "void-fbtee/middleware"`);
   expect(read(root, "pages/layout.tsx")).toContain("<I18nProvider>{children}</I18nProvider>");
   expect(existsSync(join(root, "i18n/translations"))).toBe(true);

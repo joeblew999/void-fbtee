@@ -123,6 +123,8 @@ missing; where it can't safely edit a file it prints the line to add). The piece
   it after the app's own middleware (01-98), since it adds to the shared and head data they set.
 - `pages/layout.tsx` wraps its children in `<I18nProvider>` from `void-fbtee/react`.
 - `worker: { compatibility_flags: ["temporal"] }` in `void.config.ts`.
+- `routing: { redirects: { "/": { to: "/<source locale>", status: 301 } } }` in `void.config.ts`:
+  Void's own redirect sends `/` to the source language.
 - tsconfig: `"fbtee/ReactTypes"` in `compilerOptions.types`; `"lib"` with `ES2025`, `DOM`,
   `DOM.Iterable`.
 - Vite+: `lint.jsPlugins` with `@nkzw/eslint-plugin-fbtee` and `void-fbtee/lint` in the

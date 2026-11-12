@@ -27,7 +27,10 @@ const setUp = () => {
     "pages/layout.tsx",
     `export default ({ children }) => <I18nProvider>{children}</I18nProvider>;\n`,
   );
-  write("void.config.ts", `export default { worker: { compatibility_flags: ["temporal"] } };\n`);
+  write(
+    "void.config.ts",
+    `export default {\n  worker: { compatibility_flags: ["temporal"] },\n  routing: { redirects: { "/": { to: "/en-US", status: 301 } } },\n};\n`,
+  );
 };
 
 test("loadProject reads the locales from vite.config.ts", () => {
@@ -38,7 +41,8 @@ test("loadProject reads the locales from vite.config.ts", () => {
 describe("check", () => {
   test("lists missing setup, untranslated strings and missing catalogs", () => {
     const problems = check(p);
-    expect(problems.filter((l) => l.startsWith("setup:"))).toHaveLength(3);
+    // The middleware, the layout, the temporal flag, the "/" redirect.
+    expect(problems.filter((l) => l.startsWith("setup:"))).toHaveLength(4);
     expect(problems).toContain('strings: de-DE: untranslated "Goodbye"');
     expect(problems).toContain("strings: th-TH: no catalog yet");
     expect(problems).not.toContain('strings: de-DE: untranslated "Hello"');

@@ -4,8 +4,9 @@
 //
 //   export { default } from "void-fbtee/middleware";
 //
-// - The locale comes from the first URL segment (/th-TH/...). "/" redirects to the source
-//   locale: one URL per language, as Google wants, and never a redirect by the visitor's language.
+// - The locale comes from the first URL segment (/th-TH/...). "/" goes to the source locale by
+//   Void's own redirects (routing.redirects in void.config.ts, which init adds and check requires):
+//   one URL per language, as Google wants, never a redirect by the visitor's language.
 // - fbtee's per-request state is held by fbtee itself in AsyncLocalStorage (runWithFbtee), so
 //   text rendered after the shell streams in the right language too. It gets every catalog, so
 //   fbtee falls back per message (de-AT -> de -> source text) as its README describes.
@@ -76,9 +77,6 @@ export default defineMiddleware(async (c, next) => {
 
   const found = localeFromPath(path, config);
   const source = config.locales.find((l) => l.locale === config.sourceLocale)!;
-  // Always the source language, never chosen by the visitor's language: Google's crawler sends no
-  // Accept-Language, and redirecting by language hides the other versions from it.
-  if (!found && path === "/" && !light) return c.redirect(`/${source.segment}`, 301);
   const current = found ?? source;
   const rest = found ? path.slice(found.segment.length + 1) : path;
   const i18n: SharedI18n = {
