@@ -22,12 +22,16 @@ first, the upgrade last, then only what needs Void 1.8.0.
        15 links are cast `as never` (`components/SiteHeader.tsx`, `SiteFooter.tsx`, `DocsLayout.tsx`,
        `HomeSections.tsx`, `pages/[lang]/index.tsx`, `docs/index.island.tsx`) and cache paths
        `as RouteUrl[]` (`events/index.server.ts:47`, `events/[id].server.ts:46`, `queues/translate.ts:64`).
-       First find out why our `[lang]` URLs don't type-check, then fix it, in the package if that's
-       where it belongs.
+       Checked 2026-11-12, two causes: - The `as never` on links aren't needed: with two removed from `SiteHeader.tsx:34,41`,
+       `tsc --noEmit` in `apps/example` passes (a planted error proved it runs). Delete them all. - The `as RouteUrl[]` are needed today: the package's `localizedPaths()` returns `string[]`,
+       and `revalidate({ paths })` wants Void's route types (TS2322 at `events/index.server.ts:47`).
+       Fix it in the package: `localizedPaths()` returns route-shaped strings
+       (`` `/${string}${P}` ``), then the three casts go.
        Backed by: playgrounds write typed links with no casts (`react-pages/pages/users/index.tsx:27`).
 
 3. [ ] **The page's language read without casts.** `c.get("shared" as never)` in
-       `events/index.server.ts:14`, `events/[id].server.ts:22,34`, `docs/intl.server.ts:9`. The
+       `events/index.server.ts:14`, `events/[id].server.ts:22,34`, `docs/intl.server.ts:9`, and
+       the package's own five in `packages/void-fbtee/src/middleware.ts:77-92`. The
        package augments `CloudContextVariables` so `c.get(...)` is typed.
        Backed by: Void `docs/guide/type-safety.md` "Context Variables",
        `docs/guide/pages-routing/layouts.md` "Shared Data".
@@ -49,6 +53,10 @@ first, the upgrade last, then only what needs Void 1.8.0.
 7. [ ] **Remove the starter's `routes/api/hello.ts`.** Only `e2e/server.test.ts:56` uses it, to
        check the middleware skips `/api/`. That test uses `POST /api/live` instead, which answers
        at once (not `GET`: that opens a live stream that never ends). Check what it answers first.
+       Checked 2026-11-12: `routes/api/live.ts` is ours; `POST` runs `live.control(c)` (subscribe/
+       unsubscribe), `GET` runs `live.connect(c)` (the stream). The test asserts the answer comes
+       from that route, not a redirect to a language page; the exact status is read off the running
+       server before the line is written.
 
 8. [ ] **README: how we test, and why it differs from Void's guide.** Void's testing guide covers
        unit tests in Node with `vi.mock()` for bindings; ours run the real build on the local
