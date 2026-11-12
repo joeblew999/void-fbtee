@@ -198,12 +198,24 @@ account) is left out: there isn't one.
      | Markdown docs                                    | a deploy                                                | prerendered already                                                                                                                                |
      | Events list (`events/index`)                     | a post, and time (only events not yet started, line 22) | `revalidate = 60`; cleared on posting (already, line 50)                                                                                           |
      | An event (`events/[id]`)                         | a booking (seats left), translations arriving           | `revalidate = 31536000` (until the deploy); cleared on booking (already, line 55) and when translations arrive (already, `queues/translate.ts` 62) |
-     | `/sitemap.xml`, `/manifest.webmanifest` (routes) | a post or translations (sitemap); a deploy (manifest)   | `x-revalidate: 31536000` on the response; the sitemap added to the posting and translation `revalidate()` calls                                    |
+     | `/sitemap.xml`, `/manifest.webmanifest` (routes) | a post or translations (sitemap); a deploy (manifest)   | an entry each in `routing.revalidate` (`void.config.ts`), `31536000`; the sitemap added to the posting and translation `revalidate()` calls        |
 
      Today none but the markdown pages are cached: no page sets a cache time.
 
-   - **In the pages, not one list in `void.config.ts`:** prerendering is a page's own export, so
-     both settings sit beside the page they're about.
+   - **Pages set their own; routes need `void.config.ts`:** a page's cache time is its own
+     export. A route has no page, and Void decides whether to cache a path before it runs any
+     code: no cache time from a page or `routing.revalidate` means no caching, and an
+     `x-revalidate` header can then change nothing (`packages/isr/src/runtime.ts`,
+     `handleIsrInternal`: `if (isrTtl <= 0) return null`, Void 1.7.0). So `/sitemap.xml` and
+     `/manifest.webmanifest` get entries in `routing.revalidate`. XML and JSON are cached like
+     HTML (`handleIsr` passes `htmlOnly: false`).
+   - **Where copies live:** each Cloudflare location's own cache first, then Workers KV, keyed by
+     the deployment's id (`htmlEdgeKey(host, pathname, deploymentId, …)`, same file): that's how
+     a deploy "clears" the cache; the new version just never sees the old copies.
+   - **Not known yet, found out by trying:** whether prerendering a page with a loader works
+     through void-fbtee's middleware the way markdown pages already do (they're prerendered and
+     right in all three languages live, which suggests so). The first step of this work is
+     putting the cache settings in, deploying, and reading `x-isr-cache` on every page.
    - **void-fbtee's part:** a `langParams()` export, each language as `{ lang }` typed as
      `PageParams<"/:lang">[]` (Void's `void/routes`), so a page's `getPrerenderPaths` is
      `export const getPrerenderPaths = langParams;`, and adding a language prerenders it
