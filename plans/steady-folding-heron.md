@@ -106,10 +106,12 @@ docs. One commit per item; pushed together when you say.
 
 ### D. Docs
 
-9. [ ] **README: how we test, and why it differs from Void's guide.** Void's testing guide covers
+9. [x] **README: how we test, and why it differs from Void's guide.** Void's testing guide covers
        unit tests in Node with `vi.mock()` for bindings; ours run the real build on the local
        Cloudflare runtime and against the deployed site, with nothing faked. Formatting can only be
        tested on the Worker's own `Intl`, not Node's.
+       Done: a paragraph under "What's here", which also says `vp test run` needs a Cloudflare
+       login, because Workers AI runs on Cloudflare even locally.
        Backed by: Void `docs/guide/testing.md` (new in 1.8.0; the docs can be read before upgrading).
 
 ## Then: the upgrade, last

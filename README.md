@@ -93,6 +93,15 @@ vp upgrade && vp run upgrade:vite-plus   # upgrade Vite+, then vp check, vp test
 - `e2e/`: the browser tests, and the fresh-install check. `e2e/browsers/`: the Chromium and
   WebKit run (`vp run test:browsers`).
 
+How we test, and why it isn't Void's testing guide: Void's guide
+([docs/guide/testing.md](https://github.com/voidzero-dev/void/blob/main/docs/guide/testing.md))
+covers unit tests in Node, with bindings such as D1 and KV replaced by `vi.mock()`. Ours run the
+real thing with nothing faked: the example's own build on Cloudflare's local runtime
+(`vp test run`), or the deployed site (`vp run test:deployed`). Formatting can only be tested on
+the Worker's own `Intl`, not Node's, which differs. `vp test run` needs a Cloudflare login (or
+`CLOUDFLARE_API_TOKEN`), because the example's Workers AI runs on Cloudflare even locally. The
+package's own tests (`packages/void-fbtee/test/`) are plain tests of its commands, in Node.
+
 The tasks are in `vite.config.ts` and `apps/example/vite.config.ts`.
 
 - `vp run test:production` tests the URL the last `vp run deploy` reported.
