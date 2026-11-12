@@ -8,7 +8,6 @@ import { defineQueue } from "void";
 import { ai } from "void/ai";
 import { db, eq } from "void/db";
 import { revalidate } from "void/isr";
-import type { RouteUrl } from "void/routes";
 import { appLocales, localizedPaths } from "void-fbtee/middleware";
 import { eventTopic, live } from "../src/live";
 
@@ -61,7 +60,7 @@ export default defineQueue<Message>(async (batch) => {
         .onConflictDoNothing();
     }
     await revalidate({
-      paths: [...localizedPaths(`/events/${event.id}`), ...localizedPaths("/events")] as RouteUrl[],
+      paths: [...localizedPaths(`/events/${event.id}`), ...localizedPaths("/events")],
     });
     await live.publish(eventTopic(event.id), {}, { type: "translated" });
     message.ack();

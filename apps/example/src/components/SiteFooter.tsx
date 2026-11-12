@@ -38,7 +38,7 @@ export default function SiteFooter() {
             .flatMap((g) => g.entries)
             .map((e) => (
               <li key={e.slug}>
-                <Link href={href(e.slug) as never} className={linkClass}>
+                <Link href={href(e.slug)} className={linkClass}>
                   {e.title}
                 </Link>
               </li>
@@ -50,7 +50,7 @@ export default function SiteFooter() {
           }
         >
           <li>
-            <Link href={`/${locale}/events` as never} className={linkClass}>
+            <Link href={`/${locale}/events`} className={linkClass}>
               <fbt desc="Navigation: the demo, the events app people post and book in">Demo</fbt>
             </Link>
           </li>

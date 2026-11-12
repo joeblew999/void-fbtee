@@ -36,8 +36,9 @@ export interface SharedI18n {
  * "/th-TH/events", …]. For anything that acts on all of them, such as clearing Void's page cache
  * after a change (`revalidate({ paths: localizedPaths(…) })` from void/isr).
  */
-export function localizedPaths(path: string): string[] {
-  return config.locales.map((l) => `/${l.segment}${path}`);
+export function localizedPaths<P extends `/${string}`>(path: P): `/${string}${P}`[] {
+  // Typed as the page's path under some language, so Void's typed routes accept it as it is.
+  return config.locales.map((l) => `/${l.segment}${path}` as const);
 }
 
 /** The app's languages (`voidFbtee({ locales })`), for server code that works per language. */

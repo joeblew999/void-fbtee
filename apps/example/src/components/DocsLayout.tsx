@@ -69,7 +69,7 @@ export function useDocs() {
   const { locale, path } = useLocale();
   const md = (slug: string) => pages.find((p) => p.path === `/${locale}/docs/${slug}`);
   const groups = sidebar((slug) => md(slug)?.title ?? slug);
-  const href = (slug: string) => `/${locale}/docs/${slug}`;
+  const href = (slug: string) => `/${locale}/docs/${slug}` as const;
   const current = path.replace(/^\/docs\/?/, "");
   const page = md(current);
   const headings: readonly Heading[] | undefined = page?.headings ?? OUTLINES[current]?.();
@@ -91,7 +91,7 @@ function Sidebar({
             {g.entries.map((e) => (
               <li key={e.slug}>
                 <Link
-                  href={href(e.slug) as never}
+                  href={href(e.slug)}
                   aria-current={e.slug === current ? "page" : undefined}
                   className={cn(
                     "block py-1 text-sm transition-colors duration-150 hover:text-foreground",
@@ -148,7 +148,7 @@ function PrevNext({
   return (
     <nav className="mt-16 grid gap-4 border-t pt-8 sm:grid-cols-2">
       {prev ? (
-        <Link href={href(prev.slug) as never} className={box} data-testid="docs-prev">
+        <Link href={href(prev.slug)} className={box} data-testid="docs-prev">
           <span className="text-xs text-muted-foreground">
             <fbt desc="Docs: label on the link to the previous page">Previous page</fbt>
           </span>
@@ -158,11 +158,7 @@ function PrevNext({
         <span />
       )}
       {next && (
-        <Link
-          href={href(next.slug) as never}
-          className={cn(box, "text-end")}
-          data-testid="docs-next"
-        >
+        <Link href={href(next.slug)} className={cn(box, "text-end")} data-testid="docs-next">
           <span className="text-xs text-muted-foreground">
             <fbt desc="Docs: label on the link to the next page">Next page</fbt>
           </span>

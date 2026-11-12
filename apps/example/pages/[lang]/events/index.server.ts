@@ -5,7 +5,6 @@ import { defineHandler, type InferProps } from "void";
 import { and, asc, db, eq, gte } from "void/db";
 import { queues } from "void/queues";
 import { revalidate } from "void/isr";
-import type { RouteUrl } from "void/routes";
 import { localizedPaths, type SharedI18n } from "void-fbtee/middleware";
 
 export type Props = InferProps<typeof loader>;
@@ -44,7 +43,7 @@ export const action = defineHandler.withValidator({ body: newEventSchema })(asyn
     .returning({ id: events.id });
   // Translated into the other languages after this (queues/translate.ts).
   await queues.translate.send({ eventId: created.id });
-  await revalidate({ paths: localizedPaths("/events") as RouteUrl[] });
+  await revalidate({ paths: localizedPaths("/events") });
   return c.redirect({
     pathname: "/[lang]/events/[id]",
     params: { lang: c.req.param("lang")!, id: created.id },

@@ -53,15 +53,21 @@ docs. One commit per item; pushed together when you say.
 
 ### B. Types: the casts go, nothing on screen changes
 
-5. [ ] **Typed links without casts.** `void.config.ts` has `routing.typedRoutes: true`, yet about
-       15 links are cast `as never` (`SiteHeader.tsx`, `SiteFooter.tsx`, `DocsLayout.tsx`,
+5. [x] **Typed links without casts.** `void.config.ts` has `routing.typedRoutes: true`, yet about
+       15 links were cast `as never` (`SiteHeader.tsx`, `SiteFooter.tsx`, `DocsLayout.tsx`,
        `HomeSections.tsx`, `pages/[lang]/index.tsx`, `docs/index.island.tsx`) and cache paths
        `as RouteUrl[]` (`events/index.server.ts:47`, `events/[id].server.ts:46`, `queues/translate.ts:64`).
-       Checked 2026-11-12, two causes: - The `as never` on links aren't needed: with two removed from `SiteHeader.tsx:34,41`,
-       `tsc --noEmit` in `apps/example` passes (a planted error proved it runs). Delete them all. - The `as RouteUrl[]` are needed today: the package's `localizedPaths()` returns `string[]`,
-       and `revalidate({ paths })` wants Void's route types (TS2322 at `events/index.server.ts:47`).
-       Fix it in the package so `localizedPaths()` returns route-shaped strings, then the three
-       casts go.
+       Checked 2026-11-12: links written in place need no cast. Links from helpers did, because
+       the helpers were typed as plain strings, and so did the cache paths, because the package's
+       `localizedPaths()` returned `string[]`.
+       Done: `localizedPaths()` is typed as route paths; the helpers (`DocsLayout.tsx` `href`, the
+       home page's cards) keep their route shape with `as const`; no casts are left.
+       Found doing it: typed routes can't catch a wrong link in this app. With pages under
+       `[lang]`, Void's route types include `` `/${string}` ``, which matches any path (a planted
+       link to `/${locale}/no-such-page` type-checked). And `test:browsers` follows every link but
+       never checked the page loaded: a broken link gets Void's not-found page, which hydrates
+       fine. So `e2e/server.test.ts` gets "every link on the main pages leads to a page": each
+       link on each language's home, docs and events pages is fetched and must answer 200.
        Backed by: playgrounds write typed links with no casts (`react-pages/pages/users/index.tsx:27`).
 
 6. [ ] **The page's language read without casts.** `c.get("shared" as never)` in

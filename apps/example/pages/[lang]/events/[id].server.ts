@@ -3,7 +3,6 @@ import { bookings, bookSchema, event_texts, events } from "@schema";
 import { defineHandler, type InferProps } from "void";
 import { and, count, db, eq, sql } from "void/db";
 import { revalidate } from "void/isr";
-import type { RouteUrl } from "void/routes";
 import { localizedPaths, type SharedI18n } from "void-fbtee/middleware";
 import { eventTopic, live } from "../../../src/live";
 
@@ -43,7 +42,7 @@ export const action = defineHandler.withValidator({ body: bookSchema })(async (c
   const [event] = await db.select({ seats: events.seats }).from(events).where(eq(events.id, id));
   const left = event.seats - (await booked(id));
   // This event's page, in every language (the list shows each event's seats, not what's left).
-  await revalidate({ paths: localizedPaths(`/events/${id}`) as RouteUrl[] });
+  await revalidate({ paths: localizedPaths(`/events/${id}`) });
   await live.publish(eventTopic(id), { left }, { type: "seats" });
   // No return: Void reruns the loader, so the page shows the new count.
 });

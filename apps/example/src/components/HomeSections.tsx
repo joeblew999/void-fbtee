@@ -52,7 +52,7 @@ export function AddIt() {
           </fbt>
         </p>
         <Link
-          href={`/${locale}/docs/setup` as never}
+          href={`/${locale}/docs/setup`}
           className="group mt-6 inline-flex items-center gap-2 font-medium text-brand"
         >
           <fbt desc="Home page link to the setup page of the docs">Read the full setup</fbt>
@@ -241,7 +241,7 @@ export function Features() {
               ))}
             </ul>
             <Link
-              href={`/${locale}/docs/${f.page}` as never}
+              href={`/${locale}/docs/${f.page}`}
               className="group mt-5 inline-flex items-center gap-2 text-sm font-medium text-brand"
             >
               <fbt desc="Home page: link from a feature to the docs page about it">Read more</fbt>
@@ -279,7 +279,7 @@ export function Closing() {
       </h2>
       <div className="mt-8 flex flex-wrap gap-3">
         <Link
-          href={`/${locale}/docs/setup` as never}
+          href={`/${locale}/docs/setup`}
           className={cn(buttonVariants({ size: "lg" }), "h-11 gap-2 px-5")}
         >
           <fbt desc="Button: start with the setup page of the docs">Get started</fbt>

@@ -193,7 +193,7 @@ function Hero(props: Props) {
         </p>
         <div className="mt-10 flex flex-wrap gap-3">
           <Link
-            href={`/${locale}/events` as never}
+            href={`/${locale}/events`}
             className={cn(buttonVariants({ size: "lg" }), "h-11 gap-2 px-5")}
             data-testid="try-demo"
           >
@@ -203,7 +203,7 @@ function Hero(props: Props) {
             <ArrowRight className="rtl:-scale-x-100" aria-hidden />
           </Link>
           <Link
-            href={`/${locale}/docs` as never}
+            href={`/${locale}/docs`}
             className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 px-5")}
           >
             <fbt desc="Navigation: the documentation">Docs</fbt>
@@ -221,7 +221,7 @@ function Pages() {
   const { locale } = useLocale();
   const pages = [
     {
-      href: `/${locale}/events`,
+      href: `/${locale}/events` as const,
       title: <fbt desc="Home card title: the events app">Events</fbt>,
       text: (
         <fbt desc="Home card text: what the events app shows">
@@ -230,7 +230,7 @@ function Pages() {
       ),
     },
     {
-      href: `/${locale}/docs/intl`,
+      href: `/${locale}/docs/intl` as const,
       title: "Intl",
       text: (
         <fbt desc="Home card text: what the Intl page shows">
@@ -239,7 +239,7 @@ function Pages() {
       ),
     },
     {
-      href: `/${locale}/docs`,
+      href: `/${locale}/docs` as const,
       title: <fbt desc="Home card title: the documentation">Docs</fbt>,
       text: (
         <fbt desc="Home card text: what the docs show">
@@ -253,7 +253,7 @@ function Pages() {
       {pages.map((p) => (
         <Link
           key={p.href}
-          href={p.href as never}
+          href={p.href}
           className="group border-b p-6 transition-colors duration-200 last:border-b-0 hover:bg-muted/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring sm:border-e sm:border-b-0 sm:last:border-e-0"
         >
           <h2 className="flex items-center justify-between text-xl font-medium">

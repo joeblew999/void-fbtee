@@ -31,14 +31,14 @@ export default function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b bg-background">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 px-4">
-        <Link href={`/${locale}` as never} className="flex h-14 items-center pe-2 font-semibold">
+        <Link href={`/${locale}`} className="flex h-14 items-center pe-2 font-semibold">
           void-fbtee
         </Link>
         <nav className="order-last -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto px-4 pb-2 md:order-none md:mx-0 md:w-auto md:overflow-visible md:p-0">
           {PAGES.map((page) => (
             <Link
               key={page}
-              href={`/${locale}${page}` as never}
+              href={`/${locale}${page}`}
               aria-current={page === current ? "page" : undefined}
               className={cn(
                 buttonVariants({ variant: page === current ? "secondary" : "ghost", size: "sm" }),
@@ -54,7 +54,7 @@ export default function SiteHeader() {
           {locales.map((l) => (
             <Link
               key={l.locale}
-              href={`/${l.segment}${path}` as never}
+              href={`/${l.segment}${path}`}
               hrefLang={l.locale}
               lang={l.locale}
               aria-current={l.locale === locale ? "true" : undefined}

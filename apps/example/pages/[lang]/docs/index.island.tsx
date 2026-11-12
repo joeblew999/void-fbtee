@@ -24,7 +24,7 @@ export default function DocsIndex() {
               {g.entries.map((e) => (
                 <li key={e.slug}>
                   <Link
-                    href={href(e.slug) as never}
+                    href={href(e.slug)}
                     className="group inline-flex items-center gap-2 text-muted-foreground transition-colors duration-150 hover:text-foreground"
                   >
                     {e.title}

@@ -53,6 +53,26 @@ test("the server never shows a stand-in for the reader's own time: those lines c
   }
 });
 
+// Typed routes can't catch a wrong link here: with pages under [lang], Void's route types include
+// `/${string}`, which TypeScript matches to any path. So every link on the main pages is fetched.
+test("every link on the main pages leads to a page", async () => {
+  const broken: string[] = [];
+  for (const l of LOCALES)
+    for (const start of [`/${l}`, `/${l}/docs`, `/${l}/events`]) {
+      const html = await (await get(start)).text();
+      const links = new Set(
+        [...html.matchAll(/href="(\/[^"#]*)/g)]
+          .map((m) => m[1]!)
+          .filter((h) => !h.startsWith("//") && !/\.[a-z0-9]+$/i.test(h)),
+      );
+      for (const link of links) {
+        const res = await get(link, { redirect: "manual" });
+        if (res.status !== 200) broken.push(`${start} → ${link}: ${res.status}`);
+      }
+    }
+  expect(broken).toEqual([]);
+});
+
 test("the middleware leaves files and API routes alone", async () => {
   expect((await get("/void.svg")).status).toBe(200);
   expect((await get("/api/hello")).status).toBe(200);
