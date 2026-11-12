@@ -80,12 +80,24 @@ makes models, migrations, routes, middleware, SSR, crons and queues only.
    whether 0.63.2 has either is unknown. A Thai and an Arabic picture must be rendered and looked
    at before choosing it; if they're wrong, static pictures per language, made once.
 
-## To decide (by Claude, reasons with each)
+## Decided (by Claude, 2026-11-12, reasons with each)
 
-1. **Who writes the tags:** code pages from their own `head()` (Void's example), through one
-   void-fbtee function so each page adds one line; markdown pages from their frontmatter, read
-   from `@void/md/pages` by the middleware (void-fbtee's, with @void/md optional, as `void-fbtee/lint`
-   treats Vite+).
+1. **Who writes which tags**, each at the one layer that knows it:
+   - **`void.config.ts` `head`, once for the site** (they never change): `og:site_name`,
+     `og:type` (`website`), `og:image` with `og:image:width`/`height`/`alt` (the picture has only
+     the name on it, so its alt text, "void-fbtee", is a name and isn't translated),
+     `twitter:card` (`summary_large_image`), `apple-mobile-web-app-title`, `color-scheme`.
+   - **void-fbtee middleware, per language** (it knows the language and the address): canonical,
+     hreflang, `og:locale` (there today), and `og:url`, the same address as the canonical.
+   - **Each code page's `head()`**: `og:title` and `og:description` from its own translated
+     strings, through one small void-fbtee function that returns its title, description and
+     those two tags together, so a page adds no extra lines (Void's own example puts `og:title`
+     in the page's `head()`).
+   - **Markdown pages**: `og:title` and `og:description` from their frontmatter, added by
+     void-fbtee's middleware from `@void/md/pages` when the app has `@void/md` (optional, as
+     `void-fbtee/lint` treats Vite+), since a markdown page has no `head()` of its own.
+   - **No `twitter:title`/`description`/`image`**: X reads the `og:` tags when its own are missing
+     (X's "About Cards", via specification.website's Open Graph page, checked 2026-11-12).
 2. **`og:image`: decided (2026-11-12, with the user): one picture for the whole site**, as most
    sites do (one site-wide picture is the norm; per-page pictures are for things shared on their
    own, such as posts and products). No sentence on it, only the name "void-fbtee" (a name, not
@@ -98,10 +110,10 @@ makes models, migrations, routes, middleware, SSR, crons and queues only.
    notes recent Satori versions don't run on Workers out of the box) with an open pull request,
    #688, not merged (both checked 2026-11-12). Only after a Thai and an Arabic picture are
    rendered and look right (item 3 above).
-3. **Manifest per language:** one per language, linked from that language's pages, name and
-   description through the same catalogs.
-4. **`og:locale:alternate`:** Void's de-duplication is documented, by design: at most a feature
-   request to Void, with the user's OK.
+3. **One manifest, not one per language**: its only visible words are the app's name, a name
+   that isn't translated; one manifest is what multilingual sites normally have.
+4. **`og:locale:alternate` left out**: Void's de-duplication is documented, by design; at most a
+   feature request to Void later, with the user's OK.
 
 ## Also in this work (left out of the first draft)
 
@@ -110,7 +122,6 @@ makes models, migrations, routes, middleware, SSR, crons and queues only.
   place), so search can show events.
 - **The not-found and error pages translated** (`plans/brisk-copper-wren.md` item 3, done
   together; no `noindex`, their 404/500 status keeps them out of search).
-- **`color-scheme`** (`dark`), and `apple-mobile-web-app-title`.
 - **Offline (service worker)**: a separate trial of vite-plugin-pwa with Void, reported before
   anything is added; not done blind.
 - **Checked from outside:** each language's page through a link-preview validator and Google's
