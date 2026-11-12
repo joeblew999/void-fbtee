@@ -1,13 +1,13 @@
 // One event: its title and description in the language the organiser wrote them in (marked with
 // lang, so the browser and screen readers use the right one), its start on both clocks, the seats
 // left (live: every open page sees a booking), and booking a seat with Void's useForm.
-import { routeUrl } from "void/routes";
 import { Fragment, useEffect, useState } from "react";
 import { fbt } from "fbtee";
 import { Form, useForm } from "@void/react";
 import { connectLiveStream } from "void/live/client";
-import { Formatted, Link, useLocale, useTimeZone } from "void-fbtee/react";
+import { Formatted, useLocale, useTimeZone } from "void-fbtee/react";
 import { EventTime } from "@/components/EventTime";
+import { EventsCrumbs } from "@/components/EventsCrumbs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -152,7 +152,7 @@ function Stored({ event }: { event: Props["event"] }) {
 }
 
 export default function Event({ event, text, left }: Props) {
-  const { locale, lang } = useLocale();
+  const { locale } = useLocale();
   // The browser's zone once known (null before); nothing has been typed into the form yet.
   const zone = useTimeZone();
   const seatsLeft = useLiveEvent(event.id, left);
@@ -162,12 +162,7 @@ export default function Event({ event, text, left }: Props) {
   const written = new Intl.DisplayNames(locale, { type: "language" }).of(event.locale);
   return (
     <article className="grid gap-6">
-      <Link
-        href={routeUrl("/[lang]/events", { params: { lang } })}
-        className="text-muted-foreground text-sm"
-      >
-        <fbt desc="Link back to the list of events">All events</fbt>
-      </Link>
+      <EventsCrumbs lang={textLang}>{shown.title}</EventsCrumbs>
       <h1 className="text-3xl font-medium" lang={textLang} data-testid="event-title">
         {shown.title}
       </h1>

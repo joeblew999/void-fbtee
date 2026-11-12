@@ -1,10 +1,10 @@
 // Posting an event: Void's useForm and Form, typed from the action in new.server.ts. What it sends
 // is neutral (the picker's "2026-04-01T20:00" and a zone name); the event's page shows it back in
 // every language and on every clock.
-import { routeUrl } from "void/routes";
 import { fbt } from "fbtee";
 import { Form, useForm } from "@void/react";
-import { Link, useLocale, useTimeZone } from "void-fbtee/react";
+import { useLocale, useTimeZone } from "void-fbtee/react";
+import { EventsCrumbs } from "@/components/EventsCrumbs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -119,17 +119,13 @@ function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
 }
 
 export default function NewEvent({ zones }: Props) {
-  const { lang } = useLocale();
   // The browser's zone once known (null before); nothing has been typed into the form yet.
   const zone = useTimeZone();
   return (
     <div className="grid gap-6">
-      <Link
-        href={routeUrl("/[lang]/events", { params: { lang } })}
-        className="text-muted-foreground text-sm"
-      >
-        <fbt desc="Link back to the list of events">All events</fbt>
-      </Link>
+      <EventsCrumbs>
+        <fbt desc="Heading of the form for posting a new event">Post an event</fbt>
+      </EventsCrumbs>
       <h1 className="text-3xl font-medium" data-testid="new-event-title">
         <fbt desc="Heading of the form for posting a new event">Post an event</fbt>
       </h1>

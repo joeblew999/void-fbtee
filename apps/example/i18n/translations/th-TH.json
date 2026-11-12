@@ -409,18 +409,6 @@
       ],
       "types": []
     },
-    "cpTLVzYwVvfyuSoDp7Wrtw==": {
-      "description": "Link back to the list of events",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "กิจกรรมทั้งหมด",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "fWba9x96UoFvV1W4cYEeUQ==": {
       "description": "How many seats an event has",
       "status": "translated",
@@ -1832,6 +1820,18 @@
       "translations": [
         {
           "translation": "โพสต์กิจกรรมเป็นภาษาของคุณ ตามเวลาในเมืองของคุณ แล้วทุกคนจะเห็นตามเวลาของตัวเอง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "P8ckWcezTuBnZX1Y7/eVSw==": {
+      "description": "Label of the row showing where you are on the site",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ตำแหน่งของคุณ",
           "variations": {}
         }
       ],

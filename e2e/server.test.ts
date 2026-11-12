@@ -186,6 +186,12 @@ test("the events list links to /events/new, the form for posting one", async () 
     expect(res.status, `${l}/events/new`).toBe(200);
     const form = await res.text();
     expect(form).toContain('data-testid="event-post"');
+    // "Events › Post an event": the first part goes back to the list.
+    expect(form).toMatch(
+      new RegExp(
+        `data-testid="events-crumbs"[\\s\\S]*?href="/${l}/events"[^>]*data-testid="crumb-events"`,
+      ),
+    );
     expect(form).toMatch(new RegExp(`data-testid="new-event-title"[^>]*>${heading[l]}<`));
   }
 });

@@ -577,18 +577,6 @@
       ],
       "types": []
     },
-    "cpTLVzYwVvfyuSoDp7Wrtw==": {
-      "description": "Link back to the list of events",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "كل الفعاليات",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "fWba9x96UoFvV1W4cYEeUQ==": {
       "description": "How many seats an event has",
       "status": "translated",
@@ -2198,6 +2186,18 @@
       "translations": [
         {
           "translation": "انشر فعالية بلغتك، على توقيت مدينتك، وسيراها كل شخص على توقيته.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "P8ckWcezTuBnZX1Y7/eVSw==": {
+      "description": "Label of the row showing where you are on the site",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "أين أنت",
           "variations": {}
         }
       ],
