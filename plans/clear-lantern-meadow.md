@@ -63,14 +63,16 @@ the whole; this is the whole, to approve and do as one piece of work.
    void-fbtee function so each page adds one line; markdown pages from their frontmatter, read
    from `@void/md/pages` by the middleware (void-fbtee's, with @void/md optional, as `void-fbtee/lint`
    treats Vite+).
-2. **`og:image`: decided (2026-11-12, with the user): one fixed picture per language**, as most
+2. **`og:image`: decided (2026-11-12, with the user): one picture for the whole site**, as most
    sites do (one site-wide picture is the norm; per-page pictures are for things shared on their
-   own, such as posts and products). 1200×630, the site's name and the globe from
-   `public/favicon.svg` on the site's background, with one short line in that language; made
-   once and kept in `public/` (made the same way as the icons if a standard tool can, else by
-   hand from an SVG), `og:image:alt` translated. Per-page pictures (an event's name on its
-   page) later, through Void's planned Satori support (voidzero-dev/void#442), only after a Thai
-   and an Arabic picture are rendered and look right (item 3 above).
+   own, such as posts and products). No sentence on it, only the name "void-fbtee" (a name, not
+   translated) and the globe from `public/favicon.svg` on the site's background, so the same
+   picture fits every language: the preview's title and description already come in the page's
+   language from its own tags. 1200×630, made once and kept in `public/` (made the same way as
+   the icons if a standard tool can, else from an SVG). Only `og:image:alt` is translated. Per-page
+   pictures (an event's name on its page) later, through Void's planned Satori support
+   (voidzero-dev/void#442), only after a Thai and an Arabic picture are rendered and look right
+   (item 3 above).
 3. **Manifest per language:** one per language, linked from that language's pages, name and
    description through the same catalogs.
 4. **`og:locale:alternate`:** report Void's de-duplication (with the user's OK), as #802 was.
