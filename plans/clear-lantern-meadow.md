@@ -54,7 +54,7 @@ peer range `void ^1.7.0` checked against what it then uses (`plans/brisk-copper-
 | Structured data (JSON-LD)                                                                    | `schema-dts` (Google)                               | 2.1.0, 2026-10-02                         | Types only (devDependency): `WebSite`, `Event` objects checked against schema.org.                                                                                                                                                                                                             |
 | Icons                                                                                        | `@vite-pwa/assets-generator`                        | 2.0.0, 2026-10-25                         | In use (`vp run icons`).                                                                                                                                                                                                                                                                       |
 | Preview picture (one, fixed)                                                                 | `sharp`                                             | already installed with the icon generator | Renders the picture's SVG to PNG once, like the icons.                                                                                                                                                                                                                                         |
-| Sitemap with language alternates                                                             | `sitemap`                                           | 10.0.0, 2026-10-19                        | Writes `xhtml:link` hreflang alternates. Decided below.                                                                                                                                                                                                                                        |
+| Sitemap XML                                                                                  | `fast-xml-builder`                                  | 1.3.1, 2026-08-14, MIT                    | Pure JS, runs on Workers; tried. `sitemap` (10.0.0) needs Node streams and files, which the Worker doesn't have.                                                                                                                                                                               |
 | Preview pictures per page, maybe later                                                       | `@cf-wasm/og` (Satori + resvg packaged for Workers) | 0.5.0, 2026-08-01                         | Solves what #442 says is hard on Workers. Only after Thai and Arabic render right.                                                                                                                                                                                                             |
 | Checking: search audits (title, description, hreflang, canonical, `robots.txt`, `lang`, alt) | `lighthouse` / `@lhci/cli`                          | 13.6.0, 2026-11-12 / 0.16.1, 2026-11-11   | Runs unattended against the preview or deployed site.                                                                                                                                                                                                                                          |
 | Checking: previews as sharing apps read them                                                 | `open-graph-scraper`                                | 6.13.0, 2026-10-29                        | Reads `og:`/`twitter:` from a page.                                                                                                                                                                                                                                                            |
@@ -103,15 +103,34 @@ is (X doesn't fall back to `og:image:alt`).
    `*_localized`). Add `id`, `lang`, `dir` and `description_localized` for each language from the
    catalogs; the name stays a name. `start_url` `/` redirects to the source language, so an
    installed app opens in English: said in the README.
-4. **Sitemap: yes, made when it's requested, not at build.** Visitors post events after every
-   deploy, so a sitemap built at deploy time would miss them from the first new post. A server
-   route, `routes/sitemap.xml.ts`, lists the fixed pages, the markdown pages (`@void/md/pages`) and
-   the events (from the database), each in every language with its hreflang alternates, cached by
-   Void's revalidation (`docs/guide/edge/revalidation.md`) so it isn't rebuilt on every request;
-   and a `Sitemap:` line in `robots.txt`. This is how dynamic sites normally do it (Next.js's
-   `app/sitemap.ts` is such a route). Before choosing `sitemap` (built on Node streams), check it
-   runs on Cloudflare Workers with the Worker's Node compatibility; if not, a small XML builder
-   that does, never hand-written XML.
+4. **Sitemap: made when it's requested, by a server route; checked 2026-11-12:**
+   - **Why not at build:** visitors post events after every deploy; a build-time sitemap would
+     miss them from the first new post.
+   - **The route:** `routes/sitemap.xml.ts` answers `/sitemap.xml` (Void strips only `.ts` and a
+     `.dev`/`.prod` suffix, `packages/void/src/router/parse-filename.ts`), and void-fbtee's
+     middleware lets it through (the answering route isn't a `[lang]` page).
+   - **What it lists:** the app's code pages, written in the route with `routeUrl()` so each is
+     type-checked (Void has no public runtime list of routes; `virtual:void-routes` is internal);
+     markdown pages from `@void/md/pages` (it resolves on the server); events from the database,
+     each with its `updatedAt` as `<lastmod>`. Every entry in every language, each listing all
+     the languages including itself, plus `x-default`. No `<lastmod>` where there's no honest
+     date (markdown, code pages); no `changefreq`/`priority` (Google ignores them).
+   - **Cached by Void, cleared when events change:** a long entry for `/sitemap.xml` in
+     `routing.revalidate` (or `x-revalidate` on the response), and `revalidate({ paths:
+     ["/sitemap.xml"] })` from `void/isr` wherever an event is created or changed
+     (`docs/guide/edge/revalidation.md`, "Per-response TTL override", "On-demand revalidation").
+   - **The XML: `fast-xml-builder`** (1.3.1, 2026-08-14, MIT; the writer of `fast-xml-parser`,
+     5.12.0, 2026-11-03): no Node built-ins, two small pure-JS dependencies; tried: it writes
+     `<urlset>` with `xhtml:link` alternates and escapes values (`a&b<c>` → `a&amp;b&lt;c&gt;`).
+     Not `sitemap` (10.0.0): it imports `node:stream`, `node:fs`, `node:zlib`,
+     `node:child_process`, `node:readline`, and the Worker has only the `temporal` and
+     `nodejs_als` flags (`apps/example/dist/ssr/wrangler.json`).
+   - **Google's rules** (Search Central, "Build and submit a sitemap"): one file up to 50,000 URLs
+     or 50 MB uncompressed, else a sitemap index; values entity-escaped. Far under the limit
+     here; an index when events approach it.
+   - **`robots.txt`** gains `Sitemap: <site>/sitemap.xml`.
+   - The hreflang in the sitemap and in the pages come from the same void-fbtee function, so
+     they can't disagree.
 5. **Structured data** through one escaping helper in the package (`jsonLd(obj)`: `JSON.stringify`
    with `<`, U+2028 and U+2029 escaped), never raw `innerHTML`: event names come from visitors.
    `WebSite` on each language's home page (Google reads it only on a site's root home page, here a
@@ -144,10 +163,10 @@ What's per language is void-fbtee's; the site's brand (name, picture, icons) is 
    declared, never-imported peer fails the `unused` check). The virtual module's type in
    `src/virtual.d.ts` is the package's own (`path`, `frontmatter`), so the built types don't
    reach for `@void/md`. `@void/md` a devDependency, for the test.
-5. **The sitemap's part in the package**: void-fbtee gives what's about languages, a function that
-   turns a page's path into its entry in every language with the alternates
-   (`void-fbtee/head` or its own entry, decided when written); the app's route
-   (`routes/sitemap.xml.ts`) adds its own pages and data, here the events.
+5. **The sitemap's part in the package**: `void-fbtee/head` gains `alternates(path)`, a page's
+   address in every language plus `x-default`, from the `site` option; the middleware uses it for
+   hreflang, and the app's `routes/sitemap.xml.ts` for each entry, writing the XML with
+   `fast-xml-builder` (the app's dependency, not the package's: the sitemap is the app's route).
 6. **`check`** reports a translated markdown copy without the `title` or `description` its
    original has.
 7. **`init`** adds the `site` option (item 1); the rest needs no setup.
