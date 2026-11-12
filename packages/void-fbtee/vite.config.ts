@@ -14,7 +14,10 @@ export default defineConfig({
     },
     format: ["esm"],
     dts: true,
-    deps: { neverBundle: [/^virtual:void-fbtee\//] },
+    // Nothing from node_modules is bundled, code or types: a copy would differ from the app's
+    // own (Hono's types once came in through the middleware's, as Void's defineMiddleware returns
+    // Hono's type). onlyBundle makes any bundled package a build error.
+    deps: { neverBundle: [/^virtual:void-fbtee\//], onlyBundle: [] },
     // Checks of the package as the people who install it get it, on every build: publint (the
     // package as npm would publish it), Are the Types Wrong? (its types resolve for every
     // consumer; ES modules only, so the esm-only profile), and dependencies declared but unused.

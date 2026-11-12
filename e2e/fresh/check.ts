@@ -182,6 +182,8 @@ function pack(): string {
   check(manifest.description?.trim(), "tarball: a description");
   check(manifest.license === "MIT", "tarball: MIT license");
   check(https(manifest.homepage) && https(manifest.bugs?.url), "tarball: https homepage and bugs");
+  // tsdown lists any package it copied into the build here (code or types).
+  check(!manifest.inlinedDependencies, "tarball: no other package copied into it");
   check(files.includes("package/LICENSE"), "tarball: LICENSE");
   check(files.includes("package/README.md"), "tarball: README.md");
   const unpacked = ["dependencies", "peerDependencies", "optionalDependencies", "devDependencies"]

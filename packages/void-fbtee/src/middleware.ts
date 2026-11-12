@@ -71,7 +71,9 @@ function answeringRoute(c: { req: { routeIndex: number } }): string | undefined 
     .find((r) => r.path !== "*" && r.path !== "/*")?.path;
 }
 
-export default defineMiddleware(async (c, next) => {
+// Typed by Void's own name for it, so the built types point to "void" (every app has it) rather than
+// carrying a copy of Hono's (Void's dependency; a pnpm app can't import it).
+const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (c, next) => {
   const path = c.req.path;
   const light = LIGHT.test(path);
 
@@ -121,3 +123,5 @@ export default defineMiddleware(async (c, next) => {
     madeUp ? c.notFound() : next(),
   );
 });
+
+export default middleware;
