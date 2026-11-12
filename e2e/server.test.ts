@@ -96,7 +96,12 @@ test("every link on the main pages leads to a page", async () => {
 
 test("the middleware leaves files and API routes alone", async () => {
   expect((await get("/void.svg")).status).toBe(200);
-  expect((await get("/api/hello")).status).toBe(200);
+  // An empty POST to the live stream's control route (routes/api/live.ts): Void's live code
+  // rejects the missing body itself, with its own JSON (packages/void/src/runtime/live.ts,
+  // readControlRequest), so the request reached the route rather than a redirect or not-found page.
+  const res = await get("/api/live", { method: "POST", redirect: "manual" });
+  expect(res.status).toBe(400);
+  expect(await res.json()).toMatchObject({ accepted: false });
 });
 
 // It reads the build on disk, which the tests make only when they run the site themselves: against a

@@ -26,12 +26,16 @@ docs. One commit per item; pushed together when you say.
        Backed by: Void `docs/reference/structure.md` ("`src/`: Shared application code such as
        components, utilities, and types").
 
-2. [ ] **Remove the starter's `routes/api/hello.ts`.** Only `e2e/server.test.ts:58` uses it, to
+2. [x] **Remove the starter's `routes/api/hello.ts`.** Only `e2e/server.test.ts:58` uses it, to
        check the middleware skips `/api/`. That test uses `POST /api/live` instead.
        Checked 2026-11-12: `routes/api/live.ts` is ours; `POST` runs `live.control(c)` (subscribe and
        unsubscribe) and answers at once; `GET` runs `live.connect(c)`, a stream that never ends. The
        test asserts the answer comes from that route, not a redirect to a language page; the exact
        status is read off the running server before the line is written.
+       Done: the answer read from Void's code (the server couldn't run here then, with no
+       Cloudflare sign-in): an empty POST gets 400 with Void's own JSON (`accepted: false`) from
+       `readControlRequest` (`packages/void/src/runtime/live.ts:410-414`, ee4eaa7). The test
+       checks both, and the full run proves it on the real server.
 
 3. [x] **Middleware numbered: `middleware/99.i18n.ts`.** Void orders middleware by the number in
        the file name; an unnumbered file gets order Infinity, so ours already runs last, but only by
