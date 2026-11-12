@@ -87,11 +87,19 @@ Against Vite+'s library template:
        get the newest Vite+ and Void, so a release that breaks void-fbtee shows up within a week,
        as Vite+ 1.6.0 did on 2026-11-12.
 
-## C. Then the example and the docs
+## C. Docs with the package; the example only exercises it
 
-10. [ ] **Whatever A and B change in how the package is used** goes into the example, the
-        README's "Add it to a Void app", the skill and the setup pages (all three languages).
-        The example keeps the package as a workspace dependency, as Void's own playgrounds do.
+As fbtee (`website/` for docs, `example/` for the demo) and Void (`docs/`, `playground/`) do.
+
+10. [ ] **The package's docs live once, with the package:** its README (developers) and
+        `skills/void-fbtee/SKILL.md` (coding agents, already shipped in it). The example's
+        `setup`, `strings` and `markdown-pages` pages are the package's reference docs, repeated
+        from SKILL.md and the README in three languages each; they go. The example keeps the
+        pages that exercise the plugin: the tour (translated markdown, about the demo), Intl and
+        Temporal (the platform's own formatting). The home page's links, the docs sidebar and
+        the tests that list pages follow. The example keeps the package as a workspace
+        dependency, as Void's own playgrounds do; the new apps of B are where it's used as a
+        stranger uses it.
 
 ## Not in this plan
 
