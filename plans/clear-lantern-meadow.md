@@ -176,6 +176,39 @@ account) is left out: there isn't one.
 7. **`og:locale:alternate` left out** (§1); at most a feature request to Void later, with the
    user's OK. Facebook's locale list uses `ar_AR`, not `ar_EG`; low impact, noted.
 
+8. **Made when asked for, and cached: no generated files where a route can do it** (the user,
+   2026-11-12). Void's page cache (ISR, `docs/guide/edge/revalidation.md`, Void 1.7.0) does the
+   caching; nothing new is built for it.
+   - **Today** only the markdown docs are cached (`x-isr-cache: HIT` on `/en-US/docs/tour`,
+     checked live 2026-11-12); the home, events and code docs pages have no cache time, so every
+     visit renders them, although the app already clears them on every write (posting:
+     `pages/[lang]/events/index.server.ts` 50; booking: `events/[id].server.ts` 55; translations
+     arriving: `queues/translate.ts` 62).
+   - **Tied to the deploy:** "deploys clear the ISR cache" (revalidation guide, "Per-path
+     revalidation"), so a cache time of `31536000` means "until the next deploy". Every page and
+     route whose content only a deploy changes gets it: the home pages, the code docs pages, the
+     markdown docs, `/manifest.webmanifest`, `/sitemap.xml` (also cleared on writes, below).
+   - **Cleared when data changes:** the event pages and `/sitemap.xml` cached until the deploy
+     too, and cleared by the writes that change them: posting clears the events lists and the
+     sitemap, booking clears that event's pages (seats left), translations arriving clear that
+     event's pages and the sitemap. `/sitemap.xml` is added to the existing `revalidate()` calls.
+   - **Changed by time alone:** the events list shows only events not yet started
+     (`events/index.server.ts` 22, `gte(starts_at_utc, now)`), so it changes with no write. It gets
+     a short cache time, 60 seconds; Void serves the cached page while it renders the new one in
+     the background, so no visitor waits, and an event drops off the list within a minute of
+     starting.
+   - **Set in one place:** `routing.revalidate` in `void.config.ts`, a pattern per path (first
+     match wins), so the cache times are visible together; not spread over pages.
+   - **Never cached, by Void's rules:** `/api/*`; requests with a cookie or `Authorization`;
+     responses with `Set-Cookie`, `Cache-Control: private`/`no-store`, or `Vary` on a request
+     header. void-fbtee's middleware must never add one of those to a page, or the page silently
+     stops being cached: a test checks the response headers.
+   - **Files in `public/`** (icons, the preview picture, `robots.txt`) are Void's static files,
+     cached until the next deploy (`docs/guide/edge/static-assets.md`); they stay files, since
+     drawing PNGs needs `sharp`, which doesn't run on Workers.
+   - **Proof:** after the deploy, each page and route answers `x-isr-cache: HIT` on its second
+     visit; after posting an event, the list and sitemap show it at once.
+
 ## 5. The package's part (Void add-on, Vite plugin, Vite+ package)
 
 What's per language is void-fbtee's; the site's brand (name, picture, icons) is each app's.
