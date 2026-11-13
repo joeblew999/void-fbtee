@@ -4,7 +4,9 @@
 // (the event page's delete action) checks a key against it. Web Crypto, the Worker's own and Node's.
 //
 // Getting the key to the poster: a redirect's `#` part is lost on the way (Void's client reads it
-// from fetch's response.url, which the Fetch standard always gives without it), so posting sets a
+// from fetch's response.url, which the Fetch standard always gives without it:
+// https://github.com/voidzero-dev/void/issues/810; back to a redirect with `hash` once it's
+// fixed), so posting sets a
 // short-lived cookie with the key instead (keyCookie), and the event page moves it into its own
 // `#` and deletes the cookie. A request with a cookie skips Void's page cache
 // (guide/edge/revalidation.md, "Cache bypass"): only the poster's, for those two minutes.

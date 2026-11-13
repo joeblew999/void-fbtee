@@ -61,7 +61,7 @@ All of the above, with these differences from the plan, each found while buildin
   hash target" (`guide/pages-routing/actions-and-forms.md`). So posting sets a two-minute cookie
   with the key (`keyCookie`, `src/events/delete-key.ts`), and the event page moves it into its own
   address (`history.replaceState`, `#key=…`) and deletes the cookie. A request with a cookie skips
-  Void's page cache: only the poster's, for those two minutes. To report to Void, with a repro.
+  Void's page cache: only the poster's, for those two minutes. Reported: voidzero-dev/void#810.
 - **The page follows the address's `#` part** (`hashchange`), so a link pasted into an open page
   works, and builds the link from the event's route: just after posting, the page renders before
   Void's router has moved the address off the form's page.
