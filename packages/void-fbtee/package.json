@@ -74,7 +74,8 @@
     "unplugin-unused": "0.6.0",
     "vite": "catalog:",
     "vite-plus": "catalog:",
-    "void": "catalog:"
+    "void": "catalog:",
+    "zod": "4.6.7"
   },
   "peerDependencies": {
     "@void/react": "^1.7.0",

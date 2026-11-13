@@ -438,10 +438,9 @@ async function checkDev(target: string, dir: string, app: App) {
     });
     const errors =
       form.status === 422 ? ((await form.json()) as { errors?: { name?: string } }) : {};
-    gap(
+    check(
       thai.test(errors.errors?.name ?? ""),
-      `${target}: a form from Void's docs shows its validation error in Thai (got "${errors.errors?.name}")`,
-      4,
+      `${target}: a form from Void's docs shows Zod's validation error in Thai ("${errors.errors?.name}")`,
     );
     const nothing = await fetch(`${base}/th-TH/no-such-page`);
     const nothingHtml = await nothing.text();

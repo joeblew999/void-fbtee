@@ -21,6 +21,12 @@ import { allTranslations } from "./runtime";
 const storage = new AsyncLocalStorage<Lang>();
 setServerLang(() => storage.getStore());
 
+/** The current language's BCP 47 tag: the request's or inLocale()'s; undefined outside both. */
+export function currentLocale(): AppLocale | undefined {
+  const lang = storage.getStore();
+  return lang && config.locales.find((l) => l.segment === lang)?.locale;
+}
+
 /** Runs `fn` with `lang` as the current language (the middleware, for each request). */
 export function withLang<T>(lang: Lang, fn: () => T): T {
   return storage.run(lang, fn);

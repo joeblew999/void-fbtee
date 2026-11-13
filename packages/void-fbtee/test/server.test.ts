@@ -1,5 +1,5 @@
 // inLocale() from void-fbtee/server, as an app's server code runs it with no request (a scheduled
-// job, a queue consumer), and routeUrl() from void-fbtee/routes in its language: built through the plugin for a server environment, as Void builds a
+// job, a queue consumer), routeUrl() from void-fbtee/routes and Zod's messages in its language: built through the plugin for a server environment, as Void builds a
 // Worker, then run. The fixture's catalog has German for its strings (test/fixture/i18n/).
 import { cpSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -20,6 +20,9 @@ let probe: {
   linkElsewhere: () => Promise<string>;
   linkOutside: () => string;
   linkPlain: () => string;
+  zodMessages: () => Promise<string[]>;
+  zodOwn: () => Promise<string>;
+  zodOutside: () => string;
 };
 
 beforeAll(async () => {
@@ -47,6 +50,17 @@ export const linkElsewhere = () =>
   inLocale("de-DE", () => routeUrl("/[lang]/events" as never, { params: { lang: "ar-EG" } } as never));
 export const linkOutside = () => { try { return routeUrl("/[lang]/events" as never); } catch (e) { return String(e.message); } };
 export const linkPlain = () => routeUrl("/api/live" as never);
+// Zod's messages in the current language, set up as the middleware does it.
+import { z } from "zod";
+import { setup } from "virtual:void-fbtee/zod";
+import { currentLocale } from ${JSON.stringify(server)};
+setup(currentLocale);
+const tooShort = () => z.string().min(1).safeParse("").error?.issues[0]?.message;
+const own = () => z.string().min(1, "Give it a name").safeParse("").error?.issues[0]?.message;
+export const zodMessages = () =>
+  Promise.all(["en-US", "de-DE", "ar-EG"].map((l) => inLocale(l, tooShort)));
+export const zodOwn = () => inLocale("de-DE", own);
+export const zodOutside = () => tooShort();
 `,
   );
   const builder = await createBuilder({
@@ -116,4 +130,20 @@ test("routeUrl: with no current language, an error that says to pass lang", () =
 
 test("routeUrl: an address with no [lang] is Void's own", () => {
   expect(probe.linkPlain()).toBe("/api/live");
+});
+
+test("Zod's own messages in the current language", async () => {
+  const [en, de, ar] = await probe.zodMessages();
+  expect(en).toBe("Too small: expected string to have >=1 characters");
+  expect(de).not.toBe(en);
+  expect(de).toMatch(/Zeichen/);
+  expect(ar).toMatch(/[\u0600-\u06FF]/);
+});
+
+test("an app's own message still wins", async () => {
+  expect(await probe.zodOwn()).toBe("Give it a name");
+});
+
+test("with no current language, Zod's English", () => {
+  expect(probe.zodOutside()).toBe("Too small: expected string to have >=1 characters");
 });

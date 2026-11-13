@@ -14,6 +14,7 @@
 //   with; path is the page without its locale prefix, for links to it in other languages.
 // - <html lang dir>, hreflang alternates (plus x-default, the source locale) and <meta name="void-fbtee"> (the same i18n data, for
 //   islands) go into headDefaults.
+// - Zod's validation messages follow the request's language (when the app has Zod 4).
 import { defineMiddleware } from "void";
 import { runWithFbtee } from "fbtee/server";
 import { Temporal } from "temporal-polyfill";
@@ -24,7 +25,12 @@ import markdownPages from "virtual:void-fbtee/md-pages";
 import { meta, type MetaTag } from "./head";
 import { localeFromPath, META_NAME, type Dir, type Lang } from "./locales";
 import { allTranslations } from "./runtime";
-import { siteOrigin, withLang } from "./server";
+import { setup as setupZod } from "virtual:void-fbtee/zod";
+import { currentLocale, siteOrigin, withLang } from "./server";
+
+// Zod's own validation messages (a form's errors) in each request's language, when the app has
+// Zod 4 (plugin.ts, zodMessages).
+setupZod(currentLocale);
 
 export interface SharedI18n {
   locale: string;

@@ -101,7 +101,11 @@ and `params: { lang }` for another language. A markdown page has a route per lan
 `routeUrl("/[lang]/docs/tour")` takes it too: it type-checks only if the page exists in every
 language. An action redirects the same way: `c.redirect(routeUrl("/[lang]/events/[id]", { params: { id } }))`.
 Forms use `useForm` from `void-fbtee/react` (Void's, with the page's language filled in):
-`useForm("/[lang]/events/new", { title: "" })`. Don't write a link as a plain string: Void checks
+`useForm("/[lang]/events/new", { title: "" })`. With Zod 4 as the validator (drizzle-zod's or by
+hand), `form.errors.name` is Zod's own message in the page's language (Zod's message sets, for each
+of the app's languages Zod has; English for one it hasn't). A field's own plainer message
+("Give it a title.") is still better: write it with `<fbt>` in the page and show it when the
+field has an error, as the example does. Don't write a link as a plain string: Void checks
 plain strings too, but the app's `pages/[lang]/` makes every `/…` path look like a page (its type is
 `/${string}`), so a wrong one passes. A language the app doesn't have gets the not-found page from
 the middleware. Where there's no current language at all (a server route that isn't in a

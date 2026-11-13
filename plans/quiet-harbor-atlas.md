@@ -125,7 +125,14 @@ Each step is shipped and proven before the next, each with its docs example in t
        every page links in its own language, also after Void's client navigation; both forms post
        to their page's action; a post in Arabic lands on the Arabic event page. Package tests for
        routeUrl (`test/server.test.ts`); in the fresh app the two gaps are now checks.
-4. **Translated form errors.**
+4. [x] **Translated form errors,** done 2026-11-13. When the app has Zod 4, the plugin makes
+       `virtual:void-fbtee/zod` (`zodMessages`, `src/plugin.ts`): Zod's own message sets for the
+       app's languages (a locale's own, else its language's; English where Zod has none), and the
+       middleware points Zod's `localeError` at the current request's language (`currentLocale` in
+       `src/server.ts`). An app's own messages still win: Zod ranks `localeError` below them. Without
+       Zod 4 it does nothing; Valibot and other libraries aren't covered. Package tests: German and
+       Arabic messages, an app's own message kept, English with no language. In the fresh app the gap
+       is now a check.
 5. **Not-found and error pages from `void-fbtee init`,** with the title helper.
 6. **The sitemap from the package.**
 7. **Translated content:** the pattern, then translating it with AI in a queue.

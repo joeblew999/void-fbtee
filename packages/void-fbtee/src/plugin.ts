@@ -19,7 +19,7 @@
 //   installs the page's catalog (top-level await). Islands hydrate without the layout's
 //   I18nProvider, so this is what gives them their strings.
 import { createRequire } from "node:module";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
@@ -79,6 +79,14 @@ const CATALOG_PREFIX = "virtual:void-fbtee/catalog/";
 const TEXTS_ID = "virtual:void-fbtee/texts";
 /** The app's markdown pages (@void/md's own list), or none when the app doesn't use @void/md. */
 const MD_PAGES_ID = "virtual:void-fbtee/md-pages";
+/**
+ * Zod's own messages in the app's languages, when the app has Zod 4 (Void's validators are often
+ * Zod: drizzle-zod's, or Zod by hand, guide/server-routing.md "Manual validators"). The middleware
+ * points Zod's `localeError` at the current request's language; an app's own messages still win
+ * (Zod ranks `localeError` below a schema's own and `customError`: zod.dev/error-customization).
+ * Without Zod 4, it does nothing.
+ */
+const ZOD_ID = "virtual:void-fbtee/zod";
 /** What `temporal-polyfill` is on the server: the runtime's own Temporal (Cloudflare's flag). */
 const SERVER_TEMPORAL_ID = "\0void-fbtee:server-temporal";
 // Hono's route helper, as Void's own copy of Hono: matchedRoutes reads Hono's request internals, so
@@ -206,6 +214,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           id === CATALOGS_ID ||
           id === TEXTS_ID ||
           id === MD_PAGES_ID ||
+          id === ZOD_ID ||
           id.startsWith(CATALOG_PREFIX)
         )
           return "\0" + id;
@@ -247,6 +256,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         // app has it.
         if (id === "\0" + MD_PAGES_ID)
           return hasMarkdown ? `export { default } from "@void/md/pages";` : "export default [];";
+        if (id === "\0" + ZOD_ID) return zodMessages(root, config);
         // Dev only: each string's source text, so the browser can name what it shows untranslated.
         if (id === "\0" + TEXTS_ID)
           return `export default ${command === "serve" ? JSON.stringify(runtimeTexts(project())) : "{}"};`;
@@ -266,4 +276,38 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   };
 
   return [core, fbteeVite()];
+}
+
+/**
+ * virtual:void-fbtee/zod: `setup(currentLocale)` sets Zod's `localeError` to the message set of the
+ * language `currentLocale()` gives (a locale's own, "pt-BR", else its language's, "th" for
+ * "th-TH"), English where Zod has none. Without Zod 4 in the app, a `setup` that does nothing.
+ */
+function zodMessages(root: string, config: LocaleConfig): string {
+  const none = "export function setup() {}";
+  let dir: string;
+  try {
+    const pkg = createRequire(join(root, "package.json")).resolve("zod/package.json");
+    if (Number(JSON.parse(readFileSync(pkg, "utf8")).version.split(".")[0]) < 4) return none;
+    dir = join(pkg, "../v4/locales");
+  } catch {
+    return none;
+  }
+  const has = (name: string) => existsSync(join(dir, `${name}.js`));
+  const found = config.locales.flatMap((l) => {
+    const name = [l.locale, new Intl.Locale(l.locale).language].find(has);
+    return name ? [[l.locale, name] as const] : [];
+  });
+  return [
+    `import { config } from "zod/v4/core";`,
+    `import en from "zod/v4/locales/en.js";`,
+    ...found.map(
+      ([, name], i) => `import l${i} from ${JSON.stringify(`zod/v4/locales/${name}.js`)};`,
+    ),
+    `const sets = { ${found.map(([locale], i) => `${JSON.stringify(locale)}: l${i}().localeError`).join(", ")} };`,
+    `const fallback = en().localeError;`,
+    `export function setup(currentLocale) {`,
+    `  config({ localeError: (issue) => (sets[currentLocale()] ?? fallback)(issue) });`,
+    `}`,
+  ].join("\n");
 }

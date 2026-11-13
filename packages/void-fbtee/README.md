@@ -8,10 +8,11 @@ https://void-fbtee-example.gedw99.workers.dev
 ## What it is
 
 A Void add-on, built the way Void's own `@void/md` and `@void/react` are: a Vite plugin
-(`import { voidFbtee } from "void-fbtee/plugin"`) plus the parts a Void app uses at run time
-(`void-fbtee/middleware`, `void-fbtee/react`, `void-fbtee/routes` for links in the current
-language, and `void-fbtee/server` for server code: cache clearing in every language, and code
-with no page, such as a scheduled job, a queue consumer or an email). The Vite plugin works only in a Void app: it swaps
+(`import { voidFbtee } from "void-fbtee/plugin"`) plus the parts a Void app uses at run time:
+`void-fbtee/middleware` (each request's language), `void-fbtee/react` (components and forms),
+`void-fbtee/routes` (links in the current language) and `void-fbtee/server` (cache clearing in
+every language, and code with no page: a scheduled job, a queue consumer, an email). With Zod 4,
+validation messages are in the page's language too. The Vite plugin works only in a Void app: it swaps
 modules in Void's server environment (Cloudflare's own Temporal, fbtee's per-request build, Void's
 own Hono), and the rest goes where Void looks for it (`middleware/99.i18n.ts`, `void.config.ts`),
 which `void-fbtee init` sets up and `void-fbtee check` checks. React only, as fbtee is. It works
