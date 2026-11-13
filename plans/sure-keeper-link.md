@@ -56,6 +56,12 @@ and the poster can have it emailed. Decided with the user 2026-11-13.
        app already copes (the browser's copy, the emailed link), and `delete-key.ts` says so. #810
        (a redirect's `#`) is the same family.
 
+       Update, 2026-11-13: Void fixed #810 on main, commit `ae024fb` "Preserve fragments in action
+       redirects, closes #810" (Christoph Nakazawa), after the 1.8.0 release, so not in our version
+       yet. When the next Void release ships it, recheck the redirect after posting and whether the
+       cookie hand-off in `delete-key.ts` is still needed. The commit's title covers redirects only;
+       an in-place action dropping the `#` may stay as above.
+
 ## Verification
 
 `vp check`, `vp run example#test`, `vp run i18n:check`, `vp test run --project e2e

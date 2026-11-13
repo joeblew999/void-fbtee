@@ -181,6 +181,16 @@ ready only once they print their own URL (we already do).
    > preview runs the build's config, and `withLocalPreviewBindings` doesn't add it there. Adding
    > `remote: true` to the AI binding in the preview's copy of the config would match the docs.
 
+   Checked against Void's GitHub on 2026-11-13: no issue, open or closed, covers it (searched
+   "preview AI remote binding", "Workers AI binding fails in vite preview", "needs to be run
+   remotely"). Main (`ae024fb`, after the 1.8.0 release) still has it: `guide/ai.md` keeps
+   "development and preview", `plugin-worker-bindings.ts` still adds `remote: true` only for
+   `serve`, and `plugin-cloudflare-preview.ts` (`withLocalPreviewBindings`) still copies the
+   build's config and changes only secrets. The example already uses AI Void's way (`ai` from
+   `void/ai` in `queues/translate.ts`), and our preview build's `worker.config.json` has
+   `"AI": {"type": "ai"}` with no `remote`, the same as the plain app. So there is no other way
+   to do it on our side; the issue above is still to file.
+
 ## How the tests are laid out and run (Void's `TESTING.md` and `vite.config.ts`)
 
 Void's own repo (voidzero-dev/void, main, read 2026-11-13): unit tests in `test/unit/` with Vitest's
