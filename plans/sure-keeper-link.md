@@ -1,6 +1,6 @@
 # plans/sure-keeper-link.md: a poster never loses their private link
 
-Status: approved 2026-11-13; items 1-6 done 2026-11-13 (checked on dev and by `e2e/events.test.ts`, 9 of 9), item 7 to do.
+Status: done 2026-11-13: items 1-6 built and checked (dev, and the events tests), item 7 settled.
 
 ## Context
 
@@ -50,9 +50,11 @@ and the poster can have it emailed. Decided with the user 2026-11-13.
        cancellation is in the inbox in the booker's language.
 6. [x] **Docs:** `DESIGN.md` (the form's new field, the Your event box), the comments in
        `delete-key.ts`.
-7. [ ] **Void:** reproduce the dropped `#…` in a plain `void init` app. If it reproduces, write the
-       issue text for the user to file, as with #809 and #810; if not, find what in this app
-       causes it before changing anything else.
+7. [x] **Void:** settled 2026-11-13 without a report: Void keeps no `#` around actions, as plain
+       HTML forms don't (a form's POST goes to its action URL and the page's `#` is gone), and its
+       client-side actions copy that. Taken as Void's rule, not a bug (the user, 2026-11-13); the
+       app already copes (the browser's copy, the emailed link), and `delete-key.ts` says so. #810
+       (a redirect's `#`) is the same family.
 
 ## Verification
 

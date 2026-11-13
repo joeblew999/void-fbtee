@@ -1,7 +1,6 @@
 # plans/plain-stage-compass.md: every test on the stage Void gives it, checking through Void
 
-Status: approved 2026-11-13; items 1-8 done 2026-11-13; item 9 (the preview's missing AI, in a
-plain app) to do.
+Status: done 2026-11-13; item 9's Void issue is written for the user to file.
 
 ## Context
 
@@ -153,9 +152,34 @@ ready only once they print their own URL (we already do).
        tests through Void's harness; queues and crons through Void's triggers) and the origin rule
        from 3. `DESIGN.md` is unaffected (the reminder is an email, not a page).
 
-9. [ ] **Reproduce the preview's missing AI in a plain `void init` app** (as Void issues #809 and
-       #810 were): an app that imports `void/ai` and calls it from a queue, run with `vp preview`. If it
-       reproduces, write the issue for the user to file; if not, find what in this app causes it.
+9. [x] **The preview's missing AI, reproduced in a plain `void init` app** (2026-11-13, Void
+       1.8.0, Vite+ 1.6.0), so it's Void's: made as the fresh check makes its apps, in `.vitest/repro-ai/`
+       (git ignores it). With Void's docs' own AI example as its only code, `vp dev` answers and
+       `vp preview` fails with "Binding AI needs to be run remotely". The cause, in Void's code
+       (`void/dist/index.mjs`, around line 5350): the AI binding gets `remote: true` only when
+       `viteCommand === "serve"` (dev); the build writes it without, the preview runs the build's
+       config, and Void's preview step (`withLocalPreviewBindings`, line 762) adjusts other bindings
+       but not AI. The issue for the user to file:
+
+   > **Workers AI fails in `vp preview` ("Binding AI needs to be run remotely"), though the docs say
+   > it's remote in development and preview**
+   >
+   > Void 1.8.0, Vite+ 1.6.0, direct Cloudflare (`void connect --platform cloudflare`), signed in.
+   > `guide/ai.md` ("Local Development") says: "When the app imports `void/ai`, Void enables a
+   > remote Workers AI binding during development and preview."
+   >
+   > 1. `void init --framework react --starter static --deploy none --toolchain vite-plus`, then
+   >    `void connect --platform cloudflare`.
+   > 2. Add `routes/api/ask.ts`, the "Basic Usage" example from `guide/ai.md` as written.
+   > 3. `vp dev`, then `curl -X POST localhost:5173/api/ask -H 'content-type: application/json'
+   >    -d '{"prompt":"hi"}'`: Workers AI answers.
+   > 4. `vp build && vp preview`, the same request: 500, and the server logs `Error: Binding AI needs
+   >    to be run remotely` (`remote: true` in the error).
+   >
+   > The built `dist/ssr/wrangler.json` has `"ai":{"binding":"AI"}` with no `remote`. In
+   > `dist/index.mjs` the binding gets `remote: true` only when `viteCommand === "serve"`; the
+   > preview runs the build's config, and `withLocalPreviewBindings` doesn't add it there. Adding
+   > `remote: true` to the AI binding in the preview's copy of the config would match the docs.
 
 ## How the tests are laid out and run (Void's `TESTING.md` and `vite.config.ts`)
 

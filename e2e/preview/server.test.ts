@@ -4,7 +4,7 @@
 import { globSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
-import { url } from "../helpers";
+import { onLiveSite, url } from "../helpers";
 import { EXAMPLE } from "./setup";
 import { LOCALES, SOURCE } from "../locales";
 
@@ -206,6 +206,12 @@ test("no page sets a cookie or varies by a request header, so Void can cache it"
     "/docs/tour",
   ];
   const voids = new Set(["x-voidpages", "x-voidpages-version"]);
+  // Vite's local preview server adds "Vary: Origin" to every response that has no Vary of its own,
+  // static files too (its built-in CORS; seen 2026-11-13 on /favicon.ico and the CSS), and a page
+  // Void serves from its cache can come without one. Cloudflare doesn't: the live site's /en-US/docs
+  // and assets carry no Vary. So on the preview it isn't the site's, and is left out here; on the
+  // live site (`vp run test:production`) nothing is left out.
+  if (!onLiveSite()) voids.add("origin");
   for (const l of LOCALES)
     for (const page of pages) {
       const res = await get(`/${l}${page}`);

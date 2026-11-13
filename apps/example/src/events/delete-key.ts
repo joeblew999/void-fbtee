@@ -3,12 +3,13 @@
 // `#`, which never reaches the server or Void's page cache (plans/tidy-ember-ledger.md). Deleting
 // (the event page's delete action) checks a key against it. Web Crypto, the Worker's own and Node's.
 //
-// Getting the key to the poster: a redirect's `#` part is lost on the way (Void's client reads it
-// from fetch's response.url, which the Fetch standard always gives without it:
-// https://github.com/voidzero-dev/void/issues/810; back to a redirect with `hash` once it's
-// fixed), so posting sets a
-// short-lived cookie with the key instead (keyCookie), and the event page moves it into its own
-// `#` and deletes the cookie. A request with a cookie skips Void's page cache
+// Void keeps no `#` around actions, as plain HTML forms don't: a form's POST goes to its action URL,
+// and the page's `#` part is gone. So a redirect's `#` is lost (Void's client reads the destination
+// from fetch's response.url, which the Fetch standard gives without it; reported as
+// https://github.com/voidzero-dev/void/issues/810), and an action that updates the page in place
+// writes the address from the action's URL, without the page's `#`. We take that as Void's rule,
+// not a bug to wait out. Getting the key to the poster: posting sets a short-lived cookie with the
+// key (keyCookie), and the event page moves it into its own `#` and deletes the cookie. A request with a cookie skips Void's page cache
 // (guide/edge/revalidation.md, "Cache bypass"): only the poster's, for those two minutes.
 //
 // Keeping it (plans/sure-keeper-link.md): the event page keeps a copy in the browser's storage and

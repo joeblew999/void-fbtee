@@ -135,9 +135,13 @@ Cloudflare's local stand-ins.
 - **Dev and the preview, one at a time:** they share the local database (Void's
   `guide/database/d1.md`), which the preview run resets and refuses to touch while dev is up.
   `test:dev` uses your dev server's database as it is and deletes everything it posts.
-- **Workers AI on the preview:** Void's docs say it's there in dev and the preview; on this app's
-  preview it fails with "Binding AI needs to be run remotely" (2026-11-13, Void 1.8.0), so the
-  preview suite doesn't rely on it. Being reproduced in a plain app before it's reported.
+- **Workers AI on the preview:** Void's docs say it's there in dev and the preview, but `vp preview`
+  fails with "Binding AI needs to be run remotely" (Void 1.8.0): Void's own bug, reproduced in a
+  plain `void init` app (`plans/plain-stage-compass.md`, item 9, with the issue). The preview suite
+  doesn't rely on it.
+- **`Vary: Origin` on the preview:** Vite's local preview server adds it to any response without a
+  Vary of its own (its CORS); the live site sends none. `e2e/preview/server.test.ts` leaves it out
+  on the preview only.
 - **Live tests are opt-in** (Void's rule): `test:production` skips what posts or books there,
   and `test:deployed`, the exception CI runs, posts one event, has it translated and deletes it,
   emailing no one.

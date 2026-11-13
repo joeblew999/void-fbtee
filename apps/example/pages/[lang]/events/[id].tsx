@@ -201,7 +201,7 @@ const onHashChange = (changed: () => void) => {
 /**
  * The browser's own copy of an event's key (localStorage), so it outlives the address losing its
  * "#key=…": an action on the page (Void writes the action's URL, which has no "#" part) or a
- * redirect (Void issue #810). Storage can be blocked or throw (private modes): then there's no copy,
+ * redirect (Void keeps no `#` around actions, as HTML forms don't: src/events/delete-key.ts). Storage can be blocked or throw (private modes): then there's no copy,
  * and the address and cookie work as before.
  */
 const keyStore = {
