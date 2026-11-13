@@ -11,6 +11,9 @@ export default defineConfig({
     tasks: {
       // The package rebuilding on save, and the example's dev server, together.
       dev: { command: "vp run -r --parallel dev", cache: false },
+      // The same, with posts translated by Workers AI as on the live site (needs Void's Cloudflare
+      // sign-in: without it the dev server doesn't start).
+      "dev:ai": { command: "WORKERS_AI=on vp run -r --parallel dev", cache: false },
       // Chromium for the browser tests (once per machine).
       "install:browser": {
         command: "playwright install --with-deps chromium webkit",

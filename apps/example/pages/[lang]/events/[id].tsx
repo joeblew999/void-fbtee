@@ -4,7 +4,7 @@
 // description are in the language the organiser wrote them in (marked with lang, so the browser and
 // screen readers use the right one); the seats left are live, in a split-flap chip that turns over
 // as people book; booking is Void's useForm, with the page's language filled in (void-fbtee/react).
-import { Fragment, useEffect, useState, useSyncExternalStore } from "react";
+import { Fragment, useEffect, useRef, useState, useSyncExternalStore, type RefObject } from "react";
 import { fbs, fbt } from "fbtee";
 import { action, Form, isVoidActionError, useRouter } from "@void/react";
 import { routeUrl } from "void-fbtee/routes";
@@ -30,9 +30,10 @@ import type { Props } from "./[id].server";
 
 /**
  * The event's live stream: the seats left (seats only go down, so the lower count wins), and its
- * translations arriving after the post (queues/translate.ts): then the page loads its data again.
+ * translations arriving after the post (queues/translate.ts): then the page loads its data again,
+ * unless it's being deleted (`leaving`), when that reload would land on top of the move to the list.
  */
-function useLiveEvent(id: string, left: number) {
+function useLiveEvent(id: string, left: number, leaving: RefObject<boolean>) {
   const [live, setLive] = useState(Infinity);
   const router = useRouter();
   useEffect(() => {
@@ -44,7 +45,7 @@ function useLiveEvent(id: string, left: number) {
         topic: `event:${id}`,
         onEvent: (event) => {
           if (event.type === "seats") setLive((event.data as { left: number }).left);
-          if (event.type === "translated") void router.refresh();
+          if (event.type === "translated" && !leaving.current) void router.refresh();
         },
       })
       // Closed by this effect's cleanup before subscribing finished: not an error.
@@ -55,7 +56,7 @@ function useLiveEvent(id: string, left: number) {
       closed = true;
       stream.close();
     };
-  }, [id, router]);
+  }, [id, router, leaving]);
   return Math.min(left, live);
 }
 
@@ -211,7 +212,7 @@ function keyHere(id: string, hash: string): string | null {
  * bookmarking the page keeps the link, and the cookie goes. Deleting asks once more, on the page
  * (no browser dialog).
  */
-function YourEvent({ id }: { id: string }) {
+function YourEvent({ id, onLeaving }: { id: string; onLeaving: (leaving: boolean) => void }) {
   const { lang } = useLocale();
   // The address and cookies are the browser's own: read once hydrated, so the server's HTML and the
   // first render in the browser are the same (nothing), as useHydrated is for.
@@ -238,9 +239,11 @@ function YourEvent({ id }: { id: string }) {
     // A wrong key is a 403, which Void's action() throws rather than returns (it returns only
     // 400, 404, 409, 422 and 429: guide/pages-routing/actions-and-forms.md). Deleted, the action
     // redirects to the list.
+    onLeaving(true);
     try {
       await action("/[lang]/events/[id]?delete", { params: { lang, id }, data: { key } });
     } catch (error) {
+      onLeaving(false);
       if (isVoidActionError(error) && error.status === 403) setWrong(true);
       else throw error;
     }
@@ -287,7 +290,9 @@ export default function Event({ event, text, left, deletable }: Props) {
   const { locale } = useLocale();
   // The browser's zone once known (null before); nothing has been typed into the form yet.
   const zone = useTimeZone();
-  const seatsLeft = useLiveEvent(event.id, left);
+  // Set while the event is being deleted (YourEvent), so a live update doesn't keep the page here.
+  const leaving = useRef(false);
+  const seatsLeft = useLiveEvent(event.id, left, leaving);
   // In the page's language where a translation is stored (the sample events); else as written.
   // Marked with its own language and direction (langAttrs), whichever it's in.
   const shown = text ?? event;
@@ -392,7 +397,14 @@ export default function Event({ event, text, left, deletable }: Props) {
           </div>
           <Book key={zone} id={event.id} zone={zone} soldOut={seatsLeft === 0} />
         </section>
-        {deletable && <YourEvent id={event.id} />}
+        {deletable && (
+          <YourEvent
+            id={event.id}
+            onLeaving={(on) => {
+              leaving.current = on;
+            }}
+          />
+        )}
       </aside>
       <div className="min-w-0 lg:col-start-1 lg:row-start-2">
         <Stored event={event} />

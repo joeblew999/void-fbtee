@@ -50,10 +50,6 @@ test("an event is posted, translated by Workers AI, and deleted with its private
       ).text();
       title = /<h1[^>]*>([^<]*)/.exec(html)?.[1] ?? TITLE;
     }
-    // The open page refreshes itself when the translation arrives, which would land on top of the
-    // delete's move to the list: start it again, translated, first.
-    await p.reload();
-    await started(p);
   }
 
   await p.getByTestId("delete").click();

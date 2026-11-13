@@ -111,6 +111,16 @@ plain strings too, but the app's `pages/[lang]/` makes every `/…` path look li
 the middleware. Where there's no current language at all (a server route that isn't in a
 request's language, code outside `inLocale`), `routeUrl` says so: pass `params.lang`.
 
+Every link is `Link` from `void-fbtee/react`, not Void's: it's Void's, but a link into another
+language loads a fresh page, where Void's would keep the old language's text and `<html lang dir>`.
+It works inside an island too. The language links: `useLocales()` is each of the app's languages
+(`{ locale, segment, dir }`), and the same page in one is `` `/${l.segment}${path}` `` with `path`
+from `useLocale()`; give each `hrefLang={l.locale}` and `lang={l.locale}`, and name it in its own
+language with `Intl.DisplayNames` inside `<Formatted>`. On the server, `currentLocale()` from
+`void-fbtee/server` is the current language (the request's or `inLocale()`'s; undefined outside
+both), and `siteOrigin(c)` is the site's address (`voidFbtee({ site })`, else the request's), for
+anything that writes full addresses.
+
 ## Server code with no page
 
 Void runs scheduled jobs (`crons/`), queue consumers (`queues/`) and inbound email handlers with no
