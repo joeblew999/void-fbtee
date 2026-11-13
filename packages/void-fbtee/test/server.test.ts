@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterAll, beforeAll, describe, expect, test } from "vite-plus/test";
 import { createBuilder, type Plugin } from "vite";
+import { langAttrs } from "../src/locales";
 import { voidFbtee } from "../src/plugin";
 
 let root: string;
@@ -24,6 +25,7 @@ let probe: {
   zodOwn: () => Promise<string>;
   zodOutside: () => string;
   map: () => Promise<string>;
+  texts: () => { de: string[]; ar: string; deFallsBack: string; none: null };
 };
 
 beforeAll(async () => {
@@ -81,6 +83,14 @@ export const zodOwn = () => inLocale("de-DE", own);
 export const zodOutside = () => tooShort();
 import { sitemap } from ${JSON.stringify(server)};
 const c = { req: { url: "https://example.com/sitemap.xml" } };
+import { pickText, textLocales } from ${JSON.stringify(server)};
+const rows = [{ locale: "en-US", title: "Night market" }, { locale: "ar-EG", title: "السوق الليلي" }];
+export const texts = () => ({
+  de: textLocales("de-DE"),
+  ar: pickText(rows, "ar-EG")?.title,
+  deFallsBack: pickText(rows, "de-DE")?.title,
+  none: pickText([{ locale: "ar-EG" }], "de-DE") ?? null,
+});
 export const map = () =>
   sitemap(c, {
     pages: [
@@ -98,6 +108,8 @@ export const map = () =>
     plugins: voidFbtee({
       sourceLocale: "en-US",
       locales: ["en-US", "de-DE", "ar-EG"],
+      // German falls back to English, for textLocales and pickText.
+      fallbackLocales: { "de-DE": ["en-US"] },
       src: ["src/**/*.tsx"],
     }) as Plugin[],
     environments: {
@@ -214,5 +226,23 @@ describe("sitemap()", () => {
     expect(lastmods).toContain("/de-DE/events 2026-11-12T09:00:00Z");
     expect(lastmods).toContain("/de-DE/events/a%26b 2026-11-10");
     expect(lastmods).toContain("/en-US/events/a%26b -");
+  });
+});
+
+describe("what people post, in their own language", () => {
+  test("textLocales: the page's language, then its fallbacks", () => {
+    expect(probe.texts().de).toEqual(["de-DE", "en-US"]);
+  });
+
+  test("pickText: the page's own, else a fallback's, else none (the original)", () => {
+    const { ar, deFallsBack, none } = probe.texts();
+    expect(ar).toBe("السوق الليلي");
+    expect(deFallsBack).toBe("Night market");
+    expect(none).toBeNull();
+  });
+
+  test("langAttrs: its language, and its direction", () => {
+    expect(langAttrs("ar-EG")).toEqual({ lang: "ar-EG", dir: "rtl" });
+    expect(langAttrs("th-TH")).toEqual({ lang: "th-TH", dir: "ltr" });
   });
 });

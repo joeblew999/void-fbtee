@@ -150,7 +150,20 @@ Each step is shipped and proven before the next, each with its docs example in t
        matches the live site's old one: the same 18 non-event addresses, alternates and `<lastmod>`.
        Package tests for the list, the alternates and `<lastmod>`; in the fresh app the gap is now a
        check.
-7. **Translated content:** the pattern, then translating it with AI in a queue.
+7. [x] **Translated content: the pattern,** done 2026-11-13; translating it with AI is planned
+       separately (below). `textLocales(locale)` and `pickText(rows, locale)` from
+       `void-fbtee/server`: which stored translation to show, the page's language then its
+       fallbacks. `langAttrs(locale)` from `void-fbtee/react` (`src/locales.ts`): `lang` and `dir` for
+       text in a language of its own. The example used `lang` alone, so an Arabic post on an English
+       page was laid out left to right; now every post's title, description, original, breadcrumb and
+       venue carries both (the venue had neither; in a sentence it's in a `<bdi>`). Both events pages
+       pick the translation with them (the board in a second query, so fallbacks can't double a
+       row). Checked on dev: an untranslated Arabic post is `ar-EG`/`rtl` on the English board and
+       page; the Arabic original under a Thai translation too. Package tests for the three.
+   - Not done: machine translation with Void's AI in a queue. Once an app imports `void/ai`, its
+     dev server needs Void's own Cloudflare login or a `CLOUDFLARE_API_TOKEN`
+     (`guide/ai.md`, "Local Development"), and so would the tests run here and in CI, which have
+     no Cloudflare credentials. Decided 2026-11-13: plan it on its own.
 8. **Email** in the recipient's language.
 9. **Sign-in,** when the example needs accounts.
 10. **API routes with a language,** with the MCP route when that's planned.

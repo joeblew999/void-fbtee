@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { routeUrl } from "void-fbtee/routes";
 import { fbs, fbt } from "fbtee";
 import { ChevronRight } from "lucide-react";
-import { Link, useLocale } from "void-fbtee/react";
+import { langAttrs, Link, useLocale } from "void-fbtee/react";
 
 export function EventsCrumbs({ children, lang }: { children: ReactNode; lang?: string }) {
   const { lang: page } = useLocale();
@@ -30,7 +30,7 @@ export function EventsCrumbs({ children, lang }: { children: ReactNode; lang?: s
         <li aria-hidden>
           <ChevronRight className="size-3.5 rtl:-scale-x-100" />
         </li>
-        <li aria-current="page" className="text-foreground" lang={lang}>
+        <li aria-current="page" className="text-foreground" {...(lang && langAttrs(lang))}>
           {children}
         </li>
       </ol>

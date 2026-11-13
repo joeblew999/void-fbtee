@@ -7,6 +7,7 @@
 //   defineQueue(async (batch, env) => …)), or one person's language inside a request in another.
 // - revalidate(): Void's (void/isr), clearing a page in every language.
 // - sitemap(): /sitemap.xml with every page in every language.
+// - textLocales(), pickText(): which stored translation of what people post to show.
 // - The current language for routeUrl (void-fbtee/routes): the request's, set by the middleware
 //   (withLang), or inLocale()'s, held here in an AsyncLocalStorage, as fbtee holds its own state.
 import { AsyncLocalStorage } from "node:async_hooks";
@@ -245,3 +246,35 @@ function markdownEntries(): {
 
 /** Text for XML: its five special characters escaped. */
 const xmlText = (text: string) => text.replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);
+
+/**
+ * The languages to look for a stored translation in, best first: the page's own, then its
+ * fallbacks (`voidFbtee({ fallbackLocales })`, as fbtee uses them for the app's own strings).
+ * For content people post, kept one row per language beside the original (a table such as
+ * `event_texts`: the item's id, `locale`, and the translated fields, unique on the two):
+ * `where(and(eq(event_texts.event_id, id), inArray(event_texts.locale, textLocales(locale))))`.
+ */
+export function textLocales(locale: string): string[] {
+  const fallbacks = config.fallbackLocales;
+  const after = !fallbacks
+    ? []
+    : Array.isArray(fallbacks)
+      ? fallbacks
+      : ((fallbacks as Record<string, readonly string[]>)[locale] ?? []);
+  return [...new Set([locale, ...after])];
+}
+
+/**
+ * The best of the stored translations for a page in `locale` (rows with a `locale`, as
+ * textLocales() found them), or undefined: then show the original, as its writer wrote it, marked
+ * with its own language (langAttrs).
+ */
+export function pickText<T extends { locale: string }>(
+  rows: readonly T[],
+  locale: string,
+): T | undefined {
+  for (const l of textLocales(locale)) {
+    const found = rows.find((r) => r.locale === l);
+    if (found) return found;
+  }
+}

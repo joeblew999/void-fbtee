@@ -1,12 +1,12 @@
 // One event, by its id, with its seats left (the loader), and booking a seat (the action).
 import { bookings, bookSchema, event_texts, events } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
-import { and, count, db, eq, sql } from "void/db";
+import { and, count, db, eq, inArray, sql } from "void/db";
 import { z } from "zod";
 import type { Event as SchemaEvent, WithContext } from "schema-dts";
 import { Temporal } from "temporal-polyfill";
 import { jsonLd, pageHead } from "void-fbtee/head";
-import { revalidate as clearCache, siteOrigin } from "void-fbtee/server";
+import { pickText, revalidate as clearCache, siteOrigin, textLocales } from "void-fbtee/server";
 import { eventTopic, live } from "../../../src/events/live";
 
 export type Props = InferProps<typeof loader>;
@@ -27,16 +27,18 @@ const booked = (id: string) =>
     .where(eq(bookings.event_id, id))
     .then(([row]) => row.n);
 
-// The event, its title and description in the page's language where translated, seats left.
+// The event, its title and description in the page's language where a translation is stored (else
+// its fallbacks', else as its organiser wrote it: pickText from void-fbtee/server), seats left.
 export const loader = defineHandler.withValidator({ params })(async (c, { params: { id } }) => {
   const { locale } = c.get("i18n");
   const [event] = await db.select().from(events).where(eq(events.id, id));
   if (!event) return c.notFound();
-  const [text] = await db
+  const texts = await db
     .select()
     .from(event_texts)
-    .where(and(eq(event_texts.event_id, id), eq(event_texts.locale, locale)));
-  return { event, text: text ?? null, left: event.seats - (await booked(id)) };
+    .where(and(eq(event_texts.event_id, id), inArray(event_texts.locale, textLocales(locale))));
+  const text = pickText(texts, locale) ?? null;
+  return { event, text, left: event.seats - (await booked(id)) };
 });
 
 export const action = defineHandler.withValidator({ params, body: bookSchema })(async (

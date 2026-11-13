@@ -5,7 +5,8 @@ import { bookings, event_texts, events } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
-import { and, asc, count, db, eq, gte } from "void/db";
+import { and, asc, count, db, eq, gte, inArray } from "void/db";
+import { pickText, textLocales } from "void-fbtee/server";
 
 export type Props = InferProps<typeof loader>;
 
@@ -24,16 +25,30 @@ export const loader = defineHandler(async (c) => {
     .groupBy(bookings.event_id)
     .as("taken");
   const rows = await db
-    .select({ event: events, text: event_texts, taken: taken.n })
+    .select({ event: events, taken: taken.n })
     .from(events)
-    .leftJoin(event_texts, and(eq(event_texts.event_id, events.id), eq(event_texts.locale, locale)))
     .leftJoin(taken, eq(taken.event_id, events.id))
     .where(gte(events.starts_at_utc, new Date().toISOString()))
     .orderBy(asc(events.starts_at_utc));
+  // Their stored translations for this page (the page's language and its fallbacks), and for each
+  // the best (pickText from void-fbtee/server).
+  const ids = rows.map((r) => r.event.id);
+  const texts = ids.length
+    ? await db
+        .select()
+        .from(event_texts)
+        .where(
+          and(inArray(event_texts.event_id, ids), inArray(event_texts.locale, textLocales(locale))),
+        )
+    : [];
   return {
-    events: rows.map(({ event, text, taken }) => ({
+    events: rows.map(({ event, taken }) => ({
       ...event,
-      text,
+      text:
+        pickText(
+          texts.filter((t) => t.event_id === event.id),
+          locale,
+        ) ?? null,
       left: Math.max(0, event.seats - (taken ?? 0)),
     })),
   };

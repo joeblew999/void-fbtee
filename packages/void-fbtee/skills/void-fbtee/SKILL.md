@@ -124,6 +124,24 @@ caused it: an email to an organiser is in the organiser's language, sent while a
 another. A language the app hasn't is an error. Strings in these folders are collected like any
 other, so translate them the same way.
 
+## What people post
+
+Text people write (an event's title, a review, a message) isn't in the catalogs: it's stored, in
+the language its writer wrote it in. Keep that language with it (a `locale` column), and any
+translations one row per language beside it: a table such as `event_texts` with the item's id,
+`locale` and the translated fields, unique on the id and `locale`. Pick what to show with
+`textLocales(locale)` and `pickText(rows, locale)` from `void-fbtee/server`: the page's language,
+then its fallbacks (`voidFbtee({ fallbackLocales })`), else none, and then the original.
+
+Mark the element showing it with its own language, whichever that is, by spreading
+`langAttrs(locale)` from `void-fbtee/react` on it (`<h1 {...langAttrs(text?.locale ?? event.locale)}>`):
+`lang` for screen readers and search engines, and `dir`, so Arabic posted on an English page reads
+right to left. Inside a translated sentence, put it in a `<bdi {...langAttrs(locale)}>` in the
+`<fbt:param>`, so its direction doesn't reorder the sentence around it. Say when it's shown in
+another language than the page's, in the page's own words (`<fbt>`, with the language's name from
+`Intl.DisplayNames` in `<Formatted>`): "Written in Arabic", or "Translated by machine from Arabic"
+with the original one click away.
+
 ## Markdown pages
 
 Pages under `pages/<source locale>/` have a copy per locale at the same path under

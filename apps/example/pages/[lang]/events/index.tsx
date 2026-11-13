@@ -6,7 +6,7 @@
 import { routeUrl } from "void-fbtee/routes";
 import { fbt } from "fbtee";
 import { ArrowRight, MapPin } from "lucide-react";
-import { Formatted, Link, useLocale, useNow, useTimeZone } from "void-fbtee/react";
+import { Formatted, langAttrs, Link, useLocale, useNow, useTimeZone } from "void-fbtee/react";
 import { Temporal } from "temporal-polyfill";
 import { Flap } from "@/events/Flap";
 import { buttonVariants } from "@/ui/button";
@@ -95,7 +95,7 @@ function BoardRow({ e }: { e: Row }) {
         <div className="col-span-2 row-start-2 grid min-w-0 gap-1 md:col-span-1 md:col-start-4 md:row-start-1">
           <span
             className="text-base font-medium text-pretty md:text-lg md:leading-snug"
-            lang={e.text ? locale : e.locale}
+            {...langAttrs(e.text?.locale ?? e.locale)}
             data-testid="event-title"
           >
             {e.text?.title ?? e.title}
@@ -103,7 +103,9 @@ function BoardRow({ e }: { e: Row }) {
           {e.venue && (
             <span className="flex min-w-0 items-center gap-1.5 text-muted-foreground text-sm">
               <MapPin aria-hidden className="size-3.5 shrink-0" />
-              <span className="truncate">{e.venue}</span>
+              <span className="truncate" {...langAttrs(e.locale)}>
+                {e.venue}
+              </span>
             </span>
           )}
         </div>

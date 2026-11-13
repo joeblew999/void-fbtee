@@ -8,7 +8,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { fbt } from "fbtee";
 import { Form } from "@void/react";
 import { connectLiveStream } from "void/live/client";
-import { Formatted, useForm, useLocale, useTimeZone } from "void-fbtee/react";
+import { Formatted, langAttrs, useForm, useLocale, useTimeZone } from "void-fbtee/react";
 import { MapPin } from "lucide-react";
 import { EventTime } from "@/events/EventTime";
 import { EventsCrumbs } from "@/events/EventsCrumbs";
@@ -221,8 +221,9 @@ export default function Event({ event, text, left }: Props) {
   const zone = useTimeZone();
   const seatsLeft = useLiveEvent(event.id, left);
   // In the page's language where a translation is stored (the sample events); else as written.
+  // Marked with its own language and direction (langAttrs), whichever it's in.
   const shown = text ?? event;
-  const textLang = text ? locale : event.locale;
+  const textLang = text ? text.locale : event.locale;
   const written = new Intl.DisplayNames(locale, { type: "language" }).of(event.locale);
   return (
     // Three parts: the event, booking, and the stored record. On a phone they stack in that order;
@@ -233,7 +234,7 @@ export default function Event({ event, text, left }: Props) {
           <EventsCrumbs lang={textLang}>{shown.title}</EventsCrumbs>
           <h1
             className="text-3xl font-medium text-balance md:text-4xl"
-            lang={textLang}
+            {...langAttrs(textLang)}
             data-testid="event-title"
           >
             {shown.title}
@@ -242,7 +243,10 @@ export default function Event({ event, text, left }: Props) {
             <p className="flex items-center gap-2 text-muted-foreground" data-testid="event-venue">
               <MapPin aria-hidden className="size-4 shrink-0 text-brand" />
               <fbt desc="Where an event happens, as its organiser wrote it">
-                Where: <fbt:param name="venue">{event.venue}</fbt:param>
+                Where:{" "}
+                <fbt:param name="venue">
+                  <bdi {...langAttrs(event.locale)}>{event.venue}</bdi>
+                </fbt:param>
               </fbt>
             </p>
           )}
@@ -257,7 +261,7 @@ export default function Event({ event, text, left }: Props) {
         <div className="grid gap-4">
           <p
             className="max-w-prose text-lg leading-relaxed text-pretty"
-            lang={textLang}
+            {...langAttrs(textLang)}
             data-testid="event-description"
           >
             {shown.description}
@@ -277,7 +281,7 @@ export default function Event({ event, text, left }: Props) {
               </summary>
               <div
                 className="mt-3 grid gap-1 border-s-1 ps-4"
-                lang={event.locale}
+                {...langAttrs(event.locale)}
                 data-testid="event-original"
               >
                 <strong className="text-foreground">{event.title}</strong>

@@ -60,6 +60,16 @@ export interface LocaleConfig {
 
 const RTL_LANGUAGES = new Set(["ar", "fa", "he", "ur", "ps", "sd", "ug", "yi", "dv", "ckb"]);
 
+/**
+ * The attributes for an element holding text in a language of its own, such as what a person
+ * posted, in the language they wrote it in: `lang`, so browsers, screen readers and search engines
+ * read it as that language, and `dir`, so Arabic posted on an English page reads right to left
+ * (W3C, "Inline markup and bidirectional text in HTML"). `<h1 {...langAttrs(event.locale)}>`.
+ */
+export function langAttrs(locale: string): { lang: string; dir: Dir } {
+  return { lang: locale, dir: dirOf(locale) };
+}
+
 /** The text direction of a locale, from Intl when the runtime knows it, else from its language. */
 export function dirOf(locale: string): Dir {
   const info =

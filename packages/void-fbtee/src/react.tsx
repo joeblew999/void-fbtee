@@ -27,6 +27,7 @@ import type { ActionUrl, ResolveActionBody, ResolveActionParams } from "void/rou
 import { Temporal } from "temporal-polyfill";
 import config from "virtual:void-fbtee/config";
 import { localeFromPath, type Lang, type Locale } from "./locales";
+export { langAttrs } from "./locales";
 import { install, documentI18n } from "./install";
 import type { SharedI18n } from "./middleware";
 
