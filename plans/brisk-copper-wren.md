@@ -35,8 +35,10 @@ installs nothing under a day old, so it can be installed from about 01:00 UTC on
 ## Then: what needs Void 1.8.0
 
 3. [x] **Translated not-found and error pages**, done 2026-11-13: `pages/_not-found.tsx` and
-       `pages/_error.tsx`, inside the root layout, in the page's language, keeping Void's 404 and 500. The header marks no page current on a page that's none of its own. The browser tab
-       keeps Void's English title: these components take no `head()` in 1.8.0.
+       `pages/_error.tsx`, inside the root layout, in the page's language, keeping Void's 404 and 500. The header marks no page current on a page that's none of its own. These components
+       take no `head()` in 1.8.0, so the tab title is set with React 19's own `<title>`, in the
+       page's language (checked in en/ar/th). The defer() console error seen while testing is
+       Void's, reproduced in a fresh Void app: voidzero-dev/void#809.
        Backed by: Void 1.8.0 release notes; `docs/guide/pages-routing/errors.md`.
 
 4. [x] **Unit tests of plain code**, done 2026-11-13: `src/docs/differs.test.ts`
