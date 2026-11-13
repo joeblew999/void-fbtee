@@ -1,7 +1,10 @@
 // Production build: changes clear Void's page cache. Posting, booking and deleting each clear the
 // pages they change, in every language (revalidate() from void-fbtee/server), so the next visitor
-// gets the change, not the cached page. Read through Void's own cache header, `x-isr-cache`
-// (@void/isr): HIT from the cache, MISS when built afresh. Only the production build has the cache
+// gets the change, not the cached page. And a page showing an event in a language it isn't
+// translated into yet isn't cached at all (awaitsTranslation, src/events/translations.ts), so the
+// cache never holds it in the wrong language. Read through Void's own cache header, `x-isr-cache`
+// (@void/isr): HIT from the cache, MISS when built afresh and stored, none when built afresh and not
+// stored (Void's isr runtime.mjs: an uncacheable render is returned as it is). Only the production build has the cache
 // (Void's runtime/isr.mjs: none in dev), so this runs on the preview. Fetches send no cookie: a
 // request with one skips the cache (guide/edge/revalidation.md).
 import { expect, test } from "vite-plus/test";
@@ -21,8 +24,14 @@ async function cached(path: string) {
   expect((await visit(path)).cache).toBe("HIT");
 }
 
+/** Visits twice: built afresh both times, and never stored. */
+async function notCached(path: string) {
+  expect((await visit(path)).cache).toBeNull();
+  expect((await visit(path)).cache).toBeNull();
+}
+
 test.skipIf(onLiveSite())(
-  "posting, booking and deleting each clear the cached pages they change, in every language",
+  "posting, booking and deleting clear the cached pages they change; untranslated pages aren't cached",
   async () => {
     const title = `Cache check ${crypto.randomUUID().slice(0, 8)}`;
     await cached("/en-US/events");
@@ -30,24 +39,26 @@ test.skipIf(onLiveSite())(
 
     const p = await page();
     // On the preview, Workers AI doesn't run (plans/plain-stage-compass.md, "Found while building"),
-    // so no translation lands later and clears the pages again while this reads the cache.
+    // so the event stays untranslated: its pages in English, the language it's posted in, are
+    // cached; in the other languages they wait for a translation, so they never are.
     const event = await postEvent(p, { title, local: "2027-01-20T18:00", seats: 5 });
 
     // Posting: the events list, in each language, built afresh with the new event in it.
     const list = await visit("/en-US/events");
     expect(list.cache).toBe("MISS");
     expect(list.html).toContain(title);
-    expect((await visit("/th-TH/events")).cache).toBe("MISS");
     expect((await visit("/en-US/events")).cache).toBe("HIT");
+    await notCached("/th-TH/events");
+
+    // The event's page: cached in English; in Arabic, not yet translated, built afresh each time.
+    await cached(`/en-US${event.path}`);
+    await notCached(`/ar-EG${event.path}`);
 
     // Booking: the event's page, built afresh with one seat fewer.
-    await cached(`/en-US${event.path}`);
-    await cached(`/ar-EG${event.path}`);
     await book(p, "Cache", "cache@example.com");
     const after = await visit(`/en-US${event.path}`);
     expect(after.cache).toBe("MISS");
     expect(after.html).toContain("4 seats left");
-    expect((await visit(`/ar-EG${event.path}`)).cache).toBe("MISS");
 
     // Deleting: the event's page is gone and the list, built afresh, no longer has it.
     await p.reload();

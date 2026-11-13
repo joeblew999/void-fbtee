@@ -13,12 +13,14 @@ import { pickText, revalidate as clearCache, siteOrigin, textLocales } from "voi
 import { sendBookingEmail } from "../../../src/events/emails";
 import { deleteKeyMatches } from "../../../src/events/delete-key";
 import { eventTopic, live } from "../../../src/events/live";
+import { awaitsTranslation } from "../../../src/events/translations";
 
 export type Props = InferProps<typeof loader>;
 
 // Void's page cache keeps each event's page until the next deploy (a year, the longest it
 // allows): only a booking changes it, and booking clears it at once, in every language (the
-// action). Open pages get the new seats-left count live as well (src/events/live.ts).
+// action). Open pages get the new seats-left count live as well (src/events/live.ts). A page in a
+// language the event isn't translated into yet isn't cached (awaitsTranslation, the loader).
 export const revalidate = 31_536_000;
 
 // The page's URL parameter: /<lang>/events/<id>. Whether it's an event is the database's answer:
@@ -46,6 +48,7 @@ export const loader = defineHandler.withValidator({ params })(async (c, { params
     .from(event_texts)
     .where(and(eq(event_texts.event_id, id), inArray(event_texts.locale, textLocales(locale))));
   const text = pickText(texts, locale) ?? null;
+  if (awaitsTranslation(event.locale, texts, locale)) c.header("x-revalidate", "0");
   return { event, text, left: event.seats - (await booked(id)), deletable: !!delete_key_hash };
 });
 

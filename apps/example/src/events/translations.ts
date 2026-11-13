@@ -1,12 +1,27 @@
 // Translations of what people post, made by Workers AI in the translate queue (queues/translate.ts).
 // Each is stored beside the original (event_texts), then the event's pages leave Void's page cache
-// in every language, and its open pages are told to load their data again (live).
+// in every language, and its open pages are told to load their data again (live). Until then, a
+// page in a language it isn't in yet isn't cached at all (awaitsTranslation).
 import { event_texts, events } from "@schema";
 import { db, eq } from "void/db";
 import { appLocales, revalidate } from "void-fbtee/server";
 import { eventTopic, live } from "./live";
 
 export type Text = { title: string; description: string };
+
+/**
+ * Whether a page in `locale` shows an event still waiting for its translation into that language:
+ * it was written in another one, and none of the stored texts is in `locale`. Such a page isn't
+ * kept in Void's page cache (`x-revalidate: 0`, guide/edge/revalidation.md, "Per-response TTL
+ * override"), so the cache never holds an event in the wrong language: the first visit after the
+ * translation is stored caches the finished page. Clearing the cache when it lands
+ * (storeTranslations) then only has older copies to clear, and nothing waits on it.
+ */
+export const awaitsTranslation = (
+  written: string,
+  texts: readonly { locale: string }[],
+  locale: string,
+) => written !== locale && !texts.some((t) => t.locale === locale);
 
 /** An event's original, and the app's languages it has no translation in yet. */
 export async function untranslated(eventId: string) {
