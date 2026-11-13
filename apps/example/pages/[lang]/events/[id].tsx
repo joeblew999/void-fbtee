@@ -146,7 +146,7 @@ function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut:
           data-testid="book"
           className="w-full"
         >
-          <fbt desc="Button: book a seat on the event">Book a seat</fbt>
+          <fbt desc="Button under the booking form's name and email: books the seat">Book</fbt>
         </Button>
         <div
           hidden={formOnScreen}

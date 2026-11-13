@@ -2124,6 +2124,18 @@
         }
       ],
       "types": []
+    },
+    "9wpj4yOHo3acWWy3pyTP/g==": {
+      "description": "Button under the booking form's name and email: books the seat",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "จอง",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }
