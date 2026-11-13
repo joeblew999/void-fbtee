@@ -453,10 +453,12 @@ async function checkDev(target: string, dir: string, app: App) {
       `${target}: an address with nothing at it gets init's not-found page in Thai, title too`,
     );
     const sitemap = await fetch(`${base}/sitemap.xml`);
-    gap(
-      sitemap.ok && (await sitemap.text()).includes('hreflang="th-TH"'),
-      `${target}: /sitemap.xml lists every page in every language`,
-      6,
+    const sitemapXml = sitemap.ok ? await sitemap.text() : "";
+    check(
+      sitemapXml.includes("/th-TH/form</loc>") &&
+        sitemapXml.includes('hreflang="th-TH"') &&
+        sitemapXml.includes('hreflang="x-default"'),
+      `${target}: init's /sitemap.xml lists every page in every language`,
     );
     // Void's scheduled job example (crons/hourly-heartbeat.ts), run as Void's docs say to locally
     // (guide/jobs.md, "Local development"), with the token Void keeps in .void/. The job throws

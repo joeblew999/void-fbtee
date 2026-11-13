@@ -6,6 +6,7 @@
 //   guide/jobs.md, defineScheduled(async (controller, env) => …); guide/queues.md,
 //   defineQueue(async (batch, env) => …)), or one person's language inside a request in another.
 // - revalidate(): Void's (void/isr), clearing a page in every language.
+// - sitemap(): /sitemap.xml with every page in every language.
 // - The current language for routeUrl (void-fbtee/routes): the request's, set by the middleware
 //   (withLang), or inLocale()'s, held here in an AsyncLocalStorage, as fbtee holds its own state.
 import { AsyncLocalStorage } from "node:async_hooks";
@@ -14,8 +15,11 @@ import { revalidate as voidRevalidate } from "void/isr";
 import type { RouteUrl } from "void/routes";
 import config from "virtual:void-fbtee/config";
 import catalogs from "virtual:void-fbtee/catalogs";
+import markdownPages from "virtual:void-fbtee/md-pages";
+import langPages from "virtual:void-fbtee/pages";
 import { setServerLang } from "./current";
 import type { AppLocale, Dir, Lang } from "./locales";
+import { routeUrl } from "./routes";
 import { allTranslations } from "./runtime";
 
 const storage = new AsyncLocalStorage<Lang>();
@@ -136,3 +140,108 @@ export function siteOrigin(c: { req: { url: string } }): string {
 export function appLocales(): string[] {
   return config.locales.map((l) => l.locale);
 }
+
+/** A page for the sitemap: a route under pages/[lang]/, with its other params, and its last change. */
+export interface SitemapPage {
+  path: `/[lang]${string}`;
+  params?: Record<string, string | number>;
+  /** When its content last changed (W3C date or date-time), in every language or per language. */
+  lastmod?: string | ((locale: AppLocale) => string | undefined);
+}
+
+/**
+ * The sitemap (a route's response: `export const GET = defineHandler((c) => sitemap(c))` in
+ * routes/sitemap.xml.ts), by Google's rules (Search Central, "Build and submit a sitemap" and
+ * "Tell Google about localized versions of your page", checked 2026-11-12): each page in every
+ * language, each listing all its languages, itself included, plus x-default (the source
+ * language's); full addresses on the site's own origin (siteOrigin); <lastmod> only where it's a
+ * real change, never the time it was drawn; no changefreq or priority (Google ignores them).
+ *
+ * Without options it lists every page under pages/[lang]/ whose only parameter is the language
+ * (from Void's own list of the app's pages), and every markdown page that's in every language
+ * (its frontmatter's `updated`, the date the page shows, as its <lastmod>). `pages` adds the
+ * app's own (each event: `{ path: "/[lang]/events/[id]", params: { id }, lastmod }`) or gives a
+ * listed page its last change; `exclude` leaves listed pages out (a form, with nothing to find).
+ */
+export function sitemap(
+  c: { req: { url: string } },
+  options: { pages?: readonly SitemapPage[]; exclude?: readonly `/[lang]${string}`[] } = {},
+): Response {
+  const origin = siteOrigin(c);
+  const given = options.pages ?? [];
+  const lastmodOf = new Map(given.filter((p) => !p.params).map((p) => [p.path, p.lastmod]));
+  type Entry = { urls: Record<string, string>; lastmod?: SitemapPage["lastmod"] };
+  const urlsOf = (page: SitemapPage) =>
+    Object.fromEntries(
+      config.locales.map((l) => [
+        l.locale,
+        routeUrl(page.path as never, { params: { ...page.params, lang: l.segment } } as never),
+      ]),
+    );
+  const entries: Entry[] = [
+    ...langPages
+      .filter((path) => !options.exclude?.includes(path))
+      .map((path) => ({ urls: urlsOf({ path }), lastmod: lastmodOf.get(path) })),
+    ...given
+      .filter((p) => p.params || !langPages.includes(p.path))
+      .map((p) => ({ urls: urlsOf(p), lastmod: p.lastmod })),
+    ...markdownEntries(),
+  ];
+  const source = config.sourceLocale;
+  const xml = [
+    `<?xml version="1.0" encoding="UTF-8"?>`,
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">`,
+    ...entries.flatMap((entry) =>
+      config.locales.map((l) => {
+        const lastmod =
+          typeof entry.lastmod === "function" ? entry.lastmod(l.locale) : entry.lastmod;
+        const alternates = [
+          ...config.locales.map((a) => [a.locale, entry.urls[a.locale]!] as const),
+          ["x-default", entry.urls[source]!] as const,
+        ].map(
+          ([hreflang, url]) =>
+            `    <xhtml:link rel="alternate" hreflang="${xmlText(hreflang)}" href="${xmlText(origin + url)}"/>`,
+        );
+        return [
+          `  <url>`,
+          `    <loc>${xmlText(origin + entry.urls[l.locale])}</loc>`,
+          ...(lastmod ? [`    <lastmod>${xmlText(lastmod)}</lastmod>`] : []),
+          ...alternates,
+          `  </url>`,
+        ].join("\n");
+      }),
+    ),
+    `</urlset>`,
+    ``,
+  ].join("\n");
+  return new Response(xml, { headers: { "content-type": "application/xml; charset=utf-8" } });
+}
+
+/** The markdown pages, from @void/md's own list: each one's copies under pages/<locale>/ as one
+ * page, only where it's in every language (an alternate must exist). */
+function markdownEntries(): {
+  urls: Record<string, string>;
+  lastmod: (l: string) => string | undefined;
+}[] {
+  const byPath = new Map<
+    string,
+    { urls: Record<string, string>; updated: Record<string, string> }
+  >();
+  for (const page of markdownPages) {
+    const [, segment, ...rest] = page.path.replace(/\/+$/, "").split("/");
+    const locale = config.locales.find((l) => l.segment === segment)?.locale;
+    if (!locale) continue;
+    const key = `/${rest.join("/")}`;
+    const entry = byPath.get(key) ?? { urls: {}, updated: {} };
+    entry.urls[locale] = page.path;
+    const updated = page.frontmatter.updated;
+    if (typeof updated === "string") entry.updated[locale] = updated;
+    byPath.set(key, entry);
+  }
+  return [...byPath.values()]
+    .filter((p) => config.locales.every((l) => p.urls[l.locale]))
+    .map((p) => ({ urls: p.urls, lastmod: (l: string) => p.updated[l] }));
+}
+
+/** Text for XML: its five special characters escaped. */
+const xmlText = (text: string) => text.replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);

@@ -171,6 +171,13 @@ missing; where it can't safely edit a file it prints the line to add). The piece
 - `middleware/99.i18n.ts`: `export { default } from "void-fbtee/middleware";`. The 99 makes Void run
   it after the app's own middleware (01-98), since it adds to the shared and head data they set.
 - `pages/layout.tsx` wraps its children in `<I18nProvider>` from `void-fbtee/react`.
+- `routes/sitemap.xml.ts`: `export const GET = defineHandler((c) => sitemap(c))` (`sitemap` from
+  `void-fbtee/server`): every page under `pages/[lang]/` whose only parameter is the language,
+  and every markdown page that's in every language, each in every language with its alternates.
+  The app's own pages go in `pages` (`{ path: "/[lang]/events/[id]", params: { id }, lastmod }`),
+  a listed page's last change too (`{ path: "/[lang]/events", lastmod }`), and `exclude` leaves
+  one out (a form). To keep it in Void's page cache, give `/sitemap.xml` a time in
+  `routing.revalidate` (`void.config.ts`) and clear it with `revalidate` when a page is added.
 - `pages/_not-found.tsx` and `pages/_error.tsx`: Void's not-found and error pages, in the page's
   language, with a link to the home page under `pages/[lang]/` (init writes them once that page
   exists, and never over the app's own). They take no `head()`, so their tab title is React's own

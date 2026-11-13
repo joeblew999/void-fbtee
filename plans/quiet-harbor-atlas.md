@@ -140,7 +140,16 @@ Each step is shipped and proven before the next, each with its docs example in t
        translate them. No title helper after all: React 19's own `<title>` with an `fbs(…)` string
        is one line, and the template shows it. Package tests for the three cases; in the fresh app
        the gap is now a check (the Thai page and its Thai tab title).
-6. **The sitemap from the package.**
+6. [x] **The sitemap from the package,** done 2026-11-13. `sitemap(c, { pages, exclude })` from
+       `void-fbtee/server`: every page under `pages/[lang]/` whose only parameter is the language,
+       from Void's own list of the app's pages (`PagePathMap` in the `.void/routes.d.ts` Void
+       generates; `langPages` in `src/plugin.ts`), and every markdown page in every language, with
+       the example's rules (alternates, x-default, `<lastmod>` only where real). `init` writes
+       `routes/sitemap.xml.ts` when the app has none. The example's sitemap is now `sitemap()` with
+       its events and dates (about 100 lines to 40; `fast-xml-builder` removed). Its output on dev
+       matches the live site's old one: the same 18 non-event addresses, alternates and `<lastmod>`.
+       Package tests for the list, the alternates and `<lastmod>`; in the fresh app the gap is now a
+       check.
 7. **Translated content:** the pattern, then translating it with AI in a queue.
 8. **Email** in the recipient's language.
 9. **Sign-in,** when the example needs accounts.

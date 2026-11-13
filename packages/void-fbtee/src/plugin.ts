@@ -87,6 +87,12 @@ const MD_PAGES_ID = "virtual:void-fbtee/md-pages";
  * Without Zod 4, it does nothing.
  */
 const ZOD_ID = "virtual:void-fbtee/zod";
+/**
+ * The app's pages in every language: each page under pages/[lang]/ whose only parameter is the
+ * language, from Void's own list of the app's pages (PagePathMap in the .void/routes.d.ts Void
+ * generates), for the sitemap (sitemap() in server.ts).
+ */
+const PAGES_ID = "virtual:void-fbtee/pages";
 /** What `temporal-polyfill` is on the server: the runtime's own Temporal (Cloudflare's flag). */
 const SERVER_TEMPORAL_ID = "\0void-fbtee:server-temporal";
 // Hono's route helper, as Void's own copy of Hono: matchedRoutes reads Hono's request internals, so
@@ -215,6 +221,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           id === TEXTS_ID ||
           id === MD_PAGES_ID ||
           id === ZOD_ID ||
+          id === PAGES_ID ||
           id.startsWith(CATALOG_PREFIX)
         )
           return "\0" + id;
@@ -257,6 +264,11 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         if (id === "\0" + MD_PAGES_ID)
           return hasMarkdown ? `export { default } from "@void/md/pages";` : "export default [];";
         if (id === "\0" + ZOD_ID) return zodMessages(root, config);
+        if (id === "\0" + PAGES_ID) {
+          const file = join(root, ".void/routes.d.ts");
+          if (existsSync(file)) this.addWatchFile(file);
+          return `export default ${JSON.stringify(langPages(file))};`;
+        }
         // Dev only: each string's source text, so the browser can name what it shows untranslated.
         if (id === "\0" + TEXTS_ID)
           return `export default ${command === "serve" ? JSON.stringify(runtimeTexts(project())) : "{}"};`;
@@ -276,6 +288,17 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   };
 
   return [core, fbteeVite()];
+}
+
+/**
+ * The pages under pages/[lang]/ with no parameter but the language ("/[lang]/docs"), from Void's
+ * generated route types: PagePathMap's entries whose parameters are exactly "lang". Void writes the
+ * file on install (`void prepare`) and whenever the pages change; none yet, none listed.
+ */
+export function langPages(file: string): string[] {
+  if (!existsSync(file)) return [];
+  const block = /export interface PagePathMap \{([\s\S]*?)\n\s*\}/.exec(readFileSync(file, "utf8"));
+  return [...(block?.[1] ?? "").matchAll(/^\s*"(\/\[lang\][^"]*)": "lang";$/gm)].map((m) => m[1]!);
 }
 
 /**

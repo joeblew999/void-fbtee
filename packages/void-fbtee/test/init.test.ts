@@ -50,7 +50,7 @@ function snapshot(root: string, dir = root): Record<string, string> {
 test("wires void-fbtee into a Vite+ app, and a second run changes nothing", async () => {
   const root = app("vite-plus");
   const first = await init(options(root));
-  expect(first.done.length).toBe(12);
+  expect(first.done.length).toBe(13);
 
   const vite = read(root, "vite.config.ts");
   expect(vite).toContain(`import { defineConfig } from "vite-plus";`);
@@ -150,6 +150,17 @@ test("with a home page under pages/[lang]/: Void's not-found and error pages, tr
   const before = snapshot(root);
   await init(options(root));
   expect(snapshot(root)).toEqual(before);
+});
+
+test("a sitemap route, unless the app has its own", async () => {
+  const root = app("vite-plus");
+  await init(options(root));
+  expect(read(root, "routes/sitemap.xml.ts")).toContain("sitemap(c)");
+  const own = app("vite-plus");
+  mkdirSync(join(own, "routes"), { recursive: true });
+  writeFileSync(join(own, "routes/sitemap.xml.js"), "export const GET = () => null;\n");
+  await init(options(own));
+  expect(existsSync(join(own, "routes/sitemap.xml.ts"))).toBe(false);
 });
 
 test("an app's own not-found page is left alone", async () => {

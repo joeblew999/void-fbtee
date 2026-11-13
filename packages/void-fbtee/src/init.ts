@@ -146,6 +146,14 @@ export default function ErrorPage({ error }: ErrorPageProps) {
 }
 `;
 
+const SITEMAP = `// The sitemap, at /sitemap.xml: every page in every language (void-fbtee's sitemap()). Add the app's
+// own pages, such as one per event, with sitemap(c, { pages: [...] }). Written by void-fbtee init.
+import { defineHandler } from "void";
+import { sitemap } from "void-fbtee/server";
+
+export const GET = defineHandler((c) => sitemap(c));
+`;
+
 /** Coding agents and their skills folders, as Void's own skill linking detects them. */
 const AGENTS = [
   { name: "Claude Code", detect: [".claude", "CLAUDE.md"], skillsDir: ".claude/skills" },
@@ -285,6 +293,14 @@ export async function init(o: InitOptions): Promise<InitResult> {
       written.add(`pages/${p.name}.tsx`);
       done.push(`pages/${p.name}.tsx: created, Void's ${p.what} in the page's language`);
     }
+
+  // 4c. The sitemap, where the app has none.
+  if (!has("routes", "sitemap.xml")) {
+    mkdirSync(at("routes"), { recursive: true });
+    writeFileSync(at("routes/sitemap.xml.ts"), SITEMAP);
+    written.add("routes/sitemap.xml.ts");
+    done.push("routes/sitemap.xml.ts: created, every page in every language");
+  }
 
   // 5. vite.config.ts: the plugin first, with the languages from src/locales.ts (made here if
   // there's none); on Vite+ the lint plugins (in the workspace's root config).

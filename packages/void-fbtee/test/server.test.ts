@@ -1,10 +1,10 @@
 // inLocale() from void-fbtee/server, as an app's server code runs it with no request (a scheduled
 // job, a queue consumer), routeUrl() from void-fbtee/routes and Zod's messages in its language: built through the plugin for a server environment, as Void builds a
 // Worker, then run. The fixture's catalog has German for its strings (test/fixture/i18n/).
-import { cpSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { afterAll, beforeAll, expect, test } from "vite-plus/test";
+import { afterAll, beforeAll, describe, expect, test } from "vite-plus/test";
 import { createBuilder, type Plugin } from "vite";
 import { voidFbtee } from "../src/plugin";
 
@@ -23,11 +23,29 @@ let probe: {
   zodMessages: () => Promise<string[]>;
   zodOwn: () => Promise<string>;
   zodOutside: () => string;
+  map: () => Promise<string>;
 };
 
 beforeAll(async () => {
   root = mkdtempSync(join(import.meta.dirname, ".tmp-"));
   cpSync(join(import.meta.dirname, "fixture"), root, { recursive: true });
+  // Void's generated list of the app's pages, as \`void prepare\` writes it (PagePathMap).
+  mkdirSync(join(root, ".void"), { recursive: true });
+  writeFileSync(
+    join(root, ".void/routes.d.ts"),
+    `declare module "void/routes" {
+  export interface PagePathMap {
+    "/[lang]": "lang";
+    /** @deprecated Use "/[lang]" instead. */
+    "/:lang": PagePathMap["/[lang]"];
+    "/[lang]/events": "lang";
+    "/[lang]/events/new": "lang";
+    "/[lang]/events/[id]": "lang" | "id";
+    "/about": never;
+  }
+}
+`,
+  );
   const server = join(import.meta.dirname, "../src/server.ts");
   const routes = join(import.meta.dirname, "../src/routes.ts");
   writeFileSync(
@@ -61,6 +79,16 @@ export const zodMessages = () =>
   Promise.all(["en-US", "de-DE", "ar-EG"].map((l) => inLocale(l, tooShort)));
 export const zodOwn = () => inLocale("de-DE", own);
 export const zodOutside = () => tooShort();
+import { sitemap } from ${JSON.stringify(server)};
+const c = { req: { url: "https://example.com/sitemap.xml" } };
+export const map = () =>
+  sitemap(c, {
+    pages: [
+      { path: "/[lang]/events", lastmod: "2026-11-12T09:00:00Z" },
+      { path: "/[lang]/events/[id]", params: { id: "a&b" }, lastmod: (l) => (l === "de-DE" ? "2026-11-10" : undefined) },
+    ],
+    exclude: ["/[lang]/events/new"],
+  }).text();
 `,
   );
   const builder = await createBuilder({
@@ -146,4 +174,45 @@ test("an app's own message still wins", async () => {
 
 test("with no current language, Zod's English", () => {
   expect(probe.zodOutside()).toBe("Too small: expected string to have >=1 characters");
+});
+
+describe("sitemap()", () => {
+  const urls = (xml: string) => [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((m) => m[1]);
+  test("every page under [lang] with no other param, in every language, plus the app's own", async () => {
+    expect(urls(await probe.map())).toEqual([
+      "https://example.com/en-US",
+      "https://example.com/de-DE",
+      "https://example.com/ar-EG",
+      "https://example.com/en-US/events",
+      "https://example.com/de-DE/events",
+      "https://example.com/ar-EG/events",
+      // The id as Void's routeUrl encodes it.
+      "https://example.com/en-US/events/a%26b",
+      "https://example.com/de-DE/events/a%26b",
+      "https://example.com/ar-EG/events/a%26b",
+    ]);
+  });
+
+  test("each lists all its languages and x-default, the source language's", async () => {
+    const first = (await probe.map()).split("</url>")[0]!;
+    expect(
+      [...first.matchAll(/hreflang="([^"]+)" href="([^"]+)"/g)].map((m) => `${m[1]} ${m[2]}`),
+    ).toEqual([
+      "en-US https://example.com/en-US",
+      "de-DE https://example.com/de-DE",
+      "ar-EG https://example.com/ar-EG",
+      "x-default https://example.com/en-US",
+    ]);
+  });
+
+  test("lastmod only where given, for every language or one", async () => {
+    const xml = await probe.map();
+    const lastmods = [...xml.matchAll(/<loc>(.*?)<\/loc>\s*(?:<lastmod>(.*?)<\/lastmod>)?/g)].map(
+      (m) => `${m[1]!.replace("https://example.com", "")} ${m[2] ?? "-"}`,
+    );
+    expect(lastmods).toContain("/en-US -");
+    expect(lastmods).toContain("/de-DE/events 2026-11-12T09:00:00Z");
+    expect(lastmods).toContain("/de-DE/events/a%26b 2026-11-10");
+    expect(lastmods).toContain("/en-US/events/a%26b -");
+  });
 });

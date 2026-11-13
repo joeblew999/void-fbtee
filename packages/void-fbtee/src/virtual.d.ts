@@ -29,3 +29,9 @@ declare module "virtual:void-fbtee/zod" {
   /** Zod's own messages in the current language (plugin.ts, zodMessages); a no-op without Zod 4. */
   export function setup(currentLocale: () => string | undefined): void;
 }
+
+declare module "virtual:void-fbtee/pages" {
+  /** The app's pages under pages/[lang]/ with no other parameter ("/[lang]/docs"), from Void's routes. */
+  const pages: readonly `/[lang]${string}`[];
+  export default pages;
+}
