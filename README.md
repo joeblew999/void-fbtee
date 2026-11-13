@@ -41,7 +41,9 @@ Every day:
 vp run dev               # develop: the package rebuilds on save; the example runs with Void's
                          # local D1, KV and live updates
 vp check                 # format, lint, types
-vp test run              # every test, on a local build; report: .vitest/index.html
+vp test run              # the package's tests and the browser tests, on a local build;
+                         # report: .vitest/index.html
+vp run example#test      # the example's own unit tests, in Node (seconds)
 vp run deploy            # deploy the example to production (Cloudflare), with no downtime:
                          # Void uploads the new version, checks it's ready, then moves
                          # traffic to it. It creates what's missing (D1 with read replicas,
@@ -112,7 +114,10 @@ covers unit tests in Node, with bindings such as D1 and KV replaced by `vi.mock(
 real thing with nothing faked: the example's own build on Cloudflare's local runtime
 (`vp test run`), or the deployed site (`vp run test:deployed`). Formatting can only be tested on
 the Worker's own `Intl`, not Node's, which differs. The
-package's own tests (`packages/void-fbtee/test/`) are plain tests of its commands, in Node.
+package's own tests (`packages/void-fbtee/test/`) are plain tests of its commands, in Node. The
+example has a few unit tests of plain code beside it in `src/` (Void's guide's way, with nothing
+mocked: they touch no binding), run from inside the app because Void finds an app from where it
+runs.
 
 The tasks are in `vite.config.ts` and `apps/example/vite.config.ts`.
 

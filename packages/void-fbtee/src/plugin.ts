@@ -9,7 +9,7 @@
 //   compatibility flag, which init adds and check requires), so no polyfill code goes in the
 //   worker. It once shipped broken (workerd#6907, July 2026, with no flag); the flag's version is
 //   documented and its Temporal.Now reads Date.now()'s clock. The browser keeps the polyfill's
-//   own "native if present".
+//   own "native if present", and so do tests under Vitest, which run in Node.js.
 // - Builds each locale's catalog in-process from i18n/translations/<locale>.json and the app's
 //   source (plus fbtee's built-in strings), as `virtual:void-fbtee/catalogs`. Nothing generated
 //   goes in git. Shared with the void-fbtee command: catalogs.ts.
@@ -118,6 +118,11 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   // Whether the app uses @void/md, as void-md tells its own adapters (by plugin name): no peer
   // dependency on it, which an app without markdown pages would have to install anyway.
   let hasMarkdown = false;
+  // Whether this is the server Vitest makes to run tests, which run in Node.js: no Worker, so no
+  // Cloudflare Temporal, and `temporal-polyfill` stays the polyfill. Recognised as Void 1.8.0's
+  // isVitestServer does (src/plugin-dev-config.ts): Vitest adds plugins named "vitest" and
+  // "vitest:*".
+  let underVitest = false;
   const project = (): Project => ({ root, config, translations: translationsDir, src });
 
   const api: VoidFbteeApi = { options, project };
@@ -130,6 +135,9 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       root = resolved.root;
       command = resolved.command;
       hasMarkdown = resolved.plugins.some((p) => p.name === "void-md");
+      underVitest = resolved.plugins.some(
+        (p) => p.name === "vitest" || p.name.startsWith("vitest:"),
+      );
     },
     // Once per run (the first environment to start): the dev server warns, a build reports, and
     // with failOnMissing a build fails, so `void deploy` (which runs `vite build`) can't ship gaps.
@@ -203,7 +211,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           return "\0" + id;
         if (isClient(this.environment)) return;
         if (id === "fbtee/server") return fbteeServer;
-        if (id === "temporal-polyfill") return SERVER_TEMPORAL_ID;
+        if (id === "temporal-polyfill" && !underVitest) return SERVER_TEMPORAL_ID;
         if (id === HONO_ROUTE_ID) {
           const voidEntry = await this.resolve("void", join(root, "package.json"));
           const route = voidEntry && (await this.resolve("hono/route", voidEntry.id));

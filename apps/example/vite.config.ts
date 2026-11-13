@@ -51,4 +51,8 @@ export default defineConfig({
     voidMarkdown(),
     tailwindcss(),
   ],
+  // `vp test` (or `vp run example#test` from anywhere): the example's own unit tests, beside its
+  // code in src/. They run in Node.js with no Worker (Void's docs/guide/testing.md); the browser
+  // tests are e2e/ at the repo's root.
+  test: { include: ["src/**/*.test.ts"] },
 });

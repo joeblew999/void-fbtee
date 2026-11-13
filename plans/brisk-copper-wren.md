@@ -34,16 +34,19 @@ installs nothing under a day old, so it can be installed from about 01:00 UTC on
 
 ## Then: what needs Void 1.8.0
 
-3. [ ] **Translated not-found and error pages**, inside our layout (header, language switcher):
-       `_not-found` and `_error` components. Unknown events and URLs get Void's default page today.
-       Needs 1.8.0: `_not-found` and `_error` are new in it.
+3. [x] **Translated not-found and error pages**, done 2026-11-13: `pages/_not-found.tsx` and
+       `pages/_error.tsx`, inside the root layout, in the page's language, keeping Void's 404 and 500. The header marks no page current on a page that's none of its own. The browser tab
+       keeps Void's English title: these components take no `head()` in 1.8.0.
        Backed by: Void 1.8.0 release notes; `docs/guide/pages-routing/errors.md`.
 
-4. [ ] **Three small unit tests of pure code**, run by `vp test` in seconds, beside the code in
-       `apps/example/src/`: `parseNumber`; `startsAt` with the event schema, including a time that
-       doesn't exist on a clock-change day; `showInvisible` and `listDifference`. Real code,
-       nothing mocked. Not `relativeDays` or `fmt`: they format, so they need the Worker.
-       Needs 1.8.0: it fixed app tests failing because Void started a Worker under Vitest.
+4. [x] **Unit tests of plain code**, done 2026-11-13: `src/docs/differs.test.ts`
+       (`showInvisible`, `listDifference`) and `src/events/starts-at.test.ts` (`startsAt`, a time
+       that doesn't exist on a clock-change day, and the form schema's time and zone checks). Not
+       `parseNumber`: nothing used it, so it was deleted in the src/ regrouping. They run from
+       inside the app (`vp run example#test`, also in CI): from the repo's root, Void takes the
+       root for the app, writing a `void.config.ts` and `.void/` there. They needed one package
+       change: void-fbtee now keeps `temporal-polyfill` under Vitest (Node has no Cloudflare
+       Temporal), recognising Vitest as Void 1.8.0's `isVitestServer` does.
        Backed by: Void `docs/guide/testing.md`; Void 1.8.0 release notes.
 
 `packages/void-fbtee/skills/void-fbtee/SKILL.md` is updated with any package change.

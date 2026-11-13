@@ -10,6 +10,7 @@
     "i18n:translate": "void-fbtee translate",
     "icons": "pwa-assets-generator",
     "og-image": "vpx scripts/og-image.ts",
+    "test": "vp test run",
     "postinstall": "void prepare && void init --tsconfig && void-fbtee init",
     "preview": "vp preview"
   },

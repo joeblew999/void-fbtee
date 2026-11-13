@@ -79,7 +79,9 @@ export default defineConfig({
   },
   // `vp test run`: the package's unit tests, and the browser tests on the example (e2e/), which
   // Vitest runs with Playwright's library, as voidzero-dev/void does. e2e/setup.ts builds once
-  // and starts the production preview.
+  // and starts the production preview. The example's own unit tests run from inside it
+  // (`vp run example#test`): Void finds an app from where it runs, so from here it would take the
+  // repo's root for the app.
   test: {
     // Every run's report, where Vitest 5 puts it: .vitest/index.html (open in a browser) and
     // .vitest/json/output.json. Git ignores .vitest/.
