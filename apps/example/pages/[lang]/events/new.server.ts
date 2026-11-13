@@ -6,6 +6,7 @@ import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
 import { db } from "void/db";
+import { queues } from "void/queues";
 import { routeUrl } from "void-fbtee/routes";
 import { langParams, revalidate } from "void-fbtee/server";
 import { z } from "zod";
@@ -41,6 +42,8 @@ export const action = defineHandler.withValidator({
       ...startsAt(body.local, body.time_zone),
     })
     .returning({ id: events.id });
+  // Its translations into the app's other languages, after this answers (queues/translate.ts).
+  await queues.translate.send({ eventId: created.id });
   // The list in every language, and the sitemap, which lists the new event.
   await revalidate({ paths: ["/[lang]/events", "/sitemap.xml"] });
   return c.redirect(routeUrl("/[lang]/events/[id]", { params: { id: created.id } }));

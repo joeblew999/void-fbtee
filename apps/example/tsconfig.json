@@ -15,9 +15,10 @@
       "void/routes": ["./.void/routes.d.ts"],
       "void/db": ["./.void/db.d.ts"],
       "@schema": ["./db/schema.ts"],
-      "@schema/*": ["./db/schema/*"]
+      "@schema/*": ["./db/schema/*"],
+      "void/queues": ["./.void/queues.d.ts"]
     }
   },
-  "include": ["src", "pages", "routes", "middleware", "crons", "db", "i18n"],
-  "files": ["./.void/routes.d.ts", "./.void/db.d.ts"]
+  "include": ["src", "pages", "routes", "middleware", "crons", "queues", "db", "i18n"],
+  "files": ["./.void/routes.d.ts", "./.void/db.d.ts", "./.void/queues.d.ts"]
 }

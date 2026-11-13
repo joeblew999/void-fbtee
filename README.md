@@ -39,7 +39,9 @@ Every day:
 
 ```sh
 vp run dev               # develop: the package rebuilds on save; the example runs with Void's
-                         # local D1, KV and live updates
+                         # local D1, KV, queue and live updates. A new post waits for Claude to
+                         # translate it (no Workers AI locally); WORKERS_AI=on vp run dev uses
+                         # Workers AI instead (needs Void's Cloudflare login)
 vp check                 # format, lint, types
 vp test run              # the package's tests and the browser tests, on a local build;
                          # report: .vitest/index.html

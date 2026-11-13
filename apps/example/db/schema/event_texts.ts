@@ -1,5 +1,6 @@
 // An event's title and description in another language: the sample events' stored translations
-// (db/migrations). New events have none: live translation was removed on 2026-11-12.
+// (db/migrations), and a new event's, from Workers AI on Cloudflare or Claude locally
+// (src/events/translations.ts).
 // Made by `void gen model event_texts …`; then: a UUID id, the link to its event, and one row per
 // event and language. The event row keeps the original, in the language it was written in.
 import { sql } from "void/db";

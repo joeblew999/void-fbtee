@@ -6,7 +6,7 @@
 // as people book; booking is Void's useForm, with the page's language filled in (void-fbtee/react).
 import { Fragment, useEffect, useRef, useState } from "react";
 import { fbt } from "fbtee";
-import { Form } from "@void/react";
+import { Form, useRouter } from "@void/react";
 import { connectLiveStream } from "void/live/client";
 import { Formatted, langAttrs, useForm, useLocale, useTimeZone } from "void-fbtee/react";
 import { MapPin } from "lucide-react";
@@ -19,9 +19,13 @@ import { Label } from "@/ui/label";
 import { clockParts } from "@/events/event-clock";
 import type { Props } from "./[id].server";
 
-/** The event's live stream: the seats left (seats only go down, so the lower count wins). */
+/**
+ * The event's live stream: the seats left (seats only go down, so the lower count wins), and its
+ * translations arriving after the post (queues/translate.ts): then the page loads its data again.
+ */
 function useLiveEvent(id: string, left: number) {
   const [live, setLive] = useState(Infinity);
+  const router = useRouter();
   useEffect(() => {
     const stream = connectLiveStream("/api/live");
     let closed = false;
@@ -31,6 +35,7 @@ function useLiveEvent(id: string, left: number) {
         topic: `event:${id}`,
         onEvent: (event) => {
           if (event.type === "seats") setLive((event.data as { left: number }).left);
+          if (event.type === "translated") void router.refresh();
         },
       })
       // Closed by this effect's cleanup before subscribing finished: not an error.
@@ -41,7 +46,7 @@ function useLiveEvent(id: string, left: number) {
       closed = true;
       stream.close();
     };
-  }, [id]);
+  }, [id, router]);
   return Math.min(left, live);
 }
 

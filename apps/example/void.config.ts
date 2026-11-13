@@ -73,6 +73,12 @@ export default defineConfig({
       { rel: "manifest", href: "/manifest.webmanifest" },
     ],
   },
+  // Workers AI (void/ai, for translating what people post: queues/translate.ts) only when
+  // WORKERS_AI=on, which the deploy tasks set (vite.config.ts). Void connects every dev, preview and
+  // test run to Cloudflare for an AI binding (guide/ai.md: Workers AI has no local simulator), so it
+  // stays off there: the queue then leaves a post as written, for Claude to translate locally
+  // (routes/api/translations.dev.ts). `WORKERS_AI=on vp run dev` uses Workers AI in dev too.
+  inference: { bindings: { ai: process.env.WORKERS_AI === "on" } },
   // The Worker's name on Cloudflare: void-fbtee-example.<subdomain>.workers.dev.
   // The account too, as Void's config reference shows.
   cloudflare: { name: "void-fbtee-example", account_id: "7384af54e33b8a54ff240371ea368440" },

@@ -142,6 +142,12 @@ another language than the page's, in the page's own words (`<fbt>`, with the lan
 `Intl.DisplayNames` in `<Formatted>`): "Written in Arabic", or "Translated by machine from Arabic"
 with the original one click away.
 
+To translate it as it's posted, the example (github.com/joeblew999/void-fbtee, `apps/example`)
+sends each post to a queue whose consumer asks Workers AI on Cloudflare, and stores every
+translation through one function, which also clears the pages and tells open ones. Locally,
+Workers AI is off (`inference.bindings.ai` in `void.config.ts`), so the post waits, and the coding
+agent translates it, as it translates the app's strings.
+
 ## Markdown pages
 
 Pages under `pages/<source locale>/` have a copy per locale at the same path under

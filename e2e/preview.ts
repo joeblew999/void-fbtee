@@ -24,7 +24,12 @@ const run = (cmd: string, args: string[], cwd?: string, env?: NodeJS.ProcessEnv)
   if (r.status !== 0) process.exit(r.status ?? 1);
 };
 
-run("vp", ["run", "-t", "example#build"], undefined, { CLOUDFLARE_PREVIEW_BUILD: "true" });
+// WORKERS_AI=on: a Worker Preview translates posts with Workers AI, as production does
+// (apps/example/void.config.ts).
+run("vp", ["run", "-t", "example#build"], undefined, {
+  CLOUDFLARE_PREVIEW_BUILD: "true",
+  WORKERS_AI: "on",
+});
 
 const file = join(app, ".cloudflare/output/v0/workers/default/worker.config.json");
 const worker = JSON.parse(readFileSync(file, "utf8")) as {

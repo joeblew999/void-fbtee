@@ -160,8 +160,23 @@ Each step is shipped and proven before the next, each with its docs example in t
        pick the translation with them (the board in a second query, so fallbacks can't double a
        row). Checked on dev: an untranslated Arabic post is `ar-EG`/`rtl` on the English board and
        page; the Arabic original under a Thai translation too. Package tests for the three.
-   - **7b, not done: machine translation with Void's AI, in a queue, the same locally and on
-     Cloudflare** (asked for 2026-11-13). Posting an event sends a queue message; the consumer
+   - **7b, done 2026-11-13: machine translation with Void's AI, in a queue, the same locally and
+     on Cloudflare** (asked for 2026-11-13; decided: one queue, two translators). One consumer
+     (`queues/translate.ts`), sent on each post (`new.server.ts`). On Cloudflare it asks Workers AI
+     (Llama 3.3 70B, by the measure below); locally Workers AI is off (`inference.bindings.ai` in
+     `void.config.ts`, on only with `WORKERS_AI=on`, which the deploy tasks and the preview build
+     set), so the consumer finds AI "Not available" and leaves the post for Claude, who translates
+     through a dev-only route (`routes/api/translations.dev.ts`: lists what's waiting, stores
+     translations). Both store through one function (`src/events/translations.ts`), which also
+     clears the pages and tells open pages (live), so a page reloads its data when its translation
+     arrives. Checked on dev: a post with Workers AI off waits, then my translations through the
+     route show in Thai and Arabic; with `WORKERS_AI=on`, Workers AI translated a post in 4 s and
+     an open Thai page changed from English to Thai with no reload. The build has the AI binding
+     only with the switch, the queue always; the dev route isn't in the build. The events browser
+     tests pass at their old speed (no Cloudflare connection). This is the 2026-11-11 design
+     (`5d1d47b`, removed 2026-11-12 in `a4eb631` because `void/ai` made every local run connect
+     to Cloudflare), now with that connection only where it's wanted. Its tsconfig entries for the
+     queue's types are back. Found along the way, earlier: Posting an event sends a queue message; the consumer
      translates the title and description into each of the app's languages with Void's AI
      (`void/ai`), stores them (`event_texts`) and clears those pages (`revalidate`). Found
      2026-11-13:

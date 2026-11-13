@@ -1,5 +1,5 @@
 // `vp run test:deployed`: every browser test against what Cloudflare deployed for this commit, so CI needs
-// no Cloudflare login. Cloudflare's Workers Builds builds
+// no Cloudflare login (the deployed site does its own Workers AI calls). Cloudflare's Workers Builds builds
 // each push: main as production (`vp run deploy`), any other branch as a Worker Preview
 // (`vp run build:preview`, then `cf previews deploy`). It reports each build on GitHub as the check
 // "Workers Builds: <Worker>"; this waits for that check on the commit, then tests the site it deployed.
