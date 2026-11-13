@@ -409,30 +409,6 @@
       ],
       "types": []
     },
-    "fWba9x96UoFvV1W4cYEeUQ==": {
-      "description": "How many seats an event has",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "{number} ที่นั่ง",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "b9/Y9FU3gUlroFBo6g4TMA==": {
-      "description": "How many seats an event has",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "1 ที่นั่ง",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "88bXloxtPp7U7Ddof/il7g==": {
       "description": "Heading of the form for posting a new event",
       "status": "translated",
@@ -1868,6 +1844,114 @@
       "translations": [
         {
           "translation": "i18n สำหรับแอป Void: ข้อความด้วย fbtee วันที่ด้วย Temporal และการจัดรูปแบบด้วย Intl",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PMYmAgJ1lx3RBah3SAGqOw==": {
+      "description": "Under the events page's heading",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ทุกกิจกรรมแสดงเวลาเริ่มตามเวลาของสถานที่จัด และตามเวลาของคุณ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qXDx5IlYXYzsitfaNeZNgQ==": {
+      "description": "Events board column: the day an event is on",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "วันที่",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5YTGfb3YfCkFqgphMhpS8g==": {
+      "description": "Events board column: start time on the clock where the event happens",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เริ่ม (เวลาท้องถิ่น)",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8rcT7bwafGlb2/Y0JBQfJA==": {
+      "description": "Events board column: start time on the reader's clock",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เวลาของคุณ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Pc8KX2rDNaUH2dgjLrXxlA==": {
+      "description": "Events board column: the event's title and place",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "กิจกรรม",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YPEG6i9RkPBZeQ+eCLEmBg==": {
+      "description": "Events board column: seats still free",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ที่นั่ง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "b2+r/LXjvCZFlBg8Zm0AoA==": {
+      "description": "Events page when nothing is coming up",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ยังไม่มีกิจกรรมที่กำลังจะมาถึง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RdhcAQAg2obBssPy8rffDg==": {
+      "description": "Events page when nothing is coming up: what posting does",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "โพสต์กิจกรรมเป็นภาษาใดก็ได้ แล้วกิจกรรมจะแสดงที่นี่ในทุกภาษา ตามเวลาของผู้อ่านแต่ละคน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UiCufRUv7HhJXBhYIpJXHg==": {
+      "description": "Under the heading of the form for posting an event: what happens to it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เขียนเป็นภาษาของคุณเอง และระบุเวลาเริ่มตามเวลาท้องถิ่น กิจกรรมจะแสดงบนกระดานในทุกภาษา ตามเวลาของผู้อ่านแต่ละคน",
           "variations": {}
         }
       ],

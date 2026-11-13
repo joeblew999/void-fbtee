@@ -6,6 +6,7 @@ import { fbt } from "fbtee";
 import { Temporal } from "temporal-polyfill";
 import { Formatted, useLocale, useNow, useTimeZone } from "void-fbtee/react";
 import { relativeDays } from "@/lib/relative-days";
+import { cn } from "@/lib/utils";
 
 const WHEN: Intl.DateTimeFormatOptions = {
   weekday: "long",
@@ -16,7 +17,7 @@ const WHEN: Intl.DateTimeFormatOptions = {
   timeZoneName: "longGeneric",
 };
 
-export function EventTime({ startsAt }: { startsAt: string }) {
+export function EventTime({ startsAt, className }: { startsAt: string; className?: string }) {
   const { locale } = useLocale();
   const reader = useTimeZone();
   // Once a minute, so "tomorrow" becomes "today" on a page left open past midnight.
@@ -25,8 +26,8 @@ export function EventTime({ startsAt }: { startsAt: string }) {
   const at = (timeZone: string) =>
     new Intl.DateTimeFormat(locale, { ...WHEN, timeZone }).format(start.epochMilliseconds);
   return (
-    <div className="grid gap-1 text-sm">
-      <div data-testid="event-local">
+    <div className={cn("grid gap-1 text-sm", className)}>
+      <div className="text-foreground" data-testid="event-local">
         <Formatted>{at(start.timeZoneId)}</Formatted>
       </div>
       {/* The reader's clock and how far off: only the browser knows the zone, so these lines are
