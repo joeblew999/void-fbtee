@@ -20,10 +20,15 @@ installs nothing under a day old, so it can be installed from about 01:00 UTC on
        so that task is gone and the README says `vp migrate`. Then `vp run check:tools`,
        `vp check`, `vp test run` (47) and `vp run test:fresh` (both apps) passed.
 
-2. [ ] **Void 1.8.0**, from 2026-11-13 ~01:00 UTC (published 2026-11-12 00:58 UTC; pnpm installs
-       nothing under a day old): the three Void packages to 1.8.0 in `pnpm-workspace.yaml`'s
-       catalog, `vp install`, `vp run check:tools`, then `vp check`, `vp test run`,
-       `vp run test:fresh`.
+2. [x] **Void 1.8.0**, done 2026-11-13 (published 2026-11-12 00:58 UTC; pnpm installs nothing
+       under a day old): the three Void packages to 1.8.0 in `pnpm-workspace.yaml`'s catalog,
+       `vp install` (with dev stopped: installing rebuilds the package, which the dev guard
+       refuses while dev runs), `vp run check:tools`, `vp check` and `i18n:check` pass. The full
+       `vp test run` and `vp run test:fresh` were not run (by request: no full test runs); every
+       page of the example loads in English and Arabic on dev with no new errors.
+       Still in 1.8.0: the deferred page's React #419 (Void cuts the stream at the shell,
+       `@void/react` `dist/runtime/pages-server.mjs`, `readDeferredShell`), and `void/pages-server`
+       not listed for pre-bundling (the workaround in `packages/void-fbtee/src/plugin.ts` stays).
        Backed by: README "Upgrading"; Void 1.8.0 release notes
        (https://github.com/voidzero-dev/void/releases/tag/v1.8.0).
 
