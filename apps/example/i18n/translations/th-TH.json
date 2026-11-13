@@ -2124,6 +2124,150 @@
         }
       ],
       "types": []
+    },
+    "IgVwgp5Y9MBQ9Y3NcsNPCg==": {
+      "description": "Shown on an event's open page once its organiser has deleted it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "กิจกรรมนี้ถูกยกเลิกแล้ว",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eSI/JIGvdXBhyFy7sNuuvQ==": {
+      "description": "Link from a cancelled event to the list of events",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ดูกิจกรรมอื่น ๆ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "suCemt5DI4xzGtu5Atmhzw==": {
+      "description": "Form label: an email address to send the poster their private link to (optional)",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ส่งลิงก์ส่วนตัวของฉันทางอีเมล (ไม่บังคับ)",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XhwAdRwSxWK0O0G1wMs54g==": {
+      "description": "Under the private link email field: what the link is for, and that the address isn't kept",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ลิงก์นี้ใช้ลบกิจกรรมของคุณภายหลังได้จากทุกอุปกรณ์ เราใช้อีเมลของคุณเพื่อส่งลิงก์นี้เท่านั้น",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "akdPP4Vwe0hB43GP/y6g0w==": {
+      "description": "Form error: the email address isn't one",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "นี่ไม่ใช่ที่อยู่อีเมล",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ARzrpeAlrVLrYD66ltJGvg==": {
+      "description": "Private link email: the event the reader just posted",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "คุณได้โพสต์ {event}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "M3pc8E4cZ9kvHeB4GhuKGw==": {
+      "description": "Private link email: why to keep the link, and to keep it private",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เก็บอีเมลนี้ไว้: ลิงก์ด้านล่างเป็นวิธีเดียวที่จะลบกิจกรรมของคุณภายหลัง ใครก็ตามที่มีลิงก์นี้สามารถลบกิจกรรมได้ อย่าแชร์ให้ใคร",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "65WKp3H1dRlZ+vpPMKzq7g==": {
+      "description": "Private link email subject: the link to delete the event the reader posted",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ลิงก์ส่วนตัวของคุณสำหรับ {event}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lr8L2wbKOt1b5Ro+bcY3ug==": {
+      "description": "Cancellation email: greeting, with the name the booker gave",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สวัสดี {name}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "O8KHpBEzXPn0V72AgFNfTw==": {
+      "description": "Cancellation email: the event the reader booked, and when it would have started, is cancelled",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{event} ซึ่งจะจัดขึ้น{time} ถูกผู้จัดยกเลิกแล้ว ที่นั่งของคุณจึงถูกยกเลิกไปด้วย",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qvACgHb8I2u1PdwubuKCtQ==": {
+      "description": "Cancellation email: before the link to the events list",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "กิจกรรมอื่น ๆ:",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CaDCDI/FGJybudJ1kgNDHA==": {
+      "description": "Cancellation email subject: the event the reader booked is cancelled",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{event} ถูกยกเลิกแล้ว",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

@@ -12,6 +12,7 @@ import { connectLiveStream } from "void/live/client";
 import {
   Formatted,
   langAttrs,
+  Link,
   useForm,
   useHydrated,
   useLocale,
@@ -29,12 +30,14 @@ import { keyCookieName } from "@/events/delete-key";
 import type { Props } from "./[id].server";
 
 /**
- * The event's live stream: the seats left (seats only go down, so the lower count wins), and its
- * translations arriving after the post (queues/translate.ts): then the page loads its data again,
- * unless it's being deleted (`leaving`), when that reload would land on top of the move to the list.
+ * The event's live stream: the seats left (seats only go down, so the lower count wins); its
+ * translations arriving after the post (queues/translate.ts), when the page loads its data again;
+ * and its deletion, when the page says it's cancelled. Neither while this page is deleting it
+ * (`leaving`): the reload would land on top of the move to the list.
  */
 function useLiveEvent(id: string, left: number, leaving: RefObject<boolean>) {
   const [live, setLive] = useState(Infinity);
+  const [cancelled, setCancelled] = useState(false);
   const router = useRouter();
   useEffect(() => {
     const stream = connectLiveStream("/api/live");
@@ -46,6 +49,7 @@ function useLiveEvent(id: string, left: number, leaving: RefObject<boolean>) {
         onEvent: (event) => {
           if (event.type === "seats") setLive((event.data as { left: number }).left);
           if (event.type === "translated" && !leaving.current) void router.refresh();
+          if (event.type === "deleted" && !leaving.current) setCancelled(true);
         },
       })
       // Closed by this effect's cleanup before subscribing finished: not an error.
@@ -57,7 +61,7 @@ function useLiveEvent(id: string, left: number, leaving: RefObject<boolean>) {
       stream.close();
     };
   }, [id, router, leaving]);
-  return Math.min(left, live);
+  return { seatsLeft: Math.min(left, live), cancelled };
 }
 
 /** Booking, in the reader's zone (Event remounts it once the browser knows it). */
@@ -194,7 +198,34 @@ const onHashChange = (changed: () => void) => {
   return () => removeEventListener("hashchange", changed);
 };
 
-/** The event's key, from its private link ("#key=…"), or the cookie posting just set. */
+/**
+ * The browser's own copy of an event's key (localStorage), so it outlives the address losing its
+ * "#key=…": an action on the page (Void writes the action's URL, which has no "#" part) or a
+ * redirect (Void issue #810). Storage can be blocked or throw (private modes): then there's no copy,
+ * and the address and cookie work as before.
+ */
+const keyStore = {
+  name: (id: string) => `event-key-${id}`,
+  get(id: string): string | null {
+    try {
+      return localStorage.getItem(keyStore.name(id));
+    } catch {
+      return null;
+    }
+  },
+  set(id: string, key: string) {
+    try {
+      localStorage.setItem(keyStore.name(id), key);
+    } catch {}
+  },
+  remove(id: string) {
+    try {
+      localStorage.removeItem(keyStore.name(id));
+    } catch {}
+  },
+};
+
+/** The event's key: from its private link ("#key=…"), the cookie posting just set, or the browser's copy. */
 function keyHere(id: string, hash: string): string | null {
   const fromLink = new URLSearchParams(hash.slice(1)).get("key");
   const name = `${keyCookieName(id)}=`;
@@ -202,15 +233,16 @@ function keyHere(id: string, hash: string): string | null {
     .split("; ")
     .find((c) => c.startsWith(name))
     ?.slice(name.length);
-  return fromLink ?? fromCookie ?? null;
+  return fromLink ?? fromCookie ?? keyStore.get(id);
 }
 
 /**
  * For whoever posted the event: its private delete link (src/events/delete-key.ts). Only in the
  * browser, which alone sees the "#" part, and only for an event that can be deleted. Just after
  * posting, the key comes in a cookie: it moves into this page's own address, so reloading or
- * bookmarking the page keeps the link, and the cookie goes. Deleting asks once more, on the page
- * (no browser dialog).
+ * bookmarking the page keeps the link, and the cookie goes. The browser keeps a copy too, and puts
+ * the key back in the address whenever it's lost it (booking a seat here does). Deleting asks once
+ * more, on the page (no browser dialog), and removes the copy.
  */
 function YourEvent({ id, onLeaving }: { id: string; onLeaving: (leaving: boolean) => void }) {
   const { lang } = useLocale();
@@ -229,10 +261,12 @@ function YourEvent({ id, onLeaving }: { id: string; onLeaving: (leaving: boolean
   // has moved the address from the form's page to this one.
   const page = routeUrl("/[lang]/events/[id]", { params: { id } });
   useEffect(() => {
-    if (!key || location.pathname !== page || location.hash.includes("key=")) return;
+    if (!key) return;
+    keyStore.set(id, key);
+    if (location.pathname !== page || location.hash.includes("key=")) return;
     history.replaceState(history.state, "", `${page}${location.search}#key=${key}`);
     document.cookie = `${keyCookieName(id)}=; Path=/; Max-Age=0`;
-  }, [id, key, page]);
+  }, [id, key, page, hash]);
   if (!key) return null;
   const link = `${location.origin}${page}#key=${key}`;
   const remove = async () => {
@@ -242,6 +276,7 @@ function YourEvent({ id, onLeaving }: { id: string; onLeaving: (leaving: boolean
     onLeaving(true);
     try {
       await action("/[lang]/events/[id]?delete", { params: { lang, id }, data: { key } });
+      keyStore.remove(id);
     } catch (error) {
       onLeaving(false);
       if (isVoidActionError(error) && error.status === 403) setWrong(true);
@@ -286,13 +321,33 @@ function YourEvent({ id, onLeaving }: { id: string; onLeaving: (leaving: boolean
   );
 }
 
+/** In place of booking, once the event has been deleted while this page was open. */
+function Cancelled() {
+  return (
+    <section
+      className="grid gap-3 rounded-xl bg-card p-5 ring-1 ring-foreground/10"
+      role="status"
+      data-testid="event-cancelled"
+    >
+      <p className="font-medium" data-testid="event-cancelled-text">
+        <fbt desc="Shown on an event's open page once its organiser has deleted it">
+          This event has been cancelled.
+        </fbt>
+      </p>
+      <Link href={routeUrl("/[lang]/events")} className="text-sm underline underline-offset-4">
+        <fbt desc="Link from a cancelled event to the list of events">See the other events</fbt>
+      </Link>
+    </section>
+  );
+}
+
 export default function Event({ event, text, left, deletable }: Props) {
   const { locale } = useLocale();
   // The browser's zone once known (null before); nothing has been typed into the form yet.
   const zone = useTimeZone();
   // Set while the event is being deleted (YourEvent), so a live update doesn't keep the page here.
   const leaving = useRef(false);
-  const seatsLeft = useLiveEvent(event.id, left, leaving);
+  const { seatsLeft, cancelled } = useLiveEvent(event.id, left, leaving);
   // In the page's language where a translation is stored (the sample events); else as written.
   // Marked with its own language and direction (langAttrs), whichever it's in.
   const shown = text ?? event;
@@ -378,26 +433,30 @@ export default function Event({ event, text, left, deletable }: Props) {
         id="book"
         className="grid scroll-mt-24 content-start gap-8 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start"
       >
-        <section className="grid gap-5 rounded-xl bg-card p-5 ring-1 ring-foreground/10">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="font-medium">
-              <fbt desc="Heading of the booking box on an event's page">Book a seat</fbt>
-            </h2>
-            <Flap value={seatsLeft} tone={seatsLeft ? "default" : "out"} data-testid="seats-left">
-              {seatsLeft ? (
-                <fbt desc="How many seats an event has left">
-                  <fbt:plural count={seatsLeft} many="seats left" showCount="yes">
-                    seat left
-                  </fbt:plural>
-                </fbt>
-              ) : (
-                <fbt desc="Badge: an event has no seats left">Sold out</fbt>
-              )}
-            </Flap>
-          </div>
-          <Book key={zone} id={event.id} zone={zone} soldOut={seatsLeft === 0} />
-        </section>
-        {deletable && (
+        {cancelled ? (
+          <Cancelled />
+        ) : (
+          <section className="grid gap-5 rounded-xl bg-card p-5 ring-1 ring-foreground/10">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="font-medium">
+                <fbt desc="Heading of the booking box on an event's page">Book a seat</fbt>
+              </h2>
+              <Flap value={seatsLeft} tone={seatsLeft ? "default" : "out"} data-testid="seats-left">
+                {seatsLeft ? (
+                  <fbt desc="How many seats an event has left">
+                    <fbt:plural count={seatsLeft} many="seats left" showCount="yes">
+                      seat left
+                    </fbt:plural>
+                  </fbt>
+                ) : (
+                  <fbt desc="Badge: an event has no seats left">Sold out</fbt>
+                )}
+              </Flap>
+            </div>
+            <Book key={zone} id={event.id} zone={zone} soldOut={seatsLeft === 0} />
+          </section>
+        )}
+        {deletable && !cancelled && (
           <YourEvent
             id={event.id}
             onLeaving={(on) => {

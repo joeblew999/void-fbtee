@@ -9,7 +9,8 @@ import { db } from "void/db";
 import { queues } from "void/queues";
 import { hashDeleteKey, keyCookie, newDeleteKey } from "@/events/delete-key";
 import { routeUrl } from "void-fbtee/routes";
-import { langParams, revalidate } from "void-fbtee/server";
+import { langParams, revalidate, siteOrigin } from "void-fbtee/server";
+import { sendLinkEmail } from "@/events/emails";
 import { z } from "zod";
 import { locales } from "@/locales";
 
@@ -34,6 +35,7 @@ export const action = defineHandler.withValidator({
   const { locale } = c.get("i18n");
   // The poster's private delete link: the key goes to them, its SHA-256 to the database.
   const key = newDeleteKey();
+  const start = startsAt(body.local, body.time_zone);
   const [created] = await db
     .insert(events)
     .values({
@@ -43,9 +45,21 @@ export const action = defineHandler.withValidator({
       venue: body.venue || null,
       locale,
       delete_key_hash: await hashDeleteKey(key),
-      ...startsAt(body.local, body.time_zone),
+      ...start,
     })
     .returning({ id: events.id });
+  const page = routeUrl("/[lang]/events/[id]", { params: { id: created.id } });
+  // The private link by email too, when the poster asked: in the language they posted in, so a
+  // poster who loses the page (another device, cleared browser) can still delete it. The address
+  // goes to sendEmail only.
+  if (body.email)
+    await sendLinkEmail(body.email, {
+      locale,
+      title: body.title,
+      titleLocale: locale,
+      startsAt: start.starts_at,
+      link: `${siteOrigin(c)}${page}#key=${key}`,
+    });
   // Its translations into the app's other languages, after this answers (queues/translate.ts).
   await queues.translate.send({ eventId: created.id });
   // The list in every language, and the sitemap, which lists the new event.
@@ -53,7 +67,7 @@ export const action = defineHandler.withValidator({
   // To the new event's page, with the key in a short-lived cookie, which the page turns into the
   // poster's private link (src/events/delete-key.ts).
   c.header("Set-Cookie", keyCookie(created.id, key));
-  return c.redirect(routeUrl("/[lang]/events/[id]", { params: { id: created.id } }));
+  return c.redirect(page);
 });
 
 export const head = defineHead(() =>

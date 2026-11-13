@@ -2460,6 +2460,150 @@
         }
       ],
       "types": []
+    },
+    "IgVwgp5Y9MBQ9Y3NcsNPCg==": {
+      "description": "Shown on an event's open page once its organiser has deleted it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تم إلغاء هذه الفعالية.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eSI/JIGvdXBhyFy7sNuuvQ==": {
+      "description": "Link from a cancelled event to the list of events",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "شاهد الفعاليات الأخرى",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "suCemt5DI4xzGtu5Atmhzw==": {
+      "description": "Form label: an email address to send the poster their private link to (optional)",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "أرسل لي رابطي الخاص بالبريد الإلكتروني (اختياري)",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XhwAdRwSxWK0O0G1wMs54g==": {
+      "description": "Under the private link email field: what the link is for, and that the address isn't kept",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يتيح لك الرابط حذف فعاليتك لاحقًا من أي جهاز. نستخدم عنوانك لإرساله فقط.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "akdPP4Vwe0hB43GP/y6g0w==": {
+      "description": "Form error: the email address isn't one",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "هذا ليس عنوان بريد إلكتروني.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ARzrpeAlrVLrYD66ltJGvg==": {
+      "description": "Private link email: the event the reader just posted",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لقد نشرت {event}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "M3pc8E4cZ9kvHeB4GhuKGw==": {
+      "description": "Private link email: why to keep the link, and to keep it private",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "احتفظ بهذا البريد: الرابط أدناه هو الطريقة الوحيدة لحذف فعاليتك لاحقًا. يستطيع أي شخص يملكه حذف الفعالية، فلا تشاركه.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "65WKp3H1dRlZ+vpPMKzq7g==": {
+      "description": "Private link email subject: the link to delete the event the reader posted",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "رابطك الخاص لـ {event}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lr8L2wbKOt1b5Ro+bcY3ug==": {
+      "description": "Cancellation email: greeting, with the name the booker gave",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مرحبًا {name}،",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "O8KHpBEzXPn0V72AgFNfTw==": {
+      "description": "Cancellation email: the event the reader booked, and when it would have started, is cancelled",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ألغى المنظم {event} التي كانت ستقام {time}، وأُلغي مقعدك معها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qvACgHb8I2u1PdwubuKCtQ==": {
+      "description": "Cancellation email: before the link to the events list",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "فعاليات أخرى:",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CaDCDI/FGJybudJ1kgNDHA==": {
+      "description": "Cancellation email subject: the event the reader booked is cancelled",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تم إلغاء {event}",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

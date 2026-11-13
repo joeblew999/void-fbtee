@@ -60,7 +60,16 @@ export const newEventSchema = createInsertSchema(events, {
   venue: (s) => s.trim().max(200),
 })
   .pick({ title: true, description: true, seats: true, venue: true })
-  .extend({ local: z.string().refine(isLocalTime), time_zone: z.string().refine(isZone) });
+  .extend({
+    local: z.string().refine(isLocalTime),
+    time_zone: z.string().refine(isZone),
+    // Optional: where to email the poster's private link. Only used to send it, never stored.
+    email: z
+      .string()
+      .trim()
+      .pipe(z.union([z.literal(""), z.email()]))
+      .optional(),
+  });
 
 /** The row for a new event: its start in its own zone, and the same moment in UTC. */
 export function startsAt(local: string, timeZone: string) {

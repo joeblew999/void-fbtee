@@ -10,6 +10,10 @@
 // short-lived cookie with the key instead (keyCookie), and the event page moves it into its own
 // `#` and deletes the cookie. A request with a cookie skips Void's page cache
 // (guide/edge/revalidation.md, "Cache bypass"): only the poster's, for those two minutes.
+//
+// Keeping it (plans/sure-keeper-link.md): the event page keeps a copy in the browser's storage and
+// puts it back in the address when an action there has written the address without it; and the
+// poster can have the link emailed when posting (src/events/emails.ts).
 
 /** The cookie that carries a new event's key to its page: its name, and the header that sets it. */
 export const keyCookieName = (id: string) => `event-key-${id}`;

@@ -204,7 +204,7 @@ Each step is shipped and proven before the next, each with its docs example in t
        browser as `cf`'s is; or none, so posts are only translated on Cloudflare), then the
        model, by that measure.
 8. [x] **Email in the recipient's language,** done 2026-11-13, live sending too.
-       The example sends a booking's confirmation (`src/events/booking-email.ts`) in the booker's
+       The example sends a booking's confirmation (`src/events/booking-email.ts`, now `src/events/emails.ts`) in the booker's
        language, kept with the booking (`bookings.locale`), through `inLocale`, so the same code can run
        in a queue: the subject, greeting, the event's title as they read it (`pickText`), its start on
        the place's clock, and its page in their language; HTML in the email's own `lang`/`dir`, the

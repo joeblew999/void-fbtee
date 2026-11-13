@@ -24,6 +24,7 @@ function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
     local: "",
     time_zone: zone ?? "",
     seats: 20,
+    email: "",
   });
   const error = (field: keyof typeof form.errors, message: React.ReactNode) =>
     form.errors[field] && (
@@ -118,6 +119,33 @@ function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
           onChange={(e) => form.setData("seats", e.target.valueAsNumber)}
         />
         {error("seats", <fbt desc="Form error: seats must be 1 or more">At least 1 seat.</fbt>)}
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="event-email">
+          <fbt desc="Form label: an email address to send the poster their private link to (optional)">
+            Email me my private link (optional)
+          </fbt>
+        </Label>
+        <Input
+          id="event-email"
+          type="email"
+          autoComplete="email"
+          dir="ltr"
+          aria-describedby="event-email-why"
+          data-testid="event-email-input"
+          value={form.data.email ?? ""}
+          onChange={(e) => form.setData("email", e.target.value)}
+        />
+        <p id="event-email-why" className="text-sm text-muted-foreground">
+          <fbt desc="Under the private link email field: what the link is for, and that the address isn't kept">
+            The link lets you delete your event later, from any device. Your address is only used to
+            send it.
+          </fbt>
+        </p>
+        {error(
+          "email",
+          <fbt desc="Form error: the email address isn't one">That isn't an email address.</fbt>,
+        )}
       </div>
       <Button
         type="submit"

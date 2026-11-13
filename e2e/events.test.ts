@@ -205,6 +205,37 @@ test("the poster deletes their event with its private link; a wrong key is refus
   expect(errors).toEqual([]);
 });
 
+test("the poster books their own event and keeps the link; deleting tells a page open on it", async () => {
+  const p = await page();
+  await p.goto(`/${SOURCE}/events/new`);
+  await started(p);
+  await p.getByTestId("event-title-input").fill(`Test event ${crypto.randomUUID().slice(0, 8)}`);
+  await p.getByTestId("event-description-input").fill("Posted by the tests, to book and delete.");
+  await p.getByTestId("event-local-input").fill(TEST_START);
+  await p.getByTestId("event-email-input").fill("poster@example.com");
+  await p.getByTestId("event-post").click();
+  await p.waitForURL(/\/events\/[0-9a-f-]{36}#key=/);
+  // Not kept(): the test deletes it itself.
+  const path = new URL(p.url()).pathname.replace(/^\/[^/]+/, "");
+  // Booking runs an action, after which Void writes the page's address without its "#key=…": the
+  // browser's copy puts it back, and the Delete box stays.
+  await p.getByTestId("book-name").fill("Poster");
+  await p.getByTestId("book-email").fill("poster@example.com");
+  await p.getByTestId("book").click();
+  await p.getByTestId("booked").waitFor();
+  await p.waitForURL(/#key=/);
+  await p.getByTestId("delete").waitFor();
+  // Someone else has the event open, in Thai; once it's deleted their page says so, with no reload.
+  const other = await page();
+  await other.goto(`/th-TH${path}`);
+  await started(other);
+  await p.getByTestId("delete").click();
+  await p.getByTestId("delete-sure").click();
+  await p.waitForURL(new RegExp(`/${SOURCE}/events$`));
+  await seeText(other, "event-cancelled-text", "กิจกรรมนี้ถูกยกเลิกแล้ว");
+  expect(await other.getByTestId("book").count()).toBe(0);
+});
+
 test("an event written in Arabic, read in English: its translation, and the original", async () => {
   const p = await page();
   await goToEvent(p, "en-US", "An evening of Arabic calligraphy");
