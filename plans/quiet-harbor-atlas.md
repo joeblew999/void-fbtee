@@ -203,7 +203,7 @@ Each step is shipped and proven before the next, each with its docs example in t
      - To decide: the login for AI in dev (Void's own `void account login`, approved in the
        browser as `cf`'s is; or none, so posts are only translated on Cloudflare), then the
        model, by that measure.
-8. [x] **Email in the recipient's language,** done 2026-11-13 (in dev; live sending not set up).
+8. [x] **Email in the recipient's language,** done 2026-11-13, live sending too.
        The example sends a booking's confirmation (`src/events/booking-email.ts`) in the booker's
        language, kept with the booking (`bookings.locale`), through `inLocale`, so the same code can run
        in a queue: the subject, greeting, the event's title as they read it (`pickText`), its start on
@@ -214,12 +214,13 @@ Each step is shipped and proven before the next, each with its docs example in t
        tests; a booking in Thai on dev lands in Void's dev inbox in Thai; the events browser tests,
        where a production build answers `BINDING_MISSING` and the booking goes through; importing
        `void/email` leaves the Worker's settings as they were (the built `wrangler.json`, all 12).
-   - Not done: sending from the live site. Needs a sender on a domain of the account
-     (`ubuntusoftware.net` is there, with Cloudflare's email sending already set up on `mail.`,
-     `id.` and `id-staging.`; Workers Paid, which sending to anyone needs) and Void's email setup,
-     which goes through Void's own Cloudflare login (`void email setup`), not `cf`. The sender is a
-     placeholder in `src/site.ts` (`EMAIL_FROM`), not `email.from`, so Void's deploy doesn't set
-     up email meanwhile.
+   - Live sending, done 2026-11-13: `email.from` in `void.config.ts` is
+     `void-fbtee <events@events.ubuntusoftware.net>`, a mail subdomain of `ubuntusoftware.net` (a
+     zone on the account, whose apex mail is left alone). `void email setup --platform cloudflare`
+     turned on Email Routing and Email Sending for the subdomain and plus addressing for the zone,
+     and recorded the binding in `void.lock.json`. The account sends to any address (recipient mode
+     "arbitrary", 1,000 a day). The deploy tasks pass `--require-email`, so a deploy without it
+     fails rather than going out without email.
 
 9. **Sign-in,** when the example needs accounts.
 10. **API routes with a language,** with the MCP route when that's planned.

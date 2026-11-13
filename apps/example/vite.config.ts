@@ -25,14 +25,16 @@ export default defineConfig({
       // --platform cloudflare: a fresh checkout (Cloudflare's Workers Builds) has no .void/project.json.
       deploy: {
         // WORKERS_AI=on: the deployed Worker translates posts with Workers AI (void.config.ts).
-        command: "WORKERS_AI=on void deploy --platform cloudflare",
+        // --require-email: no deploy without the email set up in void.lock.json (Void's
+        // guide/email/domains.md, "CI"), so the live site never quietly stops sending.
+        command: "WORKERS_AI=on void deploy --platform cloudflare --require-email",
         cache: false,
         dependsOn: [{ task: "build", from: "dependencies" }],
       },
       // The same, all at once: Void asks for this when a Durable Object class changes (it stops
       // and says so). Traffic moves before the readiness check, so only when it asks.
       "deploy:atomic": {
-        command: "WORKERS_AI=on void deploy --platform cloudflare --atomic",
+        command: "WORKERS_AI=on void deploy --platform cloudflare --require-email --atomic",
         cache: false,
         dependsOn: [{ task: "build", from: "dependencies" }],
       },

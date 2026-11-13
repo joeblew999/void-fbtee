@@ -1,15 +1,15 @@
 // The email confirming a booked seat, in the language of whoever booked it (kept with the booking,
 // bookings.locale), not the page's: inLocale() from void-fbtee/server, which works with no request
 // too, so the same code can run in a queue. Sent with Void's sendEmail (guide/email/sending.md):
-// in dev it lands in Void's local inbox; on Cloudflare it needs email set up for the app
-// (guide/email/domains.md), and until then sendEmail answers BINDING_MISSING and nothing is sent.
+// in dev it lands in Void's local inbox; on the live site it goes from email.from in void.config.ts,
+// set up on Cloudflare by `void email setup` (guide/email/domains.md).
 // sendEmail never throws, so a booking never fails because its email couldn't go.
 import { fbs } from "fbtee";
 import { Temporal } from "temporal-polyfill";
 import { sendEmail } from "void/email";
+import { EMAIL_FROM } from "@/site";
 import { langAttrs, type AppLocale } from "void-fbtee/locales";
 import { inLocale } from "void-fbtee/server";
-import { EMAIL_FROM } from "@/site";
 
 export type BookingEmail = { subject: string; text: string; html: string };
 
