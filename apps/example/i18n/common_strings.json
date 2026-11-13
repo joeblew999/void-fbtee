@@ -1,0 +1,8 @@
+{
+  "Events": "Navigation: the list of events people post and book",
+  "Home": "Navigation: the home page",
+  "Docs": "Navigation: the documentation",
+  "Post an event": "Heading of the form for posting a new event",
+  "Sold out": "Badge: an event has no seats left",
+  "i18n for Void apps": "Home page heading"
+}

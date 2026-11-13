@@ -296,9 +296,7 @@ function YourEvent({ id, onLeaving }: { id: string; onLeaving: (leaving: boolean
         value={link}
         onFocus={(e) => e.target.select()}
         className="w-full rounded-md border bg-muted/40 px-2 py-1.5 font-mono text-xs"
-        aria-label={String(
-          fbs("Your private link", "Label of the private link to delete an event"),
-        )}
+        aria-label={fbs("Your private link", "Label of the private link to delete an event")}
         data-testid="delete-link"
       />
       {sure ? (
@@ -449,7 +447,7 @@ export default function Event({ event, text, left, deletable }: Props) {
                     </fbt:plural>
                   </fbt>
                 ) : (
-                  <fbt desc="Badge: an event has no seats left">Sold out</fbt>
+                  <fbt common>Sold out</fbt>
                 )}
               </Flap>
             </div>

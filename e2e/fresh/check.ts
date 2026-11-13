@@ -303,18 +303,9 @@ function checkOwnDependencies(target: string, dir: string, installed: string) {
     for (const spec of importsOf(readFileSync(join(installed, "dist", f), "utf8")))
       if (!spec.startsWith(".")) specifiers.add(spec);
   const outside: string[] = [];
-  // An optional peer the app hasn't installed is left out: the part that imports it isn't loaded
-  // there (vite-plus: only Vite+'s linter loads void-fbtee/lint).
-  const own = JSON.parse(readFileSync(join(installed, "package.json"), "utf8"));
-  const appPkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
-  const optional = (name: string) =>
-    own.peerDependenciesMeta?.[name]?.optional &&
-    !appPkg.dependencies?.[name] &&
-    !appPkg.devDependencies?.[name];
   for (const spec of specifiers) {
     if (spec.startsWith("node:") || spec.startsWith("virtual:")) continue;
     const name = spec.startsWith("@") ? spec.split("/").slice(0, 2).join("/") : spec.split("/")[0]!;
-    if (optional(name)) continue;
     // Node's lookup: the first node_modules/<name> walking up from the package's folder.
     let found: string | undefined;
     for (let d = installed; !found; d = dirname(d)) {
@@ -373,20 +364,20 @@ export const clear = () => revalidate({ paths: ["/[lang]", "/[lang]/form"] });`)
   rmSync(probe);
 }
 
-/** init's lint wiring, in Vite+ itself: the example passes, a showCount="no" probe fails. */
+/** init's lint wiring, in Vite+ itself: the example passes, a probe fbtee's prefer-fbs catches fails. */
 function checkLint(target: string, dir: string, pm: Pm) {
   run(...exec(pm, "vp", "lint", "pages"), dir);
   mkdirSync(join(dir, "components"), { recursive: true });
   const probe = join(dir, "components/_LintProbe.tsx");
   writeFileSync(
     probe,
-    `import { fbt } from "fbtee";\nexport const Probe = ({ n }: { n: number }) => (\n  <fbt desc="Lint probe: a count of nights">\n    <fbt:plural count={n} many="nights" showCount="no">night</fbt:plural>\n  </fbt>\n);\n`,
+    `import { fbt } from "fbtee";\nexport const probe = () => String(fbt("Lint probe", "Lint probe: a heading"));\n`,
   );
   const output = failing(...exec(pm, "vp", "lint", "components/_LintProbe.tsx"), dir);
   rmSync(probe);
   check(
-    output.includes("void-fbtee(no-show-count-no)"),
-    `${target}: vp lint reports void-fbtee(no-show-count-no)`,
+    output.includes("@nkzw/fbtee(prefer-fbs)"),
+    `${target}: vp lint reports @nkzw/fbtee(prefer-fbs)`,
   );
 }
 

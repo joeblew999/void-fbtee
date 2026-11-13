@@ -97,8 +97,9 @@ describe("which forms a catalog gets", () => {
     // Polish "one" is only ever 1, which "1 night" already covers.
     expect(lines(pl[PLURAL]!)).toEqual([{ 0: 20 }, { 0: 12 }, { 0: 24 }]);
     expect(pl[ONE]!.tokens).toEqual([]);
-    expect(prepare("th-TH").translations[PARAM]!.tokens).toEqual([]);
-    expect(prepare("de-DE").translations[PLURAL]!.tokens).toEqual([]);
+    // One form only: fbtee's single line, as it prepared it.
+    expect(lines(prepare("th-TH").translations[PARAM]!)).toEqual([{}]);
+    expect(lines(prepare("de-DE").translations[PLURAL]!)).toEqual([{}]);
     expect(lines(prepare("de-DE").translations[PARAM]!)).toEqual([{ 0: 4 }, { 0: 24 }]);
   });
 });
@@ -166,5 +167,57 @@ describe("running prepare again", () => {
     const e = prepare("pl-PL", old).translations[PARAM]!;
     expect(e.status).toBe("new");
     expect(e.translations!.map((l) => l.translation)).toEqual(Array(4).fill("noce: {count}"));
+  });
+});
+
+// fbtee#83, fixed in fbtee 6: a plural that doesn't show its count still varies by it.
+describe('a hidden count (showCount="no")', () => {
+  const HIDDEN = `import { fbt } from "fbtee";
+const left = (n) => <fbt desc="seats left, count hidden"><fbt:plural count={n} many="seats are left" showCount="no">One seat is left</fbt:plural></fbt>;
+`;
+  const ph = JSON.parse(collectSync("h.jsx", HIDDEN, { collectPackager: "text" }).output!).phrases;
+  const prepared = JSON.parse(
+    addPluralForms(
+      prepareTranslationsBatchSync(JSON.stringify({ phrases: ph }), [{ locale: "ar-EG" }])[0]!,
+      pluralSlots(ph),
+      "ar-EG",
+    ),
+  ) as { "fb-locale": string; translations: Record<string, PluralEntry> };
+
+  test("gets a line for each form Arabic uses, and the runtime picks the right one", () => {
+    const forms: Record<number, string> = {
+      [CATEGORY_CODE.zero]: "لا مقاعد",
+      [CATEGORY_CODE.two]: "مقعدان",
+      [CATEGORY_CODE.few]: "بضعة مقاعد",
+      [CATEGORY_CODE.many]: "مقاعد كثيرة",
+      [CATEGORY_CODE.other]: "مقاعد",
+    };
+    for (const e of Object.values(prepared.translations)) {
+      // The exactly-one string has no forms; the other gets one line per form, 1 aside.
+      if (!e.translations![0]!.variations || !Object.keys(e.translations![0]!.variations).length)
+        e.translations = [{ translation: "مقعد واحد" }];
+      else {
+        expect(e.translations!.map((l) => Number(l.variations![0]))).toEqual(
+          (["zero", "two", "few", "many", "other"] as const).map((c) => CATEGORY_CODE[c]),
+        );
+        for (const l of e.translations!) l.translation = forms[Number(l.variations![0])]!;
+      }
+      e.status = "translated";
+    }
+    const table = JSON.parse(
+      translateSync(JSON.stringify({ phrases: ph, translationGroups: [prepared] }), true),
+    )["ar-EG"];
+    const { fbt } = createFbteeRuntime({ locale: "ar-EG", translations: { "ar-EG": table } });
+    const code = transformSync("h.jsx", HIDDEN, { lang: "jsx" }).code.replace(/^import .*$/m, "");
+    // oxlint-disable-next-line no-implied-eval
+    const fn = new Function("fbt", `${code}; return left;`)(fbt);
+    expect([0, 1, 2, 3, 11, 100].map((n) => fn(n))).toEqual([
+      "لا مقاعد",
+      "مقعد واحد",
+      "مقعدان",
+      "بضعة مقاعد",
+      "مقاعد كثيرة",
+      "مقاعد",
+    ]);
   });
 });

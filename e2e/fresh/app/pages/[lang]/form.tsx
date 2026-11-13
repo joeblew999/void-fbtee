@@ -14,7 +14,9 @@ export default function CreateUser() {
         onChange={(e) => form.setData("name", e.target.value)}
       />
       {form.errors.name && <span data-testid="error-name">{form.errors.name}</span>}
-      <button>Create</button>
+      <button>
+        <fbt desc="Button: post the new event">Post it</fbt>
+      </button>
     </Form>
   );
 }

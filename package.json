@@ -6,7 +6,7 @@
     "prepare": "vp config"
   },
   "devDependencies": {
-    "@nkzw/eslint-plugin-fbtee": "5.0.0",
+    "@nkzw/eslint-plugin-fbtee": "6.0.0",
     "@types/node": "26.6.6",
     "playwright": "1.65.0",
     "postal-mime": "4.2.1",

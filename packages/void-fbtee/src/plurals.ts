@@ -1,10 +1,10 @@
-// Plural forms in catalogs. fbtee's compiler and runtime handle every CLDR plural category, but
-// fbtee's prepare-translations always writes `tokens: []` and `types: []`, so a catalog never
-// shows a translator which forms a language needs. This adds them: one line per plural category
-// the locale uses, in fbtee's own format, which its translateSync then compiles.
+// Plural forms in catalogs. fbtee's compiler and runtime handle every CLDR plural category, and
+// since fbtee 6 its prepare-translations names each string's count (`tokens`, `types`), but it
+// still gives each string one line, so a catalog doesn't show a translator which forms a language
+// needs. This adds them: one line per plural category the locale uses, in fbtee's own format,
+// which its translateSync then compiles.
 //
-// The format, from fbtee 5.0.0's source:
-// - `types` holds 28 for a number token (fbtee-compiler src/translate.rs, type_to_mask).
+// The format, from fbtee's source (checked against 6.0.0):
 // - A line's `variations` maps the token's index to its category's code (fbtee src/IntlVariations.tsx).
 // - At runtime fbtee picks the category with Intl.PluralRules (fbtee src/IntlNumberType.tsx), and
 //   for n = 1 it tries a <fbt:plural>'s exactly-one form "_1" first (src/IntlVariationResolver.tsx).
@@ -20,7 +20,6 @@ export const CATEGORY_CODE: Record<Category, number> = {
   many: 12,
   other: 24,
 };
-const NUMBER_TYPE = 28;
 const ORDER: Category[] = ["zero", "one", "two", "few", "many", "other"];
 
 // Counts fbtee can be given: whole numbers and some fractions.
@@ -146,8 +145,6 @@ export function withPluralForms(entry: PluralEntry, slots: Slots, locale: string
   return {
     ...entry,
     ...(added ? { status: "new" } : {}),
-    tokens,
-    types: tokens.map(() => NUMBER_TYPE),
     translations,
   };
 }

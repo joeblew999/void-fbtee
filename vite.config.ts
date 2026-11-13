@@ -1,6 +1,7 @@
 // Root Vite+ config: the repo's tasks, and format, lint, type-check and test settings.
 // Built-in commands: `vp check` (format, lint, types) and `vp test run` (every test project).
 import { fileURLToPath } from "node:url";
+import fbtee from "@nkzw/eslint-plugin-fbtee";
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
@@ -74,15 +75,20 @@ export default defineConfig({
     // e2e/fresh/app/: pages copied into the fresh apps, linted and type-checked there.
     ignorePatterns: ["e2e/fresh/app/**"],
     plugins: ["typescript", "react"],
-    // What `void-fbtee init` asks a workspace's root config for: fbtee's rules and void-fbtee's own.
-    jsPlugins: ["@nkzw/eslint-plugin-fbtee", "void-fbtee/lint"],
+    // What `void-fbtee init` asks a workspace's root config for: fbtee's lint rules.
+    jsPlugins: ["@nkzw/eslint-plugin-fbtee"],
     options: { typeAware: true, typeCheck: true },
     rules: {
       // `fbt` / `fbs` are used through <fbt> JSX, which fbtee's compiler rewrites into calls.
       "no-unused-vars": ["warn", { varsIgnorePattern: "^(fbt|fbs)$" }],
-      "@nkzw/fbtee/no-empty-strings": "error",
-      "@nkzw/fbtee/no-unhelpful-desc": "error",
-      "void-fbtee/no-show-count-no": "error",
+      // fbtee's own set, as its README shows: strict, which also finds text nobody wrapped for
+      // translation. Left as they are: names (the site's, products', APIs') and JSX spacing and
+      // punctuation, which no language translates.
+      ...fbtee.configs.strict.rules,
+      "@nkzw/fbtee/no-untranslated-strings": [
+        "error",
+        { ignoredWords: [" ", ".", "…", "$", "void-fbtee", "GitHub", "Intl", "Temporal"] },
+      ],
     },
   },
   fmt: {

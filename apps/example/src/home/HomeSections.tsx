@@ -288,7 +288,7 @@ export function Closing() {
   return (
     <section className="border-t pt-20 pb-12">
       <h2 className="text-4xl font-medium text-balance md:text-5xl">
-        <fbt desc="Home page heading">i18n for Void apps</fbt>
+        <fbt common>i18n for Void apps</fbt>
       </h2>
       <div className="mt-8 flex flex-wrap gap-3">
         <a href={SETUP} className={cn(buttonVariants({ size: "lg" }), "h-11 gap-2 px-5")}>

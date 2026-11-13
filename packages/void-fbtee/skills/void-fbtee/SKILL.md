@@ -53,7 +53,8 @@ fbtee's code: 16 zero, 4 one, 8 two, 20 few, 12 many, 24 other. Write each line 
 grammar; the form a count falls in is `new Intl.PluralRules(locale).select(n)`, the rule fbtee's
 runtime uses. A form may leave out `{number}` where the language does (Arabic two: "ليلتان").
 Don't add or remove lines. A `<fbt:plural>` also comes as a separate entry for exactly 1 ("1 night"
-next to "{number} nights"): translate both.
+next to "{number} nights"): translate both. A plural that hides its count (`showCount="no"`, "One
+seat is left" / "seats are left") has its lines too.
 
 **fbtee's built-in strings.** Every catalog has 12 from fbtee (`fbtee/Strings.json`): how `list()`
 joins items and number labels ("{number}+"). Use the locale's own conventions; for the list
@@ -62,6 +63,17 @@ is `A وB وC`: no commas). `{ type: "disjunction" }` gives the "or" lists.
 
 **Right-to-left locales** (`ar-EG`): void-fbtee sets `<html dir="rtl">`, so write natural text with
 no direction marks (U+200E, U+200F).
+
+## Writing strings
+
+`<fbt>` for text in components; `fbs("…", "…")` wherever a plain string is needed: an attribute
+(`aria-label`, `placeholder`), a title, an email, anything stored or sent. `fbs` returns a string
+as it is; never `String(fbt(…))`, which can give "[object Object]" (fbtee's lint rule `prefer-fbs`
+reports it). A label used on several pages is a common string: once in `voidFbtee({ common })`
+(text → description, e.g. `{ Save: "Button label for saving changes" }`), then `<fbt common>Save</fbt>`
+or `fbs.c("Save")` everywhere. In server code (an email, a job, a page title), a number in an `fbs`
+string is `fbs.param("count", n, { number: true })`: fbtee formats it the language's way. In a
+component, format it in `<Formatted>` instead (below).
 
 ## Dates, numbers and names in components
 
@@ -237,6 +249,8 @@ missing; where it can't safely edit a file it prints the line to add). The piece
   Void's own redirect sends `/` to the source language.
 - tsconfig: `"fbtee/ReactTypes"` in `compilerOptions.types`; `"lib"` with `ES2025`, `DOM`,
   `DOM.Iterable`.
-- Vite+: `lint.jsPlugins` with `@nkzw/eslint-plugin-fbtee` and `void-fbtee/lint` in the
-  workspace root's `vite.config.ts` (`init` prints the rules).
+- Vite+: `lint.jsPlugins` with `@nkzw/eslint-plugin-fbtee` and fbtee's strict rules in the
+  workspace root's `vite.config.ts` (`init` prints the rules). Strict also warns of text no one
+  wrapped for translation (`vp lint` lists it); names that stay as they are (the app's,
+  products') go in that rule's `ignoredWords`.
 - Scripts `i18n:prepare`, `i18n:check`, `i18n:translate`; a void-fbtee section in `AGENTS.md`.

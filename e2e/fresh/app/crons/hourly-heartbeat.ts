@@ -9,8 +9,6 @@ import { inLocale } from "void-fbtee/server";
 export const cron = "0 * * * *";
 
 export default defineScheduled(async () => {
-  const heading = await inLocale("th-TH", () =>
-    String(fbs("i18n for Void apps", "Home page heading")),
-  );
+  const heading = await inLocale("th-TH", () => fbs("i18n for Void apps", "Home page heading"));
   if (heading !== "i18n สำหรับแอป Void") throw new Error(`inLocale("th-TH") gave "${heading}"`);
 });

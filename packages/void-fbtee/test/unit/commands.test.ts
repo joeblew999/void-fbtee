@@ -48,19 +48,15 @@ describe("check", () => {
     expect(problems).not.toContain('strings: de-DE: untranslated "Hello"');
   });
 
+  test("a common string is collected with its shared description", () => {
+    write("src/save.tsx", `export const Save = () => <fbt common>Save</fbt>;\n`);
+    const problems = check({ ...p, common: { Save: "Button label for saving changes" } });
+    expect(problems).toContain('strings: de-DE: untranslated "Save"');
+  });
+
   test("setup problems go once the app is set up", () => {
     setUp();
     expect(check(p).filter((l) => l.startsWith("setup:"))).toEqual([]);
-  });
-
-  test('reports showCount="no" with its file and line', () => {
-    write(
-      "src/plural.tsx",
-      `\nexport const n = (c) => <fbt desc="d"><fbt:plural count={c} showCount="no">x</fbt:plural></fbt>;\n`,
-    );
-    expect(check(p)).toContain(
-      'strings: src/plural.tsx:2: showCount="no" drops the count (fbtee#83)',
-    );
   });
 
   test("markdown: missing, recorded, out of date, and unaffected by formatting", () => {

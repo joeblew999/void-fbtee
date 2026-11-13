@@ -5,6 +5,7 @@ import { voidReact } from "@void/react/plugin";
 import { voidMarkdown } from "@void/md/plugin";
 import { voidFbtee } from "void-fbtee/plugin";
 import { locales, sourceLocale } from "./src/locales.ts";
+import common from "./i18n/common_strings.json" with { type: "json" };
 import tailwindcss from "@tailwindcss/vite";
 import { SITE } from "./src/site";
 
@@ -47,8 +48,9 @@ export default defineConfig({
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
   plugins: [
     // site: the deployed address, so the dev server and Worker Previews name it in canonical,
-    // hreflang, og:url and the sitemap.
-    voidFbtee({ sourceLocale, locales, site: SITE }),
+    // hreflang, og:url and the sitemap. common: labels used on several pages, each described once
+    // (fbtee's common strings), written <fbt common>Events</fbt>.
+    voidFbtee({ sourceLocale, locales, site: SITE, common }),
     voidPlugin(),
     voidReact({ react: { compiler: true } }),
     voidMarkdown(),

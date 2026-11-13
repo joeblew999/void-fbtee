@@ -12,7 +12,7 @@ export default function NotFound({ error }: ErrorPageProps) {
     <>
       {/* The tab's title in the page's language, as the other pages have it ("… · void-fbtee"):
           these components take no head(), so React's own <title> sets it (React 19). */}
-      <title>{`${String(fbs("There's nothing here", "Heading of the page shown for an address with nothing at it"))} · void-fbtee`}</title>
+      <title>{`${fbs("There's nothing here", "Heading of the page shown for an address with nothing at it")} · void-fbtee`}</title>
       <section className="grid max-w-xl gap-6 py-12" data-testid="not-found">
         <p className="text-muted-foreground font-mono text-sm" dir="ltr">
           {error.status}
@@ -30,13 +30,13 @@ export default function NotFound({ error }: ErrorPageProps) {
         </p>
         <div className="flex flex-wrap gap-3">
           <Link href={routeUrl("/[lang]/events")} className={buttonVariants({ size: "lg" })}>
-            <fbt desc="Navigation: the list of events people post and book">Events</fbt>
+            <fbt common>Events</fbt>
           </Link>
           <Link
             href={routeUrl("/[lang]")}
             className={buttonVariants({ size: "lg", variant: "outline" })}
           >
-            <fbt desc="Navigation: the home page">Home</fbt>
+            <fbt common>Home</fbt>
           </Link>
         </div>
       </section>

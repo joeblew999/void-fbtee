@@ -65,6 +65,12 @@ export interface VoidFbteeOptions {
    * it, the address each request came to.
    */
   site?: string;
+  /**
+   * fbtee's common strings (its `fbtCommon` option): labels used across the app, each with one
+   * description, e.g. { Save: "Button label for saving changes" }. Write `<fbt common>Save</fbt>`
+   * (or `fbt.c("Save")`) without repeating it. See fbtee's README, "Common Strings".
+   */
+  common?: Record<string, string>;
 }
 
 /** What the plugin exposes on its `api`, for the void-fbtee command (read with resolveConfig). */
@@ -137,7 +143,13 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   // isVitestServer does (src/plugin-dev-config.ts): Vitest adds plugins named "vitest" and
   // "vitest:*".
   let underVitest = false;
-  const project = (): Project => ({ root, config, translations: translationsDir, src });
+  const project = (): Project => ({
+    root,
+    config,
+    translations: translationsDir,
+    src,
+    common: options.common,
+  });
 
   const api: VoidFbteeApi = { options, project };
 
@@ -287,7 +299,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
     },
   };
 
-  return [core, fbteeVite()];
+  return [core, fbteeVite({ fbtCommon: options.common })];
 }
 
 /**

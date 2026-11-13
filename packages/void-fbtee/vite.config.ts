@@ -24,7 +24,6 @@ export default defineConfig({
       locales: "src/locales.ts",
       client: "src/client.ts",
       cli: "src/cli.ts",
-      lint: "src/lint.ts",
       head: "src/head.ts",
       server: "src/server.ts",
       routes: "src/routes.ts",

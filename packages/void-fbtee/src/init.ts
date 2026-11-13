@@ -13,7 +13,7 @@ import {
   symlinkSync,
   writeFileSync,
 } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, matchesGlob, relative, sep } from "node:path";
 import { builders, generateCode, loadFile, type ProxifiedModule } from "magicast";
 import { addVitePlugin, getDefaultExportOptions } from "magicast/helpers";
 import { DEFAULT_TRANSLATIONS } from "./catalogs";
@@ -98,7 +98,7 @@ export default function NotFound({ error }: ErrorPageProps) {
   return (
     <section>
       {/* No head() here: React's own <title> sets the tab's title. */}
-      <title>{String(fbs("There's nothing here", "Heading of the page shown for an address with nothing at it"))}</title>
+      <title>{fbs("There's nothing here", "Heading of the page shown for an address with nothing at it")}</title>
       <p dir="ltr">{error.status}</p>
       <h1>
         <fbt desc="Heading of the page shown for an address with nothing at it">There's nothing here</fbt>
@@ -125,7 +125,7 @@ export default function ErrorPage({ error }: ErrorPageProps) {
   return (
     <section>
       {/* No head() here: React's own <title> sets the tab's title. */}
-      <title>{String(fbs("Something went wrong", "Heading of the page shown when the site failed to make a page"))}</title>
+      <title>{fbs("Something went wrong", "Heading of the page shown when the site failed to make a page")}</title>
       <p dir="ltr">{error.status}</p>
       <h1>
         <fbt desc="Heading of the page shown when the site failed to make a page">Something went wrong</fbt>
@@ -167,10 +167,19 @@ const AGENTS = [
 const LINT_RULES: Record<string, unknown> = {
   // `fbt` / `fbs` are used through <fbt> JSX, which fbtee's compiler rewrites into calls.
   "no-unused-vars": ["warn", { varsIgnorePattern: "^(fbt|fbs)$" }],
+  // fbtee's strict set (configs.strict in @nkzw/eslint-plugin-fbtee); init.test.ts checks this list
+  // still matches it. Strict also finds text nobody wrapped for translation: a warning, not an
+  // error, since every new Void app starts with Void's English starter page, and `vp check` would
+  // fail the moment void-fbtee is added. JSX's spacing ({" "}) isn't text; the app adds its own
+  // names (its own, products') to ignoredWords.
   "@nkzw/fbtee/no-empty-strings": "error",
   "@nkzw/fbtee/no-unhelpful-desc": "error",
-  "void-fbtee/no-show-count-no": "error",
+  "@nkzw/fbtee/no-untranslated-strings": ["warn", { ignoredWords: [" "] }],
+  "@nkzw/fbtee/prefer-fbs": "error",
 };
+// What init added before fbtee 6 fixed hidden plural counts (fbtee#83); taken out again.
+const OLD_PLUGIN = "void-fbtee/lint";
+const OLD_RULE = "void-fbtee/no-show-count-no";
 
 /** Versions void-fbtee itself is built and tested with, for the app's package.json. */
 function testedVersions(): Record<string, string> {
@@ -191,11 +200,39 @@ const writeJson = (file: string, value: unknown) =>
 /**
  * The workspace the app is part of, if it isn't its own root (then lint settings belong in the
  * workspace's root config). An app with its own pnpm-workspace.yaml, as `void init` makes on
- * Vite+, is its own root.
+ * Vite+, is its own root. As pnpm decides it: the nearest pnpm-workspace.yaml above the app, and
+ * the app only if its `packages` list takes it in (an app that merely sits in another repo's
+ * folder isn't part of that repo's workspace).
  */
 function workspaceRoot(root: string): string | undefined {
-  for (let d = root; d !== dirname(d); d = dirname(d))
-    if (existsSync(join(d, "pnpm-workspace.yaml"))) return d === root ? undefined : d;
+  for (let d = root; d !== dirname(d); d = dirname(d)) {
+    const file = join(d, "pnpm-workspace.yaml");
+    if (!existsSync(file)) continue;
+    if (d === root) return undefined;
+    const globs = workspacePackages(readFileSync(file, "utf8"));
+    const at = relative(d, root).split(sep).join("/");
+    const listed = globs.filter((g) => !g.startsWith("!")).some((g) => matchesGlob(at, g));
+    const left = globs.filter((g) => g.startsWith("!")).some((g) => matchesGlob(at, g.slice(1)));
+    return listed && !left ? d : undefined;
+  }
+}
+
+/** pnpm-workspace.yaml's `packages` list: its `- glob` lines, quotes taken off. */
+function workspacePackages(yaml: string): string[] {
+  const out: string[] = [];
+  let inList = false;
+  for (const line of yaml.split("\n")) {
+    if (/^packages:\s*$/.test(line)) inList = true;
+    else if (inList && /^\s+-\s+/.test(line))
+      out.push(
+        line
+          .replace(/^\s+-\s+/, "")
+          .replace(/\s+#.*$/, "")
+          .replace(/^["']|["']$/g, ""),
+      );
+    else if (inList && /^\S/.test(line)) inList = false;
+  }
+  return out;
 }
 
 export async function init(o: InitOptions): Promise<InitResult> {
@@ -357,28 +394,44 @@ export async function init(o: InitOptions): Promise<InitResult> {
     if (vitePlus && wsRoot) {
       const rootConfig = join(wsRoot, "vite.config.ts");
       const rootPkg = readJson(join(wsRoot, "package.json"));
-      if (!(existsSync(rootConfig) && readFileSync(rootConfig, "utf8").includes("void-fbtee/lint")))
+      const rootText = existsSync(rootConfig) ? readFileSync(rootConfig, "utf8") : "";
+      if (!rootText.includes("@nkzw/eslint-plugin-fbtee"))
         todo.push(
-          `${rootConfig}: Vite+ only reads lint settings from the workspace's root config. Add lint: { jsPlugins: ["@nkzw/eslint-plugin-fbtee", "void-fbtee/lint"], rules: ${JSON.stringify(LINT_RULES)} }`,
+          `${rootConfig}: Vite+ only reads lint settings from the workspace's root config. Add lint: { jsPlugins: ["@nkzw/eslint-plugin-fbtee"], rules: ${JSON.stringify(LINT_RULES)} }`,
+        );
+      if (rootText.includes(OLD_PLUGIN))
+        todo.push(
+          `${rootConfig}: remove "${OLD_PLUGIN}" from lint.jsPlugins and "${OLD_RULE}" from lint.rules (void-fbtee no longer has them: fbtee 6 fixed what they caught)`,
         );
       if (!rootPkg.devDependencies?.["@nkzw/eslint-plugin-fbtee"])
         todo.push(
           `${join(wsRoot, "package.json")}: add "@nkzw/eslint-plugin-fbtee": "${versions["@nkzw/eslint-plugin-fbtee"]}" to devDependencies (lint runs from the workspace root)`,
         );
-    } else if (vitePlus && !code.includes("void-fbtee/lint")) {
-      // Only Vite+'s defineConfig knows `lint`, so the import moves to vite-plus (as `vp migrate`
-      // does to config files). Plain-Vite apps get the same checks from `void-fbtee check`.
-      for (const imp of mod.imports.$items)
-        if (imp.from === "vite" && imp.imported === "defineConfig") imp.from = "vite-plus";
+    } else if (vitePlus) {
+      // fbtee's lint plugin and rules, and none of what init added before fbtee 6. Only Vite+'s
+      // defineConfig knows `lint`, so the import moves to vite-plus (as `vp migrate` does).
       const options = getDefaultExportOptions(mod);
-      options.lint ??= {};
-      options.lint.jsPlugins ??= [];
-      for (const p of ["@nkzw/eslint-plugin-fbtee", "void-fbtee/lint"])
-        if (!options.lint.jsPlugins.includes(p)) options.lint.jsPlugins.push(p);
-      options.lint.rules ??= {};
-      for (const [rule, level] of Object.entries(LINT_RULES)) options.lint.rules[rule] ??= level;
-      changed = true;
-      done.push(`${viteConfig}: added fbtee's and void-fbtee's lint rules (Vite+ lint.jsPlugins)`);
+      const lint = options.lint ?? {};
+      const plugins: string[] = [...(lint.jsPlugins ?? [])];
+      const rules: Record<string, unknown> = { ...lint.rules };
+      const wanted = [...plugins.filter((p) => p !== OLD_PLUGIN)];
+      if (!wanted.includes("@nkzw/eslint-plugin-fbtee")) wanted.push("@nkzw/eslint-plugin-fbtee");
+      const missingRules = Object.keys(LINT_RULES).filter((r) => !(r in rules));
+      if (
+        JSON.stringify(wanted) !== JSON.stringify(plugins) ||
+        missingRules.length ||
+        OLD_RULE in rules
+      ) {
+        for (const imp of mod.imports.$items)
+          if (imp.from === "vite" && imp.imported === "defineConfig") imp.from = "vite-plus";
+        options.lint ??= {};
+        options.lint.jsPlugins = wanted;
+        options.lint.rules ??= {};
+        for (const r of missingRules) options.lint.rules[r] = LINT_RULES[r];
+        delete options.lint.rules[OLD_RULE];
+        changed = true;
+        done.push(`${viteConfig}: fbtee's lint rules (Vite+ lint.jsPlugins)`);
+      }
     }
     if (changed) writeModule(mod, at(viteConfig));
     if (changed) written.add(viteConfig);

@@ -18,11 +18,11 @@ const rest = (page: (typeof PAGES)[number]) => page.slice("/[lang]".length);
 function label(page: (typeof PAGES)[number]) {
   switch (page) {
     case "/[lang]":
-      return <fbt desc="Navigation: the home page">Home</fbt>;
+      return <fbt common>Home</fbt>;
     case "/[lang]/events":
-      return <fbt desc="Navigation: the list of events people post and book">Events</fbt>;
+      return <fbt common>Events</fbt>;
     case "/[lang]/docs":
-      return <fbt desc="Navigation: the documentation">Docs</fbt>;
+      return <fbt common>Docs</fbt>;
   }
 }
 

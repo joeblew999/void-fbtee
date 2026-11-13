@@ -33,7 +33,6 @@
   "exports": {
     "./client": "./dist/client.mjs",
     "./head": "./dist/head.mjs",
-    "./lint": "./dist/lint.mjs",
     "./locales": "./dist/locales.mjs",
     "./middleware": "./dist/middleware.mjs",
     "./plugin": "./dist/plugin.mjs",
@@ -54,19 +53,19 @@
     "prepublishOnly": "vp run build"
   },
   "dependencies": {
-    "@nkzw/fbtee-compiler": "5.0.0",
-    "@nkzw/vite-plugin-fbtee": "5.0.0",
+    "@nkzw/fbtee-compiler": "6.0.0",
+    "@nkzw/vite-plugin-fbtee": "6.0.0",
     "magicast": "0.5.5",
     "unhead": "3.4.3"
   },
   "devDependencies": {
     "@arethetypeswrong/core": "0.18.5",
-    "@nkzw/eslint-plugin-fbtee": "5.0.0",
+    "@nkzw/eslint-plugin-fbtee": "6.0.0",
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",
     "@void/md": "catalog:",
     "@void/react": "catalog:",
-    "fbtee": "5.0.0",
+    "fbtee": "6.0.0",
     "publint": "0.3.25",
     "react": "19.3.1",
     "temporal-polyfill": "1.0.8",
@@ -79,17 +78,11 @@
   },
   "peerDependencies": {
     "@void/react": "^1.7.0",
-    "fbtee": "5.0.0",
+    "fbtee": "6.0.0",
     "react": "^19.2.0",
     "temporal-polyfill": "^1.0.8",
     "vite": "^8.0.0",
-    "vite-plus": "^1.6.0",
     "void": "^1.7.0"
-  },
-  "peerDependenciesMeta": {
-    "vite-plus": {
-      "optional": true
-    }
   },
   "engines": {
     "node": "^24.22.0 || >=26.12.0"

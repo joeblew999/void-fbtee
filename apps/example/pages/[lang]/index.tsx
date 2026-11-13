@@ -178,7 +178,7 @@ function Hero(props: Props) {
           className="text-5xl leading-[1.05] font-medium text-balance md:text-6xl"
           data-testid="title"
         >
-          <fbt desc="Home page heading">i18n for Void apps</fbt>
+          <fbt common>i18n for Void apps</fbt>
         </h1>
         <p className="mt-6 max-w-xl text-lg text-pretty text-muted-foreground" data-testid="intro">
           <fbt desc="Home page introduction; languages is a list of language names">
@@ -204,7 +204,7 @@ function Hero(props: Props) {
             href={routeUrl("/[lang]/docs")}
             className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 px-5")}
           >
-            <fbt desc="Navigation: the documentation">Docs</fbt>
+            <fbt common>Docs</fbt>
           </Link>
           <GitHubButton />
         </div>

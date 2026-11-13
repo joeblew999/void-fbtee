@@ -11,6 +11,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join, relative } from "node:path";
+import fbteeLint from "@nkzw/eslint-plugin-fbtee";
 import { afterEach, expect, test } from "vite-plus/test";
 import { init } from "../../src/init";
 import { VOID_INIT_DIR } from "./void-init";
@@ -66,8 +67,10 @@ test("wires void-fbtee into a Vite+ app, and a second run changes nothing", asyn
   expect(vite).toMatch(/voidFbtee\(\{\s*sourceLocale(: sourceLocale)?,\s*locales(: locales)?/);
   // First in plugins, before voidPlugin().
   expect(vite.indexOf("voidFbtee({")).toBeLessThan(vite.indexOf("voidPlugin()"));
-  expect(vite).toMatch(/jsPlugins: \["@nkzw\/eslint-plugin-fbtee", "void-fbtee\/lint"\]/);
-  expect(vite).toContain(`"void-fbtee/no-show-count-no": "error"`);
+  expect(vite).toMatch(/jsPlugins: \["@nkzw\/eslint-plugin-fbtee"\]/);
+  // fbtee's own strict set, as the installed fbtee lint plugin defines it.
+  for (const rule of Object.keys(fbteeLint.configs.strict.rules))
+    expect(vite).toMatch(new RegExp(`"${rule}": (\\[\\s*)?"(error|warn)"`));
   expect(vite.endsWith(");\n")).toBe(true);
 
   expect(read(root, "void.config.ts")).toMatch(/compatibility_flags: \["temporal"\]/);
@@ -183,19 +186,29 @@ test("with no home under pages/[lang]/, neither page, and the line to come back"
 });
 
 /** A pnpm workspace with a Vite+ app in apps/app; the root config has `rootConfig`. */
-function workspace(rootConfig: string, rootDevDependencies: Record<string, string> = {}) {
+function workspace(
+  rootConfig: string,
+  rootDevDependencies: Record<string, string> = {},
+  folder = "apps/app",
+) {
   const ws = mkdtempSync(join(import.meta.dirname, ".tmp-"));
   dirs.push(ws);
   writeFileSync(join(ws, "pnpm-workspace.yaml"), "packages:\n  - apps/*\n");
   writeFileSync(join(ws, "package.json"), JSON.stringify({ devDependencies: rootDevDependencies }));
   writeFileSync(join(ws, "vite.config.ts"), rootConfig);
-  const root = join(ws, "apps/app");
+  const root = join(ws, folder);
   mkdirSync(root, { recursive: true });
   cpSync(app("vite-plus"), root, { recursive: true });
   // Without its own pnpm-workspace.yaml, the app is part of the workspace.
   rmSync(join(root, "pnpm-workspace.yaml"));
   return { ws, root };
 }
+
+test("an app in a workspace's folder but not in its packages list is its own root", async () => {
+  const { root } = workspace(`export default {};\n`, {}, "tools/app");
+  await init(options(root));
+  expect(read(root, "vite.config.ts")).toMatch(/jsPlugins: \["@nkzw\/eslint-plugin-fbtee"\]/);
+});
 
 test("in a workspace, the lint settings and plugin are left for the root", async () => {
   const { root } = workspace(`export default {};\n`);
@@ -214,9 +227,10 @@ test("in a workspace, the lint settings and plugin are left for the root", async
 });
 
 test("in a workspace whose root already has them, there's nothing to add", async () => {
-  const { root } = workspace(`export default { lint: { jsPlugins: ["void-fbtee/lint"] } };\n`, {
-    "@nkzw/eslint-plugin-fbtee": "5.0.0",
-  });
+  const { root } = workspace(
+    `export default { lint: { jsPlugins: ["@nkzw/eslint-plugin-fbtee"] } };\n`,
+    { "@nkzw/eslint-plugin-fbtee": "6.0.0" },
+  );
   const { todo } = await init(options(root));
   expect(todo.join("\n")).not.toMatch(/lint settings|eslint-plugin-fbtee/);
 });

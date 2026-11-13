@@ -423,7 +423,7 @@ export const SECTIONS: { id: SectionId; rows: Row[] }[] = [
         ),
       ),
       custom("list", `list(["Bangkok", "Cairo", "New York"])`, () =>
-        // fbtee's list() returns an FbtResult (typed as a React node); its text is its toString().
+        // fbtee's list() is typed as a React node; given plain text, it returns plain text.
         // oxlint-disable-next-line no-base-to-string
         String(list(["Bangkok", "Cairo", "New York"])),
       ),

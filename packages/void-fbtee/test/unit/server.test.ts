@@ -55,7 +55,7 @@ beforeAll(async () => {
     `import { fbs } from "fbtee";
 import { inLocale } from ${JSON.stringify(server)};
 import { routeUrl } from ${JSON.stringify(routes)};
-const hello = () => String(fbs("Hello", "Greeting in the test fixture"));
+const hello = () => fbs("Hello", "Greeting in the test fixture");
 export const german = () => inLocale("de-DE", hello);
 export const afterAwait = () =>
   inLocale("de-DE", async () => { await new Promise((r) => setTimeout(r, 10)); return hello(); });

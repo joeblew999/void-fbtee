@@ -72,6 +72,15 @@ its request came to. With it, a copy at another address answers `X-Robots-Tag: n
 stays out of search results. `void-fbtee init --site https://example.com` adds it. A change to `voidFbtee()`'s options needs the dev server restarted: Vite reads
 the plugin once, when it starts.
 
+Labels used on several pages can be fbtee's common strings: each described once, in
+`voidFbtee({ common })` (text → description), then written `<fbt common>Events</fbt>`. The example
+keeps them in `i18n/common_strings.json`:
+
+```ts
+import common from "./i18n/common_strings.json" with { type: "json" };
+voidFbtee({ sourceLocale, locales, common });
+```
+
 Link previews (WhatsApp, Facebook, LinkedIn, Slack, X) need each page's title and description,
 which void-fbtee gives them in the page's language (`pageHead` from `void-fbtee/head` in a page's
 `head()`; the frontmatter's on a markdown page), and the site's own tags, which are the app's. Put
@@ -111,7 +120,10 @@ fbtee's compiler is native code, installed already built for your system by your
 manager. fbtee builds it for macOS (Apple Silicon and Intel), Windows (x64 and ARM) and Linux
 (x64 and ARM, glibc and musl).
 
-On Vite+, `init` adds fbtee's lint rules (`@nkzw/eslint-plugin-fbtee`). They use typescript-eslint,
+On Vite+, `init` adds fbtee's lint rules (`@nkzw/eslint-plugin-fbtee`, its strict set). Besides
+checking each string's description, they warn of text no one wrapped for translation (`vp lint`
+lists it, a new app's starter page included); names that stay as they are (the app's, products')
+go in `no-untranslated-strings`'s `ignoredWords`. They use typescript-eslint,
 which doesn't support TypeScript 7 yet ([typescript-eslint#12518](https://github.com/typescript-eslint/typescript-eslint/issues/12518)),
 so your package manager warns of an unmet `typescript` peer. The rules work. With pnpm's
 `strictPeerDependencies`, allow it in `pnpm-workspace.yaml` (in the

@@ -31,7 +31,7 @@ function SeatsLeft({ left }: { left: number }) {
           </fbt:plural>
         </fbt>
       ) : (
-        <fbt desc="Badge: an event has no seats left">Sold out</fbt>
+        <fbt common>Sold out</fbt>
       )}
     </Flap>
   );
@@ -137,7 +137,7 @@ export default function Events({ events }: Props) {
           </p>
         </div>
         <Link href={post} className={buttonVariants({ size: "lg" })} data-testid="post-link">
-          <fbt desc="Heading of the form for posting a new event">Post an event</fbt>
+          <fbt common>Post an event</fbt>
         </Link>
       </div>
       {events.length ? (
@@ -184,7 +184,7 @@ export default function Events({ events }: Props) {
             </fbt>
           </p>
           <Link href={post} className={buttonVariants({ variant: "outline" })}>
-            <fbt desc="Heading of the form for posting a new event">Post an event</fbt>
+            <fbt common>Post an event</fbt>
           </Link>
         </div>
       )}

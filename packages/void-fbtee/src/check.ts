@@ -3,7 +3,7 @@
 import { createHash } from "node:crypto";
 import { existsSync, globSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
-import { missing, sourceFiles, type Project } from "./catalogs";
+import { missing, type Project } from "./catalogs";
 
 /** Frontmatter key a translated markdown page records its original's hash in. */
 export const TRANSLATED_FROM = "translatedFrom";
@@ -178,17 +178,6 @@ export function check(p: Project): string[] {
     problems.push(
       `setup: "/" doesn't redirect to /${source} (void.config.ts: routing.redirects, "/": { to: "/${source}", status: 301 })`,
     );
-
-  // fbtee#83: plurals with showCount="no" lose their count token. (Vite+ apps also get this as a
-  // lint rule; plain-Vite apps only here.)
-  for (const f of sourceFiles(p)) {
-    readFileSync(f, "utf8")
-      .split("\n")
-      .forEach((line, i) => {
-        if (/showCount\s*=\s*["']no["']/.test(line))
-          problems.push(`strings: ${rel(f)}:${i + 1}: showCount="no" drops the count (fbtee#83)`);
-      });
-  }
 
   // Untranslated strings, by fbtee's own rule (same count as the plugin's report).
   for (const r of missing(p)) {

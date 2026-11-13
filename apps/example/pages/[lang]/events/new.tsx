@@ -167,10 +167,10 @@ export default function NewEvent({ zones }: Props) {
     <div className="grid gap-8">
       <div className="grid gap-4">
         <EventsCrumbs>
-          <fbt desc="Heading of the form for posting a new event">Post an event</fbt>
+          <fbt common>Post an event</fbt>
         </EventsCrumbs>
         <h1 className="text-3xl font-medium text-balance md:text-4xl" data-testid="new-event-title">
-          <fbt desc="Heading of the form for posting a new event">Post an event</fbt>
+          <fbt common>Post an event</fbt>
         </h1>
         <p className="max-w-xl text-muted-foreground text-pretty">
           <fbt desc="Under the heading of the form for posting an event: what happens to it">

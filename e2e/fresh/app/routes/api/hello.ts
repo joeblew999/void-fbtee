@@ -5,5 +5,5 @@ import { fbs } from "fbtee";
 
 export const GET = defineHandler((c) => ({
   locale: c.get("i18n")?.locale ?? null,
-  message: String(fbs("i18n for Void apps", "Home page heading")),
+  message: fbs("i18n for Void apps", "Home page heading"),
 }));

@@ -41,6 +41,8 @@ export interface Project {
   /** Folder of editable catalogs, relative to root. */
   translations: string;
   src: string[];
+  /** fbtee's common strings (fbtCommon): text → its description, for `<fbt common>`. */
+  common?: Record<string, string>;
 }
 
 interface Phrase {
@@ -96,7 +98,8 @@ let cache: { key: string; value: Collected } | undefined;
  */
 export function collect(p: Project): Collected {
   const files = sourceFiles(p);
-  const key = files.map((f) => `${f}:${statSync(f).mtimeMs}`).join("|");
+  const key =
+    files.map((f) => `${f}:${statSync(f).mtimeMs}`).join("|") + JSON.stringify(p.common ?? {});
   if (cache?.key === key) return cache.value;
   const phrases: Phrase[] = [];
   for (const lang of LANGS) {
@@ -104,7 +107,7 @@ export function collect(p: Project): Collected {
     if (!batch.length) continue;
     const out = collectBatchSync(
       batch.map((f) => ({ filename: relative(p.root, f), sourceText: readFileSync(f, "utf8") })),
-      { lang, collectPackager: "text" },
+      { lang, collectPackager: "text", fbtCommon: p.common },
     );
     if (out.errors.length)
       throw new Error(

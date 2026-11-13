@@ -13,7 +13,7 @@ export default function ErrorPage({ error }: ErrorPageProps) {
     <>
       {/* The tab's title in the page's language, as the other pages have it ("… · void-fbtee"):
           these components take no head(), so React's own <title> sets it (React 19). */}
-      <title>{`${String(fbs("Something went wrong", "Heading of the page shown when the site failed to make a page"))} · void-fbtee`}</title>
+      <title>{`${fbs("Something went wrong", "Heading of the page shown when the site failed to make a page")} · void-fbtee`}</title>
       <section className="grid max-w-xl gap-6 py-12" data-testid="error-page">
         <p className="text-muted-foreground font-mono text-sm" dir="ltr">
           {error.status}
@@ -36,7 +36,7 @@ export default function ErrorPage({ error }: ErrorPageProps) {
             href={routeUrl("/[lang]")}
             className={buttonVariants({ size: "lg", variant: "outline" })}
           >
-            <fbt desc="Navigation: the home page">Home</fbt>
+            <fbt common>Home</fbt>
           </Link>
         </div>
       </section>

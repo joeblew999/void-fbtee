@@ -83,31 +83,25 @@ export function bookingEmail(
 ): Promise<Email> {
   return inLocale(booking.locale, ({ locale, dir }) => {
     const lines = [
-      String(
-        fbs(
-          ["Hello ", fbs.param("name", booking.name), ","],
-          "Booking email: greeting, with the name the booker gave",
-        ),
-      ),
-      String(
-        fbs(
-          [
-            "You have a seat at ",
-            fbs.param("event", booking.title),
-            ". It starts ",
-            fbs.param("time", startsAt(booking, locale)),
-            ".",
-          ],
-          "Booking email: the event, and when it starts on the clock where it happens",
-        ),
-      ),
-      String(fbs("The event's page:", "Booking email: before the link to the event's page")),
-    ];
-    const subject = String(
       fbs(
-        ["Your seat at ", fbs.param("event", booking.title)],
-        "Booking email subject: a seat is booked at this event",
+        ["Hello ", fbs.param("name", booking.name), ","],
+        "Booking email: greeting, with the name the booker gave",
       ),
+      fbs(
+        [
+          "You have a seat at ",
+          fbs.param("event", booking.title),
+          ". It starts ",
+          fbs.param("time", startsAt(booking, locale)),
+          ".",
+        ],
+        "Booking email: the event, and when it starts on the clock where it happens",
+      ),
+      fbs("The event's page:", "Booking email: before the link to the event's page"),
+    ];
+    const subject = fbs(
+      ["Your seat at ", fbs.param("event", booking.title)],
+      "Booking email subject: a seat is booked at this event",
     );
     return written(subject, lines, booking.url, booking, locale, dir);
   });
@@ -117,24 +111,18 @@ export function bookingEmail(
 export function linkEmail(post: EventFor & { locale: AppLocale; link: string }): Promise<Email> {
   return inLocale(post.locale, ({ locale, dir }) => {
     const lines = [
-      String(
-        fbs(
-          ["You posted ", fbs.param("event", post.title), "."],
-          "Private link email: the event the reader just posted",
-        ),
+      fbs(
+        ["You posted ", fbs.param("event", post.title), "."],
+        "Private link email: the event the reader just posted",
       ),
-      String(
-        fbs(
-          "Keep this email: the link below is the only way to delete your event later. Anyone with it can delete the event, so don't share it.",
-          "Private link email: why to keep the link, and to keep it private",
-        ),
+      fbs(
+        "Keep this email: the link below is the only way to delete your event later. Anyone with it can delete the event, so don't share it.",
+        "Private link email: why to keep the link, and to keep it private",
       ),
     ];
-    const subject = String(
-      fbs(
-        ["Your private link for ", fbs.param("event", post.title)],
-        "Private link email subject: the link to delete the event the reader posted",
-      ),
+    const subject = fbs(
+      ["Your private link for ", fbs.param("event", post.title)],
+      "Private link email subject: the link to delete the event the reader posted",
     );
     return written(subject, lines, post.link, post, locale, dir);
   });
@@ -149,30 +137,24 @@ export function cancellationEmail(
 ): Promise<Email> {
   return inLocale(booking.locale, ({ locale, dir }) => {
     const lines = [
-      String(
-        fbs(
-          ["Hello ", fbs.param("name", booking.name), ","],
-          "Cancellation email: greeting, with the name the booker gave",
-        ),
-      ),
-      String(
-        fbs(
-          [
-            fbs.param("event", booking.title),
-            ", on ",
-            fbs.param("time", startsAt(booking, locale)),
-            ", has been cancelled by its organiser. Your seat is gone with it.",
-          ],
-          "Cancellation email: the event the reader booked, and when it would have started, is cancelled",
-        ),
-      ),
-      String(fbs("Other events:", "Cancellation email: before the link to the events list")),
-    ];
-    const subject = String(
       fbs(
-        [fbs.param("event", booking.title), " is cancelled"],
-        "Cancellation email subject: the event the reader booked is cancelled",
+        ["Hello ", fbs.param("name", booking.name), ","],
+        "Cancellation email: greeting, with the name the booker gave",
       ),
+      fbs(
+        [
+          fbs.param("event", booking.title),
+          ", on ",
+          fbs.param("time", startsAt(booking, locale)),
+          ", has been cancelled by its organiser. Your seat is gone with it.",
+        ],
+        "Cancellation email: the event the reader booked, and when it would have started, is cancelled",
+      ),
+      fbs("Other events:", "Cancellation email: before the link to the events list"),
+    ];
+    const subject = fbs(
+      [fbs.param("event", booking.title), " is cancelled"],
+      "Cancellation email subject: the event the reader booked is cancelled",
     );
     const events = booking.origin + routeUrl("/[lang]/events");
     return written(subject, lines, events, booking, locale, dir);
@@ -188,31 +170,25 @@ export function reminderEmail(
 ): Promise<Email> {
   return inLocale(booking.locale, ({ locale, dir }) => {
     const lines = [
-      String(
-        fbs(
-          ["Hello ", fbs.param("name", booking.name), ","],
-          "Reminder email: greeting, with the name the booker gave",
-        ),
-      ),
-      String(
-        fbs(
-          [
-            "A reminder: you have a seat at ",
-            fbs.param("event", booking.title),
-            ", which starts ",
-            fbs.param("time", startsAt(booking, locale)),
-            ".",
-          ],
-          "Reminder email: the event the reader booked starts within a day, and when",
-        ),
-      ),
-      String(fbs("The event's page:", "Reminder email: before the link to the event's page")),
-    ];
-    const subject = String(
       fbs(
-        ["Reminder: ", fbs.param("event", booking.title)],
-        "Reminder email subject: the event the reader booked starts within a day",
+        ["Hello ", fbs.param("name", booking.name), ","],
+        "Reminder email: greeting, with the name the booker gave",
       ),
+      fbs(
+        [
+          "A reminder: you have a seat at ",
+          fbs.param("event", booking.title),
+          ", which starts ",
+          fbs.param("time", startsAt(booking, locale)),
+          ".",
+        ],
+        "Reminder email: the event the reader booked starts within a day, and when",
+      ),
+      fbs("The event's page:", "Reminder email: before the link to the event's page"),
+    ];
+    const subject = fbs(
+      ["Reminder: ", fbs.param("event", booking.title)],
+      "Reminder email subject: the event the reader booked starts within a day",
     );
     const page = booking.origin + routeUrl("/[lang]/events/[id]", { params: { id: booking.id } });
     return written(subject, lines, page, booking, locale, dir);

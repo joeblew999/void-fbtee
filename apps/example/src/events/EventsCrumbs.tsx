@@ -11,9 +11,7 @@ export function EventsCrumbs({ children, lang }: { children: ReactNode; lang?: s
   const { lang: page } = useLocale();
   return (
     <nav
-      aria-label={String(
-        fbs("Where you are", "Label of the row showing where you are on the site"),
-      )}
+      aria-label={fbs("Where you are", "Label of the row showing where you are on the site")}
       className="text-muted-foreground text-sm"
       data-testid="events-crumbs"
     >
@@ -24,7 +22,7 @@ export function EventsCrumbs({ children, lang }: { children: ReactNode; lang?: s
             className="hover:text-foreground"
             data-testid="crumb-events"
           >
-            <fbt desc="Navigation: the list of events people post and book">Events</fbt>
+            <fbt common>Events</fbt>
           </Link>
         </li>
         <li aria-hidden>
