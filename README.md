@@ -106,7 +106,9 @@ vp upgrade && vp migrate   # upgrade Vite+, then vp check, vp test run
   https://void-fbtee-example.gedw99.workers.dev
   ([its Worker on Cloudflare](https://dash.cloudflare.com/7384af54e33b8a54ff240371ea368440/workers/services/view/void-fbtee-example/production)).
 - `e2e/`: the browser tests, and the fresh-install check. `e2e/browsers/`: the Chromium and
-  WebKit run (`vp run test:browsers`).
+  WebKit run (`vp run test:browsers`). `e2e/fresh/app/`: Void's own docs examples, put into each
+  fresh app and checked in Thai; what doesn't work yet is listed as a known gap, with the step of
+  `plans/quiet-harbor-atlas.md` that fixes it.
 
 How we test, and why it isn't Void's testing guide: Void's guide
 ([docs/guide/testing.md](https://github.com/voidzero-dev/void/blob/main/docs/guide/testing.md))

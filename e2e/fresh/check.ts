@@ -7,6 +7,9 @@
 // tarball file is installed. Plus the git install apps use today (pnpm). Work happens in .vitest/
 // (git ignores it). It installs this checkout's last commit, so commit packages/void-fbtee first.
 //
+// Each app also gets Void's own docs examples (e2e/fresh/app/), each checked in a language other
+// than the source: what works, and, as known gaps, what doesn't yet (plans/quiet-harbor-atlas.md).
+//
 //   vpx e2e/fresh/check.ts                 every app
 //   vpx e2e/fresh/check.ts npm-vite-plus   one (pnpm-vite-plus, npm-vite-plus, pnpm-vite,
 //                                          npm-vite, git)
@@ -86,6 +89,15 @@ const check = (ok: unknown, what: string) => {
   if (!ok) throw new Error(`fresh check failed: ${what}`);
   console.error(`✓ ${what}`);
 };
+/**
+ * Something that doesn't work yet in a fresh app: a gap in plans/quiet-harbor-atlas.md, at the
+ * step that fixes it. It must still fail; once it works, this stops the run, so the step that
+ * fixed it turns it into a check().
+ */
+const gap = (ok: unknown, what: string, step: number) => {
+  if (ok) throw new Error(`fresh check: works now, make it a check(): ${what}`);
+  console.error(`✗ known gap (plans/quiet-harbor-atlas.md, step ${step}): ${what}`);
+};
 const exec = (pm: Pm, ...args: string[]): [Pm, string[]] => [pm, ["exec", "--", ...args]];
 // These installs follow edits to package.json, as on a developer's machine; under CI (set, as in
 // GitHub Actions) pnpm would otherwise refuse to update the lockfile.
@@ -150,9 +162,12 @@ for (const target of targets) {
   // middleware, flags, scripts and peers.
   run(...exec(app.pm, "void-fbtee", "init", "--locales", TRANSLATED.join(",")), dir);
   run(...install(app.pm), dir);
-  // void-fbtee's own pages (e2e/fresh/app/) and the example's translations of their strings.
-  cpSync(join(import.meta.dirname, "app/pages"), join(dir, "pages"), { recursive: true });
+  // void-fbtee's own pages and Void's docs examples (e2e/fresh/app/: pages/, routes/), and the
+  // example's translations of their strings. Zod for the form's validator, as Void's docs leave
+  // the library to the developer (guide/server-routing.md, "Manual validators").
+  cpSync(join(import.meta.dirname, "app"), dir, { recursive: true });
   cpSync(join(root, "apps/example/i18n"), join(dir, "i18n"), { recursive: true });
+  run(app.pm, app.pm === "npm" ? ["install", "zod"] : ["add", "zod", "--no-frozen-lockfile"], dir);
   checkOwnDependencies(target, dir, installed);
 
   run(...exec(app.pm, "void-fbtee", "check"), dir);
@@ -330,6 +345,31 @@ function checkTypes(target: string, dir: string, pm: Pm) {
   check(tsc().includes("_TypesProbe"), `${target}: a link to a missing page fails the type check`);
   write(`export const lang: Lang = "xx-XX";\nexport const u = routeUrl;`);
   check(tsc().includes("_TypesProbe"), `${target}: a language the app hasn't fails the type check`);
+  // Parts of the package the plan adds (plans/quiet-harbor-atlas.md), by the names it gives them;
+  // the step that builds one can rename it here, and turns its probe into a check of what it does.
+  const missing = (body: string) => {
+    writeFileSync(probe, `${body}\n`);
+    return !tsc();
+  };
+  gap(
+    missing(`import { inLocale } from "void-fbtee/server";\nimport { fbs } from "fbtee";
+export const text = inLocale("th-TH", () => String(fbs("i18n for Void apps", "Home page heading")));`),
+    `${target}: inLocale() translates with no request (a scheduled job, a queue, an email)`,
+    2,
+  );
+  gap(
+    missing(
+      `import { routeUrl } from "void-fbtee/routes";\nexport const home = routeUrl("/[lang]");`,
+    ),
+    `${target}: a link in the page's own language needs no lang`,
+    3,
+  );
+  gap(
+    missing(`import { revalidate } from "void-fbtee/server";
+export const clear = () => revalidate({ paths: ["/"] });`),
+    `${target}: revalidate() clears a page in every language`,
+    3,
+  );
   rmSync(probe);
 }
 
@@ -358,8 +398,8 @@ function checkFormatting(target: string, dir: string, pm: Pm) {
   check(!files.length, `${target}: everything init wrote is formatted ${files.join(", ")}`);
 }
 
-/** The dev server: translated pages, an Arabic page right-to-left, "/" to the source language,
- * and a language the app hasn't not found. */
+/** The dev server: translated pages, Void's docs examples in Thai (and the known gaps), an Arabic
+ * page right-to-left, "/" to the source language, and a language the app hasn't not found. */
 async function checkDev(target: string, dir: string, app: App) {
   const cli = app.toolchain === "vite-plus" ? "vp" : "vite";
   const server = spawn(
@@ -378,6 +418,49 @@ async function checkDev(target: string, dir: string, app: App) {
       if (html === undefined) await new Promise((r) => setTimeout(r, 100));
     }
     check(html?.includes("i18n สำหรับแอป Void"), `${target}: dev serves /th-TH in Thai`);
+    // Void's docs examples (e2e/fresh/app/), each in a language other than the source.
+    check(
+      html?.includes("<title>i18n สำหรับแอป Void</title>"),
+      `${target}: head() from Void's docs gives the title in Thai`,
+    );
+    check(
+      html?.includes('data-testid="loader-locale">th-TH<'),
+      `${target}: a loader from Void's docs has the page's language`,
+    );
+    const thai = /[฀-๿]/;
+    const form = await fetch(`${base}/th-TH/form`, {
+      method: "POST",
+      // As useForm sends it (@void/react).
+      headers: { "Content-Type": "application/json", "X-VoidPages": "true" },
+      body: JSON.stringify({ name: "" }),
+    });
+    const errors =
+      form.status === 422 ? ((await form.json()) as { errors?: { name?: string } }) : {};
+    gap(
+      thai.test(errors.errors?.name ?? ""),
+      `${target}: a form from Void's docs shows its validation error in Thai (got "${errors.errors?.name}")`,
+      4,
+    );
+    const nothing = await fetch(`${base}/th-TH/no-such-page`);
+    const nothingHtml = await nothing.text();
+    gap(
+      nothing.status === 404 && nothingHtml.includes("ไม่มีอะไรอยู่ที่นี่"),
+      `${target}: an address with nothing at it gets a not-found page in Thai`,
+      5,
+    );
+    const sitemap = await fetch(`${base}/sitemap.xml`);
+    gap(
+      sitemap.ok && (await sitemap.text()).includes('hreflang="th-TH"'),
+      `${target}: /sitemap.xml lists every page in every language`,
+      6,
+    );
+    const api = await fetch(`${base}/api/hello`, { headers: { "Accept-Language": "th-TH" } });
+    const hello = (await api.json()) as { locale?: string; message?: string };
+    gap(
+      hello.locale === "th-TH" && thai.test(hello.message ?? ""),
+      `${target}: a server route from Void's docs answers in the language asked for (got ${hello.locale})`,
+      10,
+    );
     const ar = await (await fetch(`${base}/ar-EG`)).text();
     check(
       ar.includes('<html lang="ar-EG" dir="rtl"') && ar.includes("تدويل تطبيقات Void"),
