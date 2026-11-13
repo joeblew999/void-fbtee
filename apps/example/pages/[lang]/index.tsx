@@ -6,9 +6,9 @@ import { Suspense, use, useState } from "react";
 import { fbt, list } from "fbtee";
 import { ArrowRight } from "lucide-react";
 import { Formatted, Link, useLocale, useLocales } from "void-fbtee/react";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { AddIt, Closing, Features, GitHubButton } from "@/components/HomeSections";
+import { buttonVariants } from "@/ui/button";
+import { cn } from "@/ui/utils";
+import { AddIt, Closing, Features, GitHubButton } from "@/home/HomeSections";
 import type { Props } from "./index.server";
 
 // fbtee's list(), joined to plain text first. A list inside a string (<fbt:list>, or list() in an

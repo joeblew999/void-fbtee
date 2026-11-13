@@ -9,7 +9,7 @@
 //                                                   named in the reader's
 // The span carries the kind and value, so a test can check every one on every page.
 import { Formatted, useLocale, useLocales, useNow, useTimeZone } from "void-fbtee/react";
-import { fmt, type FmtProps } from "@/lib/fmt";
+import { fmt, type FmtProps } from "@/docs/fmt";
 
 export default function Fmt({
   langs,

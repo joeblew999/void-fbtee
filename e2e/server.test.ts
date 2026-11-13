@@ -431,7 +431,7 @@ test.skipIf(!!process.env.E2E_URL)(
     // The app's code gets Cloudflare's own Temporal (void-fbtee's Vite plugin, plugin.ts): the
     // polyfill's code is in the worker only for the Temporal reference page, which runs it beside
     // Cloudflare's to compare. So every file that imports the polyfill is the page's rows
-    // (src/lib/temporal.ts) or imports them.
+    // (src/docs/temporal.ts) or imports them.
     expect(
       worker.filter((f) => read(f).includes("void-fbtee: no Temporal on the server")),
     ).toHaveLength(1);

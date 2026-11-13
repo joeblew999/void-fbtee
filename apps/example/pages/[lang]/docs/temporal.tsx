@@ -1,25 +1,18 @@
 // The Temporal page, a reference: date and time arithmetic with Temporal, each result a neutral
-// value (src/lib/temporal.ts), run four ways: on the Worker (the loader) with Cloudflare's own
+// value (src/docs/temporal.ts), run four ways: on the Worker (the loader) with Cloudflare's own
 // Temporal and with the polyfill, and in the browser after hydration, with its own and with the
 // polyfill. Neutral results must match everywhere, so a highlighted row is a real bug, and its
 // columns say whose. The reference is Cloudflare's own Temporal: what the app runs on the Worker.
 // Formatting is on the Intl page.
 import { Fragment, useSyncExternalStore } from "react";
 import { fbt } from "fbtee";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { ownTemporal, Polyfill, runTemporal, TEMPORAL_SECTIONS } from "@/lib/temporal";
-import { temporalTitle } from "@/lib/temporal-titles";
-import { cn } from "@/lib/utils";
-import { DIFFERS_ROW } from "@/lib/differs";
-import { PageSections } from "@/components/PageSections";
+import { Badge } from "@/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
+import { ownTemporal, Polyfill, runTemporal, TEMPORAL_SECTIONS } from "@/docs/temporal";
+import { temporalTitle } from "@/docs/temporal-titles";
+import { cn } from "@/ui/utils";
+import { DIFFERS_ROW } from "@/docs/differs";
+import { PageSections } from "@/docs/PageSections";
 import type { Props } from "./temporal.server";
 
 type Rows = Record<string, string>;

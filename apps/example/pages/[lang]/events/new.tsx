@@ -4,12 +4,12 @@
 import { fbt } from "fbtee";
 import { Form, useForm } from "@void/react";
 import { useLocale, useTimeZone } from "void-fbtee/react";
-import { EventsCrumbs } from "@/components/EventsCrumbs";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
-import { Textarea } from "@/components/ui/textarea";
+import { EventsCrumbs } from "@/events/EventsCrumbs";
+import { Button } from "@/ui/button";
+import { Input } from "@/ui/input";
+import { Label } from "@/ui/label";
+import { NativeSelect, NativeSelectOption } from "@/ui/native-select";
+import { Textarea } from "@/ui/textarea";
 import type { Props } from "./new.server";
 
 /**

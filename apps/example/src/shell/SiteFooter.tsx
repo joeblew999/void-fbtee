@@ -4,8 +4,8 @@ import { routeUrl } from "void/routes";
 import type { ReactNode } from "react";
 import { fbt } from "fbtee";
 import { Link, useLocale } from "void-fbtee/react";
-import { useDocs } from "@/components/DocsLayout";
-import { RELEASES, REPO } from "@/lib/project";
+import { useDocs } from "@/docs/DocsLayout";
+import { RELEASES, REPO } from "@/shell/project";
 
 /** What the example is made with (names, not translated). */
 const TOOLS = [

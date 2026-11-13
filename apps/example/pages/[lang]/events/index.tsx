@@ -8,11 +8,11 @@ import { fbt } from "fbtee";
 import { ArrowRight, MapPin } from "lucide-react";
 import { Formatted, Link, useLocale, useNow, useTimeZone } from "void-fbtee/react";
 import { Temporal } from "temporal-polyfill";
-import { Flap } from "@/components/Flap";
-import { buttonVariants } from "@/components/ui/button";
-import { clockParts, otherDay } from "@/lib/event-clock";
-import { relativeDays } from "@/lib/relative-days";
-import { cn } from "@/lib/utils";
+import { Flap } from "@/events/Flap";
+import { buttonVariants } from "@/ui/button";
+import { clockParts, otherDay } from "@/events/event-clock";
+import { relativeDays } from "@/events/relative-days";
+import { cn } from "@/ui/utils";
 import type { Props } from "./index.server";
 
 type Row = Props["events"][number];

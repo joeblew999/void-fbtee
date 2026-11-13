@@ -1,11 +1,11 @@
 ---
 version: 1
 slug: "components-docslayout-tsx"
-primary_target: "src/components/DocsLayout.tsx"
+primary_target: "src/docs/DocsLayout.tsx"
 related_targets: ["pages/[lang]/docs/index.island.tsx"]
 ---
 
-Scope: the Docs (src/components/DocsLayout.tsx, the docs index, every page under /<locale>/docs/), visitor mode Read, inside the established world in DESIGN.md.
+Scope: the Docs (src/docs/DocsLayout.tsx, the docs index, every page under /<locale>/docs/), visitor mode Read, inside the established world in DESIGN.md.
 Audience: developers reading how to add and use void-fbtee. Task: find a page, read it, move to the next. Constraints: markdown pages are server-rendered with no JavaScript; every language, including right-to-left; titles and headings come from each language's markdown.
 
 ## Direction contract

@@ -351,7 +351,7 @@
       },
       {
         "name": "The Kept Whole Rule",
-        "body": "A file or tool name inside a translated sentence must not break or flip: pass it to the sentence as `<bdi dir=\"ltr\" class=\"whitespace-nowrap\">` (the `file()` helper in `src/components/HomeSections.tsx`). Terminal commands break only between words (each word `whitespace-nowrap`), so \"ar-EG\" never splits into what reads as another command.",
+        "body": "A file or tool name inside a translated sentence must not break or flip: pass it to the sentence as `<bdi dir=\"ltr\" class=\"whitespace-nowrap\">` (the `file()` helper in `src/home/HomeSections.tsx`). Terminal commands break only between words (each word `whitespace-nowrap`), so \"ar-EG\" never splits into what reads as another command.",
         "section": "typography"
       },
       {
@@ -379,7 +379,7 @@
       "Do list languages from the app's locales, each named in its own language.",
       "Do divide sections with 1px rules (`--border`, oklch(1 0 0 / 12%)).",
       "Do keep file and tool names in translated sentences whole and left-to-right with `<bdi dir=\"ltr\" class=\"whitespace-nowrap\">`.",
-      "Do take the repository's address from `src/lib/project.ts` (`REPO`, `RELEASES`), never a copy of the URL."
+      "Do take the repository's address from `src/shell/project.ts` (`REPO`, `RELEASES`), never a copy of the URL."
     ],
     "donts": [
       "Don't load web fonts.",

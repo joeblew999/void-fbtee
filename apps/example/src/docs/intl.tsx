@@ -4,7 +4,7 @@
 // locale data writes it differently. The same code runs both times.
 //
 // What it covers follows go-htmx4's /formats page (joeblew999/go-htmx4, views/formats.gsx at
-// 7f0afab, 2026-11-07), plus fbtee. Temporal has its own page (src/lib/temporal.ts). Times are in a
+// 7f0afab, 2026-11-07), plus fbtee. Temporal has its own page (src/docs/temporal.ts). Times are in a
 // named zone, so both format the same moment; "in your time zone" is the browser's alone.
 import { fbt, list } from "fbtee";
 

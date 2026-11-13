@@ -1,6 +1,6 @@
 <script>
-import EventTime from "../../../src/components/EventTime.tsx" with { island: "load" }
-import Fmt from "../../../src/components/Fmt.tsx" with { island: "load" }
+import EventTime from "../../../src/events/EventTime.tsx" with { island: "load" }
+import Fmt from "../../../src/docs/Fmt.tsx" with { island: "load" }
 
 // A client script (no island): the reader's own time zone, which only the browser knows. The
 // server leaves the space empty rather than showing a stand-in.
@@ -14,7 +14,7 @@ for (const el of document.querySelectorAll("[data-your-zone]")) {
 title: ทัวร์
 description: โพสต์กิจกรรม จองที่นั่ง และดูทุกเวลาตามนาฬิกาของกิจกรรมและของคุณ
 updated: "2026-11-12"
-translatedFrom: "85778e462eaf"
+translatedFrom: "7416cbdf134e"
 ---
 
 # กิจกรรมที่รู้ว่าตอนนี้ที่คุณอยู่เป็นเวลาเท่าไร
@@ -120,7 +120,7 @@ const guessed = new Date(start.epochMilliseconds); // [!code warning]
 
 ## จัดรูปแบบให้คุณ {#formatted}
 
-ทุกค่าด้านล่างเป็น island `<Fmt>` (`src/components/Fmt.tsx`) จึงจัดรูปแบบให้คุณ เป็นภาษาของหน้านี้:
+ทุกค่าด้านล่างเป็น island `<Fmt>` (`src/docs/Fmt.tsx`) จึงจัดรูปแบบให้คุณ เป็นภาษาของหน้านี้:
 
 - ตัวเลข: <Fmt num="1234567.891" />
 - เงิน: <Fmt money="1299" currency="THB" />

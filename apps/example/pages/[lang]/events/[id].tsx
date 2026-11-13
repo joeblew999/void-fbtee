@@ -10,13 +10,13 @@ import { Form, useForm } from "@void/react";
 import { connectLiveStream } from "void/live/client";
 import { Formatted, useLocale, useTimeZone } from "void-fbtee/react";
 import { MapPin } from "lucide-react";
-import { EventTime } from "@/components/EventTime";
-import { EventsCrumbs } from "@/components/EventsCrumbs";
-import { Flap } from "@/components/Flap";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { clockParts } from "@/lib/event-clock";
+import { EventTime } from "@/events/EventTime";
+import { EventsCrumbs } from "@/events/EventsCrumbs";
+import { Flap } from "@/events/Flap";
+import { Button, buttonVariants } from "@/ui/button";
+import { Input } from "@/ui/input";
+import { Label } from "@/ui/label";
+import { clockParts } from "@/events/event-clock";
 import type { Props } from "./[id].server";
 
 /** The event's live stream: the seats left (seats only go down, so the lower count wins). */

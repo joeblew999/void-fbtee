@@ -2,8 +2,8 @@
 // (<fbt> runs during each page's own render), and the site's header and footer.
 import { useEffect, type ReactNode } from "react";
 import { I18nProvider } from "void-fbtee/react";
-import SiteFooter from "@/components/SiteFooter";
-import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/shell/SiteFooter";
+import SiteHeader from "@/shell/SiteHeader";
 import "./style.css";
 
 /**

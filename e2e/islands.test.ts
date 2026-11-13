@@ -3,7 +3,7 @@
 import { globSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
-import { fmt } from "../apps/example/src/lib/fmt";
+import { fmt } from "../apps/example/src/docs/fmt";
 import { browser, hydrated, untilText } from "./helpers";
 import { EXAMPLE } from "./setup";
 

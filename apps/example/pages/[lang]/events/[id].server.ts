@@ -8,13 +8,13 @@ import type { Event as SchemaEvent, WithContext } from "schema-dts";
 import { Temporal } from "temporal-polyfill";
 import { jsonLd, pageHead } from "void-fbtee/head";
 import { localizedPaths, siteOrigin } from "void-fbtee/middleware";
-import { eventTopic, live } from "../../../src/live";
+import { eventTopic, live } from "../../../src/events/live";
 
 export type Props = InferProps<typeof loader>;
 
 // Void's page cache keeps each event's page until the next deploy (a year, the longest it
 // allows): only a booking changes it, and booking clears it at once, in every language (the
-// action). Open pages get the new seats-left count live as well (src/live.ts).
+// action). Open pages get the new seats-left count live as well (src/events/live.ts).
 export const revalidate = 31_536_000;
 
 // The page's URL parameter: /<lang>/events/<id>. Whether it's an event is the database's answer:

@@ -1,7 +1,7 @@
-// The text for a <Fmt> value (src/components/Fmt.tsx), in one language: plain Intl, no React, so the
+// The text for a <Fmt> value (src/docs/Fmt.tsx), in one language: plain Intl, no React, so the
 // tests format each value the same way the page does.
 import { Temporal } from "temporal-polyfill";
-import { relativeDays } from "./relative-days";
+import { relativeDays } from "@/events/relative-days";
 
 export type FmtProps = {
   num?: string;

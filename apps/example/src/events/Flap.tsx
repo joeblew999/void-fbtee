@@ -3,7 +3,7 @@
 // (seats going as people book, live), the chip turns over once. Works with any script's digits;
 // the turn is skipped when the reader asks for less motion (pages/style.css).
 import { useEffect, useRef, useState, type ComponentProps } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/ui/utils";
 
 export function Flap({
   value,

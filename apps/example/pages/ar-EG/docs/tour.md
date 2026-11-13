@@ -1,6 +1,6 @@
 <script>
-import EventTime from "../../../src/components/EventTime.tsx" with { island: "load" }
-import Fmt from "../../../src/components/Fmt.tsx" with { island: "load" }
+import EventTime from "../../../src/events/EventTime.tsx" with { island: "load" }
+import Fmt from "../../../src/docs/Fmt.tsx" with { island: "load" }
 
 // A client script (no island): the reader's own time zone, which only the browser knows. The
 // server leaves the space empty rather than showing a stand-in.
@@ -14,7 +14,7 @@ for (const el of document.querySelectorAll("[data-your-zone]")) {
 title: جولة
 description: انشر فعالية، احجز مقعدًا، وشاهد كل موعد بتوقيت مكان الفعالية وبتوقيتك.
 updated: "2026-11-12"
-translatedFrom: "85778e462eaf"
+translatedFrom: "7416cbdf134e"
 ---
 
 # فعاليات تعرف كم الساعة عندك
@@ -119,7 +119,7 @@ const guessed = new Date(start.epochMilliseconds); // [!code warning]
 
 ## منسّق لك {#formatted}
 
-كل قيمة أدناه جزيرة `<Fmt>` (`src/components/Fmt.tsx`)، فهي منسّقة لك بلغة هذه الصفحة:
+كل قيمة أدناه جزيرة `<Fmt>` (`src/docs/Fmt.tsx`)، فهي منسّقة لك بلغة هذه الصفحة:
 
 - رقم: <Fmt num="1234567.891" />
 - مبلغ: <Fmt money="1299" currency="THB" />

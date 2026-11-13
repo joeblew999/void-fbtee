@@ -220,7 +220,7 @@ A cool near-black ground with white ink and a single violet accent; every neutra
 
 **The Joined Letters Rule.** h1 and h2 get -0.025em letter-spacing, except in right-to-left pages, where it is `normal`: Arabic letters join, and tracking breaks them apart.
 
-**The Kept Whole Rule.** A file or tool name inside a translated sentence must not break or flip: pass it to the sentence as `<bdi dir="ltr" class="whitespace-nowrap">` (the `file()` helper in `src/components/HomeSections.tsx`). Terminal commands break only between words (each word `whitespace-nowrap`), so "ar-EG" never splits into what reads as another command.
+**The Kept Whole Rule.** A file or tool name inside a translated sentence must not break or flip: pass it to the sentence as `<bdi dir="ltr" class="whitespace-nowrap">` (the `file()` helper in `src/home/HomeSections.tsx`). Terminal commands break only between words (each word `whitespace-nowrap`), so "ar-EG" never splits into what reads as another command.
 
 ## Layout
 
@@ -327,7 +327,7 @@ Links to the site's pages in a grid bounded by rules above and below, with 1px r
 - **Do** list languages from the app's locales, each named in its own language.
 - **Do** divide sections with 1px rules (`--border`, oklch(1 0 0 / 12%)).
 - **Do** keep file and tool names in translated sentences whole and left-to-right with `<bdi dir="ltr" class="whitespace-nowrap">`.
-- **Do** take the repository's address from `src/lib/project.ts` (`REPO`, `RELEASES`), never a copy of the URL.
+- **Do** take the repository's address from `src/shell/project.ts` (`REPO`, `RELEASES`), never a copy of the URL.
 
 ### Don't:
 

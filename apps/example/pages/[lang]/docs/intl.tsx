@@ -1,7 +1,7 @@
 // The Intl page, a reference: every Intl call the example knows, in the page's language. The
 // Worker's column (the loader) is the text a void-fbtee app's pages show; the browser's, run after
 // hydration, shows where its engine's own locale data writes it differently, every such row
-// highlighted (src/lib/differs.ts), with invisible characters shown by name and, for the supported
+// highlighted (src/docs/differs.ts), with invisible characters shown by name and, for the supported
 // values, only what differs. Pages don't depend
 // on the two agreeing: text formatted while rendering is <Formatted>, the server's kept. "Your
 // time zone" and the time in it are the browser's alone: empty until it knows the zone. Temporal
@@ -9,21 +9,14 @@
 import { Fragment, useSyncExternalStore } from "react";
 import { fbt } from "fbtee";
 import { Formatted, useLocale, useTimeZone } from "void-fbtee/react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { INSTANT, runAll, SECTIONS, ZONE } from "@/lib/intl";
-import { sectionTitle } from "@/lib/intl-titles";
-import { cn } from "@/lib/utils";
-import { DIFFERS_ROW, listDifference, showInvisible } from "@/lib/differs";
-import { PageSections } from "@/components/PageSections";
+import { Badge } from "@/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
+import { INSTANT, runAll, SECTIONS, ZONE } from "@/docs/intl";
+import { sectionTitle } from "@/docs/intl-titles";
+import { cn } from "@/ui/utils";
+import { DIFFERS_ROW, listDifference, showInvisible } from "@/docs/differs";
+import { PageSections } from "@/docs/PageSections";
 import type { Props } from "./intl.server";
 
 // The browser's rows: none while hydrating (the server sent none), then computed once.

@@ -5,9 +5,9 @@
 import { fbt } from "fbtee";
 import { routeUrl } from "void/routes";
 import { Formatted, Link, useLocale, useLocales } from "void-fbtee/react";
-import { buttonVariants } from "@/components/ui/button";
-import { REPO } from "@/lib/project";
-import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/ui/button";
+import { REPO } from "@/shell/project";
+import { cn } from "@/ui/utils";
 
 // The pages, as Void routes: each link is built by routeUrl, so a route that doesn't exist fails
 // the type check.

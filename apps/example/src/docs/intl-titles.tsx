@@ -1,5 +1,5 @@
 // The Intl page's section titles, translated: its headings, and its "On this page"
-// (src/components/PageSections.tsx).
+// (src/docs/PageSections.tsx).
 import type { ReactNode } from "react";
 import { fbt } from "fbtee";
 import type { SectionId } from "./intl";

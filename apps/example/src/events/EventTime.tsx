@@ -5,8 +5,8 @@
 import { fbt } from "fbtee";
 import { Temporal } from "temporal-polyfill";
 import { Formatted, useLocale, useNow, useTimeZone } from "void-fbtee/react";
-import { relativeDays } from "@/lib/relative-days";
-import { cn } from "@/lib/utils";
+import { relativeDays } from "@/events/relative-days";
+import { cn } from "@/ui/utils";
 
 const WHEN: Intl.DateTimeFormatOptions = {
   weekday: "long",

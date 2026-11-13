@@ -180,7 +180,7 @@
   font-size: 1.125rem;
 }
 
-/* The events board's split-flap chip (src/components/Flap.tsx): a value on a raised tile with a
+/* The events board's split-flap chip (src/events/Flap.tsx): a value on a raised tile with a
    seam across its middle, numerals at a fixed width. It shows still; when its value changes
    later it turns over once (data-turn swaps between two names for the same turn, so it plays each
    time), like a departure board's flap; skipped when the reader asks for less motion. */

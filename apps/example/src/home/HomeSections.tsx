@@ -15,9 +15,9 @@ import {
   Languages,
 } from "lucide-react";
 import { Link, useLocale } from "void-fbtee/react";
-import { buttonVariants } from "@/components/ui/button";
-import { REPO, SETUP, SKILL, type Offsite } from "@/lib/project";
-import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/ui/button";
+import { REPO, SETUP, SKILL, type Offsite } from "@/shell/project";
+import { cn } from "@/ui/utils";
 
 /** The install, as the README gives it, after the dependency is added to package.json. */
 const COMMANDS = [

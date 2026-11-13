@@ -1,7 +1,7 @@
 import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
-import { ownTemporal, Polyfill, runTemporal } from "@/lib/temporal";
+import { ownTemporal, Polyfill, runTemporal } from "@/docs/temporal";
 import { langParams } from "void-fbtee/middleware";
 
 // Cached until the next deploy, in every language (Void's prerendering: a one-year cache time,

@@ -1,6 +1,6 @@
 <script>
-import EventTime from "../../../src/components/EventTime.tsx" with { island: "load" }
-import Fmt from "../../../src/components/Fmt.tsx" with { island: "load" }
+import EventTime from "../../../src/events/EventTime.tsx" with { island: "load" }
+import Fmt from "../../../src/docs/Fmt.tsx" with { island: "load" }
 
 // A client script (no island): the reader's own time zone, which only the browser knows. The
 // server leaves the space empty rather than showing a stand-in.
@@ -126,7 +126,7 @@ Copy a code block with its button, or select it and press <kbd>Ctrl</kbd> + <kbd
 
 ## Formatted for you {#formatted}
 
-Each value below is a `<Fmt>` island (`src/components/Fmt.tsx`), so it's formatted for you, in
+Each value below is a `<Fmt>` island (`src/docs/Fmt.tsx`), so it's formatted for you, in
 this page's language:
 
 - A number: <Fmt num="1234567.891" />

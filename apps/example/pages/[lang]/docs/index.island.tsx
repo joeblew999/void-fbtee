@@ -4,7 +4,7 @@
 import { fbt } from "fbtee";
 import { ArrowRight } from "lucide-react";
 import { Link } from "void-fbtee/react";
-import { useDocs } from "@/components/DocsLayout";
+import { useDocs } from "@/docs/DocsLayout";
 
 export default function DocsIndex() {
   const { groups } = useDocs();
