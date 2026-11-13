@@ -56,6 +56,7 @@ export default defineConfig({
   ],
   // `vp test` (or `vp run example#test` from anywhere): the example's own unit tests, beside its
   // code in src/. They run in Node.js with no Worker (Void's docs/guide/testing.md); the browser
-  // tests are e2e/ at the repo's root.
-  test: { include: ["src/**/*.test.ts"] },
+  // tests are e2e/ at the repo's root. Vitest leaves CSS out unless told: the emails read
+  // pages/style.css as text for their look (src/events/email-theme.ts), so that file is let in.
+  test: { include: ["src/**/*.test.ts"], css: { include: [/pages\/style\.css/] } },
 });

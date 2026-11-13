@@ -76,7 +76,7 @@ test.skipIf(!!skip)(
     const mail = await emailTo(to, /^ที่นั่งของคุณใน /);
     expect(mail.subject).toBe(`ที่นั่งของคุณใน ${title}`);
     expect(mail.text).toContain("สวัสดี Somchai");
-    expect(mail.html).toMatch(/^<div lang="th-TH" dir="ltr">/);
+    expect(mail.html).toMatch(/<html dir="ltr" lang="th-TH">/);
     expect(mail.text).toContain(`${site}/th-TH${event.path}`);
   },
 );
@@ -109,7 +109,7 @@ test.skipIf(!!skip)(
     const en = await emailTo(poster, / is cancelled$/);
     expect(en.text).toContain(`${site}/en-US/events`);
     const ar = await emailTo(laila, /^تم إلغاء /);
-    expect(ar.html).toMatch(/^<div lang="ar-EG" dir="rtl">/);
+    expect(ar.html).toMatch(/<html dir="rtl" lang="ar-EG">/);
     expect(ar.text).toContain(`${site}/ar-EG/events`);
   },
 );

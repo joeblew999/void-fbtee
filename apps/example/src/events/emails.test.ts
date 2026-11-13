@@ -37,10 +37,34 @@ test("the booking, in the booker's language, the time on the clock where it happ
 
 test("the HTML in the email's own direction, the title in its own", async () => {
   const ar = await bookingEmail({ ...booking, locale: "ar-EG" });
-  expect(ar.html).toMatch(/^<div lang="ar-EG" dir="rtl">/);
+  expect(ar.html).toMatch(/<html dir="rtl" lang="ar-EG">/);
+  // And on the content too: Gmail drops <html>, <head> and <body>, keeping only what's inside.
+  const content = ar.html.slice(ar.html.indexOf("<body"));
+  expect(content).toMatch(
+    /<table[^>]* lang="ar-EG" dir="rtl"|<table[^>]* dir="rtl"[^>]* lang="ar-EG"/,
+  );
   const th = await bookingEmail({ ...booking, locale: "th-TH" });
-  expect(th.html).toMatch(/^<div lang="th-TH" dir="ltr">/);
+  expect(th.html).toMatch(/<html dir="ltr" lang="th-TH">/);
   expect(th.html).toContain('<bdi lang="ar-EG" dir="rtl">أمسية خط عربي</bdi>');
+});
+
+test("in the site's look: its colours inlined, the link a button, nothing mail apps can't read", async () => {
+  const email = await bookingEmail({ ...booking, locale: "en-US" });
+  // The button: the line that introduced the link is its label, and it goes to the event's page.
+  expect(email.html).toMatch(new RegExp(`<a href="${booking.url}"[^>]*background-color:rgb\\(`));
+  expect(email.html).toContain("The event&#x27;s page</span>");
+  // The site's card (--card in .dark, pages/style.css), as rgb: React Email turned its oklch.
+  expect(email.html).toMatch(/background-color:rgb\(26,27,33\)/);
+  for (const unread of ["oklch(", "var(", "class="]) expect(email.html).not.toContain(unread);
+  // The site's logo, sent inside the email and shown from there.
+  expect(email.html).toMatch(/<img[^>]*src="cid:logo"/);
+  expect(email.attachments).toEqual([
+    expect.objectContaining({ contentId: "logo", disposition: "inline", contentType: "image/png" }),
+  ]);
+  expect(email.attachments[0]!.content.subarray(1, 4)).toEqual(new TextEncoder().encode("PNG"));
+  // The plain text is as before: the lines, then the link.
+  expect(email.text).toContain("The event's page:");
+  expect(email.text.trimEnd().endsWith(booking.url)).toBe(true);
 });
 
 test("the private link, in the poster's language, with the link as given", async () => {
@@ -48,8 +72,10 @@ test("the private link, in the poster's language, with the link as given", async
   const ar = await linkEmail({ ...event, locale: "ar-EG", link });
   expect(ar.subject).toContain("أمسية خط عربي");
   expect(ar.subject).not.toContain("Your private link");
-  expect(ar.html).toMatch(/^<div lang="ar-EG" dir="rtl">/);
+  expect(ar.html).toMatch(/<html dir="rtl" lang="ar-EG">/);
   expect(ar.text.trimEnd().endsWith(link)).toBe(true);
+  // No line introduces it, so the HTML shows the link whole, the thing to keep.
+  expect(ar.html).toContain(`>${link}</a>`);
   const en = await linkEmail({ ...event, locale: "en-US", link });
   expect(en.subject).toBe("Your private link for أمسية خط عربي");
   expect(en.text).toContain("the only way to delete your event later");
@@ -85,7 +111,7 @@ test("a reminder, in the booker's language, linking to the event on the site the
   } as const;
   const ar = await reminderEmail({ ...reminder, locale: "ar-EG" });
   expect(ar.subject).toBe("تذكير: أمسية خط عربي");
-  expect(ar.html).toMatch(/^<div lang="ar-EG" dir="rtl">/);
+  expect(ar.html).toMatch(/<html dir="rtl" lang="ar-EG">/);
   expect(ar.text.trimEnd().endsWith(`http://localhost:5173/ar-EG/events/${reminder.id}`)).toBe(
     true,
   );

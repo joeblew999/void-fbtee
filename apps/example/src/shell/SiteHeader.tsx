@@ -37,7 +37,12 @@ export default function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b bg-background">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 px-4">
-        <Link href={routeUrl("/[lang]")} className="flex h-14 items-center pe-2 font-semibold">
+        <Link
+          href={routeUrl("/[lang]")}
+          className="flex h-14 items-center gap-2 pe-2 font-semibold"
+        >
+          {/* The site's icon (public/favicon.svg); the name beside it says what it is, so no alt. */}
+          <img src="/favicon.svg" alt="" width={24} height={24} className="size-6" />
           void-fbtee
         </Link>
         <nav className="order-last -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto px-4 pb-2 md:order-none md:mx-0 md:w-auto md:overflow-visible md:p-0">

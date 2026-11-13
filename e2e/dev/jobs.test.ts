@@ -61,7 +61,7 @@ test.skipIf(!!skip)(
     const th = await emailTo(somchai, /^แจ้งเตือน: /);
     expect(th.text).toContain(`${site}/th-TH${event.path}`);
     const ar = await emailTo(laila, /^تذكير: /);
-    expect(ar.html).toMatch(/^<div lang="ar-EG" dir="rtl">/);
+    expect(ar.html).toMatch(/<html dir="rtl" lang="ar-EG">/);
     expect(ar.text).toContain(`${site}/ar-EG${event.path}`);
 
     // The next day's run: the event has started by then, so no second reminder.

@@ -16,8 +16,14 @@ import { EMAIL_FROM } from "@/site";
 import { langAttrs, type AppLocale } from "void-fbtee/locales";
 import { routeUrl } from "void-fbtee/routes";
 import { inLocale } from "void-fbtee/server";
+import { emailHtml, logoAttachment } from "./EmailLayout";
 
-export type Email = { subject: string; text: string; html: string };
+export type Email = {
+  subject: string;
+  text: string;
+  html: string;
+  attachments: (typeof logoAttachment)[];
+};
 
 /** An event as one reader sees it: its title in their language (or as written), and its start. */
 export type EventFor = {
@@ -25,9 +31,6 @@ export type EventFor = {
   titleLocale: string;
   startsAt: string;
 };
-
-/** HTML text: its five special characters escaped. */
-const html = (text: string) => text.replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);
 
 /** The event's start, on the clock where it happens, written the reader's way. */
 const startsAt = (event: EventFor, locale: string) =>
@@ -41,31 +44,36 @@ const startsAt = (event: EventFor, locale: string) =>
   });
 
 /**
- * The email from its lines and closing link: plain text, and HTML in the email's own language and
- * direction, with the event's title marked in its own (a title left as its organiser wrote it can be
- * in another language than the email), as on the site.
+ * The email from its lines and closing link: the plain text as the lines and the link, and the HTML
+ * in the site's look (EmailLayout.tsx), in the email's own language and direction, with the event's
+ * title marked in its own (a title left as its organiser wrote it can be in another language than
+ * the email), as on the site. A last line that introduces the link ("The event's page:") becomes
+ * the button's label in the HTML; without one (the private link), the link is shown whole.
  */
-function written(
+async function written(
   subject: string,
   lines: string[],
   link: string,
   event: EventFor,
   locale: string,
   dir: string,
-): Email {
-  const own = langAttrs(event.titleLocale);
-  const titled = (line: string) =>
-    html(line).replace(
-      html(event.title),
-      `<bdi lang="${own.lang}" dir="${own.dir}">${html(event.title)}</bdi>`,
-    );
+): Promise<Email> {
+  const last = lines.at(-1) ?? "";
+  const intro = /[:：]\s*$/.test(last);
+  const html = await emailHtml({
+    locale,
+    dir,
+    subject,
+    lines: intro ? lines.slice(0, -1) : lines,
+    link,
+    label: intro ? last.replace(/\s*[:：]\s*$/, "") : undefined,
+    title: { text: event.title, ...langAttrs(event.titleLocale) },
+  });
   return {
     subject,
     text: [...lines, link].join("\n\n") + "\n",
-    html:
-      `<div lang="${locale}" dir="${dir}">` +
-      lines.map((l) => `<p>${titled(l)}</p>`).join("") +
-      `<p><a href="${html(link)}">${html(link)}</a></p></div>`,
+    html,
+    attachments: [logoAttachment],
   };
 }
 
