@@ -219,8 +219,8 @@ Each step is shipped and proven before the next, each with its docs example in t
      zone on the account, whose apex mail is left alone). `void email setup --platform cloudflare`
      turned on Email Routing and Email Sending for the subdomain and plus addressing for the zone,
      and recorded the binding in `void.lock.json`. The account sends to any address (recipient mode
-     "arbitrary", 1,000 a day). The deploy tasks pass `--require-email`, so a deploy without it
-     fails rather than going out without email.
+     "arbitrary", 1,000 a day). The deploys don't pass `--require-email`: Workers Builds' token can't
+     read the email settings, so that check refused the first deploy though sending was set up.
 
 9. **Sign-in,** when the example needs accounts.
 10. **API routes with a language,** with the MCP route when that's planned.
