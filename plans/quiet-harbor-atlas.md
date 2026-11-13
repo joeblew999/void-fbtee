@@ -99,7 +99,17 @@ Each step is shipped and proven before the next, each with its docs example in t
        "Too small: expected string to have >=1 characters"), a not-found page in Thai (5), the
        sitemap (6), a server route in the language asked for (10: today it answers `en-US`). A gap
        that starts working stops the run, so its step turns it into a check.
-2. **`inLocale`:** translation with no request. Everything after it needs it.
+2. [x] **`inLocale`:** translation with no request, done 2026-11-13. `inLocale(locale, fn)`
+       from `void-fbtee/server` (`packages/void-fbtee/src/server.ts`): the page's catalogs and
+       fallbacks, through `await`, nested; a language the app hasn't is an error. Tested in the
+       package (`test/server.test.ts`, built as a Worker is) and in the fresh app, where Void's
+       scheduled job example runs through Void's dev trigger (`POST /__void/scheduled`); a job that
+       throws gets a 500, so the check fails when the text is wrong. Found on the way: strings were
+       collected only from pages/, routes/, src/, components/, lib/, so a string used only in a job
+       or an email was never translated; now every folder of code in Void's project structure
+       (`reference/structure.md`) too. The other helpers for server code (`localizedPaths`,
+       `langParams`, `inEveryLocale`, `siteOrigin`, `appLocales`) are still in
+       `void-fbtee/middleware`: they move to `void-fbtee/server` in step 3, with `revalidate`.
 3. **Addresses and clearing the cache in the current language,** with the example's 28 places
    changed to use them.
 4. **Translated form errors.**
