@@ -1,6 +1,6 @@
 # plans/patient-amber-compass.md: conformance, tested the way each layer tests it
 
-Status: approved 2026-11-12, in progress. Written 2026-11-12.
+Status: done 2026-11-12 (all ten items). Written and approved 2026-11-12.
 
 ## Context
 

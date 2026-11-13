@@ -1,5 +1,9 @@
 # plans/clear-lantern-meadow.md
 
+Status: done 2026-11-12, released as v0.4.0. Since changed: the sitemap is the package's
+`sitemap()` from `void-fbtee/server` (`plans/quiet-harbor-atlas.md` step 6), and `fast-xml-builder`
+is gone; items 4 and 5 below describe the first version.
+
 Every page's metadata for link previews, search and home screens, complete and in each page's
 language, made by existing libraries wherever one does the job, and delivered by void-fbtee as a
 Void add-on, Vite plugin and Vite+ package. Rewritten 2026-11-12 after an independent review (17

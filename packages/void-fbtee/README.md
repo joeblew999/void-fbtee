@@ -33,7 +33,7 @@ It isn't on npm yet: an app installs a
 
 ```json
 "dependencies": {
-  "void-fbtee": "github:joeblew999/void-fbtee#v0.4.0&path:/packages/void-fbtee"
+  "void-fbtee": "github:joeblew999/void-fbtee#v0.5.0&path:/packages/void-fbtee"
 }
 ```
 
