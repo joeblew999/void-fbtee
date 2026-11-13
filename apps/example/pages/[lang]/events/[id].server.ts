@@ -6,7 +6,9 @@ import { z } from "zod";
 import type { Event as SchemaEvent, WithContext } from "schema-dts";
 import { Temporal } from "temporal-polyfill";
 import { jsonLd, pageHead } from "void-fbtee/head";
+import { routeUrl } from "void-fbtee/routes";
 import { pickText, revalidate as clearCache, siteOrigin, textLocales } from "void-fbtee/server";
+import { sendBookingEmail } from "../../../src/events/booking-email";
 import { eventTopic, live } from "../../../src/events/live";
 
 export type Props = InferProps<typeof loader>;
@@ -58,11 +60,26 @@ export const action = defineHandler.withValidator({ params, body: bookSchema })(
     const [found] = await db.select({ id: events.id }).from(events).where(eq(events.id, id));
     return found ? c.json({ message: "sold out" }, 409) : c.notFound();
   }
-  const [event] = await db.select({ seats: events.seats }).from(events).where(eq(events.id, id));
+  const [event] = await db.select().from(events).where(eq(events.id, id));
   const left = event.seats - (await booked(id));
   // This event's page, in every language (the list shows each event's seats, not what's left).
   await clearCache({ paths: [`/[lang]/events/${id}`] });
   await live.publish(eventTopic(id), { left }, { type: "seats" });
+  // The confirmation, in the booker's language (the one they booked in, kept with the booking),
+  // with the event's title as they read it.
+  const texts = await db
+    .select()
+    .from(event_texts)
+    .where(and(eq(event_texts.event_id, id), inArray(event_texts.locale, textLocales(locale))));
+  const text = pickText(texts, locale);
+  await sendBookingEmail(body.email, {
+    locale,
+    name: body.name,
+    title: text?.title ?? event.title,
+    titleLocale: text?.locale ?? event.locale,
+    startsAt: event.starts_at,
+    url: siteOrigin(c) + routeUrl("/[lang]/events/[id]", { params: { id } }),
+  });
   // No return: Void reruns the loader, so the page shows the new count.
 });
 

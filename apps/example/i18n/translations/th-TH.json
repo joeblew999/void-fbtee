@@ -2016,6 +2016,54 @@
         }
       ],
       "types": []
+    },
+    "/ptyln/thM7mcTTa7De/DQ==": {
+      "description": "Booking email subject: a seat is booked at this event",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ที่นั่งของคุณใน {event}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uqAg3PARSaWYjmk791nVVg==": {
+      "description": "Booking email: greeting, with the name the booker gave",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สวัสดี {name}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kaGrE79ybuG3k2gtLFVorA==": {
+      "description": "Booking email: the event, and when it starts on the clock where it happens",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "คุณมีที่นั่งใน {event} เริ่ม {time}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0n9xvB/2BBBZQNC97OSkWA==": {
+      "description": "Booking email: before the link to the event's page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หน้าของกิจกรรม:",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

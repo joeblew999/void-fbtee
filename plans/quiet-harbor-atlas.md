@@ -164,9 +164,33 @@ Each step is shipped and proven before the next, each with its docs example in t
      dev server needs Void's own Cloudflare login or a `CLOUDFLARE_API_TOKEN`
      (`guide/ai.md`, "Local Development"), and so would the tests run here and in CI, which have
      no Cloudflare credentials. Decided 2026-11-13: plan it on its own.
-8. **Email** in the recipient's language.
-9. **Sign-in,** when the example needs accounts.
-10. **API routes with a language,** with the MCP route when that's planned.
+8. [x] **Email in the recipient's language,** done 2026-11-13 (in dev; live sending not set up).
+       The example sends a booking's confirmation (`src/events/booking-email.ts`) in the booker's
+       language, kept with the booking (`bookings.locale`), through `inLocale`, so the same code can run
+       in a queue: the subject, greeting, the event's title as they read it (`pickText`), its start on
+       the place's clock, and its page in their language; HTML in the email's own `lang`/`dir`, the
+       title in its own (`<bdi>`). Void's `sendEmail` never throws, so a booking can't fail because of
+       it. The request's `locale` is now typed as one of the app's (`SharedI18n.locale: AppLocale`),
+       what `inLocale` takes. Checked: Void's test harness (`void/email/testing`) in the example's unit
+       tests; a booking in Thai on dev lands in Void's dev inbox in Thai; the events browser tests,
+       where a production build answers `BINDING_MISSING` and the booking goes through; importing
+       `void/email` leaves the Worker's settings as they were (the built `wrangler.json`, all 12).
+   - Not done: sending from the live site. Needs a sender on a domain of the account
+     (`ubuntusoftware.net` is there, with Cloudflare's email sending already set up on `mail.`,
+     `id.` and `id-staging.`; Workers Paid, which sending to anyone needs) and Void's email setup,
+     which goes through Void's own Cloudflare login (`void email setup`), not `cf`. The sender is a
+     placeholder in `src/site.ts` (`EMAIL_FROM`), not `email.from`, so Void's deploy doesn't set
+     up email meanwhile.
+
+7b. **Machine translation with Void's AI, in a queue, the same locally and on Cloudflare** (asked
+for 2026-11-13). Posting an event sends a queue message; the consumer translates the title and
+description into each of the app's languages with Void's AI (`void/ai`) and stores them
+(`event_texts`), then clears those pages (`revalidate`), with `inLocale` for anything written
+in a language. To work out first, from Void's docs: how Void runs a queue locally
+(`guide/queues.md`, "Local development") and on Cloudflare (what a deploy creates); how
+`void/ai` can run locally without Void's Cloudflare login, or what the tests here and in CI
+use instead (`guide/ai.md` says it has no local simulator); and which model translates
+Arabic and Thai well enough. 9. **Sign-in,** when the example needs accounts. 10. **API routes with a language,** with the MCP route when that's planned.
 
 The tests deleting what they post (`plans/tidy-ember-ledger.md`) is separate and can go first.
 

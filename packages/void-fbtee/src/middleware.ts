@@ -23,7 +23,7 @@ import catalogs from "virtual:void-fbtee/catalogs";
 import { matchedRoutes } from "virtual:void-fbtee/hono-route";
 import markdownPages from "virtual:void-fbtee/md-pages";
 import { meta, type MetaTag } from "./head";
-import { localeFromPath, META_NAME, type Dir, type Lang } from "./locales";
+import { localeFromPath, META_NAME, type AppLocale, type Dir, type Lang } from "./locales";
 import { allTranslations } from "./runtime";
 import { setup as setupZod } from "virtual:void-fbtee/zod";
 import { currentLocale, siteOrigin, withLang } from "./server";
@@ -33,7 +33,8 @@ import { currentLocale, siteOrigin, withLang } from "./server";
 setupZod(currentLocale);
 
 export interface SharedI18n {
-  locale: string;
+  /** The page's language, one of the app's ("th-TH"): what inLocale() takes. */
+  locale: AppLocale;
   /** The language's URL segment, typed as one of the app's (VoidFbteeRegister, in void-fbtee/locales): the
    * `lang` of `routeUrl("/[lang]/events", { params: { lang } })`, and of `/${lang}/docs/tour`. */
   lang: Lang;
@@ -83,7 +84,7 @@ const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (
   const current = found ?? source;
   const rest = found ? path.slice(found.segment.length + 1) : path;
   const i18n: SharedI18n = {
-    locale: current.locale,
+    locale: current.locale as AppLocale,
     lang: current.segment,
     dir: current.dir,
     now: Temporal.Now.instant().toString(),
