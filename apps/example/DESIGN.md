@@ -146,6 +146,25 @@ components:
     textColor: "{colors.brand}"
     rounded: "{rounded.md}"
     padding: "{spacing.gutter}"
+  flap:
+    backgroundColor: "{colors.raised}"
+    textColor: "{colors.ink}"
+    typography: "{typography.label}"
+    rounded: "{rounded.md}"
+    padding: "0.35rem 0.5rem"
+    height: "1.75rem"
+  flap-large:
+    backgroundColor: "{colors.raised}"
+    textColor: "{colors.ink}"
+    typography: "{typography.title}"
+    rounded: "{rounded.md}"
+    padding: "0.5rem 0.75rem"
+    height: "2.75rem"
+  date-tile:
+    backgroundColor: "{colors.raised}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.lg}"
+    padding: "12px 8px"
 ---
 
 # Design System: void-fbtee example
@@ -166,7 +185,7 @@ The site ships in several languages, including Arabic, so right-to-left is a fir
 - One violet accent (`--brand`), used sparingly.
 - System fonts only: system-ui sans and the platform mono, no web fonts.
 - 1px rules divide sections into ruled grids; surfaces are flat.
-- Code windows with file tabs, and a terminal window beside them, are the signature elements.
+- Code windows with file tabs, and a terminal window beside them, are the home page's signature elements; the events pages are a departure board, with split-flap chips for times and seats.
 - Right-to-left first-class: logical properties, mirrored arrows, code stays left-to-right.
 
 ## Colors
@@ -187,7 +206,7 @@ A cool near-black ground with white ink and a single violet accent; every neutra
 - **Muted Ink** (oklch(0.74 0.012 275)): `--muted-foreground`. Intro copy, card text, the footer, strings and expressions in code, the non-current language links.
 - **Rule** (oklch(1 0 0 / 12%)): `--border`. Every 1px rule: header and section borders, grid dividers, the file tabs' edges, the docs sidebar menu and "On this page" rail. In the feature grid it is also the grid's own background, showing through 1px gaps.
 - **Field Stroke** (oklch(1 0 0 / 16%)): `--input`. Input and outline-button strokes; at 30% as their fill.
-- **Destructive** (oklch(0.704 0.191 22.216)): errors, invalid fields, the sold-out badge.
+- **Destructive** (oklch(0.704 0.191 22.216)): errors, invalid fields, the sold-out flap (an 18% red tint with red text and a 35% red edge).
 
 ### Named Rules
 
@@ -206,7 +225,7 @@ A cool near-black ground with white ink and a single violet accent; every neutra
 ### Hierarchy
 
 - **Display** (500, 3rem rising to 3.75rem from 768px, line-height 1.05, balanced): the home page's one heading.
-- **Headline** (500, 1.875rem): inner page titles (Events, an event, Formats); the docs index title at 2.25rem. Home section headings are 500 at 1.875rem rising to 2.25rem from 768px, balanced; the closing call is 2.25rem rising to 3rem.
+- **Headline** (500, 1.875rem): inner page titles (Events, Formats); an event's title rises to 2.25rem from 768px; the docs index title at 2.25rem. Home section headings are 500 at 1.875rem rising to 2.25rem from 768px, balanced; the closing call is 2.25rem rising to 3rem.
 - **Title** (500, 1.25rem): headings in the ruled page grid; the code window's rendered line is 500 at 1.5rem; Formats section headings are 500 at 1.5rem over a 1px rule.
 - **Subtitle** (500, 1.125rem): feature headings (h3) and the docs index's group headings.
 - **Lead** (400, 1.125rem, max 36rem, muted ink, pretty-wrapped): the home intro.
@@ -265,7 +284,7 @@ Rectangular, quiet controls from shadcn/ui (base-nova style, RTL on), with the s
 
 ### Chips (Badges)
 
-- **Style:** 20px pill, 0.75rem 500 weight; secondary on raised fill, destructive on a 20% red tint.
+- **Style:** 20px pill, 0.75rem 500 weight; secondary on raised fill, destructive on a 20% red tint. Used on the docs pages; the events pages use the split-flap chip instead.
 
 ### Cards / Containers
 
@@ -315,6 +334,36 @@ Six features in a ruled grid (`gap-px` over `bg-border`, rules above and below).
 
 Links to the site's pages in a grid bounded by rules above and below, with 1px rules between cells. Each cell: a title at 1.25rem 500 with a violet arrow at the end, muted text below, 24px padding. Hover fills the cell with well at 50% and nudges the arrow 4px toward the end (200ms); focus draws a 2px violet outline inset by 2px.
 
+### Split-Flap Chip (signature)
+
+The events pages' one ornament, like a tile on a station's departure board (`src/events/Flap.tsx`, `.flap` in `pages/style.css`). A value on a raised tile with a 4.8px radius and a 1px rule drawn inside it: the top half a shade lighter than the bottom, with a 1px dark seam between them. The split is all background, so the seam never crosses the text. Two sizes: 1.75rem tall at 0.875rem (`flap-md`) and 2.75rem tall at 1.25rem (`flap-lg`). It shows a start time on the place's clock and the seats left (a full translated phrase, "3 seats left", never a bare number); with no seats left it turns red (`tone="out"`) and reads "Sold out".
+
+It is still when the page loads. When its value changes later (seats going as people book, while the page is open), it turns over once: 420ms, rotating down from the top edge and settling from a brighter flash. `data-turn` swaps between two names for the same animation, so it plays on every change. It never turns for people who ask for less motion.
+
+**The One Ornament Rule.** The flap is the events pages' only decoration, and it marks only values that a board would show: a time and a count. Titles, venues and text stay plain.
+
+### Events Board (signature)
+
+The events list is a departure board (`pages/[lang]/events/index.tsx`): a list between rules above and below, rows divided by 1px rules, no cards. From 768px it is five columns (`COLUMNS`: 7.5rem, 10rem, 10rem, the rest, 8.5rem) under a header row of 0.75rem 500 muted uppercase labels: Date, Starts local, Your time, Event, Seats (aligned to the end).
+
+- **Date:** the day at 1.5rem 500 tabular numerals, the month and weekday after it in 0.75rem muted uppercase, all on the place's clock.
+- **Starts, local:** the time in a flap, with the place's zone under it in 0.75rem muted ink.
+- **Your time:** the time on the reader's clock (with the weekday when it falls on another day) and how many days away. Empty, its space kept, until the browser knows the reader's zone, so nothing moves.
+- **Event:** the title at 1.125rem 500, in its stored translation where there is one, with the venue under it after a Lucide `MapPin`, cut short with an ellipsis.
+- **Seats:** the seats flap and a violet mirrored arrow that nudges toward the end on hover.
+
+Each row is one link: hover fills it with well at 50% (150ms), and focus draws a 2px violet outline inset by 2px. On a phone the row folds to three lines: the date and the place's time with the seats at the end, then the title and venue, then the reader's time. With no events, the board is replaced by a short message and an outline "Post an event" button between rules.
+
+### Event Page
+
+One event (`pages/[lang]/events/[id].tsx`), in three parts: the event, booking, and the stored record. From 1024px booking is a 22rem column of its own at the end (56px gap), sticky 96px from the top; on a phone the three stack in that order.
+
+- **The event:** breadcrumbs, the title, and the venue after a violet `MapPin`. Then, between two rules, the date tile beside the start time: the tile is 5rem wide on the raised fill with a 1px rule and a 6px radius, the month and weekday in 0.75rem muted uppercase above and below the day at 1.875rem tabular numerals. The time shows the place's clock first (1rem, 1.125rem from 768px, 500), then the reader's clock and how far away. Then the description at 1.125rem with relaxed leading, and a note that it was machine-translated (a `<details>` that opens the original) or written in another language.
+- **Booking:** a card (panel, 1px ring of white ink at 10%, 8.4px radius, 20px padding) headed "Book a seat" with the large seats flap at the end, then the form and a full-width primary button. On a phone, while the form is off screen and seats are left, a bar fixed to the bottom (ground at 95% with a blur, top rule) holds a "Book a seat" button that scrolls to the form and puts the cursor in it; it hides once the form is on screen, so there are never two.
+- **The stored record:** what the database holds for the event, under the event from 1024px, shown once.
+
+Posting an event (`pages/[lang]/events/new.tsx`) is the form on the page itself, with no card around it.
+
 ## Do's and Don'ts
 
 ### Do:
@@ -327,6 +376,7 @@ Links to the site's pages in a grid bounded by rules above and below, with 1px r
 - **Do** list languages from the app's locales, each named in its own language.
 - **Do** divide sections with 1px rules (`--border`, oklch(1 0 0 / 12%)).
 - **Do** keep file and tool names in translated sentences whole and left-to-right with `<bdi dir="ltr" class="whitespace-nowrap">`.
+- **Do** use the split-flap chip only for a time or a count on the events pages, and give a count as a full translated phrase.
 - **Do** take the repository's address from `src/shell/project.ts` (`REPO`, `RELEASES`), never a copy of the URL.
 
 ### Don't:
@@ -338,3 +388,4 @@ Links to the site's pages in a grid bounded by rules above and below, with 1px r
 - **Don't** use left/right for spacing, borders or floats.
 - **Don't** style anything from the `:root` light palette; it is never shown.
 - **Don't** put a theme class on a wrapper element; the theme lives on `<html>`.
+- **Don't** animate the flap on page load, or at all for readers who ask for less motion.
