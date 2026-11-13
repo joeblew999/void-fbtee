@@ -39,8 +39,7 @@ jobs:
       - run: vp run install:browser
       - run: vp check
       - run: vp run check:tools
-      - run: vp test run --project void-fbtee
-      - run: vp run example#test
+      - run: vp run test:unit
       - run: vp run test:deployed
 
   # A release when packages/void-fbtee/package.json has a version with no tag yet: the tag and the

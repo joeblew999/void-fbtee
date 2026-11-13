@@ -2,7 +2,7 @@
 // on real Oxlint parsing: both forms of showCount="no", and the values it leaves alone.
 import { describe, it } from "vite-plus/test";
 import { RuleTester } from "vite-plus/lint/plugins-dev";
-import plugin from "../src/lint";
+import plugin from "../../src/lint";
 
 RuleTester.describe = describe;
 RuleTester.it = it;

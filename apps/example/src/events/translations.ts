@@ -1,5 +1,4 @@
-// Translations of what people post, one way in whoever translates: Workers AI in the queue on
-// Cloudflare (queues/translate.ts), or Claude while working locally (routes/api/translations.dev.ts).
+// Translations of what people post, made by Workers AI in the translate queue (queues/translate.ts).
 // Each is stored beside the original (event_texts), then the event's pages leave Void's page cache
 // in every language, and its open pages are told to load their data again (live).
 import { event_texts, events } from "@schema";
@@ -10,14 +9,12 @@ import { eventTopic, live } from "./live";
 export type Text = { title: string; description: string };
 
 /** An event's original, and the app's languages it has no translation in yet. */
-export async function untranslated(eventId?: string) {
-  const list = await db
-    .select()
-    .from(events)
-    .where(eventId ? eq(events.id, eventId) : undefined);
+export async function untranslated(eventId: string) {
+  const list = await db.select().from(events).where(eq(events.id, eventId));
   const texts = await db
     .select({ event_id: event_texts.event_id, locale: event_texts.locale })
-    .from(event_texts);
+    .from(event_texts)
+    .where(eq(event_texts.event_id, eventId));
   return list
     .map((e) => ({
       id: e.id,

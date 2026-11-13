@@ -8,13 +8,13 @@ import { connect, createServer, type AddressInfo } from "node:net";
 import { join } from "node:path";
 import { stripVTControlCharacters } from "node:util";
 import type { TestProject } from "vite-plus/test/node";
-import { SOURCE } from "./locales";
+import { SOURCE } from "../locales";
 
-const root = join(import.meta.dirname, "..");
+export const root = join(import.meta.dirname, "../..");
 export const EXAMPLE = join(root, "apps/example");
 
 /** A port nothing is using now (Void's getFreePort). */
-async function freePort(): Promise<number> {
+export async function freePort(): Promise<number> {
   const server = createServer().listen(0, "127.0.0.1");
   await once(server, "listening");
   const { port } = server.address() as AddressInfo;
@@ -23,14 +23,15 @@ async function freePort(): Promise<number> {
   return port;
 }
 
-const run = (args: string[], cwd: string) => execFileSync("vp", args, { cwd, stdio: "inherit" });
+export const run = (args: string[], cwd: string) =>
+  execFileSync("vp", args, { cwd, stdio: "inherit" });
 
 /**
  * Start a server and wait until it's ready: --strictPort makes a taken port fail rather than move,
  * and only this server's own "Local: http://…:<port>" line counts, not any answer on the port (as
  * voidzero-dev/void's startServer, test/integration-helpers.ts).
  */
-async function start(args: string[], port: number, url: string): Promise<ChildProcess> {
+export async function start(args: string[], port: number, url: string): Promise<ChildProcess> {
   const child = spawn(
     "vp",
     [...args, "--host", "127.0.0.1", "--port", String(port), "--strictPort"],
@@ -60,10 +61,10 @@ async function start(args: string[], port: number, url: string): Promise<ChildPr
 }
 
 // The example's dev server (`vp run dev`): apps/example/vite.config.ts, server.port.
-const DEV_PORT = 5173;
+export const DEV_PORT = 5173;
 
 /** Whether something answers on the dev server's port. */
-function devServerRunning(): Promise<boolean> {
+export function devServerRunning(): Promise<boolean> {
   return new Promise((resolve) => {
     const socket = connect({ host: "localhost", port: DEV_PORT });
     socket.once("connect", () => {
@@ -75,9 +76,11 @@ function devServerRunning(): Promise<boolean> {
 }
 
 export default async function setup(project: TestProject) {
-  // `vp run test:production` (e2e/production.ts): the tests against production (the deployed site), no local build or servers.
+  // `vp run test:production` (scripts/production.ts): the tests against the live site, with no
+  // local build or servers; the ones that post or book skip themselves there (onLiveSite()).
   if (process.env.E2E_URL) {
     project.provide("prod" as never, process.env.E2E_URL as never);
+    project.provide("live" as never, true as never);
     return;
   }
   // The tests share two things with the dev server: the local database (reset below) and the
@@ -96,6 +99,7 @@ export default async function setup(project: TestProject) {
   const prod = `http://127.0.0.1:${port}`;
   const servers = [await start(["preview"], port, `${prod}/${SOURCE}`)];
   project.provide("prod" as never, prod as never);
+  project.provide("live" as never, false as never);
   return () => {
     // Each server runs in its own process group (detached): stop vp and what it started.
     for (const s of servers) if (s.pid) process.kill(-s.pid, "SIGTERM");

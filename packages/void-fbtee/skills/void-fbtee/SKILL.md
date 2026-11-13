@@ -134,6 +134,18 @@ caused it: an email to an organiser is in the organiser's language, sent while a
 another. A language the app hasn't is an error. Strings in these folders are collected like any
 other, so translate them the same way.
 
+Links in an email go to where it was sent from: `new URL(c.req.url).origin` (the dev server, a
+preview, or the live site), not `siteOrigin(c)`, which is the canonical, live address everywhere
+`voidFbtee({ site })` is set; `siteOrigin` is for the sitemap, robots.txt and structured data. A job
+or a queue has no request: keep the origin with what caused it (a booking's row, the queue message).
+
+Testing translated server code the Void way: in unit tests, Void's email harness
+(`createEmailTestHarness` from `void/email/testing`) catches each email, so its subject and text can
+be checked in each language; on the dev server, Void's inbox holds them (`/__void/inbox`, with the
+token in `.void/dev-trigger-token`), and Void's triggers run a queue or a cron on demand
+(`POST /__void/queue`, `POST /__void/scheduled`), so a test can check the email a job sent in the
+recipient's language.
+
 ## What people post
 
 Text people write (an event's title, a review, a message) isn't in the catalogs: it's stored, in

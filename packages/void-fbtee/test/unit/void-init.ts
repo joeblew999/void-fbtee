@@ -5,9 +5,9 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-const root = join(import.meta.dirname, "../../..");
+const root = join(import.meta.dirname, "../../../..");
 export const VOID_INIT_DIR = join(root, ".vitest/void-init");
-const VOID = join(import.meta.dirname, "../node_modules/.bin/void");
+const VOID = join(import.meta.dirname, "../../node_modules/.bin/void");
 
 export default function setup() {
   for (const toolchain of ["vite-plus", "vite"]) {

@@ -55,11 +55,13 @@ const book = defineHandler.withValidator({ params, body: bookSchema })(async (
   { params: { id }, body },
 ) => {
   const { locale } = c.get("i18n");
+  // Where this booking is being made (dev, a Worker Preview, live): its emails link back here.
+  const origin = new URL(c.req.url).origin;
   // One statement, so two people can't take the last seat: the row goes in only while the event
   // has fewer bookings than seats. D1 runs each statement on the primary, one at a time.
   const result = await db.run(sql`
-    INSERT INTO ${bookings} (id, event_id, name, email, locale, time_zone)
-    SELECT ${crypto.randomUUID()}, ${id}, ${body.name}, ${body.email}, ${locale}, ${body.time_zone}
+    INSERT INTO ${bookings} (id, event_id, name, email, locale, time_zone, origin)
+    SELECT ${crypto.randomUUID()}, ${id}, ${body.name}, ${body.email}, ${locale}, ${body.time_zone}, ${origin}
     WHERE (SELECT COUNT(*) FROM ${bookings} WHERE event_id = ${id})
         < (SELECT seats FROM ${events} WHERE id = ${id})`);
   if (!result.meta.changes) {
@@ -85,7 +87,7 @@ const book = defineHandler.withValidator({ params, body: bookSchema })(async (
     title: text?.title ?? event.title,
     titleLocale: text?.locale ?? event.locale,
     startsAt: event.starts_at,
-    url: siteOrigin(c) + routeUrl("/[lang]/events/[id]", { params: { id } }),
+    url: origin + routeUrl("/[lang]/events/[id]", { params: { id } }),
   });
   // No return: Void reruns the loader, so the page shows the new count.
 });
@@ -108,7 +110,8 @@ const remove = defineHandler.withValidator({ params, body: z.object({ key: z.str
       db.select().from(bookings).where(eq(bookings.event_id, id)),
       db.select().from(event_texts).where(eq(event_texts.event_id, id)),
     ]);
-    const origin = siteOrigin(c);
+    // Where the delete is made: the cancellations link back to the events list there.
+    const origin = new URL(c.req.url).origin;
     await Promise.all(
       booked.map((b) => {
         const text = pickText(texts, b.locale) ?? event;

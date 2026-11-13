@@ -2604,6 +2604,54 @@
         }
       ],
       "types": []
+    },
+    "z47tcjPbrJQirrBdPfj5Dw==": {
+      "description": "Reminder email: greeting, with the name the booker gave",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مرحبًا {name}،",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JiiV+8Yfat7Shcnld2I0fA==": {
+      "description": "Reminder email: the event the reader booked starts within a day, and when",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تذكير: لديك مقعد في {event}، التي تبدأ {time}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ww1rNR/RLXZcmijwRDG+Ug==": {
+      "description": "Reminder email: before the link to the event's page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "صفحة الفعالية:",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XokEpBv9y2oU/MYmCGZGmA==": {
+      "description": "Reminder email subject: the event the reader booked starts within a day",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تذكير: {event}",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

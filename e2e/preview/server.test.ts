@@ -4,9 +4,9 @@
 import { globSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
-import { url } from "./helpers";
+import { url } from "../helpers";
 import { EXAMPLE } from "./setup";
-import { LOCALES, SOURCE } from "./locales";
+import { LOCALES, SOURCE } from "../locales";
 
 const get = (path: string, init?: RequestInit) => fetch(url("prod") + path, init);
 

@@ -1,11 +1,11 @@
-// `void-fbtee prepare` and `check`, on copies of test/fixture (two strings: "Hello" translated
+// `void-fbtee prepare` and `check`, on copies of test/unit/fixture (two strings: "Hello" translated
 // into German, "Goodbye" not; no Thai catalog; none of void-fbtee's setup files).
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vite-plus/test";
-import { check, markdownHash, TRANSLATED_FROM } from "../src/check";
-import { loadProject, prepare } from "../src/commands";
-import type { Project } from "../src/catalogs";
+import { check, markdownHash, TRANSLATED_FROM } from "../../src/check";
+import { loadProject, prepare } from "../../src/commands";
+import type { Project } from "../../src/catalogs";
 
 const fixture = join(import.meta.dirname, "fixture");
 let root: string;

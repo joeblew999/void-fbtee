@@ -1,7 +1,7 @@
 # plans/plain-stage-compass.md: every test on the stage Void gives it, checking through Void
 
-Status: written 2026-11-13 after a second, deeper round of research; the events demo's use of
-every dev hook added at the user's direction; its four assumptions checked; approved 2026-11-13, in progress.
+Status: approved 2026-11-13; items 1-8 done 2026-11-13; item 9 (the preview's missing AI, in a
+plain app) to do.
 
 ## Context
 
@@ -81,13 +81,22 @@ ready only once they print their own URL (we already do).
   `bin.js run dev:ai`, not `vp run dev`; the package build's guard caught it. `test:dev`'s own
   start and stop must match the processes as they really appear.
 
+## Found while building (2026-11-13)
+
+- **Workers AI doesn't run on the preview.** Void's `guide/ai.md` says the remote AI binding is there
+  "during development and preview"; on the preview of this app (Void 1.8.0, signed in, the
+  `WORKERS_AI` flag gone) the translate queue's consumer ran and failed three times with "Binding
+  AI needs to be run remotely", then dropped the message. Dev's AI works (`test:dev`). Not yet
+  reproduced in a plain `void init` app, so not yet called Void's: that reproduction is item 9.
+  Meanwhile the preview suite doesn't rely on AI.
+
 ## The work, as one change
 
-1. [ ] **AI the Void way.** Remove the `WORKERS_AI` flag and everything built on it (finding 1).
+1. [x] **AI the Void way.** Remove the `WORKERS_AI` flag and everything built on it (finding 1).
        Dev, preview and deploy all have Workers AI; the README's setup says to sign in first
        (`vp run login`): without it Void doesn't start dev or preview for an app that uses AI (seen
        2026-11-13).
-2. [ ] **The events demo uses every dev hook** (finding 7).
+2. [x] **The events demo uses every dev hook** (finding 7).
    - **A cron, `crons/reminders.ts`:** once a day, everyone booked on an event starting in the next
      24 hours gets a reminder email in their own language (`inLocale`, no request), with the time on
      the event's clock: a fourth email in `src/events/emails.ts`. The window comes from the run's
@@ -95,13 +104,13 @@ ready only once they print their own URL (we already do).
    - **Queues through `/__void/queue`:** re-translating a waiting post is one call to Void's queue
      endpoint (the README shows it), in place of our `translations.dev.ts` route.
    - **Workers AI** in dev, by item 1.
-3. [ ] **Emails link to where they were sent from** (finding 2). The emails take the request's own
+3. [x] **Emails link to where they were sent from** (finding 2). The emails take the request's own
        origin (`new URL(c.req.url).origin`), and the delete action passes it to the cancellation queue.
        A cron has no request, so a booking keeps the origin it was made on (a new `bookings.origin`
        column and its migration) and the reminder links there: a booking made on dev is reminded with a
        dev link, one made live with a live link. `siteOrigin` stays for canonical, hreflang, the sitemap
        and robots.txt. The package's `siteOrigin` comment and SKILL.md say which to use for what.
-4. [ ] **A dev-server test run: `vp run test:dev`** (Void's dev-mode suite). A Vitest project in
+4. [x] **A dev-server test run: `vp run test:dev`** (Void's dev-mode suite). A Vitest project in
        `e2e/dev/`, against the dev server: the developer's own if it's running, else it starts
        `vp run dev` itself. Helpers in `e2e/helpers.ts` read Void's inbox and call Void's triggers,
        each with the token from `.void/dev-trigger-token`, as the fresh install check does. Each test
@@ -119,7 +128,7 @@ ready only once they print their own URL (we already do).
      message (`ack`, or `retry` when it should fail): a cancellation message is acked and gives its
      email; a translate message for a waiting post is acked and gives its translations; one for an
      event that no longer exists is acked with nothing sent.
-5. [ ] **The preview run keeps the full browser contract** (`vp run test:preview`): the rest of
+5. [x] **The preview run keeps the full browser contract** (`vp run test:preview`): the rest of
        `e2e/events.test.ts` (time on two clocks, past midnight, `</script>` in a title, posting with a
        missing title, a wrong delete key, translations shown with the original, live seats, the last
        seat), `e2e/server.test.ts`, `e2e/pages.test.ts`, `e2e/islands.test.ts`, and `e2e/browsers/`.
@@ -128,14 +137,14 @@ ready only once they print their own URL (we already do).
        deleting the next fresh visit (no cookie) answers `MISS` with the change in it, and `HIT` again
        after. Each test is placed by what it needs; a test that could go either way stays on the
        preview, as Void's full contract does.
-6. [ ] **Live tests are opt-in, and send nothing.** `test:production` runs the preview run's tests
+6. [x] **Live tests are opt-in, and send nothing.** `test:production` runs the preview run's tests
        against the live site minus any that post (they'd call AI) or book (they'd email); those skip
        themselves there, with the reason in the test. CI's quick live check (finding 6) stays, as an
        exception written beside it: Cloudflare deploys every push to main, so this one post, translated
        and deleted at once, is the only check that a deploy works end to end; it emails no one.
-7. [ ] **The layout and running above,** as one move: the files, the projects, the time limits,
+7. [x] **The layout and running above,** as one move: the files, the projects, the time limits,
        the tasks, the islands helper, and every reference.
-8. [ ] **Docs.** Earlier plans that describe what this replaces say so where they describe it
+8. [x] **Docs.** Earlier plans that describe what this replaces say so where they describe it
        (`plans/quiet-harbor-atlas.md` step 7b: the `WORKERS_AI` flag and the hand-translation route).
        The README: the stage table (where pages, cache, email, AI, queues and crons go at
        each stage, and how each is checked), the test commands by stage, re-translating a post through
@@ -143,6 +152,10 @@ ready only once they print their own URL (we already do).
        SKILL.md: a short "testing a translated app" note (emails in dev through Void's inbox, in unit
        tests through Void's harness; queues and crons through Void's triggers) and the origin rule
        from 3. `DESIGN.md` is unaffected (the reminder is an email, not a page).
+
+9. [ ] **Reproduce the preview's missing AI in a plain `void init` app** (as Void issues #809 and
+       #810 were): an app that imports `void/ai` and calls it from a queue, run with `vp preview`. If it
+       reproduces, write the issue for the user to file; if not, find what in this app causes it.
 
 ## How the tests are laid out and run (Void's `TESTING.md` and `vite.config.ts`)
 
@@ -228,6 +241,14 @@ stay where they are.
   `test:unit` (`unit` and the example's), `test:preview`, `test:dev`, `test:browsers`,
   `test:deployed`, `test:production`, `test:fresh`. CI runs `vp check`, `vp run test:unit` and
   `vp run test:deployed`.
+- **Browser tests, Void's rules** (`TESTING.md`, "Browser readiness"): wait for a readiness signal
+  (`html[data-hydrated]`), never `networkidle` or a fixed sleep; the quick live check's 2-second
+  polling (`e2e/deployed/live.test.ts` line 47) becomes a wait for the open page's own live update.
+  A failing browser test shows what happened: the helpers collect each page's recent console
+  messages, navigations and failed requests, and the server's output, and attach them to the
+  failure, as Void's suites do.
+- **A dev-mode smoke test**, as Void runs beside its full preview suite: in `e2e/dev/smoke.test.ts`,
+  a page loads and hydrates, an island hydrates, and a link navigates on the client.
 - **Islands:** the `hydrated()` helper waits for every island on the page, with the expected count,
   as Void's `waitForIslandsHydrated`; it waits for the first only today (`e2e/helpers.ts` line 86).
 - **References follow the moves:** CI, the README, `AGENTS.md`, `e2e/tsconfig.json`, the tasks and

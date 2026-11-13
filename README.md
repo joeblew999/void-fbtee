@@ -38,15 +38,15 @@ credential. Build logs: the Worker's Builds in Cloudflare's dashboard, linked fr
 Every day:
 
 ```sh
+vp run login             # once: Void's Cloudflare sign-in, which dev and the preview need for
+                         # Workers AI (Void has no local stand-in for it)
 vp run dev               # develop: the package rebuilds on save; the example runs with Void's
-                         # local D1, KV, queue and live updates. A new post waits for Claude to
-                         # translate it (no Workers AI)
-vp run dev:ai            # the same, with new posts translated by Workers AI as on the live site
-                         # (needs Void's Cloudflare login: vp run login)
+                         # local D1, KV, queues, live updates, email inbox and Workers AI.
+                         # It prints its email inbox's address when it starts
 vp check                 # format, lint, types
-vp test run              # the package's tests and the browser tests, on a local build;
-                         # report: .vitest/index.html
-vp run example#test      # the example's own unit tests, in Node (seconds)
+vp run test:unit         # unit tests: the package's and the example's (seconds)
+vp run test:dev          # the dev-server suite: emails, queues, the cron and AI (see Testing)
+vp run test:preview      # the browser suite on the production build (see Testing)
 vp run deploy            # deploy the example to production (Cloudflare), with no downtime:
                          # Void uploads the new version, checks it's ready, then moves
                          # traffic to it. It creates what's missing (D1 with read replicas,
@@ -55,7 +55,7 @@ vp run deploy            # deploy the example to production (Cloudflare), with n
                          # changed with no migration. It renders the cached pages (the Docs)
                          # again before traffic moves, so no one gets an old page.
                          # Log: ~/.void/logs/
-vp run test:production   # every test, against production; report: .vitest/index.html
+vp run test:production   # the preview suite against the live site, less what posts or books
 vp run deploy:preview    # this branch as a Worker Preview beside production (needs cf's login)
 vp run test:deployed     # a quick check of what Cloudflare deployed for this commit: sitemap,
                          # a Thai not-found page, one event posted, translated by Workers AI
@@ -63,9 +63,7 @@ vp run test:deployed     # a quick check of what Cloudflare deployed for this co
 vp run test:browsers     # every page in every language in Chromium, WebKit and WebKit as today's
                          # iPhones have it (no built-in Temporal): no errors, fits a phone; and
                          # the Intl and Temporal pages' engine checks. It grows with each
-                         # language, so it's not in vp test run, whose tests use a fixed few
-                         # languages (each for what it exercises), nor in CI: run it when
-                         # pages change
+                         # language, so it's its own run, not in CI: run it when pages change
 ```
 
 In a Claude cloud session, to open the dev server in your own browser without deploying:
@@ -101,7 +99,7 @@ Now and then:
 ```sh
 vp run deploy:atomic     # only when Void's deploy asks for it (a Durable Object changed)
 vp run test:fresh        # after changing the package or its dependencies
-vp upgrade && vp migrate   # upgrade Vite+, then vp check, vp test run
+vp upgrade && vp migrate   # upgrade Vite+, then vp check and the tests (Testing)
 ```
 
 ## What's here
@@ -110,29 +108,55 @@ vp upgrade && vp migrate   # upgrade Vite+, then vp check, vp test run
 - `apps/example`: a Void app using it, in three languages. Production:
   https://void-fbtee-example.gedw99.workers.dev
   ([its Worker on Cloudflare](https://dash.cloudflare.com/7384af54e33b8a54ff240371ea368440/workers/services/view/void-fbtee-example/production)).
-- `e2e/`: the browser tests, and the fresh-install check. `e2e/browsers/`: the Chromium and
-  WebKit run (`vp run test:browsers`). `e2e/deployed/`: the quick check CI runs on the deployed
-  site (`vp run test:deployed`). `e2e/fresh/app/`: Void's own docs examples, put into each
-  fresh app and checked in Thai; what doesn't work yet is listed as a known gap, with the step of
-  `plans/quiet-harbor-atlas.md` that fixes it.
+- `e2e/`: the end-to-end tests, by stage (see Testing): `e2e/preview/`, `e2e/dev/`,
+  `e2e/browsers/`, `e2e/deployed/`, and `e2e/fresh/` (the fresh-install check; `e2e/fresh/app/`
+  holds Void's own docs examples, put into each fresh app and checked in Thai, with what doesn't
+  work yet listed as a known gap and the step of `plans/quiet-harbor-atlas.md` that fixes it).
+  `e2e/helpers.ts` is what they share.
+- `scripts/`: the scripts behind the tasks (deploying, the deployed checks, Worker Previews,
+  Tailscale, the tools check).
 
-How we test, and why it isn't Void's testing guide: Void's guide
-([docs/guide/testing.md](https://github.com/voidzero-dev/void/blob/main/docs/guide/testing.md))
-covers unit tests in Node, with bindings such as D1 and KV replaced by `vi.mock()`. Ours run the
-real thing with nothing faked: the example's own build on Cloudflare's local runtime
-(`vp test run`), and a quick check of the deployed site (`vp run test:deployed`). Formatting can only be tested on
-the Worker's own `Intl`, not Node's, which differs. The
-package's own tests (`packages/void-fbtee/test/`) are plain tests of its commands, in Node. The
-example has a few unit tests of plain code beside it in `src/` (Void's guide's way, with nothing
-mocked: they touch no binding), run from inside the app because Void finds an app from where it
-runs.
+## Testing
+
+Each test runs on the stage Void gives what it checks, and checks through what Void provides
+there (`plans/plain-stage-compass.md`; Void's docs in `apps/example/node_modules/void/docs/` and its
+own `TESTING.md`). Nothing is faked: the tests use the real runtime, Void's own hooks and
+Cloudflare's local stand-ins.
+
+| Stage (task)                      | Where it runs                                        | Email                                                                          | Workers AI                | Queues and the cron                                                                                              | Page cache                         |
+| --------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `test:unit`                       | Node                                                 | Void's harness (`void/email/testing`) checks each email's wording and language | none                      | none                                                                                                             | none                               |
+| `test:dev` (`e2e/dev/`)           | the dev server: yours if running, else it starts one | Void's dev inbox, read back with its token                                     | real, through the sign-in | Void's triggers: `POST /__void/queue` (each message's ack checked), `POST /__void/scheduled` (the reminder cron) | none in dev                        |
+| `test:preview` (`e2e/preview/`)   | the production build, local                          | Cloudflare's stand-in saves it and sends nothing                               | doesn't run (see below)   | queues run                                                                                                       | Void's, read through `x-isr-cache` |
+| `test:browsers` (`e2e/browsers/`) | the production build, in Chromium and WebKit         | as preview                                                                     | as preview                | as preview                                                                                                       | as preview                         |
+| `test:deployed` (`e2e/deployed/`) | the live site, after each push                       | sends none                                                                     | real                      | Cloudflare's                                                                                                     | Cloudflare's                       |
+| `test:fresh` (`e2e/fresh/`)       | new `void init` apps                                 | —                                                                              | —                         | the cron through `/__void/scheduled`                                                                             | —                                  |
+
+- **Dev and the preview, one at a time:** they share the local database (Void's
+  `guide/database/d1.md`), which the preview run resets and refuses to touch while dev is up.
+  `test:dev` uses your dev server's database as it is and deletes everything it posts.
+- **Workers AI on the preview:** Void's docs say it's there in dev and the preview; on this app's
+  preview it fails with "Binding AI needs to be run remotely" (2026-11-13, Void 1.8.0), so the
+  preview suite doesn't rely on it. Being reproduced in a plain app before it's reported.
+- **Live tests are opt-in** (Void's rule): `test:production` skips what posts or books there,
+  and `test:deployed`, the exception CI runs, posts one event, has it translated and deletes it,
+  emailing no one.
+- **Time limits, Void's:** unit tests keep Vitest's own; the others 120 seconds per test and per
+  hook, and Playwright's own 30 seconds per wait, so a step that never happens fails and names
+  itself. A failing browser test prints what its pages did (console, errors, navigations, failed
+  requests).
+- **Emails from dev** link to the dev server; from the live site, to the live site: each email
+  links to where it was sent from.
+- **Re-translating a post in dev:** run the translate queue on it with Void's trigger, using the
+  token dev prints at the start (also in `apps/example/.void/dev-trigger-token`):
+  `curl -X POST http://localhost:5173/__void/queue -H "Content-Type: application/json" -H "x-void-dev-trigger: $(cat apps/example/.void/dev-trigger-token)" -d '{"queue":"translate","messages":[{"id":"1","timestamp":0,"body":{"eventId":"<the event's id>"},"attempts":1}]}'`
 
 The tasks are in `vite.config.ts` and `apps/example/vite.config.ts`.
 
 - `vp run test:production` tests the URL the last `vp run deploy` reported.
 - `vp run --last-details` shows how the last task run went.
 - Each commit is checked first (`vp check --fix`, a hook `vp install` sets up). CI runs
-  `vp check`, the package's tests, then `vp run test:deployed`.
+  `vp check`, `vp run test:unit`, then `vp run test:deployed`.
 
 ### Checking the live site by hand
 
@@ -160,7 +184,7 @@ Run them after a change to the head tags or the picture.
   `vp install` and `vp run check:tools`, which shows what the new Void wants.
 - **Node:** change `.node-version`.
 
-Then `vp check`, `vp test run` and `vp run test:fresh`.
+Then `vp check`, `vp run test:unit`, `vp run test:dev`, `vp run test:preview` and `vp run test:fresh`.
 
 ## Reported to Void
 
@@ -172,7 +196,7 @@ and if so remove what depends on it.
   are placed with physical `left`/`right`; the copy button's label is fixed in English
   ("Copy Code"); task lists come out as text. What depends on it: the heading-anchor rule at the
   end of `apps/example/pages/style.css` (remove it when fixed), and the tour's numbered "Try it"
-  list and the note in `e2e/server.test.ts` (a task list, and checks for it, when they work).
+  list and the note in `e2e/preview/server.test.ts` (a task list, and checks for it, when they work).
 
 ## Releasing
 

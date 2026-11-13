@@ -1,4 +1,4 @@
-// `void-fbtee translate`'s task list and `stamp`, on copies of test/fixture ("Hello" translated
+// `void-fbtee translate`'s task list and `stamp`, on copies of test/unit/fixture ("Hello" translated
 // into German, "Goodbye" not; no Thai catalog). Running claude itself is checked on the example
 // app, by hand, as the plan's step 6; these tests don't call it.
 import {
@@ -14,11 +14,11 @@ import {
 import { VOID_INIT_DIR } from "./void-init";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vite-plus/test";
-import type { Project } from "../src/catalogs";
-import { check, markdownPages, missingHead } from "../src/check";
-import { loadProject, prepare } from "../src/commands";
-import { init } from "../src/init";
-import { stamp, translateTask } from "../src/translate";
+import type { Project } from "../../src/catalogs";
+import { check, markdownPages, missingHead } from "../../src/check";
+import { loadProject, prepare } from "../../src/commands";
+import { init } from "../../src/init";
+import { stamp, translateTask } from "../../src/translate";
 
 const fixture = join(import.meta.dirname, "fixture");
 let root: string;
@@ -174,7 +174,7 @@ test("nothing to do once everything is translated", () => {
 });
 
 test("init links the skill for Claude Code like void init, once", async () => {
-  // A void init app (test/void-init.ts) that has a .claude folder.
+  // A void init app (test/unit/void-init.ts) that has a .claude folder.
   const app = mkdtempSync(join(import.meta.dirname, ".tmp-"));
   try {
     cpSync(join(VOID_INIT_DIR, "vite-plus"), app, {

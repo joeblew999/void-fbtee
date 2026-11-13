@@ -1,12 +1,12 @@
-// The shared catalog logic and the plugin's build check, on a tiny fixture app (test/fixture):
+// The shared catalog logic and the plugin's build check, on a tiny fixture app (test/unit/fixture):
 // two strings, "Hello" translated into German, "Goodbye" not.
 import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vite-plus/test";
 import { build } from "vite";
-import { voidFbtee } from "../src/plugin";
-import { collect, missing, runtimeCatalog, runtimeTexts, type Project } from "../src/catalogs";
-import { resolveLocales } from "../src/locales";
+import { voidFbtee } from "../../src/plugin";
+import { collect, missing, runtimeCatalog, runtimeTexts, type Project } from "../../src/catalogs";
+import { resolveLocales } from "../../src/locales";
 
 const fixture = join(import.meta.dirname, "fixture");
 let root: string;

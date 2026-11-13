@@ -54,9 +54,9 @@ const [, worker, preview] =
   /\/services\/view\/([^/]+)\/production\/(?:previews\/([^/]+)\/)?builds\//.exec(run.details_url)!;
 const url = `https://${preview ? `${preview}-` : ""}${worker}.${subdomain}.workers.dev`;
 console.log(`test:deployed: testing ${url}\n`);
-// The quick check only: the full browser tests run locally (`vp test run`, `vp run test:browsers`).
+// The quick check only: the full browser tests run on the preview (`vp run test:preview`).
 const code = await new Promise<number | null>((done) =>
-  spawn("vp", ["test", "run", "--config", "e2e/deployed/vite.config.ts"], {
+  spawn("vp", ["test", "run", "--project", "deployed"], {
     stdio: "inherit",
     env: { ...process.env, E2E_URL: url },
   }).on("close", done),

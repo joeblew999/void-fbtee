@@ -58,15 +58,15 @@ export default defineConfig({
       },
     },
   },
-  // `vp test`: the package's own tests, on test/fixture (a tiny app; each test works on a copy),
-  // and init's on apps `void init` makes (test/void-init.ts).
+  // `vp test`: the package's unit tests (test/unit/, as Void lays out its own packages), on
+  // test/unit/fixture (a tiny app; each test works on a copy), and init's on apps `void init` makes
+  // (test/unit/void-init.ts). Vitest's own time limits, as Void's unit tests keep. One file after
+  // another: they share the apps void-init.ts makes.
   test: {
-    include: ["test/**/*.test.ts"],
-    globalSetup: ["test/void-init.ts"],
-    // As the browser tests: one file after another, no time limits; run before them.
+    name: "unit",
+    include: ["test/unit/**/*.test.ts"],
+    globalSetup: ["test/unit/void-init.ts"],
     fileParallelism: false,
-    testTimeout: 0,
-    hookTimeout: 0,
     sequence: { groupOrder: 1 },
   },
 });

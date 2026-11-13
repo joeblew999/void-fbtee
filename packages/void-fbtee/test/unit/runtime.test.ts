@@ -3,8 +3,8 @@
 import { describe, expect, test } from "vite-plus/test";
 import { collectSync, transformSync, translateSync } from "@nkzw/fbtee-compiler";
 import { fbt, runWithFbtee, setupLocaleContext } from "fbtee/server";
-import { resolveLocales } from "../src/locales";
-import { allTranslations, localeContextOptions, type CatalogLoaders } from "../src/runtime";
+import { resolveLocales } from "../../src/locales";
+import { allTranslations, localeContextOptions, type CatalogLoaders } from "../../src/runtime";
 
 const SOURCE = `import { fbt } from "fbtee";
 const cart = () => <fbt desc="Shopping cart">Cart</fbt>;

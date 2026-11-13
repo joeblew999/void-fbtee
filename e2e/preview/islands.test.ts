@@ -3,8 +3,8 @@
 import { globSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
-import { fmt } from "../apps/example/src/docs/fmt";
-import { browser, hydrated, untilText } from "./helpers";
+import { fmt } from "../../apps/example/src/docs/fmt";
+import { browser, hydrated, untilText } from "../helpers";
 import { EXAMPLE } from "./setup";
 
 const page = browser("prod");
@@ -22,7 +22,10 @@ test("Markdown pages: every <Fmt> value, formatted in the page's language and th
     const url = "/" + file.replace(/^pages\//, "").replace(/(\/index)?\.md$/, "");
     const locale = url.split("/")[1];
     await p.goto(url);
-    await hydrated(p, "Fmt");
+    // Every <Fmt> island in the file, hydrated: one hydrated island doesn't show its siblings are
+    // (voidzero-dev/void TESTING.md, waitForIslandsHydrated).
+    const islands = readFileSync(join(EXAMPLE, file), "utf8").match(/<Fmt /g)!.length;
+    await hydrated(p, "Fmt", islands);
     const values = p.locator("[data-fmt]");
     for (let i = 0; i < (await values.count()); i++) {
       const props = JSON.parse((await values.nth(i).getAttribute("data-fmt"))!);

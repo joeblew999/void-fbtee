@@ -9,6 +9,7 @@
     "@nkzw/eslint-plugin-fbtee": "5.0.0",
     "@types/node": "26.6.6",
     "playwright": "1.65.0",
+    "postal-mime": "4.2.1",
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:",

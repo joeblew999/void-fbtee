@@ -9,7 +9,7 @@ import {
   VOID_DEFER_MESSAGE,
   watchTexts,
   started,
-} from "./helpers";
+} from "../helpers";
 
 const page = browser("prod");
 

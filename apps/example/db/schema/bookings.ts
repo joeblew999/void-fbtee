@@ -22,6 +22,9 @@ export const bookings = sqliteTable(
     // The booker's language and time zone, for their confirmation and reminder.
     locale: text("locale").notNull(),
     time_zone: text("time_zone").notNull(),
+    // The site the booking was made on (dev, a Worker Preview, or live), for its reminder's link:
+    // a cron has no request to take it from. Empty for bookings made before it was kept.
+    origin: text("origin"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`(datetime('now'))`),

@@ -2,7 +2,9 @@
 // with no request too, so the same code runs in an action or a queue):
 //   - a booking's confirmation, to whoever booked, in the language they booked in (bookings.locale);
 //   - the private link, to whoever posted an event and asked for it, in the language they posted in;
-//   - a cancellation, to everyone who booked, each in their own language (queues/cancel.ts).
+//   - a cancellation, to everyone who booked, each in their own language (queues/cancel.ts);
+//   - a reminder, the day before, to everyone who booked, each in their own (crons/reminders.ts).
+// Each links to the site it was made on (dev, a Worker Preview, live), not the canonical address.
 // Sent with Void's sendEmail (guide/email/sending.md): in dev it lands in Void's local inbox; on the
 // live site it goes from EMAIL_FROM (email.from in void.config.ts), set up on Cloudflare by `void
 // email setup` (guide/email/domains.md). sendEmail never throws, so booking, posting or deleting
@@ -169,6 +171,46 @@ export function cancellationEmail(
   });
 }
 
+/**
+ * A reminder, in `locale`: the event starts within a day, at this time on its own clock; its page
+ * in that language on the site at `origin`.
+ */
+export function reminderEmail(
+  booking: EventFor & { locale: AppLocale; name: string; id: string; origin: string },
+): Promise<Email> {
+  return inLocale(booking.locale, ({ locale, dir }) => {
+    const lines = [
+      String(
+        fbs(
+          ["Hello ", fbs.param("name", booking.name), ","],
+          "Reminder email: greeting, with the name the booker gave",
+        ),
+      ),
+      String(
+        fbs(
+          [
+            "A reminder: you have a seat at ",
+            fbs.param("event", booking.title),
+            ", which starts ",
+            fbs.param("time", startsAt(booking, locale)),
+            ".",
+          ],
+          "Reminder email: the event the reader booked starts within a day, and when",
+        ),
+      ),
+      String(fbs("The event's page:", "Reminder email: before the link to the event's page")),
+    ];
+    const subject = String(
+      fbs(
+        ["Reminder: ", fbs.param("event", booking.title)],
+        "Reminder email subject: the event the reader booked starts within a day",
+      ),
+    );
+    const page = booking.origin + routeUrl("/[lang]/events/[id]", { params: { id: booking.id } });
+    return written(subject, lines, page, booking, locale, dir);
+  });
+}
+
 /** Sends an email; a failure is logged with its code only (never the address), not thrown. */
 async function send(to: string, email: Promise<Email>, what: string) {
   const result = await sendEmail({ from: EMAIL_FROM, to, ...(await email) });
@@ -185,6 +227,9 @@ export const sendBookingEmail = (to: string, booking: Parameters<typeof bookingE
 
 export const sendLinkEmail = (to: string, post: Parameters<typeof linkEmail>[0]) =>
   send(to, linkEmail(post), "private link");
+
+export const sendReminderEmail = (to: string, booking: Parameters<typeof reminderEmail>[0]) =>
+  send(to, reminderEmail(booking), "reminder");
 
 export const sendCancellationEmail = (
   to: string,

@@ -15,7 +15,7 @@ import {
   pluralCategories,
   pluralSlots,
   type PluralEntry,
-} from "../src/plurals";
+} from "../../src/plurals";
 
 // The two ways to write a count.
 const SOURCE = `import { fbt } from "fbtee";

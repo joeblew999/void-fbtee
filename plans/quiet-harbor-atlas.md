@@ -161,7 +161,9 @@ Each step is shipped and proven before the next, each with its docs example in t
        row). Checked on dev: an untranslated Arabic post is `ar-EG`/`rtl` on the English board and
        page; the Arabic original under a Thai translation too. Package tests for the three.
    - **7b, done 2026-11-13: machine translation with Void's AI, in a queue, the same locally and
-     on Cloudflare** (asked for 2026-11-13; decided: one queue, two translators). One consumer
+     on Cloudflare** (asked for 2026-11-13; decided: one queue, two translators). **Replaced the
+     same day by `plans/plain-stage-compass.md`:** Workers AI everywhere Void puts it, with no
+     `WORKERS_AI` switch and no hand-translation route; what follows describes the first version. One consumer
      (`queues/translate.ts`), sent on each post (`new.server.ts`). On Cloudflare it asks Workers AI
      (Llama 3.3 70B, by the measure below); locally Workers AI is off (`inference.bindings.ai` in
      `void.config.ts`, on only with `WORKERS_AI=on`, which the deploy tasks and the preview build

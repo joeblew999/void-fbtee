@@ -1,4 +1,4 @@
-// `void-fbtee init`, on copies of apps `void init` made for this run (test/void-init.ts), the
+// `void-fbtee init`, on copies of apps `void init` made for this run (test/unit/void-init.ts), the
 // files only: no node_modules.
 import {
   cpSync,
@@ -12,7 +12,7 @@ import {
 } from "node:fs";
 import { join, relative } from "node:path";
 import { afterEach, expect, test } from "vite-plus/test";
-import { init } from "../src/init";
+import { init } from "../../src/init";
 import { VOID_INIT_DIR } from "./void-init";
 
 const generated = (toolchain: string) => join(VOID_INIT_DIR, toolchain);
@@ -83,7 +83,7 @@ test("wires void-fbtee into a Vite+ app, and a second run changes nothing", asyn
   );
 
   const pkg = JSON.parse(read(root, "package.json"));
-  const own = JSON.parse(read(join(import.meta.dirname, ".."), "package.json"));
+  const own = JSON.parse(read(join(import.meta.dirname, "../.."), "package.json"));
   // void-fbtee itself is the app's own choice of source (installed before init runs).
   expect(pkg.dependencies["void-fbtee"]).toBeUndefined();
   expect(pkg.dependencies.fbtee).toBe(own.devDependencies.fbtee);

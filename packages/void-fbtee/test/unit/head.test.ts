@@ -1,7 +1,7 @@
 // void-fbtee/head: unhead's unpackMeta in Void's meta shape, and a page's title and description
 // for search results and link previews. Pure functions: no app.
 import { expect, test } from "vite-plus/test";
-import { jsonLd, meta, pageHead } from "../src/head";
+import { jsonLd, meta, pageHead } from "../../src/head";
 
 test("meta: Open Graph as property, the rest as name, every value text, empty ones left out", () => {
   expect(

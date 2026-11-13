@@ -1,2 +1,2 @@
-# Copies of test/fixture made by the tests.
-test/.tmp-*/
+# Copies of test/unit/fixture made by the tests.
+test/unit/.tmp-*/

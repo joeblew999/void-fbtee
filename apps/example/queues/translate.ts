@@ -1,8 +1,8 @@
 // Translates a newly posted event's title and description into the app's other languages, after the
-// post (new.server.ts sends the message). The same consumer everywhere (Void's guide/queues.md):
-// on Cloudflare it asks Workers AI; locally, where Workers AI is off (void.config.ts), it finds AI
-// "Not available" and leaves the post as written, for Claude to translate
-// (routes/api/translations.dev.ts). Both store through src/events/translations.ts.
+// post (new.server.ts sends the message). The same consumer everywhere (Void's guide/queues.md),
+// with Workers AI everywhere too: on Cloudflare, and in dev and the preview through Void's
+// Cloudflare sign-in (guide/ai.md, "Local Development"). A failure is retried. In dev, a post can
+// be translated again through Void's queue trigger, `POST /__void/queue` (the README shows it).
 //
 // Model: @cf/meta/llama-3.3-70b-instruct-fp8-fast, chosen over @cf/meta/m2m100-1.2b (Workers AI's
 // translation model) on 2026-11-13: on the 5 sample events, title and description into every
@@ -46,8 +46,6 @@ async function translate(text: Text, from: string, to: string): Promise<Text> {
   return { title: parsed.title, description: parsed.description };
 }
 
-const unavailable = (error: unknown) => String(error).includes("ai: Not available");
-
 export default defineQueue<Message>(async (batch) => {
   for (const message of batch.messages) {
     const [event] = await untranslated(message.body.eventId);
@@ -62,9 +60,8 @@ export default defineQueue<Message>(async (batch) => {
       await storeTranslations(event.id, done);
       message.ack();
     } catch (error) {
-      // Locally: no Workers AI, so the post waits for Claude. Anything else: Cloudflare retries it.
-      if (unavailable(error)) message.ack();
-      else message.retry();
+      console.warn("translation failed, retried:", String(error));
+      message.retry();
     }
   }
 });

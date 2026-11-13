@@ -9,7 +9,7 @@ import { db } from "void/db";
 import { queues } from "void/queues";
 import { hashDeleteKey, keyCookie, newDeleteKey } from "@/events/delete-key";
 import { routeUrl } from "void-fbtee/routes";
-import { langParams, revalidate, siteOrigin } from "void-fbtee/server";
+import { langParams, revalidate } from "void-fbtee/server";
 import { sendLinkEmail } from "@/events/emails";
 import { z } from "zod";
 import { locales } from "@/locales";
@@ -58,7 +58,8 @@ export const action = defineHandler.withValidator({
       title: body.title,
       titleLocale: locale,
       startsAt: start.starts_at,
-      link: `${siteOrigin(c)}${page}#key=${key}`,
+      // Where it was posted (dev, a Worker Preview, live), not the site's canonical address.
+      link: `${new URL(c.req.url).origin}${page}#key=${key}`,
     });
   // Its translations into the app's other languages, after this answers (queues/translate.ts).
   await queues.translate.send({ eventId: created.id });

@@ -108,5 +108,5 @@ if (process.platform !== "linux") {
 } else if (process.argv[2] === "logout") {
   logout();
 } else {
-  throw new Error("Usage: vpx e2e/tailscale.ts login|logout");
+  throw new Error("Usage: vpx scripts/tailscale.ts login|logout");
 }

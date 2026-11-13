@@ -7,9 +7,11 @@ import {
   bookingEmail,
   cancellationEmail,
   linkEmail,
+  reminderEmail,
   sendBookingEmail,
   sendCancellationEmail,
   sendLinkEmail,
+  sendReminderEmail,
 } from "./emails";
 
 // The calligraphy evening as its organiser wrote it: Arabic, at 19:00 in Cairo on Monday 8 March.
@@ -74,6 +76,24 @@ test("a cancellation, in the booker's language, linking to the events in it", as
   expect(en.text).toContain("Hello Somchai,");
 });
 
+test("a reminder, in the booker's language, linking to the event on the site they booked on", async () => {
+  const reminder = {
+    ...event,
+    name: "Laila",
+    id: "d57a8bf2-5909-4475-a407-12a879df5f01",
+    origin: "http://localhost:5173",
+  } as const;
+  const ar = await reminderEmail({ ...reminder, locale: "ar-EG" });
+  expect(ar.subject).toBe("تذكير: أمسية خط عربي");
+  expect(ar.html).toMatch(/^<div lang="ar-EG" dir="rtl">/);
+  expect(ar.text.trimEnd().endsWith(`http://localhost:5173/ar-EG/events/${reminder.id}`)).toBe(
+    true,
+  );
+  const th = await reminderEmail({ ...reminder, locale: "th-TH" });
+  expect(th.subject).toBe("แจ้งเตือน: أمسية خط عربي");
+  expect(th.text).toMatch(/วันจันทร์.*มีนาคม.*19:00/);
+});
+
 test("each sent through Void's sendEmail", async () => {
   const inbox = createEmailTestHarness();
   try {
@@ -85,10 +105,18 @@ test("each sent through Void's sendEmail", async () => {
       name: "Laila",
       origin: "https://example.com",
     });
+    await sendReminderEmail("laila@example.com", {
+      ...event,
+      locale: "en-US",
+      name: "Laila",
+      id: "d57a8bf2-5909-4475-a407-12a879df5f01",
+      origin: "https://example.com",
+    });
     expect(inbox.messages.map((m) => m.subject)).toEqual([
       "Your seat at أمسية خط عربي",
       "Your private link for أمسية خط عربي",
       "أمسية خط عربي is cancelled",
+      "Reminder: أمسية خط عربي",
     ]);
   } finally {
     inbox.dispose();

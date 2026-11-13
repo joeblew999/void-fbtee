@@ -9,7 +9,7 @@ import { afterAll, beforeAll, describe, expect, test } from "vite-plus/test";
 import { createBuilder, type Plugin, type Rollup } from "vite";
 import { voidMarkdown } from "@void/md/plugin";
 import { voidReact } from "@void/react/plugin";
-import { voidFbtee } from "../src/plugin";
+import { voidFbtee } from "../../src/plugin";
 
 const fixture = join(import.meta.dirname, "fixture");
 let root: string;

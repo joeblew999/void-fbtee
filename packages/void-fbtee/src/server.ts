@@ -129,9 +129,11 @@ export async function inEveryLocale<T>(
 }
 
 /**
- * The site's own address: `voidFbtee({ site })`, or else the one this request came to. For anything
- * that writes full addresses (a sitemap, robots.txt's Sitemap line), so they match the pages'
- * canonical and hreflang.
+ * The site's own address: `voidFbtee({ site })`, or else the one this request came to. For the
+ * site's canonical addresses (a sitemap, robots.txt's Sitemap line, structured data), so they match
+ * the pages' canonical and hreflang. Not for a link someone follows from an email: that goes to
+ * where the request came from (`new URL(c.req.url).origin`: the dev server, a preview, or live),
+ * since `site` is the live address everywhere.
  */
 export function siteOrigin(c: { req: { url: string } }): string {
   return config.site ?? new URL(c.req.url).origin;
