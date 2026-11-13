@@ -160,10 +160,34 @@ Each step is shipped and proven before the next, each with its docs example in t
        pick the translation with them (the board in a second query, so fallbacks can't double a
        row). Checked on dev: an untranslated Arabic post is `ar-EG`/`rtl` on the English board and
        page; the Arabic original under a Thai translation too. Package tests for the three.
-   - Not done: machine translation with Void's AI in a queue. Once an app imports `void/ai`, its
-     dev server needs Void's own Cloudflare login or a `CLOUDFLARE_API_TOKEN`
-     (`guide/ai.md`, "Local Development"), and so would the tests run here and in CI, which have
-     no Cloudflare credentials. Decided 2026-11-13: plan it on its own.
+   - **7b, not done: machine translation with Void's AI, in a queue, the same locally and on
+     Cloudflare** (asked for 2026-11-13). Posting an event sends a queue message; the consumer
+     translates the title and description into each of the app's languages with Void's AI
+     (`void/ai`), stores them (`event_texts`) and clears those pages (`revalidate`). Found
+     2026-11-13:
+     - Queues: locally a send runs the consumer in Miniflare, the same handler as in
+       production, and `POST /__void/queue` (with the dev trigger token) runs a batch by hand
+       (`guide/queues.md`, "Local development"); no login. On Cloudflare, Void's deploy creates
+       and wires the queue, as the example's deploy already does for what's missing (README,
+       `vp run deploy`).
+     - AI locally, tried in a plain Void 1.8.0 app with no Cloudflare login: the dev server
+       starts; `ai.run()` throws "ai: Not available. Configure a Workers AI binding…", and Void
+       logs "AI requires authentication. Run `void account login`, then restart the dev server"
+       (the docs say `void cloudflare login`). So with no login, dev and the tests here and in
+       CI run, and a post isn't translated: the consumer leaves it as written, never fails.
+     - AI on Cloudflare: the deployed Worker has the binding (Workers Builds deploys with its
+       own token).
+     - Models (Cloudflare's model pages, checked 2026-11-13): `@cf/meta/m2m100-1.2b` is Workers
+       AI's one general translation model (many-to-many, Arabic and Thai among them;
+       `{ text, source_lang, target_lang }`; zero data retention; $0.342 per million tokens in
+       and out). `@cf/ai4bharat/indictrans2-en-indic-1B` is for Indian languages only. A text
+       model (`@cf/meta/llama-3.3-70b-instruct-fp8-fast`, the one Void's docs show) translates
+       when asked and is likely better at Thai, unmeasured. The sample events' human
+       translations (`db/migrations/20261111064630_sample_events.sql`) are the measure to
+       compare them on, once there's a login to run them.
+     - To decide: the login for AI in dev (Void's own `void account login`, approved in the
+       browser as `cf`'s is; or none, so posts are only translated on Cloudflare), then the
+       model, by that measure.
 8. [x] **Email in the recipient's language,** done 2026-11-13 (in dev; live sending not set up).
        The example sends a booking's confirmation (`src/events/booking-email.ts`) in the booker's
        language, kept with the booking (`bookings.locale`), through `inLocale`, so the same code can run
@@ -182,15 +206,8 @@ Each step is shipped and proven before the next, each with its docs example in t
      placeholder in `src/site.ts` (`EMAIL_FROM`), not `email.from`, so Void's deploy doesn't set
      up email meanwhile.
 
-7b. **Machine translation with Void's AI, in a queue, the same locally and on Cloudflare** (asked
-for 2026-11-13). Posting an event sends a queue message; the consumer translates the title and
-description into each of the app's languages with Void's AI (`void/ai`) and stores them
-(`event_texts`), then clears those pages (`revalidate`), with `inLocale` for anything written
-in a language. To work out first, from Void's docs: how Void runs a queue locally
-(`guide/queues.md`, "Local development") and on Cloudflare (what a deploy creates); how
-`void/ai` can run locally without Void's Cloudflare login, or what the tests here and in CI
-use instead (`guide/ai.md` says it has no local simulator); and which model translates
-Arabic and Thai well enough. 9. **Sign-in,** when the example needs accounts. 10. **API routes with a language,** with the MCP route when that's planned.
+9. **Sign-in,** when the example needs accounts.
+10. **API routes with a language,** with the MCP route when that's planned.
 
 The tests deleting what they post (`plans/tidy-ember-ledger.md`) is separate and can go first.
 
