@@ -123,8 +123,9 @@ export function collectErrors(page: Page): string[] {
 }
 
 /**
- * Void cuts the server stream at the shell on defer() pages, and React reports it (#419 in
- * production). It happens on a page with no fbtee too, so it's Void's and not ours: expected
- * there and only there.
+ * Void cuts the server stream at the shell on defer() pages (readDeferredShell in @void/react's
+ * pages-server), and React reports it (#419 in production). A fresh `void init` app with the
+ * docs' own defer() example logs it too (void 1.7.0 and 1.8.0), so it's Void's and not ours:
+ * expected on defer() pages and only there. Remove this once Void fixes it.
  */
 export const VOID_DEFER_MESSAGE = /Switched to client rendering|Minified React error #419/;
