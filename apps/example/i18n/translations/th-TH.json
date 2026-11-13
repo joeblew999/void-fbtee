@@ -1956,6 +1956,66 @@
         }
       ],
       "types": []
+    },
+    "nAQYIQzY8EiT5tKaG469QQ==": {
+      "description": "Heading of the page shown when the site failed to make a page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เกิดข้อผิดพลาด",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rvPBoQpzwcdc63MWsK3Hug==": {
+      "description": "Under the error heading: what to do",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สร้างหน้านี้ไม่ได้ในขณะนี้ ลองอีกครั้ง หรือเริ่มจากหน้าแรก",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8hIsQrMl9I5uIOQAcXb5dA==": {
+      "description": "Button: load the page again after an error",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ลองอีกครั้ง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CYxuGRRXh/qn3LllDScV5w==": {
+      "description": "Heading of the page shown for an address with nothing at it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ไม่มีอะไรอยู่ที่นี่",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "c9R3zUFlNV5JPXPawfkWhQ==": {
+      "description": "Under the not-found heading: what happened and where to go",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ลิงก์อาจเก่าแล้ว หรือกิจกรรมอาจถูกนำออกไปแล้ว ลองดูกิจกรรม หรือเริ่มจากหน้าแรก",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

@@ -32,8 +32,8 @@ const testId = (page: (typeof PAGES)[number]) => `nav-${rest(page).slice(1) || "
 export default function SiteHeader() {
   const { locale, lang, path } = useLocale();
   const locales = useLocales();
-  const current =
-    PAGES.findLast((p) => (rest(p) === "" ? path === "" : path.startsWith(rest(p)))) ?? "/[lang]";
+  // None on a page that's none of these, such as the not-found page for an unknown address.
+  const current = PAGES.findLast((p) => (rest(p) === "" ? path === "" : path.startsWith(rest(p))));
   return (
     <header className="sticky top-0 z-40 border-b bg-background">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 px-4">

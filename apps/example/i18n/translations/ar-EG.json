@@ -2292,6 +2292,66 @@
         }
       ],
       "types": []
+    },
+    "nAQYIQzY8EiT5tKaG469QQ==": {
+      "description": "Heading of the page shown when the site failed to make a page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "حدث خطأ ما",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rvPBoQpzwcdc63MWsK3Hug==": {
+      "description": "Under the error heading: what to do",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تعذّر إنشاء هذه الصفحة الآن. حاول مرة أخرى، أو ابدأ من الصفحة الرئيسية.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8hIsQrMl9I5uIOQAcXb5dA==": {
+      "description": "Button: load the page again after an error",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "حاول مرة أخرى",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CYxuGRRXh/qn3LllDScV5w==": {
+      "description": "Heading of the page shown for an address with nothing at it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لا يوجد شيء هنا",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "c9R3zUFlNV5JPXPawfkWhQ==": {
+      "description": "Under the not-found heading: what happened and where to go",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ربما يكون الرابط قديمًا، أو أُزيلت الفعالية. جرّب صفحة الفعاليات، أو ابدأ من الصفحة الرئيسية.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }
