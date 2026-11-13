@@ -2,6 +2,7 @@
 
 - Set up: install Vite+'s `vp` (`curl -fsSL https://vite.plus | bash`), then `vp env on` (so package scripts use `.node-version`'s Node, not an older one already on the machine), then `vp install`.
 - What's here, the tasks, deploying and upgrading: README.md.
+- Void's docs for the installed version are in `apps/example/node_modules/void/docs/` (`guide/`, `reference/`). Before building anything with Void (in the app, the package or the tests), read its page there rather than going from memory or the website: they match the version in use.
 - `packages/void-fbtee/skills/void-fbtee/SKILL.md` ships to apps that use the package: keep it matching the code.
 - Commit to main; push only when asked.
 
