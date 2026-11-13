@@ -135,7 +135,9 @@ ready only once they print their own URL (we already do).
        and deleted at once, is the only check that a deploy works end to end; it emails no one.
 7. [ ] **The layout and running above,** as one move: the files, the projects, the time limits,
        the tasks, the islands helper, and every reference.
-8. [ ] **Docs.** The README: the stage table (where pages, cache, email, AI, queues and crons go at
+8. [ ] **Docs.** Earlier plans that describe what this replaces say so where they describe it
+       (`plans/quiet-harbor-atlas.md` step 7b: the `WORKERS_AI` flag and the hand-translation route).
+       The README: the stage table (where pages, cache, email, AI, queues and crons go at
        each stage, and how each is checked), the test commands by stage, re-translating a post through
        `/__void/queue`, signing in first, and that dev and the preview run share the local database.
        SKILL.md: a short "testing a translated app" note (emails in dev through Void's inbox, in unit
@@ -203,6 +205,13 @@ a queue, a cron or AI as its subject. `e2e/browsers/` (3 files) and `e2e/deploye
 stay where they are.
 
 ### How they run
+
+- **One at a time:** `test:dev` and `test:preview` share the local database (finding 8), and the
+  preview run resets it and refuses to start while dev is up; `test:dev` uses the dev server's
+  database as it is and deletes everything it posts. Run one, then the other.
+- **Signed in first:** with AI on in dev and the preview (item 1), both runs need Void's Cloudflare
+  sign-in (`vp run login`), as on a Mac and in a Claude session; CI runs neither (it runs
+  `test:unit` and `test:deployed`).
 
 - **Projects** in the root `vite.config.ts`: `unit` (the package), `preview`, `dev`, `browsers`,
   `deployed`. The example's unit tests stay in `apps/example` (`vp run example#test`): Void finds an
