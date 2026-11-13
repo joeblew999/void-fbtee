@@ -133,7 +133,13 @@ Each step is shipped and proven before the next, each with its docs example in t
        Zod 4 it does nothing; Valibot and other libraries aren't covered. Package tests: German and
        Arabic messages, an app's own message kept, English with no language. In the fresh app the gap
        is now a check.
-5. **Not-found and error pages from `void-fbtee init`,** with the title helper.
+5. [x] **Not-found and error pages from `void-fbtee init`,** done 2026-11-13. `init` writes
+       `pages/_not-found.tsx` and `pages/_error.tsx` (`NOT_FOUND`, `ERROR` in `src/init.ts`) when
+       the app has none and has a home page under `pages/[lang]/` (their link home goes there; else
+       a line to run init again). Their strings are the example's, so the example's catalogs
+       translate them. No title helper after all: React 19's own `<title>` with an `fbs(…)` string
+       is one line, and the template shows it. Package tests for the three cases; in the fresh app
+       the gap is now a check (the Thai page and its Thai tab title).
 6. **The sitemap from the package.**
 7. **Translated content:** the pattern, then translating it with AI in a queue.
 8. **Email** in the recipient's language.

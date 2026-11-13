@@ -158,14 +158,16 @@ for (const target of targets) {
     run(...exec(app.pm, "void-fbtee", "--help"), dir, { capture: true }).includes("translate"),
     `${target}: void-fbtee --help`,
   );
+  // void-fbtee's own pages and Void's docs examples (e2e/fresh/app/: pages/, routes/, crons/),
+  // there before init, as a developer's own pages are: with a home under pages/[lang]/, init adds
+  // the not-found and error pages.
+  cpSync(join(import.meta.dirname, "app"), dir, { recursive: true });
   // The example's languages (its translations are copied in below); init adds the plugin,
   // middleware, flags, scripts and peers.
   run(...exec(app.pm, "void-fbtee", "init", "--locales", TRANSLATED.join(",")), dir);
   run(...install(app.pm), dir);
-  // void-fbtee's own pages and Void's docs examples (e2e/fresh/app/: pages/, routes/), and the
-  // example's translations of their strings. Zod for the form's validator, as Void's docs leave
-  // the library to the developer (guide/server-routing.md, "Manual validators").
-  cpSync(join(import.meta.dirname, "app"), dir, { recursive: true });
+  // The example's translations of the strings, and Zod for the form's validator, as Void's docs
+  // leave the library to the developer (guide/server-routing.md, "Manual validators").
   cpSync(join(root, "apps/example/i18n"), join(dir, "i18n"), { recursive: true });
   run(app.pm, app.pm === "npm" ? ["install", "zod"] : ["add", "zod", "--no-frozen-lockfile"], dir);
   checkOwnDependencies(target, dir, installed);
@@ -444,10 +446,11 @@ async function checkDev(target: string, dir: string, app: App) {
     );
     const nothing = await fetch(`${base}/th-TH/no-such-page`);
     const nothingHtml = await nothing.text();
-    gap(
-      nothing.status === 404 && nothingHtml.includes("ไม่มีอะไรอยู่ที่นี่"),
-      `${target}: an address with nothing at it gets a not-found page in Thai`,
-      5,
+    check(
+      nothing.status === 404 &&
+        nothingHtml.includes("ไม่มีอะไรอยู่ที่นี่") &&
+        nothingHtml.includes("<title>ไม่มีอะไรอยู่ที่นี่</title>"),
+      `${target}: an address with nothing at it gets init's not-found page in Thai, title too`,
     );
     const sitemap = await fetch(`${base}/sitemap.xml`);
     gap(

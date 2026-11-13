@@ -53,8 +53,10 @@ vp install
 vp run i18n:translate
 ```
 
-`init` adds only what's missing, so it's safe to run again. `void-fbtee check` lists anything
-untranslated or not set up, and `void-fbtee --help` lists the commands.
+`init` adds only what's missing, so it's safe to run again. Once the app has a home page under
+`pages/[lang]/`, it also writes Void's not-found and error pages in the page's language
+(`pages/_not-found.tsx`, `pages/_error.tsx`), unless the app has its own. `void-fbtee check` lists
+anything untranslated or not set up, and `void-fbtee --help` lists the commands.
 
 Then give it the site's own address, so every copy of the site (the dev server, a Worker Preview)
 names the real one in each page's canonical, hreflang and `og:url`, and in the sitemap

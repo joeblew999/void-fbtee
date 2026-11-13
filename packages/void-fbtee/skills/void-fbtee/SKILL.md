@@ -171,6 +171,10 @@ missing; where it can't safely edit a file it prints the line to add). The piece
 - `middleware/99.i18n.ts`: `export { default } from "void-fbtee/middleware";`. The 99 makes Void run
   it after the app's own middleware (01-98), since it adds to the shared and head data they set.
 - `pages/layout.tsx` wraps its children in `<I18nProvider>` from `void-fbtee/react`.
+- `pages/_not-found.tsx` and `pages/_error.tsx`: Void's not-found and error pages, in the page's
+  language, with a link to the home page under `pages/[lang]/` (init writes them once that page
+  exists, and never over the app's own). They take no `head()`, so their tab title is React's own
+  `<title>` with an `fbs(…)` string.
 - `worker: { compatibility_flags: ["temporal"] }` in `void.config.ts`. The Worker's own Temporal
   replaces `temporal-polyfill` there; unit tests under `vp test` run in Node.js and keep the
   polyfill.

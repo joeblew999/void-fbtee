@@ -127,6 +127,50 @@ test("an existing layout is left alone, with the line to add", async () => {
   );
 });
 
+const withHome = (root: string) => {
+  mkdirSync(join(root, "pages/[lang]"), { recursive: true });
+  writeFileSync(join(root, "pages/[lang]/index.tsx"), "export default () => null;\n");
+};
+
+test("with a home page under pages/[lang]/: Void's not-found and error pages, translated", async () => {
+  const root = app("vite-plus");
+  withHome(root);
+  const { done } = await init(options(root));
+  expect(done).toContain(
+    "pages/_not-found.tsx: created, Void's not-found page in the page's language",
+  );
+  expect(done).toContain("pages/_error.tsx: created, Void's error page in the page's language");
+  const notFound = read(root, "pages/_not-found.tsx");
+  expect(notFound).toContain(
+    `fbt desc="Heading of the page shown for an address with nothing at it"`,
+  );
+  expect(notFound).toContain("<title>");
+  expect(notFound).toContain(`routeUrl("/[lang]")`);
+  expect(read(root, "pages/_error.tsx")).toContain("router.refresh()");
+  const before = snapshot(root);
+  await init(options(root));
+  expect(snapshot(root)).toEqual(before);
+});
+
+test("an app's own not-found page is left alone", async () => {
+  const root = app("vite-plus");
+  withHome(root);
+  const own = "export default () => <p>Gone</p>;\n";
+  writeFileSync(join(root, "pages/_not-found.jsx"), own);
+  await init(options(root));
+  expect(read(root, "pages/_not-found.jsx")).toBe(own);
+  expect(existsSync(join(root, "pages/_not-found.tsx"))).toBe(false);
+  expect(existsSync(join(root, "pages/_error.tsx"))).toBe(true);
+});
+
+test("with no home under pages/[lang]/, neither page, and the line to come back", async () => {
+  const root = app("vite-plus");
+  const { todo } = await init(options(root));
+  expect(existsSync(join(root, "pages/_not-found.tsx"))).toBe(false);
+  expect(existsSync(join(root, "pages/_error.tsx"))).toBe(false);
+  expect(todo.join("\n")).toContain("once the app has a home page under pages/[lang]/");
+});
+
 /** A pnpm workspace with a Vite+ app in apps/app; the root config has `rootConfig`. */
 function workspace(rootConfig: string, rootDevDependencies: Record<string, string> = {}) {
   const ws = mkdtempSync(join(import.meta.dirname, ".tmp-"));

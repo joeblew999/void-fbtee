@@ -82,6 +82,70 @@ const MIDDLEWARE = `// Locale from the URL, fbtee's per-request state, <html lan
 export { default } from "void-fbtee/middleware";
 `;
 
+// Void's not-found and error pages (pages/_not-found.tsx, pages/_error.tsx: Void's docs,
+// guide/pages-routing/errors.md), in the page's language. They take no head(), so React's own
+// <title> sets the tab's title (React 19). Their strings are fbtee's like any other: prepare and
+// translate them with the app's.
+const NOT_FOUND = `// Not found, in the page's language: an address with nothing at it, or a loader that answers 404
+// (Void's pages/_not-found, guide/pages-routing/errors.md). Void keeps the 404 status. Written by
+// void-fbtee init: change it as you like, with its text in <fbt> so it's translated.
+import { fbs, fbt } from "fbtee";
+import type { ErrorPageProps } from "@void/react";
+import { Link } from "void-fbtee/react";
+import { routeUrl } from "void-fbtee/routes";
+
+export default function NotFound({ error }: ErrorPageProps) {
+  return (
+    <section>
+      {/* No head() here: React's own <title> sets the tab's title. */}
+      <title>{String(fbs("There's nothing here", "Heading of the page shown for an address with nothing at it"))}</title>
+      <p dir="ltr">{error.status}</p>
+      <h1>
+        <fbt desc="Heading of the page shown for an address with nothing at it">There's nothing here</fbt>
+      </h1>
+      <Link href={routeUrl("/[lang]")}>
+        <fbt desc="Navigation: the home page">Home</fbt>
+      </Link>
+    </section>
+  );
+}
+`;
+
+const ERROR = `// Something broke while making a page, in the page's language (Void's pages/_error,
+// guide/pages-routing/errors.md). Void keeps the status, and hides server details in production.
+// "Try again" reruns the page's loader. Written by void-fbtee init: change it as you like, with its
+// text in <fbt> so it's translated.
+import { fbs, fbt } from "fbtee";
+import { useRouter, type ErrorPageProps } from "@void/react";
+import { Link } from "void-fbtee/react";
+import { routeUrl } from "void-fbtee/routes";
+
+export default function ErrorPage({ error }: ErrorPageProps) {
+  const router = useRouter();
+  return (
+    <section>
+      {/* No head() here: React's own <title> sets the tab's title. */}
+      <title>{String(fbs("Something went wrong", "Heading of the page shown when the site failed to make a page"))}</title>
+      <p dir="ltr">{error.status}</p>
+      <h1>
+        <fbt desc="Heading of the page shown when the site failed to make a page">Something went wrong</fbt>
+      </h1>
+      <p>
+        <fbt desc="Under the error heading: what to do">
+          This page couldn't be made just now. Try again, or start from the home page.
+        </fbt>
+      </p>
+      <button type="button" onClick={() => router.refresh()}>
+        <fbt desc="Button: load the page again after an error">Try again</fbt>
+      </button>
+      <Link href={routeUrl("/[lang]")}>
+        <fbt desc="Navigation: the home page">Home</fbt>
+      </Link>
+    </section>
+  );
+}
+`;
+
 /** Coding agents and their skills folders, as Void's own skill linking detects them. */
 const AGENTS = [
   { name: "Claude Code", detect: [".claude", "CLAUDE.md"], skillsDir: ".claude/skills" },
@@ -200,6 +264,27 @@ export async function init(o: InitOptions): Promise<InitResult> {
       `${layout}: wrap the layout's children in <I18nProvider> (import { I18nProvider } from "void-fbtee/react"): return <I18nProvider>{children}</I18nProvider>`,
     );
   }
+
+  // 4b. Void's not-found and error pages in the page's language, where the app has none. Only with
+  // a home page under pages/[lang]/, which their link home goes to (and the type check needs).
+  const PAGE_FILE = /\.(tsx|jsx|ts|js|md|mdx)$/;
+  const has = (dir: string, name: string) =>
+    existsSync(at(dir)) &&
+    readdirSync(at(dir)).some((f) => f.replace(PAGE_FILE, "") === name && PAGE_FILE.test(f));
+  const errorPages = [
+    { name: "_not-found", code: NOT_FOUND, what: "not-found page" },
+    { name: "_error", code: ERROR, what: "error page" },
+  ].filter((p) => !has("pages", p.name));
+  if (errorPages.length && !has("pages/[lang]", "index"))
+    todo.push(
+      `pages/_not-found.tsx and pages/_error.tsx: init writes them, in the page's language, once the app has a home page under pages/[lang]/ (their link home goes there); run init again then`,
+    );
+  else
+    for (const p of errorPages) {
+      writeFileSync(at(`pages/${p.name}.tsx`), p.code);
+      written.add(`pages/${p.name}.tsx`);
+      done.push(`pages/${p.name}.tsx: created, Void's ${p.what} in the page's language`);
+    }
 
   // 5. vite.config.ts: the plugin first, with the languages from src/locales.ts (made here if
   // there's none); on Vite+ the lint plugins (in the workspace's root config).
