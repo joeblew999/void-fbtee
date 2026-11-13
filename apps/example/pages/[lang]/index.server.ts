@@ -3,7 +3,7 @@ import { fbs } from "fbtee";
 import type { WebSite, WithContext } from "schema-dts";
 import { jsonLd, pageHead } from "void-fbtee/head";
 import type { InferProps } from "void";
-import { langParams, siteOrigin } from "void-fbtee/middleware";
+import { langParams, siteOrigin } from "void-fbtee/server";
 
 // Cached until the next deploy, in every language (Void's prerendering: a one-year cache time,
 // and a deploy clears the cache). Void's own platform also builds it during the deploy; deployed

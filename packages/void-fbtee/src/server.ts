@@ -1,18 +1,36 @@
-// Server code in a language of its own choosing, not the request's: a scheduled job (crons/), a
-// queue consumer (queues/) or an email, which Void runs with no request, so the middleware has set
-// no language (Void's docs: guide/jobs.md, defineScheduled(async (controller, env) => …);
-// guide/queues.md, defineQueue(async (batch, env) => …)). Also for one person's language inside a
-// request in another (an email to the organiser, sent while a visitor books).
+// Server code's i18n: the parts an app's loaders, actions, routes, jobs and queues use, beside the
+// middleware (void-fbtee/middleware) that sets each request's language.
+//
+// - inLocale(): code in a language of its own choosing, not the request's: a scheduled job
+//   (crons/), a queue consumer (queues/) or an email, which Void runs with no request (Void's docs:
+//   guide/jobs.md, defineScheduled(async (controller, env) => …); guide/queues.md,
+//   defineQueue(async (batch, env) => …)), or one person's language inside a request in another.
+// - revalidate(): Void's (void/isr), clearing a page in every language.
+// - The current language for routeUrl (void-fbtee/routes): the request's, set by the middleware
+//   (withLang), or inLocale()'s, held here in an AsyncLocalStorage, as fbtee holds its own state.
+import { AsyncLocalStorage } from "node:async_hooks";
 import { runWithFbtee } from "fbtee/server";
+import { revalidate as voidRevalidate } from "void/isr";
+import type { RouteUrl } from "void/routes";
 import config from "virtual:void-fbtee/config";
 import catalogs from "virtual:void-fbtee/catalogs";
-import type { AppLocale, Dir } from "./locales";
+import { setServerLang } from "./current";
+import type { AppLocale, Dir, Lang } from "./locales";
 import { allTranslations } from "./runtime";
+
+const storage = new AsyncLocalStorage<Lang>();
+setServerLang(() => storage.getStore());
+
+/** Runs `fn` with `lang` as the current language (the middleware, for each request). */
+export function withLang<T>(lang: Lang, fn: () => T): T {
+  return storage.run(lang, fn);
+}
 
 /**
  * Runs `fn` in one of the app's languages: `fbs(…)` and `<fbt>` there are in it, with the same
- * catalogs and fallbacks as a page, including after an `await`. `fn` gets the language and its text
- * direction, for Intl and Temporal (`toLocaleString(locale, …)`) and for an email's `dir`.
+ * catalogs and fallbacks as a page, including after an `await`, and `routeUrl` builds addresses
+ * in it. `fn` gets the language and its text direction, for Intl and Temporal
+ * (`toLocaleString(locale, …)`) and for an email's `dir`.
  *
  *   const subject = await inLocale(user.locale, () => fbs("Your booking", "Email subject: …"));
  *
@@ -30,7 +48,85 @@ export async function inLocale<T>(
     );
   const { sourceLocale, fallbackLocales } = config;
   const translations = await allTranslations(catalogs);
-  return await runWithFbtee({ locale, sourceLocale, fallbackLocales, translations }, () =>
-    fn({ locale, dir: found.dir }),
+  return await withLang(found.segment, () =>
+    runWithFbtee({ locale, sourceLocale, fallbackLocales, translations }, () =>
+      fn({ locale, dir: found.dir }),
+    ),
   );
+}
+
+/**
+ * Void's revalidate (void/isr), with every language: a path that starts `/[lang]` is cleared in
+ * each of the app's languages, so none is left stale; any other path as it is.
+ *
+ *   await revalidate({ paths: ["/[lang]/events", `/[lang]/events/${id}`, "/sitemap.xml"] });
+ */
+export function revalidate(options: {
+  // In this package RouteUrl is Void's stub (string); in an app it's the app's routes.
+  // oxlint-disable-next-line no-redundant-type-constituents
+  paths?: readonly (`/[lang]${string}` | RouteUrl)[];
+  all?: boolean;
+}): Promise<void> {
+  const paths = options.paths?.flatMap((path) =>
+    path.startsWith("/[lang]")
+      ? localizedPaths(path.slice("/[lang]".length) as `/${string}`)
+      : [path],
+  );
+  return voidRevalidate({ ...options, paths: paths as RouteUrl[] | undefined });
+}
+
+/**
+ * The same page in every language: `localizedPaths("/events")` is ["/en-US/events",
+ * "/th-TH/events", …].
+ */
+export function localizedPaths<P extends `/${string}` | "">(path: P): `/${Lang}${P}`[] {
+  return config.locales.map((l) => `/${l.segment}${path}` as const);
+}
+
+/**
+ * Every language as a page's `[lang]` param: `[{ lang: "en-US" }, { lang: "th-TH" }, …]`. For
+ * prerendering a page under `pages/[lang]/` in every language (Void's edge prerendering, which
+ * needs a page's params; it builds the pages during the deploy on Void's platform, and on the
+ * first visit after a deploy on direct Cloudflare):
+ * `export const prerender = true; export const getPrerenderPaths = langParams;`.
+ */
+export function langParams(): { lang: Lang }[] {
+  return config.locales.map((l) => ({ lang: l.segment as Lang }));
+}
+
+/**
+ * Something worked out in every language at once, for one response that holds them all (a web app
+ * manifest's translated fields): `fn` runs once per language inside fbtee's state for it, so
+ * `fbs(…)` there is in that language, with the same catalogs and fallbacks as a page. It gets the
+ * language and its text direction. Keyed by locale, in the app's order (the source first).
+ */
+export async function inEveryLocale<T>(
+  fn: (language: { locale: string; dir: Dir }) => T,
+): Promise<Record<string, T>> {
+  const { sourceLocale, fallbackLocales } = config;
+  const translations = await allTranslations(catalogs);
+  return Object.fromEntries(
+    config.locales.map((l) => [
+      l.locale,
+      withLang(l.segment, () =>
+        runWithFbtee({ locale: l.locale, sourceLocale, fallbackLocales, translations }, () =>
+          fn({ locale: l.locale, dir: l.dir }),
+        ),
+      ),
+    ]),
+  );
+}
+
+/**
+ * The site's own address: `voidFbtee({ site })`, or else the one this request came to. For anything
+ * that writes full addresses (a sitemap, robots.txt's Sitemap line), so they match the pages'
+ * canonical and hreflang.
+ */
+export function siteOrigin(c: { req: { url: string } }): string {
+  return config.site ?? new URL(c.req.url).origin;
+}
+
+/** The app's languages (`voidFbtee({ locales })`), for server code that works per language. */
+export function appLocales(): string[] {
+  return config.locales.map((l) => l.locale);
 }

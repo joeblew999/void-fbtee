@@ -2,8 +2,8 @@
 // is neutral (the picker's "2026-04-01T20:00" and a zone name); the event's page shows it back in
 // every language and on every clock.
 import { fbt } from "fbtee";
-import { Form, useForm } from "@void/react";
-import { useLocale, useTimeZone } from "void-fbtee/react";
+import { Form } from "@void/react";
+import { useForm, useTimeZone } from "void-fbtee/react";
 import { EventsCrumbs } from "@/events/EventsCrumbs";
 import { Button } from "@/ui/button";
 import { Input } from "@/ui/input";
@@ -17,12 +17,14 @@ import type { Props } from "./new.server";
  * the server's zones. What it sends is neutral: the picker's "2026-04-01T20:00" and a zone name.
  */
 function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
-  const { lang } = useLocale();
-  const form = useForm(
-    "/[lang]/events/new",
-    { title: "", description: "", venue: "", local: "", time_zone: zone ?? "", seats: 20 },
-    { params: { lang } },
-  );
+  const form = useForm("/[lang]/events/new", {
+    title: "",
+    description: "",
+    venue: "",
+    local: "",
+    time_zone: zone ?? "",
+    seats: 20,
+  });
   const error = (field: keyof typeof form.errors, message: React.ReactNode) =>
     form.errors[field] && (
       <p className="text-destructive text-sm" data-testid={`error-${field}`}>

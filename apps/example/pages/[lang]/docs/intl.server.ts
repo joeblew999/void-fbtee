@@ -2,7 +2,7 @@ import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
 import { runAll } from "@/docs/intl";
-import { langParams } from "void-fbtee/middleware";
+import { langParams } from "void-fbtee/server";
 
 // Cached until the next deploy, in every language (Void's prerendering: a one-year cache time,
 // and a deploy clears the cache). Void's own platform also builds it during the deploy; deployed

@@ -1,8 +1,8 @@
 // The home page's sections after the first screen, as Void's own site (void.cloud) lays out its
 // home: how to add it, what it does (each with its facts and the docs page that explains it), and
 // a closing call. Every fact here is in the docs or the code; nothing is a claim made up for the page.
-import { routeUrl, type RouteUrl } from "void/routes";
-import type { Lang } from "void-fbtee/locales";
+import { routeUrl } from "void-fbtee/routes";
+import type { RouteUrl } from "void/routes";
 import type { ReactNode } from "react";
 import { fbt } from "fbtee";
 import {
@@ -14,7 +14,7 @@ import {
   Hash,
   Languages,
 } from "lucide-react";
-import { Link, useLocale } from "void-fbtee/react";
+import { Link } from "void-fbtee/react";
 import { buttonVariants } from "@/ui/button";
 import { REPO, SETUP, SKILL, type Offsite } from "@/shell/project";
 import { cn } from "@/ui/utils";
@@ -101,7 +101,7 @@ interface Feature {
   href: RouteUrl | Offsite;
 }
 
-function features(lang: Lang): Feature[] {
+function features(): Feature[] {
   const icon = "size-5 text-brand";
   return [
     {
@@ -123,7 +123,7 @@ function features(lang: Lang): Feature[] {
     {
       icon: <CalendarClock className={icon} aria-hidden />,
       title: <fbt desc="Home feature title: dates and times">Dates and times, by Temporal</fbt>,
-      href: routeUrl(`/${lang}/docs/tour`),
+      href: routeUrl("/[lang]/docs/tour"),
       facts: [
         <fbt key="1" desc="Home feature fact about times and time zones">
           Every time shown on its place's clock and on the reader's.
@@ -143,7 +143,7 @@ function features(lang: Lang): Feature[] {
           Numbers and the rest, by Intl
         </fbt>
       ),
-      href: routeUrl("/[lang]/docs/intl", { params: { lang } }),
+      href: routeUrl("/[lang]/docs/intl"),
       facts: [
         <fbt key="1" desc="Home feature fact about the Intl formats">
           Numbers, money, units, lists and names from the platform's own Intl.
@@ -217,7 +217,6 @@ function features(lang: Lang): Feature[] {
 
 /** What it does: six features in a ruled grid, each with its facts and the docs page on it. */
 export function Features() {
-  const { lang } = useLocale();
   return (
     <section className="border-t py-16">
       <h2 className="max-w-2xl text-3xl font-medium text-balance md:text-4xl">
@@ -227,7 +226,7 @@ export function Features() {
       </h2>
       {/* 1px rules between cells at any column count: the grid's colour shows through 1px gaps. */}
       <div className="mt-10 grid gap-px border-y bg-border sm:grid-cols-2 lg:grid-cols-3">
-        {features(lang).map((f, i) => (
+        {features().map((f, i) => (
           <article key={i} className="flex flex-col bg-background p-6">
             {f.icon}
             <h3 className="mt-4 text-lg font-medium">{f.title}</h3>

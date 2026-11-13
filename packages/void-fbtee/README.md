@@ -9,8 +9,9 @@ https://void-fbtee-example.gedw99.workers.dev
 
 A Void add-on, built the way Void's own `@void/md` and `@void/react` are: a Vite plugin
 (`import { voidFbtee } from "void-fbtee/plugin"`) plus the parts a Void app uses at run time
-(`void-fbtee/middleware`, `void-fbtee/react`, and `void-fbtee/server` for code with no page: a
-scheduled job, a queue consumer, an email). The Vite plugin works only in a Void app: it swaps
+(`void-fbtee/middleware`, `void-fbtee/react`, `void-fbtee/routes` for links in the current
+language, and `void-fbtee/server` for server code: cache clearing in every language, and code
+with no page, such as a scheduled job, a queue consumer or an email). The Vite plugin works only in a Void app: it swaps
 modules in Void's server environment (Cloudflare's own Temporal, fbtee's per-request build, Void's
 own Hono), and the rest goes where Void looks for it (`middleware/99.i18n.ts`, `void.config.ts`),
 which `void-fbtee init` sets up and `void-fbtee check` checks. React only, as fbtee is. It works
@@ -56,7 +57,7 @@ untranslated or not set up, and `void-fbtee --help` lists the commands.
 
 Then give it the site's own address, so every copy of the site (the dev server, a Worker Preview)
 names the real one in each page's canonical, hreflang and `og:url`, and in the sitemap
-(`siteOrigin()` from `void-fbtee/middleware`). In the app's `vite.config.ts`:
+(`siteOrigin()` from `void-fbtee/server`). In the app's `vite.config.ts`:
 
 ```ts
 voidFbtee({ sourceLocale, locales, site: "https://example.com" });
@@ -87,7 +88,7 @@ meta: [
 The picture's address in full, and a new name for a new picture: sharing apps keep one a long time. An
 installed app's name and description can be translated in one manifest (`*_localized`, Chrome and
 Edge 148); the example's `routes/manifest.webmanifest.ts` builds it from the catalogs with
-`inEveryLocale` from `void-fbtee/middleware`. Its start page is `/`, which goes to the source
+`inEveryLocale` from `void-fbtee/server`. Its start page is `/`, which goes to the source
 language: the browser picks the manifest's text by the reader's language, not a start page.
 
 Structured data for search engines (schema.org JSON-LD) goes in a page's `head()` through

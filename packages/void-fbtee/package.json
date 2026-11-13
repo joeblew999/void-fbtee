@@ -38,6 +38,7 @@
     "./middleware": "./dist/middleware.mjs",
     "./plugin": "./dist/plugin.mjs",
     "./react": "./dist/react.mjs",
+    "./routes": "./dist/routes.mjs",
     "./server": "./dist/server.mjs",
     "./package.json": "./package.json"
   },

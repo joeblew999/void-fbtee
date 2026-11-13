@@ -10,7 +10,8 @@ import { ChevronDown } from "lucide-react";
 import { useFrontmatter } from "@void/md";
 import pages from "@void/md/pages";
 import { Temporal } from "temporal-polyfill";
-import { routeUrl, type RouteUrl } from "void/routes";
+import { routeUrl } from "void-fbtee/routes";
+import type { RouteUrl } from "void/routes";
 import type { Lang } from "void-fbtee/locales";
 import { Formatted, Link, useLocale } from "void-fbtee/react";
 import { cn } from "@/ui/utils";
@@ -44,11 +45,11 @@ function sidebar(lang: Lang) {
     {
       name: <fbt desc="Docs sidebar group: reference pages">Reference</fbt>,
       entries: [
-        { slug: "intl", title: "Intl", href: routeUrl("/[lang]/docs/intl", { params: { lang } }) },
+        { slug: "intl", title: "Intl", href: routeUrl("/[lang]/docs/intl") },
         {
           slug: "temporal",
           title: "Temporal",
-          href: routeUrl("/[lang]/docs/temporal", { params: { lang } }),
+          href: routeUrl("/[lang]/docs/temporal"),
         },
       ],
     },

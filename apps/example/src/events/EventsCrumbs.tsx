@@ -2,7 +2,7 @@
 // "Events" goes back to the list; the last part is this page. Right to left in Arabic, with the
 // arrow turned to match.
 import type { ReactNode } from "react";
-import { routeUrl } from "void/routes";
+import { routeUrl } from "void-fbtee/routes";
 import { fbs, fbt } from "fbtee";
 import { ChevronRight } from "lucide-react";
 import { Link, useLocale } from "void-fbtee/react";

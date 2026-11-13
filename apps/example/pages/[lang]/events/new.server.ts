@@ -6,8 +6,8 @@ import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
 import { db } from "void/db";
-import { revalidate } from "void/isr";
-import { langParams, localizedPaths } from "void-fbtee/middleware";
+import { routeUrl } from "void-fbtee/routes";
+import { langParams, revalidate } from "void-fbtee/server";
 import { z } from "zod";
 import { locales } from "@/locales";
 
@@ -28,7 +28,7 @@ export const action = defineHandler.withValidator({
   // One of the app's languages (the middleware has already sent any other to the not-found page).
   params: z.object({ lang: z.enum(locales) }),
   body: newEventSchema,
-})(async (c, { params, body }) => {
+})(async (c, { body }) => {
   const { locale } = c.get("i18n");
   const [created] = await db
     .insert(events)
@@ -42,11 +42,8 @@ export const action = defineHandler.withValidator({
     })
     .returning({ id: events.id });
   // The list in every language, and the sitemap, which lists the new event.
-  await revalidate({ paths: [...localizedPaths("/events"), "/sitemap.xml"] });
-  return c.redirect({
-    pathname: "/[lang]/events/[id]",
-    params: { lang: params.lang, id: created.id },
-  });
+  await revalidate({ paths: ["/[lang]/events", "/sitemap.xml"] });
+  return c.redirect(routeUrl("/[lang]/events/[id]", { params: { id: created.id } }));
 });
 
 export const head = defineHead(() =>

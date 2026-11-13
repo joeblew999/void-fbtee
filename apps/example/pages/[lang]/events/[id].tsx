@@ -3,12 +3,12 @@
 // (below it on a phone, with a bar fixed to the bottom that takes you there). The title and
 // description are in the language the organiser wrote them in (marked with lang, so the browser and
 // screen readers use the right one); the seats left are live, in a split-flap chip that turns over
-// as people book; booking is Void's useForm.
+// as people book; booking is Void's useForm, with the page's language filled in (void-fbtee/react).
 import { Fragment, useEffect, useRef, useState } from "react";
 import { fbt } from "fbtee";
-import { Form, useForm } from "@void/react";
+import { Form } from "@void/react";
 import { connectLiveStream } from "void/live/client";
-import { Formatted, useLocale, useTimeZone } from "void-fbtee/react";
+import { Formatted, useForm, useLocale, useTimeZone } from "void-fbtee/react";
 import { MapPin } from "lucide-react";
 import { EventTime } from "@/events/EventTime";
 import { EventsCrumbs } from "@/events/EventsCrumbs";
@@ -64,11 +64,10 @@ function useOnScreen() {
  */
 function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut: boolean }) {
   const [here, formOnScreen] = useOnScreen();
-  const { lang } = useLocale();
   const form = useForm(
     "/[lang]/events/[id]",
     { name: "", email: "", time_zone: zone ?? "" },
-    { params: { lang, id } },
+    { params: { id } },
   );
   if (form.wasSuccessful)
     return (

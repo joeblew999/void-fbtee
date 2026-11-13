@@ -3,7 +3,7 @@
 // (voidFbtee({ site }), else whichever host is asked), as the pages' canonical. Void's
 // page cache keeps it until the next deploy (routing.revalidate in void.config.ts).
 import { defineHandler } from "void";
-import { siteOrigin } from "void-fbtee/middleware";
+import { siteOrigin } from "void-fbtee/server";
 
 export const GET = defineHandler((c) => {
   const origin = siteOrigin(c);

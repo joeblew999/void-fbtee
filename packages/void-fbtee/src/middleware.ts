@@ -24,6 +24,7 @@ import markdownPages from "virtual:void-fbtee/md-pages";
 import { meta, type MetaTag } from "./head";
 import { localeFromPath, META_NAME, type Dir, type Lang } from "./locales";
 import { allTranslations } from "./runtime";
+import { siteOrigin, withLang } from "./server";
 
 export interface SharedI18n {
   locale: string;
@@ -45,61 +46,6 @@ declare module "void" {
   interface CloudContextVariables {
     i18n: SharedI18n;
   }
-}
-
-/**
- * The same page in every language: `localizedPaths("/events")` is ["/en-US/events",
- * "/th-TH/events", …]. For anything that acts on all of them, such as clearing Void's page cache
- * after a change (`revalidate({ paths: localizedPaths(…) })` from void/isr).
- */
-export function localizedPaths<P extends `/${string}`>(path: P): `/${Lang}${P}`[] {
-  return config.locales.map((l) => `/${l.segment}${path}` as const);
-}
-
-/**
- * Every language as a page's `[lang]` param: `[{ lang: "en-US" }, { lang: "th-TH" }, …]`. For
- * prerendering a page under `pages/[lang]/` in every language (Void's edge prerendering, which
- * needs a page's params; it builds the pages during the deploy on Void's platform, and on the
- * first visit after a deploy on direct Cloudflare):
- * `export const prerender = true; export const getPrerenderPaths = langParams;`.
- */
-export function langParams(): { lang: Lang }[] {
-  return config.locales.map((l) => ({ lang: l.segment as Lang }));
-}
-
-/**
- * Something worked out in every language at once, for one response that holds them all (a web app
- * manifest's translated fields): `fn` runs once per language inside fbtee's state for it, so
- * `fbs(…)` there is in that language, with the same catalogs and fallbacks as a page. It gets the
- * language and its text direction. Keyed by locale, in the app's order (the source first).
- */
-export async function inEveryLocale<T>(
-  fn: (language: { locale: string; dir: Dir }) => T,
-): Promise<Record<string, T>> {
-  const { sourceLocale, fallbackLocales } = config;
-  const translations = await allTranslations(catalogs);
-  return Object.fromEntries(
-    config.locales.map((l) => [
-      l.locale,
-      runWithFbtee({ locale: l.locale, sourceLocale, fallbackLocales, translations }, () =>
-        fn({ locale: l.locale, dir: l.dir }),
-      ),
-    ]),
-  );
-}
-
-/**
- * The site's own address: `voidFbtee({ site })`, or else the one this request came to. For anything
- * that writes full addresses (a sitemap, robots.txt's Sitemap line), so they match the pages'
- * canonical and hreflang.
- */
-export function siteOrigin(c: { req: { url: string } }): string {
-  return config.site ?? new URL(c.req.url).origin;
-}
-
-/** The app's languages (`voidFbtee({ locales })`), for server code that works per language. */
-export function appLocales(): string[] {
-  return config.locales.map((l) => l.locale);
 }
 
 /** The markdown page at this path, from @void/md's list (a trailing slash makes no difference). */
@@ -205,9 +151,11 @@ const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (
   const own = /^\/(__void|api)(\/|$)/.test(path);
   const answering = found || own ? undefined : answeringRoute(c);
   const madeUp = answering !== undefined && /^\/:[^/]+/.test(answering);
-  const response = await runWithFbtee(
-    { locale: current.locale, sourceLocale, fallbackLocales, translations },
-    () => (madeUp ? c.notFound() : next()),
+  // The request's language for fbtee, and for routeUrl from void-fbtee/routes (server.ts).
+  const response = await withLang(current.segment, () =>
+    runWithFbtee({ locale: current.locale, sourceLocale, fallbackLocales, translations }, () =>
+      madeUp ? c.notFound() : next(),
+    ),
   );
   // A copy of the site at another address (a Worker Preview, the dev server): kept out of search
   // results, so it never competes with the site itself. Only when the app names its site.

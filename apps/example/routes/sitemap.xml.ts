@@ -10,8 +10,8 @@ import pages from "@void/md/pages";
 import XMLBuilder from "fast-xml-builder";
 import { defineHandler } from "void";
 import { db, eq, max } from "void/db";
-import { routeUrl } from "void/routes";
-import { appLocales, langParams, siteOrigin } from "void-fbtee/middleware";
+import { routeUrl } from "void-fbtee/routes";
+import { appLocales, langParams, siteOrigin } from "void-fbtee/server";
 
 /** One page in every language: its address in each, and its last real change where there is one. */
 type Page = { urls: Record<string, string>; lastmod?: (locale: string) => string | undefined };

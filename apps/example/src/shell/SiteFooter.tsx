@@ -1,9 +1,9 @@
 // The site footer, in the root layout, in link columns as Void's own site has: the docs pages (from
 // the docs sidebar, so it matches), the project, and what the example is made with.
-import { routeUrl } from "void/routes";
+import { routeUrl } from "void-fbtee/routes";
 import type { ReactNode } from "react";
 import { fbt } from "fbtee";
-import { Link, useLocale } from "void-fbtee/react";
+import { Link } from "void-fbtee/react";
 import { useDocs } from "@/docs/DocsLayout";
 import { RELEASES, REPO } from "@/shell/project";
 
@@ -29,7 +29,6 @@ function Column({ title, children }: { title: ReactNode; children: ReactNode }) 
 }
 
 export default function SiteFooter() {
-  const { lang } = useLocale();
   const { groups } = useDocs();
   return (
     <footer className="mt-12 border-t">
@@ -51,7 +50,7 @@ export default function SiteFooter() {
           }
         >
           <li>
-            <Link href={routeUrl("/[lang]/events", { params: { lang } })} className={linkClass}>
+            <Link href={routeUrl("/[lang]/events")} className={linkClass}>
               <fbt desc="Navigation: the list of events people post and book">Events</fbt>
             </Link>
           </li>

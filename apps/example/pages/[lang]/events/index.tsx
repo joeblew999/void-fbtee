@@ -3,7 +3,7 @@
 // reader's clock and how far off it is (the browser's alone, filled in once it knows the zone),
 // the title and where, and the seats left in a split-flap chip. On a phone each row folds to three
 // lines. Posting an event is its own page (new.tsx).
-import { routeUrl } from "void/routes";
+import { routeUrl } from "void-fbtee/routes";
 import { fbt } from "fbtee";
 import { ArrowRight, MapPin } from "lucide-react";
 import { Formatted, Link, useLocale, useNow, useTimeZone } from "void-fbtee/react";
@@ -38,7 +38,7 @@ function SeatsLeft({ left }: { left: number }) {
 }
 
 function BoardRow({ e }: { e: Row }) {
-  const { locale, lang } = useLocale();
+  const { locale } = useLocale();
   const reader = useTimeZone();
   // Once a minute, so "tomorrow" becomes "today" on a page left open past midnight.
   const now = useNow({ updateInterval: 60_000 });
@@ -48,7 +48,7 @@ function BoardRow({ e }: { e: Row }) {
   return (
     <li>
       <Link
-        href={routeUrl("/[lang]/events/[id]", { params: { lang, id: e.id } })}
+        href={routeUrl("/[lang]/events/[id]", { params: { id: e.id } })}
         className={cn(
           "group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 px-1 py-4 transition-colors duration-150 hover:bg-muted/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand md:items-start md:px-3 md:py-5",
           COLUMNS,
@@ -120,8 +120,7 @@ function BoardRow({ e }: { e: Row }) {
 }
 
 export default function Events({ events }: Props) {
-  const { lang } = useLocale();
-  const post = routeUrl("/[lang]/events/new", { params: { lang } });
+  const post = routeUrl("/[lang]/events/new");
   return (
     <div className="grid gap-8">
       <div className="flex flex-wrap items-end justify-between gap-4">

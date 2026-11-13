@@ -1,12 +1,11 @@
-// Void's docs example of useForm (guide/pages-routing/actions-and-forms.md), as written: the
-// field's error is shown as Void gives it. The language is passed by hand, as every address needs
-// today (plans/quiet-harbor-atlas.md, step 3).
-import { Form, useForm } from "@void/react";
-import { useLocale } from "void-fbtee/react";
+// Void's docs example of useForm (guide/pages-routing/actions-and-forms.md), as written, with
+// void-fbtee's useForm, which fills in the page's language: the field's error is shown as Void
+// gives it.
+import { Form } from "@void/react";
+import { useForm } from "void-fbtee/react";
 
 export default function CreateUser() {
-  const { lang } = useLocale();
-  const form = useForm("/[lang]/form", { name: "" }, { params: { lang } });
+  const form = useForm("/[lang]/form", { name: "" });
   return (
     <Form form={form}>
       <input

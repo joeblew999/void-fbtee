@@ -1,14 +1,13 @@
 // Not found, in the page's language, inside the site's layout (Void 1.8.0's _not-found): a URL that
 // matches no page, and a page whose loader answers 404 (an event id that isn't one). Void keeps the
 // 404 status. Two ways back, in the same language: the home page and the events.
-import { routeUrl } from "void/routes";
+import { routeUrl } from "void-fbtee/routes";
 import { fbs, fbt } from "fbtee";
 import type { ErrorPageProps } from "@void/react";
-import { Link, useLocale } from "void-fbtee/react";
+import { Link } from "void-fbtee/react";
 import { buttonVariants } from "@/ui/button";
 
 export default function NotFound({ error }: ErrorPageProps) {
-  const { lang } = useLocale();
   return (
     <>
       {/* The tab's title in the page's language, as the other pages have it ("… · void-fbtee"):
@@ -30,14 +29,11 @@ export default function NotFound({ error }: ErrorPageProps) {
           </fbt>
         </p>
         <div className="flex flex-wrap gap-3">
-          <Link
-            href={routeUrl("/[lang]/events", { params: { lang } })}
-            className={buttonVariants({ size: "lg" })}
-          >
+          <Link href={routeUrl("/[lang]/events")} className={buttonVariants({ size: "lg" })}>
             <fbt desc="Navigation: the list of events people post and book">Events</fbt>
           </Link>
           <Link
-            href={routeUrl("/[lang]", { params: { lang } })}
+            href={routeUrl("/[lang]")}
             className={buttonVariants({ size: "lg", variant: "outline" })}
           >
             <fbt desc="Navigation: the home page">Home</fbt>

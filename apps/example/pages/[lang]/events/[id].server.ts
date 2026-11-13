@@ -2,12 +2,11 @@
 import { bookings, bookSchema, event_texts, events } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { and, count, db, eq, sql } from "void/db";
-import { revalidate as clearCache } from "void/isr";
 import { z } from "zod";
 import type { Event as SchemaEvent, WithContext } from "schema-dts";
 import { Temporal } from "temporal-polyfill";
 import { jsonLd, pageHead } from "void-fbtee/head";
-import { localizedPaths, siteOrigin } from "void-fbtee/middleware";
+import { revalidate as clearCache, siteOrigin } from "void-fbtee/server";
 import { eventTopic, live } from "../../../src/events/live";
 
 export type Props = InferProps<typeof loader>;
@@ -60,7 +59,7 @@ export const action = defineHandler.withValidator({ params, body: bookSchema })(
   const [event] = await db.select({ seats: events.seats }).from(events).where(eq(events.id, id));
   const left = event.seats - (await booked(id));
   // This event's page, in every language (the list shows each event's seats, not what's left).
-  await clearCache({ paths: localizedPaths(`/events/${id}`) });
+  await clearCache({ paths: [`/[lang]/events/${id}`] });
   await live.publish(eventTopic(id), { left }, { type: "seats" });
   // No return: Void reruns the loader, so the page shows the new count.
 });

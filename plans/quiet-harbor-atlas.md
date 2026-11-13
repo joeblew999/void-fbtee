@@ -110,8 +110,21 @@ Each step is shipped and proven before the next, each with its docs example in t
        (`reference/structure.md`) too. The other helpers for server code (`localizedPaths`,
        `langParams`, `inEveryLocale`, `siteOrigin`, `appLocales`) are still in
        `void-fbtee/middleware`: they move to `void-fbtee/server` in step 3, with `revalidate`.
-3. **Addresses and clearing the cache in the current language,** with the example's 28 places
-   changed to use them.
+3. [x] **Addresses and clearing the cache in the current language,** done 2026-11-13.
+       `routeUrl` from `void-fbtee/routes` (`src/routes.ts`): Void's, typed against the app's routes
+       as Void's is, with `lang` optional; it takes the current language (`src/current.ts`): on the
+       server the request's (the middleware, `withLang`) or `inLocale`'s, held in an
+       AsyncLocalStorage (`src/server.ts`); in the browser the page's (`<meta name="void-fbtee">`, as
+       islands read it). `routeUrl("/[lang]/docs/tour")` takes a markdown page, and type-checks only
+       if it exists in every language. `useForm` from `void-fbtee/react`: Void's, with the page's
+       language filled in. `revalidate` from `void-fbtee/server`: Void's, with `"/[lang]…"` cleared in
+       every language. The server helpers moved there from `void-fbtee/middleware` (`localizedPaths`,
+       `langParams`, `inEveryLocale`, `siteOrigin`, `appLocales`). The example: every link, both
+       forms, the post's redirect and both cache clears use them; only the sitemap (each language
+       on purpose) and the breadcrumbs (the event's own language) still pass `lang`. Checked on dev:
+       every page links in its own language, also after Void's client navigation; both forms post
+       to their page's action; a post in Arabic lands on the Arabic event page. Package tests for
+       routeUrl (`test/server.test.ts`); in the fresh app the two gaps are now checks.
 4. **Translated form errors.**
 5. **Not-found and error pages from `void-fbtee init`,** with the title helper.
 6. **The sitemap from the package.**

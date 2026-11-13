@@ -1,14 +1,13 @@
 // Something broke while making a page, in the page's language, inside the site's layout (Void
 // 1.8.0's _error). Void keeps the status and hides server details in production (they stay in the
 // logs). "Try again" reruns the page's loader (useRouter().refresh(), which never repeats a form).
-import { routeUrl } from "void/routes";
+import { routeUrl } from "void-fbtee/routes";
 import { fbs, fbt } from "fbtee";
 import { useRouter, type ErrorPageProps } from "@void/react";
-import { Link, useLocale } from "void-fbtee/react";
+import { Link } from "void-fbtee/react";
 import { Button, buttonVariants } from "@/ui/button";
 
 export default function ErrorPage({ error }: ErrorPageProps) {
-  const { lang } = useLocale();
   const router = useRouter();
   return (
     <>
@@ -34,7 +33,7 @@ export default function ErrorPage({ error }: ErrorPageProps) {
             <fbt desc="Button: load the page again after an error">Try again</fbt>
           </Button>
           <Link
-            href={routeUrl("/[lang]", { params: { lang } })}
+            href={routeUrl("/[lang]")}
             className={buttonVariants({ size: "lg", variant: "outline" })}
           >
             <fbt desc="Navigation: the home page">Home</fbt>

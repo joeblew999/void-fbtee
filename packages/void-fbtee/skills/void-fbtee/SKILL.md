@@ -84,21 +84,28 @@ open); `useHydrated()` is for anything else of the browser's own.
 
 The page's language: `useLocale()` in components; `c.get("i18n")` in loaders and actions
 (typed, no cast: `const { locale } = c.get("i18n")`). Both are
-`{ locale, dir, now, path }`. After a change, `revalidate({ paths: localizedPaths("/events") })`
-refreshes the page in every language. A page under `pages/[lang]/` that only a deploy changes is
+`{ locale, dir, now, path }`. After a change, `revalidate` from `void-fbtee/server` (Void's, with
+every language) refreshes a page: `revalidate({ paths: ["/[lang]/events", "/sitemap.xml"] })`
+clears the events page in each language, and any path without `/[lang]` as it is. A page under `pages/[lang]/` that only a deploy changes is
 prerendered in every language with `export const prerender = true;` and
 `export const getPrerenderPaths = langParams;` in its `.server.ts` (`langParams` from
-`void-fbtee/middleware`): it's cached until the next deploy, in each language. Void's own
+`void-fbtee/server`): it's cached until the next deploy, in each language. Void's own
 platform also builds it during the deploy; an app deployed straight to Cloudflare builds it on
 the first visit after each deploy (Void 1.7.0).
 
-Links are built with Void's `routeUrl()` from `void/routes` and the page's `lang` (from
-`useLocale()`), so Void's typed routes check each one: `routeUrl("/[lang]/events", { params: { lang } })`
-for a page under `pages/[lang]/`, and ``routeUrl(`/${lang}/docs/tour`)`` for a markdown page (a
-route per language, a real page in every registered language). Don't write a link as a plain
-string: Void checks plain strings too, but the app's `pages/[lang]/` makes every `/…` path look like
-a page (its type is `/${string}`), so a wrong one passes. A language Void doesn't have gets the
-not-found page from the middleware.
+Links are built with `routeUrl()` from `void-fbtee/routes`: Void's own, with the language filled
+in, so Void's typed routes still check each one. `routeUrl("/[lang]/events")` is the events page
+in the current language: the page's in a component, the request's in a loader, action or route,
+`inLocale()`'s in a job. Other parameters as in Void's (`routeUrl("/[lang]/events/[id]", { params: { id } })`),
+and `params: { lang }` for another language. A markdown page has a route per language, and
+`routeUrl("/[lang]/docs/tour")` takes it too: it type-checks only if the page exists in every
+language. An action redirects the same way: `c.redirect(routeUrl("/[lang]/events/[id]", { params: { id } }))`.
+Forms use `useForm` from `void-fbtee/react` (Void's, with the page's language filled in):
+`useForm("/[lang]/events/new", { title: "" })`. Don't write a link as a plain string: Void checks
+plain strings too, but the app's `pages/[lang]/` makes every `/…` path look like a page (its type is
+`/${string}`), so a wrong one passes. A language the app doesn't have gets the not-found page from
+the middleware. Where there's no current language at all (a server route that isn't in a
+request's language, code outside `inLocale`), `routeUrl` says so: pass `params.lang`.
 
 ## Server code with no page
 

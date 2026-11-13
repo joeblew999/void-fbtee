@@ -3,7 +3,7 @@
 // no JavaScript, so it works on markdown pages too. One row on desktop; on a phone the
 // page links move to a second row that scrolls sideways.
 import { fbt } from "fbtee";
-import { routeUrl } from "void/routes";
+import { routeUrl } from "void-fbtee/routes";
 import { Formatted, Link, useLocale, useLocales } from "void-fbtee/react";
 import { buttonVariants } from "@/ui/button";
 import { REPO } from "@/shell/project";
@@ -30,24 +30,21 @@ function label(page: (typeof PAGES)[number]) {
 const testId = (page: (typeof PAGES)[number]) => `nav-${rest(page).slice(1) || "home"}`;
 
 export default function SiteHeader() {
-  const { locale, lang, path } = useLocale();
+  const { locale, path } = useLocale();
   const locales = useLocales();
   // None on a page that's none of these, such as the not-found page for an unknown address.
   const current = PAGES.findLast((p) => (rest(p) === "" ? path === "" : path.startsWith(rest(p))));
   return (
     <header className="sticky top-0 z-40 border-b bg-background">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 px-4">
-        <Link
-          href={routeUrl("/[lang]", { params: { lang } })}
-          className="flex h-14 items-center pe-2 font-semibold"
-        >
+        <Link href={routeUrl("/[lang]")} className="flex h-14 items-center pe-2 font-semibold">
           void-fbtee
         </Link>
         <nav className="order-last -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto px-4 pb-2 md:order-none md:mx-0 md:w-auto md:overflow-visible md:p-0">
           {PAGES.map((page) => (
             <Link
               key={page}
-              href={routeUrl(page, { params: { lang } })}
+              href={routeUrl(page)}
               aria-current={page === current ? "page" : undefined}
               className={cn(
                 buttonVariants({ variant: page === current ? "secondary" : "ghost", size: "sm" }),

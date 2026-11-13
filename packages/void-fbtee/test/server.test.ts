@@ -1,5 +1,5 @@
 // inLocale() from void-fbtee/server, as an app's server code runs it with no request (a scheduled
-// job, a queue consumer): built through the plugin for a server environment, as Void builds a
+// job, a queue consumer), and routeUrl() from void-fbtee/routes in its language: built through the plugin for a server environment, as Void builds a
 // Worker, then run. The fixture's catalog has German for its strings (test/fixture/i18n/).
 import { cpSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -15,16 +15,23 @@ let probe: {
   nested: () => Promise<string[]>;
   dir: () => Promise<string>;
   unknown: () => Promise<string>;
+  link: () => Promise<string>;
+  linkWithParams: () => Promise<string>;
+  linkElsewhere: () => Promise<string>;
+  linkOutside: () => string;
+  linkPlain: () => string;
 };
 
 beforeAll(async () => {
   root = mkdtempSync(join(import.meta.dirname, ".tmp-"));
   cpSync(join(import.meta.dirname, "fixture"), root, { recursive: true });
   const server = join(import.meta.dirname, "../src/server.ts");
+  const routes = join(import.meta.dirname, "../src/routes.ts");
   writeFileSync(
     join(root, "src/job.ts"),
     `import { fbs } from "fbtee";
 import { inLocale } from ${JSON.stringify(server)};
+import { routeUrl } from ${JSON.stringify(routes)};
 const hello = () => String(fbs("Hello", "Greeting in the test fixture"));
 export const german = () => inLocale("de-DE", hello);
 export const afterAwait = () =>
@@ -33,6 +40,13 @@ export const nested = () =>
   inLocale("en-US", async () => [hello(), await inLocale("de-DE", hello), hello()]);
 export const dir = () => inLocale("ar-EG", ({ dir }) => dir);
 export const unknown = () => inLocale("xx-XX", hello).then(() => "ran", (e) => String(e.message));
+export const link = () => inLocale("de-DE", () => routeUrl("/[lang]/events" as never));
+export const linkWithParams = () =>
+  inLocale("de-DE", () => routeUrl("/[lang]/events/[id]" as never, { params: { id: 7 } } as never));
+export const linkElsewhere = () =>
+  inLocale("de-DE", () => routeUrl("/[lang]/events" as never, { params: { lang: "ar-EG" } } as never));
+export const linkOutside = () => { try { return routeUrl("/[lang]/events" as never); } catch (e) { return String(e.message); } };
+export const linkPlain = () => routeUrl("/api/live" as never);
 `,
   );
   const builder = await createBuilder({
@@ -50,7 +64,13 @@ export const unknown = () => inLocale("xx-XX", hello).then(() => "ran", (e) => S
         // Everything in the bundle, as in a Worker: left outside, `fbtee` and the bundled
         // `fbtee/server` would each have their own copy of fbtee's core.
         resolve: { noExternal: true },
-        build: { ssr: true, outDir: "dist", rollupOptions: { input: "src/job.ts" } },
+        // cloudflare:workers is Cloudflare's own module: Void's revalidate (void/isr) imports it only
+        // when running there, so it stays outside the bundle.
+        build: {
+          ssr: true,
+          outDir: "dist",
+          rollupOptions: { input: "src/job.ts", external: ["cloudflare:workers"] },
+        },
       },
     },
   });
@@ -77,4 +97,23 @@ test("gives the language's text direction", async () => {
 
 test("a language the app hasn't is an error", async () => {
   expect(await probe.unknown()).toMatch(/inLocale\("xx-XX"\): not one of the app's languages/);
+});
+
+test("routeUrl: the current language, with no lang given", async () => {
+  expect(await probe.link()).toBe("/de-DE/events");
+  expect(await probe.linkWithParams()).toBe("/de-DE/events/7");
+});
+
+test("routeUrl: params.lang still picks another language", async () => {
+  expect(await probe.linkElsewhere()).toBe("/ar-EG/events");
+});
+
+test("routeUrl: with no current language, an error that says to pass lang", () => {
+  expect(probe.linkOutside()).toMatch(
+    /routeUrl\("\/\[lang\]\/events"\): no current language here.*pass params\.lang/,
+  );
+});
+
+test("routeUrl: an address with no [lang] is Void's own", () => {
+  expect(probe.linkPlain()).toBe("/api/live");
 });

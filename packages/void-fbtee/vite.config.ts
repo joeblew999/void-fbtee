@@ -27,6 +27,7 @@ export default defineConfig({
       lint: "src/lint.ts",
       head: "src/head.ts",
       server: "src/server.ts",
+      routes: "src/routes.ts",
     },
     format: ["esm"],
     dts: true,

@@ -9,7 +9,7 @@
 // manifest's text by the reader's language, but has no way to pick a start page by it.
 import { defineHandler } from "void";
 import { fbs } from "fbtee";
-import { inEveryLocale } from "void-fbtee/middleware";
+import { inEveryLocale } from "void-fbtee/server";
 import type { WebAppManifest } from "web-app-manifest";
 
 /** A translated text field, as `*_localized` takes it: a string, or with its own language and direction. */

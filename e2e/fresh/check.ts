@@ -345,24 +345,28 @@ function checkTypes(target: string, dir: string, pm: Pm) {
   check(tsc().includes("_TypesProbe"), `${target}: a link to a missing page fails the type check`);
   write(`export const lang: Lang = "xx-XX";\nexport const u = routeUrl;`);
   check(tsc().includes("_TypesProbe"), `${target}: a language the app hasn't fails the type check`);
-  // Parts of the package the plan adds (plans/quiet-harbor-atlas.md), by the names it gives them;
-  // the step that builds one can rename it here, and turns its probe into a check of what it does.
-  const missing = (body: string) => {
+  // void-fbtee's routeUrl: the current language unless given, still checked against the app's
+  // routes; and its revalidate, which takes "/[lang]…" for every language.
+  const typesOk = (body: string) => {
     writeFileSync(probe, `${body}\n`);
     return !tsc();
   };
-  gap(
-    missing(
-      `import { routeUrl } from "void-fbtee/routes";\nexport const home = routeUrl("/[lang]");`,
-    ),
-    `${target}: a link in the page's own language needs no lang`,
-    3,
+  check(
+    typesOk(`import { routeUrl } from "void-fbtee/routes";
+export const home = routeUrl("/[lang]");
+export const form = routeUrl("/[lang]/form", { params: { lang: "ar-EG" } });`),
+    `${target}: void-fbtee's routeUrl type-checks with no lang, or with one`,
   );
-  gap(
-    missing(`import { revalidate } from "void-fbtee/server";
-export const clear = () => revalidate({ paths: ["/"] });`),
-    `${target}: revalidate() clears a page in every language`,
-    3,
+  check(
+    !typesOk(
+      `import { routeUrl } from "void-fbtee/routes";\nexport const bad = routeUrl("/[lang]/no-such-page");`,
+    ),
+    `${target}: void-fbtee's routeUrl to a missing page fails the type check`,
+  );
+  check(
+    typesOk(`import { revalidate } from "void-fbtee/server";
+export const clear = () => revalidate({ paths: ["/[lang]", "/[lang]/form"] });`),
+    `${target}: revalidate() takes a page in every language ("/[lang]…")`,
   );
   rmSync(probe);
 }
@@ -420,6 +424,10 @@ async function checkDev(target: string, dir: string, app: App) {
     check(
       html?.includes('data-testid="loader-locale">th-TH<'),
       `${target}: a loader from Void's docs has the page's language`,
+    );
+    check(
+      html?.includes('href="/th-TH/form" data-testid="form-link"'),
+      `${target}: a link built with no language given is in the page's (routeUrl)`,
     );
     const thai = /[฀-๿]/;
     const form = await fetch(`${base}/th-TH/form`, {

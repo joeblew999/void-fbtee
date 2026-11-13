@@ -22,10 +22,11 @@ import {
   type ReactNode,
   type ComponentProps,
 } from "react";
-import { Link as VoidLink, SharedContext } from "@void/react";
+import { Link as VoidLink, SharedContext, useForm as voidUseForm } from "@void/react";
+import type { ActionUrl, ResolveActionBody, ResolveActionParams } from "void/routes";
 import { Temporal } from "temporal-polyfill";
 import config from "virtual:void-fbtee/config";
-import { localeFromPath, type Locale } from "./locales";
+import { localeFromPath, type Lang, type Locale } from "./locales";
 import { install, documentI18n } from "./install";
 import type { SharedI18n } from "./middleware";
 
@@ -95,6 +96,40 @@ export function Link(props: ComponentProps<typeof VoidLink>) {
   const target = href.startsWith("/") ? localeFromPath(href, config) : undefined;
   const crossesLocale = target !== undefined && target.locale !== locale;
   return <VoidLink {...props} reloadDocument={props.reloadDocument ?? crossesLocale} />;
+}
+
+// An action's URL, as Void's useForm takes it. In this package Void's route types are its empty
+// stubs (ActionUrl is never; in an app, its routes), which the lint reads as redundant.
+// oxlint-disable-next-line no-redundant-type-constituents
+type FormUrl = ActionUrl & string;
+
+type VoidFormOptions<U extends FormUrl> = NonNullable<Parameters<typeof voidUseForm<U>>[2]>;
+type ActionParams<U extends FormUrl> = ResolveActionParams<U> & Record<string, string>;
+
+/** Void's form options, with `lang` optional among the params. */
+export type LangFormOptions<U extends FormUrl> = Omit<VoidFormOptions<U>, "params"> &
+  ("lang" extends keyof ActionParams<U>
+    ? [Exclude<keyof ActionParams<U>, "lang">] extends [never]
+      ? { params?: { lang?: Lang } }
+      : { params: Omit<ActionParams<U>, "lang"> & { lang?: Lang } }
+    : Pick<VoidFormOptions<U>, "params">);
+
+/**
+ * Void's useForm (@void/react), with the page's language filled in: a page under `pages/[lang]/`
+ * posts to its own action in the language it's shown in, so `useForm("/[lang]/events/new", { … })`
+ * needs no `params.lang` (other params, such as an id, still do). Typed from the action as Void's is.
+ */
+export function useForm<U extends FormUrl>(
+  url: U,
+  defaults: ResolveActionBody<U>,
+  options?: LangFormOptions<U>,
+): ReturnType<typeof voidUseForm<U>> {
+  const { lang } = useLocale();
+  const given = options as { params?: Record<string, string> } | undefined;
+  const params = String(url).includes("[lang]")
+    ? { ...given?.params, lang: given?.params?.lang ?? lang }
+    : given?.params;
+  return voidUseForm(url, defaults, { ...options, params } as VoidFormOptions<U>);
 }
 
 /**
