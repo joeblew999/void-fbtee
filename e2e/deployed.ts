@@ -1,5 +1,5 @@
-// `vp run test:deployed`: every browser test against what Cloudflare deployed for this commit, so CI needs
-// no Cloudflare login (the deployed site does its own Workers AI calls). Cloudflare's Workers Builds builds
+// `vp run test:deployed`: the quick live check (e2e/deployed/live.test.ts) against what Cloudflare deployed
+// for this commit, so CI needs no Cloudflare login (the deployed site does its own Workers AI calls). Cloudflare's Workers Builds builds
 // each push: main as production (`vp run deploy`), any other branch as a Worker Preview
 // (`vp run build:preview`, then `cf previews deploy`). It reports each build on GitHub as the check
 // "Workers Builds: <Worker>"; this waits for that check on the commit, then tests the site it deployed.
@@ -54,14 +54,11 @@ const [, worker, preview] =
   /\/services\/view\/([^/]+)\/production\/(?:previews\/([^/]+)\/)?builds\//.exec(run.details_url)!;
 const url = `https://${preview ? `${preview}-` : ""}${worker}.${subdomain}.workers.dev`;
 console.log(`test:deployed: testing ${url}\n`);
-// The browser tests, then every page in Chromium and WebKit (e2e/browsers/), one after the other.
-const env = { ...process.env, E2E_URL: url };
-for (const args of [
-  ["test", "run", "e2e"],
-  ["test", "run", "--config", "e2e/browsers/vite.config.ts"],
-]) {
-  const code = await new Promise<number | null>((done) =>
-    spawn("vp", args, { stdio: "inherit", env }).on("close", done),
-  );
-  if (code !== 0) process.exit(code ?? 1);
-}
+// The quick check only: the full browser tests run locally (`vp test run`, `vp run test:browsers`).
+const code = await new Promise<number | null>((done) =>
+  spawn("vp", ["test", "run", "--config", "e2e/deployed/vite.config.ts"], {
+    stdio: "inherit",
+    env: { ...process.env, E2E_URL: url },
+  }).on("close", done),
+);
+process.exit(code ?? 1);

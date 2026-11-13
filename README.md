@@ -31,7 +31,7 @@ vp run login                          # Cloudflare sign-in (Void's void connect)
 On GitHub, Cloudflare's Workers Builds does the deploying: a push to `main` runs `vp run deploy` on
 Cloudflare (production), and a push to any other branch runs `vp run build:preview` and
 `npx cf previews deploy` (a Worker Preview at `<branch>-void-fbtee-example.gedw99.workers.dev`, deleted
-with its branch). CI then tests what was deployed (`vp run test:deployed`). GitHub holds no Cloudflare
+with its branch). CI then runs a quick check of what was deployed (`vp run test:deployed`). GitHub holds no Cloudflare
 credential. Build logs: the Worker's Builds in Cloudflare's dashboard, linked from each commit's
 "Workers Builds" check.
 
@@ -56,13 +56,15 @@ vp run deploy            # deploy the example to production (Cloudflare), with n
                          # Log: ~/.void/logs/
 vp run test:production   # every test, against production; report: .vitest/index.html
 vp run deploy:preview    # this branch as a Worker Preview beside production (needs cf's login)
-vp run test:deployed     # every test against what Cloudflare deployed for this commit, then
-                         # test:browsers (what CI runs; CLOUDFLARE_WORKERS_SUBDOMAIN=gedw99)
+vp run test:deployed     # a quick check of what Cloudflare deployed for this commit: sitemap,
+                         # a Thai not-found page, one event posted, translated by Workers AI
+                         # and deleted (what CI runs; CLOUDFLARE_WORKERS_SUBDOMAIN=gedw99)
 vp run test:browsers     # every page in every language in Chromium, WebKit and WebKit as today's
                          # iPhones have it (no built-in Temporal): no errors, fits a phone; and
                          # the Intl and Temporal pages' engine checks. It grows with each
                          # language, so it's not in vp test run, whose tests use a fixed few
-                         # languages (each for what it exercises); CI runs it
+                         # languages (each for what it exercises), nor in CI: run it when
+                         # pages change
 ```
 
 In a Claude cloud session, to open the dev server in your own browser without deploying:
@@ -108,7 +110,8 @@ vp upgrade && vp migrate   # upgrade Vite+, then vp check, vp test run
   https://void-fbtee-example.gedw99.workers.dev
   ([its Worker on Cloudflare](https://dash.cloudflare.com/7384af54e33b8a54ff240371ea368440/workers/services/view/void-fbtee-example/production)).
 - `e2e/`: the browser tests, and the fresh-install check. `e2e/browsers/`: the Chromium and
-  WebKit run (`vp run test:browsers`). `e2e/fresh/app/`: Void's own docs examples, put into each
+  WebKit run (`vp run test:browsers`). `e2e/deployed/`: the quick check CI runs on the deployed
+  site (`vp run test:deployed`). `e2e/fresh/app/`: Void's own docs examples, put into each
   fresh app and checked in Thai; what doesn't work yet is listed as a known gap, with the step of
   `plans/quiet-harbor-atlas.md` that fixes it.
 
@@ -116,7 +119,7 @@ How we test, and why it isn't Void's testing guide: Void's guide
 ([docs/guide/testing.md](https://github.com/voidzero-dev/void/blob/main/docs/guide/testing.md))
 covers unit tests in Node, with bindings such as D1 and KV replaced by `vi.mock()`. Ours run the
 real thing with nothing faked: the example's own build on Cloudflare's local runtime
-(`vp test run`), or the deployed site (`vp run test:deployed`). Formatting can only be tested on
+(`vp test run`), and a quick check of the deployed site (`vp run test:deployed`). Formatting can only be tested on
 the Worker's own `Intl`, not Node's, which differs. The
 package's own tests (`packages/void-fbtee/test/`) are plain tests of its commands, in Node. The
 example has a few unit tests of plain code beside it in `src/` (Void's guide's way, with nothing

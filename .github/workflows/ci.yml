@@ -1,7 +1,7 @@
 # Vite+'s own CI setup (https://viteplus.dev/guide/ci): setup-vp installs vp, the Node in
 # .node-version and the pnpm in package.json, then vp install. No Cloudflare credentials: Cloudflare's
 # Workers Builds builds and deploys each push itself (main as production, other branches as Worker
-# Previews), and the browser tests run against what it deployed (vp run test:deployed).
+# Previews), and a quick check runs against what it deployed (vp run test:deployed).
 name: CI
 
 on:

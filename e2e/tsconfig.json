@@ -9,5 +9,5 @@
     "noEmit": true,
     "skipLibCheck": true
   },
-  "include": ["*.ts", "fresh/*.mjs"]
+  "include": ["*.ts", "deployed/*.ts", "fresh/*.mjs"]
 }

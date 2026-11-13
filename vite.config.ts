@@ -20,13 +20,14 @@ export default defineConfig({
       // Every browser test against production (the deployed site), at the URL Void reported on the last deploy
       // (e2e/production.ts). Deploying and testing are separate: `vp run deploy`, then this.
       "test:production": { command: "vpx e2e/production.ts", cache: false },
-      // Every browser test against what Cloudflare's Workers Builds deployed for this commit: production
-      // for main, the branch's Preview otherwise (e2e/deployed.ts). What CI runs: no Cloudflare login.
+      // The quick live check (e2e/deployed/live.test.ts) against what Cloudflare's Workers Builds
+      // deployed for this commit: production for main, the branch's Preview otherwise (e2e/deployed.ts).
+      // What CI runs: no Cloudflare login.
       "test:deployed": { command: "vpx e2e/deployed.ts", cache: false },
       // Every page in every language, in Chromium, WebKit (Safari's engine) and WebKit as today's
       // iPhones have it (no built-in Temporal): no errors, fits a phone; and the Intl and
       // Temporal pages' engine checks (e2e/browsers/): its own run, as it grows with each language.
-      // CI runs it against the deployed site (test:deployed); not part of `vp test run`.
+      // Not part of `vp test run`, and not in CI: run it when pages change.
       "test:browsers": {
         command: "vp test run --config e2e/browsers/vite.config.ts",
         cache: false,
