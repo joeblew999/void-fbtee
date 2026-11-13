@@ -162,7 +162,7 @@ Each step is shipped and proven before the next, each with its docs example in t
        page; the Arabic original under a Thai translation too. Package tests for the three.
    - **7b, done 2026-11-13: machine translation with Void's AI, in a queue, the same locally and
      on Cloudflare** (asked for 2026-11-13; decided: one queue, two translators). **Replaced the
-     same day by `plans/plain-stage-compass.md`:** Workers AI everywhere Void puts it, with no
+     same day:** Workers AI everywhere Void puts it, with no
      `WORKERS_AI` switch and no hand-translation route; what follows describes the first version. One consumer
      (`queues/translate.ts`), sent on each post (`new.server.ts`). On Cloudflare it asks Workers AI
      (Llama 3.3 70B, by the measure below); locally Workers AI is off (`inference.bindings.ai` in
@@ -227,7 +227,18 @@ Each step is shipped and proven before the next, each with its docs example in t
 9. **Sign-in,** when the example needs accounts.
 10. **API routes with a language,** with the MCP route when that's planned.
 
-The tests deleting what they post (`plans/tidy-ember-ledger.md`) is separate and can go first.
+## Still open (moved here 2026-11-13 from plans now done and deleted; git history keeps them)
+
+- **The cookie that carries a new event's key:** remove it once a Void release has the #810 fix
+  (fragments kept through action redirects: voidzero-dev/void `ae024fb`, after 1.8.0). Then posting
+  redirects to `#key=…` itself; check it, and remove `keyCookie` and its comments
+  (`apps/example/src/events/delete-key.ts`, the event page). Actions that update the page in place
+  still drop the `#`, so the browser's copy of the key stays.
+- **Telling Void about the preview's AI:** `guide/ai.md` says Workers AI is remote "during
+  development and preview", but the preview needs `cloudflare.ai = { binding: "AI", remote: true }`
+  in `void.config.ts` (found 2026-11-13). The user's call whether to raise it.
+- **The emails' design:** parked by the user, 2026-11-13. All four emails
+  (`apps/example/src/events/emails.ts`) are plain HTML strings for now.
 
 ## Not in this plan
 

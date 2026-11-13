@@ -119,8 +119,7 @@ vp upgrade && vp migrate   # upgrade Vite+, then vp check and the tests (Testing
 ## Testing
 
 Each test runs on the stage Void gives what it checks, and checks through what Void provides
-there (`plans/plain-stage-compass.md`; Void's docs in `apps/example/node_modules/void/docs/` and its
-own `TESTING.md`). Nothing is faked: the tests use the real runtime, Void's own hooks and
+there (Void's docs in `apps/example/node_modules/void/docs/` and its own `TESTING.md`). Nothing is faked: the tests use the real runtime, Void's own hooks and
 Cloudflare's local stand-ins.
 
 | Stage (task)                      | Where it runs                                        | Email                                                                          | Workers AI                | Queues and the cron                                                                                              | Page cache                         |

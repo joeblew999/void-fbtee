@@ -1,18 +1,20 @@
 // The private delete link for whoever posts an event, as sites with no accounts do it: posting makes
 // a random key, the database keeps only its SHA-256, and the poster's link carries the key after
-// `#`, which never reaches the server or Void's page cache (plans/tidy-ember-ledger.md). Deleting
+// `#`, which never reaches the server or Void's page cache. Deleting
 // (the event page's delete action) checks a key against it. Web Crypto, the Worker's own and Node's.
 //
 // Void keeps no `#` around actions, as plain HTML forms don't: a form's POST goes to its action URL,
 // and the page's `#` part is gone. So a redirect's `#` is lost (Void's client reads the destination
-// from fetch's response.url, which the Fetch standard gives without it; reported as
-// https://github.com/voidzero-dev/void/issues/810), and an action that updates the page in place
-// writes the address from the action's URL, without the page's `#`. We take that as Void's rule,
-// not a bug to wait out. Getting the key to the poster: posting sets a short-lived cookie with the
-// key (keyCookie), and the event page moves it into its own `#` and deletes the cookie. A request with a cookie skips Void's page cache
-// (guide/edge/revalidation.md, "Cache bypass"): only the poster's, for those two minutes.
+// from fetch's response.url, which the Fetch standard gives without it: reported as
+// https://github.com/voidzero-dev/void/issues/810, fixed on Void's main in ae024fb on 2026-11-13,
+// after Void 1.8.0), and an action that updates the page in place writes the address from the
+// action's URL, without the page's `#`. Getting the key to the poster: posting sets a short-lived
+// cookie with the key (keyCookie), and the event page moves it into its own `#` and deletes the
+// cookie; once a Void release has the #810 fix, posting can redirect to `#key=…` itself and the
+// cookie can go (plans/quiet-harbor-atlas.md, "Still open"). A request with a cookie skips Void's
+// page cache (guide/edge/revalidation.md, "Cache bypass"): only the poster's, for those two minutes.
 //
-// Keeping it (plans/sure-keeper-link.md): the event page keeps a copy in the browser's storage and
+// Keeping it: the event page keeps a copy in the browser's storage and
 // puts it back in the address when an action there has written the address without it; and the
 // poster can have the link emailed when posting (src/events/emails.ts).
 
