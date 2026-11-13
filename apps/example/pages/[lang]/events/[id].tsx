@@ -1,10 +1,10 @@
 // One event, laid out like a departure board's detail: the title and where, then a ruled band with
 // the date on the place's clock and the start on both clocks, the story, and booking beside it
-// (below it on a phone, with a bar fixed to the bottom that takes you there). The title and
+// (below it on a phone). The title and
 // description are in the language the organiser wrote them in (marked with lang, so the browser and
 // screen readers use the right one); the seats left are live, in a split-flap chip that turns over
 // as people book; booking is Void's useForm, with the page's language filled in (void-fbtee/react).
-import { Fragment, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { Fragment, useEffect, useState, useSyncExternalStore } from "react";
 import { fbs, fbt } from "fbtee";
 import { action, Form, isVoidActionError, useRouter } from "@void/react";
 import { routeUrl } from "void-fbtee/routes";
@@ -21,7 +21,7 @@ import { MapPin } from "lucide-react";
 import { EventTime } from "@/events/EventTime";
 import { EventsCrumbs } from "@/events/EventsCrumbs";
 import { Flap } from "@/events/Flap";
-import { Button, buttonVariants } from "@/ui/button";
+import { Button } from "@/ui/button";
 import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
 import { clockParts } from "@/events/event-clock";
@@ -59,25 +59,8 @@ function useLiveEvent(id: string, left: number) {
   return Math.min(left, live);
 }
 
-/** Whether an element is on screen, once the browser can tell (false before). */
-function useOnScreen() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    if (!ref.current) return;
-    const watch = new IntersectionObserver(([entry]) => setOn(entry!.isIntersecting));
-    watch.observe(ref.current);
-    return () => watch.disconnect();
-  }, []);
-  return [ref, on] as const;
-}
-
-/**
- * Booking, in the reader's zone (Event remounts it once the browser knows it). On a phone, while
- * there's a seat to book and the form is off screen, a bar fixed to the bottom takes you to it.
- */
+/** Booking, in the reader's zone (Event remounts it once the browser knows it). */
 function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut: boolean }) {
-  const [here, formOnScreen] = useOnScreen();
   const form = useForm(
     "/[lang]/events/[id]?default",
     { name: "", email: "", time_zone: zone ?? "" },
@@ -100,73 +83,48 @@ function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut:
     );
   if (soldOut) return null;
   return (
-    <div ref={here}>
-      <Form form={form} className="grid gap-4">
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="book-name">
-              <fbt desc="Booking form label: the booker's name">Your name</fbt>
-            </Label>
-            <Input
-              id="book-name"
-              data-testid="book-name"
-              value={form.data.name}
-              onChange={(e) => form.setData("name", e.target.value)}
-            />
-            {form.errors.name && (
-              <p className="text-destructive text-sm" data-testid="error-name">
-                <fbt desc="Booking form error: no name">What's your name?</fbt>
-              </p>
-            )}
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="book-email">
-              <fbt desc="Booking form label: the booker's email address">Email</fbt>
-            </Label>
-            <Input
-              id="book-email"
-              type="email"
-              data-testid="book-email"
-              value={form.data.email}
-              onChange={(e) => form.setData("email", e.target.value)}
-            />
-            {form.errors.email && (
-              <p className="text-destructive text-sm" data-testid="error-email">
-                <fbt desc="Booking form error: not an email address">
-                  That's not an email address.
-                </fbt>
-              </p>
-            )}
-          </div>
+    <Form form={form} className="grid gap-4">
+      <div className="grid gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor="book-name">
+            <fbt desc="Booking form label: the booker's name">Your name</fbt>
+          </Label>
+          <Input
+            id="book-name"
+            data-testid="book-name"
+            value={form.data.name}
+            onChange={(e) => form.setData("name", e.target.value)}
+          />
+          {form.errors.name && (
+            <p className="text-destructive text-sm" data-testid="error-name">
+              <fbt desc="Booking form error: no name">What's your name?</fbt>
+            </p>
+          )}
         </div>
-        <Button
-          type="submit"
-          size="lg"
-          disabled={form.pending}
-          data-testid="book"
-          className="w-full"
-        >
-          <fbt desc="Button under the booking form's name and email: books the seat">Book</fbt>
-        </Button>
-        <div
-          hidden={formOnScreen}
-          className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 px-4 py-3 backdrop-blur lg:hidden"
-        >
-          <a
-            href="#book"
-            onClick={(e) => {
-              // Scroll to the form ourselves, then put the cursor in its first field.
-              e.preventDefault();
-              document.getElementById("book")?.scrollIntoView({ behavior: "smooth" });
-              document.getElementById("book-name")?.focus({ preventScroll: true });
-            }}
-            className={buttonVariants({ size: "lg", className: "w-full" })}
-          >
-            <fbt desc="Button: book a seat on the event">Book a seat</fbt>
-          </a>
+        <div className="grid gap-2">
+          <Label htmlFor="book-email">
+            <fbt desc="Booking form label: the booker's email address">Email</fbt>
+          </Label>
+          <Input
+            id="book-email"
+            type="email"
+            data-testid="book-email"
+            value={form.data.email}
+            onChange={(e) => form.setData("email", e.target.value)}
+          />
+          {form.errors.email && (
+            <p className="text-destructive text-sm" data-testid="error-email">
+              <fbt desc="Booking form error: not an email address">
+                That's not an email address.
+              </fbt>
+            </p>
+          )}
         </div>
-      </Form>
-    </div>
+      </div>
+      <Button type="submit" size="lg" disabled={form.pending} data-testid="book" className="w-full">
+        <fbt desc="Button under the booking form's name and email: books the seat">Book</fbt>
+      </Button>
+    </Form>
   );
 }
 

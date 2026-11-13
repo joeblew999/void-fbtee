@@ -625,18 +625,6 @@
       ],
       "types": []
     },
-    "Zib2BCOsjezfb1fyn8UNwA==": {
-      "description": "Button: book a seat on the event",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "จองที่นั่ง",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "3F6C/X8jjdqy0NUriWUeJQ==": {
       "description": "Heading of the booking box on an event's page",
       "status": "translated",
