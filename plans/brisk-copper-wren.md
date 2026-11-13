@@ -1,7 +1,7 @@
 # plans/brisk-copper-wren.md: Void 1.8.0, then what needs it
 
-Status: approved 2026-11-12 (moved from `plans/steady-folding-heron.md`, where it was the last
-part). Starts from 2026-11-13 ~01:00 UTC, once pnpm will install Void 1.8.0.
+Status: done 2026-11-13 (all four items). Approved 2026-11-12, moved from
+`plans/steady-folding-heron.md`, where it was the last part.
 
 ## Context
 

@@ -1,5 +1,8 @@
 # plans/tidy-ember-ledger.md: the tests delete the events they post
 
+Status: done 2026-11-13. How the key reaches the poster changed since: see
+`plans/sure-keeper-link.md`.
+
 ## Context
 
 The tests that run against the live site (`vp run test:deployed`, in CI after every push) post
