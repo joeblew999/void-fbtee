@@ -18,7 +18,7 @@ import {
   Tailwind,
   Text,
   render,
-} from "@react-email/components";
+} from "react-email";
 import type { ReactNode } from "react";
 import { emailTheme } from "./email-theme";
 // The site's icon, made from public/favicon.svg (`vp run icons`): a PNG, as mail apps don't show SVG.
@@ -70,7 +70,8 @@ function EmailLayout({ locale, dir, subject, lines, link, label, title }: EmailL
       <Tailwind config={emailTheme}>
         <Head />
         <Preview>{subject}</Preview>
-        <Body className="bg-background text-foreground font-sans m-0 py-6">
+        {/* React Email's Body is "ltr" and "en" unless told: the email's own, here. */}
+        <Body lang={locale} dir={dir} className="bg-background text-foreground font-sans m-0 py-6">
           {/* lang and dir here too, not only on <html>: Gmail drops <html>, <head> and <body> and
               keeps what's inside, so an Arabic email would read left to right. */}
           <Container

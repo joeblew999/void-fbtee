@@ -43,6 +43,8 @@ test("the HTML in the email's own direction, the title in its own", async () => 
   expect(content).toMatch(
     /<table[^>]* lang="ar-EG" dir="rtl"|<table[^>]* dir="rtl"[^>]* lang="ar-EG"/,
   );
+  // Nothing around it says otherwise.
+  expect(content).not.toMatch(/dir="ltr"|lang="en"/);
   const th = await bookingEmail({ ...booking, locale: "th-TH" });
   expect(th.html).toMatch(/<html dir="ltr" lang="th-TH">/);
   expect(th.html).toContain('<bdi lang="ar-EG" dir="rtl">أمسية خط عربي</bdi>');

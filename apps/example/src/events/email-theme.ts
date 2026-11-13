@@ -6,7 +6,7 @@
 // So the emails name tokens (`bg-card`, `text-brand`), never colours, and a change to style.css is
 // a change to the emails. Read as text with Vite's `?raw`: in dev and the Worker build as Vite does
 // it; in the unit tests through `test.css` in vite.config.ts (Vitest leaves CSS out otherwise).
-import { pixelBasedPreset, type TailwindConfig } from "@react-email/components";
+import { pixelBasedPreset, type TailwindConfig } from "react-email";
 import css from "../../pages/style.css?raw";
 
 /** A CSS block's custom properties, by name without the `--`. */

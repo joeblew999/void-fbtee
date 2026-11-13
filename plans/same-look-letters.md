@@ -130,3 +130,8 @@ done the proper way, with what Void already gives.
 
 `vp check`; `vp run example#test`; `vp run test:dev`; the dev inbox in three languages; one real
 email in Gmail. After a push, CI and the live check.
+
+Later (2026-11-13): npm marks `@react-email/components` deprecated (since April 2026); the same
+components now come from `react-email` itself. The example uses `react-email` 6.11.11 (6.11.12 was
+under pnpm's minimum release age that day). Its `Body` is "ltr" and "en" unless given the email's
+own `dir` and `lang`, which EmailLayout.tsx now passes.
