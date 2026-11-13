@@ -1,6 +1,7 @@
 # plans/plain-stage-compass.md: every test on the stage Void gives it, checking through Void
 
-Status: done 2026-11-13; item 9's Void issue is written for the user to file.
+Status: done 2026-11-13. Item 9 settled the same day: the preview's AI works with one setting in
+`void.config.ts`; the Void issue drafted there is not to be filed.
 
 ## Context
 
@@ -87,7 +88,8 @@ ready only once they print their own URL (we already do).
   `WORKERS_AI` flag gone) the translate queue's consumer ran and failed three times with "Binding
   AI needs to be run remotely", then dropped the message. Dev's AI works (`test:dev`). Not yet
   reproduced in a plain `void init` app, so not yet called Void's: that reproduction is item 9.
-  Meanwhile the preview suite doesn't rely on AI.
+  Meanwhile the preview suite doesn't rely on AI. Settled later that day (item 9, "Update"): the
+  AI binding has to be marked remote in `void.config.ts` for the preview.
 
 ## The work, as one change
 
@@ -190,6 +192,19 @@ ready only once they print their own URL (we already do).
    `void/ai` in `queues/translate.ts`), and our preview build's `worker.config.json` has
    `"AI": {"type": "ai"}` with no `remote`, the same as the plain app. So there is no other way
    to do it on our side; the issue above is still to file.
+
+   **Update, 2026-11-13 (later): wrong; not to be filed.** There was a way on our side. The error
+   says what's missing: the AI binding marked remote. Void's `reference/config.md` ("`cloudflare`")
+   says Void passes the `cloudflare` fields in `void.config.ts` through to the build, so
+   `cloudflare: { …, ai: { binding: "AI", remote: true } }` puts it in the build the preview runs:
+   its `worker.config.json` then has `"AI": {"type": "ai", "dev": {"remote": true}}` (was
+   `{"type": "ai"}`). With it, on the preview of this app, a posted event's translate message ran
+   (`QUEUE translate 1/1 (2968ms)`) and its Thai page showed "ชั้นเรียนปั้นดินเผา" within 5 s.
+   Checked first from a clean start (both Cloudflare sign-ins, `~/.config/cloudflare`, `~/.void`,
+   the app's `.void/` and every `node_modules` deleted; one fresh `void cloudflare login`; a full
+   install): without the line it still failed, so the sign-in was never the cause. What remains
+   for Void is at most a docs point (`guide/ai.md` promises the preview without the line), for the
+   user to decide on. The README's testing notes and the SKILL say how it's set.
 
 ## How the tests are laid out and run (Void's `TESTING.md` and `vite.config.ts`)
 

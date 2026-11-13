@@ -165,10 +165,12 @@ another language than the page's, in the page's own words (`<fbt>`, with the lan
 with the original one click away.
 
 To translate it as it's posted, the example (github.com/joeblew999/void-fbtee, `apps/example`)
-sends each post to a queue whose consumer asks Workers AI on Cloudflare, and stores every
-translation through one function, which also clears the pages and tells open ones. Locally,
-Workers AI is off (`inference.bindings.ai` in `void.config.ts`), so the post waits, and the coding
-agent translates it, as it translates the app's strings.
+sends each post to a queue whose consumer asks Workers AI, and stores every translation through
+one function, which also clears the pages and tells open ones. A page showing a post in a language
+it isn't translated into yet sends `x-revalidate: 0`, so Void's page cache never keeps it in the
+wrong language. Workers AI runs on Cloudflare in dev and the preview too, through Void's Cloudflare
+sign-in (`void cloudflare login`); for the preview, mark the binding remote in `void.config.ts`:
+`cloudflare: { ai: { binding: "AI", remote: true } }` (Void marks it so by itself only in dev).
 
 ## Markdown pages
 

@@ -80,7 +80,17 @@ export default defineConfig({
   },
   // The Worker's name on Cloudflare: void-fbtee-example.<subdomain>.workers.dev.
   // The account too, as Void's config reference shows.
-  cloudflare: { name: "void-fbtee-example", account_id: "7384af54e33b8a54ff240371ea368440" },
+  // Workers AI (void/ai, which translates what people post: queues/translate.ts) has no local
+  // stand-in, so local runs send it to Cloudflare through Void's sign-in. Void marks it remote by
+  // itself only in dev (Void 1.8.0); `vp preview` runs the build's config, where it was plain, and
+  // failed with "Binding AI needs to be run remotely". Set here, it's in the build too (Void
+  // passes `cloudflare` fields through: reference/config.md), so the preview translates as well.
+  // Deploys are unaffected: on Cloudflare the binding is always the real one.
+  cloudflare: {
+    name: "void-fbtee-example",
+    account_id: "7384af54e33b8a54ff240371ea368440",
+    ai: { binding: "AI", remote: true },
+  },
   worker: {
     compatibility_date: "2026-02-24",
     // Native Temporal in the worker (Cloudflare's `temporal` flag; default for dates from 2026-12-01).

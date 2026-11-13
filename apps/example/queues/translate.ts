@@ -1,7 +1,8 @@
 // Translates a newly posted event's title and description into the app's other languages, after the
 // post (new.server.ts sends the message). The same consumer everywhere (Void's guide/queues.md),
 // with Workers AI everywhere too: on Cloudflare, and in dev and the preview through Void's
-// Cloudflare sign-in (guide/ai.md, "Local Development"). A failure is retried. In dev, a post can
+// Cloudflare sign-in (guide/ai.md, "Local Development"; the preview needs the binding marked
+// remote in void.config.ts). A failure is retried. In dev, a post can
 // be translated again through Void's queue trigger, `POST /__void/queue` (the README shows it).
 //
 // Model: @cf/meta/llama-3.3-70b-instruct-fp8-fast, chosen over @cf/meta/m2m100-1.2b (Workers AI's
