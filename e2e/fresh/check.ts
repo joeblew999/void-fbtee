@@ -352,12 +352,6 @@ function checkTypes(target: string, dir: string, pm: Pm) {
     return !tsc();
   };
   gap(
-    missing(`import { inLocale } from "void-fbtee/server";\nimport { fbs } from "fbtee";
-export const text = inLocale("th-TH", () => String(fbs("i18n for Void apps", "Home page heading")));`),
-    `${target}: inLocale() translates with no request (a scheduled job, a queue, an email)`,
-    2,
-  );
-  gap(
     missing(
       `import { routeUrl } from "void-fbtee/routes";\nexport const home = routeUrl("/[lang]");`,
     ),
@@ -453,6 +447,20 @@ async function checkDev(target: string, dir: string, app: App) {
       sitemap.ok && (await sitemap.text()).includes('hreflang="th-TH"'),
       `${target}: /sitemap.xml lists every page in every language`,
       6,
+    );
+    // Void's scheduled job example (crons/hourly-heartbeat.ts), run as Void's docs say to locally
+    // (guide/jobs.md, "Local development"), with the token Void keeps in .void/. The job throws
+    // unless inLocale() gave it Thai, and Void reports a job that throws.
+    const token = readFileSync(join(dir, ".void/dev-trigger-token"), "utf8").trim();
+    const job = await fetch(`${base}/__void/scheduled`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-void-dev-trigger": token },
+      body: JSON.stringify({ cron: "0 * * * *", scheduledTime: Date.now() }),
+    });
+    const ran = await job.text();
+    check(
+      job.ok && JSON.parse(ran).ok === true,
+      `${target}: a scheduled job from Void's docs translates with inLocale(), with no request ${ran}`,
     );
     const api = await fetch(`${base}/api/hello`, { headers: { "Accept-Language": "th-TH" } });
     const hello = (await api.json()) as { locale?: string; message?: string };

@@ -100,6 +100,19 @@ string: Void checks plain strings too, but the app's `pages/[lang]/` makes every
 a page (its type is `/${string}`), so a wrong one passes. A language Void doesn't have gets the
 not-found page from the middleware.
 
+## Server code with no page
+
+Void runs scheduled jobs (`crons/`), queue consumers (`queues/`) and inbound email handlers with no
+request, so there's no page language, and `fbs` there has nothing to translate with. Run the code
+in a language with `inLocale` from `void-fbtee/server`: `fbs` and `<fbt>` inside are in it, also
+after an `await`, with the same catalogs as a page. It gets `{ locale, dir }`, for Intl, Temporal
+and an email's `dir`:
+`const subject = await inLocale(user.locale, () => fbs("Your booking", "Email subject: a booking is confirmed"))`.
+The language is one of the app's (a person's own, kept with them), never the page's of whoever
+caused it: an email to an organiser is in the organiser's language, sent while a visitor books in
+another. A language the app hasn't is an error. Strings in these folders are collected like any
+other, so translate them the same way.
+
 ## Markdown pages
 
 Pages under `pages/<source locale>/` have a copy per locale at the same path under

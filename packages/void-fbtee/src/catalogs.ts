@@ -17,12 +17,21 @@ import {
 import type { LocaleConfig } from "./locales";
 import { addPluralForms, pluralSlots } from "./plurals";
 
+// Where an app's strings can be: every folder of code in Void's project structure (Void's docs,
+// reference/structure.md: pages, routes, middleware, crons, queues, email, durable-objects, src),
+// plus components/ and lib/, which apps commonly add. A string used only in a scheduled job or an
+// email is collected like any other, so `void-fbtee check` reports it untranslated.
 export const DEFAULT_SRC = [
   "pages/**/*.{ts,tsx,js,jsx}",
+  "routes/**/*.{ts,tsx,js,jsx}",
+  "middleware/**/*.{ts,tsx,js,jsx}",
+  "crons/**/*.{ts,tsx,js,jsx}",
+  "queues/**/*.{ts,tsx,js,jsx}",
+  "email/**/*.{ts,tsx,js,jsx}",
+  "durable-objects/**/*.{ts,tsx,js,jsx}",
+  "src/**/*.{ts,tsx,js,jsx}",
   "components/**/*.{ts,tsx,js,jsx}",
   "lib/**/*.{ts,tsx,js,jsx}",
-  "routes/**/*.{ts,tsx,js,jsx}",
-  "src/**/*.{ts,tsx,js,jsx}",
 ];
 export const DEFAULT_TRANSLATIONS = "i18n/translations";
 

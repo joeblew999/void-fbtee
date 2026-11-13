@@ -45,7 +45,7 @@ export interface VoidFbteeOptions {
   locales: readonly LocaleInput[];
   /** Folder of editable translation files, one <locale>.json each. Default "i18n/translations". */
   translations?: string;
-  /** Source files to collect strings from. */
+  /** Source files to collect strings from. Default: every folder of code in a Void app (DEFAULT_SRC, catalogs.ts). */
   src?: string[];
   /**
    * Fail `vite build` (and so `void deploy`) when any locale has untranslated strings, fbtee's

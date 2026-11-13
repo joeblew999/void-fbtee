@@ -38,6 +38,13 @@ export type Lang = VoidFbteeRegister extends { locales: readonly (infer L)[] }
   ? SegmentOf<L>
   : string;
 
+type TagOf<L> = L extends string ? L : L extends { locale: infer T extends string } ? T : never;
+
+/** A language's BCP 47 tag ("th-TH"): one of the registered languages, as inLocale() takes it. */
+export type AppLocale = VoidFbteeRegister extends { locales: readonly (infer L)[] }
+  ? TagOf<L>
+  : string;
+
 export interface Locale {
   /** BCP 47 tag, e.g. "th-TH". Also the catalog name: i18n/translations/th-TH.json. */
   locale: string;
