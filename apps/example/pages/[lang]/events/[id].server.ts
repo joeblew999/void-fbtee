@@ -9,6 +9,7 @@ import { jsonLd, pageHead } from "void-fbtee/head";
 import { routeUrl } from "void-fbtee/routes";
 import { pickText, revalidate as clearCache, siteOrigin, textLocales } from "void-fbtee/server";
 import { sendBookingEmail } from "../../../src/events/booking-email";
+import { deleteKeyMatches } from "../../../src/events/delete-key";
 import { eventTopic, live } from "../../../src/events/live";
 
 export type Props = InferProps<typeof loader>;
@@ -30,20 +31,24 @@ const booked = (id: string) =>
     .then(([row]) => row.n);
 
 // The event, its title and description in the page's language where a translation is stored (else
-// its fallbacks', else as its organiser wrote it: pickText from void-fbtee/server), seats left.
+// its fallbacks', else as its organiser wrote it: pickText from void-fbtee/server), seats left,
+// and whether it can be deleted (a posted event, not a sample). Never its delete key's hash: the
+// page and its data are public, and cached.
 export const loader = defineHandler.withValidator({ params })(async (c, { params: { id } }) => {
   const { locale } = c.get("i18n");
-  const [event] = await db.select().from(events).where(eq(events.id, id));
-  if (!event) return c.notFound();
+  const [row] = await db.select().from(events).where(eq(events.id, id));
+  if (!row) return c.notFound();
+  const { delete_key_hash, ...event } = row;
   const texts = await db
     .select()
     .from(event_texts)
     .where(and(eq(event_texts.event_id, id), inArray(event_texts.locale, textLocales(locale))));
   const text = pickText(texts, locale) ?? null;
-  return { event, text, left: event.seats - (await booked(id)) };
+  return { event, text, left: event.seats - (await booked(id)), deletable: !!delete_key_hash };
 });
 
-export const action = defineHandler.withValidator({ params, body: bookSchema })(async (
+/** Booking a seat: the page's own action (a POST to the page). */
+const book = defineHandler.withValidator({ params, body: bookSchema })(async (
   c,
   { params: { id }, body },
 ) => {
@@ -82,6 +87,33 @@ export const action = defineHandler.withValidator({ params, body: bookSchema })(
   });
   // No return: Void reruns the loader, so the page shows the new count.
 });
+
+/**
+ * Deleting the event, with the key from the poster's private link (src/events/delete-key.ts): its
+ * bookings, translations and itself, together, then its pages leave the cache in every language,
+ * with the list and the sitemap, and the browser goes to the list. A wrong key is a 403.
+ */
+const remove = defineHandler.withValidator({ params, body: z.object({ key: z.string().min(1) }) })(
+  async (c, { params: { id }, body }) => {
+    const [event] = await db
+      .select({ hash: events.delete_key_hash })
+      .from(events)
+      .where(eq(events.id, id));
+    if (!event) return c.notFound();
+    if (!(await deleteKeyMatches(body.key, event.hash)))
+      return c.json({ message: "wrong key" }, 403);
+    await db.batch([
+      db.delete(bookings).where(eq(bookings.event_id, id)),
+      db.delete(event_texts).where(eq(event_texts.event_id, id)),
+      db.delete(events).where(eq(events.id, id)),
+    ]);
+    await clearCache({ paths: [`/[lang]/events/${id}`, "/[lang]/events", "/sitemap.xml"] });
+    return c.redirect(routeUrl("/[lang]/events"));
+  },
+);
+
+// Void's named actions: booking on the page itself, deleting on "?delete".
+export const actions = { default: book, delete: remove };
 
 // The event's own title and description, in the page's language where translated, and the event
 // described for search engines (schema.org's Event, which Google shows as an event in results). Its

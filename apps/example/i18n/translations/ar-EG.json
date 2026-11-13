@@ -2400,6 +2400,66 @@
         }
       ],
       "types": []
+    },
+    "j3i6opoGHc7x96tN8JBCmw==": {
+      "description": "For whoever posted an event: keep this private link to delete it later",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "هذا الرابط لديك وحدك. احتفظ به لتحذف فعاليتك لاحقًا.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hKnW2a7iR5vyx0Tsfl749Q==": {
+      "description": "Label of the private link to delete an event",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "رابطك الخاص",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dEkKZirV2EjNp4skRxL/yw==": {
+      "description": "Button: really delete the event, after asking",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "احذفها نهائيًا",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "g6U/RpkoDMWf58dh/rkKKQ==": {
+      "description": "Button: delete the event you posted",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "احذف هذه الفعالية",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Wbr1JqNPhJcizxGi3o0frg==": {
+      "description": "Error: the private link's key doesn't match this event",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مفتاح هذا الرابط ليس لهذه الفعالية.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

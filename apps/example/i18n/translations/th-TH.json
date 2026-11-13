@@ -2064,6 +2064,66 @@
         }
       ],
       "types": []
+    },
+    "j3i6opoGHc7x96tN8JBCmw==": {
+      "description": "For whoever posted an event: keep this private link to delete it later",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ลิงก์นี้มีแค่คุณเท่านั้น เก็บไว้เพื่อลบกิจกรรมของคุณภายหลัง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hKnW2a7iR5vyx0Tsfl749Q==": {
+      "description": "Label of the private link to delete an event",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ลิงก์ส่วนตัวของคุณ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dEkKZirV2EjNp4skRxL/yw==": {
+      "description": "Button: really delete the event, after asking",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ลบถาวร",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "g6U/RpkoDMWf58dh/rkKKQ==": {
+      "description": "Button: delete the event you posted",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ลบกิจกรรมนี้",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Wbr1JqNPhJcizxGi3o0frg==": {
+      "description": "Error: the private link's key doesn't match this event",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "คีย์ในลิงก์นี้ไม่ใช่ของกิจกรรมนี้",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

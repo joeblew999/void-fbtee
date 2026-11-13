@@ -22,6 +22,9 @@ export const events = sqliteTable("events", {
   venue: text("venue"),
   // The language the organiser wrote the title and description in.
   locale: text("locale").notNull(),
+  // The SHA-256 (hex) of the key in the poster's private delete link, never the key itself
+  // (src/events/delete-key.ts). None on the sample events, so nobody can delete them.
+  delete_key_hash: text("delete_key_hash"),
   createdAt: text("created_at")
     .notNull()
     .default(sql`(datetime('now'))`),

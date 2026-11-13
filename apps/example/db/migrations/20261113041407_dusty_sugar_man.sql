@@ -1,0 +1,1 @@
+ALTER TABLE `events` ADD `delete_key_hash` text;

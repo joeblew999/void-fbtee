@@ -427,7 +427,12 @@ test.skipIf(!!process.env.E2E_URL)(
     expect(worker.length).toBeGreaterThan(0);
     // One copy of fbtee's per-request state: the Vite plugin keeps fbtee out of the server's
     // pre-bundling, so `fbtee` and `fbtee/server` share one core (packages/void-fbtee/src/plugin.ts).
-    expect(worker.filter((f) => read(f).includes("runWithFbtee"))).toHaveLength(1);
+    // Counted by what defines it: the middleware and void-fbtee/server both call runWithFbtee, so
+    // the name appears in more than one file.
+    expect(worker.filter((f) => read(f).includes("function runWithFbtee("))).toHaveLength(1);
+    expect(
+      worker.filter((f) => read(f).includes("function registerRequestStateProvider(")),
+    ).toHaveLength(1);
     // The app's code gets Cloudflare's own Temporal (void-fbtee's Vite plugin, plugin.ts): the
     // polyfill's code is in the worker only for the Temporal reference page, which runs it beside
     // Cloudflare's to compare. So every file that imports the polyfill is the page's rows

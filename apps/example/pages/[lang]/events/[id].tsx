@@ -4,11 +4,19 @@
 // description are in the language the organiser wrote them in (marked with lang, so the browser and
 // screen readers use the right one); the seats left are live, in a split-flap chip that turns over
 // as people book; booking is Void's useForm, with the page's language filled in (void-fbtee/react).
-import { Fragment, useEffect, useRef, useState } from "react";
-import { fbt } from "fbtee";
-import { Form, useRouter } from "@void/react";
+import { Fragment, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { fbs, fbt } from "fbtee";
+import { action, Form, isVoidActionError, useRouter } from "@void/react";
+import { routeUrl } from "void-fbtee/routes";
 import { connectLiveStream } from "void/live/client";
-import { Formatted, langAttrs, useForm, useLocale, useTimeZone } from "void-fbtee/react";
+import {
+  Formatted,
+  langAttrs,
+  useForm,
+  useHydrated,
+  useLocale,
+  useTimeZone,
+} from "void-fbtee/react";
 import { MapPin } from "lucide-react";
 import { EventTime } from "@/events/EventTime";
 import { EventsCrumbs } from "@/events/EventsCrumbs";
@@ -17,6 +25,7 @@ import { Button, buttonVariants } from "@/ui/button";
 import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
 import { clockParts } from "@/events/event-clock";
+import { keyCookieName } from "@/events/delete-key";
 import type { Props } from "./[id].server";
 
 /**
@@ -70,7 +79,7 @@ function useOnScreen() {
 function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut: boolean }) {
   const [here, formOnScreen] = useOnScreen();
   const form = useForm(
-    "/[lang]/events/[id]",
+    "/[lang]/events/[id]?default",
     { name: "", email: "", time_zone: zone ?? "" },
     { params: { id } },
   );
@@ -220,7 +229,103 @@ function DateTile({ startsAt }: { startsAt: string }) {
   );
 }
 
-export default function Event({ event, text, left }: Props) {
+/** The address's "#" part, following changes to it (a link pasted into an open page); none on the server. */
+const onHashChange = (changed: () => void) => {
+  addEventListener("hashchange", changed);
+  return () => removeEventListener("hashchange", changed);
+};
+
+/** The event's key, from its private link ("#key=…"), or the cookie posting just set. */
+function keyHere(id: string, hash: string): string | null {
+  const fromLink = new URLSearchParams(hash.slice(1)).get("key");
+  const name = `${keyCookieName(id)}=`;
+  const fromCookie = document.cookie
+    .split("; ")
+    .find((c) => c.startsWith(name))
+    ?.slice(name.length);
+  return fromLink ?? fromCookie ?? null;
+}
+
+/**
+ * For whoever posted the event: its private delete link (src/events/delete-key.ts). Only in the
+ * browser, which alone sees the "#" part, and only for an event that can be deleted. Just after
+ * posting, the key comes in a cookie: it moves into this page's own address, so reloading or
+ * bookmarking the page keeps the link, and the cookie goes. Deleting asks once more, on the page
+ * (no browser dialog).
+ */
+function YourEvent({ id }: { id: string }) {
+  const { lang } = useLocale();
+  // The address and cookies are the browser's own: read once hydrated, so the server's HTML and the
+  // first render in the browser are the same (nothing), as useHydrated is for.
+  const hydrated = useHydrated();
+  const hash = useSyncExternalStore(
+    onHashChange,
+    () => location.hash,
+    () => "",
+  );
+  const key = hydrated ? keyHere(id, hash) : null;
+  const [sure, setSure] = useState(false);
+  const [wrong, setWrong] = useState(false);
+  // The event's own address, not location's: just after posting, this renders before Void's router
+  // has moved the address from the form's page to this one.
+  const page = routeUrl("/[lang]/events/[id]", { params: { id } });
+  useEffect(() => {
+    if (!key || location.pathname !== page || location.hash.includes("key=")) return;
+    history.replaceState(history.state, "", `${page}${location.search}#key=${key}`);
+    document.cookie = `${keyCookieName(id)}=; Path=/; Max-Age=0`;
+  }, [id, key, page]);
+  if (!key) return null;
+  const link = `${location.origin}${page}#key=${key}`;
+  const remove = async () => {
+    // A wrong key is a 403, which Void's action() throws rather than returns (it returns only
+    // 400, 404, 409, 422 and 429: guide/pages-routing/actions-and-forms.md). Deleted, the action
+    // redirects to the list.
+    try {
+      await action("/[lang]/events/[id]?delete", { params: { lang, id }, data: { key } });
+    } catch (error) {
+      if (isVoidActionError(error) && error.status === 403) setWrong(true);
+      else throw error;
+    }
+  };
+  return (
+    <section className="grid gap-3 rounded-xl border p-5 text-sm" data-testid="your-event">
+      <p>
+        <fbt desc="For whoever posted an event: keep this private link to delete it later">
+          Only you have this link. Keep it to delete your event later.
+        </fbt>
+      </p>
+      <input
+        readOnly
+        dir="ltr"
+        value={link}
+        onFocus={(e) => e.target.select()}
+        className="w-full rounded-md border bg-muted/40 px-2 py-1.5 font-mono text-xs"
+        aria-label={String(
+          fbs("Your private link", "Label of the private link to delete an event"),
+        )}
+        data-testid="delete-link"
+      />
+      {sure ? (
+        <Button variant="destructive" onClick={remove} data-testid="delete-sure">
+          <fbt desc="Button: really delete the event, after asking">Delete it for good</fbt>
+        </Button>
+      ) : (
+        <Button variant="outline" onClick={() => setSure(true)} data-testid="delete">
+          <fbt desc="Button: delete the event you posted">Delete this event</fbt>
+        </Button>
+      )}
+      {wrong && (
+        <p className="text-destructive" data-testid="delete-wrong">
+          <fbt desc="Error: the private link's key doesn't match this event">
+            This link's key isn't this event's.
+          </fbt>
+        </p>
+      )}
+    </section>
+  );
+}
+
+export default function Event({ event, text, left, deletable }: Props) {
   const { locale } = useLocale();
   // The browser's zone once known (null before); nothing has been typed into the form yet.
   const zone = useTimeZone();
@@ -329,6 +434,7 @@ export default function Event({ event, text, left }: Props) {
           </div>
           <Book key={zone} id={event.id} zone={zone} soldOut={seatsLeft === 0} />
         </section>
+        {deletable && <YourEvent id={event.id} />}
       </aside>
       <div className="min-w-0 lg:col-start-1 lg:row-start-2">
         <Stored event={event} />

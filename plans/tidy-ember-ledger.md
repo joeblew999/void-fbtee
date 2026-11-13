@@ -50,6 +50,40 @@ live database once with `cf d1 query` (the keyring sign-in): every event whose d
 and translations, after listing them first. The same on the dev database. The sample events
 (`db/migrations/20261111064630_sample_events.sql`) stay. Their cached pages clear on the next deploy.
 
+## Done, 2026-11-13
+
+All of the above, with these differences from the plan, each found while building it:
+
+- **The key reaches the page by cookie, not in the redirect.** A redirect's `#` part is lost:
+  Void's client follows an action's redirect with `fetch` and takes the `#` part from
+  `response.url` (`@void/react`'s `pages/client.mjs`, `redirectUrl.hash`), which the Fetch
+  standard always gives without it, though Void's docs say a redirect goes to "the destination's
+  hash target" (`guide/pages-routing/actions-and-forms.md`). So posting sets a two-minute cookie
+  with the key (`keyCookie`, `src/events/delete-key.ts`), and the event page moves it into its own
+  address (`history.replaceState`, `#key=…`) and deletes the cookie. A request with a cookie skips
+  Void's page cache: only the poster's, for those two minutes. To report to Void, with a repro.
+- **The page follows the address's `#` part** (`hashchange`), so a link pasted into an open page
+  works, and builds the link from the event's route: just after posting, the page renders before
+  Void's router has moved the address off the form's page.
+- **A wrong key's 403 is thrown, not returned,** by Void's `action()` (it returns only 400, 404, 409,
+  422 and 429: `guide/pages-routing/actions-and-forms.md`), so the page catches it.
+- **Named actions:** booking is `actions.default`, addressed as `"/[lang]/events/[id]?default"` in
+  Void's types; a POST to the page itself still books.
+- **The hash stays out of the page's data:** both loaders send the event without
+  `delete_key_hash`, only whether it can be deleted.
+
+Checked: on dev, posting lands on the page with its link (the cookie gone); no note without the key
+or on a sample; a wrong key refused; the right one deletes it (its page 404, the browser on the
+list). The events browser tests (8, with a new one for this) pass, and each posting test deletes
+its event when the file ends (a 302 each). Live database: 45 test events deleted with their 28
+bookings and 68 translations; 5 events left (the 4 samples and the Thai workshop posted on the live
+site), nothing pointing at a deleted event.
+
+Found on the way, not caused here: on the local production preview, `/[lang]/docs` (the one island
+page) answers `Vary: Origin`, so the server test "no page sets a cookie or varies by a request
+header" fails locally. The last pushed commit (`6784d29`) does the same; the live site doesn't send
+it. Nothing in Void or the built Worker sets it.
+
 ## Not in this plan
 
 - Editing an event with the same key.

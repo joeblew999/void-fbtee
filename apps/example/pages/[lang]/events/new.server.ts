@@ -7,6 +7,7 @@ import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
 import { db } from "void/db";
 import { queues } from "void/queues";
+import { hashDeleteKey, keyCookie, newDeleteKey } from "@/events/delete-key";
 import { routeUrl } from "void-fbtee/routes";
 import { langParams, revalidate } from "void-fbtee/server";
 import { z } from "zod";
@@ -31,6 +32,8 @@ export const action = defineHandler.withValidator({
   body: newEventSchema,
 })(async (c, { body }) => {
   const { locale } = c.get("i18n");
+  // The poster's private delete link: the key goes to them, its SHA-256 to the database.
+  const key = newDeleteKey();
   const [created] = await db
     .insert(events)
     .values({
@@ -39,6 +42,7 @@ export const action = defineHandler.withValidator({
       seats: body.seats,
       venue: body.venue || null,
       locale,
+      delete_key_hash: await hashDeleteKey(key),
       ...startsAt(body.local, body.time_zone),
     })
     .returning({ id: events.id });
@@ -46,6 +50,9 @@ export const action = defineHandler.withValidator({
   await queues.translate.send({ eventId: created.id });
   // The list in every language, and the sitemap, which lists the new event.
   await revalidate({ paths: ["/[lang]/events", "/sitemap.xml"] });
+  // To the new event's page, with the key in a short-lived cookie, which the page turns into the
+  // poster's private link (src/events/delete-key.ts).
+  c.header("Set-Cookie", keyCookie(created.id, key));
   return c.redirect(routeUrl("/[lang]/events/[id]", { params: { id: created.id } }));
 });
 

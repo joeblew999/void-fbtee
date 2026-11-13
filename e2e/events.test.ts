@@ -1,8 +1,8 @@
 // Production build: the events app's own part. Each event's start on its city's clock and on the
 // reader's, in the reader's language; an event posted in Arabic, then read in English. Void's
 // forms, database and cache are Void's to test; this checks what void-fbtee and the app add.
-import { expect, test } from "vite-plus/test";
-import { browser, collectErrors, seeText, started, untilText } from "./helpers";
+import { afterAll, expect, test } from "vite-plus/test";
+import { browser, collectErrors, seeText, started, untilText, url } from "./helpers";
 import { SOURCE } from "./locales";
 
 const page = browser("prod");
@@ -36,6 +36,40 @@ const SWIM = "2027-03-06T19:00:00Z"; // Harbour sunrise swim: 6:00 on 7 March in
 const TEST_START = "2026-01-01T20:00";
 
 /**
+ * The events these tests post, each with the key from its poster's private delete link: deleted
+ * when the file ends, as their poster would, so no test leaves an event behind on the live site.
+ */
+const posted: { id: string; key: string }[] = [];
+
+/**
+ * The event the page just posted: once the page has its key (the address's "#key=…", the private
+ * delete link), it's kept for deleting. Its path without the language, "/events/<id>".
+ */
+async function kept(p: import("playwright").Page): Promise<string> {
+  await p.waitForURL(/\/events\/[0-9a-f-]{36}#key=/);
+  const at = new URL(p.url());
+  posted.push({
+    id: at.pathname.split("/").pop()!,
+    key: new URLSearchParams(at.hash.slice(1)).get("key")!,
+  });
+  return at.pathname.replace(/^\/[^/]+/, "");
+}
+
+afterAll(async () => {
+  for (const { id, key } of posted) {
+    // The request the page's "Delete it for good" sends: a 302 to the list when it's deleted.
+    const r = await fetch(`${url("prod")}/${SOURCE}/events/${id}?delete`, {
+      method: "POST",
+      // From the site itself, as the page sends it (Void refuses page actions from elsewhere).
+      headers: { "Content-Type": "application/json", "X-VoidPages": "true", origin: url("prod") },
+      body: JSON.stringify({ key }),
+      redirect: "manual",
+    });
+    expect(r.status, `deleting the test event ${id}`).toBe(302);
+  }
+});
+
+/**
  * Post a new event through the app's form, so a test that books has its own seats on any database
  * (a fresh local one or the live site's). Returns its path without the language, "/events/<id>".
  */
@@ -48,8 +82,7 @@ async function postEvent(seats: number): Promise<string> {
   await p.getByTestId("event-local-input").fill(TEST_START);
   await p.getByTestId("event-seats-input").fill(String(seats));
   await p.getByTestId("event-post").click();
-  await p.waitForURL(/\/events\/[0-9a-f-]{36}$/);
-  return new URL(p.url()).pathname.replace(`/${SOURCE}`, "");
+  return kept(p);
 }
 
 /** That event's page in a language, ready to use. */
@@ -95,7 +128,7 @@ test("an event named </script><script>…: its structured data holds the name, a
   await p.getByTestId("event-description-input").fill("Posted by the tests.");
   await p.getByTestId("event-local-input").fill(TEST_START);
   await p.getByTestId("event-post").click();
-  await p.waitForURL(/\/events\/[0-9a-f-]{36}$/);
+  await kept(p);
   // The page as the server sends it, as a search engine reads it: Void updates titles and meta
   // tags when moving between pages in the browser, not scripts (its head guide), so this one
   // comes with a full load.
@@ -122,7 +155,8 @@ test("ar-EG: post an event (a missing title first); it is saved neutral and read
   await p.getByTestId("event-description-input").fill("قراءات شعرية على السطح.");
   await p.getByTestId("event-local-input").fill(TEST_START);
   await p.getByTestId("event-post").click();
-  await p.waitForURL(/\/ar-EG\/events\/[0-9a-f-]{36}$/);
+  await kept(p);
+  expect(new URL(p.url()).pathname).toMatch(/^\/ar-EG\/events\//);
   await seeText(p, "event-title", "أمسية شعر");
   // Saved neutral: the time on Cairo's clock with its zone, the same moment in UTC, a plain number.
   const stored = () => p.getByTestId("event-stored").textContent();
@@ -134,9 +168,40 @@ test("ar-EG: post an event (a missing title first); it is saved neutral and read
       "localear-EG",
   );
   // The same event in English: the page in English, the stored record unchanged.
-  await p.goto(p.url().replace("/ar-EG/", "/en-US/"));
+  await p.goto(p.url().replace("/ar-EG/", "/en-US/").replace(/#.*/, ""));
   await untilText(p, '[data-testid="event-local"]', "has", "8:00 PM");
   expect(await stored()).toBe(saved);
+  expect(errors).toEqual([]);
+});
+
+test("the poster deletes their event with its private link; a wrong key is refused", async () => {
+  const p = await page();
+  const errors = collectErrors(p);
+  await p.goto(`/${SOURCE}/events/new`);
+  await started(p);
+  await p.getByTestId("event-title-input").fill(`Test event ${crypto.randomUUID().slice(0, 8)}`);
+  await p.getByTestId("event-description-input").fill("Posted by the tests, to delete.");
+  await p.getByTestId("event-local-input").fill(TEST_START);
+  await p.getByTestId("event-post").click();
+  await p.waitForURL(/\/events\/[0-9a-f-]{36}#key=/);
+  const link = await p.getByTestId("delete-link").inputValue();
+  expect(link).toBe(p.url());
+  const path = new URL(link).pathname;
+  // Someone without the link sees nothing of it; with a wrong key, deleting is refused.
+  const other = await page();
+  await other.goto(path);
+  await started(other);
+  expect(await other.getByTestId("your-event").count()).toBe(0);
+  await other.goto(`${path}#key=wrong`);
+  await started(other);
+  await other.getByTestId("delete").click();
+  await other.getByTestId("delete-sure").click();
+  await seeText(other, "delete-wrong", "This link's key isn't this event's.");
+  // The poster, with the link: deleted, then the list, and the event's page is gone.
+  await p.getByTestId("delete").click();
+  await p.getByTestId("delete-sure").click();
+  await p.waitForURL(new RegExp(`/${SOURCE}/events$`));
+  expect((await fetch(`${url("prod")}${path}`)).status).toBe(404);
   expect(errors).toEqual([]);
 });
 
