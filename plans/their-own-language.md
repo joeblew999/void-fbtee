@@ -253,6 +253,13 @@ Title: Export `negotiateLocale` (choosing a locale on the server without `setupL
 > `negotiateLocale` (and the locale-chain helpers it uses) be exported? Until then void-fbtee
 > carries a copy of it, with a test that compares it to `setupLocaleContext(...).getLocale()`.
 >
+> On the server it would need one more thing. `getLocaleHierarchy` keeps every tag it has seen in a
+> module-level `Map` (`const hierarchies`, fbtee 6.0.0 `lib/index-core-44-4LnRZ.mjs`), never
+> cleared. In a browser that's a handful of tags. On a server fed `Accept-Language` from every
+> visitor, anyone can send new tags until the process runs out of memory. Our copy drops the cache
+> (it's cheap to work out each time); a size cap would do too. It isn't covered by "Each request has
+> its own hooks and caches" (README, "Server Rendering"), since the map is shared by the process.
+>
 > A smaller question: for sites with several regional variants of one language, would CLDR's parent
 > locales be welcome as an option? `en-AU` → `en-GB` (shared `en-001`), `es-MX` → `es-419`, `pt-AO`
 > → `pt-PT`, where the current rule gives `en-US`, `es-ES` and `pt-BR`. It's your documented rule,
