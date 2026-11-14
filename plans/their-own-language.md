@@ -191,10 +191,12 @@ So the plan is:
 - **From CLDR's own published data, as a dependency.** void-fbtee depends on `cldr-core`, the
   Unicode Consortium's JSON release of CLDR (49.0.0, licence Unicode-3.0). `negotiate()` imports
   `cldr-core/supplemental/parentLocales.json` (5.8 KB) directly, so the bundler puts it in the
-  Worker and the browser code as is. There's no copy, no generating script and no table of ours.
+  Worker as is. There's no copy, no generating script and no table of ours.
   - The version is pinned in `packages/void-fbtee/package.json`, like any dependency, and it moves
     with the other upgrades.
-  - Server and browser read the same file, so the redirect and the notice always agree.
+  - The server uses the whole file. The notice's script gets the part of it for the app's language
+    families, picked from the same file at build, which is all that can match. So the redirect and
+    the notice always agree.
 - **Likely scripts** (`zh-HK` is Traditional) come from `Intl.Locale.maximize()`, which every engine
   has built in. CLDR's own `likelySubtags.json` is 222 KB, too big to put in every page for this.
 
