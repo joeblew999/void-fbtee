@@ -121,6 +121,20 @@ mail apps rewrite: Gmail drops `<html>` and `<body>`, so the language and direct
 content too. The SKILL's "Translated emails" lists it all; the example's Emails docs page shows its
 own emails with the code that does each.
 
+fbtee itself is used as its README describes; void-fbtee adds only what a Void app needs around it.
+Which piece does what (the example's Strings page shows each in three languages):
+
+- a sentence: `<fbt>` in components, `fbs` for a plain string;
+- a count: `<fbt:plural>`, with every plural form the language has;
+- a list in a sentence: `<fbt:list>`;
+- a choice from a fixed set: `<fbt:enum>`;
+- a person and their gender: `<fbt:name>`, `<fbt:pronoun>`;
+- the same value twice: `<fbt:same-param>`;
+- part of a page in another language, or worded by the reader's gender: void-fbtee's
+  `<InLanguage locale gender>`, on fbtee's scoped runtimes.
+
+fbtee's own language switching (`setLocale`) isn't used: each language has its own address.
+
 PDFs too (a ticket, an invoice): `inLocale` writes the page of HTML in its reader's language, and
 Cloudflare Browser Run prints it, so Arabic and Thai come out right with only the system's fonts.
 The SKILL's "Translated PDFs" lists what it takes; the example's PDFs docs page shows a ticket.

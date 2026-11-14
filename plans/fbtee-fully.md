@@ -192,7 +192,9 @@ All ten steps are built. What each is checked by:
 
 1. The skill: "A finished entry" (fbtee's steps again) became "Gender", the part that's
    void-fbtee's; `<InLanguage>`, the pieces and why fbtee's language switching stays out are in it.
-   The real `void-fbtee translate` run is still to do (it needs Claude Code in the app).
+   The package README lists which fbtee piece does what. The real `void-fbtee translate` run is
+   still to do: in this cloud session a second `claude -p` can't sign in, so translate hands the
+   prompt to the session itself; on the Mac it runs Claude Code.
 2. `onMissingTranslation`: a unit test (`runtime.test.ts`), two requests in German log one line for
    the one missing string. Done as a unit test, not the preview test planned, since it's the same
    `runWithFbtee` the server calls.
