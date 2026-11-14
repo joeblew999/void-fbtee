@@ -89,6 +89,20 @@ It's a separate package, not part of void-fbtee:
 The captions are where the two meet. `void-moq` reads each watcher's language from void-fbtee
 when it's there, and from the browser's language when it isn't.
 
+What it depends on, and what it doesn't. Each layer leans only on the one below it:
+
+1. **Void:** routes, plugin, queues, Workers AI and Durable Objects. That's all `void-moq` requires.
+2. **`void-fbtee`:** an _optional_ peer dependency, used only for the captions' language. Without
+   it, the watcher's language comes from the browser.
+3. **The app:** the events, bookings, who may publish and watch, the emails, ticket and calendar,
+   and the use cases. `void-moq` knows none of these. The app ties them together through
+   `publishToken()`, `watchToken()` and the components.
+
+So a stream in `void-moq` has no event, time or booking: it's a stream with a name, a publisher,
+watchers and caption languages. The per-person times (`viewFor` in `plans/use-cases.md`) start in
+the app. If other apps need them too, they move into `void-fbtee` (they're about time and language),
+never into `void-moq`.
+
 It's shaped like void-fbtee, so it feels the same to use:
 
 - **`void-moq/plugin`:** `voidMoq()` in `vite.config.ts`, which sets up the relay (Cloudflare's
