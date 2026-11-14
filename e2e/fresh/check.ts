@@ -65,12 +65,13 @@ const APPS: Record<string, App> = {
 };
 
 // The Thai-source app's translations, as a developer (or `void-fbtee translate`) writes them: by
-// source text, one line per plural form each language uses (fbtee's codes: 16 zero, 4 one, 8 two,
-// 20 few, 12 many, 24 other).
+// source text, one line per plural form each language uses (fbtee's codes: 16 zero, 8 two, 20 few,
+// 12 many, 24 other), with exactly 1 its own entry. English then has one line, "other".
 const FROM_THAI: Record<string, Record<string, string | Record<number, string>>> = {
   "en-US": {
     งานของชุมชน: "Community events",
-    "เหลือ {number} ที่นั่ง": { 4: "{number} seat left", 24: "{number} seats left" },
+    "เหลือ {number} ที่นั่ง": "{number} seats left",
+    "เหลือ 1 ที่นั่ง": "1 seat left",
     ไม่มีอะไรอยู่ที่นี่: "There's nothing here",
     หน้าแรก: "Home",
   },
@@ -78,12 +79,12 @@ const FROM_THAI: Record<string, Record<string, string | Record<number, string>>>
     งานของชุมชน: "فعاليات المجتمع",
     "เหลือ {number} ที่นั่ง": {
       16: "لم يتبقَّ أي مقعد",
-      4: "تبقّى مقعد واحد",
       8: "تبقّى مقعدان",
       20: "تبقّت {number} مقاعد",
       12: "تبقّى {number} مقعدًا",
       24: "تبقّى {number} مقعد",
     },
+    "เหลือ 1 ที่นั่ง": "تبقّى مقعد واحد",
     ไม่มีอะไรอยู่ที่นี่: "لا يوجد شيء هنا",
     หน้าแรก: "الرئيسية",
   },
@@ -271,8 +272,12 @@ async function thaiSource(target: string, dir: string, app: App, installed: stri
       if (wanted === undefined) continue;
       if (typeof wanted === "string") entry.translations[0].translation = wanted;
       else
-        for (const line of entry.translations)
-          line.translation = wanted[Number(Object.values(line.variations)[0])] ?? line.translation;
+        for (const line of entry.translations) {
+          const form = wanted[Number(Object.values(line.variations)[0])];
+          if (form === undefined)
+            throw new Error(`${locale}: no form for ${JSON.stringify(line.variations)}`);
+          line.translation = form;
+        }
       entry.status = "translated";
     }
     writeFileSync(file, JSON.stringify(catalog, null, 2) + "\n");
