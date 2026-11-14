@@ -55,7 +55,7 @@ Sources, read 2026-11-14:
 
 ## The first thing to prove
 
-Before any app code, prove the pieces work together:
+Before any package code, prove the pieces work together:
 
 - Can moq-dev's browser packages talk to Cloudflare's relay? moq-dev's packages use their own
   protocol, moq-lite. Cloudflare's relay speaks the IETF drafts:
@@ -69,36 +69,52 @@ another, through a relay made on the account. Its result decides the plan:
 - **If they don't:** moq-dev's own relay (`moq-relay`, open source), or Cloudflare's own sample
   clients.
 
-## What gets built
+## Where it lives: a package, `void-live`
+
+Video doesn't belong in an app's own code: every app that wants it would write the same relay
+setup, tokens, players and caption pipeline. So it's a package beside void-fbtee in this repo,
+`packages/void-live`, and the example uses it as any app would (dog-fooding it, as it does
+void-fbtee).
+
+It's a separate package, not part of void-fbtee:
+
+- void-fbtee stays about language;
+- an app can have one without the other.
+
+The captions are where the two meet. `void-live` reads each watcher's language from void-fbtee
+when it's there, and from the browser's language when it isn't.
+
+It's shaped like void-fbtee, so it feels the same to use:
+
+- **`void-live/plugin`:** `voidLive()` in `vite.config.ts`, which sets up the relay (Cloudflare's
+  MoQ relay, made once with the deploy's token) and the routes that hand out short-lived tokens.
+- **`void-live/server`:** `publishToken()` and `watchToken()`. The app decides who may do which,
+  because only it knows its own rules (here: the event's key to publish, a booking to watch).
+- **`void-live/react`:** `<Broadcast>` and `<Watch>` around moq-dev's web components, with captions
+  in the watcher's language and the right direction.
+- **Captions:** the speech-to-text and translation pipeline, inside the package. The app only
+  says which languages to make captions in.
+- **`void-live init`** and a skill (`skills/void-live/SKILL.md`), like void-fbtee's: an app adds it
+  with one command, and an agent can read how to use it.
+- Its own unit tests in the package, and a fresh-app test like void-fbtee's (`e2e/fresh/`), so it's
+  checked the way a developer receives it.
+
+## What the example then does with it
 
 1. **The event is streamed.**
    - `events.streamed` (boolean), ticked when posting.
    - Each booking's `taking_part` is `there` or `online`.
-   - The relay is made once with Void's deploy if Void can (to check in Void's docs), otherwise by a
-     script that calls Cloudflare's API with the same token CI deploys with. No key goes into
-     Claude.
-2. **Who may publish and watch.**
-   - The organiser publishes with the event's private key (the delete link they already have).
-   - A booker watches with their booking.
-   - The Worker hands each a short-lived relay token. Tokens sit in the URL, so the docs' advice
-     applies: one per client, short-lived.
+2. **Who may publish and watch,** through `publishToken()` and `watchToken()`:
+   - the organiser publishes with the event's private key;
+   - a booker watches with their booking.
 3. **The pages.**
-   - The event page gets "Go live" for the organiser (`<moq-publish>`) and "Watch" for people who
-     booked online (`<moq-watch>`).
+   - The event page gets `<Broadcast>` for the organiser and `<Watch>` for people who booked online.
    - Both show when it's on on the reader's own clock, and live status comes through the page's
      existing live updates (`src/events/live.ts`).
 4. **The emails, the ticket and the calendar.**
    - "Watch online", with the link and the time on the reader's clock, in their language.
    - The reminder (per person, `plans/use-cases.md`) carries the link.
-5. **Captions.**
-   - The speaker's audio goes to Nova-3 as it's spoken. Each finished sentence is translated into the
-     languages of the people watching, and published back as one caption track per language on the
-     same broadcast.
-   - Each watcher's page subscribes to the track for their locale, and shows it right to left for
-     Arabic.
-   - Where this runs (the organiser's browser sending audio to the Worker, or a Durable Object
-     reading the broadcast) is the second thing the proof answers.
-6. **Docs:** a "Streaming" page (`pages/[lang]/docs/streaming.tsx` on `DocsPage`), linked from the
+5. **Docs:** a "Streaming" page (`pages/[lang]/docs/streaming.tsx` on `DocsPage`), linked from the
    home page like every feature, plus the "watching online" use cases in `plans/use-cases.md`.
 
 ## Later
