@@ -2,7 +2,7 @@
 
 Status: proposed 2026-11-14; its unknowns were checked the same day (below, "What was checked"), and
 it was reviewed by a separate agent the same day, whose 22 findings are folded in. Waiting for the
-user's OK. Its place in the order: `plans/README.md` (after `plans/void-1.9.md`).
+user's OK. Its place in the order: `plans/README.md` (before `plans/void-1.9.md`).
 
 ## The bug
 
@@ -285,7 +285,7 @@ The places, found in the code and by the review (2026-11-14):
 
 ## What was checked (2026-11-14), before writing the code
 
-On Void 1.8.0. The checks ran on the dev server and on the built Worker (`vp preview`, workerd),
+On Void 1.8.0, the version the repo runs. The checks ran on the dev server and on the built Worker (`vp preview`, workerd),
 with a temporary probe and a rough version of the redirect in the middleware. Both were reverted.
 
 - **The middleware sees `"/"` once Void's fixed redirect is gone:** yes, in both.
@@ -310,21 +310,19 @@ with a temporary probe and a rough version of the redirect in the middleware. Bo
 - **Void replaced the redirect's own `Vary` and `Cache-Control`** with `Vary: X-VoidPages…` and
   `no-store`.
 
-## To check first, on Void 1.9.1
+## To check first, on Void 1.8.0
 
-`plans/void-1.9.md` comes before this plan, and what was checked above was Void 1.8.0's behaviour,
-not its docs. So, after that upgrade and before writing this code, again with a temporary probe:
+Three things the plan relies on that weren't seen yet. Settled first, with a temporary probe as
+before, and written here before building:
 
-- the answering-route table above, and how Void reports an app's root catch-all page
-  (`pages/[...all].tsx`) and a `pages/[user].tsx`;
-- that Void still marks the 302 `no-store` and replaces the middleware's own headers;
-- that "not found" is still decided after the middleware;
-- that head scripts are still server-only (`head.md`), and how the notice can see Void's move to
-  the next page (an event of Void's, the Navigation API, or `popstate` and link clicks);
+- how Void reports an app's root catch-all page (`pages/[...all].tsx`) and a `pages/[user].tsx` to
+  the middleware;
+- how the notice can see Void's move to the next page: an event of Void's, the Navigation API, or
+  `popstate` and link clicks;
 - that Void's client follows a redirect on its own page fetch (`X-VoidPages`) and lands on the new
   page.
 
-Each answer is written here before building, as the 1.8.0 ones were.
+The Void 1.9.1 upgrade comes after this plan (`plans/README.md`), and runs this plan's tests on it.
 
 ## How we'll know it's right
 
