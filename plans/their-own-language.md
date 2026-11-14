@@ -112,6 +112,11 @@ the page.
    There's nothing to dismiss and nothing to remember. How it looks is the app's, through one CSS
    class.
 
+   It stays a script with the language's name only, now that void-fbtee has `<InLanguage>`
+   (fbtee-fully): `<InLanguage>` renders on the server, but whether to show the notice is only
+   known in the browser after load (`navigator.languages`, `document.referrer`), and a sentence in
+   the visitor's language would mean every page carrying every language's catalog.
+
 4. **The header's language links stay** as plain links to this page in each language, each named in
    its own language. That's for someone who wants another language on purpose. They're not the way
    in any more.
@@ -198,13 +203,20 @@ set up. So:
   - `init.ts`: writes no fixed redirect, and removes one that `init` wrote before;
   - `check.ts`: reports a fixed redirect for `"/"` as the bug;
   - `skills/void-fbtee/SKILL.md`;
-  - `package.json`: the version's minor number goes up, since it changes what apps get at `"/"`.
+  - `package.json`: the version's minor number goes up (0.5.0 to 0.6.0), since it changes what
+    apps get at `"/"`.
     CI then releases it (`.github/workflows/ci.yml`, release job), and the release notes say an app
     should drop its own fixed redirect: `void-fbtee check` says so too.
 - **Example:**
   - `void.config.ts`: the fixed redirect and its comment go;
   - `pages/style.css` styles the notice's class;
   - `SiteHeader.tsx`'s comment no longer calls the links the way in.
+- **The fresh-app test** (`e2e/fresh/check.ts`), changed by the fbtee-fully build:
+  - every app's check that `"/"` is a 301 to the source language becomes: `"/"` follows
+    `Accept-Language`, and a made-up `/xx-XX` goes to the not-found page in that language rather
+    than a 404 at once;
+  - the app written in Thai (`thai-source`, added by fbtee-fully) is where the fallback is tested
+    for real, since its source isn't English (see "How we'll know it's right").
 - **README:** the line about `"/"`.
 
 ## What was checked (2026-11-14), before writing the code
@@ -256,8 +268,11 @@ The preview tests use real requests and real browsers, not stand-ins.
   - `fr`;
   - `fr,th;q=0.5`, which gives Thai: the best one the app has;
   - no header at all, which gives the source language.
-- With `fallbackLocale` set to Thai, a French browser lands on Thai, and the home page's `x-default`
-  points there.
+- The fresh app written in Thai (`thai-source`): an English browser lands on `/en-US`, an Arabic
+  one on `/ar-EG`, a French one and one with no header on `/th-TH` (`fallbackLocale` left unset is
+  fbtee's `sourceLocale`, Thai), and its home page's `x-default` is `"/"`. The same app with
+  `fallbackLocale: "en-US"` sends the French browser to `/en-US`. This replaces setting the
+  example's fallback to Thai: an app really written in Thai is the case that matters.
 - `negotiate()` gives the same answer as fbtee's own `setupLocaleContext(...).getLocale()` for every
   case, for the example's languages and for a site with many: `th`, `ar-SA`, `ar-MA`, `en-GB`,
   `en-AU`, `es-MX`, `pt-AO`, `zh-HK`, `zh-Hant`, `sr-Latn`, `fr` and none.
