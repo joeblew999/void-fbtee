@@ -41,13 +41,20 @@ Not used yet, and wanted:
   gives it, never guessed, for emails and tickets that address them.
 - **Missing translations at run time:** `onMissingTranslation`, so a string missing in production
   is logged once, beside the build-time report the plugin already gives.
+- **Its locale matching:** which of the app's languages fits a person's list ("Locale Matching and
+  Fallback" in fbtee's README). `plans/their-own-language.md` uses it to send each visitor to their
+  own language. It's not exported yet, so void-fbtee carries fbtee's code for it unchanged, tested
+  to agree with fbtee's public `setupLocaleContext`, until fbtee exports `negotiateLocale` (the
+  issue drafted in that plan).
 - **Its translate skill** (`node_modules/fbtee/skills/fbtee-translate/SKILL.md`). It does what
   `void-fbtee translate` asks Claude Code to do. Check whether ours repeats it, and if it does, use
   theirs.
 
 ## What changes, in order
 
-There's one step for each item in "Not used yet, and wanted" above, seven in all, so none is dropped.
+There's one step for each item in "Not used yet, and wanted" above, so none is dropped. Locale
+matching is the exception: it's built in `plans/their-own-language.md`, the next plan, where it's
+used.
 
 1. **The translate skill.**
    - Compare `packages/void-fbtee/skills/void-fbtee/SKILL.md` (the part `void-fbtee translate` gives
@@ -82,8 +89,8 @@ fbtee piece does what, without repeating fbtee.
 - **`<fbt:list>`, `<fbt:enum>`, `<fbt:name>` and gender with `<fbt:pronoun>`:** unit tests render
   each in all three languages, with the expected words taken from the catalog's own translations.
   They're checked again in the browser on the Strings page.
-- **Nothing dropped:** each of the seven "wanted" items is ticked off against its step and its
-  test before the change is committed.
+- **Nothing dropped:** each "wanted" item is ticked off against its step and its test (locale
+  matching against `plans/their-own-language.md`'s) before the change is committed.
 - Then `vp check`, `test:unit`, `test:dev`, `test:preview` and `i18n:check`.
 
 Committed locally, and pushed when the user says.
