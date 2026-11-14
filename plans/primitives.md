@@ -123,6 +123,10 @@ copied code again.
    After the change the same inputs must give the same bytes. Workers AI's translations aren't
    repeatable, so for `translate` it's the measure below instead.
 
+   There are two intended differences, and the reference marks each one:
+   - "tomorrow" counted in the reader's own day (a bug today);
+   - each reminder sent at the reader's own hour.
+
 2. **The hard times are checked against outside truth, not against the code itself.** Each expected
    value is written down from a source, with that source and the date it was checked. The cases:
    - London's 2027 clock changes (GOV.UK);
