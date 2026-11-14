@@ -146,7 +146,8 @@ function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut:
             id="book-reminder-ticket"
             type="checkbox"
             data-testid="book-reminder-ticket"
-            checked={form.data.ticket_in_reminder}
+            // The form's own value is always a boolean; the schema also takes a plain form's "on".
+            checked={form.data.ticket_in_reminder === true}
             onChange={(e) => form.setData("ticket_in_reminder", e.target.checked)}
             className="mt-1 size-4 accent-brand"
           />

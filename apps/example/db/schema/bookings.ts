@@ -57,5 +57,10 @@ export const bookSchema = createInsertSchema(bookings, {
     }),
 })
   .pick({ id: true, name: true, email: true, time_zone: true })
-  // A checkbox: left out when it isn't ticked (a form posted without it, as the tests do).
-  .extend({ ticket_in_reminder: z.boolean().optional() });
+  // A checkbox: true from the page (useForm sends JSON); "on" or "true" from a plain form post;
+  // left out when it isn't ticked.
+  .extend({
+    ticket_in_reminder: z
+      .union([z.boolean(), z.enum(["on", "true"]).transform(() => true)])
+      .optional(),
+  });

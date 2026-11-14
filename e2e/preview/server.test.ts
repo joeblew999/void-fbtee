@@ -91,6 +91,32 @@ test("booking an event that doesn't exist is not found, not sold out", async () 
   expect(res.status).toBe(404);
 });
 
+// A plain form post (not the page's JSON) with the reminder box ticked books the seat: the
+// checkbox arrives as "on". Booking the same id again is refused, which shows the first went in.
+test("a plain form post with the reminder box ticked books the seat", async () => {
+  const id = crypto.randomUUID();
+  const [event] = await (
+    await get(`/${SOURCE}/events`)
+  )
+    .text()
+    .then((html) => [...html.matchAll(/\/events\/([0-9a-f-]{36})"/g)].map((m) => m[1]!));
+  const book = () =>
+    get(`/${SOURCE}/events/${event}`, {
+      method: "POST",
+      redirect: "manual",
+      headers: { origin: url("prod"), "content-type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        id,
+        name: "A",
+        email: "a@example.com",
+        time_zone: "Asia/Bangkok",
+        ticket_in_reminder: "on",
+      }),
+    });
+  expect((await book()).status).toBeLessThan(400);
+  expect((await book()).status).toBe(400);
+});
+
 // The booking's id comes from the form: one already taken is refused, not a crash.
 test("booking with an id that's already taken is refused", async () => {
   const id = crypto.randomUUID();
