@@ -19,6 +19,20 @@ So a use case doesn't need new code each time. It is one data entry (an event an
 the app works out and shows each person's view, in the page's language. Adding a use case means
 adding an entry. That's what lets them grow past the first two issues.
 
+## Gaps to close first (found 2026-11-14)
+
+- **Reminders go out at one moment for everyone.** `crons/reminders.ts` runs once a day,
+  `cron = "0 6 * * *"`: that's 13:00 in Bangkok and 22:00 the evening before in Los Angeles. "The
+  day before" has to be each booker's own day: run hourly, and remind the bookings whose
+  "day before, 09:00 in their zone" falls in that hour.
+- **An event has only a start.** It has no end or length, no "streamed" flag, and the venue is free
+  text (`db/schema/events.ts`). Add an end, a streamed flag and a venue address for directions.
+- **A person is only a booking.** It has a language and zone (`db/schema/bookings.ts`), but not
+  where they're coming from or how they take part. Add `taking_part` (there, online) to bookings,
+  and an optional "coming from" for travel.
+- **Booking needs JavaScript** (`plans/void-form-without-javascript.md`): that's Void's issue, and
+  it waits on upstream.
+
 ## What gets built
 
 1. **The model:** `src/use-cases/`.
