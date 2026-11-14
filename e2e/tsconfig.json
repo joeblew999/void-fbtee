@@ -9,13 +9,5 @@
     "noEmit": true,
     "skipLibCheck": true
   },
-  "include": [
-    "*.ts",
-    "preview/*.ts",
-    "dev/*.ts",
-    "browsers/*.ts",
-    "deployed/*.ts",
-    "fresh/*.ts",
-    "../scripts/*.ts"
-  ]
+  "include": ["*.ts", "preview/*.ts", "dev/*.ts", "browsers/*.ts", "deployed/*.ts", "fresh/*.ts"]
 }

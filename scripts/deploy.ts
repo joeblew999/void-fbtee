@@ -1,6 +1,6 @@
 // `vp run deploy` (and `deploy:atomic`, with --atomic): the example's deploy (Void's
 // `void deploy`), with its output as it comes. Void
-// prints the URL it deployed to (its summary box, `+- https://… --+`) and keeps no record of it,
+// prints the URL it deployed to (its summary box) and keeps no record of it,
 // so this saves it in .vitest/production-url for `vp run test:production`.
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -18,7 +18,9 @@ child.stdout.on("data", (chunk: Buffer) => {
 });
 const code: number = await new Promise((resolve) => child.on("close", (c) => resolve(c ?? 1)));
 const plain = stripVTControlCharacters(output);
-const url = /^\+- (https:\/\/\S+) -+\+$/m.exec(plain)?.[1];
+// Void draws the box in plain characters where the terminal can't show box lines (`+- https://… --+`)
+// and in box lines where it can, as GitHub's runners (`╭─ https://… ─╮`).
+const url = /^(?:\+-|╭─) (https:\/\/\S+) [-─]+[+╮]$/m.exec(plain)?.[1];
 if (code === 0 && plain.includes("Successfully deployed!") && url) {
   const saved = join(import.meta.dirname, "../.vitest/production-url");
   mkdirSync(join(saved, ".."), { recursive: true });
