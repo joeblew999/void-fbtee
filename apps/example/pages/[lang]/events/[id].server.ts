@@ -1,7 +1,7 @@
 // One event, by its id, with its seats left (the loader), and booking a seat (the action).
 import { bookings, bookSchema, event_texts, events } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
-import { and, count, db, eq, inArray, sql } from "void/db";
+import { count, db, eq, sql } from "void/db";
 import { queues } from "void/queues";
 import { storage } from "void/storage";
 import { z } from "zod";
@@ -10,11 +10,16 @@ import { Temporal } from "temporal-polyfill";
 import { jsonLd, pageHead } from "void-fbtee/head";
 import type { AppLocale } from "void-fbtee/locales";
 import { routeUrl } from "void-fbtee/routes";
-import { pickText, revalidate as clearCache, siteOrigin, textLocales } from "void-fbtee/server";
+import { pickText, revalidate as clearCache, siteOrigin } from "void-fbtee/server";
 import { deleteKeyMatches } from "../../../src/events/delete-key";
 import { ticketKey } from "../../../src/events/tickets";
 import { eventTopic, live } from "../../../src/events/live";
-import { awaitsTranslation } from "../../../src/events/translations";
+import {
+  awaitsTranslation,
+  eventPages,
+  textsFor,
+  titleFor,
+} from "../../../src/events/translations";
 
 export type Props = InferProps<typeof loader>;
 
@@ -44,10 +49,7 @@ export const loader = defineHandler.withValidator({ params })(async (c, { params
   const [row] = await db.select().from(events).where(eq(events.id, id));
   if (!row) return c.notFound();
   const { delete_key_hash, ...event } = row;
-  const texts = await db
-    .select()
-    .from(event_texts)
-    .where(and(eq(event_texts.event_id, id), inArray(event_texts.locale, textLocales(locale))));
+  const texts = await textsFor([id], locale);
   const text = pickText(texts, locale) ?? null;
   if (awaitsTranslation(event.locale, texts, locale)) c.header("x-revalidate", "0");
   return { event, text, left: event.seats - (await booked(id)), deletable: !!delete_key_hash };
@@ -107,13 +109,13 @@ const remove = defineHandler.withValidator({ params, body: z.object({ key: z.str
       return c.json({ message: "wrong key" }, 403);
     const [booked, texts] = await Promise.all([
       db.select().from(bookings).where(eq(bookings.event_id, id)),
-      db.select().from(event_texts).where(eq(event_texts.event_id, id)),
+      textsFor([id]),
     ]);
     // Where the delete is made: the cancellations link back to the events list there.
     const origin = new URL(c.req.url).origin;
     await Promise.all(
       booked.map((b) => {
-        const text = pickText(texts, b.locale) ?? event;
+        const text = titleFor(event, texts, b.locale);
         return queues.cancel.send({
           to: b.email,
           name: b.name,
@@ -133,7 +135,7 @@ const remove = defineHandler.withValidator({ params, body: z.object({ key: z.str
     ]);
     // Their PDF tickets too: each has its booker's name on it.
     if (booked.length) await storage.delete(booked.map((b) => ticketKey(b.id)));
-    await clearCache({ paths: [`/[lang]/events/${id}`, "/[lang]/events", "/sitemap.xml"] });
+    await clearCache({ paths: eventPages(id) });
     await live.publish(eventTopic(id), {}, { type: "deleted" });
     return c.redirect(routeUrl("/[lang]/events"));
   },

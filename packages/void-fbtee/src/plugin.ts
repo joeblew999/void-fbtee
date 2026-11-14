@@ -24,7 +24,7 @@ import { join } from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
 import type { FallbackLocales } from "fbtee";
-import { resolveLocales, type LocaleConfig, type LocaleInput } from "./locales";
+import { resolveLocales, translatedOf, type LocaleConfig, type LocaleInput } from "./locales";
 import {
   DEFAULT_SRC,
   DEFAULT_TRANSLATIONS,
@@ -263,12 +263,10 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         if (id === "\0" + CONFIG_ID)
           return `export default ${JSON.stringify({ ...config, fallbackLocales: options.fallbackLocales, site: options.site })};`;
         if (id === "\0" + CATALOGS_ID) {
-          const entries = config.locales
-            .filter((l) => l.locale !== config.sourceLocale)
-            .map(
-              (l) =>
-                `${JSON.stringify(l.locale)}: () => import(${JSON.stringify(CATALOG_PREFIX + l.locale)})`,
-            );
+          const entries = translatedOf(config).map(
+            (l) =>
+              `${JSON.stringify(l.locale)}: () => import(${JSON.stringify(CATALOG_PREFIX + l.locale)})`,
+          );
           return `export default {${entries.join(",")}};`;
         }
         // @void/md's pages list exists only inside its plugin, so it's re-exported only when the

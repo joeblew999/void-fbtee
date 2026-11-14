@@ -4,9 +4,8 @@
 import { sql } from "void/db";
 import { createInsertSchema } from "void/drizzle-zod";
 import { index, integer, sqliteTable, text } from "void/schema-d1";
-import { Temporal } from "temporal-polyfill";
 import { z } from "zod";
-import { events } from "./events";
+import { events, isZone } from "./events";
 
 export const bookings = sqliteTable(
   "bookings",
@@ -47,14 +46,7 @@ export const bookSchema = createInsertSchema(bookings, {
   id: () => z.uuid(),
   name: (s) => s.trim().min(1).max(120),
   email: (s) => s.trim().pipe(z.email()),
-  time_zone: (s) =>
-    s.refine((zone) => {
-      try {
-        return Temporal.Now.zonedDateTimeISO(zone) !== undefined;
-      } catch {
-        return false;
-      }
-    }),
+  time_zone: (s) => s.refine(isZone),
 })
   .pick({ id: true, name: true, email: true, time_zone: true })
   // A checkbox: true from the page (useForm sends JSON); "on" or "true" from a plain form post;

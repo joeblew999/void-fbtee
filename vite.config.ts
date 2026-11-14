@@ -4,6 +4,24 @@ import { fileURLToPath } from "node:url";
 import fbtee from "@nkzw/eslint-plugin-fbtee";
 import { defineConfig } from "vite-plus";
 
+/**
+ * A browser-test project: e2e/<name>/*.test.ts, with e2e/<setup>/setup.ts starting what it tests,
+ * run `order`-th, in its own processes. Its files one after another unless said otherwise: they
+ * share one server and its database.
+ */
+const e2e = (name: string, order: number, { setup = name, oneFileAtATime = true } = {}) => ({
+  test: {
+    name,
+    include: [`e2e/${name}/*.test.ts`],
+    globalSetup: [`e2e/${setup}/setup.ts`],
+    pool: "forks" as const,
+    testTimeout: 120_000,
+    hookTimeout: 120_000,
+    ...(oneFileAtATime && { fileParallelism: false }),
+    sequence: { groupOrder: order },
+  },
+});
+
 export default defineConfig({
   staged: {
     "*": "vp check --fix",
@@ -118,53 +136,11 @@ export default defineConfig({
         // The app's own `@/` (apps/example/tsconfig.json), for tests that import its code to compute
         // what a page should show (e2e/preview/islands.test.ts: src/docs/fmt.ts).
         resolve: { alias: { "@/": fileURLToPath(new URL("apps/example/src/", import.meta.url)) } },
-        test: {
-          name: "preview",
-          include: ["e2e/preview/*.test.ts"],
-          globalSetup: ["e2e/preview/setup.ts"],
-          pool: "forks",
-          testTimeout: 120_000,
-          hookTimeout: 120_000,
-          // One file after another: they share one preview server and its database.
-          fileParallelism: false,
-          sequence: { groupOrder: 2 },
-        },
+        ...e2e("preview", 2),
       },
-      {
-        test: {
-          name: "browsers",
-          include: ["e2e/browsers/*.test.ts"],
-          globalSetup: ["e2e/preview/setup.ts"],
-          pool: "forks",
-          testTimeout: 120_000,
-          hookTimeout: 120_000,
-          fileParallelism: false,
-          sequence: { groupOrder: 3 },
-        },
-      },
-      {
-        test: {
-          name: "dev",
-          include: ["e2e/dev/*.test.ts"],
-          globalSetup: ["e2e/dev/setup.ts"],
-          pool: "forks",
-          testTimeout: 120_000,
-          hookTimeout: 120_000,
-          fileParallelism: false,
-          sequence: { groupOrder: 4 },
-        },
-      },
-      {
-        test: {
-          name: "deployed",
-          include: ["e2e/deployed/*.test.ts"],
-          globalSetup: ["e2e/deployed/setup.ts"],
-          pool: "forks",
-          testTimeout: 120_000,
-          hookTimeout: 120_000,
-          sequence: { groupOrder: 5 },
-        },
-      },
+      e2e("browsers", 3, { setup: "preview" }),
+      e2e("dev", 4),
+      e2e("deployed", 5, { oneFileAtATime: false }),
     ],
   },
 });

@@ -3,11 +3,51 @@
 // in every language, and its open pages are told to load their data again (live). Until then, a
 // page in a language it isn't in yet isn't cached at all (awaitsTranslation).
 import { event_texts, events } from "@schema";
-import { db, eq } from "void/db";
-import { appLocales, revalidate } from "void-fbtee/server";
+import { and, db, eq, inArray } from "void/db";
+import type { AppLocale } from "void-fbtee/locales";
+import { appLocales, pickText, revalidate, textLocales } from "void-fbtee/server";
 import { eventTopic, live } from "./live";
 
 export type Text = { title: string; description: string };
+
+/**
+ * The pages that show an event, to clear from Void's page cache when it changes: its own page (with
+ * `id`), the list, and the sitemap.
+ */
+export const eventPages = (id?: string): Parameters<typeof revalidate>[0]["paths"] => [
+  ...(id ? ([`/[lang]/events/${id}`] as const) : []),
+  "/[lang]/events",
+  "/sitemap.xml",
+];
+
+/**
+ * The stored translations of these events: those a page in `locale` can show (it and its
+ * fallbacks, textLocales from void-fbtee/server), or all of them without `locale`.
+ */
+export async function textsFor(ids: string[], locale?: AppLocale) {
+  if (!ids.length) return [];
+  const ofThese = inArray(event_texts.event_id, ids);
+  return await db
+    .select()
+    .from(event_texts)
+    .where(locale ? and(ofThese, inArray(event_texts.locale, textLocales(locale))) : ofThese);
+}
+
+/**
+ * The event's title for someone reading in `locale`, and the language it's in: the best stored
+ * translation (pickText), else the original. `texts` may hold other events' too.
+ */
+export function titleFor(
+  event: { id: string; title: string; locale: string },
+  texts: readonly { event_id: string; title: string; locale: string }[],
+  locale: string,
+): { title: string; locale: string } {
+  const text = pickText(
+    texts.filter((t) => t.event_id === event.id),
+    locale,
+  );
+  return { title: text?.title ?? event.title, locale: text?.locale ?? event.locale };
+}
 
 /**
  * Whether a page in `locale` shows an event still waiting for its translation into that language:
@@ -57,6 +97,6 @@ export async function storeTranslations(eventId: string, translations: Record<st
         description: text.description.trim(),
       })
       .onConflictDoNothing();
-  await revalidate({ paths: [`/[lang]/events/${eventId}`, "/[lang]/events", "/sitemap.xml"] });
+  await revalidate({ paths: eventPages(eventId) });
   await live.publish(eventTopic(eventId), {}, { type: "translated" });
 }

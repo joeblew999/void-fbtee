@@ -1,13 +1,13 @@
 // Upcoming events: only those not yet started, each with its title in the page's language where a
 // translation is stored (the sample events), and its seats left. Posting one is its own page
 // (new.server.ts), which clears this list.
-import { bookings, event_texts, events } from "@schema";
+import { bookings, events } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
-import { and, asc, count, db, eq, gte, inArray } from "void/db";
-import { pickText, textLocales } from "void-fbtee/server";
-import { awaitsTranslation } from "../../../src/events/translations";
+import { asc, count, db, eq, gte } from "void/db";
+import { pickText } from "void-fbtee/server";
+import { awaitsTranslation, textsFor } from "../../../src/events/translations";
 
 export type Props = InferProps<typeof loader>;
 
@@ -35,14 +35,7 @@ export const loader = defineHandler(async (c) => {
   // Their stored translations for this page (the page's language and its fallbacks), and for each
   // the best (pickText from void-fbtee/server).
   const ids = rows.map((r) => r.event.id);
-  const texts = ids.length
-    ? await db
-        .select()
-        .from(event_texts)
-        .where(
-          and(inArray(event_texts.event_id, ids), inArray(event_texts.locale, textLocales(locale))),
-        )
-    : [];
+  const texts = await textsFor(ids, locale);
   const mine = (id: string) => texts.filter((t) => t.event_id === id);
   if (rows.some(({ event }) => awaitsTranslation(event.locale, mine(event.id), locale)))
     c.header("x-revalidate", "0");

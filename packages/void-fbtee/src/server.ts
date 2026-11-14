@@ -9,7 +9,7 @@
 // - sitemap(): /sitemap.xml with every page in every language.
 // - textLocales(), pickText(): which stored translation of what people post to show.
 // - The current language for routeUrl (void-fbtee/routes): the request's, set by the middleware
-//   (withLang), or inLocale()'s, held here in an AsyncLocalStorage, as fbtee holds its own state.
+//   (runIn), or inLocale()'s, held here in an AsyncLocalStorage, as fbtee holds its own state.
 import { AsyncLocalStorage } from "node:async_hooks";
 import { runWithFbtee } from "fbtee/server";
 import { revalidate as voidRevalidate } from "void/isr";
@@ -19,7 +19,8 @@ import catalogs from "virtual:void-fbtee/catalogs";
 import markdownPages from "virtual:void-fbtee/md-pages";
 import langPages from "virtual:void-fbtee/pages";
 import { setServerLang } from "./current";
-import type { AppLocale, Dir, Lang } from "./locales";
+import type { TranslationDictionary } from "fbtee";
+import type { AppLocale, Dir, Lang, Locale } from "./locales";
 import { routeUrl } from "./routes";
 import { allTranslations } from "./runtime";
 
@@ -33,8 +34,16 @@ export function currentLocale(): AppLocale | undefined {
 }
 
 /** Runs `fn` with `lang` as the current language (the middleware, for each request). */
-export function withLang<T>(lang: Lang, fn: () => T): T {
+function withLang<T>(lang: Lang, fn: () => T): T {
   return storage.run(lang, fn);
+}
+
+/** Runs `fn` in `language`, for fbtee (with these catalogs) and for routeUrl both. */
+export function runIn<T>(language: Locale, translations: TranslationDictionary, fn: () => T): T {
+  const { sourceLocale, fallbackLocales } = config;
+  return withLang(language.segment, () =>
+    runWithFbtee({ locale: language.locale, sourceLocale, fallbackLocales, translations }, fn),
+  );
 }
 
 /**
@@ -57,13 +66,8 @@ export async function inLocale<T>(
     throw new Error(
       `void-fbtee: inLocale("${locale}"): not one of the app's languages (${config.locales.map((l) => l.locale).join(", ")})`,
     );
-  const { sourceLocale, fallbackLocales } = config;
   const translations = await allTranslations(catalogs);
-  return await withLang(found.segment, () =>
-    runWithFbtee({ locale, sourceLocale, fallbackLocales, translations }, () =>
-      fn({ locale, dir: found.dir }),
-    ),
-  );
+  return await runIn(found, translations, () => fn({ locale, dir: found.dir }));
 }
 
 /**
@@ -114,16 +118,11 @@ export function langParams(): { lang: Lang }[] {
 export async function inEveryLocale<T>(
   fn: (language: { locale: string; dir: Dir }) => T,
 ): Promise<Record<string, T>> {
-  const { sourceLocale, fallbackLocales } = config;
   const translations = await allTranslations(catalogs);
   return Object.fromEntries(
     config.locales.map((l) => [
       l.locale,
-      withLang(l.segment, () =>
-        runWithFbtee({ locale: l.locale, sourceLocale, fallbackLocales, translations }, () =>
-          fn({ locale: l.locale, dir: l.dir }),
-        ),
-      ),
+      runIn(l, translations, () => fn({ locale: l.locale, dir: l.dir })),
     ]),
   );
 }

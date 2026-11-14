@@ -16,6 +16,14 @@ import {
 import { dirname, join, matchesGlob, relative, sep } from "node:path";
 import { builders, generateCode, loadFile, type ProxifiedModule } from "magicast";
 import { addVitePlugin, getDefaultExportOptions } from "magicast/helpers";
+import {
+  firstFile,
+  hasI18nMiddleware,
+  LAYOUTS,
+  SKILL_DIR,
+  VITE_CONFIGS,
+  VOID_CONFIGS,
+} from "./app-files";
 import { DEFAULT_TRANSLATIONS } from "./catalogs";
 import { checkSite } from "./site";
 import { packageManager } from "./translate";
@@ -35,7 +43,7 @@ export interface InitResult {
   todo: string[];
 }
 
-const SKILL = "node_modules/void-fbtee/skills/void-fbtee/SKILL.md";
+const SKILL = `${SKILL_DIR}/SKILL.md`;
 const AGENTS_START = "<!--injected-by-void-fbtee-->";
 const AGENTS_END = "<!--/injected-by-void-fbtee-->";
 const AGENTS_BLOCK = `${AGENTS_START}
@@ -285,12 +293,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
 
   // 3. Middleware.
   const mwDir = at("middleware");
-  const hasMw =
-    existsSync(mwDir) &&
-    readdirSync(mwDir).some((f) =>
-      readFileSync(join(mwDir, f), "utf8").includes("void-fbtee/middleware"),
-    );
-  if (!hasMw) {
+  if (!hasI18nMiddleware(o.root)) {
     mkdirSync(mwDir, { recursive: true });
     writeFileSync(join(mwDir, "99.i18n.ts"), MIDDLEWARE);
     written.add("middleware/99.i18n.ts");
@@ -298,7 +301,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
   }
 
   // 4. Root layout.
-  const layout = ["pages/layout.tsx", "pages/layout.jsx"].find((f) => existsSync(at(f)));
+  const layout = firstFile(o.root, LAYOUTS);
   if (!layout) {
     mkdirSync(at("pages"), { recursive: true });
     writeFileSync(at("pages/layout.tsx"), LAYOUT);
@@ -341,9 +344,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
 
   // 5. vite.config.ts: the plugin first, with the languages from src/locales.ts (made here if
   // there's none); on Vite+ the lint plugins (in the workspace's root config).
-  const viteConfig = ["vite.config.ts", "vite.config.mts", "vite.config.js"].find((f) =>
-    existsSync(at(f)),
-  );
+  const viteConfig = firstFile(o.root, VITE_CONFIGS);
   if (!viteConfig) {
     todo.push(
       `no vite.config.ts found: add voidFbtee() from "void-fbtee/plugin" first in its plugins`,
@@ -439,9 +440,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
 
   // 6. void.config.ts: Cloudflare's temporal flag (native Temporal in the worker), and "/" sent to
   // the source language by Void's own redirects (before any app code runs).
-  const voidConfig = ["void.config.ts", "void.config.mts", "void.config.js"].find((f) =>
-    existsSync(at(f)),
-  );
+  const voidConfig = firstFile(o.root, VOID_CONFIGS);
   if (!voidConfig) {
     todo.push(
       `no void.config.ts found: add worker: { compatibility_flags: ["temporal"] } and routing: { redirects: { "/": { to: "/${o.sourceLocale}", status: 301 } } }`,
@@ -516,7 +515,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
 
   // 10. Link the skill into each coding agent's skills folder, as `void init` does with Void's:
   //     a relative link, for the agents whose folder the app already has.
-  const target = join(o.root, "node_modules/void-fbtee/skills/void-fbtee");
+  const target = join(o.root, SKILL_DIR);
   for (const agent of AGENTS) {
     if (!agent.detect.some((f) => existsSync(at(f)))) continue;
     const link = at(join(agent.skillsDir, "void-fbtee"));

@@ -8,19 +8,21 @@
 // The Emails and PDFs pages' sample ticket is printed the same way, kept under a hash of its HTML:
 // printed again only when the ticket's look or words change, and the version before it deleted.
 // A booking's ticket is deleted a week after its event started (crons/reminders.ts).
-import { bookings, event_texts, events } from "@schema";
+import { bookings, events } from "@schema";
 import { fbs } from "fbtee";
 import { Temporal } from "temporal-polyfill";
-import { and, db, eq, inArray } from "void/db";
+import { db, eq } from "void/db";
 import { storage } from "void/storage";
 import { langAttrs, type AppLocale } from "void-fbtee/locales";
 import { routeUrl } from "void-fbtee/routes";
-import { inLocale, pickText, textLocales } from "void-fbtee/server";
+import { inLocale } from "void-fbtee/server";
 import { SAMPLE_EVENT, SAMPLE_ID, SAMPLE_NAME } from "@/docs/sample-event";
-import { SITE } from "@/site";
+import { originOr, SITE } from "@/site";
+import { sha256Hex } from "@/sha256";
 import { printImage, printPdf } from "@/pdf";
 import { startsAt, type EventFor } from "./emails";
 import { ticketHtml } from "./TicketLayout";
+import { textsFor, titleFor } from "./translations";
 
 /** What a ticket shows: the event as the booker reads it, who booked, and the event's page. */
 export type TicketFor = EventFor & { locale: AppLocale; name: string; url: string };
@@ -73,23 +75,17 @@ export async function bookingTicket(id: string) {
   if (!row) return undefined;
   const { booking, event } = row;
   const locale = booking.locale as AppLocale;
-  const texts = await db
-    .select()
-    .from(event_texts)
-    .where(
-      and(eq(event_texts.event_id, event.id), inArray(event_texts.locale, textLocales(locale))),
-    );
-  const text = pickText(texts, locale);
+  const text = titleFor(event, await textsFor([event.id], locale), locale);
   const page = await inLocale(locale, () =>
     routeUrl("/[lang]/events/[id]", { params: { id: event.id } }),
   );
   const ticket: TicketFor = {
     locale,
     name: booking.name,
-    title: text?.title ?? event.title,
-    titleLocale: text?.locale ?? event.locale,
+    title: text.title,
+    titleLocale: text.locale,
     startsAt: event.starts_at,
-    url: (booking.origin || SITE) + page,
+    url: originOr(booking.origin) + page,
   };
   return { email: booking.email, ticket };
 }
@@ -158,10 +154,7 @@ async function sample(locale: AppLocale) {
     routeUrl("/[lang]/events/[id]", { params: { id: SAMPLE_ID } }),
   );
   const html = await ticketPage({ ...SAMPLE_EVENT, locale, name: SAMPLE_NAME, url: SITE + page });
-  const hash = new Uint8Array(
-    await crypto.subtle.digest("SHA-256", new TextEncoder().encode(html)),
-  );
-  const short = [...hash.slice(0, 6)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  const short = (await sha256Hex(html)).slice(0, 12);
   return { html, key: `tickets/sample/${locale}-${short}` };
 }
 

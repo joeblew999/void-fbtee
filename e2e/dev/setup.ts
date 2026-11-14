@@ -15,9 +15,8 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { stripVTControlCharacters } from "node:util";
 import type { TestProject } from "vite-plus/test/node";
-import { DEV_PORT, devServerRunning, EXAMPLE, root } from "../preview/setup";
+import { DEV_PORT, devServerRunning, EXAMPLE, root, untilListening } from "../preview/setup";
 
 const DEV = `http://localhost:${DEV_PORT}`;
 
@@ -28,17 +27,11 @@ async function startDev(): Promise<ChildProcess> {
     stdio: ["ignore", "pipe", "pipe"],
     detached: true,
   });
-  const listening = new RegExp(String.raw`Local:\s+http://localhost:${DEV_PORT}(?!\d)`);
-  await new Promise<void>((resolve, reject) => {
-    let output = "";
-    const read = (chunk: Buffer) => {
-      output += chunk;
-      if (listening.test(stripVTControlCharacters(output))) resolve();
-    };
-    child.stdout!.on("data", read);
-    child.stderr!.on("data", read);
-    child.once("exit", (code) => reject(new Error(`vp run dev exited with ${code}:\n${output}`)));
-  });
+  await untilListening(
+    child,
+    new RegExp(String.raw`Local:\s+http://localhost:${DEV_PORT}(?!\d)`),
+    "vp run dev",
+  );
   return child;
 }
 

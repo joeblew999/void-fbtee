@@ -4,6 +4,7 @@ import { pageHead } from "void-fbtee/head";
 import { langParams } from "void-fbtee/server";
 import { routeUrl } from "void-fbtee/routes";
 import { bookingEmail, linkEmail, type Email } from "@/events/emails";
+import { privateLink } from "@/events/delete-key";
 import { SAMPLE_EVENT as EVENT, SAMPLE_ID as ID, SAMPLE_NAME } from "@/docs/sample-event";
 import logoUrl from "../../../public/pwa-192x192.png?url";
 
@@ -29,7 +30,7 @@ export const loader = defineHandler(async (c) => {
   const page = origin + routeUrl("/[lang]/events/[id]", { params: { id: ID } });
   const [booking, link] = await Promise.all([
     bookingEmail({ ...EVENT, locale, name: SAMPLE_NAME, url: page }),
-    linkEmail({ ...EVENT, locale, link: `${page}#key=…` }),
+    linkEmail({ ...EVENT, locale, link: privateLink(page, "…") }),
   ]);
   return { booking: shown(booking), link: shown(link) };
 });

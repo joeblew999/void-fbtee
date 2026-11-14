@@ -27,6 +27,23 @@ export const run = (args: string[], cwd: string) =>
   execFileSync("vp", args, { cwd, stdio: "inherit" });
 
 /**
+ * Waits until a server `child` started prints its own address (`listening`, on stdout or on stderr
+ * where that's piped too); fails if it exits first. No time limit.
+ */
+export function untilListening(child: ChildProcess, listening: RegExp, what: string) {
+  return new Promise<void>((resolve, reject) => {
+    let output = "";
+    const read = (chunk: Buffer) => {
+      output += chunk;
+      if (listening.test(stripVTControlCharacters(output))) resolve();
+    };
+    child.stdout?.on("data", read);
+    child.stderr?.on("data", read);
+    child.once("exit", (code) => reject(new Error(`${what} exited with ${code}:\n${output}`)));
+  });
+}
+
+/**
  * Start a server and wait until it's ready: --strictPort makes a taken port fail rather than move,
  * and only this server's own "Local: http://…:<port>" line counts, not any answer on the port (as
  * voidzero-dev/void's startServer, test/integration-helpers.ts).
@@ -41,20 +58,11 @@ export async function start(args: string[], port: number, url: string): Promise<
       detached: true,
     },
   );
-  const listening = new RegExp(
-    String.raw`(?:Local:?|Listening on)\s+https?://[^\s/]+:${port}(?!\d)`,
+  await untilListening(
+    child,
+    new RegExp(String.raw`(?:Local:?|Listening on)\s+https?://[^\s/]+:${port}(?!\d)`),
+    args.join(" "),
   );
-  // Ready when it prints its URL; failed if it exits first. No time limit.
-  await new Promise<void>((resolve, reject) => {
-    let output = "";
-    child.stdout!.on("data", (chunk: Buffer) => {
-      output += chunk;
-      if (listening.test(stripVTControlCharacters(output))) resolve();
-    });
-    child.once("exit", (code) =>
-      reject(new Error(`${args.join(" ")} exited with ${code}:\n${output}`)),
-    );
-  });
   const res = await fetch(url);
   if (!res.ok) throw new Error(`${args.join(" ")}: ${url} answered ${res.status}`);
   return child;

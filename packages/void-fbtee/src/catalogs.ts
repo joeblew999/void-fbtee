@@ -14,7 +14,7 @@ import {
   prepareTranslationsBatchSync,
   translateSync,
 } from "@nkzw/fbtee-compiler";
-import type { LocaleConfig } from "./locales";
+import { translatedOf, type LocaleConfig } from "./locales";
 import { addPluralForms, pluralSlots } from "./plurals";
 
 // Where an app's strings can be: every folder of code in Void's project structure (Void's docs,
@@ -126,8 +126,7 @@ export function collect(p: Project): Collected {
   return value;
 }
 
-const translatedLocales = (p: Project) =>
-  p.config.locales.map((l) => l.locale).filter((l) => l !== p.config.sourceLocale);
+const translatedLocales = (p: Project) => translatedOf(p.config).map((l) => l.locale);
 
 /**
  * What `void-fbtee prepare` writes: every translated locale's catalog after fbtee's own

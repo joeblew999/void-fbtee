@@ -5,9 +5,9 @@ import { fbt } from "fbtee";
 import { Form } from "@void/react";
 import { useForm, useTimeZone } from "void-fbtee/react";
 import { EventsCrumbs } from "@/events/EventsCrumbs";
+import { Field } from "@/events/Field";
 import { Button } from "@/ui/button";
 import { Input } from "@/ui/input";
-import { Label } from "@/ui/label";
 import { NativeSelect, NativeSelectOption } from "@/ui/native-select";
 import { Textarea } from "@/ui/textarea";
 import type { Props } from "./new.server";
@@ -26,59 +26,65 @@ function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
     seats: 20,
     email: "",
   });
-  const error = (field: keyof typeof form.errors, message: React.ReactNode) =>
-    form.errors[field] && (
-      <p className="text-destructive text-sm" data-testid={`error-${field}`}>
-        {message}
-      </p>
-    );
   return (
     <Form form={form} className="grid max-w-2xl gap-5">
-      <div className="grid gap-2">
-        <Label htmlFor="event-title">
-          <fbt desc="Form label: the event's title">Title</fbt>
-        </Label>
+      <Field
+        id="event-title"
+        name="title"
+        label={<fbt desc="Form label: the event's title">Title</fbt>}
+        error={
+          form.errors.title && <fbt desc="Form error: the title is missing">Give it a title.</fbt>
+        }
+      >
         <Input
           id="event-title"
           data-testid="event-title-input"
           value={form.data.title}
           onChange={(e) => form.setData("title", e.target.value)}
         />
-        {error("title", <fbt desc="Form error: the title is missing">Give it a title.</fbt>)}
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="event-description">
-          <fbt desc="Form label: what the event is about">What it's about</fbt>
-        </Label>
+      </Field>
+      <Field
+        id="event-description"
+        name="description"
+        label={<fbt desc="Form label: what the event is about">What it's about</fbt>}
+        error={
+          form.errors.description && (
+            <fbt desc="Form error: the description is missing">Say what it's about.</fbt>
+          )
+        }
+      >
         <Textarea
           id="event-description"
           data-testid="event-description-input"
           value={form.data.description}
           onChange={(e) => form.setData("description", e.target.value)}
         />
-        {error(
-          "description",
-          <fbt desc="Form error: the description is missing">Say what it's about.</fbt>,
-        )}
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="event-venue">
-          <fbt desc="Form label: where the event happens (optional)">Where (optional)</fbt>
-        </Label>
+      </Field>
+      <Field
+        id="event-venue"
+        name="venue"
+        label={<fbt desc="Form label: where the event happens (optional)">Where (optional)</fbt>}
+      >
         <Input
           id="event-venue"
           data-testid="event-venue-input"
           value={form.data.venue ?? ""}
           onChange={(e) => form.setData("venue", e.target.value)}
         />
-      </div>
+      </Field>
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="grid gap-2">
-          <Label htmlFor="event-local">
+        <Field
+          id="event-local"
+          name="local"
+          label={
             <fbt desc="Form label: when the event starts, on the clock where it happens">
               Starts, local time
             </fbt>
-          </Label>
+          }
+          error={
+            form.errors.local && <fbt desc="Form error: no start time">When does it start?</fbt>
+          }
+        >
           <Input
             id="event-local"
             type="datetime-local"
@@ -86,12 +92,12 @@ function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
             value={form.data.local}
             onChange={(e) => form.setData("local", e.target.value)}
           />
-          {error("local", <fbt desc="Form error: no start time">When does it start?</fbt>)}
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="event-zone">
-            <fbt desc="Form label: the time zone where the event happens">Time zone</fbt>
-          </Label>
+        </Field>
+        <Field
+          id="event-zone"
+          name="time_zone"
+          label={<fbt desc="Form label: the time zone where the event happens">Time zone</fbt>}
+        >
           <NativeSelect
             id="event-zone"
             data-testid="event-zone-input"
@@ -104,12 +110,19 @@ function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
               </NativeSelectOption>
             ))}
           </NativeSelect>
-        </div>
+        </Field>
       </div>
-      <div className="grid gap-2 sm:max-w-40">
-        <Label htmlFor="event-seats">
-          <fbt desc="Form label: how many seats the event has">Seats</fbt>
-        </Label>
+      <Field
+        id="event-seats"
+        name="seats"
+        className="sm:max-w-40"
+        label={<fbt desc="Form label: how many seats the event has">Seats</fbt>}
+        error={
+          form.errors.seats && (
+            <fbt desc="Form error: seats must be 1 or more">At least 1 seat.</fbt>
+          )
+        }
+      >
         <Input
           id="event-seats"
           type="number"
@@ -118,14 +131,29 @@ function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
           value={form.data.seats}
           onChange={(e) => form.setData("seats", e.target.valueAsNumber)}
         />
-        {error("seats", <fbt desc="Form error: seats must be 1 or more">At least 1 seat.</fbt>)}
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="event-email">
+      </Field>
+      <Field
+        id="event-email"
+        name="email"
+        label={
           <fbt desc="Form label: an email address to send the poster their private link to (optional)">
             Email me my private link (optional)
           </fbt>
-        </Label>
+        }
+        hint={
+          <p id="event-email-why" className="text-sm text-muted-foreground">
+            <fbt desc="Under the private link email field: what the link is for, and that the address isn't kept">
+              The link lets you delete your event later, from any device. Your address is only used
+              to send it.
+            </fbt>
+          </p>
+        }
+        error={
+          form.errors.email && (
+            <fbt desc="Form error: the email address isn't one">That isn't an email address.</fbt>
+          )
+        }
+      >
         <Input
           id="event-email"
           type="email"
@@ -136,17 +164,7 @@ function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
           value={form.data.email ?? ""}
           onChange={(e) => form.setData("email", e.target.value)}
         />
-        <p id="event-email-why" className="text-sm text-muted-foreground">
-          <fbt desc="Under the private link email field: what the link is for, and that the address isn't kept">
-            The link lets you delete your event later, from any device. Your address is only used to
-            send it.
-          </fbt>
-        </p>
-        {error(
-          "email",
-          <fbt desc="Form error: the email address isn't one">That isn't an email address.</fbt>,
-        )}
-      </div>
+      </Field>
       <Button
         type="submit"
         size="lg"

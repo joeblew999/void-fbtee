@@ -8,7 +8,7 @@ import { fbt } from "fbtee";
 import { ArrowRight, MapPin } from "lucide-react";
 import { Formatted, langAttrs, Link, useLocale, useNow, useTimeZone } from "void-fbtee/react";
 import { Temporal } from "temporal-polyfill";
-import { Flap } from "@/events/Flap";
+import { Flap, SeatsLeft } from "@/events/Flap";
 import { buttonVariants } from "@/ui/button";
 import { clockParts, otherDay } from "@/events/event-clock";
 import { relativeDays } from "@/events/relative-days";
@@ -19,23 +19,6 @@ type Row = Props["events"][number];
 
 /** The board's columns from 768px; below that each row folds to three lines. */
 const COLUMNS = "md:grid-cols-[7.5rem_10rem_10rem_minmax(0,1fr)_8.5rem]";
-
-/** Seats left in a flap, the same words as each event's page; "Sold out" when none. */
-function SeatsLeft({ left }: { left: number }) {
-  return (
-    <Flap value={left} tone={left ? "default" : "out"}>
-      {left ? (
-        <fbt desc="How many seats an event has left">
-          <fbt:plural count={left} many="seats left" showCount="yes">
-            seat left
-          </fbt:plural>
-        </fbt>
-      ) : (
-        <fbt common>Sold out</fbt>
-      )}
-    </Flap>
-  );
-}
 
 function BoardRow({ e }: { e: Row }) {
   const { locale } = useLocale();

@@ -3,6 +3,7 @@
 // (seats going as people book, live), the chip turns over once. Works with any script's digits;
 // the turn is skipped when the reader asks for less motion (pages/style.css).
 import { useEffect, useRef, useState, type ComponentProps } from "react";
+import { fbt } from "fbtee";
 import { cn } from "@/ui/utils";
 
 export function Flap({
@@ -36,5 +37,22 @@ export function Flap({
       )}
       {...props}
     />
+  );
+}
+
+/** Seats left in a flap, on the board and each event's page; "Sold out" when none. */
+export function SeatsLeft({ left, ...props }: ComponentProps<"span"> & { left: number }) {
+  return (
+    <Flap value={left} tone={left ? "default" : "out"} {...props}>
+      {left ? (
+        <fbt desc="How many seats an event has left">
+          <fbt:plural count={left} many="seats left" showCount="yes">
+            seat left
+          </fbt:plural>
+        </fbt>
+      ) : (
+        <fbt common>Sold out</fbt>
+      )}
+    </Flap>
   );
 }

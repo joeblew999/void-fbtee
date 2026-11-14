@@ -16,17 +16,23 @@
 //   islands) go into headDefaults.
 // - Zod's validation messages follow the request's language (when the app has Zod 4).
 import { defineMiddleware } from "void";
-import { runWithFbtee } from "fbtee/server";
 import { Temporal } from "temporal-polyfill";
 import config from "virtual:void-fbtee/config";
 import catalogs from "virtual:void-fbtee/catalogs";
 import { matchedRoutes } from "virtual:void-fbtee/hono-route";
 import markdownPages from "virtual:void-fbtee/md-pages";
 import { meta, type MetaTag } from "./head";
-import { localeFromPath, META_NAME, type AppLocale, type Dir, type Lang } from "./locales";
+import {
+  localeFromPath,
+  META_NAME,
+  sourceOf,
+  type AppLocale,
+  type Dir,
+  type Lang,
+} from "./locales";
 import { allTranslations } from "./runtime";
 import { setup as setupZod } from "virtual:void-fbtee/zod";
-import { currentLocale, siteOrigin, withLang } from "./server";
+import { currentLocale, runIn, siteOrigin } from "./server";
 
 // Zod's own validation messages (a form's errors) in each request's language, when the app has
 // Zod 4 (plugin.ts, zodMessages).
@@ -80,7 +86,7 @@ const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (
   const light = LIGHT.test(path);
 
   const found = localeFromPath(path, config);
-  const source = config.locales.find((l) => l.locale === config.sourceLocale)!;
+  const source = sourceOf(config);
   const current = found ?? source;
   const rest = found ? path.slice(found.segment.length + 1) : path;
   const i18n: SharedI18n = {
@@ -143,7 +149,6 @@ const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (
     meta: [...(head.meta ?? []), ...page.meta, { name: META_NAME, content: JSON.stringify(i18n) }],
   });
   // No catalogs for light requests, but still inside fbtee state, so a not-found page with <fbt> renders.
-  const { sourceLocale, fallbackLocales } = config;
   const translations = light ? {} : await allTranslations(catalogs);
   // A page under [lang] for a language the app doesn't have (/xx-XX/events, /nope) doesn't exist:
   // Void's not-found page, in the source language, rather than a copy of the page under a made-up
@@ -159,11 +164,7 @@ const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (
   const answering = found || own ? undefined : answeringRoute(c);
   const madeUp = answering !== undefined && /^\/:[^/]+/.test(answering);
   // The request's language for fbtee, and for routeUrl from void-fbtee/routes (server.ts).
-  const response = await withLang(current.segment, () =>
-    runWithFbtee({ locale: current.locale, sourceLocale, fallbackLocales, translations }, () =>
-      madeUp ? c.notFound() : next(),
-    ),
-  );
+  const response = await runIn(current, translations, () => (madeUp ? c.notFound() : next()));
   // A copy of the site at another address (a Worker Preview, the dev server): kept out of search
   // results, so it never competes with the site itself. Only when the app names its site.
   if (config.site && new URL(c.req.url).origin !== config.site) c.header("X-Robots-Tag", "noindex");

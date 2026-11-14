@@ -18,10 +18,17 @@
 // puts it back in the address when an action there has written the address without it; and the
 // poster can have the link emailed when posting (src/events/emails.ts).
 
+import { sha256Hex } from "@/sha256";
+
 /** The cookie that carries a new event's key to its page: its name, and the header that sets it. */
 export const keyCookieName = (id: string) => `event-key-${id}`;
 export const keyCookie = (id: string, key: string) =>
   `${keyCookieName(id)}=${key}; Path=/; Max-Age=120; SameSite=Lax; Secure`;
+/** The same cookie, removed (the event page, once it has the key in its own address). */
+export const noKeyCookie = (id: string) => `${keyCookieName(id)}=; Path=/; Max-Age=0`;
+
+/** The private link: the event's page with its key after `#`. */
+export const privateLink = (page: string, key: string) => `${page}#key=${key}`;
 
 /** 32 random bytes as base64url: the key. */
 export function newDeleteKey(): string {
@@ -33,10 +40,7 @@ export function newDeleteKey(): string {
 }
 
 /** The key's SHA-256, in hex: what the database keeps. */
-export async function hashDeleteKey(key: string): Promise<string> {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(key));
-  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
-}
+export const hashDeleteKey = (key: string): Promise<string> => sha256Hex(key);
 
 /** Whether `key` is the one `hash` was made from, compared in the same time whatever differs. */
 export async function deleteKeyMatches(key: string, hash: string | null): Promise<boolean> {

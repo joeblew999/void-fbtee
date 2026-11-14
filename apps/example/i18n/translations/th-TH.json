@@ -369,18 +369,6 @@
       ],
       "types": []
     },
-    "Ca5AJpTqcKLFQ1lgSwVWtw==": {
-      "description": "Home card title: the documentation",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เอกสาร",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "BWGB7cju3+tlpcpaeCdWSw==": {
       "description": "Home card text: what the docs show",
       "status": "translated",
@@ -400,18 +388,6 @@
       "translations": [
         {
           "translation": "เวลาของคุณ: {time}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "WHNLr3T+RwGJg0fnjocoaw==": {
-      "description": "Home card title: the events app",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "กิจกรรม",
           "variations": {}
         }
       ],
@@ -1100,18 +1076,6 @@
       "translations": [
         {
           "translation": "เริ่มต้นใช้งาน",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "V89sDqXgTZmT3ns8pdDdjg==": {
-      "description": "Footer column heading: the documentation pages",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เอกสาร",
           "variations": {}
         }
       ],

@@ -21,12 +21,13 @@ import {
 import { MapPin } from "lucide-react";
 import { EventTime } from "@/events/EventTime";
 import { EventsCrumbs } from "@/events/EventsCrumbs";
-import { Flap } from "@/events/Flap";
+import { Field } from "@/events/Field";
+import { SeatsLeft } from "@/events/Flap";
 import { Button } from "@/ui/button";
 import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
 import { clockParts } from "@/events/event-clock";
-import { keyCookieName } from "@/events/delete-key";
+import { keyCookieName, noKeyCookie, privateLink } from "@/events/delete-key";
 import type { Props } from "./[id].server";
 
 /**
@@ -106,26 +107,33 @@ function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut:
   return (
     <Form form={form} className="grid gap-4">
       <div className="grid gap-4">
-        <div className="grid gap-2">
-          <Label htmlFor="book-name">
-            <fbt desc="Booking form label: the booker's name">Your name</fbt>
-          </Label>
+        <Field
+          id="book-name"
+          name="name"
+          label={<fbt desc="Booking form label: the booker's name">Your name</fbt>}
+          error={
+            form.errors.name && <fbt desc="Booking form error: no name">What's your name?</fbt>
+          }
+        >
           <Input
             id="book-name"
             data-testid="book-name"
             value={form.data.name}
             onChange={(e) => form.setData("name", e.target.value)}
           />
-          {form.errors.name && (
-            <p className="text-destructive text-sm" data-testid="error-name">
-              <fbt desc="Booking form error: no name">What's your name?</fbt>
-            </p>
-          )}
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="book-email">
-            <fbt desc="Booking form label: the booker's email address">Email</fbt>
-          </Label>
+        </Field>
+        <Field
+          id="book-email"
+          name="email"
+          label={<fbt desc="Booking form label: the booker's email address">Email</fbt>}
+          error={
+            form.errors.email && (
+              <fbt desc="Booking form error: not an email address">
+                That's not an email address.
+              </fbt>
+            )
+          }
+        >
           <Input
             id="book-email"
             type="email"
@@ -133,14 +141,7 @@ function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut:
             value={form.data.email}
             onChange={(e) => form.setData("email", e.target.value)}
           />
-          {form.errors.email && (
-            <p className="text-destructive text-sm" data-testid="error-email">
-              <fbt desc="Booking form error: not an email address">
-                That's not an email address.
-              </fbt>
-            </p>
-          )}
-        </div>
+        </Field>
         <div className="flex items-start gap-2">
           <input
             id="book-reminder-ticket"
@@ -296,11 +297,11 @@ function YourEvent({ id, onLeaving }: { id: string; onLeaving: (leaving: boolean
     if (!key) return;
     keyStore.set(id, key);
     if (location.pathname !== page || location.hash.includes("key=")) return;
-    history.replaceState(history.state, "", `${page}${location.search}#key=${key}`);
-    document.cookie = `${keyCookieName(id)}=; Path=/; Max-Age=0`;
+    history.replaceState(history.state, "", privateLink(page + location.search, key));
+    document.cookie = noKeyCookie(id);
   }, [id, key, page, hash]);
   if (!key) return null;
-  const link = `${location.origin}${page}#key=${key}`;
+  const link = privateLink(location.origin + page, key);
   const remove = async () => {
     // A wrong key is a 403, which Void's action() throws rather than returns (it returns only
     // 400, 404, 409, 422 and 429: guide/pages-routing/actions-and-forms.md). Deleted, the action
@@ -471,17 +472,7 @@ export default function Event({ event, text, left, deletable }: Props) {
               <h2 className="font-medium">
                 <fbt desc="Heading of the booking box on an event's page">Book a seat</fbt>
               </h2>
-              <Flap value={seatsLeft} tone={seatsLeft ? "default" : "out"} data-testid="seats-left">
-                {seatsLeft ? (
-                  <fbt desc="How many seats an event has left">
-                    <fbt:plural count={seatsLeft} many="seats left" showCount="yes">
-                      seat left
-                    </fbt:plural>
-                  </fbt>
-                ) : (
-                  <fbt common>Sold out</fbt>
-                )}
-              </Flap>
+              <SeatsLeft left={seatsLeft} data-testid="seats-left" />
             </div>
             <Book key={zone} id={event.id} zone={zone} soldOut={seatsLeft === 0} />
           </section>

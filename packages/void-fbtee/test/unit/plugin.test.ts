@@ -3,19 +3,18 @@
 // what it does per environment. One module is built for the browser, for a second browser
 // environment named "browser", and for a server environment named "worker": the environment is
 // told by Vite's own `consumer` flag, not its name. Seconds, no app.
-import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vite-plus/test";
+import { copyFixture } from "./copy-fixture";
 import { createBuilder, type Plugin, type Rollup } from "vite";
 import { voidMarkdown } from "@void/md/plugin";
 import { voidReact } from "@void/react/plugin";
 import { voidFbtee } from "../../src/plugin";
 
-const fixture = join(import.meta.dirname, "fixture");
 let root: string;
 beforeAll(() => {
-  root = mkdtempSync(join(import.meta.dirname, ".tmp-"));
-  cpSync(fixture, root, { recursive: true });
+  root = copyFixture();
   writeFileSync(
     join(root, "src/probe.ts"),
     `import { Temporal } from "temporal-polyfill";\nimport config from "virtual:void-fbtee/config";\nexport const temporal = Temporal;\nexport const locales = config.locales.map((l) => l.locale);\n`,
@@ -117,8 +116,7 @@ describe("per environment", () => {
 // empty list without it, so the package needs no peer dependency on @void/md.
 describe("markdown pages", () => {
   const build = async (plugins: Plugin[]) => {
-    const dir = mkdtempSync(join(import.meta.dirname, ".tmp-"));
-    cpSync(fixture, dir, { recursive: true });
+    const dir = copyFixture();
     mkdirSync(join(dir, "pages/en-US"), { recursive: true });
     writeFileSync(join(dir, "pages/en-US/hello.md"), "---\ntitle: Hello page\n---\n\n# Hello\n");
     writeFileSync(

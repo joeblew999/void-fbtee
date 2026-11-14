@@ -33,7 +33,8 @@ export const events = sqliteTable("events", {
     .default(sql`(datetime('now'))`),
 });
 
-const isZone = (zone: string) => {
+/** Whether `zone` is a time zone Temporal knows (an IANA name such as "Asia/Bangkok"). */
+export const isZone = (zone: string) => {
   try {
     return Temporal.Now.zonedDateTimeISO(zone) !== undefined;
   } catch {

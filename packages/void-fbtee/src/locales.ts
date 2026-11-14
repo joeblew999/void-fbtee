@@ -98,6 +98,14 @@ export function resolveLocales(sourceLocale: string, inputs: readonly LocaleInpu
   return { sourceLocale, locales };
 }
 
+/** The source language: the one the app is written in. */
+export const sourceOf = (config: LocaleConfig): Locale =>
+  config.locales.find((l) => l.locale === config.sourceLocale)!;
+
+/** Every language but the source: the ones translated into. */
+export const translatedOf = (config: LocaleConfig): Locale[] =>
+  config.locales.filter((l) => l.locale !== config.sourceLocale);
+
 /** The locale whose segment starts this path, e.g. "/th-TH/bookings" -> th-TH. */
 export function localeFromPath(path: string, config: LocaleConfig): Locale | undefined {
   const segment = path.split("/")[1] ?? "";
@@ -106,3 +114,10 @@ export function localeFromPath(path: string, config: LocaleConfig): Locale | und
 
 /** Name of the <meta> tag the middleware writes the page's i18n data into, for islands. */
 export const META_NAME = "void-fbtee";
+
+/** The page's <meta name="void-fbtee"> data, in the browser; undefined on the server or without it. */
+export function readMeta<T>(): T | undefined {
+  if (typeof document === "undefined") return;
+  const content = document.querySelector<HTMLMetaElement>(`meta[name="${META_NAME}"]`)?.content;
+  return content ? (JSON.parse(content) as T) : undefined;
+}

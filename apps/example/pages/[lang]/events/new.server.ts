@@ -7,12 +7,13 @@ import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
 import { db } from "void/db";
 import { queues } from "void/queues";
-import { hashDeleteKey, keyCookie, newDeleteKey } from "@/events/delete-key";
+import { hashDeleteKey, keyCookie, newDeleteKey, privateLink } from "@/events/delete-key";
 import { routeUrl } from "void-fbtee/routes";
 import { langParams, revalidate } from "void-fbtee/server";
 import { sendLinkEmail } from "@/events/emails";
 import { z } from "zod";
 import { locales } from "@/locales";
+import { eventPages } from "@/events/translations";
 
 // Cached until the next deploy, in every language (Void's prerendering: a one-year cache time,
 // and a deploy clears the cache). Void's own platform also builds it during the deploy; deployed
@@ -59,12 +60,12 @@ export const action = defineHandler.withValidator({
       titleLocale: locale,
       startsAt: start.starts_at,
       // Where it was posted (dev, a Worker Preview, live), not the site's canonical address.
-      link: `${new URL(c.req.url).origin}${page}#key=${key}`,
+      link: privateLink(new URL(c.req.url).origin + page, key),
     });
   // Its translations into the app's other languages, after this answers (queues/translate.ts).
   await queues.translate.send({ eventId: created.id });
   // The list in every language, and the sitemap, which lists the new event.
-  await revalidate({ paths: ["/[lang]/events", "/sitemap.xml"] });
+  await revalidate({ paths: eventPages() });
   // To the new event's page, with the key in a short-lived cookie, which the page turns into the
   // poster's private link (src/events/delete-key.ts).
   c.header("Set-Cookie", keyCookie(created.id, key));

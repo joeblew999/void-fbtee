@@ -14,18 +14,17 @@ import {
 import { VOID_INIT_DIR } from "./void-init";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vite-plus/test";
+import { copyFixture } from "./copy-fixture";
 import type { Project } from "../../src/catalogs";
 import { check, markdownPages, missingHead } from "../../src/check";
 import { loadProject, prepare } from "../../src/commands";
 import { init } from "../../src/init";
 import { stamp, translateTask } from "../../src/translate";
 
-const fixture = join(import.meta.dirname, "fixture");
 let root: string;
 let p: Project;
 beforeEach(async () => {
-  root = mkdtempSync(join(import.meta.dirname, ".tmp-"));
-  cpSync(fixture, root, { recursive: true });
+  root = copyFixture();
   p = await loadProject(root);
 });
 afterEach(() => rmSync(root, { recursive: true, force: true }));

@@ -1,9 +1,11 @@
 // What `void-fbtee check` checks, as plain functions. Each problem is one
 // line a person can act on.
 import { createHash } from "node:crypto";
-import { existsSync, globSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, globSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { missing, type Project } from "./catalogs";
+import { firstFile, hasI18nMiddleware, LAYOUTS, VOID_CONFIGS } from "./app-files";
+import { sourceOf, translatedOf } from "./locales";
 
 /** Frontmatter key a translated markdown page records its original's hash in. */
 export const TRANSLATED_FROM = "translatedFrom";
@@ -54,23 +56,21 @@ export interface MarkdownPage {
 /** Every markdown page in the source locale's folder, per other locale. */
 export function markdownPages(p: Project): MarkdownPage[] {
   const pages = join(p.root, "pages");
-  const source = p.config.locales.find((l) => l.locale === p.config.sourceLocale)!;
+  const source = sourceOf(p.config);
   const sourceDir = join(pages, source.segment);
   if (!existsSync(sourceDir)) return [];
   const files = globSync("**/*.md", { cwd: sourceDir });
-  return p.config.locales
-    .filter((l) => l.locale !== p.config.sourceLocale)
-    .flatMap((l) =>
-      files.map((path): MarkdownPage => {
-        const file = join(pages, l.segment, path);
-        const original = join(sourceDir, path);
-        if (!existsSync(file)) return { path, locale: l.locale, file, original, state: "missing" };
-        const recorded = recordedHash(readFileSync(file, "utf8"));
-        const current = markdownHash(readFileSync(original, "utf8"));
-        const state = !recorded ? "unrecorded" : recorded === current ? "ok" : "stale";
-        return { path, locale: l.locale, file, original, state };
-      }),
-    );
+  return translatedOf(p.config).flatMap((l) =>
+    files.map((path): MarkdownPage => {
+      const file = join(pages, l.segment, path);
+      const original = join(sourceDir, path);
+      if (!existsSync(file)) return { path, locale: l.locale, file, original, state: "missing" };
+      const recorded = recordedHash(readFileSync(file, "utf8"));
+      const current = markdownHash(readFileSync(original, "utf8"));
+      const state = !recorded ? "unrecorded" : recorded === current ? "ok" : "stale";
+      return { path, locale: l.locale, file, original, state };
+    }),
+  );
 }
 
 /**
@@ -157,37 +157,28 @@ function partsDiffer(original: string, copy: string): string | undefined {
     .join("; ");
 }
 
-const firstFile = (dir: string, names: string[]) =>
-  names.map((n) => join(dir, n)).find((f) => existsSync(f));
-
 /** Problems, one line each. Empty when everything is in order. */
 export function check(p: Project): string[] {
   const problems: string[] = [];
   const rel = (f: string) => relative(p.root, f);
 
   // Setup (what `void-fbtee init` writes).
-  const middlewareDir = join(p.root, "middleware");
-  const hasMiddleware =
-    existsSync(middlewareDir) &&
-    readdirSync(middlewareDir).some((f) =>
-      readFileSync(join(middlewareDir, f), "utf8").includes("void-fbtee/middleware"),
-    );
-  if (!hasMiddleware)
+  if (!hasI18nMiddleware(p.root))
     problems.push(
       `setup: no middleware re-exports "void-fbtee/middleware" (middleware/99.i18n.ts)`,
     );
-  const layout = firstFile(join(p.root, "pages"), ["layout.tsx", "layout.jsx"]);
-  if (!layout || !readFileSync(layout, "utf8").includes("I18nProvider"))
+  const layout = firstFile(p.root, LAYOUTS);
+  if (!layout || !readFileSync(join(p.root, layout), "utf8").includes("I18nProvider"))
     problems.push(`setup: the root layout (pages/layout.tsx) doesn't wrap pages in <I18nProvider>`);
-  const voidConfig = firstFile(p.root, ["void.config.ts", "void.config.mts", "void.config.js"]);
+  const voidConfig = firstFile(p.root, VOID_CONFIGS);
   const flag = /compatibility_flags\s*:\s*\[[^\]]*["']temporal["']/;
-  const voidConfigText = voidConfig ? readFileSync(voidConfig, "utf8") : "";
+  const voidConfigText = voidConfig ? readFileSync(join(p.root, voidConfig), "utf8") : "";
   if (!flag.test(voidConfigText))
     problems.push(
       `setup: Cloudflare's "temporal" flag is missing (void.config.ts: worker.compatibility_flags)`,
     );
   // "/" goes to the source language, by Void's own redirects, permanently.
-  const source = p.config.locales.find((l) => l.locale === p.config.sourceLocale)!.segment;
+  const source = sourceOf(p.config).segment;
   const home = new RegExp(
     `["']/["']\\s*:\\s*\\{[^}]*to\\s*:\\s*["']/${source}["'][^}]*status\\s*:\\s*301`,
   );

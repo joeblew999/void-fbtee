@@ -5,7 +5,7 @@ import { setupLocaleContext } from "fbtee";
 import catalogs from "virtual:void-fbtee/catalogs";
 import config from "virtual:void-fbtee/config";
 import texts from "virtual:void-fbtee/texts";
-import { META_NAME } from "./locales";
+import { readMeta } from "./locales";
 import type { SharedI18n } from "./middleware";
 import { localeContextOptions } from "./runtime";
 
@@ -39,7 +39,5 @@ export function install(locale: string): Tracked {
 
 /** The middleware's i18n data from the page's <meta name="void-fbtee">, in the browser. */
 export function documentI18n(): SharedI18n | undefined {
-  if (typeof document === "undefined") return;
-  const content = document.querySelector<HTMLMetaElement>(`meta[name="${META_NAME}"]`)?.content;
-  return content ? (JSON.parse(content) as SharedI18n) : undefined;
+  return readMeta<SharedI18n>();
 }

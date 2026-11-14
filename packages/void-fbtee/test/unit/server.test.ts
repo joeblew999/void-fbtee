@@ -1,10 +1,11 @@
 // inLocale() from void-fbtee/server, as an app's server code runs it with no request (a scheduled
 // job, a queue consumer), routeUrl() from void-fbtee/routes and Zod's messages in its language: built through the plugin for a server environment, as Void builds a
 // Worker, then run. The fixture's catalog has German for its strings (test/unit/fixture/i18n/).
-import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterAll, beforeAll, describe, expect, test } from "vite-plus/test";
+import { copyFixture } from "./copy-fixture";
 import { createBuilder, type Plugin } from "vite";
 import { langAttrs } from "../../src/locales";
 import { voidFbtee } from "../../src/plugin";
@@ -29,8 +30,7 @@ let probe: {
 };
 
 beforeAll(async () => {
-  root = mkdtempSync(join(import.meta.dirname, ".tmp-"));
-  cpSync(join(import.meta.dirname, "fixture"), root, { recursive: true });
+  root = copyFixture();
   // Void's generated list of the app's pages, as \`void prepare\` writes it (PagePathMap).
   mkdirSync(join(root, ".void"), { recursive: true });
   writeFileSync(

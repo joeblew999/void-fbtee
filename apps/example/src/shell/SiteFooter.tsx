@@ -34,7 +34,7 @@ export default function SiteFooter() {
   return (
     <footer className="mt-12 border-t">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:grid-cols-3">
-        <Column title={<fbt desc="Footer column heading: the documentation pages">Docs</fbt>}>
+        <Column title={<fbt common>Docs</fbt>}>
           {groups
             .flatMap((g) => g.entries)
             .map((e) => (

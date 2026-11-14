@@ -8,16 +8,16 @@
 //
 // Cloudflare runs it on its Cron Trigger; in dev, Void's trigger runs it on demand
 // (`POST /__void/scheduled`, guide/jobs.md), as e2e/dev/jobs.test.ts does.
-import { bookings, event_texts, events } from "@schema";
+import { bookings, events } from "@schema";
 import { defineScheduled } from "void";
 import { and, db, eq, gte, inArray, lt } from "void/db";
 import { Temporal } from "temporal-polyfill";
 import type { AppLocale } from "void-fbtee/locales";
-import { pickText } from "void-fbtee/server";
 import { sendReminderEmail } from "@/events/emails";
 import { KEEP_TICKETS_MS, ticketKey, ticketPdf } from "@/events/tickets";
 import { storage } from "void/storage";
-import { SITE } from "@/site";
+import { originOr } from "@/site";
+import { textsFor, titleFor } from "@/events/translations";
 
 // 06:00 UTC every day: early morning in Bangkok, late evening before in the Americas.
 export const cron = "0 6 * * *";
@@ -65,14 +65,11 @@ export default defineScheduled(async (controller, env) => {
   const ids = soon.map((e) => e.id);
   const [booked, texts] = await Promise.all([
     db.select().from(bookings).where(inArray(bookings.event_id, ids)),
-    db.select().from(event_texts).where(inArray(event_texts.event_id, ids)),
+    textsFor(ids),
   ]);
   for (const b of booked) {
     const event = soon.find((e) => e.id === b.event_id)!;
-    const text = pickText(
-      texts.filter((t) => t.event_id === event.id),
-      b.locale,
-    );
+    const text = titleFor(event, texts, b.locale);
     // Their PDF ticket too, if they asked for it when booking: kept since then, so no printing
     // (src/events/tickets.ts). If it can't be had now, the reminder goes without it.
     const ticket = b.ticket_in_reminder
@@ -86,11 +83,11 @@ export default defineScheduled(async (controller, env) => {
       locale: b.locale as AppLocale,
       name: b.name,
       id: event.id,
-      title: text?.title ?? event.title,
-      titleLocale: text?.locale ?? event.locale,
+      title: text.title,
+      titleLocale: text.locale,
       startsAt: event.starts_at,
       // Bookings from before the origin was kept: the live site.
-      origin: b.origin ?? SITE,
+      origin: originOr(b.origin),
       ticket,
     });
   }

@@ -14,6 +14,7 @@ import {
   TRANSLATED_FROM_LINE,
   type MarkdownPage,
 } from "./check";
+import { sourceOf } from "./locales";
 
 /** void-fbtee's own folder (dist/ is one level down), where skills/ ships. */
 export const packageDir = () => dirname(dirname(fileURLToPath(import.meta.url)));
@@ -43,7 +44,7 @@ export function translateTask(p: Project): TranslateTask | undefined {
       const rtl = dirOf(m.locale) === "rtl" ? ", right-to-left" : "";
       return `- ${rel(catalogFile(p, m.locale))} (${m.locale}${rtl}): ${n} entries with "status": "new"`;
     });
-  const source = p.config.locales.find((l) => l.locale === p.config.sourceLocale)!;
+  const source = sourceOf(p.config);
   const pages = markdownPages(p).filter((page) => page.state !== "ok");
   const pageLines = pages.map((page) => {
     const from = rel(join(p.root, "pages", source.segment, page.path));
@@ -71,7 +72,7 @@ export function translateTask(p: Project): TranslateTask | undefined {
  * `translatedFrom: "<hash>"` in its frontmatter (made if there's none, after a leading <script>).
  */
 export function stamp(p: Project, file: string): void {
-  const source = p.config.locales.find((l) => l.locale === p.config.sourceLocale)!;
+  const source = sourceOf(p.config);
   const pagesDir = join(p.root, "pages");
   const [segment, ...rest] = relative(pagesDir, file).split(sep);
   if (!segment || !rest.length || !p.config.locales.some((l) => l.segment === segment))

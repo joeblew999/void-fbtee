@@ -219,7 +219,7 @@ function Pages() {
   const pages = [
     {
       href: routeUrl("/[lang]/events"),
-      title: <fbt desc="Home card title: the events app">Events</fbt>,
+      title: <fbt common>Events</fbt>,
       text: (
         <fbt desc="Home card text: what the events app shows">
           Post an event, book a seat: every time on the event's clock and on yours.
@@ -237,7 +237,7 @@ function Pages() {
     },
     {
       href: routeUrl("/[lang]/docs"),
-      title: <fbt desc="Home card title: the documentation">Docs</fbt>,
+      title: <fbt common>Docs</fbt>,
       text: (
         <fbt desc="Home card text: what the docs show">
           Markdown pages, translated into every language.
