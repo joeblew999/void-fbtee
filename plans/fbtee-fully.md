@@ -78,6 +78,25 @@ Steps 4–7 are each shown working in the example: the Strings page gets a secti
 three languages, so the later plans use them as they're meant. Then the skill and README say which
 fbtee piece does what, without repeating fbtee.
 
+## A source language other than English
+
+void-fbtee doesn't require English. The source language is a setting: `voidFbtee({ sourceLocale })`,
+and `void-fbtee init --source-locale`, whose default is `en-US`. That's also fbtee's own:
+"set `sourceLocale` when the inline messages are not US English" (fbtee 6.0.0 README). The package
+code has no other English in it (searched `packages/void-fbtee/src/`, 2026-11-14).
+
+But it's never been tried. Every test, the unit fixture and the fresh-app test are written in
+English. So this plan proves it:
+
+- **A fresh app written in Thai** (`void-fbtee init --source-locale th-TH`, with English and Arabic
+  as translations) goes through init, prepare, translate, check and a build. Its pages, the
+  redirect from `"/"` and the sitemap all work.
+- **One question to settle for a source like Arabic,** whose plurals have six forms. In the source
+  code, fbtee's `<fbt:plural>` takes two forms (the text, and `many`). Can an app written in Arabic
+  give all six for its own language, perhaps through a catalog for its source language, or doesn't
+  fbtee allow it? Checked in fbtee's code and with a real build. The answer goes into the skill, and
+  to fbtee as a question if it's a limit.
+
 ## How we'll know it's right
 
 - **The skill:** a diff of the two skills shows no step of fbtee's repeated in ours. Then a real
