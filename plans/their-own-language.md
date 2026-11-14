@@ -154,16 +154,20 @@ against a site with `en-US`, `en-GB`, `es-ES`, `es-419`, `pt-BR` and `pt-PT`, it
 - `es-MX` and `es-AR` → `es-ES`;
 - `pt-AO` → `pt-BR`.
 
-All three are the wrong inheritance. It also can't be called from the middleware: it changes fbtee's
-global setup.
+That's fbtee's documented rule, not a mistake. Its README ("Locale Matching and Fallback") says that
+when no exact locale or language/script parent is available, "it chooses a region with the same
+language and script, preferring the region inferred by `Intl.Locale` and using a stable order for
+ties" (fbtee 6.0.0, read 2026-11-14). That's simple and needs no data. CLDR's parents are a
+different, richer rule. They matter here because a visitor picks from many variants. The function
+also can't be called from the middleware: it changes fbtee's global setup.
 
 So the plan is:
 
 - void-fbtee's `negotiate()` keeps fbtee's script rule and adds CLDR's parents;
 - the inheritance data isn't written into our code or copied. It comes from its source, read
   where it's used (next section);
-- an issue for nkzw-tech/fbtee (drafted, filed only with the user's OK) asks for CLDR's parents in
-  `negotiateLocale`, and for exporting it. If it lands, void-fbtee uses fbtee's and deletes its own.
+- an issue for nkzw-tech/fbtee (drafted, filed only with the user's OK) asks whether they'd consider
+  CLDR's parents in `negotiateLocale` (an option, not a fix), and for exporting it. If it lands, void-fbtee uses fbtee's and deletes its own.
 
 ## Edges
 
@@ -311,7 +315,7 @@ pushed when the user says.
 
 ## The issue for nkzw-tech/fbtee (draft, not filed)
 
-Title: `negotiateLocale` ignores CLDR parent locales (es-MX → es-ES when es-419 is available)
+Title: Choosing a locale with CLDR's parent locales (es-MX → es-419), and exporting `negotiateLocale`
 
 > fbtee 6.0.0's `negotiateLocale` (used by `setupLocaleContext`) is script-aware, which is great. But
 > it doesn't follow CLDR's `parentLocales`. With available `en-US`, `en-GB`, `es-ES`, `es-419`,

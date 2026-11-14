@@ -80,6 +80,28 @@ on 2026-11-14.
     setup. The package gives `sendInLocale(reader, email)` around Void's `sendEmail`. The look stays
     the app's.
 
+## What fbtee already gives, to use rather than rebuild
+
+Read in fbtee 6.0.0's README, 2026-11-14:
+
+- **Scoped runtimes:** `createFbteeRuntime`, `LocaleProvider` and `useFbt()` show part of a page in
+  another language. Uses:
+  - the use-cases page's rows, each person in their own language;
+  - `void-moq`'s captions panel in the watcher's language.
+
+  void-fbtee wraps it with the app's catalogs, rather than writing its own.
+
+- **Lists:** `list` and `<fbt:list>` ("Bangkok, Cairo and New York", with each language's own "and").
+  For the use cases' "who's watching from where".
+- **Gender:** fbtee's viewer gender and `<fbt:pronoun>`. Arabic, for one, words "you booked"
+  differently for a man and a woman. `Reader` gets an optional gender, used only when the person
+  gives it, never guessed, for emails and tickets that address them.
+- **Missing translations at run time:** `onMissingTranslation`, so a string missing in production
+  is logged once, beside the build-time report the plugin already gives.
+- **Its translate skill** (`node_modules/fbtee/skills/fbtee-translate/SKILL.md`). It does what
+  `void-fbtee translate` asks Claude Code to do. Check whether ours repeats it, and if it does, use
+  theirs.
+
 ## Not void-fbtee's
 
 These stay out of the package, because they aren't about language:
