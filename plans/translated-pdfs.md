@@ -64,7 +64,9 @@ look like one thing.
   as the real PDF in en/ar/th (embedded, with a download link), then a few points with the real
   code lines, as `emails.tsx` does. The sample is printed once per language and kept in R2, so
   visitors don't spend browser time.
-- **Homepage:** a "PDF tickets" card in `HomeSections.tsx`.
+- **Homepage:** a "PDF tickets" card in `HomeSections.tsx` whose "Read more" link goes to the new
+  docs page (`href: routeUrl("/[lang]/docs/pdfs")`, as the Emails card links to `/docs/emails`).
+  The card grid's comment says "seven features"; it becomes eight.
 - **Tour (`tour.md` en/ar/th):** a short PDFs section after emails.
 - **README and SKILL:** the setup and the limits above.
 - **The emails docs page** says the booking email carries the PDF.
