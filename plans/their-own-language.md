@@ -55,12 +55,19 @@ the page.
    - Void's not-found handler answers 404, not a real file. The middleware calls `c.notFound()`
      itself for these, as it already does for made-up languages, because Void would otherwise only
      decide "not found" after the middleware has returned;
-   - it's a page load: `GET` or `HEAD`, with `Sec-Fetch-Dest: document` (every engine sends it
-     since 2023-03; caniuse.com, read 2026-11-14), or, from a client that sends no `Sec-Fetch-Dest`,
-     an `Accept` that includes `text/html`. A `POST`, a script's `fetch` and an image never redirect.
+   - it's `GET` or `HEAD`, and not a page's own part: `Sec-Fetch-Dest` is `document`, or it isn't
+     sent at all. Every browser engine sends it (since 2023-03; caniuse.com, read 2026-11-14), so a
+     script's `fetch` (`empty`), an image or a style is never redirected. Clients that send none get
+     the redirect, with their `Accept-Language` or the source language:
+     - link previews (WhatsApp, Slack, X fetch `"/"` to show a card);
+     - crawlers;
+     - `curl`.
+
+     (The first version of this rule asked for `Accept: text/html` too, which would have given a
+     link preview a 404 for `"/"`.) A `POST` never redirects.
 
    Then: a 302 to the same path under the best language (`/<best>` + the path, or `/<best>` for
-   `"/"`). Whether that page exists is the app's own routing: the browser lands on it, or on the
+   `"/"`), keeping the query string (`/docs/intl?x=1` → `/th-TH/docs/intl?x=1`). Whether that page exists is the app's own routing: the browser lands on it, or on the
    not-found page in its own language.
    - **The match:** `negotiate(acceptLanguage, locales)` in the package (section "Languages the site
      doesn't have, and inherited ones", below).
@@ -86,15 +93,24 @@ the page.
    - they arrived from outside the site: `document.referrer` is empty (a typed address, an email, an
      app) or another site's (a search result, a shared link).
 
-   When both hold, a small notice in _their_ language offers the same page in their language. It's
-   added by the browser after hydration, so the cached page stays the same for everyone.
+   When both hold, a small link to the same page in their language shows at the top. It's named in
+   that language by `Intl.DisplayNames` ("ไทย", "العربية"), so it needs no translated sentence and
+   no other language's catalog on the page. It's added in the browser after load, so the cached page
+   stays the same for everyone.
 
-   `document.referrer` belongs to the document, and doesn't change when Void moves between pages
-   without reloading. So `<YourLanguage>` goes in the root layout, which Void keeps across those moves
-   (`reference/api/pages.md`: "layouts persist"), and decides once per document. A link that reloads
-   the page (the header's language links are plain links) makes a new document whose referrer is this
-   site, so it doesn't show again. There's nothing to dismiss and nothing to remember. How it looks is
-   the app's.
+   **How it runs on every page.** Not as a React component in the root layout: on markdown pages and
+   island pages Void renders layouts "static only, so they are not hydrated on the client"
+   (`node_modules/void/docs/guide/pages-routing/islands.md`, "Layouts", read 2026-11-14), and the
+   docs are those. Instead, void-fbtee's middleware adds a small script to every page's head
+   (Void's head `script`, "set in middleware to apply defaults to every page", `head.md`).
+   - The script carries only the CLDR parents for the app's own language families, picked by the
+     plugin at build from `cldr-core`, so the redirect and the notice decide the same way.
+   - It decides once per document load. `document.referrer` belongs to the document, so Void's
+     moves between pages without reloading don't show it again. A plain link that reloads makes a
+     new document whose referrer is this site.
+
+   There's nothing to dismiss and nothing to remember. How it looks is the app's, through one CSS
+   class.
 
 4. **The header's language links stay** as plain links to this page in each language, each named in
    its own language. That's for someone who wants another language on purpose. They're not the way
@@ -149,6 +165,23 @@ So the plan is:
 - an issue for nkzw-tech/fbtee (drafted, filed only with the user's OK) asks for CLDR's parents in
   `negotiateLocale`, and for exporting it. If it lands, void-fbtee uses fbtee's and deletes its own.
 
+## Edges
+
+- **`Accept-Language` that isn't clean:**
+  - `*` is skipped;
+  - `q=0` means "not this one" and is skipped;
+  - a tag `Intl.getCanonicalLocales` rejects is skipped;
+  - the rest is tried in `q` order, the header's own order breaking ties.
+- **An app with its own `"/"` page** (`pages/index.tsx`): it's one of the app's own routes, so it's
+  left alone, and the app decides.
+- **Browsers that already have the old 301.** Until now the live site answered `"/"` with a
+  permanent redirect to `/en-US`, with no `Cache-Control` (checked on
+  https://void-fbtee-example.gedw99.workers.dev, 2026-11-14). A browser may keep such a redirect,
+  and the site can't take it back. Someone who opened `"/"` before may still land on English until
+  their browser forgets it. Every link the site and its emails give carries its language, so it's
+  only `"/"`. The release notes tell apps the same, and from now on `init` never writes a permanent
+  redirect.
+
 ## Where the inheritance comes from at run time
 
 - **Not from Intl.** JavaScript's Intl knows CLDR's parents inside, but doesn't expose them.
@@ -172,7 +205,8 @@ So the plan is:
   - `locales.ts`: `negotiate()`, reading CLDR's parents from `cldr-core` (a dependency, pinned in
     `package.json`);
   - `head.ts` and `server.ts`: the `x-default` and the sitemap;
-  - `react.tsx`: `<YourLanguage>`;
+  - `middleware.ts` also adds the notice's script to every page's head, and `plugin.ts` picks the
+    CLDR parents for the app's language families;
   - `init.ts`: writes no fixed redirect, and removes one that `init` wrote before;
   - `check.ts`: reports a fixed redirect for `"/"` as the bug;
   - `skills/void-fbtee/SKILL.md`;
@@ -181,7 +215,7 @@ So the plan is:
     should drop its own fixed redirect: `void-fbtee check` says so too.
 - **Example:**
   - `void.config.ts`: the fixed redirect and its comment go;
-  - the root layout shows `<YourLanguage>`;
+  - `pages/style.css` styles the notice's class;
   - `SiteHeader.tsx`'s comment no longer calls the links the way in.
 - **README:** the line about `"/"`.
 
@@ -242,8 +276,10 @@ The preview tests use real requests and real browsers, not stand-ins.
     `zh-HK` → `zh-TW`, `sr-Latn` → the source, `hi-Latn` → `en-IN` when the site has it.
 - The redirect is never shared: the same address, asked for in Thai and then in Arabic, gives each
   its own answer, and is marked `no-store`.
-- A client with no `Sec-Fetch-Dest` but `Accept: text/html` is redirected; a `fetch` and an image
-  aren't.
+- A client with no `Sec-Fetch-Dest` (a link preview, `curl`) is redirected; a `fetch`
+  (`Sec-Fetch-Dest: empty`) and an image aren't.
+- The query string survives the redirect.
+- `Accept-Language` with `*`, `q=0` and a malformed tag: each is skipped, and the next one decides.
 - The home page's `x-default` (in its head and in the sitemap) is `"/"`, and every other page's is
   still its source-language page.
 - `/th-TH/…` never redirects, whatever the browser asks for.
@@ -255,8 +291,9 @@ The preview tests use real requests and real browsers, not stand-ins.
 - In Playwright, with real Chromium and WebKit (`e2e/browsers/`):
   - a Thai browser (`locale: "th-TH"`) opening `"/"` lands on Thai;
   - an Arabic one lands on Arabic, right to left.
-- The notice:
-  - a Thai browser opening `/en-US/docs/intl` from outside sees the offer, in Thai;
+- The notice, on a code page, an island page and a markdown page (`/en-US/docs/intl`,
+  `/en-US/docs`, `/en-US/docs/tour`):
+  - a Thai browser opening one from outside sees the link, named "ไทย";
   - the same browser, after moving to another page inside the site (Void's own move, and a plain
     link that reloads), doesn't;
   - an English browser on an English page never sees it.
