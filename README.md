@@ -174,8 +174,8 @@ The tasks are in `vite.config.ts` and `apps/example/vite.config.ts`.
 - `vp run test:production` tests the URL the last `vp run deploy` reported.
 - `vp run --last-details` shows how the last task run went.
 - Each commit is checked first (`vp check --fix`, a hook `vp install` sets up). CI runs
-  `vp check`, `vp run test:unit`; then, for a push to `main`, `vp run deploy` and
-  `vp run test:deployed`.
+  `vp check`, `vp run check:tools`, `vp run test:unit` and `vp run -r build`; then, for a push to
+  `main`, `vp run deploy` and `vp run test:deployed`.
 
 ### Checking the live site by hand
 
