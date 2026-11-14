@@ -86,14 +86,14 @@ It's a separate package, not part of void-fbtee:
 - void-fbtee stays about language;
 - an app can have one without the other.
 
-The captions are where the two meet. `void-moq` reads each watcher's language from void-fbtee
-when it's there, and from the browser's language when it isn't.
+The captions are where the two meet, through void-fbtee's primitives (`plans/primitives.md`).
 
 What it depends on, and what it doesn't. Each layer leans only on the one below it:
 
 1. **Void:** routes, plugin, queues, Workers AI and Durable Objects. That's all `void-moq` requires.
-2. **`void-fbtee`:** an _optional_ peer dependency, used only for the captions' language. Without
-   it, the watcher's language comes from the browser.
+2. **`void-fbtee`:** a real dependency, for its primitives (`plans/primitives.md`): the watcher's
+   language and direction, `translate` for the captions, and `momentFor` for "live now" on each
+   watcher's clock.
 3. **The app:** the events, bookings, who may publish and watch, the emails, ticket and calendar,
    and the use cases. `void-moq` knows none of these. The app ties them together through
    `publishToken()`, `watchToken()` and the components.
