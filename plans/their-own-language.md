@@ -254,3 +254,19 @@ The preview tests use real requests and real browsers, not stand-ins.
 
 Then `vp check`, `test:unit`, `test:dev`, `test:preview` and `i18n:check`. Committed locally, and
 pushed when the user says.
+
+## The issue for nkzw-tech/fbtee (draft, not filed)
+
+Title: `negotiateLocale` ignores CLDR parent locales (es-MX → es-ES when es-419 is available)
+
+> fbtee 6.0.0's `negotiateLocale` (used by `setupLocaleContext`) is script-aware, which is great. But
+> it doesn't follow CLDR's `parentLocales`. With available `en-US`, `en-GB`, `es-ES`, `es-419`,
+> `pt-BR` and `pt-PT`, client locales `en-AU`, `es-MX` and `pt-AO` resolve to `en-US`, `es-ES` and
+> `pt-BR`. CLDR (49, `supplemental/parentLocales.json`) gives `en-AU → en-001`, `es-MX → es-419`
+> and `pt-AO → pt-PT`, so the expected answers are `en-GB`, `es-419` and `pt-PT`.
+>
+> Could `negotiateLocale` prefer the available locale that shares the closest CLDR ancestor? And
+> could it be exported, so servers can pick a locale from `Accept-Language` without
+> `setupLocaleContext`, which also sets up fbtee's global runtime?
+>
+> Seen in https://github.com/joeblew999/void-fbtee.
