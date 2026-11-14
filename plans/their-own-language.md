@@ -309,4 +309,9 @@ Title: Export `negotiateLocale` (choosing a locale on the server without `setupL
 > → `pt-PT`, where the current rule gives `en-US`, `es-ES` and `pt-BR`. It's your documented rule,
 > so this is only a suggestion.
 >
+> A small thing seen on the way: with `sourceLocale: "ar-EG"` and no catalog for it, the inline
+> exactly-one form of `fbt.plural("ليلة", count, { many: "ليالٍ", showCount: "yes" })` renders a
+> Latin `1` ("حجزت 1 ليلة"), where other counts come out in Arabic-Indic digits ("حجزت ٢ ليالٍ").
+> Should the exactly-one form format its `1` like the other counts?
+>
 > Seen in https://github.com/joeblew999/void-fbtee.
