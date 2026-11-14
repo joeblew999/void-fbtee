@@ -31,8 +31,6 @@ jobs:
       - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
         with:
           node-version-file: .node-version
-          # Vite+'s CI guide (vite-plus/docs/guide/ci.md): setup-vp caches the package manager's data.
-          cache: true
           # No lockfiles in this repo, so the install mustn't insist on one (it does in CI by default).
           run-install: |
             - args: ["--no-frozen-lockfile"]
@@ -69,8 +67,6 @@ jobs:
       - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
         with:
           node-version-file: .node-version
-          # Vite+'s CI guide (vite-plus/docs/guide/ci.md): setup-vp caches the package manager's data.
-          cache: true
           run-install: |
             - args: ["--no-frozen-lockfile"]
       - run: vp run install:browser
