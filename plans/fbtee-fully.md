@@ -113,7 +113,16 @@ used.
    catalog itself, on the server and in the browser (answer 3). It shows part of a page in
    another language. The use-cases rows and `void-moq`'s captions use it, and it replaces the plain
    `<bdi lang dir>` wrapper planned in `plans/primitives.md`, item 8.
-4. **`<fbt:list>`:** a list inside a translated sentence.
+4. **`<fbt:list>`:** a list inside a translated sentence. First, the example's workaround goes:
+   - `apps/example/pages/[lang]/index.tsx` joins a list into plain text (`String(list(items))`)
+     because, in its comment's words, a list inside a string "renders as one text on the server but
+     as separate pieces in the browser, so hydration fails (seen with fbtee 5.0.0)". We're on 6.0.0.
+   - Run on 2026-11-14 with 6.0.0, the server (`runWithFbtee`) and the browser's setup gave the same
+     HTML for a list inside a sentence ("Watching from Bangkok, Cairo and New York").
+   - That's a render, not a hydration. So the real check is the preview's browser tests, which fail
+     on any hydration error, with the home page using `<fbt:list>`. If it passes, `listText` and
+     the `String(list(...))` on the Intl page go. If it doesn't, the workaround stays, its comment
+     says 6.0.0, and fbtee gets an issue with the failing case.
 5. **`<fbt:enum>`:** a choice from a fixed set, translated within its sentence.
 6. **`<fbt:name>`:** a person's name in a sentence, with that person's gender.
 7. **Gender and `<fbt:pronoun>`:** viewer gender for text addressed to the reader, and pronouns,
