@@ -75,7 +75,8 @@ on 2026-11-14.
    runtimes), not a second component here. In an email's HTML, the same marking (`<bdi lang dir>`)
    comes with item 10, `sendInLocale`.
 9. **The visitor's own language:** this has its own plan, `plans/their-own-language.md`, done
-   first. Its `negotiate()` and `<YourLanguage>` are primitives of the package too.
+   first. Its `negotiate()` is a primitive of the package too (the notice there is a script the
+   middleware adds, not a component).
 10. **An email in its reader's language:** the email's `<html lang dir>`, the body's direction, and
     writing it inside `inLocale`. Each of the four emails in `src/events/emails.ts` repeats that
     setup. The package gives `sendInLocale(reader, email)` around Void's `sendEmail`. The look stays

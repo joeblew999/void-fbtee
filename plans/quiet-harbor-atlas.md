@@ -238,8 +238,8 @@ Each step is shipped and proven before the next, each with its docs example in t
 
 - Void features with no language in them: deployment, the Void platform, sandboxes, Durable
   Objects (unless they hold per-language content).
-- Choosing a language for the visitor: one address per language, never a redirect by the
-  visitor's language (the reason is in `void.config.ts`).
+- Choosing a language for the visitor: `plans/their-own-language.md` (one address per language;
+  an address without one follows the visitor's locale).
 
 ## Verification
 
