@@ -3,7 +3,7 @@
 // (Arabic joined and right to left, Thai broken between words) with the fonts already on
 // Cloudflare's machines, so the HTML names only system fonts and the app ships none. Checked
 // 2026-11-14 with en-US, ar-EG and th-TH: the PDFs embed DejaVu Sans (Latin, Arabic) and Loma
-// (Thai); about a second for the first, 0.2-0.4 s after (plans/translated-pdfs.md).
+// (Thai); about a second for the first, 0.2-0.4 s after.
 //
 // Its cost is browser time: Cloudflare's free plan allows 10 minutes a day and 3 browsers at once,
 // so a PDF is printed once and kept, never on every download (src/events/tickets.ts).

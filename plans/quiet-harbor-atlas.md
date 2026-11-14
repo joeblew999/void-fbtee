@@ -227,7 +227,7 @@ Each step is shipped and proven before the next, each with its docs example in t
 9. **Sign-in,** when the example needs accounts.
 10. **API routes with a language,** with the MCP route when that's planned.
 
-## Still open (moved here 2026-11-13 from plans now done and deleted; git history keeps them)
+## Still open (moved here from plans now done and deleted, last on 2026-11-14; git history keeps them)
 
 - **The cookie that carries a new event's key:** remove it once a Void release has the #810 fix
   (fragments kept through action redirects: voidzero-dev/void `ae024fb`, after 1.8.0). Then posting
@@ -237,8 +237,10 @@ Each step is shipped and proven before the next, each with its docs example in t
 - **Telling Void about the preview's AI:** `guide/ai.md` says Workers AI is remote "during
   development and preview", but the preview needs `cloudflare.ai = { binding: "AI", remote: true }`
   in `void.config.ts` (found 2026-11-13). The user's call whether to raise it.
-- **The emails' design:** parked by the user, 2026-11-13. All four emails
-  (`apps/example/src/events/emails.ts`) are plain HTML strings for now.
+- **Void 1.9.1 is out** (1.9.0 on 2026-11-14 00:11 UTC, 1.9.1 at 03:27, `npm view void time`;
+  the repo is on 1.8.0). Upgrade, then check whether it carries #810: if posting can redirect to
+  `#key=…`, the key cookie above goes. Its `Form` still sets `action: form[method]` (checked in
+  `@void/react` 1.9.1's `dist/index.mjs`), so `plans/void-form-without-javascript.md` still stands.
 
 ## Not in this plan
 
