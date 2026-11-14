@@ -172,19 +172,24 @@ The preview tests use real requests and real browsers, not stand-ins.
   - `fr,th;q=0.5`, which gives Thai: the best one the app has;
   - no header at all, which gives the source language.
 - The redirect is never shared: the same address, asked for in Thai and then in Arabic, gives each
-  its own answer, with `Vary: Accept-Language` and `no-store`.
+  its own answer, and is marked `no-store`.
+- A client with no `Sec-Fetch-Dest` but `Accept: text/html` is redirected; a `fetch` and an image
+  aren't.
+- The home page's `x-default` (in its head and in the sitemap) is `"/"`, and every other page's is
+  still its source-language page.
 - `/th-TH/…` never redirects, whatever the browser asks for.
 - Files and the app's own routes are left alone: `/void.svg`, `/robots.txt`, `/sitemap.xml`,
   `/api/live`.
 - A `POST` to an address without a language isn't redirected.
 - A made-up path (`/nope`, `/xx-XX/events`) goes to the not-found page in the person's own language,
   not in English. The preview test that expects a 404 at once changes with it.
-- In Playwright:
+- In Playwright, with real Chromium and WebKit (`e2e/browsers/`):
   - a Thai browser (`locale: "th-TH"`) opening `"/"` lands on Thai;
   - an Arabic one lands on Arabic, right to left.
 - The notice:
   - a Thai browser opening `/en-US/docs/intl` from outside sees the offer, in Thai;
-  - the same browser, after clicking a link inside the site, doesn't;
+  - the same browser, after moving to another page inside the site (Void's own move, and a plain
+    link that reloads), doesn't;
   - an English browser on an English page never sees it.
 - No page sets a cookie, and the existing cache tests stay green.
 - `void-fbtee check`:
