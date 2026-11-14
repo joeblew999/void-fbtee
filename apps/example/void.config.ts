@@ -14,11 +14,6 @@ export default defineConfig({
     // Cache prerendered pages (the docs) at the edge; set here so a
     // non-interactive deploy doesn't stop to ask.
     isr: true,
-    // "/" to the source language, permanently, by Void's own redirects (before any app code). One
-    // URL per language, never chosen by the visitor's: Google's crawler sends no Accept-Language,
-    // and redirecting by language would hide the other versions from it. void-fbtee check
-    // requires it.
-    redirects: { "/": { to: "/en-US", status: 301 } },
     // http:// visits to https:// (a permanent 308), so a cached page can never carry an http
     // address. Only on Cloudflare: localhost and 127.0.0.1 stay on http (Void's
     // guide/edge/redirects.md, "HTTP to HTTPS").

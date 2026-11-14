@@ -1,6 +1,6 @@
 {
   "name": "void-fbtee",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "i18n for Void apps, as a Void add-on: fbtee strings, Temporal dates and Intl formatting, with a Vite plugin, Void middleware and React helpers",
   "keywords": [
     "cloudflare-workers",

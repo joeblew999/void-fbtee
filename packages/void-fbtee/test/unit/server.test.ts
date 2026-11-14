@@ -205,16 +205,20 @@ describe("sitemap()", () => {
     ]);
   });
 
-  test("each lists all its languages and x-default, the source language's", async () => {
-    const first = (await probe.map()).split("</url>")[0]!;
-    expect(
-      [...first.matchAll(/hreflang="([^"]+)" href="([^"]+)"/g)].map((m) => `${m[1]} ${m[2]}`),
-    ).toEqual([
+  test("each lists all its languages and x-default: / for the home page, else the fallback's", async () => {
+    const urls = (await probe.map()).split("</url>");
+    const links = (url: string) =>
+      [...url.matchAll(/hreflang="([^"]+)" href="([^"]+)"/g)].map((m) => `${m[1]} ${m[2]}`);
+    // The home page: "/" sends each visitor to their own language.
+    expect(links(urls[0]!)).toEqual([
       "en-US https://example.com/en-US",
       "de-DE https://example.com/de-DE",
       "ar-EG https://example.com/ar-EG",
-      "x-default https://example.com/en-US",
+      "x-default https://example.com/",
     ]);
+    // Any other page: its page in the fallback language (the source, as none is set).
+    const events = urls.find((u) => u.includes("<loc>https://example.com/en-US/events</loc>"))!;
+    expect(links(events).at(-1)).toBe("x-default https://example.com/en-US/events");
   });
 
   test("lastmod only where given, for every language or one", async () => {

@@ -231,7 +231,8 @@ for (const target of targets) {
 /**
  * An app written in Thai: init with `--source-locale th-TH`, its pages (e2e/fresh/thai/), init's
  * own pages rewritten in Thai as its to-do asks, prepare, the translations, check, a build, and the
- * dev server in all three languages with "/" going to Thai. It has no Zod, so it also checks the
+ * dev server in all three languages, with "/" following the browser and Thai the fallback, and
+ * then with `fallbackLocale: "en-US"`. It has no Zod, so it also checks the
  * build without it under `pnpm exec`, whose NODE_PATH once made void-fbtee think Zod was there.
  */
 async function thaiSource(target: string, dir: string, app: App, installed: string) {
@@ -299,23 +300,13 @@ async function thaiSource(target: string, dir: string, app: App, installed: stri
   run(...exec(app.pm, "tsc", "--noEmit"), dir);
   check(true, `${target}: builds and typechecks`);
 
-  const server = spawn(
-    app.pm,
-    ["exec", "--", "vp", "dev", "--port", String(app.port), "--strictPort"],
-    { cwd: dir, env, stdio: ["ignore", "ignore", "inherit"], detached: true },
-  );
-  const base = `http://localhost:${app.port}`;
-  try {
-    const page = async (path: string) => {
-      for (let i = 0; i < 300; i++) {
-        try {
-          const res = await fetch(`${base}${path}`);
-          if (res.ok) return await res.text();
-        } catch {}
-        await new Promise((r) => setTimeout(r, 100));
-      }
-      return "";
-    };
+  const homeFor = (base: string, accept?: string) =>
+    fetch(`${base}/`, {
+      redirect: "manual",
+      headers: accept === undefined ? {} : { "accept-language": accept },
+    }).then((r) => ({ status: r.status, to: r.headers.get("location") ?? "" }));
+
+  await withDev(app, dir, async (base, page) => {
     const th = await page(`/${source}`);
     check(
       th.includes('<html lang="th-TH"') && th.includes("งานของชุมชน") && th.includes("เหลือ 3 ที่นั่ง"),
@@ -336,18 +327,85 @@ async function thaiSource(target: string, dir: string, app: App, installed: stri
       nothing.status === 404 && (await nothing.text()).includes("ไม่มีอะไรอยู่ที่นี่"),
       `${target}: the not-found page is in Thai`,
     );
-    const home = await fetch(`${base}/`, { redirect: "manual" });
+    for (const [accept, to] of [
+      ["en-GB", "/en-US"],
+      ["ar-SA", "/ar-EG"],
+      ["fr", `/${source}`],
+      [undefined, `/${source}`],
+    ] as const) {
+      const home = await homeFor(base, accept);
+      check(
+        home.status === 302 && home.to.endsWith(to),
+        `${target}: "/" in ${accept ?? "no language"} goes to ${to} (302)`,
+      );
+    }
     check(
-      home.status === 301 && home.headers.get("location")?.endsWith(`/${source}`),
-      `${target}: "/" redirects to /${source}, the source language (301)`,
+      th.includes(`hreflang="x-default" href="${base}/"`),
+      `${target}: the home page's x-default is "/"`,
     );
     const sitemap = await (await fetch(`${base}/sitemap.xml`)).text();
     check(
       sitemap.includes('hreflang="th-TH"') && sitemap.includes('hreflang="en-US"'),
       `${target}: the sitemap lists every language`,
     );
+  });
+
+  // The same app, with English for visitors it has no language for.
+  const viteConfig = join(dir, "vite.config.ts");
+  const config = readFileSync(viteConfig, "utf8");
+  check(config.includes("voidFbtee({"), `${target}: vite.config.ts calls voidFbtee({ … })`);
+  writeFileSync(viteConfig, config.replace("voidFbtee({", 'voidFbtee({ fallbackLocale: "en-US",'));
+  try {
+    await withDev(app, dir, async (base, page) => {
+      await page(`/${source}`);
+      const french = await homeFor(base, "fr");
+      check(
+        french.status === 302 && french.to.endsWith("/en-US"),
+        `${target}: with fallbackLocale "en-US", "/" in French goes to /en-US`,
+      );
+      const thai = await homeFor(base, "th");
+      check(thai.to.endsWith(`/${source}`), `${target}: and a Thai browser still to /${source}`);
+    });
+  } finally {
+    writeFileSync(viteConfig, config);
+  }
+}
+
+/** The app's dev server, until `use` is done: `page` waits for a path to answer. */
+async function withDev(
+  app: App,
+  dir: string,
+  use: (base: string, page: (path: string) => Promise<string>) => Promise<void>,
+) {
+  const server = spawn(
+    app.pm,
+    ["exec", "--", "vp", "dev", "--port", String(app.port), "--strictPort"],
+    { cwd: dir, env, stdio: ["ignore", "ignore", "inherit"], detached: true },
+  );
+  const base = `http://localhost:${app.port}`;
+  try {
+    const page = async (path: string) => {
+      for (let i = 0; i < 300; i++) {
+        try {
+          const res = await fetch(`${base}${path}`);
+          if (res.ok) return await res.text();
+        } catch {}
+        await new Promise((r) => setTimeout(r, 100));
+      }
+      return "";
+    };
+    await use(base, page);
   } finally {
     if (server.pid) process.kill(-server.pid, "SIGTERM");
+    // The port free again before the next server starts.
+    for (let i = 0; i < 50; i++) {
+      try {
+        await fetch(base);
+      } catch {
+        break;
+      }
+      await new Promise((r) => setTimeout(r, 100));
+    }
   }
 }
 
@@ -553,7 +611,7 @@ function checkFormatting(target: string, dir: string, pm: Pm) {
 }
 
 /** The dev server: translated pages, Void's docs examples in Thai (and the known gaps), an Arabic
- * page right-to-left, "/" to the source language, and a language the app hasn't not found. */
+ * page right-to-left, "/" to the visitor's language, and a language the app hasn't not found. */
 async function checkDev(target: string, dir: string, app: App) {
   const cli = app.toolchain === "vite-plus" ? "vp" : "vite";
   const server = spawn(
@@ -640,10 +698,13 @@ async function checkDev(target: string, dir: string, app: App) {
       ar.includes('<html lang="ar-EG" dir="rtl"') && ar.includes("تدويل تطبيقات Void"),
       `${target}: dev serves /ar-EG right-to-left, in Arabic`,
     );
-    const home = await fetch(`${base}/`, { redirect: "manual" });
+    const home = await fetch(`${base}/`, {
+      redirect: "manual",
+      headers: { "accept-language": "th-TH,th;q=0.9" },
+    });
     check(
-      home.status === 301 && home.headers.get("location")?.endsWith("/en-US"),
-      `${target}: "/" redirects to /en-US (301)`,
+      home.status === 302 && home.headers.get("location")?.endsWith("/th-TH"),
+      `${target}: "/" in Thai goes to /th-TH (302)`,
     );
     const madeUp = await fetch(`${base}/xx-XX`, { redirect: "manual" });
     check(madeUp.status === 404, `${target}: a language the app hasn't (/xx-XX) is not found`);

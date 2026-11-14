@@ -4,7 +4,7 @@ Status: proposed 2026-11-14 and reviewed by a separate agent the same day. Then 
 itself, `"/"`, on the user's word: the first version redirected every address without a language,
 which needed Void internals (Hono's `matchedRoutes` in Void's registration order, in no Void doc)
 and a long list of exceptions. The notice offering a visitor their own language is now its own
-plan, `plans/language-notice.md`. Waiting for the user's OK. Its place in the order:
+plan, `plans/language-notice.md`. Built 2026-11-14 on the user's "go". Its place in the order:
 `plans/README.md`.
 
 ## The bug
@@ -53,9 +53,11 @@ the page.
   middleware (`packages/void-fbtee/src/middleware.ts`): the path `"/"` and the app's languages are
   all it needs, so it knows nothing of the app's other pages and reads nothing of Void's internals.
   Other methods to `"/"` are left to Void, as today.
-- **Never shared:** Void marks a 302 `Cache-Control: no-store`, replacing the middleware's own
-  `Vary` and `Cache-Control` (seen on Void 1.8.0, below). The plan relies on that, and the live test
-  checks it on Cloudflare itself.
+- **Never shared:** the redirect carries `Cache-Control: no-store` and `Vary: Accept-Language`,
+  set by the middleware. Void adds neither to it: the first check (below) said Void marks a 302
+  `no-store`, which held for its own pages, but `"/"` isn't one, and its 302 came back with no
+  `Cache-Control` at all (built Worker, 2026-11-14, found by the preview test). The live test checks
+  it on Cloudflare itself.
 - **Everything else is unchanged:** `/th-TH/…` is cached once per language and never redirects,
   whatever the browser (Google: "avoid automatically redirecting users from one language version of
   a site to a different language version", developers.google.com/search/docs/specialty/
@@ -203,7 +205,9 @@ workerd), with a temporary probe and a rough redirect in the middleware, both re
 - **A redirect from the middleware** gave `"/"` asked for in Thai, Arabic (`ar-SA`) and with no
   language, twice over, `/th-TH`, `/ar-EG` and `/en-US` every time: nothing shared.
 - **Void replaced the redirect's own `Vary` and `Cache-Control`** with `Vary: X-VoidPages…` and
-  `no-store`.
+  `no-store`: wrong for `"/"`. That was seen on addresses Void reads as one of its pages
+  (`/docs/intl` as `/:lang`). For `"/"` Void adds nothing, so the middleware sets both itself
+  (corrected 2026-11-14, when building).
 
 Nothing else is left to find out first.
 

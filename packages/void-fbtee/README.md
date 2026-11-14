@@ -72,6 +72,13 @@ its request came to. With it, a copy at another address answers `X-Robots-Tag: n
 stays out of search results. `void-fbtee init --site https://example.com` adds it. A change to `voidFbtee()`'s options needs the dev server restarted: Vite reads
 the plugin once, when it starts.
 
+`"/"` sends each visitor to their own language: the first of their browser's languages the app
+has, matched by fbtee's own rule (`th` gets `th-TH`, `ar-SA` gets `ar-EG`), with a 302 that's never
+cached. Nothing is remembered: no cookie, no setting. A visitor none of whose languages the app has,
+or a crawler that names none, gets the fallback language: the source language, or
+`voidFbtee({ fallbackLocale: "en-US" })`. Every other address keeps its language, for everyone. An
+app with its own page at `"/"` sets `voidFbtee({ redirectHome: false })`.
+
 Labels used on several pages can be fbtee's common strings: each described once, in
 `voidFbtee({ common })` (text → description), then written `<fbt common>Events</fbt>`. The example
 keeps them in `i18n/common_strings.json`:

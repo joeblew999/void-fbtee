@@ -39,6 +39,15 @@ import {
 } from "./catalogs";
 import { checkSite } from "./site";
 
+/** voidFbtee({ fallbackLocale }), canonical and one of the app's, or the source language. */
+function checkFallback(fallback: string | undefined, config: LocaleConfig): string {
+  if (fallback === undefined) return config.sourceLocale;
+  const locale = Intl.getCanonicalLocales(fallback)[0]!;
+  if (!config.locales.some((l) => l.locale === locale))
+    throw new Error(`void-fbtee: fallbackLocale "${fallback}" is not in locales.`);
+  return locale;
+}
+
 export interface VoidFbteeOptions {
   /** The language the app's <fbt> strings are written in, e.g. "en-US". */
   sourceLocale: string;
@@ -59,6 +68,18 @@ export interface VoidFbteeOptions {
    * "Locale Matching and Fallback".
    */
   fallbackLocales?: FallbackLocales;
+  /**
+   * The language for a visitor none of whose languages the app has (a French browser on an English
+   * and Thai site), and for one whose browser names none (a crawler): where `"/"` sends them, and
+   * every page's hreflang `x-default`. One of `locales`. Default: `sourceLocale`, as fbtee's own
+   * `fallbackLocale` (fbtee's README, "Locale Matching and Fallback").
+   */
+  fallbackLocale?: string;
+  /**
+   * `"/"` sends each visitor to their own language (`Accept-Language`, by fbtee's rule). Default
+   * true. False for an app with its own page at `"/"`.
+   */
+  redirectHome?: boolean;
   /**
    * The site's own address, e.g. "https://example.com": each page's canonical, hreflang and og:url
    * are built from it, so a copy of the site at another address (the dev server, a Worker
@@ -128,6 +149,7 @@ const reportedRuns = new Set<string>();
 export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   const config: LocaleConfig = resolveLocales(options.sourceLocale, options.locales);
   if (options.site !== undefined) checkSite(options.site);
+  const fallbackLocale = checkFallback(options.fallbackLocale, config);
   const translationsDir = options.translations ?? DEFAULT_TRANSLATIONS;
   const src = options.src ?? DEFAULT_SRC;
   const require = createRequire(import.meta.url);
@@ -150,6 +172,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
     translations: translationsDir,
     src,
     common: options.common,
+    redirectHome: options.redirectHome ?? true,
   });
 
   const api: VoidFbteeApi = { options, project };
@@ -262,7 +285,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       async handler(id) {
         if (id === SERVER_TEMPORAL_ID) return SERVER_TEMPORAL;
         if (id === "\0" + CONFIG_ID)
-          return `export default ${JSON.stringify({ ...config, fallbackLocales: options.fallbackLocales, site: options.site })};`;
+          return `export default ${JSON.stringify({ ...config, fallbackLocale, redirectHome: options.redirectHome ?? true, fallbackLocales: options.fallbackLocales, site: options.site })};`;
         if (id === "\0" + CATALOGS_ID) {
           // The translated languages, and the source's own when it needs one (catalogs.ts).
           const entries = catalogLocales(project()).map(

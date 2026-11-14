@@ -1,6 +1,7 @@
 // The site header, in the root layout: the pages, and this page in every language, each named in
 // its own language (Intl.DisplayNames). Plain links, so crawlers find every language version, and
-// no JavaScript, so it works on markdown pages too. One row on desktop; on a phone the
+// no JavaScript, so it works on markdown pages too. They're for someone who wants another language
+// on purpose: "/" already sends each visitor to their own. One row on desktop; on a phone the
 // page links move to a second row that scrolls sideways.
 import { fbt } from "fbtee";
 import { routeUrl } from "void-fbtee/routes";

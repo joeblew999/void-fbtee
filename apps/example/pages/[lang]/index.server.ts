@@ -30,7 +30,7 @@ export const loader = defineHandler(async () => {
 // void-fbtee's per-request state, after the loader). The title is the heading's own string.
 // The tab's title and the search result's text, in the page's language, and the site described for
 // search engines (schema.org's WebSite; Google reads it on a site's root home page, which here is a
-// redirect, so it may pass it by: no harm).
+// redirect to each visitor's language, so it may pass it by: no harm).
 export const head = defineHead((c) => {
   const { locale, lang } = c.get("i18n");
   const description = fbs(

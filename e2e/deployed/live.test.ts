@@ -31,6 +31,23 @@ describe.skipIf(!site)("the live site (run with `vp run test:deployed`)", () => 
     for (const lang of [SOURCE, ...TRANSLATED]) expect(xml).toContain(`/${lang}</loc>`);
   });
 
+  // What only Cloudflare can show (plans/their-own-language.md): the edge never shares "/"'s answer.
+  test('"/" sends each visitor to their language, and the answer is never shared', async () => {
+    for (const [accept, to] of [
+      ["th", "/th-TH"],
+      ["ar", "/ar-EG"],
+      ["th", "/th-TH"],
+    ] as const) {
+      const r = await fetch(`${site}/`, {
+        redirect: "manual",
+        headers: { "accept-language": accept },
+      });
+      expect(r.status, accept).toBe(302);
+      expect(new URL(r.headers.get("location")!, site).pathname, accept).toBe(to);
+      expect(r.headers.get("cache-control"), accept).toMatch(/no-store/);
+    }
+  });
+
   test("a page that doesn't exist answers 404 in its language", async () => {
     const r = await fetch(`${site}/th-TH/no-such-page`);
     expect(r.status).toBe(404);

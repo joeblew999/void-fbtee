@@ -315,8 +315,12 @@ missing; where it can't safely edit a file it prints the line to add). The piece
 - `worker: { compatibility_flags: ["temporal"] }` in `void.config.ts`. The Worker's own Temporal
   replaces `temporal-polyfill` there; unit tests under `vp test` run in Node.js and keep the
   polyfill.
-- `routing: { redirects: { "/": { to: "/<source locale>", status: 301 } } }` in `void.config.ts`:
-  Void's own redirect sends `/` to the source language.
+- No redirect for `/` in `void.config.ts`: void-fbtee's middleware sends `/` to each visitor's own
+  language (their browser's `Accept-Language`, matched by fbtee's rule), else
+  `voidFbtee({ fallbackLocale })` (default the source language), with a 302 nobody caches. Every
+  other address keeps its language. An app with its own `pages/index.*` sets
+  `voidFbtee({ redirectHome: false })`. A fixed `"/"` redirect to one language (`init` wrote one
+  before 0.6.0, and removes it) sends everyone there; `check` reports it.
 - tsconfig: `"fbtee/ReactTypes"` in `compilerOptions.types`; `"lib"` with `ES2025`, `DOM`,
   `DOM.Iterable`.
 - Vite+: `lint.jsPlugins` with `@nkzw/eslint-plugin-fbtee` and fbtee's strict rules in the

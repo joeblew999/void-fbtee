@@ -4,16 +4,18 @@
 //
 //   export { default } from "void-fbtee/middleware";
 //
-// - The locale comes from the first URL segment (/th-TH/...). "/" goes to the source locale by
-//   Void's own redirects (routing.redirects in void.config.ts, which init adds and check requires):
-//   one URL per language, as Google wants, never a redirect by the visitor's language.
+// - The locale comes from the first URL segment (/th-TH/...): one URL per language, as Google
+//   wants, and never a redirect from one language's page to another's. Only "/" follows the
+//   visitor: a 302 to their own language, by fbtee's rule (negotiate.ts), or the fallback
+//   language (plans/their-own-language.md), marked no-store, so it's never shared.
 // - fbtee's per-request state is held by fbtee itself in AsyncLocalStorage (runWithFbtee), so
 //   text rendered after the shell streams in the right language too. It gets every catalog, so
 //   fbtee falls back per message (de-AT -> de -> source text) as its README describes.
 // - c.get("i18n") and shared.i18n = { locale, lang, dir, now, path }: the browser gets the same "now" the server rendered
 //   with; path is the page without its locale prefix, for links to it in other languages.
-// - <html lang dir>, hreflang alternates (plus x-default, the source locale) and <meta name="void-fbtee"> (the same i18n data, for
-//   islands) go into headDefaults.
+// - <html lang dir>, hreflang alternates (plus x-default: "/" for the home page, which sends each
+//   visitor to their language, else the page in the fallback language) and <meta name="void-fbtee">
+//   (the same i18n data, for islands) go into headDefaults.
 // - Zod's validation messages follow the request's language (when the app has Zod 4).
 import { defineMiddleware } from "void";
 import { Temporal } from "temporal-polyfill";
@@ -30,6 +32,7 @@ import {
   type Dir,
   type Lang,
 } from "./locales";
+import { acceptedLanguages, negotiate } from "./negotiate";
 import { allTranslations } from "./runtime";
 import { setup as setupZod } from "virtual:void-fbtee/zod";
 import { currentLocale, runIn, siteOrigin } from "./server";
@@ -61,6 +64,17 @@ declare module "void" {
   }
 }
 
+/**
+ * A page's hreflang x-default: for the home page "/", which sends each visitor to their own
+ * language (Google: x-default for "auto-redirecting home pages"); for any other, the page in the
+ * fallback language, where a visitor the app has no language for goes.
+ */
+export function xDefault(origin: string, rest: string): string {
+  if (rest === "" && config.redirectHome) return `${origin}/`;
+  const fallback = config.locales.find((l) => l.locale === config.fallbackLocale)!;
+  return `${origin}/${fallback.segment}${rest}`;
+}
+
 /** The markdown page at this path, from @void/md's list (a trailing slash makes no difference). */
 function markdownPage(path: string) {
   const want = path.replace(/\/+$/, "") || "/";
@@ -83,6 +97,21 @@ function answeringRoute(c: { req: { routeIndex: number } }): string | undefined 
 // carrying a copy of Hono's (Void's dependency; a pnpm app can't import it).
 const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (c, next) => {
   const path = c.req.path;
+  // "/": to the visitor's own language. The query string as it came; only GET and HEAD.
+  if (path === "/" && config.redirectHome && (c.req.method === "GET" || c.req.method === "HEAD")) {
+    const best = negotiate(
+      acceptedLanguages(c.req.header("Accept-Language")),
+      config.locales.map((l) => l.locale),
+      config.fallbackLocale,
+    );
+    const segment = config.locales.find((l) => l.locale === best)!.segment;
+    // Each visitor's own answer: never stored by a browser or the edge, and marked as depending on
+    // Accept-Language for anything that ignores no-store. Void adds neither here ("/" is no page
+    // of its own: seen on Void 1.8.0, 2026-11-14).
+    c.header("Cache-Control", "no-store");
+    c.header("Vary", "Accept-Language", { append: true });
+    return c.redirect(`/${segment}${new URL(c.req.url).search}`, 302);
+  }
   const light = LIGHT.test(path);
 
   const found = localeFromPath(path, config);
@@ -101,14 +130,13 @@ const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (
   // the same path under each language isn't a page.
   const alternates = !found
     ? []
-    : [
-        ...config.locales.map((l) => ({ hreflang: l.locale, segment: l.segment })),
-        { hreflang: "x-default", segment: source.segment },
-      ].map(({ hreflang, segment }) => ({
-        rel: "alternate",
-        hreflang,
-        href: `${origin}/${segment}${rest}`,
-      }));
+    : [...config.locales.map((l) => ({ hreflang: l.locale, segment: l.segment }))]
+        .map(({ hreflang, segment }) => ({
+          rel: "alternate",
+          hreflang,
+          href: `${origin}/${segment}${rest}`,
+        }))
+        .concat({ rel: "alternate", hreflang: "x-default", href: xDefault(origin, rest) });
   c.set("i18n", i18n);
   const shared = (c.get("shared") ?? {}) as Record<string, unknown>;
   const head = c.get("headDefaults") ?? {};

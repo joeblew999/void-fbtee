@@ -28,7 +28,7 @@ const setUp = () => {
   );
   write(
     "void.config.ts",
-    `export default {\n  worker: { compatibility_flags: ["temporal"] },\n  routing: { redirects: { "/": { to: "/en-US", status: 301 } } },\n};\n`,
+    `export default {\n  worker: { compatibility_flags: ["temporal"] },\n};\n`,
   );
 };
 
@@ -40,8 +40,8 @@ test("loadProject reads the locales from vite.config.ts", () => {
 describe("check", () => {
   test("lists missing setup, untranslated strings and missing catalogs", () => {
     const problems = check(p);
-    // The middleware, the layout, the temporal flag, the "/" redirect.
-    expect(problems.filter((l) => l.startsWith("setup:"))).toHaveLength(4);
+    // The middleware, the layout, the temporal flag.
+    expect(problems.filter((l) => l.startsWith("setup:"))).toHaveLength(3);
     expect(problems).toContain('strings: de-DE: untranslated "Goodbye"');
     expect(problems).toContain("strings: th-TH: no catalog yet");
     expect(problems).not.toContain('strings: de-DE: untranslated "Hello"');
@@ -56,6 +56,28 @@ describe("check", () => {
   test("setup problems go once the app is set up", () => {
     setUp();
     expect(check(p).filter((l) => l.startsWith("setup:"))).toEqual([]);
+  });
+
+  test('a fixed "/" redirect to one language, or an own "/" page, is reported', () => {
+    setUp();
+    write(
+      "void.config.ts",
+      `export default {\n  worker: { compatibility_flags: ["temporal"] },\n  routing: { redirects: { "/": { to: "/en-US", status: 301 } } },\n};\n`,
+    );
+    expect(check(p).filter((l) => l.startsWith("setup:"))).toEqual([
+      'setup: "/" always redirects to /en-US (void.config.ts: routing.redirects): remove it, void-fbtee sends "/" to each visitor\'s own language',
+    ]);
+    // A redirect from "/" somewhere that isn't a language is the app's own.
+    write(
+      "void.config.ts",
+      `export default {\n  worker: { compatibility_flags: ["temporal"] },\n  routing: { redirects: { "/": { to: "/welcome", status: 302 } } },\n};\n`,
+    );
+    expect(check(p).filter((l) => l.startsWith("setup:"))).toEqual([]);
+    write("pages/index.tsx", `export default () => <main />;\n`);
+    expect(check(p).filter((l) => l.startsWith("setup:"))).toEqual([
+      'setup: pages/index.tsx is the app\'s own "/" page, but void-fbtee sends "/" to each visitor\'s language: set voidFbtee({ redirectHome: false }) to keep it',
+    ]);
+    expect(check({ ...p, redirectHome: false }).filter((l) => l.startsWith("setup:"))).toEqual([]);
   });
 
   test("markdown: missing, recorded, out of date, and unaffected by formatting", () => {

@@ -11,6 +11,10 @@ export interface RuntimeConfig extends LocaleConfig {
   fallbackLocales?: FallbackLocales;
   /** voidFbtee({ site }): the site's own address, or none. */
   site?: string;
+  /** voidFbtee({ fallbackLocale }), checked: one of the app's languages. */
+  fallbackLocale: string;
+  /** voidFbtee({ redirectHome }): whether "/" sends each visitor to their own language. */
+  redirectHome: boolean;
 }
 
 /**
@@ -33,12 +37,12 @@ export function reportMissing(texts: Record<string, string>) {
 /** One lazy loader per translated locale; each resolves to { [locale]: fbtee's table }. */
 export type CatalogLoaders = Record<string, () => Promise<{ default: TranslationDictionary }>>;
 
-const availableLanguages = (config: RuntimeConfig) =>
+const availableLanguages = (config: Pick<RuntimeConfig, "locales">) =>
   new Map(config.locales.map((l) => [l.locale, l.locale]));
 
 /** fbtee's setupLocaleContext options for a page in `locale` (the browser). */
 export function localeContextOptions(
-  config: RuntimeConfig,
+  config: Pick<RuntimeConfig, "sourceLocale" | "locales" | "fallbackLocales">,
   catalogs: CatalogLoaders,
   locale: string,
   onMissingTranslation?: LocaleContextProps["onMissingTranslation"],

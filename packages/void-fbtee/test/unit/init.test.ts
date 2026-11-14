@@ -51,7 +51,7 @@ function snapshot(root: string, dir = root): Record<string, string> {
 test("wires void-fbtee into a Vite+ app, and a second run changes nothing", async () => {
   const root = app("vite-plus");
   const first = await init(options(root));
-  expect(first.done.length).toBe(13);
+  expect(first.done.length).toBe(12);
 
   const vite = read(root, "vite.config.ts");
   expect(vite).toContain(`import { defineConfig } from "vite-plus";`);
@@ -74,7 +74,8 @@ test("wires void-fbtee into a Vite+ app, and a second run changes nothing", asyn
   expect(vite.endsWith(");\n")).toBe(true);
 
   expect(read(root, "void.config.ts")).toMatch(/compatibility_flags: \["temporal"\]/);
-  expect(read(root, "void.config.ts")).toMatch(/"\/": \{\s*to: "\/en-US",\s*status: 301,?\s*\}/);
+  // "/" is void-fbtee's middleware's: no fixed redirect.
+  expect(read(root, "void.config.ts")).not.toContain("redirects");
   expect(read(root, "middleware/99.i18n.ts")).toContain(`from "void-fbtee/middleware"`);
   expect(read(root, "pages/layout.tsx")).toContain("<I18nProvider>{children}</I18nProvider>");
   expect(existsSync(join(root, "i18n/translations"))).toBe(true);
@@ -166,6 +167,27 @@ test("in an app written in Thai, init says to write its two pages' English text 
   withHome(english);
   const { todo: none } = await init({ root: english, sourceLocale: "en-GB", locales: ["en-GB"] });
   expect(none.some((line) => line.includes("their text is in English"))).toBe(false);
+});
+
+test('removes the fixed "/" redirect an older init wrote, and only that one', async () => {
+  const older = app("vite-plus");
+  writeFileSync(
+    join(older, "void.config.ts"),
+    `export default { routing: { redirects: { "/": { to: "/en-US", status: 301 } } } };\n`,
+  );
+  const { done } = await init(options(older));
+  expect(done).toContain(
+    'void.config.ts: removed the fixed redirect from "/" to /en-US: "/" now sends each visitor to their own language',
+  );
+  expect(read(older, "void.config.ts")).not.toContain('"/en-US"');
+
+  const own = app("vite-plus");
+  writeFileSync(
+    join(own, "void.config.ts"),
+    `export default { routing: { redirects: { "/": { to: "/welcome", status: 302 } } } };\n`,
+  );
+  await init(options(own));
+  expect(read(own, "void.config.ts")).toContain('"/welcome"');
 });
 
 test("a sitemap route, unless the app has its own", async () => {

@@ -1,4 +1,4 @@
-// Production build, over HTTP: what the middleware does ("/" to the source language, <html lang
+// Production build, over HTTP: what the middleware does ("/" to each visitor's own language, <html lang
 // dir>, hreflang with x-default, the i18n <meta> for islands, leaving files and API routes alone),
 // per-request state under concurrency, and the built worker.
 import { globSync, readFileSync } from "node:fs";
@@ -47,12 +47,72 @@ const postBooking = (event: string, fields: Record<string, string>) =>
     }),
   });
 
-test('"/" always redirects to the source language, whatever the browser asks for', async () => {
-  for (const accept of ["th,en;q=0.5", "ar-EG", ""]) {
-    const res = await get("/", { headers: { "accept-language": accept }, redirect: "manual" });
-    expect(res.status, accept).toBe(301);
-    expect(new URL(res.headers.get("location")!, "http://x").pathname, accept).toBe("/en-US");
-    expect(res.headers.get("vary") ?? "").not.toMatch(/accept-language/i);
+// "/" sends each visitor to their own language, by fbtee's rule (plans/their-own-language.md):
+// half the requests as a browser opening a page sends them, half with no Sec-Fetch-Dest (a link
+// preview, a crawler), which the redirect treats the same.
+const home = (accept: string | undefined, headers: Record<string, string> = {}) =>
+  get("/", {
+    redirect: "manual",
+    headers: { ...(accept === undefined ? {} : { "accept-language": accept }), ...headers },
+  });
+const landsOn = (res: Response) => new URL(res.headers.get("location")!, "http://x").pathname;
+
+test('"/" goes to each visitor\'s own language, never cached, no cookie', async () => {
+  const cases: [string | undefined, string][] = [
+    ["th", "/th-TH"],
+    ["th-TH,th;q=0.9,en;q=0.8", "/th-TH"],
+    ["ar-SA,ar;q=0.9", "/ar-EG"],
+    ["en-GB", "/en-US"],
+    ["fr", "/en-US"],
+    // What a fetch with that header gets: Thai, their second choice. (Safari sends only its first.)
+    ["fr,th;q=0.5", "/th-TH"],
+    [undefined, "/en-US"],
+    // Not clean: * and q=0 skipped, a malformed tag skipped, only the first 20 entries read.
+    ["*, fr;q=0, not a tag!, ar", "/ar-EG"],
+    [[...Array.from({ length: 25 }, () => "de"), "th"].join(","), "/en-US"],
+  ];
+  for (const [i, [accept, to]] of cases.entries()) {
+    const res = await home(accept, i % 2 ? { "sec-fetch-dest": "document" } : {});
+    expect(res.status, String(accept)).toBe(302);
+    expect(landsOn(res), String(accept)).toBe(to);
+    expect(res.headers.get("cache-control"), String(accept)).toMatch(/no-store/);
+    expect(res.headers.get("set-cookie"), String(accept)).toBeNull();
+  }
+});
+
+test('"/" as HEAD too, and its query string kept as it came; a POST isn\'t redirected', async () => {
+  const head = await get("/", {
+    method: "HEAD",
+    redirect: "manual",
+    headers: { "accept-language": "th" },
+  });
+  expect(head.status).toBe(302);
+  expect(landsOn(head)).toBe("/th-TH");
+  const query = await get("/?utm_source=x&q=%20a%C3%A9", {
+    redirect: "manual",
+    headers: { "accept-language": "ar" },
+  });
+  expect(query.headers.get("location")).toMatch(/\/ar-EG\?utm_source=x&q=%20a%C3%A9$/);
+  const post = await get("/", {
+    method: "POST",
+    redirect: "manual",
+    headers: { "accept-language": "th" },
+  });
+  expect(post.status).not.toBe(302);
+});
+
+test("a page in a language never redirects, and an address without one is the not-found page", async () => {
+  for (const accept of ["th", "ar-EG", ""]) {
+    const page = await get("/en-US/docs/intl", {
+      redirect: "manual",
+      headers: { "accept-language": accept },
+    });
+    expect(page.status, accept).toBe(200);
+    const none = await get("/events", {
+      redirect: "manual",
+      headers: { "accept-language": accept },
+    });
+    expect(none.status, accept).toBe(404);
   }
 });
 
@@ -65,7 +125,11 @@ test("page head: lang, dir, hreflang alternates with x-default, canonical, og:ur
   expect(htmlTag).toContain('lang="ar-EG"');
   expect(htmlTag).toContain('dir="rtl"');
   for (const l of LOCALES) expect(html).toContain(`hreflang="${l}" href="${SITE}/${l}/docs/intl"`);
+  // x-default: the page in the fallback language (the source); the home page's is "/", which sends
+  // each visitor to their own.
   expect(html).toContain(`hreflang="x-default" href="${SITE}/en-US/docs/intl"`);
+  const homePage = await (await get("/th-TH")).text();
+  expect(homePage).toContain(`hreflang="x-default" href="${SITE}/"`);
   // Its own address as canonical, and Open Graph's locale as language_TERRITORY (no
   // og:locale:alternate: Void keeps one meta tag per property, src/middleware.ts says more).
   expect(html).toContain(`rel="canonical" href="${SITE}/ar-EG/docs/intl"`);
@@ -488,6 +552,14 @@ test("the sitemap: every page in every language, with its alternates; robots.txt
     expect(e.alternates.sort(), e.loc).toEqual([...LOCALES, "x-default"].sort());
     expect((await get(e.loc)).status, e.loc).toBe(200);
   }
+  // x-default: "/" for the home page (it sends each visitor to their own language), else the page
+  // in the fallback language.
+  const xDefault = (loc: string) =>
+    xml.match(
+      new RegExp(`<loc>${SITE}${loc}</loc>[\\s\\S]*?hreflang="x-default" href="([^"]+)"`),
+    )?.[1];
+  expect(xDefault(`/th-TH`)).toBe(`${SITE}/`);
+  expect(xDefault(`/th-TH/docs/intl`)).toBe(`${SITE}/en-US/docs/intl`);
   // No date where nothing records one: the app's own pages.
   for (const l of LOCALES)
     for (const page of ["", "/docs", "/docs/intl"])

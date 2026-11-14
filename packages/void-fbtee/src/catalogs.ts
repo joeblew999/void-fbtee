@@ -43,6 +43,8 @@ export interface Project {
   src: string[];
   /** fbtee's common strings (fbtCommon): text → its description, for `<fbt common>`. */
   common?: Record<string, string>;
+  /** voidFbtee({ redirectHome }): whether "/" sends each visitor to their language. Default true. */
+  redirectHome?: boolean;
 }
 
 interface Phrase {

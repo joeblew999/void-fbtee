@@ -173,8 +173,8 @@ export interface SitemapPage {
  * The sitemap (a route's response: `export const GET = defineHandler((c) => sitemap(c))` in
  * routes/sitemap.xml.ts), by Google's rules (Search Central, "Build and submit a sitemap" and
  * "Tell Google about localized versions of your page", checked 2026-11-12): each page in every
- * language, each listing all its languages, itself included, plus x-default (the source
- * language's); full addresses on the site's own origin (siteOrigin); <lastmod> only where it's a
+ * language, each listing all its languages, itself included, plus x-default ("/" for the
+ * home page, which sends each visitor to their language; else the fallback language's); full addresses on the site's own origin (siteOrigin); <lastmod> only where it's a
  * real change, never the time it was drawn; no changefreq or priority (Google ignores them).
  *
  * Without options it lists every page under pages/[lang]/ whose only parameter is the language
@@ -207,7 +207,13 @@ export function sitemap(
       .map((p) => ({ urls: urlsOf(p), lastmod: p.lastmod })),
     ...markdownEntries(),
   ];
-  const source = config.sourceLocale;
+  // x-default: "/" for the home page, which sends each visitor to their language; else the page in
+  // the fallback language (as the middleware's xDefault).
+  const fallback = config.locales.find((l) => l.locale === config.fallbackLocale)!;
+  const xDefaultOf = (entry: Entry) => {
+    const url = entry.urls[fallback.locale]!;
+    return config.redirectHome && url.replace(/\/$/, "") === `/${fallback.segment}` ? "/" : url;
+  };
   const xml = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">`,
@@ -217,7 +223,7 @@ export function sitemap(
           typeof entry.lastmod === "function" ? entry.lastmod(l.locale) : entry.lastmod;
         const alternates = [
           ...config.locales.map((a) => [a.locale, entry.urls[a.locale]!] as const),
-          ["x-default", entry.urls[source]!] as const,
+          ["x-default", xDefaultOf(entry)] as const,
         ].map(
           ([hreflang, url]) =>
             `    <xhtml:link rel="alternate" hreflang="${xmlText(hreflang)}" href="${xmlText(origin + url)}"/>`,

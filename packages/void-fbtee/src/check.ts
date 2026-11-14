@@ -7,6 +7,12 @@ import { missing, type Project } from "./catalogs";
 import { firstFile, hasI18nMiddleware, LAYOUTS, VOID_CONFIGS } from "./app-files";
 import { sourceOf, translatedOf } from "./locales";
 
+/** An app's own "/" page or route: Void's `index` files (guide/pages-routing/overview.md). */
+const HOME_PAGES = [
+  ...["tsx", "jsx", "ts", "js", "md", "mdx", "vue", "svelte"].map((e) => `pages/index.${e}`),
+  ...["ts", "tsx", "js", "jsx"].map((e) => `routes/index.${e}`),
+];
+
 /** Frontmatter key a translated markdown page records its original's hash in. */
 export const TRANSLATED_FROM = "translatedFrom";
 
@@ -177,15 +183,24 @@ export function check(p: Project): string[] {
     problems.push(
       `setup: Cloudflare's "temporal" flag is missing (void.config.ts: worker.compatibility_flags)`,
     );
-  // "/" goes to the source language, by Void's own redirects, permanently.
-  const source = sourceOf(p.config).segment;
-  const home = new RegExp(
-    `["']/["']\\s*:\\s*\\{[^}]*to\\s*:\\s*["']/${source}["'][^}]*status\\s*:\\s*301`,
-  );
-  if (!home.test(voidConfigText))
-    problems.push(
-      `setup: "/" doesn't redirect to /${source} (void.config.ts: routing.redirects, "/": { to: "/${source}", status: 301 })`,
+  // "/" sends each visitor to their own language (the middleware), so a fixed redirect from "/" to
+  // one of the app's languages (what init once wrote) sends everyone to that one.
+  if (p.redirectHome !== false) {
+    const segments = p.config.locales.map((l) => l.segment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    const fixed = new RegExp(
+      `["']/["']\\s*:\\s*\\{[^}]*to\\s*:\\s*["']/(${segments.join("|")})["']`,
     );
+    const to = voidConfigText.match(fixed)?.[1];
+    if (to)
+      problems.push(
+        `setup: "/" always redirects to /${to} (void.config.ts: routing.redirects): remove it, void-fbtee sends "/" to each visitor's own language`,
+      );
+    const own = HOME_PAGES.find((f) => existsSync(join(p.root, f)));
+    if (own)
+      problems.push(
+        `setup: ${own} is the app's own "/" page, but void-fbtee sends "/" to each visitor's language: set voidFbtee({ redirectHome: false }) to keep it`,
+      );
+  }
 
   // Untranslated strings, by fbtee's own rule (same count as the plugin's report).
   for (const r of missing(p)) {
