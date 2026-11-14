@@ -18,6 +18,8 @@ Waiting on others, not in the order:
 
 - `void-form-without-javascript.md`: waits on Void (an issue drafted for voidzero-dev/void, filed
   only with the user's OK).
+- `language-notice.md`: a link offering a visitor their own language on a page in another, split
+  out of the language plan. The user decides whether it's wanted.
 - `quiet-harbor-atlas.md`: the long plan, steps 1–8 done. Steps 9 (sign-in) and 10 (API routes with
   a language) wait until the example needs them, and "Still open" has the preview-AI note, the
   user's call.

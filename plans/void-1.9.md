@@ -34,10 +34,8 @@ and this upgrade runs those tests on 1.9.1: that's the check, not a wait.
    only" layouts, `head.md`'s script, `revalidation.md`'s `Vary` rule, `rewrites.md`) are checked
    again in 1.9.1, and corrected where they changed.
 6. **What the language plan relies on in Void's behaviour** (`plans/their-own-language.md`, "What
-   was checked"): the route Void reports as answering, `no-store` on the 302, "not found" decided
-   after the middleware, head scripts server-only, and Void's client following a redirect on its
-   own page fetch. Its preview, browser and live tests cover each; a change in 1.9.1 shows up there,
-   and is fixed in this plan.
+   was checked"): the middleware seeing `"/"`, and Void marking the 302 `no-store`. Its preview and
+   live tests cover both; a change in 1.9.1 shows up there, and is fixed in this plan.
 
 ## How we'll know it's right
 
