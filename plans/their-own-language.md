@@ -103,8 +103,8 @@ the page.
    (`node_modules/void/docs/guide/pages-routing/islands.md`, "Layouts", read 2026-11-14), and the
    docs are those. Instead, void-fbtee's middleware adds a small script to every page's head
    (Void's head `script`, "set in middleware to apply defaults to every page", `head.md`).
-   - The script carries only the CLDR parents for the app's own language families, picked by the
-     plugin at build from `cldr-core`, so the redirect and the notice decide the same way.
+   - The script carries the same `negotiate()` as the middleware, so the redirect and the notice
+     choose the same way.
    - It decides once per document load. `document.referrer` belongs to the document, so Void's
      moves between pages without reloading don't show it again. A plain link that reloads makes a
      new document whose referrer is this site.
@@ -119,55 +119,50 @@ the page.
 ## Languages the site doesn't have, and inherited ones
 
 The browser sends a list, best first (`Accept-Language: fr, th;q=0.5`). `negotiate()` goes down it
-and takes the first one the site can serve, by these rules.
+and takes the first one the site can serve. Each one is matched by **fbtee's own rule**, so the
+whole system has one way of choosing a language. From fbtee 6.0.0's README, "Locale Matching and
+Fallback", read 2026-11-14:
+
+- "It prefers exact locales, then language/script parents".
+- "If none are available during language selection, it chooses a region with the same language and
+  script, preferring the region inferred by `Intl.Locale` and using a stable order for ties".
+- "Traditional Chinese falls back through `zh-Hant`; it does not automatically use a Simplified
+  Chinese catalog".
 
 1. **Languages the site doesn't have are skipped, not guessed.** `fr, th;q=0.5` gives Thai, their
    second choice. If nothing on the list can be served, or there's no list (Google's crawler), the
-   answer is the app's source language. That's fbtee's own fallback (`sourceLocale`) and the meaning
-   of `x-default`. The notice in point 3 doesn't show then: there's nothing better to offer.
-2. **Inherited languages follow CLDR, the Unicode locale data every browser and Intl use.** A
-   language variant inherits from its parent:
-   - `es-MX` and `es-AR` → `es-419` (Latin American Spanish) → `es`;
-   - `en-AU` and `en-GB` → `en-001` (international English) → `en`;
-   - `pt-AO` → `pt-PT`;
-   - `zh-Hant-MO` → `zh-Hant-HK`;
-   - `hi-Latn` (Hindi written in Latin letters) → `en-IN`, which crosses into another language.
+   answer is the app's source language. That's fbtee's own fallback (`fallbackLocale`, which
+   defaults to `sourceLocale`) and the meaning of `x-default`. The notice in point 3 doesn't show
+   then: there's nothing better to offer.
+2. **Inherited languages: the same language and script, in the region `Intl.Locale` expects.** Run
+   with fbtee 6.0.0 on 2026-11-14 for the example's languages (`en-US`, `th-TH`, `ar-EG`):
+   - `th` → `th-TH`;
+   - `ar-SA` and `ar-MA` → `ar-EG`;
+   - `en-GB` and `en-AU` → `en-US`;
+   - `fr` → `en-US` (the source).
+3. **A different script is a different language.** `zh-Hant` never gets `zh-Hans`, and `sr-Latn`
+   never gets `sr-Cyrl`. Such a reader goes on down their list.
 
-   From CLDR's `parentLocales` table (`cldr-core` 49.0.0 on npm, `supplemental/parentLocales.json`,
-   198 entries, read 2026-11-14), read at run time ("Where the inheritance comes from", below).
+**Why fbtee's rule and not a richer one of ours.** CLDR's parent locales would pick differently only
+on a site that has two variants of one language: `en-AU` → `en-GB` (fbtee: `en-US`), `es-MX` →
+`es-419` (fbtee: `es-ES`), `pt-AO` → `pt-PT` (fbtee: `pt-BR`). With one variant per language, which
+is every app here, both give the same answer. A second rule would mean two answers to "which
+language" in one system, plus a CLDR dependency. So we use fbtee's. The difference goes to fbtee as
+a suggestion (the issue below), to change there if they agree.
 
-   A request matches the app's language that shares the closest ancestor with it. So, for a site
-   with `en-US` and `en-GB`, an Australian reader gets `en-GB` (shared `en-001`), not `en-US` (shared
-   only `en`). And a Mexican reader gets `es-419` when the site has it, not `es-ES`.
+**How void-fbtee calls it.** fbtee's chooser, `negotiateLocale`, isn't exported. The only way to it,
+`setupLocaleContext`, also calls `setupFbtee` and changes fbtee's global setup. That's unsafe in the
+middleware, where requests in different languages run at once, and on a page whose fbtee is already
+set up. So:
 
-3. **A different script is a different language.** `zh-Hant` (Traditional) never gets `zh-Hans`
-   (Simplified), and `sr-Latn` never gets `sr-Cyrl`: their CLDR parent is the root, so they share no
-   ancestor. Such a reader goes on down their list, and gets the source language if nothing else
-   fits.
-
-**Why not just fbtee's rule.** fbtee 6.0.0 already picks a language from a browser's list
-(`setupLocaleContext`; inside it `negotiateLocale`, which isn't exported). It's script-aware (it gives
-`zh-HK` → `zh-TW`, and `sr-Latn` nothing). But it doesn't know CLDR's parents. Run on 2026-11-14
-against a site with `en-US`, `en-GB`, `es-ES`, `es-419`, `pt-BR` and `pt-PT`, it gave:
-
-- `en-AU` → `en-US`;
-- `es-MX` and `es-AR` → `es-ES`;
-- `pt-AO` → `pt-BR`.
-
-That's fbtee's documented rule, not a mistake. Its README ("Locale Matching and Fallback") says that
-when no exact locale or language/script parent is available, "it chooses a region with the same
-language and script, preferring the region inferred by `Intl.Locale` and using a stable order for
-ties" (fbtee 6.0.0, read 2026-11-14). That's simple and needs no data. CLDR's parents are a
-different, richer rule. They matter here because a visitor picks from many variants. The function
-also can't be called from the middleware: it changes fbtee's global setup.
-
-So the plan is:
-
-- void-fbtee's `negotiate()` keeps fbtee's script rule and adds CLDR's parents;
-- the inheritance data isn't written into our code or copied. It comes from its source, read
-  where it's used (next section);
-- an issue for nkzw-tech/fbtee (drafted, filed only with the user's OK) asks whether they'd consider
-  CLDR's parents in `negotiateLocale` (an option, not a fix), and for exporting it. If it lands, void-fbtee uses fbtee's and deletes its own.
+- `negotiate()` in void-fbtee carries fbtee 6.0.0's matching (`getLocaleHierarchy`,
+  `areEquivalentLocales`, `negotiateLocale` in `fbtee/lib/index-core-*.mjs`, MIT), with that
+  source, version and licence noted at the top. It's the same code, not a new rule.
+- A unit test runs every case above through both: fbtee's public `setupLocaleContext(...).getLocale()`
+  (in a test, where its global setup does no harm) and `negotiate()`. The answers must be equal, so
+  an fbtee upgrade that changes the rule fails the test instead of drifting.
+- The issue below asks fbtee to export `negotiateLocale`. When it does, `negotiate()` calls fbtee's
+  and its copy is deleted. The signature is kept the same as fbtee's, so nothing else changes then.
 
 ## Edges
 
@@ -186,33 +181,14 @@ So the plan is:
   only `"/"`. The release notes tell apps the same, and from now on `init` never writes a permanent
   redirect.
 
-## Where the inheritance comes from at run time
-
-- **Not from Intl.** JavaScript's Intl knows CLDR's parents inside, but doesn't expose them.
-  `new Intl.DateTimeFormat("es-MX").resolvedOptions().locale` gives `es-MX` back, and there's no
-  "parent of" call (checked in Node 26, ICU 78.3 with CLDR 48, 2026-11-14).
-- **Not fetched from the network** on each request: that would be slow, and it could fail.
-- **From CLDR's own published data, as a dependency.** void-fbtee depends on `cldr-core`, the
-  Unicode Consortium's JSON release of CLDR (49.0.0, licence Unicode-3.0). `negotiate()` imports
-  `cldr-core/supplemental/parentLocales.json` (5.8 KB) directly, so the bundler puts it in the
-  Worker as is. There's no copy, no generating script and no table of ours.
-  - The version is pinned in `packages/void-fbtee/package.json`, like any dependency, and it moves
-    with the other upgrades.
-  - The server uses the whole file. The notice's script gets the part of it for the app's language
-    families, picked from the same file at build, which is all that can match. So the redirect and
-    the notice always agree.
-- **Likely scripts** (`zh-HK` is Traditional) come from `Intl.Locale.maximize()`, which every engine
-  has built in. CLDR's own `likelySubtags.json` is 222 KB, too big to put in every page for this.
-
 ## What changes
 
 - **Package:**
   - `middleware.ts`: the redirect for addresses without a language;
-  - `locales.ts`: `negotiate()`, reading CLDR's parents from `cldr-core` (a dependency, pinned in
-    `package.json`);
+  - `locales.ts`: `negotiate()`, fbtee 6.0.0's matching (see "How void-fbtee calls it");
   - `head.ts` and `server.ts`: the `x-default` and the sitemap;
-  - `middleware.ts` also adds the notice's script to every page's head, and `plugin.ts` picks the
-    CLDR parents for the app's language families;
+  - `middleware.ts` also adds the notice's script to every page's head, with `negotiate()` in it,
+    so the redirect and the notice choose the same way;
   - `init.ts`: writes no fixed redirect, and removes one that `init` wrote before;
   - `check.ts`: reports a fixed redirect for `"/"` as the bug;
   - `skills/void-fbtee/SKILL.md`;
@@ -274,12 +250,9 @@ The preview tests use real requests and real browsers, not stand-ins.
   - `fr`;
   - `fr,th;q=0.5`, which gives Thai: the best one the app has;
   - no header at all, which gives the source language.
-- `negotiate()`'s unit tests, with the expected answers taken from CLDR's own table, not from the
-  code:
-  - for the example's three languages: `ar-MA` → `ar-EG`, `zh-HK` → `en-US` (no Chinese), and
-    `es-MX` → `en-US` (no Spanish);
-  - for a site with many languages: `en-AU` → `en-GB`, `es-MX` → `es-419`, `pt-AO` → `pt-PT`,
-    `zh-HK` → `zh-TW`, `sr-Latn` → the source, `hi-Latn` → `en-IN` when the site has it.
+- `negotiate()` gives the same answer as fbtee's own `setupLocaleContext(...).getLocale()` for every
+  case, for the example's languages and for a site with many: `th`, `ar-SA`, `ar-MA`, `en-GB`,
+  `en-AU`, `es-MX`, `pt-AO`, `zh-HK`, `zh-Hant`, `sr-Latn`, `fr` and none.
 - The redirect is never shared: the same address, asked for in Thai and then in Arabic, gives each
   its own answer, and is marked `no-store`.
 - A client with no `Sec-Fetch-Dest` (a link preview, `curl`) is redirected; a `fetch`
@@ -315,16 +288,17 @@ pushed when the user says.
 
 ## The issue for nkzw-tech/fbtee (draft, not filed)
 
-Title: Choosing a locale with CLDR's parent locales (es-MX → es-419), and exporting `negotiateLocale`
+Title: Export `negotiateLocale` (choosing a locale on the server without `setupLocaleContext`)
 
-> fbtee 6.0.0's `negotiateLocale` (used by `setupLocaleContext`) is script-aware, which is great. But
-> it doesn't follow CLDR's `parentLocales`. With available `en-US`, `en-GB`, `es-ES`, `es-419`,
-> `pt-BR` and `pt-PT`, client locales `en-AU`, `es-MX` and `pt-AO` resolve to `en-US`, `es-ES` and
-> `pt-BR`. CLDR (49, `supplemental/parentLocales.json`) gives `en-AU → en-001`, `es-MX → es-419`
-> and `pt-AO → pt-PT`, so the expected answers are `en-GB`, `es-419` and `pt-PT`.
+> void-fbtee picks the language for a request from `Accept-Language` in middleware, and wants fbtee's
+> exact rule for it, so the whole app chooses one way. `negotiateLocale` isn't exported, and
+> `setupLocaleContext` also calls `setupFbtee`, which isn't safe per request. Could
+> `negotiateLocale` (and the locale-chain helpers it uses) be exported? Until then void-fbtee
+> carries a copy of it, with a test that compares it to `setupLocaleContext(...).getLocale()`.
 >
-> Could `negotiateLocale` prefer the available locale that shares the closest CLDR ancestor? And
-> could it be exported, so servers can pick a locale from `Accept-Language` without
-> `setupLocaleContext`, which also sets up fbtee's global runtime?
+> A smaller question: for sites with several regional variants of one language, would CLDR's parent
+> locales be welcome as an option? `en-AU` → `en-GB` (shared `en-001`), `es-MX` → `es-419`, `pt-AO`
+> → `pt-PT`, where the current rule gives `en-US`, `es-ES` and `pt-BR`. It's your documented rule,
+> so this is only a suggestion.
 >
 > Seen in https://github.com/joeblew999/void-fbtee.
