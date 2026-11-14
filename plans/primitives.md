@@ -1,7 +1,7 @@
 # plans/primitives.md: void-fbtee's base primitives, before anything is built on them
 
-Status: proposed 2026-11-14, waiting for the user's OK. Comes before `plans/use-cases.md` and
-`plans/video-conferencing.md`: both are built from these.
+Status: proposed 2026-11-14, waiting for the user's OK. Comes after `plans/their-own-language.md`, and before
+`plans/use-cases.md` and `plans/video-conferencing.md`: both are built from these.
 
 ## Why
 
@@ -73,34 +73,8 @@ on 2026-11-14.
    email, marked with `<bdi lang dir>`. `langAttrs` gives the attributes, but each place writes the
    element itself (`src/events/EmailLayout.tsx`, the event pages). The package gives an
    `<InLanguage locale>` component, plus the same thing for an email's HTML.
-9. **The visitor's own language, followed.** The system's premise is that each person gets their own
-   locale. For the web pages today, though, `"/"` always goes to `/en-US` (a 301 in
-   `apps/example/void.config.ts`), and the switcher in `src/shell/SiteHeader.tsx` is the only way to
-   Thai or Arabic. That's a debug tool standing in for the real thing. Instead:
-   - **Entry follows the person.** `"/"` (and a link without a language) answers with a 302 to the
-     best of the app's languages for that browser, from `Accept-Language`. `"/"` is the `x-default` in hreflang. With the source language when nothing matches,
-     which is also what Google's crawler gets: it sends no `Accept-Language`.
-   - **A language page never redirects.** `/th-TH/…` stays Thai for everyone, so shared links and
-     search engines see every version. That's Google's rule ("don't redirect based on what you think
-     the user's language may be", developers.google.com/search/docs/specialty/international/
-     managing-multi-regional-sites, read 2026-11-14). An auto-redirecting root is fine when it's the
-     `x-default` (John Mueller via seroundtable.com, read 2026-11-14).
-   - **A suggestion, not a trap:** on a language page in a language the browser doesn't prefer, a
-     small notice offers the browser's language ("This page is in English. อ่านเป็นภาษาไทย?"). It's
-     added by the browser after the page loads, so the cached page stays one per language.
-   - **Nothing is remembered.** There's no stored choice: no cookie, no browser storage, no
-     preference. The language comes from only two places: the person's own locale (their browser's
-     `Accept-Language`), and the address they're on. A remembered choice would be a second source of
-     truth that can disagree with the person's locale. It would also put a cookie on pages that Void
-     then can't cache (`e2e/preview/server.test.ts`, "no page sets a cookie"). The other languages
-     of a page stay plain links to it, without memory.
-   - What's addressed to a person (emails, reminders, tickets, captions) already uses their own
-     locale, from their booking.
-
-   This reverses the earlier decision written in `void.config.ts` ("never chosen by the visitor's")
-   and the preview test that `"/"` always goes to the source language. Both change with it, and
-   `void-fbtee check`'s rule for `"/"` too.
-
+9. **The visitor's own language:** this has its own plan, `plans/their-own-language.md`, done
+   first. Its `negotiate()` and `<YourLanguage>` are primitives of the package too.
 10. **An email in its reader's language:** the email's `<html lang dir>`, the body's direction, and
     writing it inside `inLocale`. Each of the four emails in `src/events/emails.ts` repeats that
     setup. The package gives `sendInLocale(reader, email)` around Void's `sendEmail`. The look stays
