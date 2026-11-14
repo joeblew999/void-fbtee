@@ -81,7 +81,12 @@ test("booking an event that doesn't exist is not found, not sold out", async () 
     redirect: "manual",
     // A page action from the page itself (Void refuses cross-origin ones).
     headers: { origin: url("prod"), "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ name: "A", email: "a@example.com", time_zone: "Asia/Bangkok" }),
+    body: new URLSearchParams({
+      id: crypto.randomUUID(),
+      name: "A",
+      email: "a@example.com",
+      time_zone: "Asia/Bangkok",
+    }),
   });
   expect(res.status).toBe(404);
 });
@@ -167,6 +172,7 @@ test("every page has a title and a description, in its own language", async () =
     "/docs/right-to-left",
     "/docs/translating",
     "/docs/emails",
+    "/docs/pdfs",
     "/docs/tour",
   ];
   const head = async (path: string) => {
@@ -243,6 +249,20 @@ test("every home page feature links to its docs page", async () => {
     expect(html, page).toContain(`href="/th-TH/docs/${page}"`);
 });
 
+// The PDFs page shows the app's own ticket, printed by Cloudflare Browser Run for the page's
+// language (remote in the preview too: void.config.ts), and a ticket that isn't there is a 404.
+test("the PDFs page shows a ticket printed for its language", async () => {
+  const page = await (await get("/ar-EG/docs/pdfs")).text();
+  expect(page).toContain('src="/samples/ticket/ar-EG"');
+  const pdf = await get("/samples/ticket/ar-EG");
+  expect(pdf.status).toBe(200);
+  expect(pdf.headers.get("content-type")).toBe("application/pdf");
+  expect(new TextDecoder().decode(new Uint8Array(await pdf.arrayBuffer()).slice(0, 5))).toBe(
+    "%PDF-",
+  );
+  expect((await get(`/tickets/${crypto.randomUUID()}`)).status).toBe(404);
+});
+
 // Void's page cache skips any response with Set-Cookie, or a Vary on a request header other than
 // its own X-VoidPages ones (docs/guide/edge/revalidation.md, "How revalidation works"): silently,
 // the page just stops being cached. void-fbtee's middleware runs on every page, so it must add
@@ -260,6 +280,7 @@ test("no page sets a cookie or varies by a request header, so Void can cache it"
     "/docs/right-to-left",
     "/docs/translating",
     "/docs/emails",
+    "/docs/pdfs",
     "/docs/tour",
   ];
   const voids = new Set(["x-voidpages", "x-voidpages-version"]);
@@ -450,6 +471,8 @@ test("the sitemap: every page in every language, with its alternates; robots.txt
       "/docs/right-to-left",
       "/docs/translating",
       "/docs/emails",
+      "/docs/pdfs",
+      "/docs/pdfs",
       "/events",
       "/docs/tour",
     ])

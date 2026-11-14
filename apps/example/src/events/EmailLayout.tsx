@@ -24,6 +24,9 @@ import { emailTheme } from "./email-theme";
 // The site's icon, made from public/favicon.svg (`vp run icons`): a PNG, as mail apps don't show SVG.
 import logoUrl from "../../public/pwa-192x192.png?inline";
 
+/** The logo as a data: URL, for a page that carries it inside (the PDF ticket: TicketLayout.tsx). */
+export const logoDataUrl = logoUrl;
+
 /**
  * The logo, sent inside each email (Void's inline attachments, guide/email/sending.md) and shown
  * from there (`cid:logo`): no link out, so it shows in dev's inbox too, where the site is localhost.
@@ -49,8 +52,9 @@ export type EmailLook = {
   title: { text: string; lang: string; dir: string };
 };
 
-/** A line with the event's title in it marked in its own language and direction. */
-function titled(line: string, title: EmailLook["title"]): ReactNode {
+/** A line with the event's title in it marked in its own language and direction (the PDF ticket's
+ * heading too: TicketLayout.tsx). */
+export function titled(line: string, title: EmailLook["title"]): ReactNode {
   const at = line.indexOf(title.text);
   if (at < 0) return line;
   return (

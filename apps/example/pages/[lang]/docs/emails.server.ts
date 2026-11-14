@@ -4,6 +4,7 @@ import { pageHead } from "void-fbtee/head";
 import { langParams } from "void-fbtee/server";
 import { routeUrl } from "void-fbtee/routes";
 import { bookingEmail, linkEmail, type Email } from "@/events/emails";
+import { SAMPLE_EVENT as EVENT, SAMPLE_ID as ID, SAMPLE_NAME } from "@/docs/sample-event";
 import logoUrl from "../../../public/pwa-192x192.png?url";
 
 // Cached until the next deploy, in every language (Void's prerendering, as the Intl page): the
@@ -12,15 +13,6 @@ export const prerender = true;
 export const getPrerenderPaths = langParams;
 
 export type Props = InferProps<typeof loader>;
-
-// The sample: the calligraphy evening as its organiser wrote it, in Arabic (the email tests'
-// event), so on the English and Thai pages its title is in another language than the email.
-const EVENT = {
-  title: "أمسية خط عربي",
-  titleLocale: "ar-EG",
-  startsAt: "2027-03-08T19:00:00+02:00[Africa/Cairo]",
-} as const;
-const ID = "d57a8bf2-5909-4475-a407-12a879df5f01";
 
 /** An email as the page shows it: the logo from the site's own file, as only a mail app reads cid:. */
 const shown = (email: Email) => ({
@@ -36,7 +28,7 @@ export const loader = defineHandler(async (c) => {
   const origin = new URL(c.req.url).origin;
   const page = origin + routeUrl("/[lang]/events/[id]", { params: { id: ID } });
   const [booking, link] = await Promise.all([
-    bookingEmail({ ...EVENT, locale, name: "Laila", url: page }),
+    bookingEmail({ ...EVENT, locale, name: SAMPLE_NAME, url: page }),
     linkEmail({ ...EVENT, locale, link: `${page}#key=…` }),
   ]);
   return { booking: shown(booking), link: shown(link) };

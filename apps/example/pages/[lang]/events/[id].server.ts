@@ -3,6 +3,7 @@ import { bookings, bookSchema, event_texts, events } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { and, count, db, eq, inArray, sql } from "void/db";
 import { queues } from "void/queues";
+import { storage } from "void/storage";
 import { z } from "zod";
 import type { Event as SchemaEvent, WithContext } from "schema-dts";
 import { Temporal } from "temporal-polyfill";
@@ -10,8 +11,8 @@ import { jsonLd, pageHead } from "void-fbtee/head";
 import type { AppLocale } from "void-fbtee/locales";
 import { routeUrl } from "void-fbtee/routes";
 import { pickText, revalidate as clearCache, siteOrigin, textLocales } from "void-fbtee/server";
-import { sendBookingEmail } from "../../../src/events/emails";
 import { deleteKeyMatches } from "../../../src/events/delete-key";
+import { ticketKey } from "../../../src/events/tickets";
 import { eventTopic, live } from "../../../src/events/live";
 import { awaitsTranslation } from "../../../src/events/translations";
 
@@ -64,7 +65,7 @@ const book = defineHandler.withValidator({ params, body: bookSchema })(async (
   // has fewer bookings than seats. D1 runs each statement on the primary, one at a time.
   const result = await db.run(sql`
     INSERT INTO ${bookings} (id, event_id, name, email, locale, time_zone, origin)
-    SELECT ${crypto.randomUUID()}, ${id}, ${body.name}, ${body.email}, ${locale}, ${body.time_zone}, ${origin}
+    SELECT ${body.id}, ${id}, ${body.name}, ${body.email}, ${locale}, ${body.time_zone}, ${origin}
     WHERE (SELECT COUNT(*) FROM ${bookings} WHERE event_id = ${id})
         < (SELECT seats FROM ${events} WHERE id = ${id})`);
   if (!result.meta.changes) {
@@ -77,21 +78,9 @@ const book = defineHandler.withValidator({ params, body: bookSchema })(async (
   // This event's page, in every language (the list shows each event's seats, not what's left).
   await clearCache({ paths: [`/[lang]/events/${id}`] });
   await live.publish(eventTopic(id), { left }, { type: "seats" });
-  // The confirmation, in the booker's language (the one they booked in, kept with the booking),
-  // with the event's title as they read it.
-  const texts = await db
-    .select()
-    .from(event_texts)
-    .where(and(eq(event_texts.event_id, id), inArray(event_texts.locale, textLocales(locale))));
-  const text = pickText(texts, locale);
-  await sendBookingEmail(body.email, {
-    locale,
-    name: body.name,
-    title: text?.title ?? event.title,
-    titleLocale: text?.locale ?? event.locale,
-    startsAt: event.starts_at,
-    url: origin + routeUrl("/[lang]/events/[id]", { params: { id } }),
-  });
+  // The confirmation, in the booker's language, with its PDF ticket, after this answers
+  // (queues/ticket.ts): printing takes up to a second.
+  await queues.ticket.send({ bookingId: body.id });
   // No return: Void reruns the loader, so the page shows the new count.
 });
 
@@ -99,7 +88,7 @@ const book = defineHandler.withValidator({ params, body: bookSchema })(async (
  * Deleting the event, with the key from the poster's private link (src/events/delete-key.ts): first
  * everyone who booked is sent a cancellation, each in their own language with the title as they read
  * it (queues/cancel.ts, so this answers at once however many booked); then its bookings,
- * translations and itself go, together; its pages leave the cache in every language, with the list
+ * translations and itself go, together, and the bookings' PDF tickets; its pages leave the cache in every language, with the list
  * and the sitemap; pages open on it hear "deleted" (src/events/live.ts) and say it's cancelled; and
  * the browser goes to the list. A wrong key is a 403.
  */
@@ -135,6 +124,8 @@ const remove = defineHandler.withValidator({ params, body: z.object({ key: z.str
       db.delete(event_texts).where(eq(event_texts.event_id, id)),
       db.delete(events).where(eq(events.id, id)),
     ]);
+    // Their PDF tickets too: each has its booker's name on it.
+    if (booked.length) await storage.delete(booked.map((b) => ticketKey(b.id)));
     await clearCache({ paths: [`/[lang]/events/${id}`, "/[lang]/events", "/sitemap.xml"] });
     await live.publish(eventTopic(id), {}, { type: "deleted" });
     return c.redirect(routeUrl("/[lang]/events"));

@@ -56,7 +56,7 @@ test.skipIf(!!skip)(
 );
 
 test.skipIf(!!skip)(
-  "a new post is translated by Workers AI, live; booking it in Thai emails a Thai confirmation with that title",
+  "a new post is translated by Workers AI, live; booking it in Thai emails a Thai confirmation with that title and its PDF ticket",
   async () => {
     const p = await page();
     const event = await postEvent(p, {
@@ -78,6 +78,16 @@ test.skipIf(!!skip)(
     expect(mail.text).toContain("สวัสดี Somchai");
     expect(mail.html).toMatch(/<html dir="ltr" lang="th-TH">/);
     expect(mail.text).toContain(`${site}/th-TH${event.path}`);
+    // Its PDF ticket, printed by Cloudflare Browser Run through the ticket queue, attached; and the
+    // same ticket from the page's download link.
+    expect(mail.text).toContain("แนบตั๋วของคุณมาแล้ว");
+    const pdf = mail.attachments.find((a) => a.filename === "ticket.pdf");
+    expect(pdf?.mimeType).toBe("application/pdf");
+    expect(new TextDecoder().decode(pdf!.content.slice(0, 5))).toBe("%PDF-");
+    const href = await thai.getByTestId("ticket").getAttribute("href");
+    const download = await fetch(site + href);
+    expect(download.headers.get("content-type")).toBe("application/pdf");
+    expect(new Uint8Array(await download.arrayBuffer())).toEqual(pdf!.content);
   },
 );
 

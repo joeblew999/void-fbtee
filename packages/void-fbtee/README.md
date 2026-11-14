@@ -111,8 +111,8 @@ Structured data for search engines (schema.org JSON-LD) goes in a page's `head()
 ## Using it
 
 How to write translated strings, format dates and numbers in components, build typed links, give
-pages translated titles, translate in code with no page (`inLocale`), send emails in each
-recipient's language and translate markdown pages: `skills/void-fbtee/SKILL.md` in this package.
+pages translated titles, translate in code with no page (`inLocale`), send emails and print PDFs in each
+reader's language and translate markdown pages: `skills/void-fbtee/SKILL.md` in this package.
 It's written for coding agents, and `init` links it where yours finds it.
 
 Emails take nothing more from void-fbtee than a page does: `inLocale` writes one in its
@@ -120,6 +120,10 @@ recipient's language and `langAttrs` marks text in another. What's particular to
 mail apps rewrite: Gmail drops `<html>` and `<body>`, so the language and direction go on the
 content too. The SKILL's "Translated emails" lists it all; the example's Emails docs page shows its
 own emails with the code that does each.
+
+PDFs too (a ticket, an invoice): `inLocale` writes the page of HTML in its reader's language, and
+Cloudflare Browser Run prints it, so Arabic and Thai come out right with only the system's fonts.
+The SKILL's "Translated PDFs" lists what it takes; the example's PDFs docs page shows a ticket.
 
 ## Systems
 

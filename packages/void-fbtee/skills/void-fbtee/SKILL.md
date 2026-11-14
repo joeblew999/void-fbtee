@@ -173,6 +173,30 @@ translated email arrive the right way round:
 The example does each (its Emails docs page shows them, with the code: `src/events/emails.ts`,
 `src/events/EmailLayout.tsx`).
 
+### Translated PDFs
+
+A PDF (a ticket, an invoice, a receipt, a report) is server code with no page too: write it with
+`inLocale` in its reader's language, the one saved with them. Make it a page of HTML and have a
+real browser print it, Cloudflare Browser Run (`env.BROWSER.quickAction("pdf", { html })`): a
+browser joins Arabic and lays it right to left, and breaks Thai between words, which PDF libraries
+that draw text themselves get wrong. Then:
+
+- **System fonts only:** name `system-ui, sans-serif`, as the pages do. Cloudflare's Chrome has
+  fonts for Arabic, Thai and the rest, so the app ships none.
+- **`<html lang dir>`** in the reader's language, and `<bdi {...langAttrs(its locale)}>` around
+  text in another, as on a page. A written-out address gets `dir="ltr"`.
+- **Not while anyone waits:** printing takes up to a second and the free plan allows 3 browsers at
+  once, so print in a queue, with retries.
+- **Print once, keep it** (R2, through `void/storage`): browser time is the cost (10 minutes a day
+  free).
+- **Setup:** `cloudflare: { browser: { binding: "BROWSER", remote: true } }` in `void.config.ts`
+  (it runs on Cloudflare in dev too, through Void's sign-in), and a compatibility date of
+  `2026-03-24` or later for `quickAction`.
+
+The example prints each booking's ticket, attaches it to the booking's email and offers it for
+download (its PDFs docs page shows one, with the code: `src/pdf.ts`, `src/events/tickets.ts`,
+`src/events/TicketLayout.tsx`, `queues/ticket.ts`).
+
 Testing translated server code the Void way: in unit tests, Void's email harness
 (`createEmailTestHarness` from `void/email/testing`) catches each email, so its subject and text can
 be checked in each language; on the dev server, Void's inbox holds them (`/__void/inbox`, with the

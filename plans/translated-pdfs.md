@@ -1,6 +1,6 @@
 # plans/translated-pdfs.md: translated PDFs, documented by the package and shown by the example
 
-Status: approved by the user 2026-11-14.
+Status: approved by the user 2026-11-14 and done the same day (committed locally).
 
 ## Why
 
@@ -113,3 +113,28 @@ the Reference group in `DocsLayout.tsx`. The PDFs card makes eight, all linking 
   Cloudflare's compatibility-flags list for that month before changing it.
 - The free plan's 3 browsers at once: the queue's batch size will be kept small so a burst of
   bookings retries instead of failing.
+
+## As built (2026-11-14)
+
+Where it differs from the plan above:
+
+- **The booking's id comes from the form** (a random UUID the browser makes, `bookSchema`), so the
+  page knows the ticket's address the moment it's booked, with no redirect.
+- **Download at `/tickets/<id>`** (`routes/tickets/[id].ts`), not under `/api`; it prints the
+  ticket itself if the queue hasn't yet, so it always works.
+- **The docs' sample** is its own route, `/samples/ticket/<language>`, kept in R2 under a hash of its
+  HTML, so a change to the ticket's look or words prints it again.
+- **Deleting an event deletes its tickets** from R2: each has its booker's name on it.
+- **The ticket has the email's look** (the site's dark palette, through `email-theme.ts`) on an A5
+  page, rendered with React Email as the emails are (`src/events/TicketLayout.tsx`).
+- **`tsconfig.json`** now lists `.void/bindings.d.ts` with Void's other generated files, so
+  `c.env.BROWSER` is typed (its `files` replaced the list Void generates, leaving it out).
+- **The real email:** shown before deploying, the three booking emails (en, ar, th) as the app made
+  them on the dev server, their PDFs printed by the real Browser Run, were sent to the user's inbox
+  through Gmail. The live site sends its own once deployed.
+- **Every homepage card links to its own docs page:** new Strings, Markdown pages, Right to left
+  and Translating pages, with the PDFs page; the Temporal card links to the Temporal page.
+
+Tests run: `test:unit`, `test:dev` (the Thai booking's email carries the PDF, and the page's
+download link gives the same bytes), `test:preview` (every page in the lists, the PDFs page's sample
+is a PDF, an unknown ticket is a 404). All passed.

@@ -39,13 +39,14 @@ Every day:
 
 ```sh
 vp run login             # once: Void's Cloudflare sign-in, which dev and the preview need for
-                         # Workers AI (Void has no local stand-in for it)
+                         # Workers AI and Browser Run (Void has no local stand-in for them)
 vp run dev               # develop: the package rebuilds on save; the example runs with Void's
-                         # local D1, KV, queues, live updates, email inbox and Workers AI.
+                         # local D1, KV, R2, queues, live updates, email inbox, Workers AI and
+                         # Browser Run (the PDF tickets).
                          # It prints its email inbox's address when it starts
 vp check                 # format, lint, types
 vp run test:unit         # unit tests: the package's and the example's (seconds)
-vp run test:dev          # the dev-server suite: emails, queues, the cron and AI (see Testing)
+vp run test:dev          # the dev-server suite: emails, PDFs, queues, the cron and AI (see Testing)
 vp run test:preview      # the browser suite on the production build (see Testing)
 vp run deploy            # deploy the example to production (Cloudflare), with no downtime:
                          # Void uploads the new version, checks it's ready, then moves
@@ -138,6 +139,9 @@ Cloudflare's local stand-ins.
   (`vp run login`). Void marks the AI binding remote by itself only in dev, so
   `apps/example/void.config.ts` sets `ai: { binding: "AI", remote: true }` in `cloudflare`; without
   it the preview fails with "Binding AI needs to be run remotely".
+- **Browser Run (the PDF tickets) in dev and the preview:** the same, through the same sign-in:
+  `browser: { binding: "BROWSER", remote: true }` in `cloudflare`. Each print uses browser time
+  (Cloudflare's free plan: 10 minutes a day), so tickets are printed once and kept in R2.
 - **`Vary: Origin` on the preview:** Vite's local preview server adds it to any response without a
   Vary of its own (its CORS); the live site sends none. `e2e/preview/server.test.ts` leaves it out
   on the preview only.

@@ -66,16 +66,32 @@ function useLiveEvent(id: string, left: number, leaving: RefObject<boolean>) {
 
 /** Booking, in the reader's zone (Event remounts it once the browser knows it). */
 function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut: boolean }) {
+  // The booking's id, made here: its PDF ticket's address (/tickets/<id>), known to this page only.
+  const [ticket] = useState(() => crypto.randomUUID());
   const form = useForm(
     "/[lang]/events/[id]?default",
-    { name: "", email: "", time_zone: zone ?? "" },
+    { id: ticket, name: "", email: "", time_zone: zone ?? "" },
     { params: { id } },
   );
   if (form.wasSuccessful)
     return (
-      <p className="font-medium" data-testid="booked">
-        <fbt desc="Shown after booking a seat on an event">You're booked. See you there!</fbt>
-      </p>
+      <div className="space-y-3">
+        <p className="font-medium" data-testid="booked">
+          <fbt desc="Shown after booking a seat on an event">You're booked. See you there!</fbt>
+        </p>
+        <p className="text-sm text-muted-foreground">
+          <fbt desc="Shown after booking: the PDF ticket is emailed, and can be downloaded here">
+            Your ticket is on its way by email, or{" "}
+            <fbt:param name="link">
+              <a href={`/tickets/${ticket}`} className="underline" data-testid="ticket">
+                <fbt desc="Link text after booking: opens the booking's PDF ticket">
+                  download it now
+                </fbt>
+              </a>
+            </fbt:param>.
+          </fbt>
+        </p>
+      </div>
     );
   // The 409 from the action: someone else took the last seat (the live count may say so first).
   if (form.error?.status === 409)

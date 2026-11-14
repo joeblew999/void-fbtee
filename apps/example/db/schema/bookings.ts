@@ -35,8 +35,14 @@ export const bookings = sqliteTable(
   (t) => [index("bookings_event_id").on(t.event_id)],
 );
 
-/** The "book a seat" form. The page shows its own, translated, message for each field that fails. */
+/**
+ * The "book a seat" form. The page shows its own, translated, message for each field that fails.
+ * The booking's id comes from the form, a random UUID the browser made: so the page knows the
+ * booking's PDF ticket's address (/tickets/<id>) as soon as it's booked, and only it does. One
+ * that's taken already fails to go in, like any id.
+ */
 export const bookSchema = createInsertSchema(bookings, {
+  id: () => z.uuid(),
   name: (s) => s.trim().min(1).max(120),
   email: (s) => s.trim().pipe(z.email()),
   time_zone: (s) =>
@@ -47,4 +53,4 @@ export const bookSchema = createInsertSchema(bookings, {
         return false;
       }
     }),
-}).pick({ name: true, email: true, time_zone: true });
+}).pick({ id: true, name: true, email: true, time_zone: true });

@@ -165,6 +165,26 @@ function points(): Point[] {
         },
       ],
     },
+    {
+      id: "ticket",
+      title: (
+        <fbt desc="Emails page point title: the booking's PDF ticket attached to its email">
+          A PDF attached
+        </fbt>
+      ),
+      why: (
+        <fbt desc="Emails page point: the booking's confirmation carries its PDF ticket, in the same language; the PDFs page shows how">
+          A booking's confirmation carries its ticket as a PDF, in the same language. The PDFs page
+          shows how it's printed.
+        </fbt>
+      ),
+      code: [
+        {
+          file: "src/events/emails.ts",
+          line: '[{ filename: "ticket.pdf", content: booking.ticket, contentType: "application/pdf" }]',
+        },
+      ],
+    },
   ];
 }
 

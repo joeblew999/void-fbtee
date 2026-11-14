@@ -14,6 +14,7 @@ import {
   Hash,
   Languages,
   Mail,
+  FileDown,
 } from "lucide-react";
 import { Link } from "void-fbtee/react";
 import { buttonVariants } from "@/ui/button";
@@ -238,10 +239,39 @@ function features(): Feature[] {
         </fbt>,
       ],
     },
+    {
+      icon: <FileDown className={icon} aria-hidden />,
+      title: (
+        <fbt desc="Home feature title: PDFs in each reader's language">
+          PDFs in each reader's language
+        </fbt>
+      ),
+      href: routeUrl("/[lang]/docs/pdfs"),
+      facts: [
+        <fbt
+          key="1"
+          desc="Home feature fact: any document can be printed as a PDF in its reader's language"
+        >
+          Tickets, invoices, receipts: any page printed as a PDF in its reader's language.
+        </fbt>,
+        <fbt
+          key="2"
+          desc="Home feature fact: Arabic and Thai come out right in the PDFs, with only the system's fonts"
+        >
+          Arabic and Thai come out right, with only the system's fonts.
+        </fbt>,
+        <fbt
+          key="3"
+          desc="Home feature fact: the PDFs are printed by Cloudflare Browser Run, in a queue, and kept"
+        >
+          Printed by Cloudflare Browser Run in a queue, once, and kept.
+        </fbt>,
+      ],
+    },
   ];
 }
 
-/** What it does: seven features in a ruled grid, each with its facts and the docs page on it. */
+/** What it does: eight features in a ruled grid, each with its facts and the docs page on it. */
 export function Features() {
   return (
     <section className="border-t py-16">

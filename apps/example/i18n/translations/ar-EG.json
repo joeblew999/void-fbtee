@@ -3601,6 +3601,402 @@
         }
       ],
       "types": []
+    },
+    "tcesMjuZRBKKvSEpKDUFQA==": {
+      "description": "Home feature title: PDFs in each reader's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ملفات PDF بلغة كل قارئ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Hzbp3eFVRQ1uV3KOJUZ/+A==": {
+      "description": "Home feature fact: any document can be printed as a PDF in its reader's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تذاكر وفواتير وإيصالات: أي صفحة تُطبع ملف PDF بلغة قارئها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ER29Lgj+z/RySWnYjsgCOg==": {
+      "description": "Home feature fact: Arabic and Thai come out right in the PDFs, with only the system's fonts",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "العربية والتايلاندية تظهران صحيحتين، بخطوط النظام وحدها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fvMbZt5AijBxYoTAuKp2dw==": {
+      "description": "Home feature fact: the PDFs are printed by Cloudflare Browser Run, in a queue, and kept",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يطبعها Cloudflare Browser Run في طابور، مرة واحدة، وتُحفظ.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "t05E1QEqKHf3SEmbHgZnFA==": {
+      "description": "Docs page title: the page about translated PDFs",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ملفات PDF",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ygGN8B/pTj/WJdjj0BSjRQ==": {
+      "description": "Shown after booking: the PDF ticket is emailed, and can be downloaded here",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تذكرتك في طريقها إليك بالبريد الإلكتروني، أو {link}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Kt42M8d1TsS1Bo28kUlMxA==": {
+      "description": "Link text after booking: opens the booking's PDF ticket",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "نزّلها الآن",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EeZVySGgiRANJGtNpVHlmg==": {
+      "description": "Emails page point title: the booking's PDF ticket attached to its email",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ملف PDF مرفق",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "b+AXgd2hqP6enW2uqmfkGA==": {
+      "description": "Emails page point: the booking's confirmation carries its PDF ticket, in the same language; the PDFs page shows how",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يحمل تأكيد الحجز تذكرته ملفَّ PDF، باللغة نفسها. وتبيّن صفحة ملفات PDF كيف تُطبع.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "G4wHFwtEoZ4s/JjyvUTHOA==": {
+      "description": "PDFs page point title: the PDF is printed by a real browser",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يطبعها متصفح",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jR/zqH8XPjGrsIONxPENwA==": {
+      "description": "PDFs page point: a browser lays out every script right, so the PDF is a page of HTML printed by Cloudflare Browser Run",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "العربية يجب أن تتصل حروفها وتُقرأ من اليمين إلى اليسار، والتايلاندية بلا مسافات، فيجب أن تنكسر أسطرها بين الكلمات. والمتصفح يفعل ذلك كله، لذا ملف PDF صفحة HTML يطبعها Cloudflare Browser Run: متصفح Chrome على Cloudflare. أما مكتبات PDF التي ترسم النص بنفسها فتخطئ في هذا أو ذاك.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "phUD4eXIvUWURLJFOKsUsw==": {
+      "description": "PDFs page point title: only the fonts already on the machine",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "خطوط النظام وحدها",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RZVplTzV9b9hYKJPI5fwJA==": {
+      "description": "PDFs page point: the page names the system font, as the site does, and Cloudflare's Chrome has fonts for every language, so no font files are shipped",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تسمّي الصفحة خط النظام، كما يفعل الموقع كله، ومتصفح Chrome على Cloudflare فيه خطوط للعربية والتايلاندية وغيرهما، فلا يحمل التطبيق أي ملف خط.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JoYon6A5ta7YgCMJiboGgw==": {
+      "description": "PDFs page point title: the PDF is in its reader's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "بلغة القارئ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CD2yL+ezDGKMrUG6YdL7QA==": {
+      "description": "PDFs page point: the PDF is made in the language saved with the booking, with void-fbtee's inLocale, its language and direction on the page, and text in another language marked",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يُصنع ملف PDF بعيدًا عن أي صفحة: في طابور، أو عند التنزيل. فيشغّل inLocale من void-fbtee شيفرته باللغة المحفوظة مع الحجز، وتحمل الصفحة تلك اللغة واتجاهها. وعنوان الفعالية بلغة أخرى يُعلَّم بلغته، كما في الموقع.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FCeb/7Cw/YYb5NKdqoteTw==": {
+      "description": "PDFs page point title: the PDF is made after the page answers",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لا أحد ينتظر",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ajm5hBJSoW/3BWzxaQpDLA==": {
+      "description": "PDFs page point: printing takes up to a second and can fail, so booking sends a message to a queue, whose consumer prints the ticket and retries if it has to",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تستغرق الطباعة ما يصل إلى ثانية، وقد يكون المتصفح مشغولًا، لذا لا يفعل الحجز إلا إرسال معرّف الحجز إلى طابور. ويطبع مستهلكه التذكرة، حجزًا تلو الآخر، ويعيد المحاولة بعد دقيقة إن لزم.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "61ejh+VpKPuhht2UfxwsbQ==": {
+      "description": "PDFs page point title: each PDF is printed once and kept",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يُطبع مرة واحدة ويُحفظ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "olc9dfcmP+APdeBoxOXb9g==": {
+      "description": "PDFs page point: each PDF is kept in R2 under the booking's random id, which is its private address",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يُحفظ كل ملف PDF في R2، تحت معرّف الحجز، فيُطبع مرة واحدة مهما فُتح. والمعرّف عشوائي، فلا يعرف عنوان التذكرة إلا من حجز.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2bDX0Q5iuYkFXy0DlAYb/w==": {
+      "description": "PDFs page point title: the PDF is attached to the booking's email",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مرفق بالبريد الإلكتروني",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2M3NvtZ7LdvWa8A+L9rDgA==": {
+      "description": "PDFs page point: the ticket goes with the booking's confirmation email, in the same language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تُرسل التذكرة مع تأكيد الحجز، باللغة نفسها. وإن تعذّرت طباعتها في المحاولة الأخيرة، يُرسل البريد بدونها، وتُطبع التذكرة عند تنزيلها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "POI7A+ALrOLDJ3JcVUylGw==": {
+      "description": "PDFs page point title: what to set up",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الإعداد",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1ZgRTsLW3UVFnhciyWetNA==": {
+      "description": "PDFs page point: the browser binding in void.config.ts, run on Cloudflare in development too, a compatibility date from 2026-03-24, and the free plan's limits",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Browser Run ربط (binding) في void.config.ts، يعمل على Cloudflare في التطوير أيضًا، عبر تسجيل دخول Void إلى Cloudflare. ويتطلب تاريخ توافق 2026-03-24 أو بعده. وتمنح خطة Cloudflare المجانية 10 دقائق من وقت المتصفح يوميًا: نحو ألفي تذكرة.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yCF3/6M+1/izLuN7RZCVKA==": {
+      "description": "PDFs page section title: the sample PDF, printed for this page's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تذكرة مطبوعة لهذه الصفحة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "n4q/zB8B3Eo5khGR4UqI9w==": {
+      "description": "PDFs page section title: what a translated PDF needs",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ما يحتاجه ملف PDF مترجم",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mOjypCzUtIxYfveU0dOjYA==": {
+      "description": "PDFs page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يستطيع التطبيق أن يطبع أي مستند ملفَّ PDF بلغة قارئه: تذكرة، أو فاتورة، أو إيصال، أو تقرير. وهذا التطبيق يطبع تذكرة كل حجز. هذه واحدة مطبوعة بلغة هذه الصفحة، وما يتطلبه الأمر، مع الأسطر التي تقوم به.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oAs11JY3P3tux420T+l3FQ==": {
+      "description": "PDFs page: the sample is the app's own ticket, for a sample booking, printed by Browser Run in this page's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تذكرة التطبيق نفسه لحجز تجريبي، مقعد ليلى في أمسية خط عربي، يطبعها Browser Run بلغة هذه الصفحة. افتحها باللغات الأخرى من القائمة.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hMHmKUR1wg5dW9Fdm1eZvQ==": {
+      "description": "PDFs page: name of the frame that shows the sample PDF",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "التذكرة التجريبية",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "I+w03GZW5OS8fNXYCy3plQ==": {
+      "description": "PDFs page: link that opens the sample PDF on its own",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "افتح ملف PDF",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7eEV29i88ZacbFIldCU/MQ==": {
+      "description": "Booking email: the PDF ticket is attached to it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تذكرتك مرفقة.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OuoRoEp0HO+vlN/hD72vJQ==": {
+      "description": "PDF ticket: label of the name the booker gave",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الاسم",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HAQ1EvLSj1obFRk2+rqrnA==": {
+      "description": "PDF ticket: label of when the event starts, on its own clock",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يبدأ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qVki9NW0D0cT5ZXsGVuC8w==": {
+      "description": "PDF ticket: what to do with the ticket",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "أظهر هذه التذكرة عند الباب، على هاتفك أو مطبوعة.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

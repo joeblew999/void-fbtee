@@ -88,6 +88,11 @@ function sidebar(lang: Lang) {
           ),
           href: routeUrl("/[lang]/docs/emails"),
         },
+        {
+          slug: "pdfs",
+          title: <fbt desc="Docs page title: the page about translated PDFs">PDFs</fbt>,
+          href: routeUrl("/[lang]/docs/pdfs"),
+        },
       ],
     },
     {

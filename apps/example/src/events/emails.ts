@@ -18,11 +18,20 @@ import { routeUrl } from "void-fbtee/routes";
 import { inLocale } from "void-fbtee/server";
 import { emailHtml, logoAttachment } from "./EmailLayout";
 
+/** A file sent with an email: the logo, shown inside it, or a booking's PDF ticket, attached. */
+type Attachment = {
+  filename: string;
+  content: Uint8Array;
+  contentType: string;
+  contentId?: string;
+  disposition?: "inline" | "attachment";
+};
+
 export type Email = {
   subject: string;
   text: string;
   html: string;
-  attachments: (typeof logoAttachment)[];
+  attachments: Attachment[];
 };
 
 /** An event as one reader sees it: its title in their language (or as written), and its start. */
@@ -33,7 +42,7 @@ export type EventFor = {
 };
 
 /** The event's start, on the clock where it happens, written the reader's way. */
-const startsAt = (event: EventFor, locale: string) =>
+export const startsAt = (event: EventFor, locale: string) =>
   Temporal.ZonedDateTime.from(event.startsAt).toLocaleString(locale, {
     weekday: "long",
     day: "numeric",
@@ -57,6 +66,7 @@ async function written(
   event: EventFor,
   locale: string,
   dir: string,
+  attachments: Attachment[] = [],
 ): Promise<Email> {
   const last = lines.at(-1) ?? "";
   const intro = /[:：]\s*$/.test(last);
@@ -73,13 +83,16 @@ async function written(
     subject,
     text: [...lines, link].join("\n\n") + "\n",
     html,
-    attachments: [logoAttachment],
+    attachments: [logoAttachment, ...attachments],
   };
 }
 
-/** A booking's confirmation, in `locale`: the event, when it starts, and its page in that language. */
+/**
+ * A booking's confirmation, in `locale`: the event, when it starts, and its page in that language;
+ * with its PDF ticket attached when there is one (queues/ticket.ts).
+ */
 export function bookingEmail(
-  booking: EventFor & { locale: AppLocale; name: string; url: string },
+  booking: EventFor & { locale: AppLocale; name: string; url: string; ticket?: Uint8Array },
 ): Promise<Email> {
   return inLocale(booking.locale, ({ locale, dir }) => {
     const lines = [
@@ -97,13 +110,19 @@ export function bookingEmail(
         ],
         "Booking email: the event, and when it starts on the clock where it happens",
       ),
+      ...(booking.ticket
+        ? [fbs("Your ticket is attached.", "Booking email: the PDF ticket is attached to it")]
+        : []),
       fbs("The event's page:", "Booking email: before the link to the event's page"),
     ];
     const subject = fbs(
       ["Your seat at ", fbs.param("event", booking.title)],
       "Booking email subject: a seat is booked at this event",
     );
-    return written(subject, lines, booking.url, booking, locale, dir);
+    const ticket: Attachment[] = booking.ticket
+      ? [{ filename: "ticket.pdf", content: booking.ticket, contentType: "application/pdf" }]
+      : [];
+    return written(subject, lines, booking.url, booking, locale, dir, ticket);
   });
 }
 

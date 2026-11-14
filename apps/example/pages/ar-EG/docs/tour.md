@@ -14,7 +14,7 @@ for (const el of document.querySelectorAll("[data-your-zone]")) {
 title: جولة
 description: انشر فعالية، احجز مقعدًا، وشاهد كل موعد بتوقيت مكان الفعالية وبتوقيتك.
 updated: "2026-11-14"
-translatedFrom: "efbaa12ffbd6"
+translatedFrom: "379ae94ae71a"
 ---
 
 # فعاليات تعرف كم الساعة عندك
@@ -144,6 +144,9 @@ const email = await inLocale(booking.locale, ({ locale, dir }) =>
 
 تعرض [صفحة رسائل البريد](./emails) اثنتين منها، بلغة هذه الصفحة، وما يلزم كي تصل كل منها في الاتجاه
 الصحيح، بما في ذلك من اليمين إلى اليسار في Gmail.
+
+تصل تذكرتك مع التأكيد ملفَّ PDF، باللغة نفسها، ويمكنك تنزيلها من صفحة الفعالية بعد أن تحجز. وتعرض
+[صفحة ملفات PDF](./pdfs) واحدة مطبوعة بلغة هذه الصفحة، وكيف تُطبع.
 
 ## منسّق لك {#formatted}
 

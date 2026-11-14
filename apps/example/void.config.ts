@@ -90,9 +90,15 @@ export default defineConfig({
     name: "void-fbtee-example",
     account_id: "7384af54e33b8a54ff240371ea368440",
     ai: { binding: "AI", remote: true },
+    // Cloudflare Browser Run (headless Chrome), which prints the PDFs (src/pdf.ts). It has no local
+    // stand-in either, so it's remote in dev and the preview too, through the same sign-in.
+    browser: { binding: "BROWSER", remote: true },
   },
   worker: {
-    compatibility_date: "2026-02-24",
+    // 2026-03-24 or later for Browser Run's quickAction (src/pdf.ts). What it changed since
+    // 2026-02-24 (Cloudflare's compatibility-flags list, checked 2026-11-14): Node.js module stubs
+    // under nodejs_compat, and WebSocket's default binaryType; this app uses neither.
+    compatibility_date: "2026-03-24",
     // Native Temporal in the worker (Cloudflare's `temporal` flag; default for dates from 2026-12-01).
     compatibility_flags: ["temporal"],
   },

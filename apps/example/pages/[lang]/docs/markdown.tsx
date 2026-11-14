@@ -43,7 +43,12 @@ function points(): Point[] {
           changes, void-fbtee check reports the copy as out of date, as the column above would show.
         </fbt>
       ),
-      code: [{ file: "pages/ar-EG/docs/tour.md", line: 'translatedFrom: "efbaa12ffbd6"' }],
+      code: [
+        {
+          file: "packages/void-fbtee/src/check.ts",
+          line: 'export const TRANSLATED_FROM = "translatedFrom";',
+        },
+      ],
     },
     {
       id: "values",

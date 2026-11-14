@@ -3305,6 +3305,402 @@
         }
       ],
       "types": []
+    },
+    "tcesMjuZRBKKvSEpKDUFQA==": {
+      "description": "Home feature title: PDFs in each reader's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "PDF ในภาษาของผู้อ่านแต่ละคน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Hzbp3eFVRQ1uV3KOJUZ/+A==": {
+      "description": "Home feature fact: any document can be printed as a PDF in its reader's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ตั๋ว ใบแจ้งหนี้ ใบเสร็จ: หน้าใดก็พิมพ์เป็น PDF ในภาษาของผู้อ่านได้",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ER29Lgj+z/RySWnYjsgCOg==": {
+      "description": "Home feature fact: Arabic and Thai come out right in the PDFs, with only the system's fonts",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ภาษาอาหรับและภาษาไทยออกมาถูกต้อง ด้วยฟอนต์ของระบบเท่านั้น",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fvMbZt5AijBxYoTAuKp2dw==": {
+      "description": "Home feature fact: the PDFs are printed by Cloudflare Browser Run, in a queue, and kept",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "พิมพ์โดย Cloudflare Browser Run ในคิว ครั้งเดียว แล้วเก็บไว้",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "t05E1QEqKHf3SEmbHgZnFA==": {
+      "description": "Docs page title: the page about translated PDFs",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "PDF",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ygGN8B/pTj/WJdjj0BSjRQ==": {
+      "description": "Shown after booking: the PDF ticket is emailed, and can be downloaded here",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ตั๋วของคุณกำลังส่งไปทางอีเมล หรือ{link}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Kt42M8d1TsS1Bo28kUlMxA==": {
+      "description": "Link text after booking: opens the booking's PDF ticket",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ดาวน์โหลดตอนนี้",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EeZVySGgiRANJGtNpVHlmg==": {
+      "description": "Emails page point title: the booking's PDF ticket attached to its email",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แนบ PDF",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "b+AXgd2hqP6enW2uqmfkGA==": {
+      "description": "Emails page point: the booking's confirmation carries its PDF ticket, in the same language; the PDFs page shows how",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "อีเมลยืนยันการจองแนบตั๋วเป็น PDF ในภาษาเดียวกัน หน้า PDF แสดงว่าพิมพ์อย่างไร",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "G4wHFwtEoZ4s/JjyvUTHOA==": {
+      "description": "PDFs page point title: the PDF is printed by a real browser",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "พิมพ์โดยเบราว์เซอร์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jR/zqH8XPjGrsIONxPENwA==": {
+      "description": "PDFs page point: a browser lays out every script right, so the PDF is a page of HTML printed by Cloudflare Browser Run",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ภาษาอาหรับต้องเชื่อมตัวอักษรและอ่านจากขวาไปซ้าย ภาษาไทยไม่มีช่องว่าง จึงต้องตัดบรรทัดระหว่างคำ เบราว์เซอร์ทำได้ทั้งหมด PDF จึงเป็นหน้า HTML ที่พิมพ์โดย Cloudflare Browser Run คือ Chrome บน Cloudflare ไลบรารี PDF ที่วาดข้อความเองมักผิดอย่างใดอย่างหนึ่ง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "phUD4eXIvUWURLJFOKsUsw==": {
+      "description": "PDFs page point title: only the fonts already on the machine",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ฟอนต์ของระบบเท่านั้น",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RZVplTzV9b9hYKJPI5fwJA==": {
+      "description": "PDFs page point: the page names the system font, as the site does, and Cloudflare's Chrome has fonts for every language, so no font files are shipped",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หน้านี้ระบุฟอนต์ของระบบ เหมือนทั้งเว็บไซต์ และ Chrome บน Cloudflare มีฟอนต์สำหรับภาษาอาหรับ ภาษาไทย และภาษาอื่น ๆ แอปจึงไม่ต้องมีไฟล์ฟอนต์เลย",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JoYon6A5ta7YgCMJiboGgw==": {
+      "description": "PDFs page point title: the PDF is in its reader's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ในภาษาของผู้อ่าน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CD2yL+ezDGKMrUG6YdL7QA==": {
+      "description": "PDFs page point: the PDF is made in the language saved with the booking, with void-fbtee's inLocale, its language and direction on the page, and text in another language marked",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "PDF สร้างขึ้นนอกหน้าเว็บ: ในคิว หรือตอนดาวน์โหลด inLocale ของ void-fbtee รันโค้ดในภาษาที่บันทึกไว้กับการจอง และหน้านั้นระบุภาษาและทิศทางนั้น ชื่ออีเวนต์ในภาษาอื่นระบุภาษาของตัวเอง เหมือนบนเว็บไซต์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FCeb/7Cw/YYb5NKdqoteTw==": {
+      "description": "PDFs page point title: the PDF is made after the page answers",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ไม่มีใครต้องรอ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ajm5hBJSoW/3BWzxaQpDLA==": {
+      "description": "PDFs page point: printing takes up to a second and can fail, so booking sends a message to a queue, whose consumer prints the ticket and retries if it has to",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "การพิมพ์ใช้เวลาถึงหนึ่งวินาที และเบราว์เซอร์อาจไม่ว่าง การจองจึงแค่ส่ง id ของการจองเข้าคิว ตัวรับของคิวพิมพ์ตั๋วทีละการจอง และลองใหม่ในอีกหนึ่งนาทีถ้าจำเป็น",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "61ejh+VpKPuhht2UfxwsbQ==": {
+      "description": "PDFs page point title: each PDF is printed once and kept",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "พิมพ์ครั้งเดียว แล้วเก็บไว้",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "olc9dfcmP+APdeBoxOXb9g==": {
+      "description": "PDFs page point: each PDF is kept in R2 under the booking's random id, which is its private address",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "PDF แต่ละไฟล์เก็บไว้ใน R2 ใต้ id ของการจอง จึงพิมพ์ครั้งเดียวไม่ว่าจะเปิดกี่ครั้ง id เป็นค่าสุ่ม ที่อยู่ของตั๋วจึงรู้เฉพาะผู้ที่จอง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2bDX0Q5iuYkFXy0DlAYb/w==": {
+      "description": "PDFs page point title: the PDF is attached to the booking's email",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แนบไปกับอีเมล",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2M3NvtZ7LdvWa8A+L9rDgA==": {
+      "description": "PDFs page point: the ticket goes with the booking's confirmation email, in the same language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ตั๋วส่งไปพร้อมอีเมลยืนยันการจอง ในภาษาเดียวกัน ถ้ายังพิมพ์ไม่ได้ในครั้งสุดท้าย อีเมลจะส่งไปโดยไม่มีตั๋ว และตั๋วจะพิมพ์ตอนดาวน์โหลด",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "POI7A+ALrOLDJ3JcVUylGw==": {
+      "description": "PDFs page point title: what to set up",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "การตั้งค่า",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1ZgRTsLW3UVFnhciyWetNA==": {
+      "description": "PDFs page point: the browser binding in void.config.ts, run on Cloudflare in development too, a compatibility date from 2026-03-24, and the free plan's limits",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Browser Run เป็น binding ใน void.config.ts ทำงานบน Cloudflare ตอนพัฒนาด้วย ผ่านการลงชื่อเข้า Cloudflare ของ Void ต้องใช้ compatibility date ตั้งแต่ 2026-03-24 แพ็กเกจฟรีของ Cloudflare ให้เวลาเบราว์เซอร์ 10 นาทีต่อวัน ประมาณสองพันใบ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yCF3/6M+1/izLuN7RZCVKA==": {
+      "description": "PDFs page section title: the sample PDF, printed for this page's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ตั๋วที่พิมพ์สำหรับหน้านี้",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "n4q/zB8B3Eo5khGR4UqI9w==": {
+      "description": "PDFs page section title: what a translated PDF needs",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สิ่งที่ PDF ที่แปลแล้วต้องมี",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mOjypCzUtIxYfveU0dOjYA==": {
+      "description": "PDFs page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แอปพิมพ์เอกสารใดก็ได้เป็น PDF ในภาษาของผู้อ่าน: ตั๋ว ใบแจ้งหนี้ ใบเสร็จ รายงาน แอปนี้พิมพ์ตั๋วของการจองแต่ละครั้ง นี่คือหนึ่งใบ พิมพ์ในภาษาของหน้านี้ และสิ่งที่ต้องทำ พร้อมบรรทัดโค้ดที่ทำงานนั้น",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oAs11JY3P3tux420T+l3FQ==": {
+      "description": "PDFs page: the sample is the app's own ticket, for a sample booking, printed by Browser Run in this page's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ตั๋วจากโค้ดของแอปเองสำหรับการจองตัวอย่าง ที่นั่งของ Laila ในค่ำคืนการเขียนอักษรอาหรับ พิมพ์โดย Browser Run ในภาษาของหน้านี้ เปิดในภาษาอื่นได้จากเมนู",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hMHmKUR1wg5dW9Fdm1eZvQ==": {
+      "description": "PDFs page: name of the frame that shows the sample PDF",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ตั๋วตัวอย่าง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "I+w03GZW5OS8fNXYCy3plQ==": {
+      "description": "PDFs page: link that opens the sample PDF on its own",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เปิด PDF",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7eEV29i88ZacbFIldCU/MQ==": {
+      "description": "Booking email: the PDF ticket is attached to it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แนบตั๋วของคุณมาแล้ว",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OuoRoEp0HO+vlN/hD72vJQ==": {
+      "description": "PDF ticket: label of the name the booker gave",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ชื่อ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HAQ1EvLSj1obFRk2+rqrnA==": {
+      "description": "PDF ticket: label of when the event starts, on its own clock",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เริ่ม",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qVki9NW0D0cT5ZXsGVuC8w==": {
+      "description": "PDF ticket: what to do with the ticket",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แสดงตั๋วนี้ที่ทางเข้า บนโทรศัพท์หรือพิมพ์ออกมา",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

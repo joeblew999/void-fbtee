@@ -154,6 +154,10 @@ const email = await inLocale(booking.locale, ({ locale, dir }) =>
 The [Emails page](./emails) shows two of them, in this page's language, and what it takes for each
 to arrive the right way round, right to left in Gmail included.
 
+Your ticket comes with the confirmation as a PDF, in the same language, and you can download it
+from the event's page once you've booked. The [PDFs page](./pdfs) shows one, printed for this page's
+language, and how.
+
 ## Formatted for you {#formatted}
 
 Each value below is a `<Fmt>` island (`src/docs/Fmt.tsx`), so it's formatted for you, in

@@ -174,7 +174,14 @@ const hook = (path: string, init: { method?: string; body?: string } = {}) =>
   });
 
 /** An email from Void's dev inbox, as postal-mime (Void's own parser) reads it. */
-export type Mail = { to: string[]; subject: string; text: string; html: string };
+export type Mail = {
+  to: string[];
+  subject: string;
+  text: string;
+  html: string;
+  /** What it carries: the logo shown inside it, a PDF attached. */
+  attachments: { filename: string; mimeType: string; content: Uint8Array }[];
+};
 
 /**
  * The emails Void's dev inbox holds for `to`, newest first. The inbox's page links each message;
@@ -192,6 +199,13 @@ export async function emailsTo(to: string): Promise<Mail[]> {
       subject: email.subject ?? "",
       text: email.text ?? "",
       html: email.html ?? "",
+      attachments: email.attachments.map((a) => ({
+        filename: a.filename ?? "",
+        mimeType: a.mimeType,
+        content: new Uint8Array(
+          typeof a.content === "string" ? new TextEncoder().encode(a.content) : a.content,
+        ),
+      })),
     };
     if (mail.to.includes(to)) mails.push(mail);
   }
