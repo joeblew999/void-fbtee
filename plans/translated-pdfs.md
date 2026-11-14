@@ -1,6 +1,6 @@
 # plans/translated-pdfs.md: translated PDFs, documented by the package and shown by the example
 
-Status: proposed 2026-11-14, waiting for the user's OK.
+Status: approved by the user 2026-11-14.
 
 ## Why
 
@@ -76,6 +76,23 @@ look like one thing.
 - **Tour (`tour.md` en/ar/th):** a short PDFs section after emails.
 - **README and SKILL:** the setup and the limits above.
 - **The emails docs page** says the booking email carries the PDF.
+
+## Every homepage card links to a docs page on this site
+
+Approved 2026-11-14 with this plan. Today five of the seven cards in `src/home/HomeSections.tsx`
+`features()` don't link to a page of their own on this site:
+
+| Card                              | Links to now                       | Becomes                              |
+| --------------------------------- | ---------------------------------- | ------------------------------------ |
+| Strings, by fbtee                 | SKILL on GitHub, `#strings`        | new `/[lang]/docs/strings`           |
+| Dates and times, by Temporal      | `/docs/tour`                       | the existing `/[lang]/docs/temporal` |
+| Markdown pages, translated        | SKILL on GitHub, `#markdown-pages` | new `/[lang]/docs/markdown`          |
+| Translated by AI, checked by you  | SKILL on GitHub (top)              | new `/[lang]/docs/translating`       |
+| Every language, right to left too | SKILL on GitHub, `#strings`        | new `/[lang]/docs/right-to-left`     |
+
+Each new page is built like the Intl, Temporal and Emails pages: what it does, shown working on
+this site, with the real code lines, and a link on to the SKILL for the full reference. They join
+the Reference group in `DocsLayout.tsx`. The PDFs card makes eight, all linking to this site.
 
 ## Email with a PDF, shown for real
 
