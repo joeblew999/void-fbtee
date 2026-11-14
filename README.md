@@ -34,8 +34,10 @@ On GitHub, CI deploys, Void's way (Void's `guide/deployment.md`, "Deploy from Gi
 repository secret `CLOUDFLARE_API_TOKEN`; Void's `integrations/cloudflare.md` ("Deploying from CI")
 lists what it needs: Workers Scripts, and the products Void makes (here D1, KV, R2 and Queues). To make one, once:
 
-1. Open the token form with the permissions already ticked (Void's own way of linking to it):
-   [Create the deploy token](https://dash.cloudflare.com/profile/api-tokens?permissionGroupKeys=%5B%7B%22key%22%3A%22account_settings%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_scripts%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22workers_kv_storage%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22workers_r2%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22d1%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22queues%22%2C%22type%22%3A%22edit%22%7D%5D&name=void-fbtee+deploy+from+GitHub). Then Continue to summary → Create Token, and copy
+1. Open the form for an account-owned token (it belongs to the Cloudflare account, not a person)
+   with the permissions already ticked (Cloudflare's "API token template URLs" page, checked
+   2026-11-14):
+   [Create the deploy token](https://dash.cloudflare.com/?to=/:account/api-tokens&permissionGroupKeys=%5B%7B%22key%22%3A%22account_settings%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_scripts%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22workers_kv_storage%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22workers_r2%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22d1%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22queues%22%2C%22type%22%3A%22edit%22%7D%5D&name=void-fbtee%20deploy%20from%20GitHub). Then Continue to summary → Create Token, and copy
    it.
 2. Store it in GitHub, pasting the token when asked:
 
