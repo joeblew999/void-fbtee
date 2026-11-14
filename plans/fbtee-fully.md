@@ -192,9 +192,11 @@ All ten steps are built. What each is checked by:
 
 1. The skill: "A finished entry" (fbtee's steps again) became "Gender", the part that's
    void-fbtee's; `<InLanguage>`, the pieces and why fbtee's language switching stays out are in it.
-   The package README lists which fbtee piece does what. The real `void-fbtee translate` run is
-   still to do: in this cloud session a second `claude -p` can't sign in, so translate hands the
-   prompt to the session itself; on the Mac it runs Claude Code.
+   The package README lists which fbtee piece does what. A real `void-fbtee translate` run
+   (2026-11-14, in this Claude Code session, which is what translate does inside Claude Code): a
+   new string and a new markdown page, both translated into Thai and Arabic by the skill, the pages
+   stamped, `void-fbtee check` all good, both pages served in dev; then the original edited and
+   check reported both copies out of date. The trial was removed after.
 2. `onMissingTranslation`: a unit test (`runtime.test.ts`), two requests in German log one line for
    the one missing string. Done as a unit test, not the preview test planned, since it's the same
    `runWithFbtee` the server calls.
