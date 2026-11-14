@@ -34,10 +34,9 @@ On GitHub, CI deploys, Void's way (Void's `guide/deployment.md`, "Deploy from Gi
 repository secret `CLOUDFLARE_API_TOKEN`; Void's `integrations/cloudflare.md` ("Deploying from CI")
 lists what it needs: Workers Scripts, and the products Void makes (here D1, KV, R2 and Queues). To make one, once:
 
-1. Open the form for an account-owned token (it belongs to the Cloudflare account, not a person)
-   with the permissions already ticked (Cloudflare's "API token template URLs" page, checked
-   2026-11-14):
-   [Create the deploy token](https://dash.cloudflare.com/?to=/:account/api-tokens&permissionGroupKeys=%5B%7B%22key%22%3A%22account_settings%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_scripts%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22workers_kv_storage%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22workers_r2%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22d1%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22queues%22%2C%22type%22%3A%22edit%22%7D%5D&name=void-fbtee%20deploy%20from%20GitHub). Then Continue to summary → Create Token, and copy
+1. Open Cloudflare's form for an account token with the permissions already ticked, the link built
+   the way Void builds its own token links (`void/dist/platform-setup-*.mjs`, Void 1.8.0):
+   [Create the deploy token](https://dash.cloudflare.com/?to=%2F7384af54e33b8a54ff240371ea368440%2Fapi-tokens&name=void-fbtee-example+Deploy&permissionGroupKeys=%5B%7B%22key%22%3A%22account_settings%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_scripts%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22workers_kv_storage%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22workers_r2%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22d1%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22queues%22%2C%22type%22%3A%22edit%22%7D%5D). Then Continue to summary → Create Token, and copy
    it.
 2. Store it in GitHub, pasting the token when asked:
 
