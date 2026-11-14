@@ -39,16 +39,59 @@ Not used yet, and wanted:
 - **Gender:** fbtee's viewer gender and `<fbt:pronoun>`. Arabic, for one, words "you booked"
   differently for a man and a woman. `Reader` gets an optional gender, used only when the person
   gives it, never guessed, for emails and tickets that address them.
-- **Missing translations at run time:** `onMissingTranslation`, so a string missing in production
-  is logged once, beside the build-time report the plugin already gives.
+- **Missing translations at run time:** `onMissingTranslation`. Already used, but only in the browser
+  and only in dev (`packages/void-fbtee/src/install.ts`: "Dev only: name each string this page shows
+  untranslated"). Not in production, and not on the server (`runWithFbtee`).
 - **Its locale matching:** which of the app's languages fits a person's list ("Locale Matching and
   Fallback" in fbtee's README). `plans/their-own-language.md` uses it to send each visitor to their
   own language. It's not exported yet, so void-fbtee carries fbtee's code for it unchanged, tested
   to agree with fbtee's public `setupLocaleContext`, until fbtee exports `negotiateLocale` (the
   issue drafted in that plan).
-- **Its translate skill** (`node_modules/fbtee/skills/fbtee-translate/SKILL.md`). It does what
-  `void-fbtee translate` asks Claude Code to do. Check whether ours repeats it, and if it does, use
-  theirs.
+- **Its translate skill** (`node_modules/fbtee/skills/fbtee-translate/SKILL.md`). Ours already
+  hands the translating to it ("Follow its steps 3 to 5", `skills/void-fbtee/SKILL.md`, "Strings").
+  What's left to tidy is in "Answers" below.
+
+## Answers to the open questions (checked 2026-11-14, before writing the code)
+
+Each was run, not read. fbtee 6.0.0, its compiler and React 19, from this repo's `node_modules`.
+The throwaway scripts are in `apps/example/.vitest/proof/` (git-ignored).
+
+1. **An app written in Arabic can have all six plural forms, but only with a catalog for its own
+   language.**
+   - With no catalog, fbtee uses the inline text, which has two forms: the text, and `many`. Arabic
+     then reads `حجزت ٢ ليالٍ`, `حجزت ١١ ليالٍ` and `حجزت ١٠٠ ليالٍ`, all with the same word, which is
+     wrong grammar for 2, 11 and 100.
+   - Given an `ar-EG` catalog for the source language, with void-fbtee's plural lines added, fbtee
+     picked each form: zero, exactly one, two, few, many and other. So a source catalog works,
+     and fbtee reads it ("then the source locale's catalog if supplied", its README).
+   - Today void-fbtee makes catalogs only for the translated languages, and its skill says "The
+     source locale has no catalog". So `prepare` will also make one for the source language when that
+     language has more plural forms than the inline two (`Intl.PluralRules(locale)
+     .resolvedOptions().pluralCategories`), with the plural strings only. The skill says so.
+   - **A small thing seen on the way:** in the inline text, the "exactly one" form writes a Latin
+     `1` (`حجزت 1 ليلة`), where the other counts come out in Arabic digits (`٢`). A source catalog
+     avoids it, as the translated catalogs do: the live Arabic Strings page reads `حجزت ليلة واحدة`.
+     It goes to fbtee as a note in the issue drafted in `plans/their-own-language.md`.
+2. **`onMissingTranslation` works per request on the server.** Inside `runWithFbtee` it reported a
+   Thai request's two missing messages once each, though one was asked for twice. So it's set on the
+   server too, and in production, logged once per language and message.
+3. **Scoped runtimes work in a server render.** An English request rendering a Thai `LocaleProvider`
+   gave `<div>You booked | <span>คุณจองแล้ว</span></div>`. So:
+   - on pages rendered on the server, and on markdown pages and static layouts, `<InLanguage>`
+     works as it is;
+   - in a hydrated component (an island, a page), the runtime has to be made again in the browser,
+     because the runtime object carries functions, and fbtee's README says to "pass locale and
+     translation data across that boundary". So `<InLanguage locale>` takes only the locale, and
+     loads that language's catalog itself, the same way on the server and in the browser.
+4. **The translate skill.**
+   - Ours already gives the translating to fbtee's skill (its steps 3–5).
+   - Its steps 1, 2 and 6 (collect, prepare, compile) are replaced on purpose by `void-fbtee prepare`
+     and the plugin: they add the plural lines and fbtee's built-in strings, and fbtee's own
+     prepare doesn't.
+   - What repeats fbtee: "A finished entry" (keep placeholders, the status) restates fbtee's steps 4
+     and 5, so it gets cut down to what's ours.
+   - The status wording isn't a conflict: fbtee says remove `"status": "new"`, ours says set
+     `"translated"`, and both mark the entry done for fbtee's compiler and for `void-fbtee check`.
 
 ## What changes, in order
 
@@ -62,10 +105,12 @@ used.
    - Where ours repeats fbtee's steps (matching existing terminology and tone, keeping placeholders,
      plural and gender variants, only removing `"status": "new"` when an entry is whole), point at
      fbtee's skill instead. Keep only what's Void's: markdown pages, `translatedFrom`, the checks.
-2. **`onMissingTranslation`:** set by void-fbtee's runtime config (`packages/void-fbtee/src/runtime.ts`),
-   so a string missing in production is logged once per language, on the Worker and in the browser.
+2. **`onMissingTranslation`:** extended from dev in the browser to production, and to the server
+   (`runWithFbtee` in `packages/void-fbtee/src/middleware.ts` and `server.ts`), logged once per
+   language and message (answer 2).
 3. **Scoped runtimes:** a void-fbtee wrapper, `<InLanguage locale>`, around fbtee's
-   `createFbteeRuntime` and `LocaleProvider`, with the app's catalogs. It shows part of a page in
+   `createFbteeRuntime` and `LocaleProvider`. It takes only the locale and loads that language's
+   catalog itself, on the server and in the browser (answer 3). It shows part of a page in
    another language. The use-cases rows and `void-moq`'s captions use it, and it replaces the plain
    `<bdi lang dir>` wrapper planned in `plans/primitives.md`, item 8.
 4. **`<fbt:list>`:** a list inside a translated sentence.
@@ -79,6 +124,8 @@ three languages, so the later plans use them as they're meant. Then the skill an
 fbtee piece does what, without repeating fbtee.
 
 ## A source language other than English
+
+(Answer 1 above settles the Arabic question: a catalog for the source language. It's built here.)
 
 void-fbtee doesn't require English. The source language is a setting: `voidFbtee({ sourceLocale })`,
 and `void-fbtee init --source-locale`, whose default is `en-US`. That's also fbtee's own:
