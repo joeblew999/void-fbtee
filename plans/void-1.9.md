@@ -1,11 +1,13 @@
 # plans/void-1.9.md: Void 1.8.0 to 1.9.1, before building more on 1.8.0
 
-Status: proposed 2026-11-14, waiting for the user's OK. Its place in the order: `plans/README.md`.
+Status: proposed 2026-11-14, waiting for the user's OK. Can't start before 2026-11-15 03:27 UTC: pnpm
+installs a release only once it's 24 hours old (it held back react-email 6.11.12 the same way on
+2026-11-13), and 1.9.1 was published 2026-11-14 03:27 UTC. Its place in the order: `plans/README.md`.
 Moved here from `plans/quiet-harbor-atlas.md`, "Still open".
 
-## Why first
+## Why before the language plan
 
-Everything in the other plans is built on Void. Void 1.9.0 came out on 2026-11-14 at 00:11 UTC and
+The language plan and everything after it are built on Void's routing, middleware and pages. Void 1.9.0 came out on 2026-11-14 at 00:11 UTC and
 1.9.1 at 03:27 (`npm view void time`), and the repo is on 1.8.0. Upgrading after building would
 mean checking all of it twice.
 
