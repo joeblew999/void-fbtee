@@ -4,14 +4,18 @@
     "W2S4HeMOJcq2xOy3+nXfaw==": {
       "description": "Text rendered from deferred loader data",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
           "translation": "ภายหลัง: เหลืออีก {number} คืน",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "HEbq6lwochMG+bINu8ib4w==": {
       "description": "Text rendered from deferred loader data",
@@ -28,14 +32,18 @@
     "d20AdENCUCFEupNI3bkyqg==": {
       "description": "How many nights are booked",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
           "translation": "คุณจองไว้ {number} คืน",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "firIdTpNp5HR3/x49jpnZA==": {
       "description": "How many nights are booked",
@@ -52,26 +60,34 @@
     "IYUmtYxQtGdt1MucjXrsVA==": {
       "description": "Label with meaning 'at least number'",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
           "translation": "{number}+",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "ZIF1WhVQwt7WZJvFTEbMWw==": {
       "description": "Label with meaning 'less than number'",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
           "translation": "<{number}",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "Oc/9PrbjfyLHS60BXceD1A==": {
       "description": "A list of items of various types, for example: \"San Francisco; London; Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",
@@ -220,14 +236,18 @@
     "FbSCJUsAz2v5ZsAnATiLFw==": {
       "description": "How many rows the browser formatted exactly as the Worker did",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "total"
+      ],
       "translations": [
         {
           "translation": "{same} จาก {total} แถวตรงกันในเบราว์เซอร์ของคุณ",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "jFQA2JEUnikrWL/p4Txfag==": {
       "description": "Page fact: the page's language",
@@ -640,14 +660,18 @@
     "z0y3w4ix7fjn6Gfpky7afQ==": {
       "description": "How many seats an event has left",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
           "translation": "เหลือ {number} ที่นั่ง",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "vEMyyfPJPzzmHW8XeXGuyQ==": {
       "description": "How many seats an event has left",
@@ -1216,14 +1240,18 @@
     "uf52IScFDECmh/bEfLha4Q==": {
       "description": "How many Temporal rows the browser's own Temporal got the same as the Worker",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "total"
+      ],
       "translations": [
         {
           "translation": "Temporal ของเบราว์เซอร์คุณเอง: เหมือนกัน {same} จาก {total}",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "2xLRymCBC6CIAHj3ozPOjw==": {
       "description": "The visitor's browser has no Temporal of its own",
@@ -1240,14 +1268,18 @@
     "tI0QvUJqhhk8IJMdGyOetg==": {
       "description": "How many Temporal rows the polyfill in the browser got the same as the Worker",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "total"
+      ],
       "translations": [
         {
           "translation": "polyfill ในเบราว์เซอร์ของคุณ: เหมือนกัน {same} จาก {total}",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "9ScYgwZCVdYOiiihIPP1+w==": {
       "description": "Temporal table column: the result with the browser's own Temporal",
@@ -1468,14 +1500,18 @@
     "gi0X6ltCIDT8dCC+9MsHYA==": {
       "description": "A number of nights, on the Intl page",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "number"
+      ],
       "translations": [
         {
           "translation": "{number} คืน",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "dnovwbPDT9HPYhWQC5XDMQ==": {
       "description": "A number of nights, on the Intl page",
@@ -1660,14 +1696,18 @@
     "4Kbft/ENivNWEOtkOOYDbg==": {
       "description": "How many Temporal rows the polyfill on the Worker got the same as Cloudflare's own Temporal",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "total"
+      ],
       "translations": [
         {
           "translation": "polyfill บน Worker: เหมือนกัน {same} จาก {total}",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [
+        28
+      ]
     },
     "mTDc+BXpwQqqK+pea+yfZw==": {
       "description": "Temporal page: which Temporal runs where",
@@ -2312,6 +2352,259 @@
       "translations": [
         {
           "translation": "แจ้งเตือน: {event}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GVbiJcLUe1A8lpRge3QmCA==": {
+      "description": "Home feature title: emails in each recipient's language",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "อีเมลในภาษาของแต่ละคน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ss4LuZVei4N8hhIIB0S6bA==": {
+      "description": "Home feature fact: an email is in its recipient's language, not in the language of whoever caused it",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แต่ละคนได้รับอีเมลในภาษาของตัวเอง ไม่ว่าใครจะเป็นผู้ทำให้เกิดขึ้น",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3sZg3WlaLSRBo7kLn7d7mA==": {
+      "description": "Home feature fact: Arabic emails read right to left in Gmail",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ภาษาอาหรับอ่านจากขวาไปซ้ายใน Gmail ด้วย",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "I7GpuvCileib7mw8B2Owug==": {
+      "description": "Home feature fact: in development, Void's inbox catches the emails, so tests can read them",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ระหว่างพัฒนา กล่องจดหมายของ Void จะเก็บอีเมลไว้ ให้การทดสอบอ่านได้",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3/+8ub8oqHil6VMBPJd1JA==": {
+      "description": "Docs page title: the page about the app's translated emails",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "อีเมล",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jJjvqoh018tEoo4gkf8QVw==": {
+      "description": "Emails page: shows the plain-text version sent with an email",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ฉบับข้อความล้วนที่ส่งไปด้วย",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xNW9wwR0nMAWXutG4Tcc3g==": {
+      "description": "Emails page point title: the email is in the recipient's language",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ในภาษาของผู้รับ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NbUYQUVMcLiFwzEP1fUvYw==": {
+      "description": "Emails page point: void-fbtee's inLocale writes the email in the language saved with the booking",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "อีเมลถูกส่งจากแอ็กชัน คิว หรืองานตามกำหนดเวลา และหลายครั้งเกิดจากคนอื่น: การยกเลิกจะส่งถึงทุกคนที่จองไว้ แต่ละคนในภาษาของตัวเอง ภาษาถูกบันทึกไว้กับการจอง และ inLocale ของ void-fbtee จะรันโค้ดของอีเมลในภาษานั้น รวมทั้งข้อความ fbs และวันที่",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vd3MEl3yHHdMTTC1zRRUSQ==": {
+      "description": "Emails page point title: the language and direction go on the email's content",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ภาษาและทิศทางบนเนื้อหา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5Z2K5VtQbounK5TVY55rXA==": {
+      "description": "Emails page point: Gmail drops the html element, so lang and dir also go on the content's box",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gmail ตัดอิลิเมนต์ html, head และ body ของอีเมลทิ้งแล้วเก็บเฉพาะสิ่งที่อยู่ข้างใน อีเมลภาษาอาหรับที่ระบุว่าอ่านจากขวาไปซ้ายไว้แค่ที่ html จึงแสดงจากซ้ายไปขวา กล่องเนื้อหาจึงต้องระบุไว้เองด้วย",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DoUYz5xll+gSdsN5kpJLKg==": {
+      "description": "Emails page point title: the email builder's defaults",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ค่าเริ่มต้นของตัวสร้างอีเมล",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HyUNijYiBwsSCh/xnXfEsQ==": {
+      "description": "Emails page point: React Email's Body says English, left to right, unless given the email's language",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "React Email ซึ่งแอปนี้ใช้สร้างอีเมล จะเขียนภาษาอังกฤษ และจากซ้ายไปขวา รอบเนื้อหา เว้นแต่จะส่งภาษาและทิศทางของอีเมลให้ Body",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EazpjYSpTaLuVFyeId9LHw==": {
+      "description": "Emails page point title: text in another language than the email",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ข้อความในภาษาอื่น",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gN7YzfeUiKAbHR65yA9xTw==": {
+      "description": "Emails page point: an event's title in another language is marked with its own, as on the site's pages",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ชื่อกิจกรรมเป็นไปตามที่ผู้จัดเขียนไว้ จึงอาจเป็นภาษาอื่นที่ไม่ใช่ภาษาของอีเมล เช่นชื่อภาษาอาหรับในอีเมลภาษาอังกฤษและภาษาไทยที่นี่ ชื่อนั้นจะถูกระบุภาษาและทิศทางของตัวเองด้วย langAttrs ของ void-fbtee เหมือนในหน้าเว็บของไซต์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Pj0kzgV8bxfNDJYtC19a7w==": {
+      "description": "Emails page point title: a web address written out in the email",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ที่อยู่เว็บที่เขียนเต็ม",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jos9Wtq2cr9giw/SN9rEpw==": {
+      "description": "Emails page point: a web address in a right-to-left email is marked left to right",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ที่อยู่เว็บอ่านจากซ้ายไปขวาในทุกภาษา หากเขียนเต็มในอีเมลที่อ่านจากขวาไปซ้าย เช่นลิงก์ส่วนตัว ส่วนต่าง ๆ ของมันจะกลับด้าน เว้นแต่จะระบุว่าอ่านจากซ้ายไปขวา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JUvRRLGQ1bjAm0Vcv2HZbQ==": {
+      "description": "Emails page point title: images sent inside the email",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "รูปภาพภายในอีเมล",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2usNtx/WYBQMiwnPJvyB6g==": {
+      "description": "Emails page point: the logo is sent inside the email, so it shows in every mail app and in the dev inbox",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "โลโก้ถูกส่งไปภายในอีเมลด้วยไฟล์แนบแบบอินไลน์ของ Void แทนการลิงก์ จึงแสดงในทุกแอปอีเมล และระหว่างพัฒนาด้วย ซึ่งที่อยู่ของไซต์คือ localhost",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "s96U1PJw3Ypy+kEOLoP6MA==": {
+      "description": "Emails page introduction",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แอปนี้ส่งอีเมลถึงผู้คนในภาษาของพวกเขาเอง: การยืนยันการจอง การแจ้งเตือนล่วงหน้าหนึ่งวัน การยกเลิก และลิงก์ส่วนตัวสำหรับลบกิจกรรม นี่คือสองฉบับ ที่โค้ดของแอปเองสร้างขึ้นสำหรับกิจกรรมตัวอย่าง ในภาษาของหน้านี้ พร้อมสิ่งที่ต้องทำเพื่อให้แต่ละฉบับแสดงผลในทิศทางที่ถูกต้อง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dRNSEr8XFaAgyTWvKq4xcA==": {
+      "description": "Emails page section title: the sample emails",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "อีเมลสองฉบับ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uH6q6coDpyh9WdmyxCsdiA==": {
+      "description": "Emails page section title: what a translated email needs",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สิ่งที่อีเมลแปลต้องมี",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lR8tRrPsoJ/f8whuFbAH6w==": {
+      "description": "Emails page: the sample booking confirmation email",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "การยืนยันการจอง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OGbYARASr2WAjEzET6808Q==": {
+      "description": "Emails page: the sample email with the private link to delete an event",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ลิงก์ส่วนตัว ถึงผู้ที่โพสต์กิจกรรม",
           "variations": {}
         }
       ],

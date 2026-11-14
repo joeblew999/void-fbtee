@@ -164,6 +164,18 @@
   overflow-wrap: anywhere;
 }
 
+/* Code reads left to right in every language: in an Arabic page, a code block or inline code
+   (`<Fmt>`) took the page's direction, reversing its brackets and arrows. Isolated, so the
+   sentence around inline code keeps its own. */
+.void-md pre,
+.void-md code {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.void-md pre {
+  text-align: left;
+}
+
 /* @void/md (1.7.0 and 1.8.0) places heading anchors with physical left (float: left; margin-left),
    so in right-to-left pages they stick out past the left edge. The same, in logical directions.
    Reported as voidzero-dev/void#802: remove this when it's fixed. */

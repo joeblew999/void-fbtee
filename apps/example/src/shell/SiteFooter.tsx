@@ -14,6 +14,7 @@ const TOOLS = [
   ["fbtee", "https://github.com/nkzw-tech/fbtee"],
   ["Temporal", "https://tc39.es/proposal-temporal/docs/"],
   ["shadcn/ui", "https://ui.shadcn.com"],
+  ["React Email", "https://react.email"],
 ] as const;
 
 const linkClass =

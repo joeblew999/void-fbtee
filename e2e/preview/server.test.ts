@@ -162,6 +162,7 @@ test("every page has a title and a description, in its own language", async () =
     "/docs",
     "/docs/intl",
     "/docs/temporal",
+    "/docs/emails",
     "/docs/tour",
   ];
   const head = async (path: string) => {
@@ -191,6 +192,19 @@ test("every page has a title and a description, in its own language", async () =
   }
 });
 
+// The Emails page shows the app's own emails (src/events/emails.ts) in the page's language: the
+// subject, and the HTML as a mail app gets it, in the email's direction on its content too.
+test("the Emails page shows the app's emails in its own language", async () => {
+  const ar = await (await get("/ar-EG/docs/emails")).text();
+  expect(ar).toContain("مقعدك في أمسية خط عربي");
+  expect(ar.match(/<iframe/g)).toHaveLength(2);
+  expect(ar).toContain("lang=&quot;ar-EG&quot; dir=&quot;rtl&quot;");
+  const th = await (await get("/th-TH/docs/emails")).text();
+  expect(th).toContain("ที่นั่งของคุณใน أمسية خط عربي");
+  // The Arabic title marked as Arabic inside the Thai email.
+  expect(th).toContain("&lt;bdi lang=&quot;ar-EG&quot; dir=&quot;rtl&quot;&gt;");
+});
+
 // Void's page cache skips any response with Set-Cookie, or a Vary on a request header other than
 // its own X-VoidPages ones (docs/guide/edge/revalidation.md, "How revalidation works"): silently,
 // the page just stops being cached. void-fbtee's middleware runs on every page, so it must add
@@ -203,6 +217,7 @@ test("no page sets a cookie or varies by a request header, so Void can cache it"
     "/docs",
     "/docs/intl",
     "/docs/temporal",
+    "/docs/emails",
     "/docs/tour",
   ];
   const voids = new Set(["x-voidpages", "x-voidpages-version"]);
@@ -383,7 +398,15 @@ test("the sitemap: every page in every language, with its alternates; robots.txt
     alternates: [...u.matchAll(/hreflang="([^"]+)"/g)].map(([, h]) => h),
   }));
   for (const l of LOCALES)
-    for (const page of ["", "/docs", "/docs/intl", "/docs/temporal", "/events", "/docs/tour"])
+    for (const page of [
+      "",
+      "/docs",
+      "/docs/intl",
+      "/docs/temporal",
+      "/docs/emails",
+      "/events",
+      "/docs/tour",
+    ])
       expect(
         entries.map((e) => e.loc),
         `${l}${page}`,

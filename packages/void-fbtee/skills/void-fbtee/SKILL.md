@@ -151,6 +151,28 @@ preview, or the live site), not `siteOrigin(c)`, which is the canonical, live ad
 `voidFbtee({ site })` is set; `siteOrigin` is for the sitemap, robots.txt and structured data. A job
 or a queue has no request: keep the origin with what caused it (a booking's row, the queue message).
 
+### Translated emails
+
+An email is server code with no page, so it's written with `inLocale` in its recipient's language:
+the one saved with them (a booking's, a user's), not the page's of whoever caused it. Void leaves
+the HTML to the app (`sendEmail`'s `html` is a string), so whatever builds it, these make a
+translated email arrive the right way round:
+
+- **`lang` and `dir` on the content too**, not only on `<html>`: Gmail drops `<html>`, `<head>` and
+  `<body>` and keeps what's inside, so an Arabic email marked only on `<html>` shows left to right.
+  Put them on the content's outer element as well.
+- **The builder's own defaults:** an email builder can write its own language around the content;
+  React Email's `Body` is `dir="ltr" lang="en"` unless given the email's.
+- **Text in another language** (a title as its author wrote it): `<bdi {...langAttrs(its locale)}>`,
+  as on a page.
+- **A written-out address** in a right-to-left email: `dir="ltr"` on it, or its parts come out
+  reversed.
+- **Images inside the email** (Void's inline attachments, `cid:`), not linked: they show in every
+  mail app, and in dev, where the site's address is localhost.
+
+The example does each (its Emails docs page shows them, with the code: `src/events/emails.ts`,
+`src/events/EmailLayout.tsx`).
+
 Testing translated server code the Void way: in unit tests, Void's email harness
 (`createEmailTestHarness` from `void/email/testing`) catches each email, so its subject and text can
 be checked in each language; on the dev server, Void's inbox holds them (`/__void/inbox`, with the

@@ -51,6 +51,13 @@ function sidebar(lang: Lang) {
           title: "Temporal",
           href: routeUrl("/[lang]/docs/temporal"),
         },
+        {
+          slug: "emails",
+          title: (
+            <fbt desc="Docs page title: the page about the app's translated emails">Emails</fbt>
+          ),
+          href: routeUrl("/[lang]/docs/emails"),
+        },
       ],
     },
     {

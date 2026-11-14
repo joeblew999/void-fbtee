@@ -13,6 +13,7 @@ import {
   FileText,
   Hash,
   Languages,
+  Mail,
 } from "lucide-react";
 import { Link } from "void-fbtee/react";
 import { buttonVariants } from "@/ui/button";
@@ -212,10 +213,36 @@ function features(): Feature[] {
         </fbt>,
       ],
     },
+    {
+      icon: <Mail className={icon} aria-hidden />,
+      title: (
+        <fbt desc="Home feature title: emails in each recipient's language">
+          Emails in each person's language
+        </fbt>
+      ),
+      href: routeUrl("/[lang]/docs/emails"),
+      facts: [
+        <fbt
+          key="1"
+          desc="Home feature fact: an email is in its recipient's language, not in the language of whoever caused it"
+        >
+          Each person gets theirs in their own language, whoever caused it.
+        </fbt>,
+        <fbt key="2" desc="Home feature fact: Arabic emails read right to left in Gmail">
+          Arabic reads right to left in Gmail too.
+        </fbt>,
+        <fbt
+          key="3"
+          desc="Home feature fact: in development, Void's inbox catches the emails, so tests can read them"
+        >
+          In development, Void's inbox catches them, so tests can read them.
+        </fbt>,
+      ],
+    },
   ];
 }
 
-/** What it does: six features in a ruled grid, each with its facts and the docs page on it. */
+/** What it does: seven features in a ruled grid, each with its facts and the docs page on it. */
 export function Features() {
   return (
     <section className="border-t py-16">
@@ -227,7 +254,8 @@ export function Features() {
       {/* 1px rules between cells at any column count: the grid's colour shows through 1px gaps. */}
       <div className="mt-10 grid gap-px border-y bg-border sm:grid-cols-2 lg:grid-cols-3">
         {features().map((f, i) => (
-          <article key={i} className="flex flex-col bg-background p-6">
+          // Seven: the last is alone in its row at two columns and at three, so it fills it.
+          <article key={i} className="flex flex-col bg-background p-6 sm:last:col-span-full">
             {f.icon}
             <h3 className="mt-4 text-lg font-medium">{f.title}</h3>
             <ul className="mt-3 flex-1 space-y-2 text-sm text-muted-foreground">

@@ -2652,6 +2652,259 @@
         }
       ],
       "types": []
+    },
+    "GVbiJcLUe1A8lpRge3QmCA==": {
+      "description": "Home feature title: emails in each recipient's language",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "رسائل بريد بلغة كل شخص",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ss4LuZVei4N8hhIIB0S6bA==": {
+      "description": "Home feature fact: an email is in its recipient's language, not in the language of whoever caused it",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يتلقى كل شخص رسالته بلغته، أيًّا كان من تسبّب فيها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3sZg3WlaLSRBo7kLn7d7mA==": {
+      "description": "Home feature fact: Arabic emails read right to left in Gmail",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "العربية تُقرأ من اليمين إلى اليسار في Gmail أيضًا.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "I7GpuvCileib7mw8B2Owug==": {
+      "description": "Home feature fact: in development, Void's inbox catches the emails, so tests can read them",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "أثناء التطوير، يلتقطها صندوق بريد Void، فتقرؤها الاختبارات.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3/+8ub8oqHil6VMBPJd1JA==": {
+      "description": "Docs page title: the page about the app's translated emails",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "رسائل البريد",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jJjvqoh018tEoo4gkf8QVw==": {
+      "description": "Emails page: shows the plain-text version sent with an email",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "النسخة النصية المرسلة معها",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xNW9wwR0nMAWXutG4Tcc3g==": {
+      "description": "Emails page point title: the email is in the recipient's language",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "بلغة المستلم",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NbUYQUVMcLiFwzEP1fUvYw==": {
+      "description": "Emails page point: void-fbtee's inLocale writes the email in the language saved with the booking",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تُرسل الرسالة من إجراء أو طابور أو مهمة مجدولة، وكثيرًا ما يتسبّب فيها شخص آخر: يصل الإلغاء إلى كل من حجز، كلٌّ بلغته. تُحفظ اللغة مع الحجز، ويشغّل inLocale من void-fbtee شيفرة الرسالة بها، بما فيها نصوص fbs وتواريخها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vd3MEl3yHHdMTTC1zRRUSQ==": {
+      "description": "Emails page point title: the language and direction go on the email's content",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "اللغة والاتجاه على المحتوى",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5Z2K5VtQbounK5TVY55rXA==": {
+      "description": "Emails page point: Gmail drops the html element, so lang and dir also go on the content's box",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يحذف Gmail عناصر html وhead وbody من الرسالة ويُبقي ما بداخلها، فالرسالة العربية التي لا تذكر الاتجاه من اليمين إلى اليسار إلا على html تظهر من اليسار إلى اليمين. لذا يذكره صندوق المحتوى نفسه أيضًا.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DoUYz5xll+gSdsN5kpJLKg==": {
+      "description": "Emails page point title: the email builder's defaults",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الإعدادات الافتراضية لأداة بناء الرسائل",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HyUNijYiBwsSCh/xnXfEsQ==": {
+      "description": "Emails page point: React Email's Body says English, left to right, unless given the email's language",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "React Email، التي يبني بها هذا التطبيق رسائله، تكتب الإنجليزية ومن اليسار إلى اليمين حول المحتوى ما لم يُعطَ عنصر Body لغة الرسالة واتجاهها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EazpjYSpTaLuVFyeId9LHw==": {
+      "description": "Emails page point title: text in another language than the email",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "نص بلغة أخرى",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gN7YzfeUiKAbHR65yA9xTw==": {
+      "description": "Emails page point: an event's title in another language is marked with its own, as on the site's pages",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "عنوان الفعالية كما كتبه منظّمها، فقد يكون بلغة غير لغة الرسالة، كالعنوان العربي في الرسالتين الإنجليزية والتايلاندية هنا. يُعلَّم بلغته واتجاهه الخاصّين، باستخدام langAttrs من void-fbtee، كما في صفحات الموقع.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Pj0kzgV8bxfNDJYtC19a7w==": {
+      "description": "Emails page point title: a web address written out in the email",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "عنوان ويب مكتوب كاملًا",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jos9Wtq2cr9giw/SN9rEpw==": {
+      "description": "Emails page point: a web address in a right-to-left email is marked left to right",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يُقرأ عنوان الويب من اليسار إلى اليمين في كل اللغات. إذا كُتب كاملًا في رسالة من اليمين إلى اليسار، كالرابط الخاص، انقلبت أجزاؤه ما لم يُعلَّم من اليسار إلى اليمين.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JUvRRLGQ1bjAm0Vcv2HZbQ==": {
+      "description": "Emails page point title: images sent inside the email",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الصور داخل الرسالة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2usNtx/WYBQMiwnPJvyB6g==": {
+      "description": "Emails page point: the logo is sent inside the email, so it shows in every mail app and in the dev inbox",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يُرسل الشعار داخل الرسالة، بالمرفقات المضمّنة في Void، بدلًا من ربطه: فيظهر في كل تطبيقات البريد، وأثناء التطوير أيضًا، حيث عنوان الموقع هو localhost.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "s96U1PJw3Ypy+kEOLoP6MA==": {
+      "description": "Emails page introduction",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يراسل هذا التطبيق الناس بلغتهم: تأكيد الحجز، وتذكير قبل يوم، والإلغاء، والرابط الخاص لحذف فعالية. هذه اثنتان منها، صنعتهما شيفرة التطبيق نفسها لفعالية تجريبية، بلغة هذه الصفحة، وما يلزم كي تصل كل منها في الاتجاه الصحيح.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dRNSEr8XFaAgyTWvKq4xcA==": {
+      "description": "Emails page section title: the sample emails",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "رسالتان من الرسائل",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uH6q6coDpyh9WdmyxCsdiA==": {
+      "description": "Emails page section title: what a translated email needs",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ما تحتاجه الرسالة المترجمة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lR8tRrPsoJ/f8whuFbAH6w==": {
+      "description": "Emails page: the sample booking confirmation email",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تأكيد الحجز",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OGbYARASr2WAjEzET6808Q==": {
+      "description": "Emails page: the sample email with the private link to delete an event",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الرابط الخاص، لمن نشر الفعالية",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

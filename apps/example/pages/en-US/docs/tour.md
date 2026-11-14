@@ -13,7 +13,7 @@ for (const el of document.querySelectorAll("[data-your-zone]")) {
 
 title: The tour
 description: Post an event, book a seat, and see every time on the event's clock and on yours.
-updated: "2026-11-12"
+updated: "2026-11-14"
 ---
 
 # Events that know what time it is where you are
@@ -123,6 +123,36 @@ const guessed = new Date(start.epochMilliseconds); // [!code warning]
 > Changing an event's time zone changes when it happens for everyone. Change the time with it.
 
 Copy a code block with its button, or select it and press <kbd>Ctrl</kbd> + <kbd>C</kbd>.
+
+## Emailed in your language {#emails}
+
+Book a seat, and the confirmation comes in the language you booked in, with the start on the
+event's clock written your way. Each email goes to someone in their own language, whoever caused
+it:
+
+| What happens          | Who gets an email          | In whose language    |
+| --------------------- | -------------------------- | -------------------- |
+| You book a seat       | You                        | Yours, as you booked |
+| You post an event     | You, with its private link | Yours, as you posted |
+| The day before it     | Everyone booked            | Each their own       |
+| The organiser cancels | Everyone booked            | Each their own       |
+
+The language is saved with the booking, as the event's is with the event, and the email is
+written in it:
+
+```ts
+// In short, what src/events/emails.ts does for a booking:
+const email = await inLocale(booking.locale, ({ locale, dir }) =>
+  fbs(["Your seat at ", fbs.param("event", booking.title)], "Booking email subject"),
+);
+```
+
+> [!NOTE] The title stays as it was written
+> An event's title is in its organiser's language, so a Thai email can carry an Arabic title. It's
+> marked with its own language there too, as on the event's page.
+
+The [Emails page](./emails) shows two of them, in this page's language, and what it takes for each
+to arrive the right way round, right to left in Gmail included.
 
 ## Formatted for you {#formatted}
 
