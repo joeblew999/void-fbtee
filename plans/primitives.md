@@ -82,7 +82,19 @@ on 2026-11-14.
 
 ## What fbtee already gives, to use rather than rebuild
 
-Read in fbtee 6.0.0's README, 2026-11-14:
+From the whole of fbtee 6.0.0's README and its type definitions (`ReactTypes.d.ts`, the package's
+exports), read 2026-11-14.
+
+Already used:
+
+- `<fbt>`/`fbs`, `<fbt:param>` and `<fbt:plural>`;
+- common strings and `list()`;
+- `runWithFbtee` per request, and `setupLocaleContext` in the browser;
+- `fallbackLocales`;
+- the compiler's collect, prepare and translate (including its partial-catalog fallback);
+- the lint rules.
+
+Not used yet, and wanted:
 
 - **Scoped runtimes:** `createFbteeRuntime`, `LocaleProvider` and `useFbt()` show part of a page in
   another language. Uses:
@@ -93,6 +105,11 @@ Read in fbtee 6.0.0's README, 2026-11-14:
 
 - **Lists:** `list` and `<fbt:list>` ("Bangkok, Cairo and New York", with each language's own "and").
   For the use cases' "who's watching from where".
+- **Choices from a fixed set:** `<fbt:enum>`, each value translated in its sentence. That's how
+  `plans/use-cases.md`'s "how they take part" (there, online, organising) gets written, not as
+  separate strings joined together.
+- **A person's name in a sentence:** `<fbt:name>`, which carries that person's gender into the
+  translation ("Laila booked a seat" is worded by Laila's gender in Arabic).
 - **Gender:** fbtee's viewer gender and `<fbt:pronoun>`. Arabic, for one, words "you booked"
   differently for a man and a woman. `Reader` gets an optional gender, used only when the person
   gives it, never guessed, for emails and tickets that address them.
