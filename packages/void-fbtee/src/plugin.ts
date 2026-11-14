@@ -20,7 +20,7 @@
 //   I18nProvider, so this is what gives them their strings.
 import { createRequire } from "node:module";
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
 import type { FallbackLocales } from "fbtee";
@@ -259,7 +259,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
     },
     load: {
       filter: { id: LOAD_FILTER },
-      handler(id) {
+      async handler(id) {
         if (id === SERVER_TEMPORAL_ID) return SERVER_TEMPORAL;
         if (id === "\0" + CONFIG_ID)
           return `export default ${JSON.stringify({ ...config, fallbackLocales: options.fallbackLocales, site: options.site })};`;
@@ -275,7 +275,12 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         // app has it.
         if (id === "\0" + MD_PAGES_ID)
           return hasMarkdown ? `export { default } from "@void/md/pages";` : "export default [];";
-        if (id === "\0" + ZOD_ID) return zodMessages(root, config);
+        if (id === "\0" + ZOD_ID) {
+          // Found as the bundler finds it: Node's require would also look in NODE_PATH, which
+          // `pnpm exec` sets to every package pnpm installed, the app's or not.
+          const core = await this.resolve("zod/v4/core", join(root, "package.json"));
+          return zodMessages(core && !core.external ? core.id : undefined, config);
+        }
         if (id === "\0" + PAGES_ID) {
           const file = join(root, ".void/routes.d.ts");
           if (existsSync(file)) this.addWatchFile(file);
@@ -320,16 +325,18 @@ export function langPages(file: string): string[] {
  * language `currentLocale()` gives (a locale's own, "pt-BR", else its language's, "th" for
  * "th-TH"), English where Zod has none. Without Zod 4 in the app, a `setup` that does nothing.
  */
-function zodMessages(root: string, config: LocaleConfig): string {
+function zodMessages(core: string | undefined, config: LocaleConfig): string {
   const none = "export function setup() {}";
-  let dir: string;
-  try {
-    const pkg = createRequire(join(root, "package.json")).resolve("zod/package.json");
-    if (Number(JSON.parse(readFileSync(pkg, "utf8")).version.split(".")[0]) < 4) return none;
-    dir = join(pkg, "../v4/locales");
-  } catch {
-    return none;
-  }
+  // zod/v4/core is in Zod 3.25 too; the package's own version says which Zod the app has.
+  let pkg = core && dirname(core);
+  const manifest = (dir: string) => {
+    const file = join(dir, "package.json");
+    return existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : undefined;
+  };
+  while (pkg && manifest(pkg)?.name !== "zod")
+    pkg = dirname(pkg) === pkg ? undefined : dirname(pkg);
+  if (!pkg || Number(manifest(pkg).version.split(".")[0]) < 4) return none;
+  const dir = join(pkg, "v4/locales");
   const has = (name: string) => existsSync(join(dir, `${name}.js`));
   const found = config.locales.flatMap((l) => {
     const name = [l.locale, new Intl.Locale(l.locale).language].find(has);

@@ -230,7 +230,8 @@ for (const target of targets) {
 /**
  * An app written in Thai: init with `--source-locale th-TH`, its pages (e2e/fresh/thai/), init's
  * own pages rewritten in Thai as its to-do asks, prepare, the translations, check, a build, and the
- * dev server in all three languages with "/" going to Thai.
+ * dev server in all three languages with "/" going to Thai. It has no Zod, so it also checks the
+ * build without it under `pnpm exec`, whose NODE_PATH once made void-fbtee think Zod was there.
  */
 async function thaiSource(target: string, dir: string, app: App, installed: string) {
   const source = app.written!;
