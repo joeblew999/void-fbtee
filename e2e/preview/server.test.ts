@@ -162,6 +162,10 @@ test("every page has a title and a description, in its own language", async () =
     "/docs",
     "/docs/intl",
     "/docs/temporal",
+    "/docs/strings",
+    "/docs/markdown",
+    "/docs/right-to-left",
+    "/docs/translating",
     "/docs/emails",
     "/docs/tour",
   ];
@@ -205,6 +209,40 @@ test("the Emails page shows the app's emails in its own language", async () => {
   expect(th).toContain("&lt;bdi lang=&quot;ar-EG&quot; dir=&quot;rtl&quot;&gt;");
 });
 
+// The reference pages show their feature at work in the page's language: the Strings page's
+// plural in all six of Arabic's forms, each copy of the markdown pages, every catalog's count, and
+// the same markup both ways round.
+test("the reference pages show their feature at work", async () => {
+  const strings = await (await get("/ar-EG/docs/strings")).text();
+  for (const form of ["zero", "one", "two", "few", "many", "other"])
+    expect(strings, form).toContain(`>${form}<`);
+  expect(strings).toContain("حجزت ليلتين");
+  const markdown = await (await get("/th-TH/docs/markdown")).text();
+  expect(markdown).toContain("docs/tour.md");
+  expect(markdown).toContain("translatedFrom: ");
+  const translating = await (await get("/en-US/docs/translating")).text();
+  for (const l of LOCALES.filter((l) => l !== SOURCE))
+    expect(translating).toContain(`i18n/translations/${l}.json`);
+  const rtl = await (await get("/ar-EG/docs/right-to-left")).text();
+  expect(rtl).toContain('dir="ltr" data-testid="row-ltr"');
+  expect(rtl).toContain('dir="rtl" data-testid="row-rtl"');
+});
+
+// Every feature on the home page links to its own docs page on this site, in the page's language.
+test("every home page feature links to its docs page", async () => {
+  const html = await (await get("/th-TH")).text();
+  for (const page of [
+    "strings",
+    "temporal",
+    "intl",
+    "markdown",
+    "translating",
+    "right-to-left",
+    "emails",
+  ])
+    expect(html, page).toContain(`href="/th-TH/docs/${page}"`);
+});
+
 // Void's page cache skips any response with Set-Cookie, or a Vary on a request header other than
 // its own X-VoidPages ones (docs/guide/edge/revalidation.md, "How revalidation works"): silently,
 // the page just stops being cached. void-fbtee's middleware runs on every page, so it must add
@@ -217,6 +255,10 @@ test("no page sets a cookie or varies by a request header, so Void can cache it"
     "/docs",
     "/docs/intl",
     "/docs/temporal",
+    "/docs/strings",
+    "/docs/markdown",
+    "/docs/right-to-left",
+    "/docs/translating",
     "/docs/emails",
     "/docs/tour",
   ];
@@ -403,6 +445,10 @@ test("the sitemap: every page in every language, with its alternates; robots.txt
       "/docs",
       "/docs/intl",
       "/docs/temporal",
+      "/docs/strings",
+      "/docs/markdown",
+      "/docs/right-to-left",
+      "/docs/translating",
       "/docs/emails",
       "/events",
       "/docs/tour",

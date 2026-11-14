@@ -2609,6 +2609,702 @@
         }
       ],
       "types": []
+    },
+    "naBQ1NAndzvYk3foo0e+cQ==": {
+      "description": "Docs page title: the page about translated strings",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ข้อความ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DLrjEdgnZFPrQlj71F2utQ==": {
+      "description": "Docs page title: the page about translated markdown pages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หน้า Markdown",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gdsprPgijAf7i4aJGXejjw==": {
+      "description": "Docs page title: the page about right-to-left languages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ขวาไปซ้าย",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0QlWMWPWKIJVwMzYcHG7vw==": {
+      "description": "Docs page title: the page about how the app gets translated",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "การแปล",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tMTvUgdJP4qo/QlJCTb6ww==": {
+      "description": "Docs: link at the end of a page to void-fbtee's skill, its full reference",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "รายละเอียดทั้งหมดอยู่ใน{link}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HOTWNW9NlJ0aGkzX/S81BA==": {
+      "description": "Docs: link text naming void-fbtee's skill, its full reference",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สกิลของ void-fbtee",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BgLeWvb0E7iENcPahhyFuA==": {
+      "description": "Markdown page point title: a copy of each page per language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หนึ่งสำเนาต่อภาษา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "O3DiNYJ/EbuRA2TcUBPJWg==": {
+      "description": "Markdown page point: each page has a copy per language at the same path under the language's folder",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เขียนหน้าครั้งเดียวใต้ pages/ และภาษาต้นทาง แล้วแต่ละภาษามีสำเนาของตัวเองที่ path เดียวกันในโฟลเดอร์ของภาษานั้น แปลทั้งหน้า ทั้งหัวข้อ เนื้อความ และชื่อกับคำอธิบายใน frontmatter",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XTxmV9cNQS5qJAbGReTbbQ==": {
+      "description": "Markdown page point title: a copy whose original changed",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แจ้งเมื่อล้าสมัย",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WUZ4TnxzXPNCQAYx/NWQqQ==": {
+      "description": "Markdown page point: each copy records which version of the original it was translated from, and check reports it when the original changes",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สำเนาแต่ละฉบับบันทึกเวอร์ชันของต้นฉบับที่แปลมา เมื่อต้นฉบับเปลี่ยน void-fbtee check จะแจ้งว่าสำเนานั้นล้าสมัย ดังที่คอลัมน์ด้านบนจะแสดง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "A/OTAM3Acd6zaLfNmnG5vg==": {
+      "description": "Markdown page point title: dates and numbers in a markdown page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "วันที่และตัวเลขสำหรับผู้อ่านแต่ละคน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "At+2Ds66rkPDf5rscfzYxQ==": {
+      "description": "Markdown page point: dates and numbers in a page are islands that format them with Intl, on a line of their own",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "วันที่หรือตัวเลขในหน้าไม่ได้เขียนเป็นข้อความตายตัว แต่เป็น island ที่จัดรูปแบบด้วย Intl ให้ผู้อ่าน แต่ละ island อยู่บรรทัดของตัวเอง เพราะ HTML ของหน้าถูกตัดที่แต่ละ island",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "saYYe6KCZqUj4Al5djzeXA==": {
+      "description": "Markdown page point title: links between the site's pages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ลิงก์อยู่ในภาษาเดิม",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nygdBbCeR3M7Ob031HEajA==": {
+      "description": "Markdown page point: links to the site's own pages are written relative, so each copy's links stay in its language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ลิงก์ไปยังหน้าของเว็บไซต์เองเขียนแบบสัมพัทธ์ ไม่มีภาษาอยู่ในลิงก์ ลิงก์ของทุกสำเนาจึงอยู่ในภาษาของสำเนานั้น",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "y4ekpWh/5+v5FMHnqcZJkg==": {
+      "description": "Markdown page section title: this site's markdown pages and their copies",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หน้าของเว็บไซต์นี้",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ibUKl+8bisEKyM7E7nKmCQ==": {
+      "description": "Markdown page section title: what translated markdown pages take",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สิ่งที่ต้องทำ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GwFKLFrF+X3/eRvyHioK2g==": {
+      "description": "Markdown page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หน้าที่เขียนด้วย Markdown มีสำเนาในแต่ละภาษา แปลทั้งหน้า นี่คือหน้าของเว็บไซต์นี้ และสิ่งที่ต้องทำ พร้อมบรรทัดโค้ดที่ทำงานนั้น",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "po1WqShm0vPjOiIR2/p/EQ==": {
+      "description": "Markdown page: this language has no copy of the page yet",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ยังไม่ได้แปล",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HV4C+XujTZTfmto+jqJyVQ==": {
+      "description": "Markdown page: this copy is the original that the others are translated from",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ต้นฉบับ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yxgk/xDn2tD935gnxHRpJQ==": {
+      "description": "Right-to-left page point title: the page's language and direction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ภาษาและทิศทางของหน้า",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xbd/XezLTFLZ3OmT/6Su7A==": {
+      "description": "Right-to-left page point: void-fbtee's middleware sets the page's lang and dir from the URL, and links to the page in every language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "middleware ของ void-fbtee อ่านภาษาจากที่อยู่ ตั้ง lang และ dir ให้หน้า และระบุหน้าเดียวกันในทุกภาษาให้เครื่องมือค้นหา (hreflang)",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xOBwwonnIhiDrGIUg0j7zg==": {
+      "description": "Right-to-left page point title: start and end instead of left and right",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ต้นและท้าย ไม่ใช่ซ้ายและขวา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4J2rCL6dOn3VgGdYwsGgsg==": {
+      "description": "Right-to-left page point: spacing and alignment are written as start and end, so the same markup mirrors; arrows that point a way are flipped",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ระยะห่างและการจัดแนวเขียนเป็นต้นและท้าย มาร์กอัปเดียวกันจึงกลับด้านเองในภาษาอาหรับ ดังกล่องด้านบน ไอคอนที่ชี้ทิศทางจะถูกพลิก",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FaEcKJ3NOItY1qVr44S07w==": {
+      "description": "Right-to-left page point title: text in another language than the page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ข้อความในภาษาอื่น",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gUA03CORtHDX4RCnfKsnHg==": {
+      "description": "Right-to-left page point: text in another language than the page is marked with its own language and direction, so it reads the right way round",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สิ่งที่ผู้คนโพสต์อยู่ในภาษาของเขา ไม่ใช่ภาษาของหน้า จึงระบุภาษาและทิศทางของมันเองด้วย langAttrs ของ void-fbtee ชื่ออังกฤษในหน้าภาษาอาหรับ หรือชื่ออาหรับในหน้าภาษาอังกฤษ จึงอ่านได้ถูกทิศ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bnf1ZzRC/D5t9ZN80bYTdQ==": {
+      "description": "Right-to-left page point title: what is always left to right",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สิ่งที่เป็นซ้ายไปขวาเสมอ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WpoglIk2emqLAPZEd80YqQ==": {
+      "description": "Right-to-left page point: code, commands and web addresses read left to right in every language, so they are marked so",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "โค้ด คำสั่ง และที่อยู่เว็บอ่านจากซ้ายไปขวาในทุกภาษา ในหน้าขวาไปซ้าย ส่วนต่าง ๆ ของมันจะกลับลำดับ จึงต้องระบุว่าเป็นซ้ายไปขวา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FAj4TF5TvQACeWRW4Q5X+A==": {
+      "description": "Right-to-left page section title: this page's address in every language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หนึ่งที่อยู่ต่อภาษา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oDAhyDDL0CQIaSgd4vf1jg==": {
+      "description": "Right-to-left page section title: the same markup shown both ways round",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "มาร์กอัปเดียวกัน ทั้งสองทิศ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Sb9iDIh00P1ZwNdWleVysw==": {
+      "description": "Right-to-left page section title: what right to left takes",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สิ่งที่ต้องทำ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5eJguiKJa4CoBXQ++0dvjw==": {
+      "description": "Right-to-left page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ทุกภาษามีที่อยู่ของตัวเอง และภาษาอาหรับอ่านจากขวาไปซ้าย ทั้งเว็บไซต์จึงกลับด้าน นี่คือมาร์กอัปเดียวกันทั้งสองทิศ และสิ่งที่ต้องทำ พร้อมบรรทัดโค้ดที่ทำงานนั้น",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "S0/BcPiqQtKyQmZVKVZXWw==": {
+      "description": "Right-to-left page: the two boxes have the same markup, only the direction differs",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สองกล่องนี้เป็นมาร์กอัปเดียวกัน เขียนด้วยต้นและท้าย ต่างกันแค่ทิศทาง ขอบสี ลำดับ และลูกศร ล้วนตามทิศทางนั้น",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NLQXainHsxby1xQrwZXS6g==": {
+      "description": "Strings page point title: text is marked in the code",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ทำเครื่องหมายในโค้ด",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7rhYxSaDtuj+fF/XDSIenA==": {
+      "description": "Strings page point: text in components is written in fbt elements, each with a description for the translator",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ข้อความในคอมโพเนนต์เขียนไว้ใน fbt พร้อมคำอธิบายที่บอกผู้แปลว่าแสดงที่ไหนและหมายถึงอะไร void-fbtee prepare รวบรวมทุกข้อความลงแค็ตตาล็อกของแต่ละภาษา i18n/translations ซึ่งเป็นไฟล์ใน repository ของแอป",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dJBLP1ojMmgmJXaGGrvtzQ==": {
+      "description": "Strings page point title: plain strings for attributes",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ข้อความธรรมดา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "X2x6D5RNHlg4+MM0RLe1HQ==": {
+      "description": "Strings page point: fbs gives a plain string, for attributes, titles and emails",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ที่ไหนต้องใช้ข้อความธรรมดา เช่น ในแอตทริบิวต์ ชื่อหน้า หรืออีเมล fbs จะให้ข้อความนั้น แปลแบบเดียวกัน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+AuH23AakSMD2/1McKhd4w==": {
+      "description": "Strings page point title: plurals",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "รูปพหูพจน์ ตามแต่ละภาษา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hZSIYveQUjjD/aMtzy9bVQ==": {
+      "description": "Strings page point: a count has one translation per plural form the language uses",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ประโยคที่มีจำนวนจะมีคำแปลหนึ่งแบบต่อรูปพหูพจน์ที่ภาษานั้นมี ภาษาไทยมีหนึ่ง ภาษาอังกฤษมีสอง ภาษาอาหรับมีหก void-fbtee prepare เพิ่มบรรทัดที่แต่ละภาษาต้องใช้ แล้วจำนวนของผู้อ่านจะเลือกบรรทัดที่ถูก ดังตารางด้านบน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VVvSSum9GnPIeJhJSuC8CA==": {
+      "description": "Strings page point title: words used on many pages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "คำที่ใช้ร่วมกัน ครั้งเดียว",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Der7UKrjBbMrI58bHq/Bpw==": {
+      "description": "Strings page point: a word used on many pages is given once to voidFbtee and translated once",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "คำที่ใช้ในหลายหน้า เช่นคำในเมนู ให้ไว้ครั้งเดียวกับ voidFbtee ใน vite.config.ts พร้อมคำอธิบาย และแปลครั้งเดียว",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hCYToQBG97vWabsRO8x/Rw==": {
+      "description": "Strings page point title: finding what's untranslated",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ไม่มีอะไรตกหล่น",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+E7jk91kiDc3/q8UErfn1Q==": {
+      "description": "Strings page point: void-fbtee check lists what is untranslated, and the lint rules catch text not marked",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "void-fbtee check แสดงทุกข้อความที่ยังไม่ได้แปลในทุกภาษา และกฎ lint ของ fbtee แจ้งข้อความที่เขียนในคอมโพเนนต์โดยไม่มี fbt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hC/uuazRUITa0nHQfPmwyg==": {
+      "description": "Strings page section title: one sentence with a count, shown for several counts",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ประโยคเดียว ทุกจำนวน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bGG9eGtKcHRw+2cw0ZMGIw==": {
+      "description": "Strings page section title: what translated strings take",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สิ่งที่ต้องทำ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "omyx0QbtSL68JpfA+DIVoQ==": {
+      "description": "Strings page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ทุกคำบนเว็บไซต์นี้ทำเครื่องหมายไว้ในโค้ดด้วย fbtee และแต่ละภาษามีไฟล์แค็ตตาล็อกที่เก็บคำแปล นี่คือสิ่งที่ต้องทำ พร้อมบรรทัดโค้ดที่ทำงานนั้น",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EqG9EN7jYqigN14Xh2JBwA==": {
+      "description": "Strings page: the table shows one plural sentence for several counts, in this page's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ประโยคเดียวกันสำหรับหกจำนวน ในภาษาของหน้านี้ คอลัมน์ที่สองคือรูปพหูพจน์ที่ภาษาจัดแต่ละจำนวนไว้ ตามชื่อที่ Intl.PluralRules เรียก",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "i/MdP3gsGmDEKBj4uhRyAA==": {
+      "description": "Translating page point title: the translate script hands the work to Claude Code",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "คำสั่งเดียว โดย Claude Code",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jtUuydgLCMbWwHfQ2CIwGQ==": {
+      "description": "Translating page point: the translate script prepares the catalogs and hands the work to Claude Code with void-fbtee's skill",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "vp run i18n:translate รวบรวมข้อความใหม่ลงแต่ละแค็ตตาล็อก แล้วส่งงานให้ Claude Code พร้อมสกิลของ void-fbtee ทั้งข้อความ และหน้า Markdown ที่เปลี่ยน AGENTS.md ของแอปก็บอกไว้เช่นกัน การขอให้ Claude Code แปลแอปจึงได้ผลเหมือนกัน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CsY7QsE69lQzED6yPnTlEQ==": {
+      "description": "Translating page point title: translations are files to review",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ไฟล์ที่คุณตรวจ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Z5HLziNAw3FE2qyVKj2yfw==": {
+      "description": "Translating page point: translations are files in the repository, reviewed and committed like code",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "คำแปลเป็นไฟล์ใน repository แค็ตตาล็อกหนึ่งไฟล์ต่อภาษา และสำเนาของหน้า Markdown แต่ละหน้า จึงตรวจด้วย git diff และ commit เหมือนโค้ด ไม่มีอะไรถูกแปลขณะที่ผู้เข้าชมรอ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QWTleZIgt+OQTekLHF+MJw==": {
+      "description": "Translating page point title: what people post is translated as it's posted",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สิ่งที่ผู้คนโพสต์ ทันทีที่โพสต์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PiM5wxtePrk1NeOis7gFQA==": {
+      "description": "Translating page point: a posted event goes to a queue whose consumer translates it with Workers AI",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "อีเวนต์ที่มีคนโพสต์ไม่ได้อยู่ใน repository จึงแปลทันทีที่โพสต์ โพสต์จะเข้าคิว และตัวรับของคิวขอให้ Workers AI แปลเป็นภาษาอื่น ๆ ของแอป หลังจากผู้โพสต์ได้รับคำตอบแล้ว",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XxIseC//t+ZDp/MXfOKBvw==": {
+      "description": "Translating page section title: this app's catalogs, one per language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แค็ตตาล็อกของแอปนี้",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "X0UGyc2IqB5dmQPhCrvl7A==": {
+      "description": "Translating page section title: how the app is translated",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ทำอย่างไร",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "go4hg/3m6IV9tBrvRVt+lg==": {
+      "description": "Translating page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ข้อความของแอปเองแปลโดย Claude Code เป็นไฟล์ใน repository ที่คุณตรวจ สิ่งที่ผู้คนโพสต์แปลโดย Workers AI ทันทีที่โพสต์ นี่คือทั้งสองอย่าง พร้อมบรรทัดโค้ดที่ทำงานนั้น",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EYkqTAts0TYxkS2Z2dl5oQ==": {
+      "description": "Translating page: how many of a catalog's strings are translated",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แปลแล้ว {translated} จาก {strings} ข้อความ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "y21dje6+O2aW8hjr7VbxIQ==": {
+      "description": "Translating page: link to the events, whose posts are translated by Workers AI",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "อีเวนต์แปลโดย Workers AI: {link}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kWZkiGUUPLl04F06tVbaXg==": {
+      "description": "Translating page: link text to the list of events",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ดูอีเวนต์",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

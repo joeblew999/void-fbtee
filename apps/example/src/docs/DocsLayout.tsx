@@ -45,11 +45,41 @@ function sidebar(lang: Lang) {
     {
       name: <fbt desc="Docs sidebar group: reference pages">Reference</fbt>,
       entries: [
+        {
+          slug: "strings",
+          title: <fbt desc="Docs page title: the page about translated strings">Strings</fbt>,
+          href: routeUrl("/[lang]/docs/strings"),
+        },
         { slug: "intl", title: "Intl", href: routeUrl("/[lang]/docs/intl") },
         {
           slug: "temporal",
           title: "Temporal",
           href: routeUrl("/[lang]/docs/temporal"),
+        },
+        {
+          slug: "markdown",
+          title: (
+            <fbt desc="Docs page title: the page about translated markdown pages">
+              Markdown pages
+            </fbt>
+          ),
+          href: routeUrl("/[lang]/docs/markdown"),
+        },
+        {
+          slug: "right-to-left",
+          title: (
+            <fbt desc="Docs page title: the page about right-to-left languages">Right to left</fbt>
+          ),
+          href: routeUrl("/[lang]/docs/right-to-left"),
+        },
+        {
+          slug: "translating",
+          title: (
+            <fbt desc="Docs page title: the page about how the app gets translated">
+              Translating
+            </fbt>
+          ),
+          href: routeUrl("/[lang]/docs/translating"),
         },
         {
           slug: "emails",

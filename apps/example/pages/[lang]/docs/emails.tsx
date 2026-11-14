@@ -5,6 +5,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { fbt } from "fbtee";
 import { PageSections } from "@/docs/PageSections";
+import { Points, type Point } from "@/docs/Points";
 import type { Props } from "./emails.server";
 
 type Shown = Props["booking"];
@@ -51,14 +52,6 @@ function Preview({ id, name, email }: { id: string; name: ReactNode; email: Show
       </details>
     </figure>
   );
-}
-
-/** One thing a translated email needs: what and why, and the code that does it, as in its file. */
-interface Point {
-  id: string;
-  title: ReactNode;
-  why: ReactNode;
-  code: { file: string; line: string }[];
 }
 
 function points(): Point[] {
@@ -237,20 +230,7 @@ export default function EmailsPage({ booking, link }: Props) {
             What a translated email needs
           </fbt>
         </h2>
-        {all.map((p) => (
-          <div key={p.id} id={p.id} data-point={p.id} className="space-y-2">
-            <h3 className="text-lg font-medium">{p.title}</h3>
-            <p className="text-pretty text-muted-foreground">{p.why}</p>
-            <div dir="ltr" className="space-y-2 rounded-md bg-muted p-3 font-mono text-xs">
-              {p.code.map((c) => (
-                <div key={c.file + c.line}>
-                  <div className="text-muted-foreground">{c.file}</div>
-                  <code className="break-all">{c.line}</code>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+        <Points points={all} />
       </section>
     </div>
   );

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Link } from "void-fbtee/react";
 import { buttonVariants } from "@/ui/button";
-import { REPO, SETUP, SKILL, type Offsite } from "@/shell/project";
+import { REPO, SETUP, type Offsite } from "@/shell/project";
 import { cn } from "@/ui/utils";
 
 /** The install, as the README gives it, after the dependency is added to package.json. */
@@ -97,9 +97,8 @@ interface Feature {
   icon: ReactNode;
   title: ReactNode;
   facts: ReactNode[];
-  /** What explains it: a page of this site, built by routeUrl (checked by Void's typed routes), or
-   * void-fbtee's own docs (its skill, on GitHub). */
-  href: RouteUrl | Offsite;
+  /** Its docs page on this site, built by routeUrl (checked by Void's typed routes). */
+  href: RouteUrl;
 }
 
 function features(): Feature[] {
@@ -108,7 +107,7 @@ function features(): Feature[] {
     {
       icon: <Languages className={icon} aria-hidden />,
       title: <fbt desc="Home feature title: translated strings">Strings, by fbtee</fbt>,
-      href: `${SKILL}#strings`,
+      href: routeUrl("/[lang]/docs/strings"),
       facts: [
         <fbt key="1" desc="Home feature fact about translated strings">
           Mark text with fbt in your components; each language gets a catalog file.
@@ -124,7 +123,7 @@ function features(): Feature[] {
     {
       icon: <CalendarClock className={icon} aria-hidden />,
       title: <fbt desc="Home feature title: dates and times">Dates and times, by Temporal</fbt>,
-      href: routeUrl("/[lang]/docs/tour"),
+      href: routeUrl("/[lang]/docs/temporal"),
       facts: [
         <fbt key="1" desc="Home feature fact about times and time zones">
           Every time shown on its place's clock and on the reader's.
@@ -162,7 +161,7 @@ function features(): Feature[] {
       title: (
         <fbt desc="Home feature title: translated markdown pages">Markdown pages, translated</fbt>
       ),
-      href: `${SKILL}#markdown-pages`,
+      href: routeUrl("/[lang]/docs/markdown"),
       facts: [
         <fbt key="1" desc="Home feature fact about where translated markdown pages are">
           One copy of each page per language, under pages/ and the language.
@@ -180,7 +179,7 @@ function features(): Feature[] {
       title: (
         <fbt desc="Home feature title: machine translation">Translated by AI, checked by you</fbt>
       ),
-      href: SKILL,
+      href: routeUrl("/[lang]/docs/translating"),
       facts: [
         <fbt key="1" desc="Home feature fact about the translate command (vp run i18n:translate)">
           vp run i18n:translate hands the work to Claude Code, with void-fbtee's skill.
@@ -197,7 +196,7 @@ function features(): Feature[] {
           Every language, right to left too
         </fbt>
       ),
-      href: `${SKILL}#strings`,
+      href: routeUrl("/[lang]/docs/right-to-left"),
       facts: [
         <fbt
           key="1"

@@ -2905,6 +2905,702 @@
         }
       ],
       "types": []
+    },
+    "naBQ1NAndzvYk3foo0e+cQ==": {
+      "description": "Docs page title: the page about translated strings",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "النصوص",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DLrjEdgnZFPrQlj71F2utQ==": {
+      "description": "Docs page title: the page about translated markdown pages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "صفحات Markdown",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gdsprPgijAf7i4aJGXejjw==": {
+      "description": "Docs page title: the page about right-to-left languages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "من اليمين إلى اليسار",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0QlWMWPWKIJVwMzYcHG7vw==": {
+      "description": "Docs page title: the page about how the app gets translated",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الترجمة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tMTvUgdJP4qo/QlJCTb6ww==": {
+      "description": "Docs: link at the end of a page to void-fbtee's skill, its full reference",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المرجع الكامل في {link}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HOTWNW9NlJ0aGkzX/S81BA==": {
+      "description": "Docs: link text naming void-fbtee's skill, its full reference",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مهارة void-fbtee",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BgLeWvb0E7iENcPahhyFuA==": {
+      "description": "Markdown page point title: a copy of each page per language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "نسخة لكل لغة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "O3DiNYJ/EbuRA2TcUBPJWg==": {
+      "description": "Markdown page point: each page has a copy per language at the same path under the language's folder",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تُكتب الصفحة مرة واحدة تحت pages/ ولغة المصدر، ولكل لغة نسختها في المسار نفسه داخل مجلدها، مترجمة كاملة: العناوين والنص والعنوان والوصف في رأس الملف (frontmatter).",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XTxmV9cNQS5qJAbGReTbbQ==": {
+      "description": "Markdown page point title: a copy whose original changed",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الإبلاغ عمّا صار قديمًا",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WUZ4TnxzXPNCQAYx/NWQqQ==": {
+      "description": "Markdown page point: each copy records which version of the original it was translated from, and check reports it when the original changes",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تسجّل كل نسخة إصدار الأصل الذي تُرجمت منه. وعندما يتغيّر الأصل، يُبلغ void-fbtee check بأن النسخة قديمة، كما سيظهر في العمود أعلاه.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "A/OTAM3Acd6zaLfNmnG5vg==": {
+      "description": "Markdown page point title: dates and numbers in a markdown page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تواريخ وأرقام لكل قارئ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "At+2Ds66rkPDf5rscfzYxQ==": {
+      "description": "Markdown page point: dates and numbers in a page are islands that format them with Intl, on a line of their own",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لا يُكتب التاريخ أو الرقم في الصفحة نصًا: بل هو جزيرة (island) تنسّقه بـ Intl للقارئ. وكل جزيرة في سطر خاص بها، لأن HTML الصفحة يُقطع عند كل واحدة.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "saYYe6KCZqUj4Al5djzeXA==": {
+      "description": "Markdown page point title: links between the site's pages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الروابط تبقى في اللغة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nygdBbCeR3M7Ob031HEajA==": {
+      "description": "Markdown page point: links to the site's own pages are written relative, so each copy's links stay in its language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تُكتب روابط صفحات الموقع نفسه نسبية، ولا تحمل اللغة أبدًا، فتبقى روابط كل نسخة بلغتها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "y4ekpWh/5+v5FMHnqcZJkg==": {
+      "description": "Markdown page section title: this site's markdown pages and their copies",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "صفحات هذا الموقع",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ibUKl+8bisEKyM7E7nKmCQ==": {
+      "description": "Markdown page section title: what translated markdown pages take",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ما يتطلبه الأمر",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GwFKLFrF+X3/eRvyHioK2g==": {
+      "description": "Markdown page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "للصفحة المكتوبة بـ Markdown نسخة بكل لغة، مترجمة كاملة. هذه صفحات هذا الموقع، وما يتطلبه الأمر، مع الأسطر التي تقوم به.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "po1WqShm0vPjOiIR2/p/EQ==": {
+      "description": "Markdown page: this language has no copy of the page yet",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لم تُترجم بعد",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HV4C+XujTZTfmto+jqJyVQ==": {
+      "description": "Markdown page: this copy is the original that the others are translated from",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الأصل",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yxgk/xDn2tD935gnxHRpJQ==": {
+      "description": "Right-to-left page point title: the page's language and direction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لغة الصفحة واتجاهها",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xbd/XezLTFLZ3OmT/6Su7A==": {
+      "description": "Right-to-left page point: void-fbtee's middleware sets the page's lang and dir from the URL, and links to the page in every language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يقرأ وسيط void-fbtee اللغة من العنوان، ويضع lang وdir على الصفحة، ويسرد الصفحة نفسها بكل لغة لمحركات البحث (hreflang).",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xOBwwonnIhiDrGIUg0j7zg==": {
+      "description": "Right-to-left page point title: start and end instead of left and right",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "البداية والنهاية، لا اليمين واليسار",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4J2rCL6dOn3VgGdYwsGgsg==": {
+      "description": "Right-to-left page point: spacing and alignment are written as start and end, so the same markup mirrors; arrows that point a way are flipped",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تُكتب المسافات والمحاذاة بالبداية والنهاية، فينعكس الترميز نفسه وحده في العربية، كما في المربعين أعلاه. والأيقونة التي تشير إلى اتجاه تُقلب.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FaEcKJ3NOItY1qVr44S07w==": {
+      "description": "Right-to-left page point title: text in another language than the page",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "نص بلغة أخرى",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gUA03CORtHDX4RCnfKsnHg==": {
+      "description": "Right-to-left page point: text in another language than the page is marked with its own language and direction, so it reads the right way round",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ما ينشره الناس بلغتهم، لا بلغة الصفحة. فيُعلَّم بلغته واتجاهه، بـ langAttrs من void-fbtee، فيُقرأ العنوان الإنجليزي في صفحة عربية، أو العربي في صفحة إنجليزية، في الاتجاه الصحيح.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bnf1ZzRC/D5t9ZN80bYTdQ==": {
+      "description": "Right-to-left page point title: what is always left to right",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ما يبقى من اليسار إلى اليمين",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WpoglIk2emqLAPZEd80YqQ==": {
+      "description": "Right-to-left page point: code, commands and web addresses read left to right in every language, so they are marked so",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تُقرأ الشيفرة والأوامر وعناوين الويب من اليسار إلى اليمين بكل لغة. وفي صفحة من اليمين إلى اليسار تنقلب أجزاؤها، لذا تُعلَّم من اليسار إلى اليمين.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FAj4TF5TvQACeWRW4Q5X+A==": {
+      "description": "Right-to-left page section title: this page's address in every language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "عنوان لكل لغة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oDAhyDDL0CQIaSgd4vf1jg==": {
+      "description": "Right-to-left page section title: the same markup shown both ways round",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الترميز نفسه، في الاتجاهين",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Sb9iDIh00P1ZwNdWleVysw==": {
+      "description": "Right-to-left page section title: what right to left takes",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ما يتطلبه الأمر",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5eJguiKJa4CoBXQ++0dvjw==": {
+      "description": "Right-to-left page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لكل لغة عنوانها، والعربية تُقرأ من اليمين إلى اليسار: الموقع كله ينعكس. هذا الترميز نفسه في الاتجاهين، وما يتطلبه الأمر، مع الأسطر التي تقوم به.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "S0/BcPiqQtKyQmZVKVZXWw==": {
+      "description": "Right-to-left page: the two boxes have the same markup, only the direction differs",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المربعان بالترميز نفسه، مكتوبان بالبداية والنهاية؛ لا يختلف إلا اتجاههما. والحافة الملوّنة والترتيب والسهم كلها تتبعه.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NLQXainHsxby1xQrwZXS6g==": {
+      "description": "Strings page point title: text is marked in the code",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مُعلَّم في الشيفرة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7rhYxSaDtuj+fF/XDSIenA==": {
+      "description": "Strings page point: text in components is written in fbt elements, each with a description for the translator",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يُكتب النص في المكوّن داخل عنصر fbt، مع وصف يخبر المترجم أين يظهر وماذا يعني. ويجمع void-fbtee prepare كل واحد في فهرس كل لغة، i18n/translations، وهو ملف في مستودع التطبيق.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dJBLP1ojMmgmJXaGGrvtzQ==": {
+      "description": "Strings page point title: plain strings for attributes",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "نصوص عادية",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "X2x6D5RNHlg4+MM0RLe1HQ==": {
+      "description": "Strings page point: fbs gives a plain string, for attributes, titles and emails",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "حيث يلزم نص عادي، في سمة أو عنوان صفحة أو بريد إلكتروني، يعطيه fbs، مترجمًا بالطريقة نفسها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+AuH23AakSMD2/1McKhd4w==": {
+      "description": "Strings page point title: plurals",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الجمع، لكل لغة قواعدها",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hZSIYveQUjjD/aMtzy9bVQ==": {
+      "description": "Strings page point: a count has one translation per plural form the language uses",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "للجملة التي فيها عدد ترجمة لكل صيغة جمع في اللغة: واحدة في التايلاندية، واثنتان في الإنجليزية، وست في العربية. ويضيف void-fbtee prepare الأسطر التي تحتاجها كل لغة، ويختار عدد القارئ السطر الصحيح، كما في الجدول أعلاه.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VVvSSum9GnPIeJhJSuC8CA==": {
+      "description": "Strings page point title: words used on many pages",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الكلمات المشتركة، مرة واحدة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Der7UKrjBbMrI58bHq/Bpw==": {
+      "description": "Strings page point: a word used on many pages is given once to voidFbtee and translated once",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الكلمة المستعملة في صفحات كثيرة، ككلمات القائمة، تُعطى مرة واحدة لـ voidFbtee في vite.config.ts، مع وصفها، وتُترجم مرة واحدة.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hCYToQBG97vWabsRO8x/Rw==": {
+      "description": "Strings page point title: finding what's untranslated",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لا شيء يفوت",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+E7jk91kiDc3/q8UErfn1Q==": {
+      "description": "Strings page point: void-fbtee check lists what is untranslated, and the lint rules catch text not marked",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يسرد void-fbtee check كل نص لم يُترجم بعد في أي لغة، وتُبلغ قواعد فحص fbtee عن نص مكتوب في مكوّن بلا fbt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hC/uuazRUITa0nHQfPmwyg==": {
+      "description": "Strings page section title: one sentence with a count, shown for several counts",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "جملة واحدة، لكل عدد",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bGG9eGtKcHRw+2cw0ZMGIw==": {
+      "description": "Strings page section title: what translated strings take",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ما يتطلبه الأمر",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "omyx0QbtSL68JpfA+DIVoQ==": {
+      "description": "Strings page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "كل كلمة في هذا الموقع مُعلَّمة في الشيفرة بـ fbtee، ولكل لغة ملف فهرس بترجماتها. هذا ما يتطلبه الأمر، مع الأسطر التي تقوم به.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EqG9EN7jYqigN14Xh2JBwA==": {
+      "description": "Strings page: the table shows one plural sentence for several counts, in this page's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الجملة نفسها لستة أعداد، بلغة هذه الصفحة. والعمود الثاني صيغة الجمع التي تضع فيها اللغة كل عدد، كما يسمّيها Intl.PluralRules.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "i/MdP3gsGmDEKBj4uhRyAA==": {
+      "description": "Translating page point title: the translate script hands the work to Claude Code",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "أمر واحد، يقوم به Claude Code",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jtUuydgLCMbWwHfQ2CIwGQ==": {
+      "description": "Translating page point: the translate script prepares the catalogs and hands the work to Claude Code with void-fbtee's skill",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يجمع vp run i18n:translate النصوص الجديدة في كل فهرس، ثم يسلّم العمل إلى Claude Code مع مهارة void-fbtee: النصوص، وصفحات Markdown التي تغيّرت. وملف AGENTS.md في التطبيق يقول ذلك أيضًا، فطلب ترجمة التطبيق من Claude Code يفعل الشيء نفسه.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CsY7QsE69lQzED6yPnTlEQ==": {
+      "description": "Translating page point title: translations are files to review",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ملفات تراجعها",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Z5HLziNAw3FE2qyVKj2yfw==": {
+      "description": "Translating page point: translations are files in the repository, reviewed and committed like code",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الترجمات ملفات في المستودع، فهرس لكل لغة ونسخة من كل صفحة Markdown، فتُراجع بـ git diff وتُحفظ كالشيفرة. لا يُترجم شيء والزائر ينتظر.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QWTleZIgt+OQTekLHF+MJw==": {
+      "description": "Translating page point title: what people post is translated as it's posted",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ما ينشره الناس، عند نشره",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PiM5wxtePrk1NeOis7gFQA==": {
+      "description": "Translating page point: a posted event goes to a queue whose consumer translates it with Workers AI",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الفعالية التي ينشرها أحد ليست في المستودع، فتُترجم عند نشرها: يذهب المنشور إلى طابور، ويطلب مستهلكه من Workers AI كل لغة أخرى في التطبيق، بعد أن يتلقى الناشر جوابه.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XxIseC//t+ZDp/MXfOKBvw==": {
+      "description": "Translating page section title: this app's catalogs, one per language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "فهارس هذا التطبيق",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "X0UGyc2IqB5dmQPhCrvl7A==": {
+      "description": "Translating page section title: how the app is translated",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "كيف يتم ذلك",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "go4hg/3m6IV9tBrvRVt+lg==": {
+      "description": "Translating page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يترجم Claude Code نص التطبيق نفسه، إلى ملفات في المستودع تراجعها أنت. وما ينشره الناس يترجمه Workers AI عند نشره. هذا كلٌّ منهما، مع الأسطر التي تقوم به.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "EYkqTAts0TYxkS2Z2dl5oQ==": {
+      "description": "Translating page: how many of a catalog's strings are translated",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تُرجم {translated} من {strings} نصًا",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "y21dje6+O2aW8hjr7VbxIQ==": {
+      "description": "Translating page: link to the events, whose posts are translated by Workers AI",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يترجم Workers AI الفعاليات: {link}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kWZkiGUUPLl04F06tVbaXg==": {
+      "description": "Translating page: link text to the list of events",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "شاهدها",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }
