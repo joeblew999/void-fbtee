@@ -159,12 +159,29 @@ to arrive the right way round, right to left in Gmail included.
 Each value below is a `<Fmt>` island (`src/docs/Fmt.tsx`), so it's formatted for you, in
 this page's language:
 
-- A number: <Fmt num="1234567.891" />
-- Money: <Fmt money="1299" currency="THB" />
-- A time, on its place's clock: <Fmt when="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
-- The same time, on yours: <Fmt yours="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
-- How far off it is: <Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
-- Languages, named in yours: <Fmt langs />
+**A number**
+
+<Fmt num="1234567.891" />
+
+**Money**
+
+<Fmt money="1299" currency="THB" />
+
+**A time, on its place's clock**
+
+<Fmt when="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+
+**The same time, on yours**
+
+<Fmt yours="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+
+**How far off it is**
+
+<Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+
+**Languages, named in yours**
+
+<Fmt langs />
 
 Back to [every time, twice](./tour.md#times), or [see the upcoming events](../events).
 

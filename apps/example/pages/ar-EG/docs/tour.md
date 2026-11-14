@@ -14,7 +14,7 @@ for (const el of document.querySelectorAll("[data-your-zone]")) {
 title: جولة
 description: انشر فعالية، احجز مقعدًا، وشاهد كل موعد بتوقيت مكان الفعالية وبتوقيتك.
 updated: "2026-11-14"
-translatedFrom: "7cf1992461d8"
+translatedFrom: "efbaa12ffbd6"
 ---
 
 # فعاليات تعرف كم الساعة عندك
@@ -149,12 +149,29 @@ const email = await inLocale(booking.locale, ({ locale, dir }) =>
 
 كل قيمة أدناه جزيرة `<Fmt>` (`src/docs/Fmt.tsx`)، فهي منسّقة لك بلغة هذه الصفحة:
 
-- رقم: <Fmt num="1234567.891" />
-- مبلغ: <Fmt money="1299" currency="THB" />
-- وقت، بتوقيت مكانه: <Fmt when="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
-- الوقت نفسه، بتوقيتك: <Fmt yours="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
-- كم بقي عليه: <Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
-- أسماء اللغات، بلغتك: <Fmt langs />
+**رقم**
+
+<Fmt num="1234567.891" />
+
+**مبلغ**
+
+<Fmt money="1299" currency="THB" />
+
+**وقت، بتوقيت مكانه**
+
+<Fmt when="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+
+**الوقت نفسه، بتوقيتك**
+
+<Fmt yours="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+
+**كم بقي عليه**
+
+<Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+
+**أسماء اللغات، بلغتك**
+
+<Fmt langs />
 
 عُد إلى [كل موعد مرتين](./tour.md#times)، أو [شاهد الفعاليات القادمة](../events).
 

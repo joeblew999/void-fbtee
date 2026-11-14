@@ -229,7 +229,9 @@ Pages under `pages/<source locale>/` have a copy per locale at the same path und
   `<kbd>`, and code blocks with their meta (`{4} :line-numbers`) and `// [!code …]` comments.
 - **Dates, times, numbers:** a page shows them through a component that formats them with `Intl`
   (an island, with the value as a prop), not as written-out text. Leave the component as it is;
-  if the original has one written out, keep it as written and say so in your summary.
+  if the original has one written out, keep it as written and say so in your summary. An island
+  goes on a line of its own, between paragraphs: @void/md cuts the page's HTML at each island, so
+  one inside a list item, a table or a sentence breaks the HTML around it (the list falls apart).
 - **translatedFrom:** each translated page records the original it came from in its frontmatter.
   Don't write it yourself: `void-fbtee translate` records it, and after a hand translation run
   `void-fbtee stamp pages/<locale>/<path>.md`. For a page `check` reports out of date, compare it

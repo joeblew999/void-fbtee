@@ -14,7 +14,7 @@ for (const el of document.querySelectorAll("[data-your-zone]")) {
 title: ทัวร์
 description: โพสต์กิจกรรม จองที่นั่ง และดูทุกเวลาตามนาฬิกาของกิจกรรมและของคุณ
 updated: "2026-11-14"
-translatedFrom: "7cf1992461d8"
+translatedFrom: "efbaa12ffbd6"
 ---
 
 # กิจกรรมที่รู้ว่าตอนนี้ที่คุณอยู่เป็นเวลาเท่าไร
@@ -150,12 +150,29 @@ const email = await inLocale(booking.locale, ({ locale, dir }) =>
 
 ทุกค่าด้านล่างเป็น island `<Fmt>` (`src/docs/Fmt.tsx`) จึงจัดรูปแบบให้คุณ เป็นภาษาของหน้านี้:
 
-- ตัวเลข: <Fmt num="1234567.891" />
-- เงิน: <Fmt money="1299" currency="THB" />
-- เวลาตามนาฬิกาของสถานที่: <Fmt when="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
-- เวลาเดียวกันตามนาฬิกาของคุณ: <Fmt yours="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
-- อีกนานเท่าไร: <Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
-- ชื่อภาษาในภาษาของคุณ: <Fmt langs />
+**ตัวเลข**
+
+<Fmt num="1234567.891" />
+
+**เงิน**
+
+<Fmt money="1299" currency="THB" />
+
+**เวลาตามนาฬิกาของสถานที่**
+
+<Fmt when="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+
+**เวลาเดียวกันตามนาฬิกาของคุณ**
+
+<Fmt yours="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+
+**อีกนานเท่าไร**
+
+<Fmt ago="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+
+**ชื่อภาษาในภาษาของคุณ**
+
+<Fmt langs />
 
 กลับไปที่[ทุกเวลาแสดงสองแบบ](./tour.md#times) หรือ[ดูกิจกรรมที่กำลังจะมาถึง](../events)
 

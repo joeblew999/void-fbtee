@@ -176,6 +176,13 @@
   text-align: left;
 }
 
+/* A <Fmt> value on its own line under its label (the tour's "Formatted for you"): @void/md places an
+   island only on a line of its own, as a block between paragraphs. Close under its label, with the
+   paragraph's space before the next one. */
+.void-md [data-island="src/docs/Fmt"] {
+  margin-block: -0.75em 1.25em;
+}
+
 /* @void/md (1.7.0 and 1.8.0) places heading anchors with physical left (float: left; margin-left),
    so in right-to-left pages they stick out past the left edge. The same, in logical directions.
    Reported as voidzero-dev/void#802: remove this when it's fixed. */

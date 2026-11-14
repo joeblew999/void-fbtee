@@ -82,5 +82,12 @@ language like Intl (fixed data). Its strings translated into Arabic and Thai lik
 - Code in the Arabic markdown pages ran right to left: code blocks and inline code took the page's
   direction, so `=>` showed as `<=` and brackets reversed (the tour's existing blocks too). Fixed in
   pages/style.css: markdown code is left to right and isolated from the sentence around it.
-- Not changed here: on the tour's "Formatted for you" list, each value drops to its own line and the
-  first item has no bullet, in every language (the `<Fmt>` islands in list items).
+- The tour's "Formatted for you" list fell apart (each value on its own line, the first bullet
+  gone) in every language: @void/md cuts the page's HTML at each island (its plugin.mjs, the React
+  emitter), so an island inside a list item breaks the list. Each value is now on a line of its own
+  under its label, in all three copies, and the SKILL says islands go on a line of their own.
+- The Emails page's frames were a fixed height; each now fits its email once loaded.
+- A dev reminder test failed once on 2026-11-13 (at about 34 s, past the 30 s wait for its email),
+  its error not kept; three cold starts of dev, each followed straight away by the dev tests, all
+  passed (8/8). Left as it is: the next failure's message says whether the email was late or sent
+  twice.

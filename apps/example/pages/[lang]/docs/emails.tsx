@@ -2,7 +2,7 @@
 // in this page's language (the loader), shown as a mail app gets them, and what it takes for a
 // translated email to arrive the right way round, each with the file and the code that does it.
 // What's void-fbtee's (inLocale, langAttrs) and what's this app's (its look, in EmailLayout.tsx).
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { fbt } from "fbtee";
 import { PageSections } from "@/docs/PageSections";
 import type { Props } from "./emails.server";
@@ -11,16 +11,33 @@ type Shown = Props["booking"];
 
 /** One email: its subject, its HTML as a mail app shows it, and its text version. */
 function Preview({ id, name, email }: { id: string; name: ReactNode; email: Shown }) {
+  // The frame as tall as its email, once loaded (it may have loaded before the page hydrated).
+  const frame = useRef<HTMLIFrameElement>(null);
+  useEffect(() => {
+    const el = frame.current;
+    if (!el) return;
+    // Measured collapsed: a document is never shorter than its frame.
+    const fit = () => {
+      const doc = el.contentDocument?.documentElement;
+      if (!doc) return;
+      el.style.height = "0px";
+      el.style.height = `${doc.scrollHeight}px`;
+    };
+    if (el.contentDocument?.readyState === "complete") fit();
+    el.addEventListener("load", fit);
+    return () => el.removeEventListener("load", fit);
+  }, [email.html]);
   return (
     <figure className="space-y-3" data-email={id}>
       <figcaption className="text-sm text-muted-foreground">{name}</figcaption>
       <p className="font-medium" data-testid={`${id}-subject`}>
         {email.subject}
       </p>
-      {/* Sandboxed: the email's own HTML, with nothing of the page's. */}
+      {/* Sandboxed: the email's own HTML, no scripts; same origin only so the page can measure it. */}
       <iframe
+        ref={frame}
         srcDoc={email.html}
-        sandbox=""
+        sandbox="allow-same-origin"
         title={email.subject}
         className="h-[28rem] w-full rounded-lg border bg-[rgb(20,22,28)]"
       />
