@@ -69,11 +69,16 @@ another, through a relay made on the account. Its result decides the plan:
 - **If they don't:** moq-dev's own relay (`moq-relay`, open source), or Cloudflare's own sample
   clients.
 
-## Where it lives: a package, `void-live`
+## Where it lives: a package, `void-moq`
+
+Its name: `void-moq`, MoQ for Void, as `void-fbtee` is fbtee for Void. Not "void-live": Void has
+its own live feature, `void/live` (`defineLiveStream`, `guide/live.md`), which the example already
+uses for seat counts (`src/events/live.ts`), and a package with that name would read as Void's own,
+or as a wrapper around it.
 
 Video doesn't belong in an app's own code: every app that wants it would write the same relay
 setup, tokens, players and caption pipeline. So it's a package beside void-fbtee in this repo,
-`packages/void-live`, and the example uses it as any app would (dog-fooding it, as it does
+`packages/void-moq`, and the example uses it as any app would (dog-fooding it, as it does
 void-fbtee).
 
 It's a separate package, not part of void-fbtee:
@@ -81,20 +86,20 @@ It's a separate package, not part of void-fbtee:
 - void-fbtee stays about language;
 - an app can have one without the other.
 
-The captions are where the two meet. `void-live` reads each watcher's language from void-fbtee
+The captions are where the two meet. `void-moq` reads each watcher's language from void-fbtee
 when it's there, and from the browser's language when it isn't.
 
 It's shaped like void-fbtee, so it feels the same to use:
 
-- **`void-live/plugin`:** `voidLive()` in `vite.config.ts`, which sets up the relay (Cloudflare's
+- **`void-moq/plugin`:** `voidMoq()` in `vite.config.ts`, which sets up the relay (Cloudflare's
   MoQ relay, made once with the deploy's token) and the routes that hand out short-lived tokens.
-- **`void-live/server`:** `publishToken()` and `watchToken()`. The app decides who may do which,
+- **`void-moq/server`:** `publishToken()` and `watchToken()`. The app decides who may do which,
   because only it knows its own rules (here: the event's key to publish, a booking to watch).
-- **`void-live/react`:** `<Broadcast>` and `<Watch>` around moq-dev's web components, with captions
+- **`void-moq/react`:** `<Broadcast>` and `<Watch>` around moq-dev's web components, with captions
   in the watcher's language and the right direction.
 - **Captions:** the speech-to-text and translation pipeline, inside the package. The app only
   says which languages to make captions in.
-- **`void-live init`** and a skill (`skills/void-live/SKILL.md`), like void-fbtee's: an app adds it
+- **`void-moq init`** and a skill (`skills/void-moq/SKILL.md`), like void-fbtee's: an app adds it
   with one command, and an agent can read how to use it.
 - Its own unit tests in the package, and a fresh-app test like void-fbtee's (`e2e/fresh/`), so it's
   checked the way a developer receives it.
