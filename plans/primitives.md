@@ -1,6 +1,6 @@
 # plans/primitives.md: void-fbtee's base primitives, before anything is built on them
 
-Status: proposed 2026-11-14, waiting for the user's OK. Comes after `plans/their-own-language.md`, and before
+Status: proposed 2026-11-14, waiting for the user's OK. Comes after `plans/fbtee-fully.md` and `plans/their-own-language.md`, and before
 `plans/use-cases.md` and `plans/video-conferencing.md`: both are built from these.
 
 ## Why
@@ -80,44 +80,10 @@ on 2026-11-14.
     setup. The package gives `sendInLocale(reader, email)` around Void's `sendEmail`. The look stays
     the app's.
 
-## What fbtee already gives, to use rather than rebuild
+## fbtee
 
-From the whole of fbtee 6.0.0's README and its type definitions (`ReactTypes.d.ts`, the package's
-exports), read 2026-11-14.
-
-Already used:
-
-- `<fbt>`/`fbs`, `<fbt:param>` and `<fbt:plural>`;
-- common strings and `list()`;
-- `runWithFbtee` per request, and `setupLocaleContext` in the browser;
-- `fallbackLocales`;
-- the compiler's collect, prepare and translate (including its partial-catalog fallback);
-- the lint rules.
-
-Not used yet, and wanted:
-
-- **Scoped runtimes:** `createFbteeRuntime`, `LocaleProvider` and `useFbt()` show part of a page in
-  another language. Uses:
-  - the use-cases page's rows, each person in their own language;
-  - `void-moq`'s captions panel in the watcher's language.
-
-  void-fbtee wraps it with the app's catalogs, rather than writing its own.
-
-- **Lists:** `list` and `<fbt:list>` ("Bangkok, Cairo and New York", with each language's own "and").
-  For the use cases' "who's watching from where".
-- **Choices from a fixed set:** `<fbt:enum>`, each value translated in its sentence. That's how
-  `plans/use-cases.md`'s "how they take part" (there, online, organising) gets written, not as
-  separate strings joined together.
-- **A person's name in a sentence:** `<fbt:name>`, which carries that person's gender into the
-  translation ("Laila booked a seat" is worded by Laila's gender in Arabic).
-- **Gender:** fbtee's viewer gender and `<fbt:pronoun>`. Arabic, for one, words "you booked"
-  differently for a man and a woman. `Reader` gets an optional gender, used only when the person
-  gives it, never guessed, for emails and tickets that address them.
-- **Missing translations at run time:** `onMissingTranslation`, so a string missing in production
-  is logged once, beside the build-time report the plugin already gives.
-- **Its translate skill** (`node_modules/fbtee/skills/fbtee-translate/SKILL.md`). It does what
-  `void-fbtee translate` asks Claude Code to do. Check whether ours repeats it, and if it does, use
-  theirs.
+Using fbtee fully is its own plan, done first: `plans/fbtee-fully.md`. The primitives here are built
+on what it adopts (scoped runtimes, `<fbt:enum>`, `<fbt:name>`, gender), not beside it.
 
 ## Not void-fbtee's
 
