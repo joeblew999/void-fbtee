@@ -1,7 +1,7 @@
 # plans/their-own-language.md: every visitor lands in their own language
 
-Status: proposed 2026-11-14, waiting for the user's OK. Comes before everything else in `plans/`:
-it's the front door, and it's broken.
+Status: proposed 2026-11-14; its unknowns were checked the same day (below, "What was checked"). Waiting
+for the user's OK. Comes before everything else in `plans/`: it's the front door, and it's broken.
 
 ## The bug
 
@@ -44,46 +44,60 @@ the page.
    think the user's language may be" (developers.google.com/search/docs/specialty/international/
    managing-multi-regional-sites, read 2026-11-14).
 2. **An address without a language follows the person.** This lives in void-fbtee's middleware, so
-   it can't know any app's paths: it knows only the app's languages and what Void itself tells it.
-   - **`"/"`:** a 302 to `/<best language>`.
-   - **Anything else whose first segment isn't one of the app's languages.** Today the middleware
-     already finds these: when the route that will answer is one under `pages/[lang]/` (its first
-     segment is a parameter, `answeringRoute()` in `packages/void-fbtee/src/middleware.ts`), it
-     hands them to Void's not-found handler. That handler serves a real file if there is one
-     (`/void.svg`), and otherwise the not-found page. The change: when no file answers and the
-     request is a page load (`Sec-Fetch-Dest: document`, or `Accept: text/html`), answer with a 302
-     to the same path under the best language (`/<best>` + the path). Whether that page exists is
-     the app's own routing: the browser lands on it, or on the not-found page in its own language.
-   - **The app's own routes** (`/api/…`, `/__void/…`, its `routes/` files, which don't start with a
-     parameter) and real files are left alone, as today.
-   - **Only `GET` and `HEAD` page loads redirect.** A `POST` to an address without a language (a form
-     sent from somewhere else) gets the not-found answer as today, never a redirect that would drop
-     its body.
+   it can't know any app's paths: it knows only the app's languages and what Void itself tells it. It
+   redirects when all of these hold:
+   - the first segment isn't one of the app's languages;
+   - it isn't one of the app's own routes (`/api/…`, `/__void/…`, its `routes/` files). Void reports
+     the route that will answer (`answeringRoute()` in `packages/void-fbtee/src/middleware.ts`): an
+     app's own route has a fixed first segment (`/robots.txt`, `/tickets/:id`). Anything else is
+     either no route at all (`"/"`, `/docs/intl`, `/events/new`) or one under `pages/[lang]/` that
+     takes the first segment as the language (`/events` read as `/:lang`);
+   - Void's not-found handler answers 404, not a real file. The middleware calls `c.notFound()`
+     itself for these, as it already does for made-up languages, because Void would otherwise only
+     decide "not found" after the middleware has returned;
+   - it's a page load: `GET` or `HEAD`, with `Sec-Fetch-Dest: document` (every engine sends it
+     since 2023-03; caniuse.com, read 2026-11-14), or, from a client that sends no `Sec-Fetch-Dest`,
+     an `Accept` that includes `text/html`. A `POST`, a script's `fetch` and an image never redirect.
+
+   Then: a 302 to the same path under the best language (`/<best>` + the path, or `/<best>` for
+   `"/"`). Whether that page exists is the app's own routing: the browser lands on it, or on the
+   not-found page in its own language.
    - **The match**, in `negotiate(acceptLanguage, locales)` in the package:
      - the browser's languages in their `q` order, each tried exactly first, then by its language
        alone: `th` gives `th-TH`, `ar-SA` gives `ar-EG`, `en-GB` gives `en-US`;
      - the source language when nothing matches (`fr`), or when there's no header at all. That's
        Google's crawler, which sends none.
-   - **The response** is marked `Vary: Accept-Language`. Void then never shares it: "Responses that
-     vary by request headers, such as `Vary: Accept-Language` … are rendered live"
-     (`node_modules/void/docs/guide/edge/revalidation.md`, Void 1.8.0, read 2026-11-14). It's also
-     `Cache-Control: private, no-store`, so no browser or proxy keeps one person's answer for
-     another.
-   - **Search engines see the routing for what it is:** each page's hreflang `x-default`, and the
-     sitemap's, becomes its address without a language. An auto-redirecting root is fine as the
-     `x-default` (John Mueller, seroundtable.com, read 2026-11-14).
+   - **The response is never shared:** Void itself marks the 302 `Cache-Control: no-store`. In the
+     check below it replaced the middleware's own `Vary` and `Cache-Control` with its own, so the plan
+     relies on Void's `no-store`, and the tests check for it, rather than on headers the middleware
+     sets.
+   - **Search engines:**
+     - the home page's hreflang `x-default`, and the sitemap's, becomes `"/"`, the auto-redirecting
+       home page. Google's own words: "Consider adding a fallback page for unmatched languages,
+       especially on language/country selectors or auto-redirecting home pages. Use the x-default
+       value" (developers.google.com/search/docs/specialty/international/localized-versions, read
+       2026-11-14);
+     - every other page keeps its source-language page as `x-default`, as today. Google endorses
+       redirecting addresses for home pages only, and an hreflang target that redirects can void the
+       annotation. So the other unprefixed addresses redirect people, but aren't advertised.
    - **Void's own docs show a different way:** a rewrite by `Accept-Language`, serving another
      language at the same address (`reference/api/rewrites.md`). We don't do that. It would put two
      languages behind one URL, which breaks the rule "one address per language".
+
 3. **A language page reached from outside offers the person's own language.** Two conditions:
    - the page is in a language other than the person's best match from `navigator.languages`;
-   - they arrived from outside the site: a search result or a shared link (`document.referrer` isn't
-     this site).
+   - they arrived from outside the site: `document.referrer` is empty (a typed address, an email, an
+     app) or another site's (a search result, a shared link).
 
    When both hold, a small notice in _their_ language offers the same page in their language. It's
-   added by the browser after hydration, so the cached page stays the same for everyone. Once they
-   move around inside the site, it doesn't show again, so there's nothing to dismiss and nothing to
-   remember. It's a package component, `<YourLanguage>`; how it looks is the app's.
+   added by the browser after hydration, so the cached page stays the same for everyone.
+
+   `document.referrer` belongs to the document, and doesn't change when Void moves between pages
+   without reloading. So `<YourLanguage>` goes in the root layout, which Void keeps across those moves
+   (`reference/api/pages.md`: "layouts persist"), and decides once per document. A link that reloads
+   the page (the header's language links are plain links) makes a new document whose referrer is this
+   site, so it doesn't show again. There's nothing to dismiss and nothing to remember. How it looks is
+   the app's.
 
 4. **The header's language links stay** as plain links to this page in each language, each named in
    its own language. That's for someone who wants another language on purpose. They're not the way
@@ -108,13 +122,40 @@ the page.
   - `SiteHeader.tsx`'s comment no longer calls the links the way in.
 - **README:** the line about `"/"`.
 
-## First, two things to check in Void
+## What was checked (2026-11-14), before writing the code
 
-- **That the middleware runs for `"/"` once Void's fixed redirect is gone.** On Cloudflare, an app
-  with middleware sends every request to the Worker first (noted in
-  `packages/void-fbtee/src/middleware.ts`). Check it in dev, the preview and the deploy.
-- **That Void's page cache never stores these redirects,** with the `Vary` above, checked in the
-  preview by a second request in another language.
+The checks ran on the dev server and on the built Worker (`vp preview`, workerd), with a temporary
+probe and a rough version of the redirect in the middleware. Both were reverted afterwards.
+
+- **The middleware sees `"/"` once Void's fixed redirect is gone:** yes, in both.
+- **What Void reports as the answering route:**
+
+  | Address                                            | What Void reports |
+  | -------------------------------------------------- | ----------------- |
+  | `"/"`, `/docs/intl`, `/events/new`, `/events/<id>` | no route at all   |
+  | `/events`, `/nope`                                 | `/:lang`          |
+  | `/xx-XX/events`                                    | `/:lang/events`   |
+  | `/robots.txt`, `/sitemap.xml`, `/tickets/:id`      | their own routes  |
+
+  So the first rule written here ("the answering route starts with a parameter") would have missed
+  most pages. The rule above covers both cases.
+
+- **Void decides "not found" only after the middleware returns,** so the middleware calls
+  `c.notFound()` itself to see the 404.
+- **Files** (`/void.svg`, `/pwa-192x192.png`) are answered before the middleware locally. On
+  Cloudflare they reach the Worker, and Void's not-found handler serves them (200), so they're never
+  redirected.
+- **With the rough redirect in place**, on the built Worker:
+  - `/docs/intl` asked for in Thai, Arabic (`ar-SA`) and with no language, twice over, gave
+    `/th-TH/…`, `/ar-EG/…` and `/en-US/…` every time. Nothing was shared;
+  - `"/"`, `/events/new` and an event's page went to the right language;
+  - files, `/robots.txt`, `/sitemap.xml`, `/api/live` and `/tickets/<unknown>` were left alone;
+  - `/th-TH/…` never moved;
+  - the rough version also redirected a `POST`, which the real one won't (rule above).
+- **Void replaced the redirect's own `Vary` and `Cache-Control`** with `Vary: X-VoidPages…` and
+  `no-store` (see "never shared" above).
+- **Still to see on Cloudflare itself,** after deploying: a Thai request for `"/"` lands on `/th-TH`,
+  a file still loads, and the redirect is `no-store` there too (in "How we'll know").
 
 ## How we'll know it's right
 
