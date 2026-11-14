@@ -1,10 +1,15 @@
-# plans/translated-pdfs.md: translated PDF tickets, documented by the package and shown by the example
+# plans/translated-pdfs.md: translated PDFs, documented by the package and shown by the example
 
 Status: proposed 2026-11-14, waiting for the user's OK.
 
 ## Why
 
-People who book want a ticket they can keep, print or show at the door, in their own language. The
+The feature is translated PDFs, for any document an app prints (tickets, invoices, receipts,
+reports). The docs, homepage, tour, SKILL and README call it "PDFs" or "Translated PDFs", never
+"tickets". The example's case is the booking ticket, the way the Emails page uses the booking
+email as its sample.
+
+In the example, people who book want a ticket they can keep, print or show at the door, in their own language. The
 hard part is Arabic (letters joined, right to left) and Thai (no spaces, so lines must break between
 words), with only the fonts already on the machine (the project's system-fonts rule: no font files).
 
@@ -60,11 +65,12 @@ look like one thing.
 
 ## How it's documented and shown (the same way as emails)
 
-- **Docs page `/[lang]/docs/pdfs`**, next to Emails in `DocsLayout.tsx`: the sample ticket shown
+- **Docs page `/[lang]/docs/pdfs`**, titled "PDFs", next to Emails in `DocsLayout.tsx`: written for
+  any PDF an app makes, with the example's ticket as the sample, shown
   as the real PDF in en/ar/th (embedded, with a download link), then a few points with the real
   code lines, as `emails.tsx` does. The sample is printed once per language and kept in R2, so
   visitors don't spend browser time.
-- **Homepage:** a "PDF tickets" card in `HomeSections.tsx` whose "Read more" link goes to the new
+- **Homepage:** a "PDFs" card (what any app can print, translated) in `HomeSections.tsx` whose "Read more" link goes to the new
   docs page (`href: routeUrl("/[lang]/docs/pdfs")`, as the Emails card links to `/docs/emails`).
   The card grid's comment says "seven features"; it becomes eight.
 - **Tour (`tour.md` en/ar/th):** a short PDFs section after emails.
