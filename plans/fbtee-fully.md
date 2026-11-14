@@ -129,7 +129,16 @@ used.
    only when the person has given their gender, never guessed.
 
 Steps 4–7 are each shown working in the example: the Strings page gets a section for each, in all
-three languages, so the later plans use them as they're meant. Then the skill and README say which
+three languages, so the later plans use them as they're meant.
+
+**The rule: all of fbtee that fits, and every piece shown.** The example is how void-fbtee is
+proven, so every fbtee feature an app could need is used where the example has a real case for it,
+and shown on the Strings page either way. That covers `<fbt:same-param>` too (the same value twice
+in one sentence), shown there even though the events app has no case for it yet. One piece stays
+out, with its reason written in the skill: fbtee's own language switching (`createLocaleContext`,
+`useLocaleContext().setLocale`) changes a page's language in place. void-fbtee gives each language
+its own address (`plans/their-own-language.md`), so a page never switches language where it
+stands. Then the skill and README say which
 fbtee piece does what, without repeating fbtee.
 
 ## A source language other than English
