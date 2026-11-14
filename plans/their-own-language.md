@@ -56,6 +56,9 @@ the page.
      the app's own routing: the browser lands on it, or on the not-found page in its own language.
    - **The app's own routes** (`/api/…`, `/__void/…`, its `routes/` files, which don't start with a
      parameter) and real files are left alone, as today.
+   - **Only `GET` and `HEAD` page loads redirect.** A `POST` to an address without a language (a form
+     sent from somewhere else) gets the not-found answer as today, never a redirect that would drop
+     its body.
    - **The match**, in `negotiate(acceptLanguage, locales)` in the package:
      - the browser's languages in their `q` order, each tried exactly first, then by its language
        alone: `th` gives `th-TH`, `ar-SA` gives `ar-EG`, `en-GB` gives `en-US`;
@@ -95,7 +98,10 @@ the page.
   - `react.tsx`: `<YourLanguage>`;
   - `init.ts`: writes no fixed redirect, and removes one that `init` wrote before;
   - `check.ts`: reports a fixed redirect for `"/"` as the bug;
-  - `skills/void-fbtee/SKILL.md`.
+  - `skills/void-fbtee/SKILL.md`;
+  - `package.json`: the version's minor number goes up, since it changes what apps get at `"/"`.
+    CI then releases it (`.github/workflows/ci.yml`, release job), and the release notes say an app
+    should drop its own fixed redirect: `void-fbtee check` says so too.
 - **Example:**
   - `void.config.ts`: the fixed redirect and its comment go;
   - the root layout shows `<YourLanguage>`;
@@ -129,6 +135,7 @@ The preview tests use real requests and real browsers, not stand-ins.
 - `/th-TH/…` never redirects, whatever the browser asks for.
 - Files and the app's own routes are left alone: `/void.svg`, `/robots.txt`, `/sitemap.xml`,
   `/api/live`.
+- A `POST` to an address without a language isn't redirected.
 - A made-up path (`/nope`, `/xx-XX/events`) goes to the not-found page in the person's own language,
   not in English. The preview test that expects a 404 at once changes with it.
 - In Playwright:
