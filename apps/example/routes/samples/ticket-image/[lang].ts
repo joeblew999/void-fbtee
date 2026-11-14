@@ -11,7 +11,7 @@ export const GET = defineHandler.withValidator({ params: z.object({ lang: z.enum
   async (c, { params: { lang } }) => {
     let image: Uint8Array | undefined;
     try {
-      image = await sampleImage(lang, new URL(c.req.url).origin, c.env.BROWSER);
+      image = await sampleImage(lang, c.env.BROWSER);
     } catch (error) {
       if (!(error instanceof PrintError)) throw error;
       console.warn("sample ticket picture not made:", error.message);

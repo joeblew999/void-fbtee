@@ -3,18 +3,20 @@
 // the event on the site they booked on. A job has no request and no page language: the email is
 // written with inLocale() (src/events/emails.ts). The window is the 24 hours after the run's own
 // scheduledTime, so daily runs cover every start once and no event is reminded twice. A booker
-// who ticked the box when booking gets their PDF ticket attached again.
+// who ticked the box when booking gets their PDF ticket attached again. The same run deletes the
+// PDF tickets of events that started a week before.
 //
 // Cloudflare runs it on its Cron Trigger; in dev, Void's trigger runs it on demand
 // (`POST /__void/scheduled`, guide/jobs.md), as e2e/dev/jobs.test.ts does.
 import { bookings, event_texts, events } from "@schema";
 import { defineScheduled } from "void";
-import { and, db, gte, inArray, lt } from "void/db";
+import { and, db, eq, gte, inArray, lt } from "void/db";
 import { Temporal } from "temporal-polyfill";
 import type { AppLocale } from "void-fbtee/locales";
 import { pickText } from "void-fbtee/server";
 import { sendReminderEmail } from "@/events/emails";
-import { ticketPdf } from "@/events/tickets";
+import { KEEP_TICKETS_MS, ticketKey, ticketPdf } from "@/events/tickets";
+import { storage } from "void/storage";
 import { SITE } from "@/site";
 
 // 06:00 UTC every day: early morning in Bangkok, late evening before in the Americas.
@@ -24,8 +26,32 @@ export const cron = "0 6 * * *";
 const utc = (ms: number) =>
   Temporal.Instant.fromEpochMilliseconds(ms).toString({ smallestUnit: "second" });
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * The PDF tickets of events that started a week before this run, in the same kind of 24-hour
+ * window as the reminders, so each event's are deleted once. A ticket never printed is no matter:
+ * R2 deletes what's there.
+ */
+async function deleteOldTickets(from: number) {
+  const done = await db
+    .select({ id: bookings.id })
+    .from(bookings)
+    .innerJoin(events, eq(events.id, bookings.event_id))
+    .where(
+      and(
+        gte(events.starts_at_utc, utc(from - KEEP_TICKETS_MS - DAY_MS)),
+        lt(events.starts_at_utc, utc(from - KEEP_TICKETS_MS)),
+      ),
+    );
+  // R2 deletes up to 1,000 keys a call (Cloudflare's R2 Workers API reference, checked 2026-11-14).
+  for (let i = 0; i < done.length; i += 1000)
+    await storage.delete(done.slice(i, i + 1000).map((b) => ticketKey(b.id)));
+}
+
 export default defineScheduled(async (controller, env) => {
   const from = controller.scheduledTime;
+  await deleteOldTickets(from);
   const soon = await db
     .select()
     .from(events)

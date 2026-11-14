@@ -11,6 +11,7 @@ import {
   browser,
   deleteEvent,
   emailTo,
+  keptTickets,
   postEvent,
   seeText,
   started,
@@ -92,7 +93,7 @@ test.skipIf(!!skip)(
 );
 
 test.skipIf(!!skip)(
-  "the poster books their own event and keeps the link; deleting cancels each booking in its language and tells an open page",
+  "the poster books their own event and keeps the link; deleting cancels each booking in its language, deletes their tickets and tells an open page",
   async () => {
     const p = await page();
     const poster = address("poster");
@@ -108,6 +109,11 @@ test.skipIf(!!skip)(
     await started(other);
     const laila = address("laila");
     await book(other, "Laila", laila);
+    const ticketIds = await Promise.all(
+      [p, other].map(async (page) =>
+        (await page.getByTestId("ticket").getAttribute("href"))!.replace("/tickets/", ""),
+      ),
+    );
     await p.getByTestId("delete").click();
     await p.getByTestId("delete-sure").click();
     await p.waitForURL(new RegExp(`/${SOURCE}/events$`));
@@ -121,5 +127,10 @@ test.skipIf(!!skip)(
     const ar = await emailTo(laila, /^تم إلغاء /);
     expect(ar.html).toMatch(/<html dir="rtl" lang="ar-EG">/);
     expect(ar.text).toContain(`${site}/ar-EG/events`);
+    // Their PDF tickets are gone too, even one the ticket queue was still printing when the event
+    // was deleted: each has its booker's name on it.
+    const left = async () =>
+      (await keptTickets()).filter((k) => ticketIds.some((id) => k.includes(id)));
+    await expect.poll(left, { timeout: 15_000 }).toEqual([]);
   },
 );

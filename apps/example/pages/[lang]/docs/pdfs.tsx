@@ -198,7 +198,10 @@ export default function PdfsPage() {
             src={`/samples/ticket-image/${locale}`}
             width={559}
             height={794}
-            alt={fbs("The sample ticket", "PDFs page: name of the frame that shows the sample PDF")}
+            alt={fbs(
+              "The sample ticket",
+              "PDFs page: description of the picture of the sample PDF ticket",
+            )}
             data-testid="pdf-sample"
             className="h-auto w-full rounded-lg border"
           />

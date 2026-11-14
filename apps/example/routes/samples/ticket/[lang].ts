@@ -11,7 +11,7 @@ export const GET = defineHandler.withValidator({ params: z.object({ lang: z.enum
   async (c, { params: { lang } }) => {
     let pdf: Uint8Array | undefined;
     try {
-      pdf = await samplePdf(lang, new URL(c.req.url).origin, c.env.BROWSER);
+      pdf = await samplePdf(lang, c.env.BROWSER);
     } catch (error) {
       if (!(error instanceof PrintError)) throw error;
       console.warn("sample ticket not printed:", error.message);

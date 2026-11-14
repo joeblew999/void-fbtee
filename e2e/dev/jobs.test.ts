@@ -12,6 +12,7 @@ import {
   deleteEvent,
   emailsTo,
   emailTo,
+  keptTickets,
   postEvent,
   runCron,
   runQueue,
@@ -32,7 +33,7 @@ afterAll(async () => {
 });
 
 test.skipIf(!!skip)(
-  "the reminder cron: each booker reminded in their language, linking here, the ticket attached for whoever asked; a run a day later sends none",
+  "the reminder cron: each booker reminded in their language, linking here, the ticket attached for whoever asked; a run a day later sends none; a week after it starts, the tickets are deleted",
   async () => {
     // An event three days from now at 18:00 UTC, posted from a browser on UTC.
     const start = new Date();
@@ -68,6 +69,16 @@ test.skipIf(!!skip)(
     expect(ar.attachments.find(isTicket)?.mimeType).toBe("application/pdf");
     expect(ar.text).toContain("تذكرتك مرفقة.");
     expect(th.attachments.some(isTicket)).toBe(false);
+
+    // Laila's ticket is kept until a week after the event started; the run that day deletes it.
+    const ticket = (await arabic.getByTestId("ticket").getAttribute("href"))!.replace(
+      "/tickets/",
+      "",
+    );
+    const kept = async () => (await keptTickets()).some((k) => k.includes(ticket));
+    expect(await kept()).toBe(true);
+    await runCron(DAILY, start.getTime() + 7 * 24 * 60 * 60 * 1000 + 12 * 60 * 60 * 1000);
+    expect(await kept()).toBe(false);
 
     // The next day's run: the event has started by then, so no second reminder.
     await runCron(DAILY, before + 24 * 60 * 60 * 1000);

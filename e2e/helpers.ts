@@ -302,5 +302,17 @@ export async function book(
   await page.getByTestId("booked").waitFor();
 }
 
+/**
+ * The PDF tickets the dev server keeps in R2 (not the docs' samples), read through the Cloudflare
+ * Vite plugin's local explorer (`/cdn-cgi/local/explorer/api`, which the dev server prints).
+ */
+export async function keptTickets(): Promise<string[]> {
+  const r = await fetch(
+    `${url("prod")}/cdn-cgi/local/explorer/api/r2/buckets/default/objects?prefix=tickets/`,
+  );
+  const { result } = (await r.json()) as { result: { key: string }[] };
+  return result.map((o) => o.key).filter((k) => !k.startsWith("tickets/sample/"));
+}
+
 /** A fresh address, so a test reads only its own emails from the shared inbox. */
 export const address = (who: string) => `${who}-${crypto.randomUUID().slice(0, 8)}@example.com`;

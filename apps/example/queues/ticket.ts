@@ -37,6 +37,11 @@ export default defineQueue<Message>(async (batch, env) => {
       }
       console.warn("ticket not printed, emailing without it:", String(error));
     }
+    // Deleted while its ticket was printing: its cancellation has gone instead.
+    if (!ticket && !(await bookingTicket(message.body.bookingId))) {
+      message.ack();
+      continue;
+    }
     if (await sendBookingEmail(booking.email, { ...booking.ticket, ticket })) message.ack();
     else message.retry({ delaySeconds: 60 });
   }

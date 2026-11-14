@@ -3618,18 +3618,6 @@
       ],
       "types": []
     },
-    "hMHmKUR1wg5dW9Fdm1eZvQ==": {
-      "description": "PDFs page: name of the frame that shows the sample PDF",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ตั๋วตัวอย่าง",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "I+w03GZW5OS8fNXYCy3plQ==": {
       "description": "PDFs page: link that opens the sample PDF on its own",
       "status": "translated",
@@ -3709,6 +3697,18 @@
       "translations": [
         {
           "translation": "แนบตั๋วของคุณมาแล้ว",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PYVHoz+qVApwKyp2Hp+hUA==": {
+      "description": "PDFs page: description of the picture of the sample PDF ticket",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ตั๋วตัวอย่าง",
           "variations": {}
         }
       ],

@@ -148,6 +148,21 @@ Where it differs from the plan above:
   (`bookings.ticket_in_reminder`, migration `20261114052207_mighty_screwball.sql`). The reminder
   cron attaches the ticket kept in R2, so no printing.
 
+### Second review (2026-11-14, approved by the user)
+
+- **The preview's "translation failed, retried":** D1 refused the translations with a foreign-key
+  error: the event had been deleted while Workers AI was translating it (a preview test posts and
+  deletes at once). The translate queue now acks when the event is gone, and logs D1's own reason
+  (the error's cause) for any other failure. The preview log is clean.
+- **Tickets are deleted a week after their event started,** by the daily job, and not printed again
+  after that (each has the booker's name).
+- **A race left tickets behind:** the ticket queue could store a ticket just after its event was
+  deleted. It now deletes one whose booking is gone, and sends no email for it; the dev test
+  checks no ticket is left after deleting an event.
+- **The docs' samples:** they link to the live site wherever they're made, so dev and the preview
+  share one version, and the earlier versions are deleted.
+- The sample picture's translator note says it's a picture.
+
 Tests run: `test:unit`, `test:dev` (the Thai booking's email carries the PDF, and the page's
 download link gives the same bytes), `test:preview` (every page in the lists, the PDFs page's sample
 is a PDF, an unknown ticket is a 404). All passed.

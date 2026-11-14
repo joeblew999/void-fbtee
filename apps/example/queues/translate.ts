@@ -61,7 +61,20 @@ export default defineQueue<Message>(async (batch) => {
       await storeTranslations(event.id, done);
       message.ack();
     } catch (error) {
-      console.warn("translation failed, retried:", String(error));
+      // Deleted while it was being translated: its translations can't go in (the database's
+      // foreign key refuses them), and there's nothing left to translate.
+      const [still] = await untranslated(message.body.eventId);
+      if (!still) {
+        message.ack();
+        continue;
+      }
+      // D1's own reason is the error's cause; Drizzle's message only names the query.
+      const cause = (error as { cause?: unknown }).cause;
+      console.warn(
+        "translation failed, retried:",
+        String(error),
+        cause instanceof Error ? cause.message : "",
+      );
       message.retry();
     }
   }

@@ -6,9 +6,11 @@
 // only to whoever booked. Deleting the event deletes its tickets (pages/[lang]/events/[id].server.ts).
 //
 // The Emails and PDFs pages' sample ticket is printed the same way, kept under a hash of its HTML:
-// printed again only when the ticket's look or words change.
+// printed again only when the ticket's look or words change, and the version before it deleted.
+// A booking's ticket is deleted a week after its event started (crons/reminders.ts).
 import { bookings, event_texts, events } from "@schema";
 import { fbs } from "fbtee";
+import { Temporal } from "temporal-polyfill";
 import { and, db, eq, inArray } from "void/db";
 import { storage } from "void/storage";
 import { langAttrs, type AppLocale } from "void-fbtee/locales";
@@ -92,6 +94,16 @@ export async function bookingTicket(id: string) {
   return { email: booking.email, ticket };
 }
 
+/** How long after its event starts a booking's ticket is kept (it has the booker's name on it):
+ * then the daily job deletes it (crons/reminders.ts), and it isn't printed again. */
+export const KEEP_TICKETS_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** Whether an event (its start, as stored) started longer ago than its tickets are kept. */
+const past = (startsAt: string) =>
+  Temporal.Now.instant().epochMilliseconds -
+    Temporal.ZonedDateTime.from(startsAt).epochMilliseconds >
+  KEEP_TICKETS_MS;
+
 /** Where a booking's ticket is kept in R2. */
 export const ticketKey = (id: string) => `tickets/${id}.pdf`;
 
@@ -112,25 +124,40 @@ async function kept(
   return file;
 }
 
-/** A booking's ticket as a PDF (kept, or printed now and kept), or undefined: no such booking. */
-export const ticketPdf = (id: string, browser: BrowserRun) =>
-  kept(
+/**
+ * A booking's ticket as a PDF (kept, or printed now and kept), or undefined: no such booking, or
+ * its event started more than a week ago. If the event is deleted while it's printing (its delete
+ * deletes the tickets it finds: pages/[lang]/events/[id].server.ts), the one just kept is deleted too,
+ * so none is left behind with a name on it.
+ */
+export async function ticketPdf(id: string, browser: BrowserRun) {
+  let printed = false;
+  const pdf = await kept(
     ticketKey(id),
     async () => {
       const booking = await bookingTicket(id);
-      return booking && ticketPage(booking.ticket);
+      if (!booking || past(booking.ticket.startsAt)) return undefined;
+      printed = true;
+      return ticketPage(booking.ticket);
     },
     (page) => printPdf(browser, page),
     "application/pdf",
   );
+  if (printed && !(await bookingTicket(id))) {
+    await storage.delete(ticketKey(id));
+    return undefined;
+  }
+  return pdf;
+}
 
-/** The docs' sample ticket's page in `locale` (Laila's seat at the calligraphy evening), and the
- * key it's kept under: a hash of its HTML, so a change to the ticket prints it again. */
-async function sample(locale: AppLocale, origin: string) {
+/** The docs' sample ticket's page in `locale` (Laila's seat at the calligraphy evening), linking to
+ * the live site wherever it's made (dev, the preview), so there's one version of it; and the key
+ * it's kept under: a hash of its HTML, so a change to the ticket prints it again. */
+async function sample(locale: AppLocale) {
   const page = await inLocale(locale, () =>
     routeUrl("/[lang]/events/[id]", { params: { id: SAMPLE_ID } }),
   );
-  const html = await ticketPage({ ...SAMPLE_EVENT, locale, name: SAMPLE_NAME, url: origin + page });
+  const html = await ticketPage({ ...SAMPLE_EVENT, locale, name: SAMPLE_NAME, url: SITE + page });
   const hash = new Uint8Array(
     await crypto.subtle.digest("SHA-256", new TextEncoder().encode(html)),
   );
@@ -138,24 +165,34 @@ async function sample(locale: AppLocale, origin: string) {
   return { html, key: `tickets/sample/${locale}-${short}` };
 }
 
+/**
+ * The sample kept under `key`, else made now; and the earlier versions of it (the same language
+ * and kind, from before the ticket changed) deleted, so they don't pile up in R2: one short
+ * listing per request, and browsers keep the answer for a day.
+ */
+async function keptSample(
+  locale: AppLocale,
+  key: string,
+  html: string,
+  print: (page: string) => Promise<Uint8Array>,
+  contentType: string,
+) {
+  const file = await kept(key, async () => html, print, contentType);
+  const kind = key.slice(key.lastIndexOf("."));
+  const earlier = await storage.list({ prefix: `tickets/sample/${locale}-` });
+  const old = earlier.objects.map((o) => o.key).filter((k) => k !== key && k.endsWith(kind));
+  if (old.length) await storage.delete(old);
+  return file;
+}
+
 /** The docs' sample ticket as a PDF. */
-export async function samplePdf(locale: AppLocale, origin: string, browser: BrowserRun) {
-  const { html, key } = await sample(locale, origin);
-  return kept(
-    `${key}.pdf`,
-    async () => html,
-    (p) => printPdf(browser, p),
-    "application/pdf",
-  );
+export async function samplePdf(locale: AppLocale, browser: BrowserRun) {
+  const { html, key } = await sample(locale);
+  return keptSample(locale, `${key}.pdf`, html, (p) => printPdf(browser, p), "application/pdf");
 }
 
 /** The docs' sample ticket as a picture of the page, for phones that don't show a PDF in a page. */
-export async function sampleImage(locale: AppLocale, origin: string, browser: BrowserRun) {
-  const { html, key } = await sample(locale, origin);
-  return kept(
-    `${key}.webp`,
-    async () => html,
-    (p) => printImage(browser, p),
-    "image/webp",
-  );
+export async function sampleImage(locale: AppLocale, browser: BrowserRun) {
+  const { html, key } = await sample(locale);
+  return keptSample(locale, `${key}.webp`, html, (p) => printImage(browser, p), "image/webp");
 }
