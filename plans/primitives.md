@@ -70,14 +70,44 @@ copied code again.
 2. `plans/use-cases.md`, on `momentFor` and `Reader`.
 3. `plans/video-conferencing.md`, `void-moq` on all of it.
 
-## How it's checked
+## How we'll know it's right
 
-- `vp check`.
-- `test:unit`: the package's own unit tests for `translate` (against Workers AI, not a stand-in, so
-  in the dev stage) and `momentFor` (daylight saving, the date line, Thai years, Arabic digits).
-- `test:dev` and `test:preview`: the example's emails, reminders and translations unchanged
-  in what they show.
-- `i18n:check`.
-- The fresh-app test: a new app gets the primitives from the package.
+1. **Nothing a person receives changes.** Before touching the code, the example's current output is
+   saved as the reference, in all three languages:
+   - every email, as HTML and as text;
+   - the reminder;
+   - the ticket's page;
+   - every date line the events pages show.
+
+   After the change the same inputs must give the same bytes. Workers AI's translations aren't
+   repeatable, so for `translate` it's the measure below instead.
+
+2. **The hard times are checked against outside truth, not against the code itself.** Each expected
+   value is written down from a source, with that source and the date it was checked. The cases:
+   - London's 2027 clock changes (GOV.UK);
+   - a Pacific date-line crossing;
+   - the Thai Buddhist year;
+   - Arabic digits and right to left;
+   - a 23-hour and a 25-hour day;
+   - "tomorrow" for a reader whose day has already turned over.
+3. **`translate` is as good as what it replaces.** It's measured the same way the example's model was
+   chosen: chrF against the stored translations of the sample events, run against real Workers AI. It
+   has to score at least the 53.0 recorded in `queues/translate.ts`.
+4. **No copies left behind.** The example's own versions are deleted, not wrapped. A search of
+   `apps/example/` for the old functions finds nothing.
+5. **They're really general:**
+   - **Use cases:** all ten from `plans/use-cases.md` are written as package tests using only
+     `momentFor`, `Reader` and `inLocale`, with no example code. If one can't be written that way,
+     the shape is wrong and gets fixed before anything is committed.
+   - **Captions:** a sentence is translated into Thai and Arabic with `translate` alone, as
+     `void-moq` will do.
+6. **A new app gets them:** the fresh-app test (`e2e/fresh/`) installs the package into a new Void
+   app and uses `translate` and `momentFor` there, outside the example.
+7. **The skill explains them in a few lines each** (`packages/void-fbtee/skills/void-fbtee/SKILL.md`).
+   Needing pages to explain one means it's the wrong shape.
+8. **The user judges the output:** the emails and the use-case tables in all three languages, shown
+   before anything is pushed.
+
+The usual run on top: `vp check`, `test:unit`, `test:dev`, `test:preview`, `i18n:check`.
 
 Committed locally, and pushed when the user says.
