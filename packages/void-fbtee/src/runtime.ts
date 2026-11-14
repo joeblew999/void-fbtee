@@ -53,6 +53,34 @@ export function localeContextOptions(
   };
 }
 
+/** A language's fallbacks (`voidFbtee({ fallbackLocales })`, fbtee's option), best first. */
+export function fallbacksOf(locale: string, fallbacks: FallbackLocales | undefined): string[] {
+  if (!fallbacks) return [];
+  return Array.isArray(fallbacks)
+    ? [...fallbacks]
+    : [...((fallbacks as Readonly<Record<string, readonly string[]>>)[locale] ?? [])];
+}
+
+/**
+ * The catalogs text in one language can need, loaded: its own, its fallbacks', and the source
+ * language's (which has one when it has more plural forms than the code writes). Not the rest,
+ * so a part of a page in another language loads one language, not all of them.
+ */
+export async function translationsFor(
+  catalogs: CatalogLoaders,
+  locale: string,
+  config: Pick<RuntimeConfig, "sourceLocale" | "fallbackLocales">,
+): Promise<TranslationDictionary> {
+  const wanted = new Set([
+    locale,
+    ...fallbacksOf(locale, config.fallbackLocales),
+    config.sourceLocale,
+  ]);
+  const loads = [...wanted].flatMap((l) => (catalogs[l] ? [catalogs[l]()] : []));
+  const modules = await Promise.all(loads);
+  return Object.assign({}, ...modules.map((m) => m.default));
+}
+
 /**
  * Every catalog, for runWithFbtee: fbtee picks each message's fallback from what it is given.
  * The catalog modules load once per server process; later requests reuse them.

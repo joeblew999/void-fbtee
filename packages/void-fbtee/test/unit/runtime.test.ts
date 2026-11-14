@@ -8,6 +8,7 @@ import {
   allTranslations,
   localeContextOptions,
   reportMissing,
+  translationsFor,
   type CatalogLoaders,
 } from "../../src/runtime";
 
@@ -91,4 +92,20 @@ test("a missing translation is logged once per language and string, however many
   } finally {
     warn.mockRestore();
   }
+});
+
+test("text in one language loads that language's catalogs only, with its fallbacks", async () => {
+  const loaded: string[] = [];
+  const spied: CatalogLoaders = Object.fromEntries(
+    Object.entries({
+      ...catalogs,
+      fr: async () => ({ default: compile("fr", { Cart: "Panier" }) }),
+    }).map(([l, load]) => [l, () => (loaded.push(l), load())]),
+  );
+  const t = await translationsFor(spied, "de-AT", {
+    sourceLocale: "en-US",
+    fallbackLocales: { "de-AT": ["de"] },
+  });
+  expect(loaded.sort()).toEqual(["de", "de-AT"]);
+  expect(Object.keys(t).sort()).toEqual(["de", "de-AT"]);
 });

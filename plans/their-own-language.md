@@ -116,10 +116,12 @@ Fallback", read 2026-11-14:
 
 **Why fbtee's rule and not a richer one of ours.** CLDR's parent locales would pick differently only
 on a site that has two variants of one language: `en-AU` → `en-GB` (fbtee: `en-US`), `es-MX` →
-`es-419` (fbtee: `es-ES`), `pt-AO` → `pt-PT` (fbtee: `pt-BR`). With one variant per language, which
-is every app here, both give the same answer. A second rule would mean two answers to "which
-language" in one system, plus a CLDR dependency. So we use fbtee's. The difference goes to fbtee as
-a suggestion (the issue below), to change there if they agree.
+`es-419` (fbtee: `es-ES`), `pt-AO` → `pt-PT` (fbtee: `pt-BR`). With one variant per language, as
+the example has today, both give the same answer. The example will grow towards every language
+(the user, 2026-11-14), and then sites will have such variants, so CLDR's answer is the one wanted.
+But a second rule would mean two answers to "which language" in one system: the server choosing
+one way, fbtee in the page another. So we use fbtee's, and ask fbtee for CLDR's parents (issue 1
+below, its first point); when fbtee changes, `negotiate()`'s equality test moves with it.
 
 **How void-fbtee calls it.** fbtee's chooser, `negotiateLocale`, isn't exported. The only way to it,
 `setupLocaleContext`, also calls `setupFbtee` and changes fbtee's global setup. That's unsafe in the
@@ -243,36 +245,55 @@ test after each deploy, since CI runs only the unit tests and that (`.github/wor
 Then `vp check`, `test:unit`, `test:dev`, `test:preview` and `i18n:check`. Committed locally, and
 pushed when the user says.
 
-## The issue for nkzw-tech/fbtee (draft, not filed)
+## The issues for nkzw-tech/fbtee (drafts, not filed)
 
-Title: Export `negotiateLocale` (choosing a locale on the server without `setupLocaleContext`)
+Two, one per subject, filed only with the user's OK.
 
-> void-fbtee picks the language for a request from `Accept-Language` in middleware, and wants fbtee's
-> exact rule for it, so the whole app chooses one way. `negotiateLocale` isn't exported, and
-> `setupLocaleContext` also calls `setupFbtee`, which isn't safe per request. Could
-> `negotiateLocale` (and the locale-chain helpers it uses) be exported? Until then void-fbtee
-> carries a copy of it, with a test that compares it to `setupLocaleContext(...).getLocale()`.
+### 1. Locale matching: regional variants, and using it on a server
+
+Title: Locale matching for sites with several variants of a language, and on the server
+
+> void-fbtee (https://github.com/joeblew999/void-fbtee) uses fbtee in Void apps that will have
+> many languages, and wants one rule for "which language" across the app: fbtee's.
 >
-> On the server it would need one more thing. `getLocaleHierarchy` keeps every tag it has seen in a
-> module-level `Map` (`const hierarchies`, fbtee 6.0.0 `lib/index-core-44-4LnRZ.mjs`), never
-> cleared. In a browser that's a handful of tags. On a server fed `Accept-Language` from every
-> visitor, anyone can send new tags until the process runs out of memory. Our copy drops the cache
-> (it's cheap to work out each time); a size cap would do too. It isn't covered by "Each request has
-> its own hooks and caches" (README, "Server Rendering"), since the map is shared by the process.
+> **Regional variants.** With one variant per language, fbtee's matching gives the expected answer.
+> With several, it picks the region `Intl.Locale` infers rather than the nearer variant CLDR's
+> parent locales give (cldr-core 49.0.0, `parentLocales`):
 >
-> A smaller question: for sites with several regional variants of one language, would CLDR's parent
-> locales be welcome as an option? `en-AU` → `en-GB` (shared `en-001`), `es-MX` → `es-419`, `pt-AO`
-> → `pt-PT`, where the current rule gives `en-US`, `es-ES` and `pt-BR`. It's your documented rule,
-> so this is only a suggestion.
+> | Visitor | Site has          | fbtee 6.0.0 | CLDR parent               |
+> | ------- | ----------------- | ----------- | ------------------------- |
+> | `en-AU` | `en-US`, `en-GB`  | `en-US`     | `en-GB` (shared `en-001`) |
+> | `es-MX` | `es-ES`, `es-419` | `es-ES`     | `es-419`                  |
+> | `pt-AO` | `pt-BR`, `pt-PT`  | `pt-BR`     | `pt-PT`                   |
 >
-> A small thing seen on the way: with `sourceLocale: "ar-EG"` and no catalog for it, the inline
-> exactly-one form of `fbt.plural("ليلة", count, { many: "ليالٍ", showCount: "yes" })` renders a
-> Latin `1` ("حجزت 1 ليلة"), where other counts come out in Arabic-Indic digits ("حجزت ٢ ليالٍ").
-> Should the exactly-one form format its `1` like the other counts?
+> It's your documented rule ("preferring the region inferred by `Intl.Locale`", README "Locale
+> Matching and Fallback"). Would CLDR's parents be welcome, as the rule or an option? The same
+> answer matters in the browser (`clientLocales: navigator.languages`).
 >
-> And one about lists: `list()` joins every item but the last with one string,
-> `{previous items}, {following items}`, for "and", "or" and plain lists alike. In Arabic, CLDR's
-> "and" list is `A وB وC` (what `Intl.ListFormat("ar-EG")` prints), but translating that string as
-> `و` makes the "or" list `A وB أو C`. Would a separate middle string per conjunction be welcome?
+> **On the server.** We choose the language for a request from `Accept-Language` in middleware.
+> `negotiateLocale` isn't exported, and `setupLocaleContext` also calls `setupFbtee`, which isn't
+> safe per request. Could `negotiateLocale` (and the locale-chain helpers it uses) be exported?
+> Until then void-fbtee carries a copy, with a test comparing it to
+> `setupLocaleContext(...).getLocale()`.
 >
-> Seen in https://github.com/joeblew999/void-fbtee.
+> Exported as it is, it would need one change for servers: `getLocaleHierarchy` keeps every tag it
+> has seen in a module-level `Map` (`const hierarchies`, `lib/index-core-44-4LnRZ.mjs`), never
+> cleared. In a browser that's a handful of tags. On a server fed every visitor's `Accept-Language`,
+> anyone can send new tags until the process runs out of memory. "Each request has its own hooks and
+> caches" (README, "Server Rendering") doesn't cover it, since the map is shared by the process. Our
+> copy has no cache (it's cheap to work out each time); a size cap would do too.
+
+### 2. Two things seen in Arabic
+
+Title: Arabic: the exactly-one form's digit, and the list's middle separator
+
+> Seen in https://github.com/joeblew999/void-fbtee, with fbtee 6.0.0:
+>
+> - With `sourceLocale: "ar-EG"` and no catalog for it, the inline exactly-one form of
+>   `fbt.plural("ليلة", count, { many: "ليالٍ", showCount: "yes" })` renders a Latin `1`
+>   ("حجزت 1 ليلة"), where other counts come out in Arabic-Indic digits ("حجزت ٢ ليالٍ"). Should the
+>   exactly-one form format its `1` like the other counts?
+> - `list()` joins every item but the last with one string, `{previous items}, {following items}`,
+>   for "and", "or" and plain lists alike. CLDR's Arabic "and" list is `A وB وC` (what
+>   `Intl.ListFormat("ar-EG")` prints), but translating that string as `و` makes the "or" list
+>   `A وB أو C`. Would a separate middle string per conjunction be welcome?

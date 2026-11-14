@@ -36,7 +36,7 @@ import { Temporal } from "temporal-polyfill";
 import config from "virtual:void-fbtee/config";
 import { currentTranslations } from "./current";
 import { langAttrs, localeFromPath, type Lang, type Locale } from "./locales";
-import { allTranslations } from "./runtime";
+import { translationsFor } from "./runtime";
 export { langAttrs } from "./locales";
 import { install, documentI18n } from "./install";
 import type { SharedI18n } from "./middleware";
@@ -106,7 +106,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
  *
  * It takes only the locale: the runtime carries functions, so it can't cross from the server to the
  * browser (fbtee's README: "pass locale and translation data across that boundary"). The server
- * builds it from the request's catalogs at once; the browser loads them first, keeping the
+ * builds it from the request's catalogs at once; the browser loads that language's first (its own,
+ * its fallbacks' and the source's, not every language's), keeping the
  * server's HTML meanwhile. The element carries `lang` and `dir`.
  */
 export function InLanguage({
@@ -153,13 +154,13 @@ function serverRuntime(locale: string, gender: Gender | undefined): FbteeRuntime
   return runtime;
 }
 
-// One per language and gender in the browser, made once every catalog has loaded.
+// One per language and gender in the browser, made once that language's catalogs have loaded.
 const browserRuntimes = new Map<string, Promise<FbteeRuntime>>();
 function browserRuntime(locale: string, gender: Gender | undefined): Promise<FbteeRuntime> {
   const key = `${locale} ${gender ?? ""}`;
   let runtime = browserRuntimes.get(key);
   if (!runtime) {
-    runtime = allTranslations(catalogs).then((t) =>
+    runtime = translationsFor(catalogs, locale, config).then((t) =>
       createFbteeRuntime(runtimeOptions(locale, gender, t)),
     );
     browserRuntimes.set(key, runtime);

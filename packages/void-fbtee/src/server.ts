@@ -22,7 +22,7 @@ import { setServerLang, setServerTranslations } from "./current";
 import type { TranslationDictionary } from "fbtee";
 import type { AppLocale, Dir, Lang, Locale } from "./locales";
 import { routeUrl } from "./routes";
-import { allTranslations, reportMissing } from "./runtime";
+import { allTranslations, fallbacksOf, reportMissing } from "./runtime";
 import texts from "virtual:void-fbtee/texts";
 
 const storage = new AsyncLocalStorage<Lang>();
@@ -274,13 +274,7 @@ const xmlText = (text: string) => text.replace(/[&<>"']/g, (ch) => `&#${ch.charC
  * `where(and(eq(event_texts.event_id, id), inArray(event_texts.locale, textLocales(locale))))`.
  */
 export function textLocales(locale: string): string[] {
-  const fallbacks = config.fallbackLocales;
-  const after = !fallbacks
-    ? []
-    : Array.isArray(fallbacks)
-      ? fallbacks
-      : ((fallbacks as Record<string, readonly string[]>)[locale] ?? []);
-  return [...new Set([locale, ...after])];
+  return [...new Set([locale, ...fallbacksOf(locale, config.fallbackLocales)])];
 }
 
 /**
