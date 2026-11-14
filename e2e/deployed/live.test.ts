@@ -1,9 +1,9 @@
-// The quick check of a deployed site, after every push (`vp run test:deployed`, scripts/deployed.ts):
+// The quick check of a deployed site, after each deploy (`vp run test:deployed`, scripts/deployed.ts):
 // the sitemap, a not-found page in Thai, and one event posted, translated by Workers AI and deleted
 // with its private link. It emails no one (it posts without an address and books nothing).
 //
 // Void's own rule is that live tests are opt-in (voidzero-dev/void TESTING.md): they write data and
-// call AI. This one runs in CI as an exception: Cloudflare deploys every push to main, and this one
+// call AI. This one runs in CI as an exception: CI deploys every push to main, and this one
 // post, translated and deleted at once, is the only check that a deploy works end to end. Without a
 // site to check (a plain `vp test run`), it skips itself. The full browser tests run on the preview
 // (`vp run test:preview`, `vp run test:browsers`).

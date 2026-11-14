@@ -28,12 +28,23 @@ vp run login                          # Cloudflare sign-in (Void's void connect)
                                       # and deploys from this machine
 ```
 
-On GitHub, Cloudflare's Workers Builds does the deploying: a push to `main` runs `vp run deploy` on
-Cloudflare (production), and a push to any other branch runs `vp run build:preview` and
-`npx cf previews deploy` (a Worker Preview at `<branch>-void-fbtee-example.gedw99.workers.dev`, deleted
-with its branch). CI then runs a quick check of what was deployed (`vp run test:deployed`). GitHub holds no Cloudflare
-credential. Build logs: the Worker's Builds in Cloudflare's dashboard, linked from each commit's
-"Workers Builds" check.
+On GitHub, CI deploys, Void's way (Void's `guide/deployment.md`, "Deploy from GitHub"): a push to
+`main` that passes the checks runs the same `vp run deploy` you would, then `vp run test:deployed`
+(`.github/workflows/ci.yml`, the `deploy` job). It deploys with a Cloudflare API token kept as the
+repository secret `CLOUDFLARE_API_TOKEN`; Void's `integrations/cloudflare.md` ("Deploying from CI")
+lists what it needs: Workers Scripts, and the products Void makes (here D1, KV, R2 and Queues). To make one, once:
+
+1. Open the token form with the permissions already ticked (Void's own way of linking to it):
+   [Create the deploy token](https://dash.cloudflare.com/profile/api-tokens?permissionGroupKeys=%5B%7B%22key%22%3A%22account_settings%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_scripts%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22workers_kv_storage%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22workers_r2%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22d1%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22queues%22%2C%22type%22%3A%22edit%22%7D%5D&name=void-fbtee+deploy+from+GitHub). Then Continue to summary → Create Token, and copy
+   it.
+2. Store it in GitHub, pasting the token when asked:
+
+   ```sh
+   gh secret set CLOUDFLARE_API_TOKEN -R joeblew999/void-fbtee
+   ```
+
+A branch's Worker Preview (`<branch>-void-fbtee-example.gedw99.workers.dev`) is made from your
+machine: `vp run deploy:preview`.
 
 Every day:
 
@@ -58,9 +69,9 @@ vp run deploy            # deploy the example to production (Cloudflare), with n
                          # Log: ~/.void/logs/
 vp run test:production   # the preview suite against the live site, less what posts or books
 vp run deploy:preview    # this branch as a Worker Preview beside production (needs cf's login)
-vp run test:deployed     # a quick check of what Cloudflare deployed for this commit: sitemap,
-                         # a Thai not-found page, one event posted, translated by Workers AI
-                         # and deleted (what CI runs; CLOUDFLARE_WORKERS_SUBDOMAIN=gedw99)
+vp run test:deployed     # a quick check of what the last deploy put live: sitemap, a Thai
+                         # not-found page, one event posted, translated by Workers AI and
+                         # deleted (CI runs it after each deploy)
 vp run test:browsers     # every page in every language in Chromium, WebKit and WebKit as today's
                          # iPhones have it (no built-in Temporal): no errors, fits a phone; and
                          # the Intl and Temporal pages' engine checks. It grows with each
@@ -129,7 +140,7 @@ Cloudflare's local stand-ins.
 | `test:dev` (`e2e/dev/`)           | the dev server: yours if running, else it starts one | Void's dev inbox, read back with its token                                     | real, through the sign-in | Void's triggers: `POST /__void/queue` (each message's ack checked), `POST /__void/scheduled` (the reminder cron) | none in dev                        |
 | `test:preview` (`e2e/preview/`)   | the production build, local                          | Cloudflare's stand-in saves it and sends nothing                               | doesn't run (see below)   | queues run                                                                                                       | Void's, read through `x-isr-cache` |
 | `test:browsers` (`e2e/browsers/`) | the production build, in Chromium and WebKit         | as preview                                                                     | as preview                | as preview                                                                                                       | as preview                         |
-| `test:deployed` (`e2e/deployed/`) | the live site, after each push                       | sends none                                                                     | real                      | Cloudflare's                                                                                                     | Cloudflare's                       |
+| `test:deployed` (`e2e/deployed/`) | the live site, after each deploy                     | sends none                                                                     | real                      | Cloudflare's                                                                                                     | Cloudflare's                       |
 | `test:fresh` (`e2e/fresh/`)       | new `void init` apps                                 | —                                                                              | —                         | the cron through `/__void/scheduled`                                                                             | —                                  |
 
 - **Dev and the preview, one at a time:** they share the local database (Void's
@@ -163,7 +174,8 @@ The tasks are in `vite.config.ts` and `apps/example/vite.config.ts`.
 - `vp run test:production` tests the URL the last `vp run deploy` reported.
 - `vp run --last-details` shows how the last task run went.
 - Each commit is checked first (`vp check --fix`, a hook `vp install` sets up). CI runs
-  `vp check`, `vp run test:unit`, then `vp run test:deployed`.
+  `vp check`, `vp run test:unit`; then, for a push to `main`, `vp run deploy` and
+  `vp run test:deployed`.
 
 ### Checking the live site by hand
 

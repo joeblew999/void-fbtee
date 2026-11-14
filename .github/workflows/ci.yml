@@ -1,7 +1,8 @@
 # Vite+'s own CI setup (https://viteplus.dev/guide/ci): setup-vp installs vp, the Node in
-# .node-version and the pnpm in package.json, then vp install. No Cloudflare credentials: Cloudflare's
-# Workers Builds builds and deploys each push itself (main as production, other branches as Worker
-# Previews), and a quick check runs against what it deployed (vp run test:deployed).
+# .node-version and the pnpm in package.json, then vp install. Then, for a push to main, Void's own
+# way of deploying from GitHub (Void's guide/deployment.md, "Deploy from GitHub", and the workflow
+# `void init --github` writes): the same `vp run deploy` as on your machine, with a Cloudflare API
+# token from the repository's secrets, then the quick live check (`vp run test:deployed`).
 name: CI
 
 on:
@@ -22,10 +23,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      checks: read # Cloudflare's "Workers Builds" check on the commit
-    env:
-      CLOUDFLARE_WORKERS_SUBDOMAIN: gedw99
-      GH_TOKEN: ${{ github.token }} # gh, for the check
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -40,6 +37,35 @@ jobs:
       - run: vp check
       - run: vp run check:tools
       - run: vp run test:unit
+
+  # The deploy, once the checks pass: only for main, one at a time (a newer push waits).
+  deploy:
+    name: deploy
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [ci]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    concurrency:
+      group: deploy
+      cancel-in-progress: false
+    env:
+      # The repository secret (README): Workers Scripts, D1, KV, R2 and Queues.
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: 7384af54e33b8a54ff240371ea368440
+      # The account's workers.dev subdomain, for Void's readiness check of the new version.
+      CLOUDFLARE_WORKERS_SUBDOMAIN: gedw99
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+        with:
+          node-version-file: .node-version
+          run-install: |
+            - args: ["--no-frozen-lockfile"]
+      - run: vp run install:browser
+      - run: vp run deploy
       - run: vp run test:deployed
 
   # A release when packages/void-fbtee/package.json has a version with no tag yet: the tag and the
@@ -48,7 +74,7 @@ jobs:
   release:
     name: release
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [ci]
+    needs: [deploy]
     runs-on: ubuntu-latest
     permissions:
       contents: write

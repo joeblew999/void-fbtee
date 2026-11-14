@@ -23,11 +23,11 @@ export default defineConfig({
       logs: { command: "void project logs", cache: false },
       rollback: { command: "void project rollback", cache: false },
       // Deploy to Cloudflare: https://void-fbtee-example.gedw99.workers.dev (void-fbtee built first).
-      // --platform cloudflare: a fresh checkout (Cloudflare's Workers Builds) has no .void/project.json.
+      // --platform cloudflare: a fresh checkout (CI's) has no .void/project.json. Email: the
+      // send_email binding from void.lock.json (`void email setup`). Not --require-email: it also
+      // wants inbound Email Routing on events.ubuntusoftware.net, which would have Cloudflare write
+      // and lock MX and SPF records there; the site only sends (checked 2026-11-14).
       deploy: {
-        // Email: the send_email binding from void.lock.json (`void email setup`). Not
-        // --require-email: Workers Builds' token can't read Email Routing and Email Sending
-        // settings, so that check fails there even though sending is set up.
         command: "void deploy --platform cloudflare",
         cache: false,
         dependsOn: [{ task: "build", from: "dependencies" }],

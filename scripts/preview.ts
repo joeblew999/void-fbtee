@@ -1,9 +1,7 @@
 // `vp run build:preview`: the example's build as Preview Build Output, for a Cloudflare Worker Preview of
 // this branch beside production (https://developers.cloudflare.com/workers/previews/). Then
 // `npx cf previews deploy --prebuilt --mode production` in apps/example uploads it, named after the branch
-// (cf reads it from Workers Builds or git): `vp run deploy:preview` does both. Workers Builds runs the two
-// for every branch but main, the upload as its own Preview command, which Cloudflare requires to call
-// `cf previews deploy` itself.
+// (cf reads it from git): `vp run deploy:preview` does both.
 //
 // Void has no preview deploy, so Void builds as usual, with CLOUDFLARE_PREVIEW_BUILD=true, the switch
 // Cloudflare's Vite plugin reads to write Preview Build Output

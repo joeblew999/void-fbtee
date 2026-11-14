@@ -36,9 +36,8 @@ export default defineConfig({
       // iPhones have it (no built-in Temporal), on the preview (e2e/browsers/). Run it when pages
       // change; not in CI.
       "test:browsers": { command: "vp test run --project browsers", cache: false },
-      // The quick live check (e2e/deployed/live.test.ts) against what Cloudflare's Workers Builds
-      // deployed for this commit: production for main, the branch's Preview otherwise
-      // (scripts/deployed.ts). What CI runs: no Cloudflare login.
+      // The quick live check (e2e/deployed/live.test.ts) against what the last `vp run deploy`
+      // deployed (scripts/deployed.ts). CI's deploy job runs it after deploying.
       "test:deployed": { command: "vpx scripts/deployed.ts", cache: false },
       // The preview suite against the live site, at the URL Void reported on the last deploy
       // (scripts/production.ts), less the tests that post or book: on the live site those would
@@ -62,7 +61,7 @@ export default defineConfig({
       deploy: { command: "vpx scripts/deploy.ts", cache: false },
       "deploy:atomic": { command: "vpx scripts/deploy.ts --atomic", cache: false },
       // This branch as a Cloudflare Worker Preview beside production: the preview build (scripts/preview.ts),
-      // then Cloudflare's cf uploads it. Workers Builds runs these two for every branch but main.
+      // then Cloudflare's cf uploads it (it needs cf's own login).
       "build:preview": { command: "vpx scripts/preview.ts", cache: false },
       "deploy:preview": {
         command:
