@@ -10,6 +10,7 @@ import {
   book,
   browser,
   deleteEvent,
+  deleteInPage,
   emailTo,
   keptTickets,
   postEvent,
@@ -18,7 +19,6 @@ import {
   url,
   type Posted,
 } from "../helpers";
-import { SOURCE } from "../locales";
 
 const page = browser("prod");
 const skip = inject("devSkip" as never) as string;
@@ -114,9 +114,7 @@ test.skipIf(!!skip)(
         (await page.getByTestId("ticket").getAttribute("href"))!.replace("/tickets/", ""),
       ),
     );
-    await p.getByTestId("delete").click();
-    await p.getByTestId("delete-sure").click();
-    await p.waitForURL(new RegExp(`/${SOURCE}/events$`));
+    await deleteInPage(p);
     // The open Arabic page says so, with no reload.
     await seeText(other, "event-cancelled-text", "تم إلغاء هذه الفعالية.");
     expect(await other.getByTestId("book").count()).toBe(0);

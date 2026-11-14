@@ -4,11 +4,48 @@
 import { globSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
+import { SITE } from "../../apps/example/src/site";
 import { onLiveSite, url } from "../helpers";
 import { EXAMPLE } from "./setup";
 import { LOCALES, SOURCE } from "../locales";
 
 const get = (path: string, init?: RequestInit) => fetch(url("prod") + path, init);
+
+/** The app's own pages, under each language ("" is its home). */
+const PAGES = [
+  "",
+  "/events",
+  "/events/new",
+  "/docs",
+  "/docs/intl",
+  "/docs/temporal",
+  "/docs/strings",
+  "/docs/markdown",
+  "/docs/right-to-left",
+  "/docs/translating",
+  "/docs/emails",
+  "/docs/pdfs",
+  "/docs/tour",
+];
+
+/** The id of an event on the list. */
+const firstEventId = async () =>
+  (await (await get(`/${SOURCE}/events`)).text()).match(/\/events\/([0-9a-f-]{36})"/)![1]!;
+
+/** A booking for `event` as a plain form post (not the page's JSON), from the site itself. */
+const postBooking = (event: string, fields: Record<string, string>) =>
+  get(`/${SOURCE}/events/${event}`, {
+    method: "POST",
+    redirect: "manual",
+    // A page action from the page itself (Void refuses cross-origin ones).
+    headers: { origin: url("prod"), "content-type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      name: "A",
+      email: "a@example.com",
+      time_zone: "Asia/Bangkok",
+      ...fields,
+    }),
+  });
 
 test('"/" always redirects to the source language, whatever the browser asks for', async () => {
   for (const accept of ["th,en;q=0.5", "ar-EG", ""]) {
@@ -20,9 +57,7 @@ test('"/" always redirects to the source language, whatever the browser asks for
 });
 
 // voidFbtee({ site }) in apps/example/vite.config.ts: every copy of the site (this one, the dev
-// server, a Worker Preview) names the deployed address.
-const SITE = "https://void-fbtee-example.gedw99.workers.dev";
-
+// server, a Worker Preview) names the deployed address, SITE.
 test("page head: lang, dir, hreflang alternates with x-default, canonical, og:url, og:locale, i18n meta", async () => {
   const html = await (await get("/ar-EG/docs/intl")).text();
   // The <html> attributes, in any order (Void's own, class and data-theme, come first).
@@ -76,18 +111,7 @@ test("a page under a language the app doesn't have is not found", async () => {
 });
 
 test("booking an event that doesn't exist is not found, not sold out", async () => {
-  const res = await get(`/${SOURCE}/events/${crypto.randomUUID()}`, {
-    method: "POST",
-    redirect: "manual",
-    // A page action from the page itself (Void refuses cross-origin ones).
-    headers: { origin: url("prod"), "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      id: crypto.randomUUID(),
-      name: "A",
-      email: "a@example.com",
-      time_zone: "Asia/Bangkok",
-    }),
-  });
+  const res = await postBooking(crypto.randomUUID(), { id: crypto.randomUUID() });
   expect(res.status).toBe(404);
 });
 
@@ -95,24 +119,8 @@ test("booking an event that doesn't exist is not found, not sold out", async () 
 // checkbox arrives as "on". Booking the same id again is refused, which shows the first went in.
 test("a plain form post with the reminder box ticked books the seat", async () => {
   const id = crypto.randomUUID();
-  const [event] = await (
-    await get(`/${SOURCE}/events`)
-  )
-    .text()
-    .then((html) => [...html.matchAll(/\/events\/([0-9a-f-]{36})"/g)].map((m) => m[1]!));
-  const book = () =>
-    get(`/${SOURCE}/events/${event}`, {
-      method: "POST",
-      redirect: "manual",
-      headers: { origin: url("prod"), "content-type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        id,
-        name: "A",
-        email: "a@example.com",
-        time_zone: "Asia/Bangkok",
-        ticket_in_reminder: "on",
-      }),
-    });
+  const event = await firstEventId();
+  const book = () => postBooking(event, { id, ticket_in_reminder: "on" });
   expect((await book()).status).toBeLessThan(400);
   expect((await book()).status).toBe(400);
 });
@@ -120,23 +128,8 @@ test("a plain form post with the reminder box ticked books the seat", async () =
 // The booking's id comes from the form: one already taken is refused, not a crash.
 test("booking with an id that's already taken is refused", async () => {
   const id = crypto.randomUUID();
-  const [event] = await (
-    await get(`/${SOURCE}/events`)
-  )
-    .text()
-    .then((html) => [...html.matchAll(/\/events\/([0-9a-f-]{36})"/g)].map((m) => m[1]!));
-  const book = () =>
-    get(`/${SOURCE}/events/${event}`, {
-      method: "POST",
-      redirect: "manual",
-      headers: { origin: url("prod"), "content-type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        id,
-        name: "A",
-        email: "a@example.com",
-        time_zone: "Asia/Bangkok",
-      }),
-    });
+  const event = await firstEventId();
+  const book = () => postBooking(event, { id });
   expect((await book()).status).toBeLessThan(400);
   expect((await book()).status).toBe(400);
 });
@@ -210,21 +203,6 @@ test("the tour: every @void/md feature, in every language, every title in that l
 });
 
 test("every page has a title and a description, in its own language", async () => {
-  const pages = [
-    "",
-    "/events",
-    "/events/new",
-    "/docs",
-    "/docs/intl",
-    "/docs/temporal",
-    "/docs/strings",
-    "/docs/markdown",
-    "/docs/right-to-left",
-    "/docs/translating",
-    "/docs/emails",
-    "/docs/pdfs",
-    "/docs/tour",
-  ];
   const head = async (path: string) => {
     const html = await (await get(path)).text();
     const got = {
@@ -241,7 +219,7 @@ test("every page has a title and a description, in its own language", async () =
     );
     return got;
   };
-  for (const page of pages) {
+  for (const page of PAGES) {
     const source = await head(`/${SOURCE}${page}`);
     for (const l of LOCALES) {
       const got = l === SOURCE ? source : await head(`/${l}${page}`);
@@ -322,21 +300,6 @@ test("the PDFs page shows a ticket printed for its language", async () => {
 // the page just stops being cached. void-fbtee's middleware runs on every page, so it must add
 // neither.
 test("no page sets a cookie or varies by a request header, so Void can cache it", async () => {
-  const pages = [
-    "",
-    "/events",
-    "/events/new",
-    "/docs",
-    "/docs/intl",
-    "/docs/temporal",
-    "/docs/strings",
-    "/docs/markdown",
-    "/docs/right-to-left",
-    "/docs/translating",
-    "/docs/emails",
-    "/docs/pdfs",
-    "/docs/tour",
-  ];
   const voids = new Set(["x-voidpages", "x-voidpages-version"]);
   // Vite's local preview server adds "Vary: Origin" to every response that has no Vary of its own,
   // static files too (its built-in CORS; seen 2026-11-13 on /favicon.ico and the CSS), and a page
@@ -345,7 +308,7 @@ test("no page sets a cookie or varies by a request header, so Void can cache it"
   // live site (`vp run test:production`) nothing is left out.
   if (!onLiveSite()) voids.add("origin");
   for (const l of LOCALES)
-    for (const page of pages) {
+    for (const page of PAGES) {
       const res = await get(`/${l}${page}`);
       expect(res.headers.get("set-cookie"), `${l}${page}`).toBeNull();
       const vary = (res.headers.get("vary") ?? "")
@@ -515,21 +478,8 @@ test("the sitemap: every page in every language, with its alternates; robots.txt
     alternates: [...u.matchAll(/hreflang="([^"]+)"/g)].map(([, h]) => h),
   }));
   for (const l of LOCALES)
-    for (const page of [
-      "",
-      "/docs",
-      "/docs/intl",
-      "/docs/temporal",
-      "/docs/strings",
-      "/docs/markdown",
-      "/docs/right-to-left",
-      "/docs/translating",
-      "/docs/emails",
-      "/docs/pdfs",
-      "/docs/pdfs",
-      "/events",
-      "/docs/tour",
-    ])
+    // Not the form for posting one, which routes/sitemap.xml.ts leaves out.
+    for (const page of PAGES.filter((p) => p !== "/events/new"))
       expect(
         entries.map((e) => e.loc),
         `${l}${page}`,

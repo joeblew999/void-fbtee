@@ -5,7 +5,7 @@
 // points are what it takes, each with the lines that do it.
 import { fbs, fbt } from "fbtee";
 import { useLocale } from "void-fbtee/react";
-import { PageSections } from "@/docs/PageSections";
+import { DocsPage } from "@/docs/DocsPage";
 import { Points, Section, SkillLink, type Point } from "@/docs/Points";
 
 function points(): Point[] {
@@ -169,20 +169,18 @@ export default function PdfsPage() {
     },
   ];
   return (
-    <div className="min-w-0 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-medium" data-testid="pdfs-title">
-          <fbt desc="Docs page title: the page about translated PDFs">PDFs</fbt>
-        </h1>
-        <p className="text-muted-foreground">
-          <fbt desc="PDFs page introduction">
-            An app can print any document as a PDF in its reader's language: a ticket, an invoice, a
-            receipt, a report. This app prints each booking's ticket. Here is one, printed for this
-            page's language, and what it takes, with the lines that do it.
-          </fbt>
-        </p>
-      </div>
-      <PageSections sections={sections} />
+    <DocsPage
+      testId="pdfs-title"
+      title={<fbt desc="Docs page title: the page about translated PDFs">PDFs</fbt>}
+      intro={
+        <fbt desc="PDFs page introduction">
+          An app can print any document as a PDF in its reader's language: a ticket, an invoice, a
+          receipt, a report. This app prints each booking's ticket. Here is one, printed for this
+          page's language, and what it takes, with the lines that do it.
+        </fbt>
+      }
+      sections={sections}
+    >
       <Section id={sections[0].id} title={sections[0].title}>
         <p className="text-muted-foreground">
           <fbt desc="PDFs page: the sample is the app's own ticket, for a sample booking, printed by Browser Run in this page's language">
@@ -216,6 +214,6 @@ export default function PdfsPage() {
         <Points points={points()} />
         <SkillLink section="translated-pdfs" />
       </Section>
-    </div>
+    </DocsPage>
   );
 }

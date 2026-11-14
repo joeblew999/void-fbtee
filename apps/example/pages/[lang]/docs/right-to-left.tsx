@@ -6,7 +6,7 @@ import { ChevronRight } from "lucide-react";
 import type { RouteUrl } from "void/routes";
 import { langAttrs } from "void-fbtee/locales";
 import { Link, useLocale, useLocales } from "void-fbtee/react";
-import { PageSections } from "@/docs/PageSections";
+import { DocsPage } from "@/docs/DocsPage";
 import { Points, Section, SkillLink, type Point } from "@/docs/Points";
 
 function points(): Point[] {
@@ -149,20 +149,20 @@ export default function RightToLeftPage() {
     },
   ];
   return (
-    <div className="min-w-0 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-medium" data-testid="right-to-left-title">
-          <fbt desc="Docs page title: the page about right-to-left languages">Right to left</fbt>
-        </h1>
-        <p className="text-muted-foreground">
-          <fbt desc="Right-to-left page introduction">
-            Every language gets its own address, and Arabic reads right to left: the whole site
-            mirrors. Here is the same markup both ways round, and what it takes, with the lines that
-            do it.
-          </fbt>
-        </p>
-      </div>
-      <PageSections sections={sections} />
+    <DocsPage
+      testId="right-to-left-title"
+      title={
+        <fbt desc="Docs page title: the page about right-to-left languages">Right to left</fbt>
+      }
+      intro={
+        <fbt desc="Right-to-left page introduction">
+          Every language gets its own address, and Arabic reads right to left: the whole site
+          mirrors. Here is the same markup both ways round, and what it takes, with the lines that
+          do it.
+        </fbt>
+      }
+      sections={sections}
+    >
       <Section id={sections[0].id} title={sections[0].title}>
         <ul className="space-y-2 text-sm" data-testid="addresses">
           {locales.map((l) => (
@@ -195,6 +195,6 @@ export default function RightToLeftPage() {
         <Points points={points()} />
         <SkillLink section="strings" />
       </Section>
-    </div>
+    </DocsPage>
   );
 }

@@ -34,14 +34,17 @@ export function Points({ points }: { points: Point[] }) {
 export function Section({
   id,
   title,
+  className = "space-y-6",
   children,
 }: {
   id: string;
   title: ReactNode;
+  /** Its spacing, space-y-6 if not given. */
+  className?: string;
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-20 space-y-6 pt-6">
+    <section id={id} className={`scroll-mt-20 pt-6 ${className}`}>
       <h2 className="border-b pb-2 text-2xl font-medium">{title}</h2>
       {children}
     </section>

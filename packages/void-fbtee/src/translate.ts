@@ -6,7 +6,14 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { catalogFile, missing, type Project } from "./catalogs";
-import { markdownHash, markdownPages, TRANSLATED_FROM, type MarkdownPage } from "./check";
+import {
+  frontmatter,
+  markdownHash,
+  markdownPages,
+  TRANSLATED_FROM,
+  TRANSLATED_FROM_LINE,
+  type MarkdownPage,
+} from "./check";
 
 /** void-fbtee's own folder (dist/ is one level down), where skills/ ships. */
 export const packageDir = () => dirname(dirname(fileURLToPath(import.meta.url)));
@@ -74,15 +81,12 @@ export function stamp(p: Project, file: string): void {
     throw new Error(`no original for ${relative(p.root, file)} (${relative(p.root, original)})`);
   const line = `${TRANSLATED_FROM}: "${markdownHash(readFileSync(original, "utf8"))}"`;
   const text = readFileSync(file, "utf8");
-  const existing = new RegExp(`^${TRANSLATED_FROM}:.*$`, "m");
   let out: string;
-  if (existing.test(text)) out = text.replace(existing, line);
+  if (TRANSLATED_FROM_LINE.test(text)) out = text.replace(TRANSLATED_FROM_LINE, line);
   else {
-    const fm = /(^|\n)---\n([\s\S]*?)\n---(?=\n|$)/.exec(text);
-    if (fm) {
-      const end = fm.index + fm[0].length - 3;
-      out = text.slice(0, end) + `${line}\n` + text.slice(end);
-    } else {
+    const fm = frontmatter(text);
+    if (fm) out = text.slice(0, fm.close) + `${line}\n` + text.slice(fm.close);
+    else {
       const script = /^<script>[\s\S]*?<\/script>\n*/.exec(text)?.[0] ?? "";
       out = `${script}---\n${line}\n---\n\n${text.slice(script.length)}`;
     }

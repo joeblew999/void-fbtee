@@ -4,8 +4,8 @@
 // What's void-fbtee's (inLocale, langAttrs) and what's this app's (its look, in EmailLayout.tsx).
 import { useEffect, useRef, type ReactNode } from "react";
 import { fbt } from "fbtee";
-import { PageSections } from "@/docs/PageSections";
-import { Points, type Point } from "@/docs/Points";
+import { DocsPage } from "@/docs/DocsPage";
+import { Points, Section, type Point } from "@/docs/Points";
 import type { Props } from "./emails.server";
 
 type Shown = Props["booking"];
@@ -188,43 +188,39 @@ function points(): Point[] {
   ];
 }
 
+// A function, so each is translated when the page renders, in its language.
+const sections = () => [
+  {
+    id: "emails",
+    title: <fbt desc="Emails page section title: the sample emails">Two of the emails</fbt>,
+  },
+  {
+    id: "how",
+    title: (
+      <fbt desc="Emails page section title: what a translated email needs">
+        What a translated email needs
+      </fbt>
+    ),
+  },
+];
+
 export default function EmailsPage({ booking, link }: Props) {
-  const all = points();
+  const all = { points: points(), sections: sections() };
   return (
-    <div className="min-w-0 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-medium" data-testid="emails-title">
-          <fbt desc="Docs page title: the page about the app's translated emails">Emails</fbt>
-        </h1>
-        <p className="text-muted-foreground">
-          <fbt desc="Emails page introduction">
-            This app emails people in their own language: a booking's confirmation, a reminder the
-            day before, a cancellation, and the private link to delete an event. Here are two of
-            them, made by the app's own code for a sample event, in this page's language, and what
-            it takes for each to arrive the right way round.
-          </fbt>
-        </p>
-      </div>
-      <PageSections
-        sections={[
-          {
-            id: "emails",
-            title: <fbt desc="Emails page section title: the sample emails">Two of the emails</fbt>,
-          },
-          {
-            id: "how",
-            title: (
-              <fbt desc="Emails page section title: what a translated email needs">
-                What a translated email needs
-              </fbt>
-            ),
-          },
-        ]}
-      />
-      <section id="emails" className="scroll-mt-20 space-y-8 pt-6">
-        <h2 className="border-b pb-2 text-2xl font-medium">
-          <fbt desc="Emails page section title: the sample emails">Two of the emails</fbt>
-        </h2>
+    <DocsPage
+      testId="emails-title"
+      title={<fbt desc="Docs page title: the page about the app's translated emails">Emails</fbt>}
+      intro={
+        <fbt desc="Emails page introduction">
+          This app emails people in their own language: a booking's confirmation, a reminder the day
+          before, a cancellation, and the private link to delete an event. Here are two of them,
+          made by the app's own code for a sample event, in this page's language, and what it takes
+          for each to arrive the right way round.
+        </fbt>
+      }
+      sections={all.sections}
+    >
+      <Section id={all.sections[0].id} title={all.sections[0].title} className="space-y-8">
         <Preview
           id="booking"
           email={booking}
@@ -243,15 +239,10 @@ export default function EmailsPage({ booking, link }: Props) {
             </fbt>
           }
         />
-      </section>
-      <section id="how" className="scroll-mt-20 space-y-6 pt-6">
-        <h2 className="border-b pb-2 text-2xl font-medium">
-          <fbt desc="Emails page section title: what a translated email needs">
-            What a translated email needs
-          </fbt>
-        </h2>
-        <Points points={all} />
-      </section>
-    </div>
+      </Section>
+      <Section id={all.sections[1].id} title={all.sections[1].title}>
+        <Points points={all.points} />
+      </Section>
+    </DocsPage>
   );
 }

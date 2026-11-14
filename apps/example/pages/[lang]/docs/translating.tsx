@@ -4,7 +4,7 @@
 import { fbt } from "fbtee";
 import { routeUrl } from "void-fbtee/routes";
 import { Formatted, Link, useLocale } from "void-fbtee/react";
-import { PageSections } from "@/docs/PageSections";
+import { DocsPage } from "@/docs/DocsPage";
 import { Points, Section, SkillLink, type Point } from "@/docs/Points";
 import type { Props } from "./translating.server";
 
@@ -96,20 +96,20 @@ export default function TranslatingPage({ catalogs }: Props) {
     },
   ];
   return (
-    <div className="min-w-0 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-medium" data-testid="translating-title">
-          <fbt desc="Docs page title: the page about how the app gets translated">Translating</fbt>
-        </h1>
-        <p className="text-muted-foreground">
-          <fbt desc="Translating page introduction">
-            The app's own text is translated by Claude Code, into files in the repository that you
-            review. What people post is translated by Workers AI as it's posted. Here is each, with
-            the lines that do it.
-          </fbt>
-        </p>
-      </div>
-      <PageSections sections={sections} />
+    <DocsPage
+      testId="translating-title"
+      title={
+        <fbt desc="Docs page title: the page about how the app gets translated">Translating</fbt>
+      }
+      intro={
+        <fbt desc="Translating page introduction">
+          The app's own text is translated by Claude Code, into files in the repository that you
+          review. What people post is translated by Workers AI as it's posted. Here is each, with
+          the lines that do it.
+        </fbt>
+      }
+      sections={sections}
+    >
       <Section id={sections[0].id} title={sections[0].title}>
         <table className="w-full text-sm" data-testid="catalogs">
           <tbody>
@@ -149,6 +149,6 @@ export default function TranslatingPage({ catalogs }: Props) {
         <Points points={points()} />
         <SkillLink section="translate-a-void-app-with-void-fbtee" />
       </Section>
-    </div>
+    </DocsPage>
   );
 }

@@ -6,7 +6,7 @@ import pages from "@void/md/pages";
 import type { RouteUrl } from "void/routes";
 import { langAttrs } from "void-fbtee/locales";
 import { Link, useLocales } from "void-fbtee/react";
-import { PageSections } from "@/docs/PageSections";
+import { DocsPage } from "@/docs/DocsPage";
 import { Points, Section, SkillLink, type Point } from "@/docs/Points";
 
 function points(): Point[] {
@@ -130,19 +130,19 @@ export default function MarkdownPage() {
     },
   ];
   return (
-    <div className="min-w-0 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-medium" data-testid="markdown-title">
-          <fbt desc="Docs page title: the page about translated markdown pages">Markdown pages</fbt>
-        </h1>
-        <p className="text-muted-foreground">
-          <fbt desc="Markdown page introduction">
-            A page written in markdown has a copy in each language, translated whole. Here are this
-            site's, and what it takes, with the lines that do it.
-          </fbt>
-        </p>
-      </div>
-      <PageSections sections={sections} />
+    <DocsPage
+      testId="markdown-title"
+      title={
+        <fbt desc="Docs page title: the page about translated markdown pages">Markdown pages</fbt>
+      }
+      intro={
+        <fbt desc="Markdown page introduction">
+          A page written in markdown has a copy in each language, translated whole. Here are this
+          site's, and what it takes, with the lines that do it.
+        </fbt>
+      }
+      sections={sections}
+    >
       <Section id={sections[0].id} title={sections[0].title}>
         {all.map(({ path, bySegment }) => (
           <table key={path} className="w-full text-sm" data-testid="markdown-copies">
@@ -189,6 +189,6 @@ export default function MarkdownPage() {
         <Points points={points()} />
         <SkillLink section="markdown-pages" />
       </Section>
-    </div>
+    </DocsPage>
   );
 }

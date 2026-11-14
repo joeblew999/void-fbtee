@@ -6,32 +6,17 @@
 // on the two agreeing: text formatted while rendering is <Formatted>, the server's kept. "Your
 // time zone" and the time in it are the browser's alone: empty until it knows the zone. Temporal
 // is on its own page (docs/temporal).
-import { Fragment, useSyncExternalStore } from "react";
 import { fbt } from "fbtee";
 import { Formatted, useLocale, useTimeZone } from "void-fbtee/react";
 import { Badge } from "@/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
 import { INSTANT, runAll, SECTIONS, ZONE } from "@/docs/intl";
 import { sectionTitle } from "@/docs/intl-titles";
-import { cn } from "@/ui/utils";
-import { DIFFERS_ROW, listDifference, showInvisible } from "@/docs/differs";
-import { PageSections } from "@/docs/PageSections";
+import { listDifference, showInvisible } from "@/docs/differs";
+import { RowsSection } from "@/docs/RowsSection";
+import { useBrowserOnce } from "@/docs/useBrowserOnce";
+import { DocsPage } from "@/docs/DocsPage";
 import type { Props } from "./intl.server";
-
-// The browser's rows: none while hydrating (the server sent none), then computed once.
-const noSubscribe = () => () => {};
-const browserRows = new Map<string, Record<string, string>>();
-function useBrowserRows(locale: string): Record<string, string> | null {
-  return useSyncExternalStore(
-    noSubscribe,
-    () => {
-      if (!browserRows.has(locale)) browserRows.set(locale, runAll(locale));
-      return browserRows.get(locale)!;
-    },
-    () => null,
-  );
-}
 
 /** A row listing an engine's supported values (the "supported" section), not a format. */
 const isInventory = (key: string) => key.startsWith("supported/");
@@ -58,124 +43,117 @@ function ListDifference({ worker, browser }: { worker: string; browser: string }
 
 export default function IntlPage({ worker }: Props) {
   const { locale, dir } = useLocale();
-  const browser = useBrowserRows(locale);
+  const browser = useBrowserOnce(`intl/${locale}`, () => runAll(locale));
   const keys = Object.keys(worker);
   const same = browser ? keys.filter((k) => browser[k] === worker[k]).length : 0;
   const number = (n: number) => new Intl.NumberFormat(locale).format(n);
   return (
-    <div className="min-w-0 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-medium" data-testid="intl-title">
-          Intl
-        </h1>
-        <p className="text-muted-foreground">
-          <fbt desc="Intl page introduction">
-            Each row is one call to the platform's own Intl, in this page's language. The Worker ran
-            it before sending the page: that's the text this app's pages show. Your browser ran it
-            again with its own engine.
-          </fbt>
-        </p>
-        {/* Once the browser has run every row: how many match the Worker's. Its line is kept free
-            meanwhile, so the page doesn't shift when it appears. */}
-        <div className="min-h-6">
-          {browser && (
-            <Badge
-              variant={same === keys.length ? "secondary" : "outline"}
-              data-testid="intl-match"
-            >
-              <fbt desc="How many rows the browser formatted exactly as the Worker did">
-                <fbt:param name="same">{number(same)}</fbt:param> of{" "}
-                <fbt:param name="total" number={keys.length}>
-                  {number(keys.length)}
-                </fbt:param>{" "}
-                rows are the same in your browser.
-              </fbt>
-            </Badge>
-          )}
-        </div>
-        <p className="text-sm text-pretty text-muted-foreground">
-          <fbt desc="Intl page: what a highlighted row means">
-            A highlighted row is where your browser's engine writes it differently: each engine
-            ships its own locale data. Pages show the server's text, so they don't depend on the two
-            agreeing. In a highlighted row, characters that print as nothing are shown by name, such
-            as ⟨RLM⟩, and the supported-value lists show only what differs.
-          </fbt>
-        </p>
-      </div>
-      <PageFacts />
-      <p className="text-sm text-muted-foreground">
-        <fbt desc="Where the times on the Intl page are shown">
-          The times below are <fbt:param name="instant">{INSTANT}</fbt:param>, shown in{" "}
-          <fbt:param name="zone">{ZONE}</fbt:param>.
+    <DocsPage
+      testId="intl-title"
+      title="Intl"
+      intro={
+        <fbt desc="Intl page introduction">
+          Each row is one call to the platform's own Intl, in this page's language. The Worker ran
+          it before sending the page: that's the text this app's pages show. Your browser ran it
+          again with its own engine.
         </fbt>
-      </p>
-      <PageSections sections={SECTIONS.map((s) => ({ id: s.id, title: sectionTitle(s.id) }))} />
+      }
+      header={
+        <>
+          {/* Once the browser has run every row: how many match the Worker's. Its line is kept free
+            meanwhile, so the page doesn't shift when it appears. */}
+          <div className="min-h-6">
+            {browser && (
+              <Badge
+                variant={same === keys.length ? "secondary" : "outline"}
+                data-testid="intl-match"
+              >
+                <fbt desc="How many rows the browser formatted exactly as the Worker did">
+                  <fbt:param name="same">{number(same)}</fbt:param> of{" "}
+                  <fbt:param name="total" number={keys.length}>
+                    {number(keys.length)}
+                  </fbt:param>{" "}
+                  rows are the same in your browser.
+                </fbt>
+              </Badge>
+            )}
+          </div>
+          <p className="text-sm text-pretty text-muted-foreground">
+            <fbt desc="Intl page: what a highlighted row means">
+              A highlighted row is where your browser's engine writes it differently: each engine
+              ships its own locale data. Pages show the server's text, so they don't depend on the
+              two agreeing. In a highlighted row, characters that print as nothing are shown by
+              name, such as ⟨RLM⟩, and the supported-value lists show only what differs.
+            </fbt>
+          </p>
+        </>
+      }
+      lead={
+        <>
+          <PageFacts />
+          <p className="text-sm text-muted-foreground">
+            <fbt desc="Where the times on the Intl page are shown">
+              The times below are <fbt:param name="instant">{INSTANT}</fbt:param>, shown in{" "}
+              <fbt:param name="zone">{ZONE}</fbt:param>.
+            </fbt>
+          </p>
+        </>
+      }
+      sections={SECTIONS.map((s) => ({ id: s.id, title: sectionTitle(s.id) }))}
+    >
       {SECTIONS.map((section) => (
-        <section
+        <RowsSection
           key={section.id}
           id={section.id}
-          data-section={section.id}
-          className="scroll-mt-20 pt-6"
-        >
-          <h2 className="border-b pb-2 text-2xl font-medium">{sectionTitle(section.id)}</h2>
-          <div className="mt-2">
-            <Table className="table-fixed">
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-1/2">
-                    <fbt desc="Intl table column: the result on the Cloudflare Worker">Worker</fbt>
-                  </TableHead>
-                  <TableHead>
-                    <fbt desc="Intl table column: the result in the visitor's browser">
-                      Your browser
-                    </fbt>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {section.rows.map((row) => {
-                  const key = `${section.id}/${row.id}`;
-                  const differs = browser !== null && browser[key] !== worker[key];
-                  const cell = "whitespace-normal break-words align-top";
-                  return (
-                    <Fragment key={key}>
-                      {/* The call, across both columns; its results in the row below. */}
-                      <TableRow className="border-b-0 hover:bg-transparent">
-                        <TableCell colSpan={2} dir="ltr" className={cn(cell, "pt-3 pb-0")}>
-                          <code className="font-mono text-xs text-muted-foreground">
-                            {row.code.replace(/\blang\b/g, JSON.stringify(locale))}
-                          </code>
-                        </TableCell>
-                      </TableRow>
-                      <TableRow
-                        data-row={key}
-                        className={differs ? DIFFERS_ROW : undefined}
-                        data-differs={differs || undefined}
-                      >
-                        <TableCell className={cell} data-side="worker" dir={dir}>
-                          {differs ? showInvisible(worker[key]!) : worker[key]}
-                        </TableCell>
-                        <TableCell className={cell} data-side="browser" dir={dir}>
-                          {!browser ? (
-                            "…"
-                          ) : !differs ? (
-                            browser[key]
-                          ) : isInventory(key) ? (
-                            <ListDifference worker={worker[key]!} browser={browser[key]!} />
-                          ) : (
-                            showInvisible(browser[key]!)
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    </Fragment>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
-        </section>
+          title={sectionTitle(section.id)}
+          cell="whitespace-normal break-words align-top"
+          heads={[
+            {
+              className: "w-1/2",
+              label: (
+                <fbt desc="Intl table column: the result on the Cloudflare Worker">Worker</fbt>
+              ),
+            },
+            {
+              label: (
+                <fbt desc="Intl table column: the result in the visitor's browser">
+                  Your browser
+                </fbt>
+              ),
+            },
+          ]}
+          rows={section.rows.map((row) => {
+            const key = `${section.id}/${row.id}`;
+            const differs = browser !== null && browser[key] !== worker[key];
+            return {
+              key,
+              code: row.code.replace(/\blang\b/g, JSON.stringify(locale)),
+              differs,
+              cells: [
+                {
+                  side: "worker",
+                  dir,
+                  content: differs ? showInvisible(worker[key]!) : worker[key],
+                },
+                {
+                  side: "browser",
+                  dir,
+                  content: !browser ? (
+                    "…"
+                  ) : !differs ? (
+                    browser[key]
+                  ) : isInventory(key) ? (
+                    <ListDifference worker={worker[key]!} browser={browser[key]!} />
+                  ) : (
+                    showInvisible(browser[key]!)
+                  ),
+                },
+              ],
+            };
+          })}
+        />
       ))}
-    </div>
+    </DocsPage>
   );
 }
 

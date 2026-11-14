@@ -1,7 +1,7 @@
 // The Strings page, a reference: how the site's text is translated with fbtee through void-fbtee,
 // with one plural shown in this page's language (Arabic has six forms), and the lines that do it.
 import { fbt } from "fbtee";
-import { PageSections } from "@/docs/PageSections";
+import { DocsPage } from "@/docs/DocsPage";
 import { Points, Section, SkillLink, type Point } from "@/docs/Points";
 import { Formatted, useLocale } from "void-fbtee/react";
 
@@ -115,19 +115,17 @@ export default function StringsPage() {
     },
   ];
   return (
-    <div className="min-w-0 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-medium" data-testid="strings-title">
-          <fbt desc="Docs page title: the page about translated strings">Strings</fbt>
-        </h1>
-        <p className="text-muted-foreground">
-          <fbt desc="Strings page introduction">
-            Every word on this site is marked in the code with fbtee, and each language has a
-            catalog file with its translations. Here is what that takes, with the lines that do it.
-          </fbt>
-        </p>
-      </div>
-      <PageSections sections={sections} />
+    <DocsPage
+      testId="strings-title"
+      title={<fbt desc="Docs page title: the page about translated strings">Strings</fbt>}
+      intro={
+        <fbt desc="Strings page introduction">
+          Every word on this site is marked in the code with fbtee, and each language has a catalog
+          file with its translations. Here is what that takes, with the lines that do it.
+        </fbt>
+      }
+      sections={sections}
+    >
       <Section id={sections[0].id} title={sections[0].title}>
         <p className="text-muted-foreground">
           <fbt desc="Strings page: the table shows one plural sentence for several counts, in this page's language">
@@ -162,6 +160,6 @@ export default function StringsPage() {
         <Points points={points()} />
         <SkillLink section="strings" />
       </Section>
-    </div>
+    </DocsPage>
   );
 }

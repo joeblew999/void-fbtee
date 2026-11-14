@@ -252,17 +252,32 @@ export async function runCron(cron: string, scheduledTime: number) {
 export type Posted = { id: string; key: string; path: string };
 
 /**
- * Posts an event through the app's form, as a visitor would, starting at `local` (the picker's
- * "2027-01-20T18:00") on the browser's clock; with `email`, its private link is emailed there.
+ * Posts an event through the app's form, as a visitor would, in `locale` (the source language if
+ * not given), starting at `local` (the picker's "2027-01-20T18:00") on the browser's clock; with
+ * `email`, its private link is emailed there.
  */
 export async function postEvent(
   page: Page,
-  { title, local, email, seats }: { title: string; local: string; email?: string; seats?: number },
+  {
+    title,
+    local,
+    email,
+    seats,
+    description = "Posted by the tests.",
+    locale = "en-US",
+  }: {
+    title: string;
+    local: string;
+    email?: string;
+    seats?: number;
+    description?: string;
+    locale?: string;
+  },
 ): Promise<Posted> {
-  await page.goto("/en-US/events/new");
+  await page.goto(`/${locale}/events/new`);
   await started(page);
   await page.getByTestId("event-title-input").fill(title);
-  await page.getByTestId("event-description-input").fill("Posted by the tests.");
+  await page.getByTestId("event-description-input").fill(description);
   await page.getByTestId("event-local-input").fill(local);
   if (seats) await page.getByTestId("event-seats-input").fill(String(seats));
   if (email) await page.getByTestId("event-email-input").fill(email);
@@ -288,6 +303,18 @@ export async function deleteEvent({ id, key }: Posted): Promise<boolean> {
   return r.status === 302;
 }
 
+/** Asks the event's page to delete it ("Delete", then "Delete it for good"), as its poster does. */
+export async function confirmDelete(page: Page) {
+  await page.getByTestId("delete").click();
+  await page.getByTestId("delete-sure").click();
+}
+
+/** Deletes the event from its page, with the key the page has, and waits for the events list. */
+export async function deleteInPage(page: Page) {
+  await confirmDelete(page);
+  await page.waitForURL(/\/events$/);
+}
+
 /** Books a seat on the page's event, in the page's language. */
 export async function book(
   page: Page,
@@ -307,9 +334,14 @@ export async function book(
  * Vite plugin's local explorer (`/cdn-cgi/local/explorer/api`, which the dev server prints).
  */
 export async function keptTickets(): Promise<string[]> {
-  const r = await fetch(
-    `${url("prod")}/cdn-cgi/local/explorer/api/r2/buckets/default/objects?prefix=tickets/`,
-  );
+  const api = `${url("prod")}/cdn-cgi/local/explorer/api/r2/buckets`;
+  // The app's one bucket, under whatever name it has: the dev server takes the deployed bucket's
+  // name from apps/example/void.lock.json ("void-fbtee-example-storage"), not "default".
+  const { result: buckets } = (await (await fetch(api)).json()) as {
+    result: { buckets: { name: string }[] };
+  };
+  expect(buckets.buckets, "the dev server's R2 buckets").toHaveLength(1);
+  const r = await fetch(`${api}/${buckets.buckets[0]!.name}/objects?prefix=tickets/`);
   const { result } = (await r.json()) as { result: { key: string }[] };
   return result.map((o) => o.key).filter((k) => !k.startsWith("tickets/sample/"));
 }

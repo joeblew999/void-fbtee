@@ -2,7 +2,21 @@
 // reader's, in the reader's language; an event posted in Arabic, then read in English. Void's
 // forms, database and cache are Void's to test; this checks what void-fbtee and the app add.
 import { afterAll, expect, test } from "vite-plus/test";
-import { browser, collectErrors, onLiveSite, seeText, started, untilText, url } from "../helpers";
+import {
+  book,
+  browser,
+  collectErrors,
+  confirmDelete,
+  deleteEvent,
+  deleteInPage,
+  onLiveSite,
+  postEvent,
+  seeText,
+  started,
+  untilText,
+  url,
+  type Posted,
+} from "../helpers";
 import { SOURCE } from "../locales";
 
 const page = browser("prod");
@@ -39,7 +53,7 @@ const TEST_START = "2026-01-01T20:00";
  * The events these tests post, each with the key from its poster's private delete link: deleted
  * when the file ends, as their poster would, so no test leaves an event behind on the live site.
  */
-const posted: { id: string; key: string }[] = [];
+const posted: Posted[] = [];
 
 /**
  * The event the page just posted: once the page has its key (the address's "#key=…", the private
@@ -48,41 +62,31 @@ const posted: { id: string; key: string }[] = [];
 async function kept(p: import("playwright").Page): Promise<string> {
   await p.waitForURL(/\/events\/[0-9a-f-]{36}#key=/);
   const at = new URL(p.url());
+  const path = at.pathname.replace(/^\/[^/]+/, "");
   posted.push({
     id: at.pathname.split("/").pop()!,
     key: new URLSearchParams(at.hash.slice(1)).get("key")!,
+    path,
   });
-  return at.pathname.replace(/^\/[^/]+/, "");
+  return path;
 }
 
 afterAll(async () => {
-  for (const { id, key } of posted) {
-    // The request the page's "Delete it for good" sends: a 302 to the list when it's deleted.
-    const r = await fetch(`${url("prod")}/${SOURCE}/events/${id}?delete`, {
-      method: "POST",
-      // From the site itself, as the page sends it (Void refuses page actions from elsewhere).
-      headers: { "Content-Type": "application/json", "X-VoidPages": "true", origin: url("prod") },
-      body: JSON.stringify({ key }),
-      redirect: "manual",
-    });
-    expect(r.status, `deleting the test event ${id}`).toBe(302);
-  }
+  for (const event of posted)
+    expect(await deleteEvent(event), `deleting the test event ${event.id}`).toBe(true);
 });
 
+/** A random title, so each test's event is its own. */
+const testTitle = () => `Test event ${crypto.randomUUID().slice(0, 8)}`;
+
 /**
- * Post a new event through the app's form, so a test that books has its own seats on any database
- * (a fresh local one or the live site's). Returns its path without the language, "/events/<id>".
+ * A new event, so a test that books has its own seats on any database (a fresh local one or the
+ * live site's); deleted when the file ends. Returns its path without the language, "/events/<id>".
  */
-async function postEvent(seats: number): Promise<string> {
-  const p = await page();
-  await p.goto(`/${SOURCE}/events/new`);
-  await started(p);
-  await p.getByTestId("event-title-input").fill(`Test event ${crypto.randomUUID().slice(0, 8)}`);
-  await p.getByTestId("event-description-input").fill("Posted by the tests.");
-  await p.getByTestId("event-local-input").fill(TEST_START);
-  await p.getByTestId("event-seats-input").fill(String(seats));
-  await p.getByTestId("event-post").click();
-  return kept(p);
+async function ownEvent(seats: number): Promise<string> {
+  const event = await postEvent(await page(), { title: testTitle(), local: TEST_START, seats });
+  posted.push(event);
+  return event.path;
 }
 
 /** That event's page in a language, ready to use. */
@@ -185,13 +189,11 @@ test.skipIf(onLiveSite())(
   async () => {
     const p = await page();
     const errors = collectErrors(p);
-    await p.goto(`/${SOURCE}/events/new`);
-    await started(p);
-    await p.getByTestId("event-title-input").fill(`Test event ${crypto.randomUUID().slice(0, 8)}`);
-    await p.getByTestId("event-description-input").fill("Posted by the tests, to delete.");
-    await p.getByTestId("event-local-input").fill(TEST_START);
-    await p.getByTestId("event-post").click();
-    await p.waitForURL(/\/events\/[0-9a-f-]{36}#key=/);
+    await postEvent(p, {
+      title: testTitle(),
+      local: TEST_START,
+      description: "Posted by the tests, to delete.",
+    });
     const link = await p.getByTestId("delete-link").inputValue();
     expect(link).toBe(p.url());
     const path = new URL(link).pathname;
@@ -202,13 +204,11 @@ test.skipIf(onLiveSite())(
     expect(await other.getByTestId("your-event").count()).toBe(0);
     await other.goto(`${path}#key=wrong`);
     await started(other);
-    await other.getByTestId("delete").click();
-    await other.getByTestId("delete-sure").click();
+    await confirmDelete(other);
     await seeText(other, "delete-wrong", "This link's key isn't this event's.");
     // The poster, with the link: deleted, then the list, and the event's page is gone.
-    await p.getByTestId("delete").click();
-    await p.getByTestId("delete-sure").click();
-    await p.waitForURL(new RegExp(`/${SOURCE}/events$`));
+    await deleteInPage(p);
+    expect(new URL(p.url()).pathname).toBe(`/${SOURCE}/events`);
     expect((await fetch(`${url("prod")}${path}`)).status).toBe(404);
     expect(errors).toEqual([]);
   },
@@ -226,16 +226,14 @@ test("an event written in Arabic, read in English: its translation, and the orig
 test.skipIf(onLiveSite())(
   "book in Thai; an Arabic page open on the event sees the seat go, live",
   async () => {
-    const event = await postEvent(12);
+    const event = await ownEvent(12);
     const thai = await page();
     const arabic = await page();
     const errors = [...collectErrors(thai), ...collectErrors(arabic)];
     await open(arabic, "ar-EG", event);
     await seeText(arabic, "seats-left", "تبقّى ١٢ مقعدًا");
     await open(thai, "th-TH", event);
-    await thai.getByTestId("book-name").fill("Somchai");
-    await thai.getByTestId("book-email").fill("somchai@example.com");
-    await thai.getByTestId("book").click();
+    await book(thai, "Somchai", "somchai@example.com");
     await seeText(thai, "booked", "จองเรียบร้อยแล้ว แล้วเจอกันนะ!");
     await seeText(thai, "seats-left", "เหลือ 11 ที่นั่ง");
     // Arabic's "many" form, for 11.
@@ -247,7 +245,7 @@ test.skipIf(onLiveSite())(
 test.skipIf(onLiveSite())(
   "two people book the last seat at once: one gets it, the other is told, in Arabic",
   async () => {
-    const event = await postEvent(1);
+    const event = await ownEvent(1);
     const [a, b] = [await page(), await page()];
     for (const p of [a, b]) {
       await open(p, "ar-EG", event);

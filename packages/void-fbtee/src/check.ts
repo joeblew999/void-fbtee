@@ -8,16 +8,32 @@ import { missing, type Project } from "./catalogs";
 /** Frontmatter key a translated markdown page records its original's hash in. */
 export const TRANSLATED_FROM = "translatedFrom";
 
+/** The whole `translatedFrom:` line of a page's frontmatter. */
+export const TRANSLATED_FROM_LINE = new RegExp(`^${TRANSLATED_FROM}:.*$`, "m");
+
+/**
+ * A markdown page's frontmatter: the `---` block at its top, after the `<script>` block a page
+ * with islands starts with (@void/md's order). `start` and `end` are where the block is, `close`
+ * where its closing `---` begins (to add a line before it), `yaml` what's between. Undefined when
+ * the page has none. The one reader of frontmatter here: `check`, `translate` and `stamp` use it.
+ */
+export function frontmatter(
+  text: string,
+): { start: number; end: number; close: number; yaml: string } | undefined {
+  const start = /^\s*(?:<script\b[\s\S]*?<\/script>\s*)?/.exec(text)![0].length;
+  const block = /^---\r?\n([\s\S]*?)\r?\n(---)[ \t]*(?=\r?\n|$)/.exec(text.slice(start));
+  if (!block) return undefined;
+  const end = start + block[0].length;
+  return { start, end, close: start + block[0].lastIndexOf("---"), yaml: block[1]! };
+}
+
 /**
  * Hash of a markdown page for "is this translation out of date": the whole file with its own
  * `translatedFrom:` line removed and all whitespace collapsed, so formatting (which rewrites
  * blank lines in frontmatter) never makes a translation look stale. First 12 hex of SHA-256.
  */
 export function markdownHash(text: string): string {
-  const normalised = text
-    .replace(new RegExp(`^${TRANSLATED_FROM}:.*$`, "m"), "")
-    .replace(/\s+/g, " ")
-    .trim();
+  const normalised = text.replace(TRANSLATED_FROM_LINE, "").replace(/\s+/g, " ").trim();
   return createHash("sha256").update(normalised).digest("hex").slice(0, 12);
 }
 
@@ -65,7 +81,7 @@ export function markdownPages(p: Project): MarkdownPage[] {
  */
 export function missingHead(original: string, copy: string): string[] {
   const fields = (text: string) => {
-    const yaml = text.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? "";
+    const yaml = frontmatter(text)?.yaml ?? "";
     return new Set(
       [...yaml.matchAll(/^(title|description):[ \t]*(\S.*)$/gm)].map(([, key]) => key!),
     );
@@ -76,9 +92,10 @@ export function missingHead(original: string, copy: string): string[] {
 
 /** A markdown page's `<script>` block, frontmatter and fenced code blocks, split from its text. */
 function splitPage(text: string) {
-  const script = text.match(/<script\b[\s\S]*?<\/script>/)?.[0];
-  let body = script ? text.replace(script, "") : text;
-  body = body.replace(/^\s*---\n[\s\S]*?\n---[ \t]*$/m, "");
+  const fm = frontmatter(text);
+  const rest = fm ? text.slice(0, fm.start) + text.slice(fm.end) : text;
+  const script = rest.match(/<script\b[\s\S]*?<\/script>/)?.[0];
+  const body = script ? rest.replace(script, "") : rest;
   const fence = /^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1[ \t]*$/gm;
   const code = [...body.matchAll(fence)].map((m) => m[0]);
   return { script, code, text: body.replace(fence, "") };

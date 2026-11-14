@@ -4,25 +4,13 @@
 import { defineHandler } from "void";
 import { z } from "zod";
 import { locales } from "../../../src/locales";
-import { PrintError } from "../../../src/pdf";
+import { printedResponse } from "../../../src/pdf";
 import { sampleImage } from "../../../src/events/tickets";
 
 export const GET = defineHandler.withValidator({ params: z.object({ lang: z.enum(locales) }) })(
-  async (c, { params: { lang } }) => {
-    let image: Uint8Array | undefined;
-    try {
-      image = await sampleImage(lang, c.env.BROWSER);
-    } catch (error) {
-      if (!(error instanceof PrintError)) throw error;
-      console.warn("sample ticket picture not made:", error.message);
-      return c.text("The picture can't be made right now. Try again in a minute.", 503, {
-        "retry-after": "60",
-      });
-    }
-    if (!image) return c.notFound();
-    return c.body(image.slice().buffer, 200, {
+  async (c, { params: { lang } }) =>
+    (await printedResponse("picture", () => sampleImage(lang, c.env.BROWSER), {
       "content-type": "image/webp",
       "cache-control": "public, max-age=86400",
-    });
-  },
+    })) ?? c.notFound(),
 );

@@ -205,3 +205,17 @@ test("check: a translated markdown copy keeps the original's title and descripti
   // The original without them asks nothing of its copies.
   expect(missingHead("# Tour\n", "# ทัวร์\n")).toEqual([]);
 });
+
+// A page with islands starts with its <script> block, then the frontmatter (@void/md's order, and
+// every page in the example): check reads the frontmatter there too. Before frontmatter() it
+// didn't, and a copy missing its title passed.
+test("check: the title and description after a page's <script> block", () => {
+  const script = '<script>\nimport Fmt from "./Fmt.tsx" with { island: "load" }\n</script>\n\n';
+  const original = `${script}---\n\ntitle: Tour\ndescription: Post an event.\n---\n\n# Tour\n`;
+  expect(missingHead(original, `${script}---\ntitle: ทัวร์\n---\n\n# ทัวร์\n`)).toEqual([
+    "description",
+  ]);
+  expect(
+    missingHead(original, `${script}---\r\ntitle: ทัวร์\r\ndescription: โพสต์\r\n---\r\n`),
+  ).toEqual([]);
+});

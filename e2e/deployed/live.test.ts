@@ -8,12 +8,20 @@
 // site to check (a plain `vp test run`), it skips itself. The full browser tests run on the preview
 // (`vp run test:preview`, `vp run test:browsers`).
 import { afterAll, describe, expect, test } from "vite-plus/test";
-import { browser, started, url } from "../helpers";
+import {
+  browser,
+  deleteEvent,
+  deleteInPage,
+  postEvent,
+  started,
+  url,
+  type Posted,
+} from "../helpers";
 import { SOURCE, TRANSLATED } from "../locales";
 
 const site = url("prod");
 const page = browser("prod");
-let posted: { id: string; key: string } | undefined;
+let posted: Posted | undefined;
 
 describe.skipIf(!site)("the live site (run with `vp run test:deployed`)", () => {
   test("the sitemap lists every language's pages", async () => {
@@ -31,20 +39,11 @@ describe.skipIf(!site)("the live site (run with `vp run test:deployed`)", () => 
 
   test("an event is posted, translated by Workers AI, and deleted with its private link", async () => {
     const p = await page();
-    await p.goto(`/${SOURCE}/events/new`);
-    await started(p);
-    await p.getByTestId("event-title-input").fill("Live check: pottery class");
-    await p
-      .getByTestId("event-description-input")
-      .fill("A pottery class for beginners. Clay is provided.");
-    await p.getByTestId("event-local-input").fill("2027-01-20T18:00");
-    await p.getByTestId("event-post").click();
-    await p.waitForURL(/\/events\/[0-9a-f-]{36}#key=/);
-    const at = new URL(p.url());
-    posted = {
-      id: at.pathname.split("/").pop()!,
-      key: new URLSearchParams(at.hash.slice(1)).get("key")!,
-    };
+    posted = await postEvent(p, {
+      title: "Live check: pottery class",
+      description: "A pottery class for beginners. Clay is provided.",
+      local: "2027-01-20T18:00",
+    });
 
     // The Thai page, open while the queue translates: it reloads itself when the translation lands
     // (its live stream's "translated"), and its title turns Thai, whatever the wording.
@@ -53,9 +52,7 @@ describe.skipIf(!site)("the live site (run with `vp run test:deployed`)", () => 
     await started(thai);
     await thai.waitForFunction(() => /[฀-๿]/.test(document.querySelector("h1")?.textContent ?? ""));
 
-    await p.getByTestId("delete").click();
-    await p.getByTestId("delete-sure").click();
-    await p.waitForURL(new RegExp(`/${SOURCE}/events$`));
+    await deleteInPage(p);
     expect((await fetch(`${site}/${SOURCE}/events/${posted.id}`)).status).toBe(404);
     posted = undefined;
   });
@@ -63,12 +60,6 @@ describe.skipIf(!site)("the live site (run with `vp run test:deployed`)", () => 
 
 // If the test stopped before deleting it, the event is deleted here, as its page would.
 afterAll(async () => {
-  if (!posted) return;
-  const r = await fetch(`${site}/${SOURCE}/events/${posted.id}?delete`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-VoidPages": "true", origin: site },
-    body: JSON.stringify({ key: posted.key }),
-    redirect: "manual",
-  });
-  expect(r.status, `deleting the check's event ${posted.id}`).toBe(302);
+  if (posted)
+    expect(await deleteEvent(posted), `deleting the check's event ${posted.id}`).toBe(true);
 });

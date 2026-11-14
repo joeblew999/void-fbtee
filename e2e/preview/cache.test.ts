@@ -9,7 +9,7 @@
 // build has the cache (Void's runtime/isr.mjs: none in dev), so this runs on the preview. Fetches
 // send no cookie: a request with one skips the cache (guide/edge/revalidation.md).
 import { expect, test } from "vite-plus/test";
-import { book, browser, onLiveSite, postEvent, started, url } from "../helpers";
+import { book, browser, deleteInPage, onLiveSite, postEvent, started, url } from "../helpers";
 
 const page = browser("prod");
 
@@ -81,9 +81,7 @@ test.skipIf(onLiveSite())(
     // Deleting: the event's page is gone and the list, built afresh, no longer has it.
     await p.reload();
     await started(p);
-    await p.getByTestId("delete").click();
-    await p.getByTestId("delete-sure").click();
-    await p.waitForURL(/\/events$/);
+    await deleteInPage(p);
     expect((await visit(`/en-US${event.path}`)).status).toBe(404);
     const gone = await visit("/en-US/events");
     expect(gone.cache).toBe("MISS");

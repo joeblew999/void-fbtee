@@ -1,6 +1,6 @@
 # plans/one-copy-each.md: one copy of each thing, and the two bugs the copies caused
 
-Status: proposed 2026-11-14, waiting for the user's OK.
+Status: change 1 done 2026-11-14 (not pushed); change 2 waits for the user's OK.
 
 ## Why
 
