@@ -19,6 +19,7 @@ import { addVitePlugin, getDefaultExportOptions } from "magicast/helpers";
 import {
   firstFile,
   hasI18nMiddleware,
+  HOME_PAGES,
   LAYOUTS,
   SKILL_DIR,
   VITE_CONFIGS,
@@ -474,6 +475,14 @@ export async function init(o: InitOptions): Promise<InitResult> {
     if (changed) writeModule(mod, at(voidConfig));
     if (changed) written.add(voidConfig);
   }
+
+  // An own "/" page (a new Void app's starter, pages/index.tsx) is hidden: "/" goes to each
+  // visitor's language. The developer decides: move it under pages/[lang]/, or keep it.
+  const ownHome = HOME_PAGES.find((f) => existsSync(at(f)));
+  if (ownHome)
+    todo.push(
+      `${ownHome}: hidden, since "/" sends each visitor to their own language; put the home page in pages/[lang]/index.tsx and delete ${ownHome}, or keep it with voidFbtee({ redirectHome: false })`,
+    );
 
   // 7. tsconfig.json: fbtee's JSX types, ES2025 (Temporal, Intl.DurationFormat) and the DOM.
   if (existsSync(at("tsconfig.json"))) {

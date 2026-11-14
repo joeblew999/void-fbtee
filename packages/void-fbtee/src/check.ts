@@ -4,14 +4,8 @@ import { createHash } from "node:crypto";
 import { existsSync, globSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { missing, type Project } from "./catalogs";
-import { firstFile, hasI18nMiddleware, LAYOUTS, VOID_CONFIGS } from "./app-files";
+import { firstFile, hasI18nMiddleware, HOME_PAGES, LAYOUTS, VOID_CONFIGS } from "./app-files";
 import { sourceOf, translatedOf } from "./locales";
-
-/** An app's own "/" page or route: Void's `index` files (guide/pages-routing/overview.md). */
-const HOME_PAGES = [
-  ...["tsx", "jsx", "ts", "js", "md", "mdx", "vue", "svelte"].map((e) => `pages/index.${e}`),
-  ...["ts", "tsx", "js", "jsx"].map((e) => `routes/index.${e}`),
-];
 
 /** Frontmatter key a translated markdown page records its original's hash in. */
 export const TRANSLATED_FROM = "translatedFrom";

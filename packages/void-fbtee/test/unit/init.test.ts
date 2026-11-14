@@ -190,6 +190,16 @@ test('removes the fixed "/" redirect an older init wrote, and only that one', as
   expect(read(own, "void.config.ts")).toContain('"/welcome"');
 });
 
+test('says an own "/" page (Void\'s starter) is hidden by "/" going to each visitor\'s language', async () => {
+  const root = app("vite-plus");
+  mkdirSync(join(root, "pages"), { recursive: true });
+  writeFileSync(join(root, "pages/index.tsx"), "export default () => null;\n");
+  const { todo } = await init(options(root));
+  expect(todo).toContain(
+    'pages/index.tsx: hidden, since "/" sends each visitor to their own language; put the home page in pages/[lang]/index.tsx and delete pages/index.tsx, or keep it with voidFbtee({ redirectHome: false })',
+  );
+});
+
 test("a sitemap route, unless the app has its own", async () => {
   const root = app("vite-plus");
   await init(options(root));

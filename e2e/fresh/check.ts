@@ -204,7 +204,11 @@ for (const target of targets) {
   cpSync(join(import.meta.dirname, "app"), dir, { recursive: true });
   // The example's languages (its translations are copied in below); init adds the plugin,
   // middleware, flags, scripts and peers.
-  run(...exec(app.pm, "void-fbtee", "init", "--locales", TRANSLATED.join(",")), dir);
+  const said = run(...exec(app.pm, "void-fbtee", "init", "--locales", TRANSLATED.join(",")), dir, {
+    capture: true,
+  });
+  console.error(said);
+  moveStarterHome(target, dir, said);
   run(...install(app.pm), dir);
   // The example's translations of the strings, and Zod for the form's validator, as Void's docs
   // leave the library to the developer (guide/server-routing.md, "Manual validators").
@@ -247,6 +251,7 @@ async function thaiSource(target: string, dir: string, app: App, installed: stri
     said.includes(`write it in ${source}`),
     `${target}: init says its own pages' English text is to be written in ${source}`,
   );
+  moveStarterHome(target, dir, said);
   // As the developer does: init's not-found page in Thai (the error page keeps its English,
   // translated as any string is; only what's shown below is checked).
   const notFound = join(dir, "pages/_not-found.tsx");
@@ -369,6 +374,21 @@ async function thaiSource(target: string, dir: string, app: App, installed: stri
   } finally {
     writeFileSync(viteConfig, config);
   }
+}
+
+/**
+ * Void's starter page at "/" (pages/index.tsx, from `void init`): "/" now sends each visitor to
+ * their language, so init says it's hidden, and the developer moves the home under pages/[lang]/
+ * (the fresh apps have theirs already) and deletes it, as done here.
+ */
+function moveStarterHome(target: string, dir: string, said: string) {
+  const starter = join(dir, "pages/index.tsx");
+  if (!existsSync(starter)) return;
+  check(
+    said.includes(`pages/index.tsx: hidden, since "/" sends each visitor to their own language`),
+    `${target}: init says Void's starter page at "/" is hidden`,
+  );
+  rmSync(starter);
 }
 
 /** The app's dev server, until `use` is done: `page` waits for a path to answer. */

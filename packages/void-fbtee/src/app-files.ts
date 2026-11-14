@@ -7,6 +7,13 @@ export const VITE_CONFIGS = ["vite.config.ts", "vite.config.mts", "vite.config.j
 export const VOID_CONFIGS = ["void.config.ts", "void.config.mts", "void.config.js"];
 export const LAYOUTS = ["pages/layout.tsx", "pages/layout.jsx"];
 
+/** An app's own "/" page or route: Void's `index` files (guide/pages-routing/overview.md). A new
+ * Void app has one, Void's starter page (pages/index.tsx). */
+export const HOME_PAGES = [
+  ...["tsx", "jsx", "ts", "js", "md", "mdx", "vue", "svelte"].map((e) => `pages/index.${e}`),
+  ...["ts", "tsx", "js", "jsx"].map((e) => `routes/index.${e}`),
+];
+
 /** void-fbtee's skill, inside the installed package. */
 export const SKILL_DIR = "node_modules/void-fbtee/skills/void-fbtee";
 
