@@ -279,7 +279,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           // Found as the bundler finds it: Node's require would also look in NODE_PATH, which
           // `pnpm exec` sets to every package pnpm installed, the app's or not.
           const core = await this.resolve("zod/v4/core", join(root, "package.json"));
-          return zodMessages(core && !core.external ? core.id : undefined, config);
+          return zodMessages(root, Boolean(core && !core.external), config);
         }
         if (id === "\0" + PAGES_ID) {
           const file = join(root, ".void/routes.d.ts");
@@ -325,17 +325,19 @@ export function langPages(file: string): string[] {
  * language `currentLocale()` gives (a locale's own, "pt-BR", else its language's, "th" for
  * "th-TH"), English where Zod has none. Without Zod 4 in the app, a `setup` that does nothing.
  */
-function zodMessages(core: string | undefined, config: LocaleConfig): string {
+function zodMessages(root: string, inApp: boolean, config: LocaleConfig): string {
   const none = "export function setup() {}";
-  // zod/v4/core is in Zod 3.25 too; the package's own version says which Zod the app has.
-  let pkg = core && dirname(core);
-  const manifest = (dir: string) => {
-    const file = join(dir, "package.json");
-    return existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : undefined;
-  };
-  while (pkg && manifest(pkg)?.name !== "zod")
-    pkg = dirname(pkg) === pkg ? undefined : dirname(pkg);
-  if (!pkg || Number(manifest(pkg).version.split(".")[0]) < 4) return none;
+  if (!inApp) return none;
+  // Where it is, by Node (in dev, Vite resolves it to its optimized copy). zod/v4/core is in
+  // Zod 3.25 too; the package's own version says which Zod the app has.
+  let pkg: string;
+  try {
+    pkg = dirname(createRequire(join(root, "package.json")).resolve("zod/package.json"));
+  } catch {
+    return none;
+  }
+  if (Number(JSON.parse(readFileSync(join(pkg, "package.json"), "utf8")).version.split(".")[0]) < 4)
+    return none;
   const dir = join(pkg, "v4/locales");
   const has = (name: string) => existsSync(join(dir, `${name}.js`));
   const found = config.locales.flatMap((l) => {
