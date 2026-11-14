@@ -27,8 +27,10 @@ Not used yet, and wanted:
 
   void-fbtee wraps it with the app's catalogs, rather than writing its own.
 
-- **Lists:** `list` and `<fbt:list>` ("Bangkok, Cairo and New York", with each language's own "and").
-  For the use cases' "who's watching from where".
+- **Lists inside a sentence:** `<fbt:list>` ("Watching from Bangkok, Cairo and New York", with each
+  language's own "and" and the sentence worded around it). `list()` on its own is already used (the
+  Intl page, the home page), but not a list inside a translated sentence. For the use cases' "who's
+  watching from where".
 - **Choices from a fixed set:** `<fbt:enum>`, each value translated in its sentence. That's how
   `plans/use-cases.md`'s "how they take part" (there, online, organising) gets written, not as
   separate strings joined together.
@@ -45,6 +47,8 @@ Not used yet, and wanted:
 
 ## What changes, in order
 
+There's one step for each item in "Not used yet, and wanted" above, seven in all, so none is dropped.
+
 1. **The translate skill.**
    - Compare `packages/void-fbtee/skills/void-fbtee/SKILL.md` (the part `void-fbtee translate` gives
      Claude Code) with `node_modules/fbtee/skills/fbtee-translate/SKILL.md`.
@@ -57,13 +61,15 @@ Not used yet, and wanted:
    `createFbteeRuntime` and `LocaleProvider`, with the app's catalogs. It shows part of a page in
    another language. The use-cases rows and `void-moq`'s captions use it, and it replaces the plain
    `<bdi lang dir>` wrapper planned in `plans/primitives.md`, item 8.
-4. **`<fbt:enum>`, `<fbt:name>` and gender:** shown working in the example and its docs (the
-   Strings page gets a section for each, in all three languages), so the later plans use them as
-   they're meant:
-   - `<fbt:enum>` for a fixed set of choices;
-   - `<fbt:name>` with the person's gender for a person named in a sentence;
-   - viewer gender for text addressed to the reader, only when the person has given it.
-5. **The skill and README** say which fbtee piece does what, and void-fbtee doesn't repeat them.
+4. **`<fbt:list>`:** a list inside a translated sentence.
+5. **`<fbt:enum>`:** a choice from a fixed set, translated within its sentence.
+6. **`<fbt:name>`:** a person's name in a sentence, with that person's gender.
+7. **Gender and `<fbt:pronoun>`:** viewer gender for text addressed to the reader, and pronouns,
+   only when the person has given their gender, never guessed.
+
+Steps 4–7 are each shown working in the example: the Strings page gets a section for each, in all
+three languages, so the later plans use them as they're meant. Then the skill and README say which
+fbtee piece does what, without repeating fbtee.
 
 ## How we'll know it's right
 
@@ -73,9 +79,11 @@ Not used yet, and wanted:
   sees exactly one log line for it, and none for the rest.
 - **`<InLanguage>`:** a Thai row inside an English page renders in Thai with its own plural forms,
   and the page around it stays English.
-- **`<fbt:enum>` and `<fbt:name>`:** unit tests render each in all three languages, with the
-  expected words taken from the catalog's own translations. They're checked again in the browser on
-  the Strings page.
+- **`<fbt:list>`, `<fbt:enum>`, `<fbt:name>` and gender with `<fbt:pronoun>`:** unit tests render
+  each in all three languages, with the expected words taken from the catalog's own translations.
+  They're checked again in the browser on the Strings page.
+- **Nothing dropped:** each of the seven "wanted" items is ticked off against its step and its
+  test before the change is committed.
 - Then `vp check`, `test:unit`, `test:dev`, `test:preview` and `i18n:check`.
 
 Committed locally, and pushed when the user says.
