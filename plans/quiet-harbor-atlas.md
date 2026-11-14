@@ -229,18 +229,10 @@ Each step is shipped and proven before the next, each with its docs example in t
 
 ## Still open (moved here from plans now done and deleted, last on 2026-11-14; git history keeps them)
 
-- **The cookie that carries a new event's key:** remove it once a Void release has the #810 fix
-  (fragments kept through action redirects: voidzero-dev/void `ae024fb`, after 1.8.0). Then posting
-  redirects to `#key=…` itself; check it, and remove `keyCookie` and its comments
-  (`apps/example/src/events/delete-key.ts`, the event page). Actions that update the page in place
-  still drop the `#`, so the browser's copy of the key stays.
 - **Telling Void about the preview's AI:** `guide/ai.md` says Workers AI is remote "during
   development and preview", but the preview needs `cloudflare.ai = { binding: "AI", remote: true }`
   in `void.config.ts` (found 2026-11-13). The user's call whether to raise it.
-- **Void 1.9.1 is out** (1.9.0 on 2026-11-14 00:11 UTC, 1.9.1 at 03:27, `npm view void time`;
-  the repo is on 1.8.0). Upgrade, then check whether it carries #810: if posting can redirect to
-  `#key=…`, the key cookie above goes. Its `Form` still sets `action: form[method]` (checked in
-  `@void/react` 1.9.1's `dist/index.mjs`), so `plans/void-form-without-javascript.md` still stands.
+- **Void 1.9.1, and the key cookie it may let go:** its own plan, `plans/void-1.9.md`.
 
 ## Not in this plan
 

@@ -1,6 +1,6 @@
 # plans/use-cases.md: use cases, written as data, shown in every language
 
-Status: proposed 2026-11-14, waiting for the user's OK. This is issue #7 ("use cases"), moved here whole: the London 1 pm event, when
+Status: proposed 2026-11-14, waiting for the user's OK. Its place in the order: `plans/README.md`. This is issue #7 ("use cases"), moved here whole: the London 1 pm event, when
 each person signs in to watch, when anyone travelling must land. The issue is closed. Issue #8 (video
 conferencing) is `plans/video-conferencing.md`.
 
@@ -22,15 +22,16 @@ adding an entry. That's what lets them grow past the first two issues.
 
 ## Gaps to close first (found 2026-11-14)
 
-- **Reminders go out at one moment for everyone.** `crons/reminders.ts` runs once a day,
-  `cron = "0 6 * * *"`: that's 13:00 in Bangkok and 22:00 the evening before in Los Angeles. "The
-  day before" has to be each booker's own day: run hourly, and remind the bookings whose
-  "day before, 09:00 in their zone" falls in that hour.
+- **Reminders go out at one moment for everyone** (`crons/reminders.ts`, `cron = "0 6 * * *"`).
+  Fixed by `plans/primitives.md`, item 4 (`dueNow`), before this plan; here the reminder cron just
+  uses it.
 - **An event has only a start.** It has no end or length, no "streamed" flag, and the venue is free
   text (`db/schema/events.ts`). Add an end, a streamed flag and a venue address for directions.
 - **A person is only a booking.** It has a language and zone (`db/schema/bookings.ts`), but not
   where they're coming from or how they take part. Add `taking_part` (there, online) to bookings,
-  and an optional "coming from" for travel.
+  written with `<fbt:enum>` (`plans/fbtee-fully.md`), and an optional "coming from" for travel.
+  `plans/video-conferencing.md` uses this field and the "streamed" flag above, so they're made here
+  and only here.
 - **Booking needs JavaScript** (`plans/void-form-without-javascript.md`): that's Void's issue, and
   it waits on upstream.
 
@@ -41,8 +42,8 @@ adding an entry. That's what lets them grow past the first two issues.
      - `Scenario`: an id, the event, its people;
      - `Person`: name, locale, home zone, how they take part (`there`, `travelling`, `online`,
        `organising`) and, for travel, where they come from.
-   - `view.ts`: `viewFor(event, person, now)`, which returns that person's moments as neutral values.
-     It uses Temporal only, the same way the events app already does. The moments:
+   - `view.ts`: each person's moments, from `momentFor` and `Reader` (`plans/primitives.md`, items
+     1–2), not a second date model. The moments:
      - starts, and ends;
      - on their clock, and the day it is for them;
      - "arrive by" in the event's own zone;
@@ -57,12 +58,12 @@ adding an entry. That's what lets them grow past the first two issues.
      language.
    - A home page card linking to it, like every feature.
    - Each scenario also has its own address (`/[lang]/docs/use-cases#<id>`) to link to from issues.
-3. **The events app does them for real:** the same `viewFor` behind the event page, the emails, the
-   ticket and the reminder cron, so the demo and the docs can't drift apart:
+3. **The events app does them for real:** the same `momentFor` behind the event page, the emails,
+   the ticket and the reminder cron, so the demo and the docs can't drift apart:
    - an event gets an optional end time (length);
    - "Streamed: watch online" when posting (#8, the stream itself comes later);
-   - a calendar file (`.ics`, with the event's zone) on the event page and attached to the booking
-     email;
+   - the calendar file from `plans/primitives.md`, item 5, on the event page and attached to the
+     booking email;
    - "Getting there": a Google Maps link to the venue and a flight search arriving the day before,
      plain links with no keys.
 4. **New use cases come in as issues:** a GitHub issue form, `.github/ISSUE_TEMPLATE/use-case.yml`,
@@ -93,10 +94,8 @@ adding an entry. That's what lets them grow past the first two issues.
 
 ## Not in this plan
 
-The live stream and captions themselves (#8: MoQ on Cloudflare, speech-to-text and translation on
-Workers AI). They get their own plan once this model exists, because the stream's page, emails and
-captions all hang off `viewFor`. Cloudflare's MoQ relay launched as a technical preview (moq.dev,
-2025-08-22); I'll check its status again before that plan.
+The live stream and captions themselves: `plans/video-conferencing.md`, which comes after this
+plan.
 
 ## How it's checked
 

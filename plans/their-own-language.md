@@ -1,8 +1,7 @@
 # plans/their-own-language.md: every visitor lands in their own language
 
 Status: proposed 2026-11-14; its unknowns were checked the same day (below, "What was checked"). Waiting
-for the user's OK. Comes right after `plans/fbtee-fully.md`, before everything else: it's the front
-door, and it's broken.
+for the user's OK. Its place in the order: `plans/README.md`.
 
 ## The bug
 

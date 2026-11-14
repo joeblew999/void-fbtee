@@ -1,7 +1,7 @@
 # plans/primitives.md: void-fbtee's base primitives, before anything is built on them
 
-Status: proposed 2026-11-14, waiting for the user's OK. Comes after `plans/fbtee-fully.md` and `plans/their-own-language.md`, and before
-`plans/use-cases.md` and `plans/video-conferencing.md`: both are built from these.
+Status: proposed 2026-11-14, waiting for the user's OK. Its place in the order: `plans/README.md`.
+`plans/use-cases.md` and `plans/video-conferencing.md` are built from these.
 
 ## Why
 
@@ -33,7 +33,8 @@ on 2026-11-14.
 
 **People and time**
 
-1. **`Reader`:** a person's `{ locale, timeZone }`. `inLocale`, `momentFor`, `translate`, the email
+1. **`Reader`:** a person's `{ locale, timeZone }`, and their gender only if they gave it (fbtee's
+   gender, adopted in `plans/fbtee-fully.md`, step 7). `inLocale`, `momentFor`, `translate`, the email
    and the calendar entry all take it. The package doesn't store it; storing is the app's.
 2. **`momentFor(instant, reader)`:** the instant on their clock, their day ("tomorrow" counted in
    _their_ day, not the event's, which is a bug today), their calendar and digits, in their
@@ -70,9 +71,9 @@ on 2026-11-14.
 **Showing it**
 
 8. **Text in its own language inside another:** the event's Arabic title on a Thai page or in a Thai
-   email, marked with `<bdi lang dir>`. `langAttrs` gives the attributes, but each place writes the
-   element itself (`src/events/EmailLayout.tsx`, the event pages). The package gives an
-   `<InLanguage locale>` component, plus the same thing for an email's HTML.
+   email. On a page that's `<InLanguage>` from `plans/fbtee-fully.md`, step 3 (fbtee's scoped
+   runtimes), not a second component here. In an email's HTML, the same marking (`<bdi lang dir>`)
+   comes with item 10, `sendInLocale`.
 9. **The visitor's own language:** this has its own plan, `plans/their-own-language.md`, done
    first. Its `negotiate()` and `<YourLanguage>` are primitives of the package too.
 10. **An email in its reader's language:** the email's `<html lang dir>`, the body's direction, and
@@ -109,11 +110,7 @@ copied code again.
 
 ## Order
 
-1. This plan: the three missing primitives in the package, with tests, the skill and the example
-   using them (its translate queue, emails and reminders on the package's versions, and its own copies
-   removed).
-2. `plans/use-cases.md`, on `momentFor` and `Reader`.
-3. `plans/video-conferencing.md`, `void-moq` on all of it.
+The plans' order is kept in one place, `plans/README.md`.
 
 ## How we'll know it's right
 

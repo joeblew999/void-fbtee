@@ -1,6 +1,6 @@
 # plans/fbtee-fully.md: use all of fbtee that fits, before building anything on top
 
-Status: proposed 2026-11-14, waiting for the user's OK. Comes before every other plan in `plans/`.
+Status: proposed 2026-11-14, waiting for the user's OK. Its place in the order: `plans/README.md`.
 void-fbtee is fbtee for Void, so the rest has to be built on fbtee's own pieces, not on copies of
 them. An audit of all of fbtee found pieces we don't use, and one place where we likely repeat it.
 

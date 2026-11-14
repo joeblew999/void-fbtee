@@ -1,6 +1,6 @@
 # plans/video-conferencing.md: events streamed live, with captions in each watcher's language
 
-Status: proposed 2026-11-14, waiting for the user's OK. This is issue #8 ("video conferencing"),
+Status: proposed 2026-11-14, waiting for the user's OK. Its place in the order: `plans/README.md`. This is issue #8 ("video conferencing"),
 moved here whole; the issue is closed. It builds on `plans/use-cases.md`: a person who
 `taking_part: online` is that plan's "watching online" use case.
 
@@ -11,7 +11,7 @@ moved here whole; the issue is closed. It builds on `plans/use-cases.md`: a pers
 - The web pages, the emails and the PDF ticket all show it: the link to watch, and when that is on
   the reader's clock.
 - A unified calendar: each booking's calendar entry carries the link (the `.ics` from
-  `plans/use-cases.md`).
+  `plans/primitives.md`, item 5).
 - **Live captions in each watcher's language.** The app already knows every person's language (their
   locale), as it does for everything else. Speech-to-text first: the speaker's words become text,
   and the text is translated for each watcher. Speaking it in the speaker's voice can come later.
@@ -99,9 +99,8 @@ What it depends on, and what it doesn't. Each layer leans only on the one below 
    `publishToken()`, `watchToken()` and the components.
 
 So a stream in `void-moq` has no event, time or booking: it's a stream with a name, a publisher,
-watchers and caption languages. The per-person times (`viewFor` in `plans/use-cases.md`) start in
-the app. If other apps need them too, they move into `void-fbtee` (they're about time and language),
-never into `void-moq`.
+watchers and caption languages. The per-person times are void-fbtee's `momentFor`
+(`plans/primitives.md`), never `void-moq`'s.
 
 It's shaped like void-fbtee, so it feels the same to use:
 
@@ -120,9 +119,8 @@ It's shaped like void-fbtee, so it feels the same to use:
 
 ## What the example then does with it
 
-1. **The event is streamed.**
-   - `events.streamed` (boolean), ticked when posting.
-   - Each booking's `taking_part` is `there` or `online`.
+1. **The event is streamed:** the `streamed` flag on events and `taking_part` on bookings, both
+   made in `plans/use-cases.md`. Here they start the stream and show "Watch".
 2. **Who may publish and watch,** through `publishToken()` and `watchToken()`:
    - the organiser publishes with the event's private key;
    - a booker watches with their booking.
@@ -130,7 +128,8 @@ It's shaped like void-fbtee, so it feels the same to use:
    - The event page gets `<Broadcast>` for the organiser and `<Watch>` for people who booked online.
    - Both show when it's on on the reader's own clock, and live status comes through the page's
      existing live updates (`src/events/live.ts`).
-4. **The emails, the ticket and the calendar.**
+4. **The emails, the ticket and the calendar** (the calendar entry is `plans/primitives.md`,
+   item 5).
    - "Watch online", with the link and the time on the reader's clock, in their language.
    - The reminder (per person, `plans/use-cases.md`) carries the link.
 5. **Docs:** a "Streaming" page (`pages/[lang]/docs/streaming.tsx` on `DocsPage`), linked from the
