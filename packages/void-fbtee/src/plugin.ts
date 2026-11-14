@@ -24,11 +24,12 @@ import { join } from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
 import type { FallbackLocales } from "fbtee";
-import { resolveLocales, translatedOf, type LocaleConfig, type LocaleInput } from "./locales";
+import { resolveLocales, type LocaleConfig, type LocaleInput } from "./locales";
 import {
   DEFAULT_SRC,
   DEFAULT_TRANSLATIONS,
   catalogFile,
+  catalogLocales,
   collect,
   formatMissing,
   missing,
@@ -263,9 +264,10 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         if (id === "\0" + CONFIG_ID)
           return `export default ${JSON.stringify({ ...config, fallbackLocales: options.fallbackLocales, site: options.site })};`;
         if (id === "\0" + CATALOGS_ID) {
-          const entries = translatedOf(config).map(
-            (l) =>
-              `${JSON.stringify(l.locale)}: () => import(${JSON.stringify(CATALOG_PREFIX + l.locale)})`,
+          // The translated languages, and the source's own when it needs one (catalogs.ts).
+          const entries = catalogLocales(project()).map(
+            (locale) =>
+              `${JSON.stringify(locale)}: () => import(${JSON.stringify(CATALOG_PREFIX + locale)})`,
           );
           return `export default {${entries.join(",")}};`;
         }
@@ -279,9 +281,11 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           if (existsSync(file)) this.addWatchFile(file);
           return `export default ${JSON.stringify(langPages(file))};`;
         }
-        // Dev only: each string's source text, so the browser can name what it shows untranslated.
+        // Each string's source text, so a missing translation can be named: on the server always
+        // (its log is where production shows them), in the browser only in dev (no page ships the
+        // whole app's text to visitors).
         if (id === "\0" + TEXTS_ID)
-          return `export default ${command === "serve" ? JSON.stringify(runtimeTexts(project())) : "{}"};`;
+          return `export default ${command === "serve" || !isClient(this.environment) ? JSON.stringify(runtimeTexts(project())) : "{}"};`;
         if (id.startsWith("\0" + CATALOG_PREFIX)) {
           const locale = id.slice(1 + CATALOG_PREFIX.length);
           const file = catalogFile(project(), locale);

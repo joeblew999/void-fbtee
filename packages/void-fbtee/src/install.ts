@@ -7,10 +7,11 @@ import config from "virtual:void-fbtee/config";
 import texts from "virtual:void-fbtee/texts";
 import { readMeta } from "./locales";
 import type { SharedI18n } from "./middleware";
-import { localeContextOptions } from "./runtime";
+import { localeContextOptions, reportMissing } from "./runtime";
 
 type Tracked = Promise<void> & { status?: "pending" | "fulfilled"; value?: void };
 const installed = new Map<string, Tracked>();
+const missing = reportMissing(texts);
 
 /**
  * Loads and installs a locale's catalogs, once per locale. The promise is marked fulfilled when
@@ -19,15 +20,21 @@ const installed = new Map<string, Tracked>();
 export function install(locale: string): Tracked {
   let ready = installed.get(locale);
   if (!ready) {
-    // Dev only: name each string this page shows untranslated (fbtee reports each once).
-    const onMissing = import.meta.env.DEV
-      ? ({ hashKey }: { hashKey: string }) =>
-          console.warn(
-            `void-fbtee: no ${locale} translation for ${JSON.stringify(texts[hashKey] ?? hashKey)}`,
-          )
-      : undefined;
-    const context = setupLocaleContext(localeContextOptions(config, catalogs, locale, onMissing));
-    const p: Tracked = context.preloadLocale(locale).then(() => {
+    // Dev only in the browser: production's missing strings are logged where they're rendered
+    // first, on the server (server.ts, runIn).
+    const onMissing = import.meta.env.DEV ? missing : undefined;
+    // The source language's own catalog, when it has one (catalogs.ts, sourceNeedsCatalog), is
+    // given up front: fbtee's setupLocaleContext never loads a catalog for the source language
+    // itself, though it reads one it's given.
+    const source = catalogs[config.sourceLocale];
+    const p: Tracked = (async () => {
+      const translations = source ? (await source()).default : undefined;
+      const context = setupLocaleContext({
+        ...localeContextOptions(config, catalogs, locale, onMissing),
+        ...(translations && { translations }),
+      });
+      await context.preloadLocale(locale);
+    })().then(() => {
       p.status = "fulfilled";
     });
     p.status = "pending";

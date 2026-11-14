@@ -155,6 +155,19 @@ test("with a home page under pages/[lang]/: Void's not-found and error pages, tr
   expect(snapshot(root)).toEqual(before);
 });
 
+test("in an app written in Thai, init says to write its two pages' English text in Thai", async () => {
+  const thai = app("vite-plus");
+  withHome(thai);
+  const { todo } = await init({ root: thai, sourceLocale: "th-TH", locales: ["th-TH", "en-US"] });
+  expect(todo).toContain(
+    "pages/_not-found.tsx and pages/_error.tsx: their text is in English; write it in th-TH, the code's language, then run void-fbtee prepare",
+  );
+  const english = app("vite-plus");
+  withHome(english);
+  const { todo: none } = await init({ root: english, sourceLocale: "en-GB", locales: ["en-GB"] });
+  expect(none.some((line) => line.includes("their text is in English"))).toBe(false);
+});
+
 test("a sitemap route, unless the app has its own", async () => {
   const root = app("vite-plus");
   await init(options(root));

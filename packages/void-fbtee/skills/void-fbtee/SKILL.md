@@ -41,11 +41,19 @@ language the page shows it in (`inLanguage`).
 **Where things are.** Catalogs: `i18n/translations/<locale>.json`, one per locale except the source
 locale; `prepare` writes them, you edit them, nothing else under `i18n/`. Locales:
 `voidFbtee({ sourceLocale, locales })` in `vite.config.ts`. The source locale (the code's language)
-has no catalog: its text comes from the code.
+takes its text from the code, so it usually has no catalog. The exception is a source language with
+more plural forms than a `<fbt:plural>` can write in the code (the text for exactly 1, and `many` for
+the rest): an app written in Arabic, say. Then `prepare` makes a catalog for the source language too,
+holding only the strings with a count. You write each form there in the source language itself, so
+2, 11 and 100 each get their own grammar. Its lines are marked `"status": "new"` like any other.
 
-**A finished entry.** Set the text in `translations[0].translation`, keep every `{placeholder}`
-exactly as written, and change `"status": "new"` to `"status": "translated"`. Leave `tokens`,
-`types` and the hash keys as they are.
+**Gender.** fbtee's skill covers the rest of an entry; two things are void-fbtee's. A `<fbt:name>`
+or `<fbt:pronoun>` entry already has `"types": [3]`: give it one line per gender, `variations`
+`{"0": 1}` male, `{"0": 2}` female, `{"0": 3}` unknown, where the language changes its words
+(Arabic does, Thai mostly doesn't, and one line with `{}` is then fine). A sentence spoken to the
+reader can change by the reader's gender too, set by `<InLanguage gender>`: add
+`"tokens": ["__viewing_user__"], "types": [3]` to that entry and the same three lines. Never change
+the hash keys.
 
 **Plurals.** A string with a count has one line per plural form the language uses (`prepare` adds
 them; fbtee's own prepare-translations doesn't). Each line's `variations` names its form by
@@ -58,8 +66,11 @@ seat is left" / "seats are left") has its lines too.
 
 **fbtee's built-in strings.** Every catalog has 12 from fbtee (`fbtee/Strings.json`): how `list()`
 joins items and number labels ("{number}+"). Use the locale's own conventions; for the list
-strings, CLDR's, which `Intl.ListFormat` prints (`new Intl.ListFormat("ar-EG").format(["A","B","C"])`
-is `A وB وC`: no commas). `{ type: "disjunction" }` gives the "or" lists.
+strings, CLDR's where fbtee can write them, as `Intl.ListFormat` prints them
+(`{ type: "disjunction" }` gives the "or" lists). fbtee joins every item but the last with one
+string, `{previous items}, {following items}`, the same for "and", "or" and plain lists, so it holds
+the language's comma: CLDR's Arabic "and" list, `A وB وC`, would make the "or" list `A وB أو C`.
+Arabic is then `A، B وC`.
 
 **Right-to-left locales** (`ar-EG`): void-fbtee sets `<html dir="rtl">`, so write natural text with
 no direction marks (U+200E, U+200F).
@@ -74,6 +85,17 @@ reports it). A label used on several pages is a common string: once in `voidFbte
 or `fbs.c("Save")` everywhere. In server code (an email, a job, a page title), a number in an `fbs`
 string is `fbs.param("count", n, { number: true })`: fbtee formats it the language's way. In a
 component, format it in `<Formatted>` instead (below).
+
+Part of a page in another language (a row for a Thai reader on an English page) goes in
+`<InLanguage locale="th-TH">` from `void-fbtee/react`. Inside it, a component that translates
+calls `const { fbt } = useFbt();` (from `fbtee`) and uses that `fbt`; plain `<fbt>` stays in the
+page's language. `gender` (`"male"`, `"female"` or `"unknown"`) is the reader's, only when the
+person gave it. Use fbtee's other pieces as its README describes: `<fbt:list>` for a list in a sentence (not
+`String(list(…))`), `<fbt:enum>` for a choice from a fixed set, `<fbt:name>` and
+`<fbt:pronoun>` for a person's gender, `<fbt:same-param>` for a value used twice.
+Not fbtee's own language switching (`createLocaleContext`, `useLocaleContext().setLocale`): with
+void-fbtee each language has its own address, so a page never changes language where it stands; a
+link to the other language's address does.
 
 ## Dates, numbers and names in components
 

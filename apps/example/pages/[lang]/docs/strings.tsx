@@ -3,6 +3,7 @@
 import { fbt } from "fbtee";
 import { DocsPage } from "@/docs/DocsPage";
 import { Points, Section, SkillLink, type Point } from "@/docs/Points";
+import { StringPieces } from "@/docs/StringPieces";
 import { Formatted, useLocale } from "void-fbtee/react";
 
 const COUNTS = [0, 1, 2, 3, 11, 100];
@@ -108,6 +109,14 @@ export default function StringsPage() {
       ),
     },
     {
+      id: "pieces",
+      title: (
+        <fbt desc="Strings page section title: each of fbtee's ways of writing a sentence">
+          Every piece of fbtee
+        </fbt>
+      ),
+    },
+    {
       id: "how",
       title: (
         <fbt desc="Strings page section title: what translated strings take">What it takes</fbt>
@@ -157,6 +166,15 @@ export default function StringsPage() {
         </table>
       </Section>
       <Section id={sections[1].id} title={sections[1].title}>
+        <p className="text-muted-foreground">
+          <fbt desc="Strings page: each of fbtee's ways of writing a sentence, shown in this page's language">
+            Each of fbtee's ways of writing a sentence, in this page's language, with the line that
+            does it. Arabic changes its words by who is meant; Thai and English mostly don't.
+          </fbt>
+        </p>
+        <StringPieces />
+      </Section>
+      <Section id={sections[2].id} title={sections[2].title}>
         <Points points={points()} />
         <SkillLink section="strings" />
       </Section>

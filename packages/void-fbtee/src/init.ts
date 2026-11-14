@@ -333,6 +333,13 @@ export async function init(o: InitOptions): Promise<InitResult> {
       written.add(`pages/${p.name}.tsx`);
       done.push(`pages/${p.name}.tsx: created, Void's ${p.what} in the page's language`);
     }
+  // Their text is in English, init's own language. In an app written in another language the code's
+  // text is that language's (the source), so the developer rewrites it; prepare then translates it.
+  const englishPages = errorPages.filter((p) => written.has(`pages/${p.name}.tsx`));
+  if (englishPages.length && new Intl.Locale(o.sourceLocale).language !== "en")
+    todo.push(
+      `${englishPages.map((p) => `pages/${p.name}.tsx`).join(" and ")}: their text is in English; write it in ${o.sourceLocale}, the code's language, then run void-fbtee prepare`,
+    );
 
   // 4c. The sitemap, where the app has none.
   if (!has("routes", "sitemap.xml")) {

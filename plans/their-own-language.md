@@ -314,4 +314,9 @@ Title: Export `negotiateLocale` (choosing a locale on the server without `setupL
 > Latin `1` ("حجزت 1 ليلة"), where other counts come out in Arabic-Indic digits ("حجزت ٢ ليالٍ").
 > Should the exactly-one form format its `1` like the other counts?
 >
+> And one about lists: `list()` joins every item but the last with one string,
+> `{previous items}, {following items}`, for "and", "or" and plain lists alike. In Arabic, CLDR's
+> "and" list is `A وB وC` (what `Intl.ListFormat("ar-EG")` prints), but translating that string as
+> `و` makes the "or" list `A وB أو C`. Would a separate middle string per conjunction be welcome?
+>
 > Seen in https://github.com/joeblew999/void-fbtee.

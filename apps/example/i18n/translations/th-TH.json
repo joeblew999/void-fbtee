@@ -345,18 +345,6 @@
       ],
       "types": []
     },
-    "2PraAVUpYGeGFRtoUfZbqQ==": {
-      "description": "Home page introduction; languages is a list of language names",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ข้อความโดย fbtee วันที่โดย Temporal และที่เหลือทั้งหมดโดย Intl ของแพลตฟอร์มเอง ตัวอย่างนี้มีภาษา {languages}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "5w2wB/LokLMrSJDX7ET7xQ==": {
       "description": "Docs index heading",
       "status": "translated",
@@ -3673,6 +3661,238 @@
       "translations": [
         {
           "translation": "ตั๋วตัวอย่าง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wslJzxORlTJzxeD0lWVayA==": {
+      "description": "Strings page: the site's menu, its words as a list inside the sentence",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เมนูมี {pages}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "a6RutNoEAizv/Rqo6g8TCw==": {
+      "description": "Strings page: how someone takes part in an event, chosen from a fixed set",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} เข้าร่วมด้วยตัวเอง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OYa/dzUl3KVTLjx4UuaYwA==": {
+      "description": "Strings page: how someone takes part in an event, chosen from a fixed set",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} เข้าร่วมทางออนไลน์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Ykl5ci4CbSxY96rgkgXBfg==": {
+      "description": "Strings page: someone booked a seat, worded by their gender",
+      "status": "translated",
+      "tokens": [
+        "name"
+      ],
+      "translations": [
+        {
+          "translation": "{name} จองที่นั่งแล้ว",
+          "variations": {}
+        }
+      ],
+      "types": [
+        3
+      ]
+    },
+    "hl+18clzmkueXyxBRAm6dw==": {
+      "description": "Strings page: the same name twice in one sentence",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} จองแล้ว และ {name} ได้รับตั๋วทางอีเมล",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5Jf1Uen6KRT21ot3NTL4ew==": {
+      "description": "Strings page: told to the reader who just booked",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "คุณจองแล้ว",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "l1rZHZvHHLbW/a/yEblXwQ==": {
+      "description": "Strings page piece title: a list inside a sentence",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "รายการในประโยค",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Ze+y8mH7PTW766I4LwERmw==": {
+      "description": "Strings page piece title: a choice from a fixed set",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ตัวเลือกจากชุดที่กำหนด",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XWFC+7e2Mtu7iSiMeI/Lcg==": {
+      "description": "Strings page piece title: a person's name, with their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ชื่อและเพศ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SXOyBny8orkEOBw42AvK5w==": {
+      "description": "Strings page piece title: a pronoun by gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สรรพนาม",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2sEBdi/HqR9d28AdOPbLVg==": {
+      "description": "Strings page piece title: the same value twice in a sentence",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ค่าเดียวกันสองครั้ง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1ldXio0BzOF9+7o9Jna/rg==": {
+      "description": "Strings page piece title: a sentence for the reader, by the reader's gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สำหรับผู้อ่าน ตามเพศของผู้อ่าน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "l2im0sieXAQmyaHWJT4u9Q==": {
+      "description": "Strings page piece title: part of the page in another language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ส่วนหนึ่งของหน้าในอีกภาษา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gA5w9YnyCStts6aLzi/eUQ==": {
+      "description": "Strings page section title: each of fbtee's ways of writing a sentence",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ทุกส่วนของ fbtee",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2F0uBrci189YangXw6qYvg==": {
+      "description": "Strings page: each of fbtee's ways of writing a sentence, shown in this page's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แต่ละวิธีของ fbtee ในการเขียนประโยค ในภาษาของหน้านี้ พร้อมบรรทัดที่ทำหน้าที่นั้น ภาษาอาหรับเปลี่ยนคำตามบุคคลที่กล่าวถึง ส่วนภาษาไทยและภาษาอังกฤษส่วนใหญ่ไม่เปลี่ยน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2PraAVUpYGeGFRtoUfZbqQ==": {
+      "description": "Home page introduction; languages is a list of language names",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ข้อความโดย fbtee วันที่โดย Temporal และที่เหลือทั้งหมดโดย Intl ของแพลตฟอร์มเอง ตัวอย่างนี้มีภาษา {languages}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0ninRllHFSy0f8sMESsm1w==": {
+      "description": "Strings page: someone checked their own ticket, with a pronoun by their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} ตรวจตั๋วของเธอแล้ว",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "moH0FtiyxrwnNEDnFVgNHg==": {
+      "description": "Strings page: someone checked their own ticket, with a pronoun by their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} ตรวจตั๋วของเขาแล้ว",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "85XCoag9WLA3pTjGs4A8hw==": {
+      "description": "Strings page: someone checked their own ticket, with a pronoun by their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} ตรวจตั๋วของตนแล้ว",
           "variations": {}
         }
       ],

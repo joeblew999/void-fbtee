@@ -24,9 +24,19 @@ import {
 } from "react";
 import { Link as VoidLink, SharedContext, useForm as voidUseForm } from "@void/react";
 import type { ActionUrl, ResolveActionBody, ResolveActionParams } from "void/routes";
+import {
+  createFbteeRuntime,
+  LocaleProvider,
+  type FbteeRuntime,
+  type Gender,
+  type TranslationDictionary,
+} from "fbtee";
+import catalogs from "virtual:void-fbtee/catalogs";
 import { Temporal } from "temporal-polyfill";
 import config from "virtual:void-fbtee/config";
-import { localeFromPath, type Lang, type Locale } from "./locales";
+import { currentTranslations } from "./current";
+import { langAttrs, localeFromPath, type Lang, type Locale } from "./locales";
+import { allTranslations } from "./runtime";
 export { langAttrs } from "./locales";
 import { install, documentI18n } from "./install";
 import type { SharedI18n } from "./middleware";
@@ -84,6 +94,77 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const { locale } = useLocale();
   if (!import.meta.env.SSR) use(install(locale) as Promise<void>);
   return children;
+}
+
+/**
+ * Part of a page in another language, by fbtee's scoped runtimes (its README, "Scoped Runtimes"):
+ * a row for a Thai reader on an English page, a caption in the watcher's language. Inside it,
+ * components that translate call fbtee's `useFbt()` and keep its local names, so their <fbt> and
+ * fbs are in `locale`: `const { fbt } = useFbt();`. Plain <fbt> elsewhere stays in the page's
+ * language, as fbtee's global imports do. `gender` is the reader's, for sentences that address
+ * them (`<fbt:pronoun>`, viewer gender), and only when the person gave it.
+ *
+ * It takes only the locale: the runtime carries functions, so it can't cross from the server to the
+ * browser (fbtee's README: "pass locale and translation data across that boundary"). The server
+ * builds it from the request's catalogs at once; the browser loads them first, keeping the
+ * server's HTML meanwhile. The element carries `lang` and `dir`.
+ */
+export function InLanguage({
+  locale,
+  gender,
+  children,
+}: {
+  locale: string;
+  gender?: Gender;
+  children: ReactNode;
+}) {
+  const runtime = import.meta.env.SSR
+    ? serverRuntime(locale, gender)
+    : use(browserRuntime(locale, gender));
+  return (
+    <LocaleProvider runtime={runtime}>
+      <span {...langAttrs(locale)}>{children}</span>
+    </LocaleProvider>
+  );
+}
+
+const runtimeOptions = (
+  locale: string,
+  gender: Gender | undefined,
+  translations: TranslationDictionary,
+) => ({
+  locale,
+  gender,
+  translations,
+  sourceLocale: config.sourceLocale,
+  fallbackLocales: config.fallbackLocales,
+});
+
+// One runtime per request's catalogs, language and gender, on the server.
+const serverRuntimes = new WeakMap<TranslationDictionary, Map<string, FbteeRuntime>>();
+function serverRuntime(locale: string, gender: Gender | undefined): FbteeRuntime {
+  const translations = currentTranslations() ?? {};
+  let byKey = serverRuntimes.get(translations);
+  if (!byKey) serverRuntimes.set(translations, (byKey = new Map()));
+  const key = `${locale} ${gender ?? ""}`;
+  let runtime = byKey.get(key);
+  if (!runtime)
+    byKey.set(key, (runtime = createFbteeRuntime(runtimeOptions(locale, gender, translations))));
+  return runtime;
+}
+
+// One per language and gender in the browser, made once every catalog has loaded.
+const browserRuntimes = new Map<string, Promise<FbteeRuntime>>();
+function browserRuntime(locale: string, gender: Gender | undefined): Promise<FbteeRuntime> {
+  const key = `${locale} ${gender ?? ""}`;
+  let runtime = browserRuntimes.get(key);
+  if (!runtime) {
+    runtime = allTranslations(catalogs).then((t) =>
+      createFbteeRuntime(runtimeOptions(locale, gender, t)),
+    );
+    browserRuntimes.set(key, runtime);
+  }
+  return runtime;
 }
 
 /**

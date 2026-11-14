@@ -39,12 +39,15 @@ const { TRANSLATED } = await import("../locales");
 const work = join(root, ".vitest");
 
 type Pm = "npm" | "pnpm";
+type Translation = { translation: string; variations: Record<string, number> };
 type App = {
   pm: Pm;
   toolchain: "vite" | "vite-plus";
   /** The packed tarball, or the git dependency apps use today (a shorter check). */
   source: "tarball" | "git";
   port: number;
+  /** The language the app's code is written in, when not English (`init --source-locale`). */
+  written?: "th-TH";
 };
 const APPS: Record<string, App> = {
   "pnpm-vite-plus": { pm: "pnpm", toolchain: "vite-plus", source: "tarball", port: 5274 },
@@ -52,6 +55,38 @@ const APPS: Record<string, App> = {
   "pnpm-vite": { pm: "pnpm", toolchain: "vite", source: "tarball", port: 5275 },
   "npm-vite": { pm: "npm", toolchain: "vite", source: "tarball", port: 5277 },
   git: { pm: "pnpm", toolchain: "vite-plus", source: "git", port: 5278 },
+  "thai-source": {
+    pm: "pnpm",
+    toolchain: "vite-plus",
+    source: "tarball",
+    port: 5279,
+    written: "th-TH",
+  },
+};
+
+// The Thai-source app's translations, as a developer (or `void-fbtee translate`) writes them: by
+// source text, one line per plural form each language uses (fbtee's codes: 16 zero, 4 one, 8 two,
+// 20 few, 12 many, 24 other).
+const FROM_THAI: Record<string, Record<string, string | Record<number, string>>> = {
+  "en-US": {
+    งานของชุมชน: "Community events",
+    "เหลือ {number} ที่นั่ง": { 4: "{number} seat left", 24: "{number} seats left" },
+    ไม่มีอะไรอยู่ที่นี่: "There's nothing here",
+    หน้าแรก: "Home",
+  },
+  "ar-EG": {
+    งานของชุมชน: "فعاليات المجتمع",
+    "เหลือ {number} ที่นั่ง": {
+      16: "لم يتبقَّ أي مقعد",
+      4: "تبقّى مقعد واحد",
+      8: "تبقّى مقعدان",
+      20: "تبقّت {number} مقاعد",
+      12: "تبقّى {number} مقعدًا",
+      24: "تبقّى {number} مقعد",
+    },
+    ไม่มีอะไรอยู่ที่นี่: "لا يوجد شيء هنا",
+    หน้าแรก: "الرئيسية",
+  },
 };
 const targets = process.argv[2] ? [process.argv[2]] : Object.keys(APPS);
 
@@ -161,6 +196,10 @@ for (const target of targets) {
   // void-fbtee's own pages and Void's docs examples (e2e/fresh/app/: pages/, routes/, crons/),
   // there before init, as a developer's own pages are: with a home under pages/[lang]/, init adds
   // the not-found and error pages.
+  if (app.written) {
+    await thaiSource(target, dir, app, installed);
+    continue;
+  }
   cpSync(join(import.meta.dirname, "app"), dir, { recursive: true });
   // The example's languages (its translations are copied in below); init adds the plugin,
   // middleware, flags, scripts and peers.
@@ -186,6 +225,124 @@ for (const target of targets) {
   }
   await checkDev(target, dir, app);
   if (target === "npm-vite-plus") checkMacLockfile(target, dir);
+}
+
+/**
+ * An app written in Thai: init with `--source-locale th-TH`, its pages (e2e/fresh/thai/), init's
+ * own pages rewritten in Thai as its to-do asks, prepare, the translations, check, a build, and the
+ * dev server in all three languages with "/" going to Thai.
+ */
+async function thaiSource(target: string, dir: string, app: App, installed: string) {
+  const source = app.written!;
+  cpSync(join(import.meta.dirname, "thai"), dir, { recursive: true });
+  const said = run(
+    ...exec(app.pm, "void-fbtee", "init", "--source-locale", source, "--locales", "en-US,ar-EG"),
+    dir,
+    { capture: true },
+  );
+  check(
+    said.includes(`write it in ${source}`),
+    `${target}: init says its own pages' English text is to be written in ${source}`,
+  );
+  // As the developer does: init's not-found page in Thai (the error page keeps its English,
+  // translated as any string is; only what's shown below is checked).
+  const notFound = join(dir, "pages/_not-found.tsx");
+  writeFileSync(
+    notFound,
+    readFileSync(notFound, "utf8")
+      .replaceAll("There's nothing here", "ไม่มีอะไรอยู่ที่นี่")
+      .replace(">Home</fbt>", ">หน้าแรก</fbt>"),
+  );
+  run(...install(app.pm), dir);
+  checkOwnDependencies(target, dir, installed);
+  run(...exec(app.pm, "void-fbtee", "prepare"), dir);
+  check(
+    !existsSync(join(dir, `i18n/translations/${source}.json`)),
+    `${target}: no catalog for Thai, the source: it writes every count one way`,
+  );
+  for (const [locale, texts] of Object.entries(FROM_THAI)) {
+    const file = join(dir, `i18n/translations/${locale}.json`);
+    const catalog = JSON.parse(readFileSync(file, "utf8")) as {
+      translations: Record<string, { status?: string; translations: Translation[] }>;
+    };
+    for (const entry of Object.values(catalog.translations)) {
+      const wanted = texts[entry.translations[0]?.translation ?? ""];
+      if (wanted === undefined) continue;
+      if (typeof wanted === "string") entry.translations[0].translation = wanted;
+      else
+        for (const line of entry.translations)
+          line.translation = wanted[Number(Object.values(line.variations)[0])] ?? line.translation;
+      entry.status = "translated";
+    }
+    writeFileSync(file, JSON.stringify(catalog, null, 2) + "\n");
+  }
+  // The rest (init's error page, still in English, and fbtee's built-in strings) keep the text
+  // prepare gave them: this check is about the pages above, so they're only marked done.
+  for (const locale of Object.keys(FROM_THAI)) {
+    const file = join(dir, `i18n/translations/${locale}.json`);
+    const catalog = JSON.parse(readFileSync(file, "utf8")) as {
+      translations: Record<string, { status?: string }>;
+    };
+    for (const entry of Object.values(catalog.translations))
+      if (entry.status === "new") entry.status = "translated";
+    writeFileSync(file, JSON.stringify(catalog, null, 2) + "\n");
+  }
+  run(...exec(app.pm, "void-fbtee", "check"), dir);
+  check(true, `${target}: void-fbtee check passes`);
+  run(...exec(app.pm, "vp", "build"), dir);
+  run(...exec(app.pm, "tsc", "--noEmit"), dir);
+  check(true, `${target}: builds and typechecks`);
+
+  const server = spawn(
+    app.pm,
+    ["exec", "--", "vp", "dev", "--port", String(app.port), "--strictPort"],
+    { cwd: dir, env, stdio: ["ignore", "ignore", "inherit"], detached: true },
+  );
+  const base = `http://localhost:${app.port}`;
+  try {
+    const page = async (path: string) => {
+      for (let i = 0; i < 300; i++) {
+        try {
+          const res = await fetch(`${base}${path}`);
+          if (res.ok) return await res.text();
+        } catch {}
+        await new Promise((r) => setTimeout(r, 100));
+      }
+      return "";
+    };
+    const th = await page(`/${source}`);
+    check(
+      th.includes('<html lang="th-TH"') && th.includes("งานของชุมชน") && th.includes("เหลือ 3 ที่นั่ง"),
+      `${target}: /th-TH is the code's own Thai`,
+    );
+    const en = await page("/en-US");
+    check(
+      en.includes("Community events") && en.includes("3 seats left"),
+      `${target}: /en-US is translated into English, by its plural form`,
+    );
+    const ar = await page("/ar-EG");
+    check(
+      ar.includes('dir="rtl"') && ar.includes("فعاليات المجتمع") && ar.includes("تبقّت ٣ مقاعد"),
+      `${target}: /ar-EG is in Arabic, right-to-left, with its "few" form for 3`,
+    );
+    const nothing = await fetch(`${base}/th-TH/no-such-page`);
+    check(
+      nothing.status === 404 && (await nothing.text()).includes("ไม่มีอะไรอยู่ที่นี่"),
+      `${target}: the not-found page is in Thai`,
+    );
+    const home = await fetch(`${base}/`, { redirect: "manual" });
+    check(
+      home.status === 301 && home.headers.get("location")?.endsWith(`/${source}`),
+      `${target}: "/" redirects to /${source}, the source language (301)`,
+    );
+    const sitemap = await (await fetch(`${base}/sitemap.xml`)).text();
+    check(
+      sitemap.includes('hreflang="th-TH"') && sitemap.includes('hreflang="en-US"'),
+      `${target}: the sitemap lists every language`,
+    );
+  } finally {
+    if (server.pid) process.kill(-server.pid, "SIGTERM");
+  }
 }
 
 /** The package as npm would publish it, checked as Void checks its own (packed-registry.mjs,

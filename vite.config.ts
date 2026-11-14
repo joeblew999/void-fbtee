@@ -89,8 +89,8 @@ export default defineConfig({
     },
   },
   lint: {
-    // e2e/fresh/app/: pages copied into the fresh apps, linted and type-checked there.
-    ignorePatterns: ["e2e/fresh/app/**"],
+    // e2e/fresh/app/ and thai/: pages copied into the fresh apps, linted and type-checked there.
+    ignorePatterns: ["e2e/fresh/app/**", "e2e/fresh/thai/**"],
     plugins: ["typescript", "react"],
     // What `void-fbtee init` asks a workspace's root config for: fbtee's lint rules.
     jsPlugins: ["@nkzw/eslint-plugin-fbtee"],

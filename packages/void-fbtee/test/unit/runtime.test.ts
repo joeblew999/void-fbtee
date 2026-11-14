@@ -1,10 +1,15 @@
 // What void-fbtee hands fbtee's runtime, checked with fbtee's real runtime: regional locales fall
 // back per message (de-AT -> de -> source text) in the browser and on the server.
-import { describe, expect, test } from "vite-plus/test";
+import { describe, expect, test, vi } from "vite-plus/test";
 import { collectSync, transformSync, translateSync } from "@nkzw/fbtee-compiler";
 import { fbt, runWithFbtee, setupLocaleContext } from "fbtee/server";
 import { resolveLocales } from "../../src/locales";
-import { allTranslations, localeContextOptions, type CatalogLoaders } from "../../src/runtime";
+import {
+  allTranslations,
+  localeContextOptions,
+  reportMissing,
+  type CatalogLoaders,
+} from "../../src/runtime";
 
 const SOURCE = `import { fbt } from "fbtee";
 const cart = () => <fbt desc="Shopping cart">Cart</fbt>;
@@ -66,4 +71,24 @@ describe("de-AT falls back to de, then the source text", () => {
     });
     expect(out).toEqual(DE_AT);
   });
+});
+
+test("a missing translation is logged once per language and string, however many requests", async () => {
+  const translations = await allTranslations(catalogs);
+  // Source text by fbtee's runtime hash, the key fbtee reports (the plugin's texts module).
+  const texts = Object.fromEntries(
+    JSON.parse(collectSync("s.jsx", SOURCE, { collectPackager: "both" }).output!).phrases.map(
+      (p: any) => [p.hash_key, p.jsfbt.t.text],
+    ),
+  );
+  const missing = reportMissing(texts);
+  const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+  try {
+    // Two requests in German, each its own fbtee runtime, as the server makes one per request.
+    for (let i = 0; i < 2; i++)
+      runWithFbtee({ locale: "de", translations, onMissingTranslation: missing }, strings);
+    expect(warn.mock.calls).toEqual([['void-fbtee: no de translation for "Hello"']]);
+  } finally {
+    warn.mockRestore();
+  }
 });

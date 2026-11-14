@@ -79,3 +79,56 @@ describe("runtime texts (dev naming)", () => {
     );
   });
 });
+
+// An app written in Arabic: a count has six forms in Arabic, and the code's <fbt:plural> can write
+// two (the text, and `many`). So prepare makes a catalog for the source language too, holding only
+// the counted strings, and fbtee reads each form from it (checked with fbtee 6.0.0).
+describe("a source language with more plural forms than the code can write", () => {
+  const arabic = (): Project => ({
+    ...project(),
+    config: resolveLocales("ar-EG", ["ar-EG", "en-US"]),
+  });
+  const withNights = () =>
+    writeFileSync(
+      join(root, "src/nights.tsx"),
+      `import { fbt } from "fbtee";
+export const nights = (count: number) => (
+  <fbt desc="How many nights are booked">
+    حجزت <fbt:plural count={count} many="ليالٍ" showCount="yes">ليلة</fbt:plural>
+  </fbt>
+);
+`,
+    );
+
+  test("prepare makes the source's own catalog, with only the counted string, in all its forms", async () => {
+    withNights();
+    const { prepared, sourceNeedsCatalog } = await import("../../src/catalogs");
+    expect(sourceNeedsCatalog(arabic())).toBe(true);
+    const own = prepared(arabic()).find((c) => c.locale === "ar-EG")!;
+    const texts = runtimeTexts(arabic());
+    const entries = Object.entries(JSON.parse(own.json).translations) as [
+      string,
+      { translations: { translation: string; variations: Record<string, number> }[] },
+    ][];
+    // Only strings with a count: not "Hello" or "Goodbye".
+    const lines = entries.flatMap(([, e]) => e.translations.map((l) => l.translation));
+    expect(lines.some((l) => l.includes("Hello") || l.includes("Goodbye"))).toBe(false);
+    expect(lines.some((l) => l.includes("ليال"))).toBe(true);
+    expect(Object.keys(texts).length).toBeGreaterThan(0);
+    // fbtee's codes: zero 16, two 8, few 20, many 12, other 24 (exactly 1 is its own string).
+    const forms = entries
+      .filter(([, e]) => e.translations.some((l) => l.translation.includes("ليال")))
+      .map(([, e]) => e.translations.map((l) => Object.values(l.variations)[0]))
+      .find((f) => f.length > 1);
+    expect(forms?.sort((a, b) => a! - b!)).toEqual([8, 12, 16, 20, 24]);
+  });
+
+  test("an English or Thai source needs none", async () => {
+    withNights();
+    const { sourceNeedsCatalog } = await import("../../src/catalogs");
+    expect(sourceNeedsCatalog(project())).toBe(false);
+    expect(
+      sourceNeedsCatalog({ ...project(), config: resolveLocales("th-TH", ["th-TH", "en-US"]) }),
+    ).toBe(false);
+  });
+});

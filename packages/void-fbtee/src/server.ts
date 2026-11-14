@@ -18,14 +18,18 @@ import config from "virtual:void-fbtee/config";
 import catalogs from "virtual:void-fbtee/catalogs";
 import markdownPages from "virtual:void-fbtee/md-pages";
 import langPages from "virtual:void-fbtee/pages";
-import { setServerLang } from "./current";
+import { setServerLang, setServerTranslations } from "./current";
 import type { TranslationDictionary } from "fbtee";
 import type { AppLocale, Dir, Lang, Locale } from "./locales";
 import { routeUrl } from "./routes";
-import { allTranslations } from "./runtime";
+import { allTranslations, reportMissing } from "./runtime";
+import texts from "virtual:void-fbtee/texts";
 
 const storage = new AsyncLocalStorage<Lang>();
 setServerLang(() => storage.getStore());
+// The catalogs runIn renders with, for <InLanguage> (react.tsx): it builds its own runtime from them.
+const catalogsNow = new AsyncLocalStorage<TranslationDictionary>();
+setServerTranslations(() => catalogsNow.getStore());
 
 /** The current language's BCP 47 tag: the request's or inLocale()'s; undefined outside both. */
 export function currentLocale(): AppLocale | undefined {
@@ -42,9 +46,23 @@ function withLang<T>(lang: Lang, fn: () => T): T {
 export function runIn<T>(language: Locale, translations: TranslationDictionary, fn: () => T): T {
   const { sourceLocale, fallbackLocales } = config;
   return withLang(language.segment, () =>
-    runWithFbtee({ locale: language.locale, sourceLocale, fallbackLocales, translations }, fn),
+    catalogsNow.run(translations, () =>
+      runWithFbtee(
+        {
+          locale: language.locale,
+          sourceLocale,
+          fallbackLocales,
+          translations,
+          onMissingTranslation: missing,
+        },
+        fn,
+      ),
+    ),
   );
 }
+
+/** Each language's missing string, logged once per Worker isolate (runtime.ts). */
+const missing = reportMissing(texts);
 
 /**
  * Runs `fn` in one of the app's languages: `fbs(…)` and `<fbt>` there are in it, with the same

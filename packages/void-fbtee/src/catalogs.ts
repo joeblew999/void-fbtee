@@ -15,7 +15,7 @@ import {
   translateSync,
 } from "@nkzw/fbtee-compiler";
 import { translatedOf, type LocaleConfig } from "./locales";
-import { addPluralForms, pluralSlots } from "./plurals";
+import { addPluralForms, pluralCategories, pluralSlots } from "./plurals";
 
 // Where an app's strings can be: every folder of code in Void's project structure (Void's docs,
 // reference/structure.md: pages, routes, middleware, crons, queues, email, durable-objects, src),
@@ -129,13 +129,37 @@ export function collect(p: Project): Collected {
 const translatedLocales = (p: Project) => translatedOf(p.config).map((l) => l.locale);
 
 /**
+ * Whether the source language needs a catalog of its own: a count in the code has more forms in
+ * that language than fbtee's inline two (the text, for "one", and `many`, for "other"). Arabic has six, so an app written in Arabic needs one; English and Thai don't. fbtee
+ * reads a catalog for the source language when it's given one (its README, "Locale Matching and
+ * Fallback": "then the source locale's catalog if supplied"); checked with fbtee 6.0.0.
+ */
+export function sourceNeedsCatalog(p: Project): boolean {
+  const slots = pluralSlots(collect(p).phrases);
+  // The code writes the "one" form and the `many` one; any other category needs a catalog.
+  return [...slots.values()].some((counts) =>
+    counts.some((c) =>
+      pluralCategories(p.config.sourceLocale, c.exactlyOne).some(
+        (form) => form !== "one" && form !== "other",
+      ),
+    ),
+  );
+}
+
+/** Every locale with a catalog: the translated ones, and the source when it needs one. */
+export const catalogLocales = (p: Project) => [
+  ...translatedLocales(p),
+  ...(sourceNeedsCatalog(p) ? [p.config.sourceLocale] : []),
+];
+
+/**
  * What `void-fbtee prepare` writes: every translated locale's catalog after fbtee's own
  * prepare-translations (new strings marked "new", finished ones kept, stale ones removed), plus a
  * line for each plural form the locale needs (plurals.ts).
  */
 export function prepared(p: Project): { locale: string; json: string; existed: boolean }[] {
   const { phrases } = collect(p);
-  const locales = translatedLocales(p);
+  const locales = catalogLocales(p);
   const inputs = locales.map((locale) => {
     const file = catalogFile(p, locale);
     return existsSync(file) ? { locale, existingJson: readFileSync(file, "utf8") } : { locale };
@@ -143,11 +167,19 @@ export function prepared(p: Project): { locale: string; json: string; existed: b
   const out = prepareTranslationsBatchSync(JSON.stringify({ phrases }), inputs);
   // fbtee's prepare leaves plural forms out; add a line for each form the locale needs.
   const slots = pluralSlots(phrases);
-  return out.map((json, i) => ({
-    locale: locales[i]!,
-    json: addPluralForms(json, slots, locales[i]!),
-    existed: !!inputs[i]!.existingJson,
-  }));
+  return out.map((json, i) => {
+    const locale = locales[i]!;
+    let full = addPluralForms(json, slots, locale);
+    // The source language's catalog holds only the strings with a count: the rest is the code's.
+    if (locale === p.config.sourceLocale) {
+      const catalog = JSON.parse(full) as Catalog;
+      catalog.translations = Object.fromEntries(
+        Object.entries(catalog.translations).filter(([hash]) => slots.has(hash)),
+      );
+      full = JSON.stringify(catalog, null, 2) + "\n";
+    }
+    return { locale, json: full, existed: !!inputs[i]!.existingJson };
+  });
 }
 
 export interface LocaleMissing {

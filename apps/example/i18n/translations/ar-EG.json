@@ -493,18 +493,6 @@
       ],
       "types": []
     },
-    "2PraAVUpYGeGFRtoUfZbqQ==": {
-      "description": "Home page introduction; languages is a list of language names",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "النصوص بواسطة fbtee، والتواريخ بواسطة Temporal، وكل ما عدا ذلك بواسطة Intl الخاص بالمنصة. هذا المثال متاح بـ{languages}.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "5w2wB/LokLMrSJDX7ET7xQ==": {
       "description": "Docs index heading",
       "status": "translated",
@@ -3969,6 +3957,270 @@
       "translations": [
         {
           "translation": "التذكرة التجريبية",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wslJzxORlTJzxeD0lWVayA==": {
+      "description": "Strings page: the site's menu, its words as a list inside the sentence",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تضم القائمة {pages}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "a6RutNoEAizv/Rqo6g8TCw==": {
+      "description": "Strings page: how someone takes part in an event, chosen from a fixed set",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مشاركة {name}: حضوريًا.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OYa/dzUl3KVTLjx4UuaYwA==": {
+      "description": "Strings page: how someone takes part in an event, chosen from a fixed set",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مشاركة {name}: عبر الإنترنت.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Ykl5ci4CbSxY96rgkgXBfg==": {
+      "description": "Strings page: someone booked a seat, worded by their gender",
+      "status": "translated",
+      "tokens": [
+        "name"
+      ],
+      "translations": [
+        {
+          "translation": "حجز {name} مقعدًا.",
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "حجزت {name} مقعدًا.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "تم حجز مقعد باسم {name}.",
+          "variations": {
+            "0": 3
+          }
+        }
+      ],
+      "types": [
+        3
+      ]
+    },
+    "hl+18clzmkueXyxBRAm6dw==": {
+      "description": "Strings page: the same name twice in one sentence",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تم الحجز باسم {name}، ووصلت التذكرة إلى {name} بالبريد الإلكتروني.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5Jf1Uen6KRT21ot3NTL4ew==": {
+      "description": "Strings page: told to the reader who just booked",
+      "status": "translated",
+      "tokens": [
+        "__viewing_user__"
+      ],
+      "translations": [
+        {
+          "translation": "أنت مسجَّل.",
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "أنتِ مسجَّلة.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "تم تأكيد حجزك.",
+          "variations": {
+            "0": 3
+          }
+        }
+      ],
+      "types": [
+        3
+      ]
+    },
+    "l1rZHZvHHLbW/a/yEblXwQ==": {
+      "description": "Strings page piece title: a list inside a sentence",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "قائمة داخل جملة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Ze+y8mH7PTW766I4LwERmw==": {
+      "description": "Strings page piece title: a choice from a fixed set",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "اختيار من مجموعة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XWFC+7e2Mtu7iSiMeI/Lcg==": {
+      "description": "Strings page piece title: a person's name, with their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "اسم وجنسه",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SXOyBny8orkEOBw42AvK5w==": {
+      "description": "Strings page piece title: a pronoun by gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ضمير",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2sEBdi/HqR9d28AdOPbLVg==": {
+      "description": "Strings page piece title: the same value twice in a sentence",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "القيمة نفسها مرتين",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1ldXio0BzOF9+7o9Jna/rg==": {
+      "description": "Strings page piece title: a sentence for the reader, by the reader's gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "للقارئ، بحسب جنسه",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "l2im0sieXAQmyaHWJT4u9Q==": {
+      "description": "Strings page piece title: part of the page in another language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "جزء من الصفحة بلغة أخرى",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gA5w9YnyCStts6aLzi/eUQ==": {
+      "description": "Strings page section title: each of fbtee's ways of writing a sentence",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "كل أدوات fbtee",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2F0uBrci189YangXw6qYvg==": {
+      "description": "Strings page: each of fbtee's ways of writing a sentence, shown in this page's language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "كل طريقة من طرق fbtee لكتابة جملة، بلغة هذه الصفحة، مع السطر الذي يكتبها. العربية تغيّر كلماتها بحسب الشخص المقصود، أما التايلاندية والإنجليزية فغالبًا لا.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2PraAVUpYGeGFRtoUfZbqQ==": {
+      "description": "Home page introduction; languages is a list of language names",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "النصوص بواسطة fbtee، والتواريخ بواسطة Temporal، وكل ما عدا ذلك بواسطة Intl الخاص بالمنصة. هذا المثال متاح بـ{languages}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0ninRllHFSy0f8sMESsm1w==": {
+      "description": "Strings page: someone checked their own ticket, with a pronoun by their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تمّت مراجعة {name} لتذكرتها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "moH0FtiyxrwnNEDnFVgNHg==": {
+      "description": "Strings page: someone checked their own ticket, with a pronoun by their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تمّت مراجعة {name} لتذكرته.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "85XCoag9WLA3pTjGs4A8hw==": {
+      "description": "Strings page: someone checked their own ticket, with a pronoun by their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تمّت مراجعة {name} لتذكرتهم.",
           "variations": {}
         }
       ],

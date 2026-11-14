@@ -3,19 +3,13 @@
 // that arrives after the shell (a defer() read), which must render in the page's language too.
 import { routeUrl } from "void-fbtee/routes";
 import { Suspense, use, useState } from "react";
-import { fbt, list } from "fbtee";
+import { fbt } from "fbtee";
 import { ArrowRight } from "lucide-react";
 import { Formatted, Link, useLocale, useLocales } from "void-fbtee/react";
 import { buttonVariants } from "@/ui/button";
 import { cn } from "@/ui/utils";
 import { AddIt, Closing, Features, GitHubButton } from "@/home/HomeSections";
 import type { Props } from "./index.server";
-
-// fbtee's list(), joined to plain text first. A list inside a string (<fbt:list>, or list() in an
-// <fbt:param>) renders as one text on the server but as separate pieces in the browser, so
-// hydration fails (seen with fbtee 5.0.0).
-// oxlint-disable-next-line no-base-to-string
-const listText = (items: string[]) => String(list(items));
 
 /** The code of the plural below (the formatter keeps it on fewer lines there), wrapped to fit a
  * phone's width: what it takes to translate a line. */
@@ -184,9 +178,12 @@ function Hero(props: Props) {
           <fbt desc="Home page introduction; languages is a list of language names">
             Strings by fbtee, dates by Temporal, and everything else by the platform's own Intl.
             This example is in{" "}
-            <fbt:param name="languages">
-              <Formatted>{listText(names)}</Formatted>
-            </fbt:param>.
+            <fbt:list
+              items={names.map((name) => (
+                <Formatted key={name}>{name}</Formatted>
+              ))}
+              name="languages"
+            />.
           </fbt>
         </p>
         <div className="mt-10 flex flex-wrap gap-3">

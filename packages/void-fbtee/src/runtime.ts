@@ -13,6 +13,23 @@ export interface RuntimeConfig extends LocaleConfig {
   site?: string;
 }
 
+/**
+ * fbtee's onMissingTranslation, logging each language's missing string once for as long as the
+ * process (a Worker isolate, the browser tab) lives. fbtee reports once per runtime, and the server
+ * makes one per request (runWithFbtee), so without this a busy page would log on every request.
+ */
+export function reportMissing(texts: Record<string, string>) {
+  const seen = new Set<string>();
+  return ({ locale, hashKey }: { locale: string; hashKey: string }) => {
+    const key = `${locale} ${hashKey}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    console.warn(
+      `void-fbtee: no ${locale} translation for ${JSON.stringify(texts[hashKey] ?? hashKey)}`,
+    );
+  };
+}
+
 /** One lazy loader per translated locale; each resolves to { [locale]: fbtee's table }. */
 export type CatalogLoaders = Record<string, () => Promise<{ default: TranslationDictionary }>>;
 

@@ -42,7 +42,11 @@ export function translateTask(p: Project): TranslateTask | undefined {
     .map((m) => {
       const n = m.app.length + m.builtin;
       const rtl = dirOf(m.locale) === "rtl" ? ", right-to-left" : "";
-      return `- ${rel(catalogFile(p, m.locale))} (${m.locale}${rtl}): ${n} entries with "status": "new"`;
+      const own =
+        m.locale === p.config.sourceLocale
+          ? `, the source language's own plural forms: write each form in ${m.locale} itself`
+          : "";
+      return `- ${rel(catalogFile(p, m.locale))} (${m.locale}${rtl}${own}): ${n} entries with "status": "new"`;
     });
   const source = sourceOf(p.config);
   const pages = markdownPages(p).filter((page) => page.state !== "ok");

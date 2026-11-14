@@ -124,7 +124,9 @@ vp upgrade && vp migrate   # upgrade Vite+, then vp check and the tests (Testing
 - `e2e/`: the end-to-end tests, by stage (see Testing): `e2e/preview/`, `e2e/dev/`,
   `e2e/browsers/`, `e2e/deployed/`, and `e2e/fresh/` (the fresh-install check; `e2e/fresh/app/`
   holds Void's own docs examples, put into each fresh app and checked in Thai, with what doesn't
-  work yet listed as a known gap and the step of `plans/quiet-harbor-atlas.md` that fixes it).
+  work yet listed as a known gap and the step of `plans/quiet-harbor-atlas.md` that fixes it;
+  `e2e/fresh/thai/` is the app written in Thai, `init --source-locale th-TH`, translated into
+  English and Arabic).
   `e2e/helpers.ts` is what they share.
 - `scripts/`: the scripts behind the tasks (deploying, the deployed checks, Worker Previews,
   Tailscale, the tools check).

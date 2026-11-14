@@ -105,9 +105,10 @@ used.
    - Where ours repeats fbtee's steps (matching existing terminology and tone, keeping placeholders,
      plural and gender variants, only removing `"status": "new"` when an entry is whole), point at
      fbtee's skill instead. Keep only what's Void's: markdown pages, `translatedFrom`, the checks.
-2. **`onMissingTranslation`:** extended from dev in the browser to production, and to the server
-   (`runWithFbtee` in `packages/void-fbtee/src/middleware.ts` and `server.ts`), logged once per
-   language and message (answer 2).
+2. **`onMissingTranslation`:** on the server (`runWithFbtee` in `packages/void-fbtee/src/server.ts`,
+   which the middleware uses), in production too, and in the browser in dev, logged once per
+   language and message (answer 2). The browser stays dev-only: in production the texts module is
+   empty there, so the page doesn't carry every string's source text.
 3. **Scoped runtimes:** a void-fbtee wrapper, `<InLanguage locale>`, around fbtee's
    `createFbteeRuntime` and `LocaleProvider`. It takes only the locale and loads that language's
    catalog itself, on the server and in the browser (answer 3). It shows part of a page in
@@ -184,3 +185,29 @@ English. So this plan proves it:
 - Then `vp check`, `test:unit`, `test:dev`, `test:preview` and `i18n:check`.
 
 Committed locally, and pushed when the user says.
+
+## Done (2026-11-14)
+
+All ten steps are built. What each is checked by:
+
+1. The skill: "A finished entry" (fbtee's steps again) became "Gender", the part that's
+   void-fbtee's; `<InLanguage>`, the pieces and why fbtee's language switching stays out are in it.
+   The real `void-fbtee translate` run is still to do (it needs Claude Code in the app).
+2. `onMissingTranslation`: a unit test (`runtime.test.ts`), two requests in German log one line for
+   the one missing string. Done as a unit test, not the preview test planned, since it's the same
+   `runWithFbtee` the server calls.
+3. `<InLanguage>`: the Strings page's "For the reader" and "Part of the page in another language",
+   in `e2e/preview/strings.test.ts`, each part carrying its own `lang`, the page keeping its own.
+4. to 8. `<fbt:list>` (the home page's workaround is gone), `<fbt:enum>`, `<fbt:name>`,
+   `<fbt:pronoun>` with the reader's gender, `<fbt:same-param>`: the same preview test, in all three
+   languages, through hydration with no other text shown.
+5. The source catalog: `catalogs.test.ts` (an Arabic source gets one, English and Thai don't).
+6. The Thai-source app: `vpx e2e/fresh/check.ts thai-source`. It found that init's not-found and
+   error pages are written in English whatever the source language; init now says to rewrite them
+   in the code's language.
+
+**Found on the way:** fbtee joins every list item but the last with one string, the same for "and",
+"or" and plain lists (`{previous items}, {following items}`, fbtee 6.0.0 `lib/index-core`). So
+Arabic can't have CLDR's "and" list, `A وB وC`, without its "or" list becoming `A وB أو C`. The
+catalog keeps `A، B وC`, and the skill no longer says "no commas". A question for fbtee, drafted with
+the others in `plans/their-own-language.md`, filed only with the user's OK.
