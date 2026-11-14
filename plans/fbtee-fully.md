@@ -128,7 +128,13 @@ used.
 7. **Gender and `<fbt:pronoun>`:** viewer gender for text addressed to the reader, and pronouns,
    only when the person has given their gender, never guessed.
 
-Steps 4–7 are each shown working in the example: the Strings page gets a section for each, in all
+8. **`<fbt:same-param>`:** shown on the Strings page (the rule below).
+9. **A catalog for the source language** when it has more plural forms than fbtee's inline two
+   (answer 1): `prepare`, `check` and the skill.
+10. **A fresh app written in Thai** in the fresh-app test (section "A source language other than
+    English").
+
+Steps 4–8 are each shown working in the example: the Strings page gets a section for each, in all
 three languages, so the later plans use them as they're meant.
 
 **The rule: all of fbtee that fits, and every piece shown.** The example is how void-fbtee is
