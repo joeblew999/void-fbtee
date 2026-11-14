@@ -289,9 +289,15 @@ export async function deleteEvent({ id, key }: Posted): Promise<boolean> {
 }
 
 /** Books a seat on the page's event, in the page's language. */
-export async function book(page: Page, name: string, email: string) {
+export async function book(
+  page: Page,
+  name: string,
+  email: string,
+  options: { ticketInReminder?: boolean } = {},
+) {
   await page.getByTestId("book-name").fill(name);
   await page.getByTestId("book-email").fill(email);
+  if (options.ticketInReminder) await page.getByTestId("book-reminder-ticket").check();
   await page.getByTestId("book").click();
   await page.getByTestId("booked").waitFor();
 }

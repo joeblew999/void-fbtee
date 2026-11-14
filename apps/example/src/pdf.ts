@@ -23,3 +23,17 @@ export async function printPdf(browser: BrowserRun, html: string): Promise<Uint8
   if (!res.ok) throw new PrintError(`Browser Run answered ${res.status}: ${await res.text()}`);
   return new Uint8Array(await res.arrayBuffer());
 }
+
+/**
+ * The same page as a picture of its first page (WebP), for where a PDF can't be shown inside a page
+ * (phones): A5 at 96 dpi (148 x 210 mm is 559 x 794 px), twice as sharp.
+ */
+export async function printImage(browser: BrowserRun, html: string): Promise<Uint8Array> {
+  const res = await browser.quickAction("screenshot", {
+    html,
+    viewport: { width: 559, height: 794, deviceScaleFactor: 2 },
+    screenshotOptions: { type: "webp", quality: 85 },
+  });
+  if (!res.ok) throw new PrintError(`Browser Run answered ${res.status}: ${await res.text()}`);
+  return new Uint8Array(await res.arrayBuffer());
+}

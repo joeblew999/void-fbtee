@@ -70,7 +70,7 @@ function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut:
   const [ticket] = useState(() => crypto.randomUUID());
   const form = useForm(
     "/[lang]/events/[id]?default",
-    { id: ticket, name: "", email: "", time_zone: zone ?? "" },
+    { id: ticket, name: "", email: "", time_zone: zone ?? "", ticket_in_reminder: false },
     { params: { id } },
   );
   if (form.wasSuccessful)
@@ -140,6 +140,21 @@ function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut:
               </fbt>
             </p>
           )}
+        </div>
+        <div className="flex items-start gap-2">
+          <input
+            id="book-reminder-ticket"
+            type="checkbox"
+            data-testid="book-reminder-ticket"
+            checked={form.data.ticket_in_reminder}
+            onChange={(e) => form.setData("ticket_in_reminder", e.target.checked)}
+            className="mt-1 size-4 accent-brand"
+          />
+          <Label htmlFor="book-reminder-ticket" className="font-normal leading-6">
+            <fbt desc="Booking form checkbox: also attach the PDF ticket to the reminder email sent the day before">
+              Attach my ticket to the reminder the day before too
+            </fbt>
+          </Label>
         </div>
       </div>
       <Button type="submit" size="lg" disabled={form.pending} data-testid="book" className="w-full">

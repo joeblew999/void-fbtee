@@ -3,7 +3,7 @@
 // bookings: one source of truth, no counter to keep in step.
 import { sql } from "void/db";
 import { createInsertSchema } from "void/drizzle-zod";
-import { index, sqliteTable, text } from "void/schema-d1";
+import { index, integer, sqliteTable, text } from "void/schema-d1";
 import { Temporal } from "temporal-polyfill";
 import { z } from "zod";
 import { events } from "./events";
@@ -25,6 +25,8 @@ export const bookings = sqliteTable(
     // The site the booking was made on (dev, a Worker Preview, or live), for its reminder's link:
     // a cron has no request to take it from. Empty for bookings made before it was kept.
     origin: text("origin"),
+    // Whether the booker asked for their PDF ticket again with the day-before reminder.
+    ticket_in_reminder: integer("ticket_in_reminder", { mode: "boolean" }).notNull().default(false),
     createdAt: text("created_at")
       .notNull()
       .default(sql`(datetime('now'))`),
@@ -53,4 +55,7 @@ export const bookSchema = createInsertSchema(bookings, {
         return false;
       }
     }),
-}).pick({ id: true, name: true, email: true, time_zone: true });
+})
+  .pick({ id: true, name: true, email: true, time_zone: true })
+  // A checkbox: left out when it isn't ticked (a form posted without it, as the tests do).
+  .extend({ ticket_in_reminder: z.boolean().optional() });

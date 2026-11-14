@@ -61,11 +61,18 @@ const book = defineHandler.withValidator({ params, body: bookSchema })(async (
   const { locale } = c.get("i18n");
   // Where this booking is being made (dev, a Worker Preview, live): its emails link back here.
   const origin = new URL(c.req.url).origin;
+  // The booking's id comes from the form (bookSchema): one that's taken is refused, not a crash.
+  const [taken] = await db
+    .select({ id: bookings.id })
+    .from(bookings)
+    .where(eq(bookings.id, body.id));
+  if (taken) return c.json({ message: "booking id taken" }, 400);
   // One statement, so two people can't take the last seat: the row goes in only while the event
   // has fewer bookings than seats. D1 runs each statement on the primary, one at a time.
   const result = await db.run(sql`
-    INSERT INTO ${bookings} (id, event_id, name, email, locale, time_zone, origin)
-    SELECT ${body.id}, ${id}, ${body.name}, ${body.email}, ${locale}, ${body.time_zone}, ${origin}
+    INSERT INTO ${bookings} (id, event_id, name, email, locale, time_zone, origin, ticket_in_reminder)
+    SELECT ${body.id}, ${id}, ${body.name}, ${body.email}, ${locale}, ${body.time_zone}, ${origin},
+      ${body.ticket_in_reminder ? 1 : 0}
     WHERE (SELECT COUNT(*) FROM ${bookings} WHERE event_id = ${id})
         < (SELECT seats FROM ${events} WHERE id = ${id})`);
   if (!result.meta.changes) {

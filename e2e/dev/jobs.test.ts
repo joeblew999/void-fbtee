@@ -32,7 +32,7 @@ afterAll(async () => {
 });
 
 test.skipIf(!!skip)(
-  "the reminder cron: each booker reminded in their language, linking here; a run a day later sends none",
+  "the reminder cron: each booker reminded in their language, linking here, the ticket attached for whoever asked; a run a day later sends none",
   async () => {
     // An event three days from now at 18:00 UTC, posted from a browser on UTC.
     const start = new Date();
@@ -53,7 +53,8 @@ test.skipIf(!!skip)(
     await arabic.goto(`/ar-EG${event.path}`);
     await started(arabic);
     const laila = address("laila");
-    await book(arabic, "Laila", laila);
+    // Laila asks for her ticket with the reminder too; Somchai doesn't.
+    await book(arabic, "Laila", laila, { ticketInReminder: true });
 
     // Run as if 12 hours before it starts: it's in the next 24 hours.
     const before = start.getTime() - 12 * 60 * 60 * 1000;
@@ -63,6 +64,10 @@ test.skipIf(!!skip)(
     const ar = await emailTo(laila, /^تذكير: /);
     expect(ar.html).toMatch(/<html dir="rtl" lang="ar-EG">/);
     expect(ar.text).toContain(`${site}/ar-EG${event.path}`);
+    const isTicket = (a: { filename: string }) => a.filename === "ticket.pdf";
+    expect(ar.attachments.find(isTicket)?.mimeType).toBe("application/pdf");
+    expect(ar.text).toContain("تذكرتك مرفقة.");
+    expect(th.attachments.some(isTicket)).toBe(false);
 
     // The next day's run: the event has started by then, so no second reminder.
     await runCron(DAILY, before + 24 * 60 * 60 * 1000);

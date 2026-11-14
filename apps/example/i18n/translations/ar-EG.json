@@ -3794,18 +3794,6 @@
       ],
       "types": []
     },
-    "ajm5hBJSoW/3BWzxaQpDLA==": {
-      "description": "PDFs page point: printing takes up to a second and can fail, so booking sends a message to a queue, whose consumer prints the ticket and retries if it has to",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تستغرق الطباعة ما يصل إلى ثانية، وقد يكون المتصفح مشغولًا، لذا لا يفعل الحجز إلا إرسال معرّف الحجز إلى طابور. ويطبع مستهلكه التذكرة، حجزًا تلو الآخر، ويعيد المحاولة بعد دقيقة إن لزم.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "61ejh+VpKPuhht2UfxwsbQ==": {
       "description": "PDFs page point title: each PDF is printed once and kept",
       "status": "translated",
@@ -3950,18 +3938,6 @@
       ],
       "types": []
     },
-    "7eEV29i88ZacbFIldCU/MQ==": {
-      "description": "Booking email: the PDF ticket is attached to it",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تذكرتك مرفقة.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "OuoRoEp0HO+vlN/hD72vJQ==": {
       "description": "PDF ticket: label of the name the booker gave",
       "status": "translated",
@@ -3993,6 +3969,42 @@
       "translations": [
         {
           "translation": "أظهر هذه التذكرة عند الباب، على هاتفك أو مطبوعة.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4x11xUJVRHK5CXAMPNzwIg==": {
+      "description": "Booking form checkbox: also attach the PDF ticket to the reminder email sent the day before",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "أرفق تذكرتي بالتذكير قبل يوم أيضًا",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2coqkqhqyAioPcUDPMSXQg==": {
+      "description": "PDFs page point: printing takes up to a second and can fail, so booking sends a message to a queue, whose consumer prints each ticket on its own and retries if it has to",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تستغرق الطباعة ما يصل إلى ثانية، وقد يكون المتصفح مشغولًا، لذا لا يفعل الحجز إلا إرسال معرّف الحجز إلى طابور. ويطبع مستهلكه تذكرة كل حجز على حدة، فما يتعذّر منها يُعاد بعد دقيقة دون أن يؤخّر غيره.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IkgRC3pkBXP8x+yBVpf9OQ==": {
+      "description": "Email: the booking's PDF ticket is attached to it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تذكرتك مرفقة.",
           "variations": {}
         }
       ],

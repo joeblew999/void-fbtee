@@ -91,6 +91,30 @@ test("booking an event that doesn't exist is not found, not sold out", async () 
   expect(res.status).toBe(404);
 });
 
+// The booking's id comes from the form: one already taken is refused, not a crash.
+test("booking with an id that's already taken is refused", async () => {
+  const id = crypto.randomUUID();
+  const [event] = await (
+    await get(`/${SOURCE}/events`)
+  )
+    .text()
+    .then((html) => [...html.matchAll(/\/events\/([0-9a-f-]{36})"/g)].map((m) => m[1]!));
+  const book = () =>
+    get(`/${SOURCE}/events/${event}`, {
+      method: "POST",
+      redirect: "manual",
+      headers: { origin: url("prod"), "content-type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        id,
+        name: "A",
+        email: "a@example.com",
+        time_zone: "Asia/Bangkok",
+      }),
+    });
+  expect((await book()).status).toBeLessThan(400);
+  expect((await book()).status).toBe(400);
+});
+
 // The tour uses every feature @void/md has (packages/md/src/compile.ts in Void 1.8.0), so each is
 // seen working in every language. Each box's title is written in the page's language: @void/md
 // marks a box left with its English default title ("TIP", "WARNING") custom-block-title-default.
@@ -253,7 +277,11 @@ test("every home page feature links to its docs page", async () => {
 // language (remote in the preview too: void.config.ts), and a ticket that isn't there is a 404.
 test("the PDFs page shows a ticket printed for its language", async () => {
   const page = await (await get("/ar-EG/docs/pdfs")).text();
-  expect(page).toContain('src="/samples/ticket/ar-EG"');
+  // A picture of the ticket's page, which every phone shows, opening the PDF.
+  expect(page).toContain('href="/samples/ticket/ar-EG"');
+  expect(page).toContain('src="/samples/ticket-image/ar-EG"');
+  const image = await get("/samples/ticket-image/ar-EG");
+  expect(image.headers.get("content-type")).toBe("image/webp");
   const pdf = await get("/samples/ticket/ar-EG");
   expect(pdf.status).toBe(200);
   expect(pdf.headers.get("content-type")).toBe("application/pdf");

@@ -1,6 +1,7 @@
 // The PDFs page, a reference: translated PDFs for any document an app prints, shown with this app's
 // case, a booking's ticket (src/events/tickets.ts). The sample is the app's own ticket code printed
-// by Cloudflare Browser Run for this page's language (routes/samples/ticket/[lang].ts), and the
+// by Cloudflare Browser Run for this page's language (routes/samples/ticket/[lang].ts), shown as a
+// picture of its page (routes/samples/ticket-image/[lang].ts) that opens the PDF, and the
 // points are what it takes, each with the lines that do it.
 import { fbs, fbt } from "fbtee";
 import { useLocale } from "void-fbtee/react";
@@ -73,10 +74,10 @@ function points(): Point[] {
         </fbt>
       ),
       why: (
-        <fbt desc="PDFs page point: printing takes up to a second and can fail, so booking sends a message to a queue, whose consumer prints the ticket and retries if it has to">
+        <fbt desc="PDFs page point: printing takes up to a second and can fail, so booking sends a message to a queue, whose consumer prints each ticket on its own and retries if it has to">
           Printing takes up to a second, and the browser can be busy, so booking only sends the
-          booking's id to a queue. Its consumer prints the ticket, one booking at a time, and tries
-          again a minute later if it has to.
+          booking's id to a queue. Its consumer prints each booking's ticket on its own, so one that
+          fails is tried again a minute later without holding up the others.
         </fbt>
       ),
       code: [
@@ -190,15 +191,20 @@ export default function PdfsPage() {
             languages from the menu.
           </fbt>
         </p>
-        {/* The PDF as the browser shows one; phones that don't show PDFs inside a page get the link. */}
-        <iframe
-          src={sample}
-          title={fbs("The sample ticket", "PDFs page: name of the frame that shows the sample PDF")}
-          data-testid="pdf-sample"
-          className="h-[36rem] w-full rounded-lg border bg-muted"
-        />
+        {/* A picture of the PDF's page, made from the same page, as every phone shows a picture and
+            not all show a PDF inside a page; it opens the PDF itself. */}
+        <a href={sample} data-testid="pdf-sample-link" className="block max-w-sm">
+          <img
+            src={`/samples/ticket-image/${locale}`}
+            width={559}
+            height={794}
+            alt={fbs("The sample ticket", "PDFs page: name of the frame that shows the sample PDF")}
+            data-testid="pdf-sample"
+            className="h-auto w-full rounded-lg border"
+          />
+        </a>
         <p>
-          <a href={sample} className="underline" data-testid="pdf-sample-link">
+          <a href={sample} className="underline">
             <fbt desc="PDFs page: link that opens the sample PDF on its own">Open the PDF</fbt>
           </a>
         </p>

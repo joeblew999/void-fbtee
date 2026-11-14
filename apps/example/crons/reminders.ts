@@ -2,7 +2,8 @@
 // each in their own language (the one they booked in) with the title as they read it, linking to
 // the event on the site they booked on. A job has no request and no page language: the email is
 // written with inLocale() (src/events/emails.ts). The window is the 24 hours after the run's own
-// scheduledTime, so daily runs cover every start once and no event is reminded twice.
+// scheduledTime, so daily runs cover every start once and no event is reminded twice. A booker
+// who ticked the box when booking gets their PDF ticket attached again.
 //
 // Cloudflare runs it on its Cron Trigger; in dev, Void's trigger runs it on demand
 // (`POST /__void/scheduled`, guide/jobs.md), as e2e/dev/jobs.test.ts does.
@@ -13,6 +14,7 @@ import { Temporal } from "temporal-polyfill";
 import type { AppLocale } from "void-fbtee/locales";
 import { pickText } from "void-fbtee/server";
 import { sendReminderEmail } from "@/events/emails";
+import { ticketPdf } from "@/events/tickets";
 import { SITE } from "@/site";
 
 // 06:00 UTC every day: early morning in Bangkok, late evening before in the Americas.
@@ -22,7 +24,7 @@ export const cron = "0 6 * * *";
 const utc = (ms: number) =>
   Temporal.Instant.fromEpochMilliseconds(ms).toString({ smallestUnit: "second" });
 
-export default defineScheduled(async (controller) => {
+export default defineScheduled(async (controller, env) => {
   const from = controller.scheduledTime;
   const soon = await db
     .select()
@@ -45,6 +47,14 @@ export default defineScheduled(async (controller) => {
       texts.filter((t) => t.event_id === event.id),
       b.locale,
     );
+    // Their PDF ticket too, if they asked for it when booking: kept since then, so no printing
+    // (src/events/tickets.ts). If it can't be had now, the reminder goes without it.
+    const ticket = b.ticket_in_reminder
+      ? await ticketPdf(b.id, env.BROWSER).catch((error: unknown) => {
+          console.warn("reminder sent without its ticket:", String(error));
+          return undefined;
+        })
+      : undefined;
     await sendReminderEmail(b.email, {
       // The language they booked in: one of the app's, as booking stores it.
       locale: b.locale as AppLocale,
@@ -55,6 +65,7 @@ export default defineScheduled(async (controller) => {
       startsAt: event.starts_at,
       // Bookings from before the origin was kept: the live site.
       origin: b.origin ?? SITE,
+      ticket,
     });
   }
 });

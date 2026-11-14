@@ -27,6 +27,15 @@ type Attachment = {
   disposition?: "inline" | "attachment";
 };
 
+/** A booking's PDF ticket, attached as ticket.pdf, and the line that says so; none without one. */
+function withTicket(ticket: Uint8Array | undefined) {
+  if (!ticket) return { line: [], attachments: [] };
+  return {
+    line: [fbs("Your ticket is attached.", "Email: the booking's PDF ticket is attached to it")],
+    attachments: [{ filename: "ticket.pdf", content: ticket, contentType: "application/pdf" }],
+  };
+}
+
 export type Email = {
   subject: string;
   text: string;
@@ -95,6 +104,7 @@ export function bookingEmail(
   booking: EventFor & { locale: AppLocale; name: string; url: string; ticket?: Uint8Array },
 ): Promise<Email> {
   return inLocale(booking.locale, ({ locale, dir }) => {
+    const ticket = withTicket(booking.ticket);
     const lines = [
       fbs(
         ["Hello ", fbs.param("name", booking.name), ","],
@@ -110,19 +120,14 @@ export function bookingEmail(
         ],
         "Booking email: the event, and when it starts on the clock where it happens",
       ),
-      ...(booking.ticket
-        ? [fbs("Your ticket is attached.", "Booking email: the PDF ticket is attached to it")]
-        : []),
+      ...ticket.line,
       fbs("The event's page:", "Booking email: before the link to the event's page"),
     ];
     const subject = fbs(
       ["Your seat at ", fbs.param("event", booking.title)],
       "Booking email subject: a seat is booked at this event",
     );
-    const ticket: Attachment[] = booking.ticket
-      ? [{ filename: "ticket.pdf", content: booking.ticket, contentType: "application/pdf" }]
-      : [];
-    return written(subject, lines, booking.url, booking, locale, dir, ticket);
+    return written(subject, lines, booking.url, booking, locale, dir, ticket.attachments);
   });
 }
 
@@ -182,12 +187,20 @@ export function cancellationEmail(
 
 /**
  * A reminder, in `locale`: the event starts within a day, at this time on its own clock; its page
- * in that language on the site at `origin`.
+ * in that language on the site at `origin`; with the PDF ticket attached again when the booker
+ * asked for it (crons/reminders.ts).
  */
 export function reminderEmail(
-  booking: EventFor & { locale: AppLocale; name: string; id: string; origin: string },
+  booking: EventFor & {
+    locale: AppLocale;
+    name: string;
+    id: string;
+    origin: string;
+    ticket?: Uint8Array;
+  },
 ): Promise<Email> {
   return inLocale(booking.locale, ({ locale, dir }) => {
+    const ticket = withTicket(booking.ticket);
     const lines = [
       fbs(
         ["Hello ", fbs.param("name", booking.name), ","],
@@ -203,6 +216,7 @@ export function reminderEmail(
         ],
         "Reminder email: the event the reader booked starts within a day, and when",
       ),
+      ...ticket.line,
       fbs("The event's page:", "Reminder email: before the link to the event's page"),
     ];
     const subject = fbs(
@@ -210,7 +224,7 @@ export function reminderEmail(
       "Reminder email subject: the event the reader booked starts within a day",
     );
     const page = booking.origin + routeUrl("/[lang]/events/[id]", { params: { id: booking.id } });
-    return written(subject, lines, page, booking, locale, dir);
+    return written(subject, lines, page, booking, locale, dir, ticket.attachments);
   });
 }
 

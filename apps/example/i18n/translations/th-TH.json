@@ -3498,18 +3498,6 @@
       ],
       "types": []
     },
-    "ajm5hBJSoW/3BWzxaQpDLA==": {
-      "description": "PDFs page point: printing takes up to a second and can fail, so booking sends a message to a queue, whose consumer prints the ticket and retries if it has to",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "การพิมพ์ใช้เวลาถึงหนึ่งวินาที และเบราว์เซอร์อาจไม่ว่าง การจองจึงแค่ส่ง id ของการจองเข้าคิว ตัวรับของคิวพิมพ์ตั๋วทีละการจอง และลองใหม่ในอีกหนึ่งนาทีถ้าจำเป็น",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "61ejh+VpKPuhht2UfxwsbQ==": {
       "description": "PDFs page point title: each PDF is printed once and kept",
       "status": "translated",
@@ -3654,18 +3642,6 @@
       ],
       "types": []
     },
-    "7eEV29i88ZacbFIldCU/MQ==": {
-      "description": "Booking email: the PDF ticket is attached to it",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "แนบตั๋วของคุณมาแล้ว",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "OuoRoEp0HO+vlN/hD72vJQ==": {
       "description": "PDF ticket: label of the name the booker gave",
       "status": "translated",
@@ -3697,6 +3673,42 @@
       "translations": [
         {
           "translation": "แสดงตั๋วนี้ที่ทางเข้า บนโทรศัพท์หรือพิมพ์ออกมา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4x11xUJVRHK5CXAMPNzwIg==": {
+      "description": "Booking form checkbox: also attach the PDF ticket to the reminder email sent the day before",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แนบตั๋วของฉันไปกับอีเมลเตือนก่อนวันงานด้วย",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2coqkqhqyAioPcUDPMSXQg==": {
+      "description": "PDFs page point: printing takes up to a second and can fail, so booking sends a message to a queue, whose consumer prints each ticket on its own and retries if it has to",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "การพิมพ์ใช้เวลาถึงหนึ่งวินาที และเบราว์เซอร์อาจไม่ว่าง การจองจึงแค่ส่ง id ของการจองเข้าคิว ตัวรับของคิวพิมพ์ตั๋วของแต่ละการจองแยกกัน ใบที่พิมพ์ไม่สำเร็จจะลองใหม่ในอีกหนึ่งนาทีโดยไม่ทำให้ใบอื่นต้องรอ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IkgRC3pkBXP8x+yBVpf9OQ==": {
+      "description": "Email: the booking's PDF ticket is attached to it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แนบตั๋วของคุณมาแล้ว",
           "variations": {}
         }
       ],

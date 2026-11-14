@@ -135,6 +135,19 @@ Where it differs from the plan above:
 - **Every homepage card links to its own docs page:** new Strings, Markdown pages, Right to left
   and Translating pages, with the PDFs page; the Temporal card links to the Temporal page.
 
+### Fixes after review (2026-11-14, approved by the user)
+
+- The PDFs page no longer says the queue prints "one booking at a time": `maxBatchSize = 1` puts one
+  booking in each batch, but Cloudflare can run batches side by side, and Void has no setting to
+  stop that. It now says each booking's ticket is printed and retried on its own.
+- A booking id that's already taken is refused (400), not a crash.
+- The PDFs page shows the sample as a picture of its page (Browser Run's screenshot, kept in R2
+  like the PDF, at `/samples/ticket-image/<language>`), opening the PDF: Android Chrome doesn't show
+  a PDF inside a page.
+- **Reminder option:** the booking form has "Attach my ticket to the reminder the day before too"
+  (`bookings.ticket_in_reminder`, migration `20261114052207_mighty_screwball.sql`). The reminder
+  cron attaches the ticket kept in R2, so no printing.
+
 Tests run: `test:unit`, `test:dev` (the Thai booking's email carries the PDF, and the page's
 download link gives the same bytes), `test:preview` (every page in the lists, the PDFs page's sample
 is a PDF, an unknown ticket is a 404). All passed.

@@ -1,0 +1,1 @@
+ALTER TABLE `bookings` ADD `ticket_in_reminder` integer DEFAULT false NOT NULL;
