@@ -43,9 +43,19 @@ the page.
    language version of a site to a different language version … don't redirect based on what you
    think the user's language may be" (developers.google.com/search/docs/specialty/international/
    managing-multi-regional-sites, read 2026-11-14).
-2. **An address without a language follows the person.** That's `"/"`, `"/events"`, `"/docs/intl"`
-   and so on. void-fbtee's middleware answers with a 302 to the same page in the best of the app's
-   languages for that browser.
+2. **An address without a language follows the person.** This lives in void-fbtee's middleware, so
+   it can't know any app's paths: it knows only the app's languages and what Void itself tells it.
+   - **`"/"`:** a 302 to `/<best language>`.
+   - **Anything else whose first segment isn't one of the app's languages.** Today the middleware
+     already finds these: when the route that will answer is one under `pages/[lang]/` (its first
+     segment is a parameter, `answeringRoute()` in `packages/void-fbtee/src/middleware.ts`), it
+     hands them to Void's not-found handler. That handler serves a real file if there is one
+     (`/void.svg`), and otherwise the not-found page. The change: when no file answers and the
+     request is a page load (`Sec-Fetch-Dest: document`, or `Accept: text/html`), answer with a 302
+     to the same path under the best language (`/<best>` + the path). Whether that page exists is
+     the app's own routing: the browser lands on it, or on the not-found page in its own language.
+   - **The app's own routes** (`/api/…`, `/__void/…`, its `routes/` files, which don't start with a
+     parameter) and real files are left alone, as today.
    - **The match**, in `negotiate(acceptLanguage, locales)` in the package:
      - the browser's languages in their `q` order, each tried exactly first, then by its language
        alone: `th` gives `th-TH`, `ar-SA` gives `ar-EG`, `en-GB` gives `en-US`;
@@ -104,8 +114,9 @@ the page.
 
 The preview tests use real requests and real browsers, not stand-ins.
 
-- `"/"`, `"/events"` and `"/docs/intl"`, asked for as each of the following, give the right
-  language:
+- `"/"` and two of the example's pages without a language (`"/events"`, `"/docs/intl"`, used here only
+  as examples, which the package knows nothing about), asked for as each of the following, give the
+  right language:
   - `th`;
   - `th-TH,th;q=0.9,en;q=0.8`;
   - `ar-SA,ar;q=0.9`;
@@ -116,6 +127,10 @@ The preview tests use real requests and real browsers, not stand-ins.
 - The redirect is never shared: the same address, asked for in Thai and then in Arabic, gives each
   its own answer, with `Vary: Accept-Language` and `no-store`.
 - `/th-TH/…` never redirects, whatever the browser asks for.
+- Files and the app's own routes are left alone: `/void.svg`, `/robots.txt`, `/sitemap.xml`,
+  `/api/live`.
+- A made-up path (`/nope`, `/xx-XX/events`) goes to the not-found page in the person's own language,
+  not in English. The preview test that expects a 404 at once changes with it.
 - In Playwright:
   - a Thai browser (`locale: "th-TH"`) opening `"/"` lands on Thai;
   - an Arabic one lands on Arabic, right to left.
