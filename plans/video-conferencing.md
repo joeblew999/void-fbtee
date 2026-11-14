@@ -1,0 +1,118 @@
+# plans/video-conferencing.md: events streamed live, with captions in each watcher's language
+
+Status: proposed 2026-11-14, waiting for the user's OK. This is issue #8 ("video conferencing"),
+moved here whole; the issue is closed. It builds on `plans/use-cases.md`: a person who
+`taking_part: online` is that plan's "watching online" use case.
+
+## What the issue asks
+
+- Whoever posts an event can tick **"Streamed: watch online"**. Everyone who books then knows they
+  can attend from anywhere, and the organiser streams it from the event's page.
+- The web pages, the emails and the PDF ticket all show it: the link to watch, and when that is on
+  the reader's clock.
+- A unified calendar: each booking's calendar entry carries the link (the `.ics` from
+  `plans/use-cases.md`).
+- **Live captions in each watcher's language.** The app already knows every person's language (their
+  locale), as it does for everything else. Speech-to-text first: the speaker's words become text,
+  and the text is translated for each watcher. Speaking it in the speaker's voice can come later.
+- Getting there for people in person (Google Maps, a flight search) is in `plans/use-cases.md`.
+
+## The tools, checked 2026-11-14
+
+Sources, read 2026-11-14:
+
+- WebTransport in Safari 26.4: https://webrtc.ventures/2026/04/webtransport-is-now-baseline-what-it-means-for-real-time-media/
+- Cloudflare's MoQ relay: https://blog.cloudflare.com/moq/ and https://developers.cloudflare.com/moq/ (its pages last updated 2026-07-31; demo streams 2026-09-30)
+- moq-dev's browser packages: https://doc.moq.dev/lib/js/ and https://depscope.dev/pkg/npm/@moq/publish
+- Nova-3 on Workers AI: https://developers.cloudflare.com/workers-ai/models/nova-3/ and https://developers.cloudflare.com/ai-gateway/usage/websockets-api/realtime-api/
+
+- **Browsers:** every major browser now has WebTransport. As of March 2026,
+  Safari 26.4 ships WebTransport out of the box. No flags, no workarounds. Chrome, Firefox, and
+  Edge already had it.
+- **The relay:** Cloudflare's MoQ relay network.
+  - Cloudflare is launching the first Media over QUIC (MoQ) relay network,
+    running on every Cloudflare server in datacenters in 330+ cities.
+  - Its docs say it's in beta and free to use during the beta period (Last
+    updated Jul 31, 2026).
+  - A relay is made via API: POST to /client/v4/accounts/$ACCOUNT_ID/moq/relays
+    with a JSON name and a bearer API token.
+  - A new relay returns two default tokens: one for publish and subscribe,
+    and one for subscribe only.
+  - The docs recommend no browser client libraries, and a Workers binding
+    is not mentioned.
+- **In the browser:** moq-dev's packages. They include a JavaScript API and
+  a `<moq-watch>` Web Component for watching, and the same for publishing (`@moq/publish`).
+  - Their own docs warn that MoQ is under active development. The APIs and
+    protocols are still evolving and will change.
+  - `@moq/publish` was at v0.4.3 (depscope.dev, last updated
+    2026-08-03).
+- **Speech-to-text:** Deepgram's Nova-3 on Workers AI.
+  - Workers AI supports two Deepgram STT models: @cf/deepgram/nova-3 and
+    @cf/deepgram/flux, streamed over a WebSocket.
+  - Nova-3 is listed as Cloudflare-hosted, Batch, Partner, Real-time.
+- **Translation:** the same Workers AI model the app already translates posts with
+  (`queues/translate.ts`, `@cf/meta/llama-3.3-70b-instruct-fp8-fast`).
+
+## The first thing to prove
+
+Before any app code, prove the pieces work together:
+
+- Can moq-dev's browser packages talk to Cloudflare's relay? moq-dev's packages use their own
+  protocol, moq-lite. Cloudflare's relay speaks the IETF drafts:
+  Draft-14 and draft-16 are supported.
+- Do they work in Safari 26.4 as well as Chrome? Some of moq-dev's pages still say Chromium only.
+
+The proof is a page in `.vitest/` that publishes the camera from one browser and watches it in
+another, through a relay made on the account. Its result decides the plan:
+
+- **If they work together:** Cloudflare's relay.
+- **If they don't:** moq-dev's own relay (`moq-relay`, open source), or Cloudflare's own sample
+  clients.
+
+## What gets built
+
+1. **The event is streamed.**
+   - `events.streamed` (boolean), ticked when posting.
+   - Each booking's `taking_part` is `there` or `online`.
+   - The relay is made once with Void's deploy if Void can (to check in Void's docs), otherwise by a
+     script that calls Cloudflare's API with the same token CI deploys with. No key goes into
+     Claude.
+2. **Who may publish and watch.**
+   - The organiser publishes with the event's private key (the delete link they already have).
+   - A booker watches with their booking.
+   - The Worker hands each a short-lived relay token. Tokens sit in the URL, so the docs' advice
+     applies: one per client, short-lived.
+3. **The pages.**
+   - The event page gets "Go live" for the organiser (`<moq-publish>`) and "Watch" for people who
+     booked online (`<moq-watch>`).
+   - Both show when it's on on the reader's own clock, and live status comes through the page's
+     existing live updates (`src/events/live.ts`).
+4. **The emails, the ticket and the calendar.**
+   - "Watch online", with the link and the time on the reader's clock, in their language.
+   - The reminder (per person, `plans/use-cases.md`) carries the link.
+5. **Captions.**
+   - The speaker's audio goes to Nova-3 as it's spoken. Each finished sentence is translated into the
+     languages of the people watching, and published back as one caption track per language on the
+     same broadcast.
+   - Each watcher's page subscribes to the track for their locale, and shows it right to left for
+     Arabic.
+   - Where this runs (the organiser's browser sending audio to the Worker, or a Durable Object
+     reading the broadcast) is the second thing the proof answers.
+6. **Docs:** a "Streaming" page (`pages/[lang]/docs/streaming.tsx` on `DocsPage`), linked from the
+   home page like every feature, plus the "watching online" use cases in `plans/use-cases.md`.
+
+## Later
+
+- The translated captions spoken aloud, in the speaker's own voice.
+- Recording, so people in other time zones can watch afterwards.
+
+## How it's checked
+
+- `vp check`.
+- `test:unit`: tokens and caption timing.
+- `test:dev`: publish and watch between two Playwright browsers, with captions arriving in Thai and
+  Arabic. These run against the real relay and the real Workers AI, not stand-ins.
+- `test:preview`: the pages and emails.
+- `i18n:check`.
+
+Committed locally, and pushed when the user says.

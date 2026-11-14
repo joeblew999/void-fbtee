@@ -1,7 +1,8 @@
 # plans/use-cases.md: use cases, written as data, shown in every language
 
-Status: proposed 2026-11-14, waiting for the user's OK. Comes from issues #7 (use cases) and #8
-(video conferencing).
+Status: proposed 2026-11-14, waiting for the user's OK. This is issue #7 ("use cases"), moved here whole: the London 1 pm event, when
+each person signs in to watch, when anyone travelling must land. The issue is closed. Issue #8 (video
+conferencing) is `plans/video-conferencing.md`.
 
 ## The idea
 
