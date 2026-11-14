@@ -78,8 +78,7 @@ on 2026-11-14.
    `apps/example/void.config.ts`), and the switcher in `src/shell/SiteHeader.tsx` is the only way to
    Thai or Arabic. That's a debug tool standing in for the real thing. Instead:
    - **Entry follows the person.** `"/"` (and a link without a language) answers with a 302 to the
-     best of the app's languages for that browser, from `Accept-Language`, or the language they last
-     chose. `"/"` is the `x-default` in hreflang. With the source language when nothing matches,
+     best of the app's languages for that browser, from `Accept-Language`. `"/"` is the `x-default` in hreflang. With the source language when nothing matches,
      which is also what Google's crawler gets: it sends no `Accept-Language`.
    - **A language page never redirects.** `/th-TH/…` stays Thai for everyone, so shared links and
      search engines see every version. That's Google's rule ("don't redirect based on what you think
@@ -89,9 +88,12 @@ on 2026-11-14.
    - **A suggestion, not a trap:** on a language page in a language the browser doesn't prefer, a
      small notice offers the browser's language ("This page is in English. อ่านเป็นภาษาไทย?"). It's
      added by the browser after the page loads, so the cached page stays one per language.
-   - **Changing language** stays possible from every page. It becomes a small "Language" control
-     that remembers the choice, rather than the main way in. The package gives the names (each in its
-     own language), the links and the remembering; how it looks stays the app's.
+   - **Nothing is remembered.** There's no stored choice: no cookie, no browser storage, no
+     preference. The language comes from only two places: the person's own locale (their browser's
+     `Accept-Language`), and the address they're on. A remembered choice would be a second source of
+     truth that can disagree with the person's locale. It would also put a cookie on pages that Void
+     then can't cache (`e2e/preview/server.test.ts`, "no page sets a cookie"). The other languages
+     of a page stay plain links to it, without memory.
    - What's addressed to a person (emails, reminders, tickets, captions) already uses their own
      locale, from their booking.
 
