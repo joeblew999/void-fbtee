@@ -131,8 +131,13 @@ Fallback", read 2026-11-14:
 
 1. **Languages the site doesn't have are skipped, not guessed.** `fr, th;q=0.5` gives Thai, their
    second choice. If nothing on the list can be served, or there's no list (Google's crawler), the
-   answer is the app's source language. That's fbtee's own fallback (`fallbackLocale`, which
-   defaults to `sourceLocale`) and the meaning of `x-default`. The notice in point 3 doesn't show
+   answer is fbtee's own `fallbackLocale`: "`fallbackLocale` controls the selected language when
+   none of `clientLocales` is supported. It defaults to `sourceLocale`" (fbtee 6.0.0 README, read
+   2026-11-14). void-fbtee doesn't pass it today (searched `packages/void-fbtee/src/`, 2026-11-14).
+   So `voidFbtee({ fallbackLocale })` passes it through to fbtee, unchanged, as `fallbackLocales`
+   already is. `negotiate()` uses it, and so does the home page's `x-default`. An app written in
+   Thai that wants English for visitors it can't match sets `fallbackLocale: "en-US"`; the example
+   leaves it unset (English is its source). The notice in point 3 doesn't show
    then: there's nothing better to offer.
 2. **Inherited languages: the same language and script, in the region `Intl.Locale` expects.** Run
    with fbtee 6.0.0 on 2026-11-14 for the example's languages (`en-US`, `th-TH`, `ar-EG`):
@@ -186,6 +191,7 @@ set up. So:
 - **Package:**
   - `middleware.ts`: the redirect for addresses without a language;
   - `locales.ts`: `negotiate()`, fbtee 6.0.0's matching (see "How void-fbtee calls it");
+  - `plugin.ts` and `runtime.ts`: the `fallbackLocale` option, passed through to fbtee;
   - `head.ts` and `server.ts`: the `x-default` and the sitemap;
   - `middleware.ts` also adds the notice's script to every page's head, with `negotiate()` in it,
     so the redirect and the notice choose the same way;
@@ -250,6 +256,8 @@ The preview tests use real requests and real browsers, not stand-ins.
   - `fr`;
   - `fr,th;q=0.5`, which gives Thai: the best one the app has;
   - no header at all, which gives the source language.
+- With `fallbackLocale` set to Thai, a French browser lands on Thai, and the home page's `x-default`
+  points there.
 - `negotiate()` gives the same answer as fbtee's own `setupLocaleContext(...).getLocale()` for every
   case, for the example's languages and for a site with many: `th`, `ar-SA`, `ar-MA`, `en-GB`,
   `en-AU`, `es-MX`, `pt-AO`, `zh-HK`, `zh-Hant`, `sr-Latn`, `fr` and none.
