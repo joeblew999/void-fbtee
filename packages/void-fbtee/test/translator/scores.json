@@ -232,8 +232,8 @@
     "date": "2026-11-15",
     "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
     "right": 18,
-    "wrong": 2,
-    "unreviewed": ["The app's AGENTS.md tells your coding agent what to do."],
+    "wrong": 3,
+    "unreviewed": [],
     "meaning": 88,
     "chrF": 91,
     "results": [
@@ -311,11 +311,12 @@
         "text": "The app's AGENTS.md tells your coding agent what to do.",
         "hash": "E3kkP1xBWrE61ZBOek87xg==",
         "cache": false,
-        "verdict": "unreviewed",
-        "meaning": 92,
-        "chrF": 67,
+        "verdict": "wrong",
+        "why": "Drops ของ (\"of\"): reads \"app AGENTS.md\"; should be AGENTS.md ของแอป.",
+        "meaning": 91,
+        "chrF": 59,
         "reference": ["AGENTS.md ของแอปบอกเอเจนต์เขียนโค้ดของคุณว่าต้องทำอะไร"],
-        "got": ["แอป AGENTS.md บอกเอเจนต์การเขียนโค้ดของคุณว่าจะทำอะไร"]
+        "got": ["แอป AGENTS.md บอกเอเจนต์โค้ดของคุณว่าจะทำอะไร"]
       },
       {
         "text": "Void's AI or Claude Code translates what's new.",
@@ -1146,14 +1147,12 @@
   "th-TH @cf/qwen/qwen3.8-27b": {
     "date": "2026-11-15",
     "model": "@cf/qwen/qwen3.8-27b",
-    "right": 6,
+    "right": 8,
     "wrong": 0,
     "unreviewed": [
       "Your event shows in every language once it's posted.",
       "Hello {name}, your ticket is attached.",
-      "{number} seats left",
-      "1 seat left",
-      "Run vp dev to start the app.",
+      "{translated} of {total} strings translated",
       "The app's AGENTS.md tells your coding agent what to do.",
       "Void's AI or Claude Code translates what's new.",
       "Each language's catalog is in i18n/translations.",
@@ -1165,8 +1164,8 @@
       "{name} checked their ticket.",
       "{name} booked, and {name} got the ticket by email."
     ],
-    "meaning": 86,
-    "chrF": 81,
+    "meaning": 87,
+    "chrF": 84,
     "results": [
       {
         "text": "Save",
@@ -1183,10 +1182,10 @@
         "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
         "cache": true,
         "verdict": "unreviewed",
-        "meaning": 95,
-        "chrF": 100,
+        "meaning": 89,
+        "chrF": 78,
         "reference": ["อีเวนต์ของคุณจะแสดงในทุกภาษาเมื่อโพสต์แล้ว"],
-        "got": ["อีเวนต์ของคุณจะแสดงในทุกภาษาเมื่อโพสต์แล้ว"]
+        "got": ["อีเวนต์ของคุณจะแสดงในทุ่กภาษาเมื่่อโพสแล้ว"]
       },
       {
         "text": "Hello {name}, your ticket is attached.",
@@ -1202,61 +1201,61 @@
         "text": "{translated} of {total} strings translated",
         "hash": "0/yUVSiGyC2JT0/i90uO0A==",
         "cache": true,
-        "verdict": "right",
+        "verdict": "unreviewed",
         "meaning": 86,
-        "chrF": 92,
+        "chrF": 86,
         "reference": ["แปลแล้ว {translated} จาก {total} ข้อความ"],
-        "got": ["{translated} จาก {total} ข้อความแปลแล้ว"]
+        "got": ["แปลข้อความแล้ว {translated} จาก {total}"]
       },
       {
         "text": "{number} seats left",
         "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
         "cache": true,
-        "verdict": "unreviewed",
-        "meaning": 88,
-        "chrF": 76,
+        "verdict": "right",
+        "meaning": 93,
+        "chrF": 100,
         "reference": ["เหลือ {number} ที่นั่ง"],
-        "got": ["เหลือ {number} ท่ีนั่ง"]
+        "got": ["เหลือ {number} ที่นั่ง"]
       },
       {
         "text": "1 seat left",
         "hash": "YPVBS6NNHhGVrCKVfko+lw==",
         "cache": true,
-        "verdict": "unreviewed",
-        "meaning": 80,
-        "chrF": 36,
+        "verdict": "right",
+        "meaning": 93,
+        "chrF": 100,
         "reference": ["เหลือ 1 ที่นั่ง"],
-        "got": ["เหลือหนึ่่งท่ีนั่ง"]
+        "got": ["เหลือ 1 ที่นั่ง"]
       },
       {
         "text": "Run vp dev to start the app.",
         "hash": "zMoep4eguZ3OejsIbcWbjg==",
         "cache": true,
-        "verdict": "unreviewed",
-        "meaning": 92,
-        "chrF": 58,
+        "verdict": "right",
+        "meaning": 94,
+        "chrF": 100,
         "reference": ["รัน vp dev เพื่อเริ่มแอป"],
-        "got": ["รัน vp dev เพื่่อสตั้ปแอป"]
+        "got": ["รัน vp dev เพื่อเริ่มแอป"]
       },
       {
         "text": "The app's AGENTS.md tells your coding agent what to do.",
         "hash": "E3kkP1xBWrE61ZBOek87xg==",
         "cache": false,
         "verdict": "unreviewed",
-        "meaning": 92,
-        "chrF": 79,
+        "meaning": 91,
+        "chrF": 63,
         "reference": ["AGENTS.md ของแอปบอกเอเจนต์เขียนโค้ดของคุณว่าต้องทำอะไร"],
-        "got": ["AGENTS.md ของแอปบอกรายละเอียดให้เอเจนต์โค้ดของคุณว่าต้องทำอะไร"]
+        "got": ["AGENTS.md ของแอปบอกรหัสโค้ดของคุณว่่าต้องทําอะไร"]
       },
       {
         "text": "Void's AI or Claude Code translates what's new.",
         "hash": "XheCGRJ31SRnsGZhKLgJRA==",
         "cache": true,
         "verdict": "unreviewed",
-        "meaning": 89,
-        "chrF": 55,
+        "meaning": 94,
+        "chrF": 66,
         "reference": ["Void's AI หรือ Claude Code แปลสิ่งที่ใหม่"],
-        "got": ["AI ของ Void หรือ Claude Code แปลข้้อใหม่"]
+        "got": ["AI ของ Void หรือ Claude Code แปลสิ่งใหม่ๆ"]
       },
       {
         "text": "Each language's catalog is in i18n/translations.",
@@ -1274,9 +1273,9 @@
         "cache": true,
         "verdict": "unreviewed",
         "meaning": 94,
-        "chrF": 99,
+        "chrF": 76,
         "reference": ["พร้อมแปลแอปของคุณแล้วหรือยัง"],
-        "got": ["พร้อมแปลแอปของคุณแล้วหรือยัง?"]
+        "got": ["พร้อมแปลแอปของคุณหรือยัง?"]
       },
       {
         "text": "Strings",
@@ -1313,30 +1312,30 @@
         "hash": "fRQVudyYBFiDmWyed6yR7A==",
         "cache": true,
         "verdict": "unreviewed",
-        "meaning": 85,
-        "chrF": 55,
+        "meaning": 78,
+        "chrF": 57,
         "reference": ["{name} เข้าร่วมด้วยตนเอง"],
-        "got": ["{name} เข้าร่วมนที่สถานที่."]
+        "got": ["{name} เข้าร่วมแบบพบปะ"]
       },
       {
         "text": "{name} takes part online.",
         "hash": "iP10/gSomcvt/+9NrQA7XQ==",
         "cache": true,
         "verdict": "unreviewed",
-        "meaning": 76,
-        "chrF": 66,
+        "meaning": 88,
+        "chrF": 75,
         "reference": ["{name} เข้าร่วมทางออนไลน์"],
-        "got": ["{name} เข้้าร่วมนออนไลน์"]
+        "got": ["{name} เข้าร่วมนออนไลน์"]
       },
       {
         "text": "{name} booked a seat.",
         "hash": "Oeto9jViL+xxuaYfiMdwwg==",
         "cache": true,
         "verdict": "unreviewed",
-        "meaning": 83,
-        "chrF": 89,
+        "meaning": 82,
+        "chrF": 84,
         "reference": ["{name} จองที่นั่งแล้ว"],
-        "got": ["{name} จองที่นั่่งแล้ว"]
+        "got": ["{name} จองที่นั่้งแล้ว"]
       },
       {
         "text": "{name} checked her ticket.",

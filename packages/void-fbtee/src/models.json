@@ -35,15 +35,6 @@
       },
       "why": "reasoning medium by default; low is its lowest (model page: low, medium, high, checked 2026-11-15)"
     },
-    "@cf/zai-org/glm-4.7-flash": {
-      "jsonMode": false,
-      "options": {
-        "chat_template_kwargs": {
-          "enable_thinking": false
-        }
-      },
-      "why": "reasoning model; thinking off by chat_template_kwargs, as for Gemma 4 (to be proven by the translator test)"
-    },
     "@cf/deepseek-ai/deepseek-v4.1-flash-1017": {
       "jsonMode": false,
       "options": {
@@ -60,9 +51,9 @@
     }
   },
   "default": {
-    "model": "@cf/zai-org/glm-4.7-flash",
+    "model": "@cf/google/gemma-4-26b-a4b-it",
     "source": "cloudflare",
-    "why": "model page: multilingual, 100+ languages"
+    "why": "Gemma 4: multilingual, 35+ languages out of the box (Cloudflare's changelog, 2026-04-04), the fastest here (1 s a string, AI Gateway's logs, 2026-11-15); GLM 4.7 Flash was the default until its thinking couldn't be switched off (8192 tokens, no answer, 2026-11-15)"
   },
   "languages": [
     {
@@ -201,72 +192,72 @@
     {
       "language": "hi",
       "name": "Hindi",
-      "model": "@cf/zai-org/glm-4.7-flash",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
     },
     {
       "language": "bn",
       "name": "Bengali",
-      "model": "@cf/zai-org/glm-4.7-flash",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
     },
     {
       "language": "ur",
       "name": "Urdu",
-      "model": "@cf/zai-org/glm-4.7-flash",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
     },
     {
       "language": "gu",
       "name": "Gujarati",
-      "model": "@cf/zai-org/glm-4.7-flash",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
     },
     {
       "language": "mr",
       "name": "Marathi",
-      "model": "@cf/zai-org/glm-4.7-flash",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
     },
     {
       "language": "te",
       "name": "Telugu",
-      "model": "@cf/zai-org/glm-4.7-flash",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
     },
     {
       "language": "kn",
       "name": "Kannada",
-      "model": "@cf/zai-org/glm-4.7-flash",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
     },
     {
       "language": "ml",
       "name": "Malayalam",
-      "model": "@cf/zai-org/glm-4.7-flash",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
     },
     {
       "language": "pa",
       "name": "Punjabi",
-      "model": "@cf/zai-org/glm-4.7-flash",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
     },
     {
       "language": "ne",
       "name": "Nepali",
-      "model": "@cf/zai-org/glm-4.7-flash",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
     },
     {
       "language": "en",

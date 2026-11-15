@@ -93,6 +93,7 @@ max_tokens, is an unusable answer (ai.ts ask), left for Claude Code.
   could run at the same time, cutting the first full run from hours to minutes.
 - Test the runtime path the same way: the example's translate queue runs in `vp dev` too (Void's
   guide/queues.md), so a posted event's translations can be judged with the same verdicts.
-- GLM 4.7 Flash's and gpt-oss-120b's thinking settings aren't on their Cloudflare model pages as
-  read here: the first pick run's AI Gateway logs show whether they took (no `reasoning`, few
-  output tokens).
+- gpt-oss-120b's thinking setting (`reasoning_effort: low`) isn't on its Cloudflare model page as
+  read here; its logs show it took (about 170 tokens a string, 2026-11-15). GLM 4.7 Flash was
+  dropped: `enable_thinking: false` didn't take (8192 tokens of thinking, no answer, up to 140 s),
+  so its languages and the default went to Gemma 4 until a pick run measures them.
