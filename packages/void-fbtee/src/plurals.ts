@@ -120,6 +120,16 @@ const keyOf = (v: Record<string, number | string> | undefined) =>
 /** fbtee's IntlVariations codes for a person's gender (fbtee src/IntlVariations.tsx). */
 export const GENDER_CODE = { male: 1, female: 2, unknown: 3 } as const;
 
+/**
+ * The word for each code a line can be marked with, as the translating skill names them
+ * ("Counts", "People"): what Void's AI is told each line is for (ai.ts). From the same codes
+ * withVariants writes, so the two can't differ; test/unit/skills.test.ts holds the skills to them.
+ */
+export const MARKS: Record<number, string> = Object.fromEntries([
+  ...Object.entries(CATEGORY_CODE).map(([word, code]) => [code, word]),
+  ...Object.entries(GENDER_CODE).map(([word, code]) => [code, word]),
+]);
+
 /** fbtee's `types` for a token: a count (BITMASK_NUMBER) or a person's gender (BITMASK_GENDER). */
 const NUMBER = 28;
 const GENDER = 3;

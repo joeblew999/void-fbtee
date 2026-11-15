@@ -20,6 +20,9 @@ app's own translations as examples.
   question, an instruction an instruction, in the same tense. Add nothing and leave nothing out.
 - Keep every `{placeholder}` exactly as written, untranslated, and put it where the language
   needs it.
+- A placeholder may be a finished value the app writes in the reader's language: a date or time,
+  an amount of money with its currency, a number with its unit, a list. Keep it as it is and add
+  no unit, currency or word for it: "{price}", never "{price} euros".
 - Words marked to keep (commands, file names, paths, product names such as Void's AI or Claude
   Code) stay exactly as written, in Latin letters, never translated or explained.
 - Use the app's own translations as examples: the same word for the same thing, and the same

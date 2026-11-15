@@ -110,6 +110,10 @@ number is a number, money is a number with a currency code. Never store, send or
 formatted text. A form sends neutral values too (a `datetime-local` gives `"2026-04-01T20:00"`;
 read a number typed the language's way back to a number in the browser before sending it).
 
+Money in a sentence is a plain `<fbt:param>` holding the amount `Intl` formatted, currency and
+all: never `number={amount}`, which makes fbtee treat it as a count, with a line per plural form.
+Write "Your ticket costs {price}.", never "{price} euros".
+
 Text formatted while rendering (`Intl`, `toLocaleString`) goes in `<Formatted>` from
 `void-fbtee/react`: `<Formatted>{new Intl.NumberFormat(locale).format(n)}</Formatted>`, inside an
 `<fbt:param>` too. The server formats it; the browser keeps the server's text through hydration,

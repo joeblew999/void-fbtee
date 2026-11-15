@@ -86,6 +86,12 @@ for its kind, and for `<fbt>` text fbtee's own skill, steps 3 to 5, read from th
 fbtee (translate.ts `fbteeRules`), never a copy. Claude Code reads the same two skills; the main
 skill keeps only what's about editing the catalogs and pages.
 
+In harmony with the code: the marks Void's AI is told each line is for (plurals.ts `MARKS`) come
+from the same codes prepared() writes (`CATEGORY_CODE`, `GENDER_CODE`), and test/unit/skills.test.ts
+fails if either skill's list of them, or its catalog codes, drift from the code. A placeholder can be
+a finished value Intl wrote (a date, money, a number with its unit, a list): the skill says to keep
+it and add no unit; money in the code is a plain `<fbt:param>`, never `number=`.
+
 Measured (Gemma 4, the translator test, 2026-11-15, every answer judged by Claude Code): Thai 20/21
 with the skill, 18/21 without; Arabic 20/21 with it, 14/21 without (without it Gemma wrote Egyptian
 dialect in six strings). So it stays; any change to it is measured the same way

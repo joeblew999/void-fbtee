@@ -16,6 +16,7 @@
 import { ai } from "void/ai";
 import skill from "../skills/void-fbtee-translate/SKILL.md?raw";
 import { LLAMA, modelById, modelFor, type TranslationModel } from "./models";
+import { MARKS } from "./plurals";
 
 /**
  * How to translate: the translating skill (skills/void-fbtee-translate/SKILL.md), the same text a
@@ -174,20 +175,6 @@ function instructions(
   );
 }
 
-/** fbtee's variation codes, as its catalogs name them in each line's `variations`: a gender
- * (a name's, a pronoun's, the reader's) or a plural form. */
-const FORMS: Record<number, string> = {
-  1: "male",
-  2: "female",
-  3: "unknown gender",
-  16: "zero",
-  4: "one",
-  8: "two",
-  20: "few",
-  12: "many",
-  24: "other",
-};
-
 /** One catalog entry to translate: its description and its source lines, each maybe a form. */
 export interface StringEntry {
   description: string;
@@ -246,7 +233,7 @@ export async function translateStrings(
     lines: e.lines.map((l) => ({
       form:
         Object.values(l.variations)
-          .map((v) => FORMS[v] ?? `variation ${v}`)
+          .map((v) => MARKS[v] ?? `variation ${v}`)
           .join(", ") || "only",
       source: l.text,
     })),
