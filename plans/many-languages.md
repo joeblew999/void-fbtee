@@ -19,8 +19,6 @@ has been measured yet: this plan is to measure first, then fix what doesn't hold
   `src/server.ts` and `src/middleware.ts`, merged per request. Its time and memory.
 - **Each page's hreflang list** (one link per language in the head) and **the sitemap** (every page
   times every language, against Google's per-file limits, read from Google's docs with the date).
-- **The language picker's size** (`plans/language-picker.md`): a hundred links on every page, in
-  bytes, against the page as it is now. (The header's row of links goes in that plan.)
 - **Translating:** `void-fbtee translate` and the catalogs' size in the repo, per string added.
 
 ## How we'll know

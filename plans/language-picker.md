@@ -100,8 +100,6 @@ the browser's own work after load, inside the closed `<details>`, so nothing mov
 - `Intl.DisplayNames` in the page's language for every language: what it gives where it has no
   name (the code itself, or `undefined`), in Node, workerd, Chromium and WebKit, and the plan's
   fallback (the code).
-- Its size: a hundred links on every page, in bytes, against the page as it is now. Measured with
-  the generated app of `plans/many-languages.md`.
 
 ## What changes
 
@@ -119,7 +117,7 @@ the browser's own work after load, inside the closed `<details>`, so nothing mov
     state (`[open]`, `[data-yours]`) needs a rule Tailwind can't say in a class.
 - **Plans:**
   - `plans/language-notice.md` is deleted: its job is point 2 above;
-  - `plans/many-languages.md` drops the header item and measures the picker's size instead;
+  - `plans/many-languages.md` drops the header item;
   - `plans/README.md` puts this plan in the order.
 - **Tests** (below); the existing tests that use the header's `to-<locale>` links move to the
   picker's.
@@ -145,8 +143,8 @@ markdown page (`/en-US/docs/intl`, `/en-US/docs`, `/en-US/docs/tour`), in Englis
 - the package adds no CSS: its build has no stylesheet, and the picker with no `className` renders
   no `class` attributes at all.
 
-With the generated app of about a hundred languages (`plans/many-languages.md`): it opens, search
-finds any of them, and the page's added size is written in that plan with the date.
+A unit test renders it with a hundred languages: every one listed once, in the page language's
+order, the visitor's own first, and search finding any of them by either name or code.
 
 Then `vp check`, `test:unit`, `test:dev`, `test:preview`, `i18n:check`, committed locally, and
 pushed when the user says.
