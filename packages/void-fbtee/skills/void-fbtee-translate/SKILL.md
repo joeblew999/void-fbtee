@@ -17,14 +17,21 @@ app's own translations as examples.
 - The description says where the text shows and what it means. It's there to explain: never put
   its words in the translation.
 - Say everything the source says, the same way: a statement stays a statement, a question a
-  question, an instruction an instruction, in the same tense. Add nothing and leave nothing out.
+  question, an instruction an instruction, in the same tense. Add nothing and leave nothing out:
+  no "successfully" after "booked", no "with this email" after "attached", no "the same" before a
+  name said twice, and nothing said twice ("joint en pièce jointe").
 - Keep every `{placeholder}` exactly as written, untranslated, and put it where the language
-  needs it.
+  needs it. Keep what each one means: in "{translated} of {total}", {translated} is the part and
+  {total} the whole.
 - A placeholder may be a finished value the app writes in the reader's language: a date or time,
   an amount of money with its currency, a number with its unit, a list. Keep it as it is and add
   no unit, currency or word for it: "{price}", never "{price} euros".
 - Words marked to keep (commands, file names, paths, product names such as Void's AI or Claude
-  Code) stay exactly as written, in Latin letters, never translated or explained.
+  Code) stay exactly as written, in Latin letters, never translated or explained. Everything else
+  is translated, technical words too: a "coding agent" is an AI program that writes code, said
+  the way developers in the language say it, not left in English and not a sales agent.
+- Capital letters only where the language puts them: a word in the middle of a sentence is
+  lowercase even when the app uses it as a heading elsewhere ("Catalog", "Strings").
 - Use the app's own translations as examples: the same word for the same thing, and the same
   style. Where the app gives its own word for a term, always use it.
 - Give exactly one translated line for each source line, in order.
@@ -37,12 +44,27 @@ language's own rule (`Intl.PluralRules`). The zero, one and two forms may say th
 instead of `{number}` (Arabic two: "مقعدان"). A count also comes as its own entry for exactly 1
 ("1 seat left" beside "{number} seats left"): translate both.
 
+- Each line is for its own form only. The one line is for 1 (and in French and Hindi 0 too):
+  its noun is singular ("{seats} Platz", "{seats} place", "{seats} सीट", "{number} место"), never
+  the plural the other lines use.
+- Russian: one "место", few (2–4, 22–24…) "места", many (5–20, 25–30…) "мест", other (fractions,
+  1,5) "места".
+- The zero line says none: a sentence with "not" ("didn't book any seat", Arabic "لم يحجز {who}
+  أي مقعد"), never "booked any seats".
+
 ## People: one line per gender
 
 A line marked with a gender (male, female, unknown) is the sentence for a person of that gender:
 the name's, a pronoun's, or the reader's own. Word it for that gender where the language changes
 its words (Arabic's verbs, Hindi's, French and Spanish participles). For unknown, use the
 language's usual form for a person whose gender isn't said.
+
+- Each line for its own gender only: the male line in the male form and the female line in the
+  female form. A form that covers both (Russian "забронировал(а)") belongs on the unknown line only.
+- "Their" for a person whose gender isn't said is that person's own: the language's word for
+  one's own (German "das eigene", Chinese "自己的", Vietnamese "của mình"), never a word for other
+  people's ("他们的", "của họ") or for one gender ("his", "her", German "ihr").
+- The same politeness on every line: Japanese keeps さん after the name on all of them.
 
 ## fbtee's built-in strings
 
@@ -86,3 +108,5 @@ Translate the whole page, keeping its structure: the same headings in the same o
   without the number (مقعدان as a subject, مقعدين as an object); 3 to 10, plural (مقاعد); 11 to 99,
   singular, accusative (مقعدًا); 100 and up, singular (مقعد).
 - Right-to-left languages in general: natural text, no direction marks.
+- Korean: after a placeholder, give both forms of the particle, as the app does: 을(를), 이(가),
+  은(는), since the word it stands for may end in a consonant or a vowel.

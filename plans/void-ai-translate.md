@@ -110,7 +110,13 @@ dialect in six strings). So it stays; any change to it is measured the same way
    the plural (German, Spanish, French, Hindi, Russian), Russian's male lines written
    "забронировал(а)", a word capitalised mid-sentence (Spanish, French, Indonesian, Vietnamese),
    "their" given as someone else's or as "his"/"her" (German, Vietnamese, Chinese), words added
-   ("successfully", "with this email", 同じ). Next: the skill's rules for those, then a run.
+   ("successfully", "with this email", 同じ). Rules for those added to the translating skill
+   (2026-11-15): 259 of 276 right after them. They fixed Arabic's zero lines, Russian's counts and
+   its male "booked a seat", "their" in Vietnamese and Chinese, and German's one seat. Gemma gave
+   the same wrong answer as before, rules or not, for: one seat in Spanish, French and Russian
+   counts, "Catálogo", "String", "Chuỗi" capitalised, Hindi's swapped numbers, Korean's particle,
+   "successfully" (Vietnamese), "with this email" (Thai), "joint en pièce jointe", "Sie sind
+   gebucht", "coding agent" left in English (Thai, Chinese), 同じく, Arabic's 100-and-up line.
    AI Gateway's cache is now keyed by the request and the string's round (ai.ts ask,
    `cacheKey`): every answer is stored the first time it's asked, so a judged answer comes back
    the same until the skill, the examples or the model change.

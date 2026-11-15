@@ -3,10 +3,10 @@
     "date": "2026-11-15",
     "model": "@cf/google/gemma-4-26b-a4b-it",
     "right": 22,
-    "wrong": 1,
-    "unreviewed": [],
+    "wrong": 0,
+    "unreviewed": ["{who} booked {seats} seats."],
     "meaning": 84,
-    "chrF": 83,
+    "chrF": 85,
     "results": [
       {
         "text": "Save",
@@ -33,10 +33,10 @@
         "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
         "cache": "round 0",
         "verdict": "right",
-        "meaning": 86,
-        "chrF": 75,
+        "meaning": 84,
+        "chrF": 100,
         "reference": ["مرحبًا {name}، تذكرتك مرفقة."],
-        "got": ["أهلاً {name}، تذكرتك مرفقة."]
+        "got": ["مرحبًا {name}، تذكرتك مرفقة."]
       },
       {
         "text": "{translated} of {total} strings translated",
@@ -95,10 +95,10 @@
         "hash": "E3kkP1xBWrE61ZBOek87xg==",
         "cache": "round 3",
         "verdict": "right",
-        "meaning": 86,
-        "chrF": 60,
+        "meaning": 87,
+        "chrF": 70,
         "reference": ["يخبر ملف AGENTS.md في التطبيق وكيل البرمجة لديك بما يفعله."],
-        "got": ["ملف AGENTS.md الخاص بالتطبيق يخبر وكيل البرمجة الخاص بك بما يجب فعله."]
+        "got": ["يخبر ملف AGENTS.md الخاص بالتطبيق وكيل البرمجة الخاص بك بما يجب فعله."]
       },
       {
         "text": "Void's AI or Claude Code translates what's new.",
@@ -108,7 +108,7 @@
         "meaning": 94,
         "chrF": 87,
         "reference": ["يترجم Void's AI أو Claude Code ما هو جديد."],
-        "got": ["تُترجم Void's AI أو Claude Code كل ما هو جديد."]
+        "got": ["يُترجم Void's AI أو Claude Code كل ما هو جديد."]
       },
       {
         "text": "Each language's catalog is in i18n/translations.",
@@ -243,11 +243,10 @@
       {
         "text": "{who} booked {seats} seats.",
         "hash": "Nr+WWEAaNhdmcsZktc6jkQ==",
-        "cache": "round 2",
-        "verdict": "wrong",
-        "why": "the zero lines say \"{who} booked any seats\" (حجز {who} أي مقاعد), with no \"didn't\"",
-        "meaning": 89,
-        "chrF": 94,
+        "cache": "round 3",
+        "verdict": "unreviewed",
+        "meaning": 86,
+        "chrF": 96,
         "reference": [
           "لم يحجز {who} أي مقعد.",
           "حجز {who} مقعدًا واحدًا.",
@@ -269,24 +268,24 @@
           "حجز {who} {seats} مقعد."
         ],
         "got": [
-          "حجز {who} أي مقاعد.",
+          "لم يحجز {who} أي مقاعد.",
           "حجز {who} مقعدًا واحدًا.",
           "حجز {who} مقعدين.",
           "حجز {who} {seats} مقاعد.",
           "حجز {who} {seats} مقعدًا.",
-          "حجز {who} {seats} مقعد.",
-          "حجزت {who} أي مقاعد.",
+          "حجز {who} {seats} مقعدًا.",
+          "لم تحجز {who} أي مقاعد.",
           "حجزت {who} مقعدًا واحدًا.",
           "حجزت {who} مقعدين.",
           "حجزت {who} {seats} مقاعد.",
           "حجزت {who} {seats} مقعدًا.",
-          "حجزت {who} {seats} مقعد.",
-          "حجز {who} أي مقاعد.",
+          "حجزت {who} {seats} مقعدًا.",
+          "لم يحجز {who} أي مقاعد.",
           "حجز {who} مقعدًا واحدًا.",
           "حجز {who} مقعدين.",
           "حجز {who} {seats} مقاعد.",
           "حجز {who} {seats} مقعدًا.",
-          "حجز {who} {seats} مقعد."
+          "حجز {who} {seats} مقعدًا."
         ]
       }
     ]
@@ -2299,8 +2298,8 @@
   "de-DE": {
     "date": "2026-11-15",
     "model": "@cf/google/gemma-4-26b-a4b-it",
-    "right": 21,
-    "wrong": 2,
+    "right": 22,
+    "wrong": 1,
     "unreviewed": [],
     "meaning": 93,
     "chrF": 90,
@@ -2509,12 +2508,11 @@
         "text": "{name} checked their ticket.",
         "hash": "3jFQRFLYFLOxE6C21bq6GA==",
         "cache": "round 1",
-        "verdict": "wrong",
-        "why": "says \"ihr Ticket\" (her ticket) where the person's gender isn't known",
+        "verdict": "right",
         "meaning": 95,
-        "chrF": 64,
+        "chrF": 67,
         "reference": ["{name} hat das eigene Ticket geprüft."],
-        "got": ["{name} hat ihr Ticket geprüft."]
+        "got": ["{name} hat sein Ticket geprüft."]
       },
       {
         "text": "{name} booked, and {name} got the ticket by email.",
@@ -2530,20 +2528,20 @@
         "text": "You're booked.",
         "hash": "iQJF/J4mB7QMxMxmCJJLOw==",
         "cache": "round 1",
-        "verdict": "right",
-        "meaning": 87,
-        "chrF": 15,
+        "verdict": "wrong",
+        "why": "\"Sie sind gebucht\" said of a person means hired, not booked in",
+        "meaning": 90,
+        "chrF": 13,
         "reference": ["Du bist angemeldet.", "Du bist angemeldet.", "Du bist angemeldet."],
-        "got": ["Sie haben gebucht.", "Sie haben gebucht.", "Sie haben gebucht."]
+        "got": ["Sie sind gebucht.", "Sie sind gebucht.", "Sie sind gebucht."]
       },
       {
         "text": "{who} booked {seats} seats.",
         "hash": "Nr+WWEAaNhdmcsZktc6jkQ==",
         "cache": "round 1",
-        "verdict": "wrong",
-        "why": "the one-seat lines say \"Plätze\" (1 Plätze), not \"Platz\"",
-        "meaning": 96,
-        "chrF": 90,
+        "verdict": "right",
+        "meaning": 95,
+        "chrF": 81,
         "reference": [
           "{who} hat {seats} Platz gebucht.",
           "{who} hat {seats} Plätze gebucht.",
@@ -2553,12 +2551,12 @@
           "{who} hat {seats} Plätze gebucht."
         ],
         "got": [
-          "{who} hat {seats} Plätze gebucht.",
-          "{who} hat {seats} Plätze gebucht.",
-          "{who} hat {seats} Plätze gebucht.",
-          "{who} hat {seats} Plätze gebucht.",
-          "{who} hat {seats} Plätze gebucht.",
-          "{who} hat {seats} Plätze gebucht."
+          "{who} hat {seats} Sitzplatz gebucht.",
+          "{who} hat {seats} Sitze gebucht.",
+          "{who} hat {seats} Sitzplatz gebucht.",
+          "{who} hat {seats} Sitze gebucht.",
+          "{who} hat {seats} Sitzplatz gebucht.",
+          "{who} hat {seats} Sitze gebucht."
         ]
       }
     ]
@@ -3305,7 +3303,7 @@
     "wrong": 2,
     "unreviewed": [],
     "meaning": 86,
-    "chrF": 90,
+    "chrF": 91,
     "results": [
       {
         "text": "Save",
@@ -3333,9 +3331,9 @@
         "cache": "round 0",
         "verdict": "right",
         "meaning": 81,
-        "chrF": 70,
+        "chrF": 59,
         "reference": ["Hola, {name}: tu entrada va adjunta."],
-        "got": ["Hola, {name}, tu entrada está adjunta."]
+        "got": ["Hola {name}, tu entrada está adjunta."]
       },
       {
         "text": "{translated} of {total} strings translated",
@@ -3468,9 +3466,9 @@
         "cache": "round 0",
         "verdict": "right",
         "meaning": 97,
-        "chrF": 66,
+        "chrF": 100,
         "reference": ["{name} participa en línea."],
-        "got": ["{name} participa online."]
+        "got": ["{name} participa en línea."]
       },
       {
         "text": "{name} booked a seat.",
@@ -3570,11 +3568,11 @@
   "fr-FR": {
     "date": "2026-11-15",
     "model": "@cf/google/gemma-4-26b-a4b-it",
-    "right": 22,
-    "wrong": 1,
+    "right": 21,
+    "wrong": 2,
     "unreviewed": [],
     "meaning": 88,
-    "chrF": 92,
+    "chrF": 93,
     "results": [
       {
         "text": "Save",
@@ -3612,10 +3610,10 @@
         "hash": "0/yUVSiGyC2JT0/i90uO0A==",
         "cache": "round 1",
         "verdict": "right",
-        "meaning": 83,
-        "chrF": 88,
+        "meaning": 82,
+        "chrF": 90,
         "reference": ["{translated} chaînes traduites sur {total}"],
-        "got": ["{translated} sur {total} chaînes traduites"]
+        "got": ["{translated} chaînes sur {total} traduites"]
       },
       {
         "text": "{number} seats left",
@@ -3653,13 +3651,11 @@
         "cache": "round 0",
         "verdict": "right",
         "meaning": 90,
-        "chrF": 96,
+        "chrF": 83,
         "reference": [
           "Le fichier AGENTS.md de l'application indique à votre agent de code ce qu'il doit faire."
         ],
-        "got": [
-          "Le fichier AGENTS.md de l'application indique à votre agent de codage ce qu'il doit faire."
-        ]
+        "got": ["Le fichier AGENTS.md de l'application indique à votre agent de codage quoi faire."]
       },
       {
         "text": "Void's AI or Claude Code translates what's new.",
@@ -3817,9 +3813,10 @@
         "text": "{who} booked {seats} seats.",
         "hash": "Nr+WWEAaNhdmcsZktc6jkQ==",
         "cache": "round 1",
-        "verdict": "right",
-        "meaning": 94,
-        "chrF": 76,
+        "verdict": "wrong",
+        "why": "the one-seat lines say \"places\" (1 places), not \"place\"",
+        "meaning": 90,
+        "chrF": 98,
         "reference": [
           "{who} a réservé {seats} place.",
           "{who} a réservé {seats} places.",
@@ -3829,12 +3826,12 @@
           "{who} a réservé {seats} places."
         ],
         "got": [
-          "{who} a réservé {seats} siège.",
-          "{who} a réservé {seats} sièges.",
-          "{who} a réservé {seats} siège.",
-          "{who} a réservé {seats} sièges.",
-          "{who} a réservé {seats} siège.",
-          "{who} a réservé {seats} sièges."
+          "{who} a réservé {seats} places.",
+          "{who} a réservé {seats} places.",
+          "{who} a réservé {seats} places.",
+          "{who} a réservé {seats} places.",
+          "{who} a réservé {seats} places.",
+          "{who} a réservé {seats} places."
         ]
       }
     ]
@@ -3842,8 +3839,8 @@
   "hi-IN": {
     "date": "2026-11-15",
     "model": "@cf/google/gemma-4-26b-a4b-it",
-    "right": 21,
-    "wrong": 2,
+    "right": 22,
+    "wrong": 1,
     "unreviewed": [],
     "meaning": 91,
     "chrF": 91,
@@ -3873,10 +3870,10 @@
         "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
         "cache": "round 0",
         "verdict": "right",
-        "meaning": 92,
-        "chrF": 90,
+        "meaning": 93,
+        "chrF": 100,
         "reference": ["नमस्ते {name}, आपका टिकट संलग्न है।"],
-        "got": ["नमस्ते {name}, आपका टिकट साथ में संलग्न है।"]
+        "got": ["नमस्ते {name}, आपका टिकट संलग्न है।"]
       },
       {
         "text": "{translated} of {total} strings translated",
@@ -3893,12 +3890,11 @@
         "text": "{number} seats left",
         "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
         "cache": "round 1",
-        "verdict": "wrong",
-        "why": "the one-seat line (0 and 1) says \"सीटें बची हैं\", not \"सीट बची है\"",
-        "meaning": 92,
-        "chrF": 88,
+        "verdict": "right",
+        "meaning": 91,
+        "chrF": 100,
         "reference": ["{number} सीट बची है", "{number} सीटें बची हैं"],
-        "got": ["{number} सीटें बची हैं", "{number} सीटें बची हैं"]
+        "got": ["{number} सीट बची है", "{number} सीटें बची हैं"]
       },
       {
         "text": "1 seat left",
@@ -3946,9 +3942,9 @@
         "cache": "round 0",
         "verdict": "right",
         "meaning": 95,
-        "chrF": 100,
+        "chrF": 91,
         "reference": ["हर भाषा का कैटलॉग i18n/translations में है।"],
-        "got": ["हर भाषा का कैटलॉग i18n/translations में है।"]
+        "got": ["प्रत्येक भाषा का कैटलॉग i18n/translations में है।"]
       },
       {
         "text": "Ready to translate your app?",
@@ -4103,7 +4099,7 @@
     "wrong": 1,
     "unreviewed": [],
     "meaning": 87,
-    "chrF": 91,
+    "chrF": 90,
     "results": [
       {
         "text": "Save",
@@ -4255,10 +4251,10 @@
         "hash": "fRQVudyYBFiDmWyed6yR7A==",
         "cache": "round 0",
         "verdict": "right",
-        "meaning": 84,
-        "chrF": 100,
+        "meaning": 85,
+        "chrF": 70,
         "reference": ["{name} ikut secara langsung."],
-        "got": ["{name} ikut secara langsung."]
+        "got": ["{name} hadir secara langsung."]
       },
       {
         "text": "{name} takes part online.",
@@ -4324,9 +4320,9 @@
         "cache": "round 0",
         "verdict": "right",
         "meaning": 94,
-        "chrF": 66,
+        "chrF": 82,
         "reference": ["{name} memesan, dan {name} menerima tiket lewat email."],
-        "got": ["{name} memesan, dan {name} mendapatkan tiketnya melalui email."]
+        "got": ["{name} memesan, dan {name} menerima tiketnya melalui email."]
       },
       {
         "text": "You're booked.",
@@ -4361,8 +4357,8 @@
   "ja-JP": {
     "date": "2026-11-15",
     "model": "@cf/google/gemma-4-26b-a4b-it",
-    "right": 21,
-    "wrong": 2,
+    "right": 22,
+    "wrong": 1,
     "unreviewed": [],
     "meaning": 88,
     "chrF": 90,
@@ -4382,30 +4378,30 @@
         "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
         "cache": "round 0",
         "verdict": "right",
-        "meaning": 91,
-        "chrF": 51,
+        "meaning": 90,
+        "chrF": 76,
         "reference": ["イベントは投稿されるとすべての言語で表示されます。"],
-        "got": ["イベントを投稿すると、すべての言語で表示されるようになります。"]
+        "got": ["投稿されると、イベントはすべての言語で表示されます。"]
       },
       {
         "text": "Hello {name}, your ticket is attached.",
         "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
         "cache": "round 0",
         "verdict": "right",
-        "meaning": 89,
-        "chrF": 100,
+        "meaning": 92,
+        "chrF": 69,
         "reference": ["{name}さん、こんにちは。チケットを添付しました。"],
-        "got": ["{name}さん、こんにちは。チケットを添付しました。"]
+        "got": ["{name}さん、こんにちは。チケットが添付されています。"]
       },
       {
         "text": "{translated} of {total} strings translated",
         "hash": "0/yUVSiGyC2JT0/i90uO0A==",
         "cache": "round 0",
         "verdict": "right",
-        "meaning": 84,
-        "chrF": 72,
+        "meaning": 83,
+        "chrF": 62,
         "reference": ["{total}件中{translated}件の文字列を翻訳済み"],
-        "got": ["{translated} / {total} 個の文字列を翻訳済み"]
+        "got": ["翻訳済み文字列: {total} 中 {translated}"]
       },
       {
         "text": "{number} seats left",
@@ -4578,13 +4574,13 @@
       {
         "text": "{name} booked, and {name} got the ticket by email.",
         "hash": "AHgdPbajKOCj4zXFKNEbbg==",
-        "cache": "round 2",
+        "cache": "round 3",
         "verdict": "wrong",
-        "why": "adds \"the same\" (同じ) before the second name",
-        "meaning": 89,
-        "chrF": 92,
+        "why": "adds \"likewise\" (同じく) before the second name",
+        "meaning": 90,
+        "chrF": 91,
         "reference": ["{name}さんが予約し、{name}さんがメールでチケットを受け取りました。"],
-        "got": ["{name}さんが予約し、同じ{name}さんがメールでチケットを受け取りました。"]
+        "got": ["{name}さんが予約し、同じく{name}さんがメールでチケットを受け取りました。"]
       },
       {
         "text": "You're booked.",
@@ -4600,10 +4596,9 @@
         "text": "{who} booked {seats} seats.",
         "hash": "Nr+WWEAaNhdmcsZktc6jkQ==",
         "cache": "round 1",
-        "verdict": "wrong",
-        "why": "drops さん after {who} on the third line",
+        "verdict": "right",
         "meaning": 93,
-        "chrF": 77,
+        "chrF": 84,
         "reference": [
           "{who}さんが{seats}席を予約しました。",
           "{who}さんが{seats}席を予約しました。",
@@ -4612,7 +4607,7 @@
         "got": [
           "{who}さんが{seats}席予約しました。",
           "{who}さんが{seats}席予約しました。",
-          "{who}が{seats}席予約しました。"
+          "{who}さんが{seats}席予約しました。"
         ]
       }
     ]
@@ -4642,9 +4637,9 @@
         "cache": "round 0",
         "verdict": "right",
         "meaning": 91,
-        "chrF": 65,
+        "chrF": 60,
         "reference": ["이벤트를 게시하면 모든 언어로 표시됩니다."],
-        "got": ["이벤트가 게시되면 모든 언어로 표시됩니다."]
+        "got": ["게시되면 이벤트가 모든 언어로 표시됩니다."]
       },
       {
         "text": "Hello {name}, your ticket is attached.",
@@ -4662,9 +4657,9 @@
         "cache": "round 0",
         "verdict": "right",
         "meaning": 85,
-        "chrF": 73,
+        "chrF": 72,
         "reference": ["{total}개 중 {translated}개 문자열 번역됨"],
-        "got": ["{total}개의 문자열 중 {translated}개 번역됨"]
+        "got": ["{translated} / {total}개의 문자열 번역됨"]
       },
       {
         "text": "{number} seats left",
@@ -4701,10 +4696,10 @@
         "hash": "E3kkP1xBWrE61ZBOek87xg==",
         "cache": "round 0",
         "verdict": "right",
-        "meaning": 90,
-        "chrF": 68,
+        "meaning": 93,
+        "chrF": 64,
         "reference": ["앱의 AGENTS.md가 코딩 에이전트에게 할 일을 알려 줍니다."],
-        "got": ["앱의 AGENTS.md는 코딩 에이전트에게 수행할 작업을 알려줍니다."]
+        "got": ["앱의 AGENTS.md는 코딩 에이전트에게 무엇을 해야 할지 알려줍니다."]
       },
       {
         "text": "Void's AI or Claude Code translates what's new.",
@@ -4841,9 +4836,9 @@
         "cache": "round 0",
         "verdict": "right",
         "meaning": 92,
-        "chrF": 88,
+        "chrF": 100,
         "reference": ["{name}님이 예약했고, {name}님이 이메일로 티켓을 받았습니다."],
-        "got": ["{name}님이 예약했으며, {name}님이 이메일로 티켓을 받았습니다."]
+        "got": ["{name}님이 예약했고, {name}님이 이메일로 티켓을 받았습니다."]
       },
       {
         "text": "You're booked.",
@@ -4878,8 +4873,8 @@
   "ru-RU": {
     "date": "2026-11-15",
     "model": "@cf/google/gemma-4-26b-a4b-it",
-    "right": 19,
-    "wrong": 4,
+    "right": 21,
+    "wrong": 2,
     "unreviewed": [],
     "meaning": 89,
     "chrF": 87,
@@ -4928,10 +4923,9 @@
         "text": "{number} seats left",
         "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
         "cache": "round 2",
-        "verdict": "wrong",
-        "why": "the \"other\" line (fractions, 1,5 места) says \"мест\", not \"места\"",
+        "verdict": "right",
         "meaning": 91,
-        "chrF": 99,
+        "chrF": 100,
         "reference": [
           "Осталось {number} место",
           "Осталось {number} места",
@@ -4942,7 +4936,7 @@
           "Осталось {number} место",
           "Осталось {number} места",
           "Осталось {number} мест",
-          "Осталось {number} мест"
+          "Осталось {number} места"
         ]
       },
       {
@@ -4969,14 +4963,15 @@
         "text": "The app's AGENTS.md tells your coding agent what to do.",
         "hash": "E3kkP1xBWrE61ZBOek87xg==",
         "cache": "round 1",
-        "verdict": "wrong",
-        "why": "says \"AI agent\" (ИИ-агенту) for \"coding agent\"",
+        "verdict": "right",
         "meaning": 88,
-        "chrF": 49,
+        "chrF": 55,
         "reference": [
           "Файл AGENTS.md приложения подсказывает вашему агенту для программирования, что делать."
         ],
-        "got": ["Файл AGENTS.md в приложении говорит вашему ИИ-агенту, что делать."]
+        "got": [
+          "Файл AGENTS.md в приложении говорит вашему ИИ-агенту для написания кода, что делать."
+        ]
       },
       {
         "text": "Void's AI or Claude Code translates what's new.",
@@ -4984,9 +4979,9 @@
         "cache": "round 0",
         "verdict": "right",
         "meaning": 92,
-        "chrF": 59,
+        "chrF": 60,
         "reference": ["Void's AI или Claude Code переводит то, что появилось нового."],
-        "got": ["Void's AI или Claude Code переводят всё новое."]
+        "got": ["Void's AI или Claude Code переводит новые данные."]
       },
       {
         "text": "Each language's catalog is in i18n/translations.",
@@ -5062,17 +5057,16 @@
         "text": "{name} booked a seat.",
         "hash": "Oeto9jViL+xxuaYfiMdwwg==",
         "cache": "round 1",
-        "verdict": "wrong",
-        "why": "the male line says \"забронировал(а)\", though he is known to be male",
+        "verdict": "right",
         "meaning": 90,
-        "chrF": 82,
+        "chrF": 87,
         "reference": [
           "{name} забронировал место.",
           "{name} забронировала место.",
           "{name}: место забронировано."
         ],
         "got": [
-          "{name} забронировал(а) место.",
+          "{name} забронировал место.",
           "{name} забронировала место.",
           "{name} забронировал(а) место."
         ]
@@ -5112,22 +5106,23 @@
         "hash": "AHgdPbajKOCj4zXFKNEbbg==",
         "cache": "round 0",
         "verdict": "right",
-        "meaning": 90,
-        "chrF": 100,
+        "meaning": 93,
+        "chrF": 90,
         "reference": [
           "{name} забронировал(а) место, и {name} получил(а) билет по электронной почте."
         ],
-        "got": ["{name} забронировал(а) место, и {name} получил(а) билет по электронной почте."]
+        "got": ["{name} забронировал(а), и {name} получил(а) билет по электронной почте."]
       },
       {
         "text": "You're booked.",
         "hash": "iQJF/J4mB7QMxMxmCJJLOw==",
-        "cache": "round 0",
-        "verdict": "right",
+        "cache": "round 1",
+        "verdict": "wrong",
+        "why": "the third line says \"забронировали(а)\", which isn't a Russian form",
         "meaning": 85,
         "chrF": 20,
         "reference": ["Вы записаны.", "Вы записаны.", "Вы записаны."],
-        "got": ["Вы забронировали место.", "Вы забронировали место.", "Вы забронировали место."]
+        "got": ["Вы забронировали место.", "Вы забронировали место.", "Вы забронировали(а) место."]
       },
       {
         "text": "{who} booked {seats} seats.",
@@ -5136,7 +5131,7 @@
         "verdict": "wrong",
         "why": "the one-seat lines say \"места\" (1 места), and the male lines \"забронировал(а)\"",
         "meaning": 94,
-        "chrF": 93,
+        "chrF": 95,
         "reference": [
           "{who} забронировал {seats} место.",
           "{who} забронировал {seats} места.",
@@ -5155,15 +5150,15 @@
           "{who} забронировал(а) {seats} места.",
           "{who} забронировал(а) {seats} места.",
           "{who} забронировал(а) {seats} мест.",
-          "{who} забронировал(а) {seats} мест.",
+          "{who} забронировал(а) {seats} места.",
           "{who} забронировала {seats} места.",
           "{who} забронировала {seats} места.",
           "{who} забронировала {seats} мест.",
-          "{who} забронировала {seats} мест.",
+          "{who} забронировала {seats} места.",
           "{who} забронировал(а) {seats} места.",
           "{who} забронировал(а) {seats} места.",
           "{who} забронировал(а) {seats} мест.",
-          "{who} забронировал(а) {seats} мест."
+          "{who} забронировал(а) {seats} места."
         ]
       }
     ]
@@ -5251,23 +5246,23 @@
       {
         "text": "The app's AGENTS.md tells your coding agent what to do.",
         "hash": "E3kkP1xBWrE61ZBOek87xg==",
-        "cache": "round 6",
+        "cache": "round 7",
         "verdict": "wrong",
-        "why": "Leaves \"coding agent\" in English.",
+        "why": "leaves \"coding agent\" in English",
         "meaning": 96,
-        "chrF": 54,
+        "chrF": 60,
         "reference": ["AGENTS.md ของแอปบอกเอเจนต์เขียนโค้ดของคุณว่าต้องทำอะไร"],
-        "got": ["AGENTS.md ของแอปจะบอกให้ coding agent ของคุณรู้ว่าต้องทำอะไร"]
+        "got": ["AGENTS.md ของแอปจะบอก coding agent ของคุณว่าต้องทำอะไร"]
       },
       {
         "text": "Void's AI or Claude Code translates what's new.",
         "hash": "XheCGRJ31SRnsGZhKLgJRA==",
         "cache": "round 4",
         "verdict": "right",
-        "meaning": 93,
-        "chrF": 68,
+        "meaning": 94,
+        "chrF": 75,
         "reference": ["Void's AI หรือ Claude Code แปลสิ่งที่ใหม่"],
-        "got": ["Void's AI หรือ Claude Code จะแปลส่วนที่เป็นของใหม่"]
+        "got": ["Void's AI หรือ Claude Code แปลส่วนที่เป็นของใหม่"]
       },
       {
         "text": "Each language's catalog is in i18n/translations.",
@@ -7220,8 +7215,8 @@
   "vi-VN": {
     "date": "2026-11-15",
     "model": "@cf/google/gemma-4-26b-a4b-it",
-    "right": 19,
-    "wrong": 4,
+    "right": 21,
+    "wrong": 2,
     "unreviewed": [],
     "meaning": 86,
     "chrF": 92,
@@ -7251,21 +7246,21 @@
         "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
         "cache": "round 0",
         "verdict": "right",
-        "meaning": 89,
-        "chrF": 95,
+        "meaning": 91,
+        "chrF": 100,
         "reference": ["Xin chào {name}, vé của bạn được đính kèm."],
-        "got": ["Xin chào {name}, vé của bạn được đính kèm ở đây."]
+        "got": ["Xin chào {name}, vé của bạn được đính kèm."]
       },
       {
         "text": "{translated} of {total} strings translated",
         "hash": "0/yUVSiGyC2JT0/i90uO0A==",
-        "cache": "round 1",
+        "cache": "round 2",
         "verdict": "wrong",
         "why": "capitalises \"Chuỗi\" mid-sentence",
-        "meaning": 83,
-        "chrF": 78,
+        "meaning": 80,
+        "chrF": 89,
         "reference": ["Đã dịch {translated} trên {total} chuỗi"],
-        "got": ["Đã dịch {translated} trên tổng số {total} Chuỗi"]
+        "got": ["Đã dịch {translated} trên {total} Chuỗi"]
       },
       {
         "text": "{number} seats left",
@@ -7292,21 +7287,20 @@
         "hash": "zMoep4eguZ3OejsIbcWbjg==",
         "cache": "round 0",
         "verdict": "right",
-        "meaning": 97,
-        "chrF": 100,
+        "meaning": 95,
+        "chrF": 58,
         "reference": ["Chạy vp dev để khởi động ứng dụng."],
-        "got": ["Chạy vp dev để khởi động ứng dụng."]
+        "got": ["Chạy vp dev để bắt đầu ứng dụng."]
       },
       {
         "text": "The app's AGENTS.md tells your coding agent what to do.",
         "hash": "E3kkP1xBWrE61ZBOek87xg==",
         "cache": "round 1",
-        "verdict": "wrong",
-        "why": "\"đại lý\" is a sales agent or dealer, not a coding agent",
+        "verdict": "right",
         "meaning": 87,
-        "chrF": 79,
+        "chrF": 76,
         "reference": ["Tệp AGENTS.md của ứng dụng cho trợ lý lập trình của bạn biết cần làm gì."],
-        "got": ["Tệp AGENTS.md của ứng dụng cho đại lý lập trình của bạn biết phải làm gì."]
+        "got": ["Tệp AGENTS.md của ứng dụng cho agent lập trình của bạn biết phải làm gì."]
       },
       {
         "text": "Void's AI or Claude Code translates what's new.",
@@ -7422,12 +7416,11 @@
         "text": "{name} checked their ticket.",
         "hash": "3jFQRFLYFLOxE6C21bq6GA==",
         "cache": "round 1",
-        "verdict": "wrong",
-        "why": "\"vé của họ\" reads as other people's ticket; needs \"của mình\"",
-        "meaning": 95,
-        "chrF": 80,
+        "verdict": "right",
+        "meaning": 94,
+        "chrF": 100,
         "reference": ["{name} đã kiểm tra vé của mình."],
-        "got": ["{name} đã kiểm tra vé của họ."]
+        "got": ["{name} đã kiểm tra vé của mình."]
       },
       {
         "text": "{name} booked, and {name} got the ticket by email.",
@@ -7481,7 +7474,7 @@
     "wrong": 1,
     "unreviewed": [],
     "meaning": 86,
-    "chrF": 84,
+    "chrF": 86,
     "results": [
       {
         "text": "Save",
@@ -7521,7 +7514,7 @@
         "meaning": 82,
         "chrF": 100,
         "reference": ["已翻译 {translated}/{total} 个字符串"],
-        "got": ["已翻译 {translated}/{total} 个字符串"]
+        "got": ["已翻译 {translated} / {total} 个字符串"]
       },
       {
         "text": "{number} seats left",
@@ -7556,22 +7549,23 @@
       {
         "text": "The app's AGENTS.md tells your coding agent what to do.",
         "hash": "E3kkP1xBWrE61ZBOek87xg==",
-        "cache": "round 0",
-        "verdict": "right",
-        "meaning": 89,
-        "chrF": 65,
+        "cache": "round 1",
+        "verdict": "wrong",
+        "why": "leaves \"coding agent\" in English",
+        "meaning": 95,
+        "chrF": 57,
         "reference": ["应用的 AGENTS.md 会告诉你的编程助手该做什么。"],
-        "got": ["应用的 AGENTS.md 会告知你的编程智能体该做什么。"]
+        "got": ["应用的 AGENTS.md 会告知你的 coding agent 该做什么。"]
       },
       {
         "text": "Void's AI or Claude Code translates what's new.",
         "hash": "XheCGRJ31SRnsGZhKLgJRA==",
         "cache": "round 0",
         "verdict": "right",
-        "meaning": 89,
-        "chrF": 88,
+        "meaning": 88,
+        "chrF": 100,
         "reference": ["Void's AI 或 Claude Code 会翻译新增内容。"],
-        "got": ["Void's AI 或 Claude Code 会翻译新内容。"]
+        "got": ["Void's AI 或 Claude Code 会翻译新增内容。"]
       },
       {
         "text": "Each language's catalog is in i18n/translations.",
@@ -7677,22 +7671,21 @@
         "text": "{name} checked their ticket.",
         "hash": "3jFQRFLYFLOxE6C21bq6GA==",
         "cache": "round 2",
-        "verdict": "wrong",
-        "why": "says \"his ticket\" (他的票) where the person's gender isn't known; needs \"自己的\"",
-        "meaning": 87,
-        "chrF": 64,
+        "verdict": "right",
+        "meaning": 86,
+        "chrF": 100,
         "reference": ["{name}查看了自己的票。"],
-        "got": ["{name}查看了他的票。"]
+        "got": ["{name}查看了自己的票。"]
       },
       {
         "text": "{name} booked, and {name} got the ticket by email.",
         "hash": "AHgdPbajKOCj4zXFKNEbbg==",
         "cache": "round 0",
         "verdict": "right",
-        "meaning": 91,
+        "meaning": 90,
         "chrF": 67,
         "reference": ["{name}预订了，{name}通过电子邮件收到了票。"],
-        "got": ["{name}进行了预订，并且{name}通过电子邮件收到了门票。"]
+        "got": ["{name}已预订，并且{name}通过电子邮件收到了门票。"]
       },
       {
         "text": "You're booked.",
