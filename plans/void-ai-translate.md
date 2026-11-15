@@ -1,95 +1,70 @@
-# vp dev translates with Void's AI first
+# void-ai-translate.md: vp dev translates with Void's AI first
 
-The user's decision, 2026-11-15: `vp dev` translates with Void's AI when it can, and with
-Claude Code otherwise. There's no setting: it picks the engine itself.
+The user's decision, 2026-11-15: `vp dev` translates with Void's AI when the app has it, and
+with Claude Code otherwise, with no setting. Built; what follows is how it works now, then what's
+left.
 
-## Which engine
+## How it works
 
-1. **Void's AI**, when the app uses `void/ai`. Void then turns on a remote Workers AI binding in
-   dev, on the Cloudflare account from `void connect` (Void 1.8.0 docs, guide/ai.md, "Local
-   Development"; read 2026-11-15). Usage is billed in neurons on that account (guide/ai.md,
-   "Usage Limits").
-2. **Claude Code** otherwise: the session the dev server runs in, or `claude -p`.
-3. **Neither**: vp dev reports what's left, as it does in tests and CI now.
+- **One translator,** `void-fbtee/ai` (src/ai.ts), on Void's AI in the app's Worker. The example's
+  queue uses it for posted events (`translate`), and `vp dev` uses it for the app's strings and
+  pages (`translateStrings`, `translatePage`) through a route only `vp dev` has
+  (`virtual:void-fbtee/dev`, a token per run). Void connects its AI when the app's own files import
+  `void/ai` (Void 1.8.0 reads the app's files, not its packages); without it, the route answers 503
+  and Claude Code translates.
+- **The model per language,** src/models.ts, each choice with where it comes from: Cloudflare's
+  docs, llmgateway.io's recommendations, or measured by the translator test. All checked against
+  Cloudflare's catalog and its November 2026 deprecation list (2026-11-15).
+- **How a string is sent** (src/translate.ts `translateEntry`, the same for `vp dev` and the test):
+  alone, with the catalog's closest own translations as examples, the app's words for its terms
+  (glossary), the words to keep, the code around it and the skills' translating rules, at
+  temperature 0 with a fixed seed. An answer the judge finds problems in goes back with what was
+  wrong, up to twice; only one with none is kept.
+- **One judge,** src/judge.ts. Problems, which mean an answer is never kept: lines missing, JSON in
+  a line, text left in English, the wrong script (the language's likely script, Intl.Locale
+  maximize), a placeholder, command, file name or path changed. Signals, for the test to rank
+  answers: the meaning score (ai.ts `meaningScores`, Workers AI's multilingual embeddings
+  `@cf/baai/bge-m3`), the score against a reference (test/translator/score.ts, chrF), and a
+  person's verdict (test/translator/verdicts.ts).
+- **What's cached:** only answers that passed, where the app keeps its text: the catalog (an
+  accepted string is never sent again), a translated page with its recorded original, a stored
+  post's translation (event_texts). AI Gateway's cache is off for `vp dev` and on for the
+  translator test, where at temperature 0 a cached answer is the one the model gives anyway, so a
+  rerun costs only what changed; a retry carries what was wrong, so it's a new request.
+  `TRANSLATOR_FRESH=1` turns it off, to see whether Cloudflare changed a model behind its name.
+- **How the cache is controlled,** on the example's own Cloudflare account: `ai.run()`'s third
+  argument is the Workers AI binding's (Void passes it on: runtime/ai.mjs `makeDirectBackend`).
+  `gateway.id` sends a request through AI Gateway, `cacheTtl` turns its cache on, `skipCache` off
+  (Cloudflare's AI Gateway docs, "Workers Bindings", 2026-11-05). Without an `id` a request skips AI
+  Gateway, so the options do nothing. Proven 2026-11-15 by e2e/translator/cache.test.ts (the raw
+  response's cf-aig-cache-status: HIT with the cache on, MISS off) and the gateway's own logs. The
+  account's "default" gateway (made 2026-09-25) has its own cache off (`cache_ttl: 0`).
 
-## How
+## The translator test
 
-- Workers AI only runs inside the Worker, so the plugin can't call it from Node. The plan is a
-  dev-only route served by void-fbtee's middleware (only under `vp dev`, never in a build),
-  for example `POST /__void-fbtee/translate`. It takes one catalog entry or page and returns
-  the translation from `ai.run`. The plugin posts what's new to its own dev server and writes
-  the answers.
-- The same rules as the skill: the entry's description, placeholders kept exactly, one line per
-  plural form, markdown pages with their parts kept (`keptParts`, `missingHead`). After that,
-  the same check runs, and a wrong answer is reported, not shipped: `vp build` still fails.
-- The model: open. The app's own queue uses `@cf/meta/llama-3.3-70b-instruct-fp8-fast`, and
-  guide/ai.md also lists Gateway models (`google/gemini-2.5-flash`, `openai/gpt-4.1-mini`).
-  Pick the one that passes the example's catalogs and pages (Arabic plurals, Thai) in a trial.
+`vp run test:translator` (e2e/translator/, on the example's dev server). The data is in the
+package: test/translator/strings.ts (English strings, each testing one thing a translation can get
+wrong), references.ts (each string in 12 languages, written by Claude Code, not yet reviewed by
+native speakers), verdicts.ts (what a person decided about an answer).
+test/unit/translator-data.test.ts checks the data on every `vp test`: every language has every
+string, the right plural forms, references that pass the judge, and a model.
 
-## One translator, used in every place Void runs app code
+Each string is sent as `vp dev` sends it, with the language's other strings as examples. An answer
+with problems, or one a person marked wrong, fails the test; one marked right passes; the rest are
+listed as unreviewed, lowest signals first, for a person to read. Every result goes to
+test/translator/scores.json, committed: the git diff is what changed. A change to the prompt, the
+judge or a model is kept only if no language gets more wrong answers or lower signals.
 
-Found 2026-11-13 (plans/quiet-harbor-atlas.md, step 7b): Void's AI is there wherever Void runs the
-app's code. That's dev, the preview and Cloudflare, in a route, a queue or a job, always through
-the same `ai` from `void/ai`. So there's one translator, not two:
+## Still to do
 
-- `translate(text, { from, to })` moves into the package. It's plans/primitives.md item 6, now
-  built first, here. It's the model and prompt queues/translate.ts measured, extended for
-  catalog entries: the description, placeholders, plural forms.
-- The example's queue (posted events, at runtime) calls it, and so does the dev route
-  (catalogs and pages, under `vp dev`). Both use one model and one measure.
-
-## Proven already
-
-Void's AI answers during `vp dev` in a Claude cloud session, with the keyring sign-in and no
-API key: e2e/dev/events.test.ts ("a new post is translated by Workers AI, live") passed on
-2026-11-15. It posts an event, and queues/translate.ts translates it with `ai.run` in the dev
-server's Worker.
-
-## Decided (2026-11-15)
-
-- **The signal is "the app uses `void/ai`".** That's what makes Void connect dev to
-  Cloudflare, so an app without AI never needs a Cloudflare sign-in just to run `vp dev`.
-- **The route exists only under `vp dev`.** The plugin adds it only when it serves, never in a
-  build, and it answers only requests that carry a token the plugin made at start.
-- **The model is picked by measurement**, as queues/translate.ts's was (2026-11-13). Start from
-  its model, Llama 3.3 70B. Run it on the example's catalogs and pages, with the Claude-written
-  translations as the reference. A model that breaks a placeholder, a plural form or a page's
-  kept parts fails, whatever its score.
-- **The docs follow in the same change:** the skill, the READMEs, the Translating page and the
-  home page then say "vp dev translates, with Void's AI or Claude Code".
-
-## Found while building it (2026-11-15), to follow up
-
-- Stopping the dev server with `fuser -k 5173/tcp` leaves its workerd processes running: 46 had
-  piled up, holding about 5 GB, and `vp check` was killed for lack of memory. Stop the whole
-  process group instead (what e2e/dev/setup.ts does for a server it started), and say so in the
-  README's "Testing".
-- Arabic with Llama 3.3 (test/translator/scores.json, chrF 65): an English word left in a line,
-  "coding agent" as "terminal", the zero form of a count written as "{number} seats". Next cycle:
-  try the models Cloudflare recommends for Arabic and for frontier quality (models.ts), on the
-  test strings.
-- The test strings' references are Claude Code's, not reviewed by a native speaker.
-- The translator test runs through the example's dev server (e2e/translator/). Move it into the
-  package with an app of its own (packages/void-fbtee/test/translator/app/: voidFbtee() and one
-  file importing void/ai), started and stopped by the test (its whole process group), run as
-  `vp run void-fbtee#test:translator`. Later, the user's call (2026-11-15).
-- The test strings are all English source. An app written in another language (the Thai-source
-  fresh app) is never tested: add source strings in another language, with references.
-
-## Decided: what's cached (2026-11-15)
-
-Only answers that passed the checks are kept, where the app keeps its text: the catalog (vp dev
-never sends an accepted string again), a translated page with its recorded original, a stored
-post's translation (event_texts). AI Gateway's cache is never used for translating: the loop asks
-again when an answer is wrong, and a cached wrong first answer would come back every time.
-
-How it's controlled, on the example's own Cloudflare account: `ai.run()`'s third argument is the
-Workers AI binding's own (Void passes it on: runtime/ai.mjs makeDirectBackend). `gateway.id` sends
-a request through AI Gateway, `cacheTtl` turns its cache on, `skipCache` off (Cloudflare's AI
-Gateway docs, "Workers Bindings", 2026-11-05). Without an `id` a request skips AI Gateway, so the
-options do nothing: that was the first, wrong version of the cache test. Proven 2026-11-15 by
-e2e/translator/cache.test.ts (the raw response's cf-aig-cache-status: HIT twice with the cache on,
-MISS with it off) and the gateway's own logs (`cached: true`, then `false`). The account's
-"default" gateway exists (made 2026-09-25) with its cache off unless a request asks
-(`cache_ttl: 0`). Translation requests go through it with `skipCache`, so they're in its logs.
-Temperature 0 and a fixed seed make them give the same answer each time, so test runs compare.
+- Move the translator test into the package with an app of its own
+  (packages/void-fbtee/test/translator/app/: voidFbtee() and one file importing void/ai), started
+  and stopped by the test (its whole process group), run as `vp run void-fbtee#test:translator`.
+  Later, the user's call (2026-11-15).
+- Source strings in another language than English (the Thai-source fresh app is never tested).
+- `vp dev` doesn't act on the meaning score yet: what's low enough to ask again is for the test's
+  numbers to show.
+- Stopping the dev server with `fuser -k 5173/tcp` leaves its workerd processes running (46 had
+  piled up, about 5 GB, 2026-11-15). Stop the whole process group, as e2e/dev/setup.ts does for a
+  server it started, and say so in the README's "Testing".
+- Native speakers to review the references and verdicts.

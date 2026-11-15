@@ -1,10 +1,11 @@
 // The translator test's own data, before anything is sent to Void's AI (e2e/translator/): every
 // language has a reference for every test string, a count one line per plural form the language
-// uses, and each reference passes the checks the answers must pass (translate.ts problemsWith);
+// uses, and each reference passes the checks the answers must pass (judge.ts problemsWith, in
+// its script);
 // and every language has a model (models.ts).
 import { expect, test } from "vite-plus/test";
 import { CHOICES, modelFor } from "../../src/models";
-import { problemsWith } from "../../src/translate";
+import { problemsWith } from "../../src/judge";
 import { REFERENCES } from "../translator/references";
 import { formsFor, STRINGS } from "../translator/strings";
 
@@ -14,7 +15,7 @@ for (const [locale, refs] of Object.entries(REFERENCES)) {
     for (const s of STRINGS) {
       const lines = s.plural ? formsFor(locale, s.lines[0]!.text) : s.lines;
       const source = lines.map((l) => ({ translation: l.text, variations: l.variations }));
-      expect(problemsWith(source, refs[s.name]!), `${locale} ${s.name}`).toEqual([]);
+      expect(problemsWith(source, refs[s.name]!, locale), `${locale} ${s.name}`).toEqual([]);
     }
   });
 

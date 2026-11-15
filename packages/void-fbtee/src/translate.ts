@@ -18,6 +18,7 @@ import {
   type MarkdownPage,
 } from "./check";
 import { sourceOf } from "./locales";
+import { glossaryMisses, keptTerms, problemsWith } from "./judge";
 import { check } from "./check";
 
 /** void-fbtee's own folder (dist/ is one level down), where skills/ ships. */
@@ -266,78 +267,6 @@ interface CatalogEntry {
   translations?: CatalogLine[];
 }
 
-/** The {placeholders} in a line. */
-const placeholders = (text: string) => new Set(text.match(/\{[^{}]+\}/g) ?? []);
-/** Forms that may say the number in words (zero, one, two), so may leave {number} out. */
-const WORDED = new Set([16, 4, 8]);
-
-/**
- * What a translation keeps exactly as the source writes it: commands (`vp dev`), file names
- * (`AGENTS.md`), paths (`i18n/translations`) and lower-case names with a hyphen (`void-fbtee`).
- */
-export function keptTerms(text: string): string[] {
-  return (
-    text.match(
-      /\bvp [a-z]+\b|[\w-]+\.(?:md|mdx|ts|tsx|js|json|ya?ml)\b|\b[\w.-]+(?:\/[\w.-]+)+|\b[a-z0-9]+(?:-[a-z0-9]+)+\b/g,
-    ) ?? []
-  ).map((t) => t.replace(/[.-]+$/, "")); // a sentence's own full stop isn't part of a path
-}
-
-/**
- * Whether a translated entry is usable, by the skill's rules: one line per source line, none
- * empty; no line left in the source language (a line of three words or more, unchanged); every
- * command, file name and path kept (keptTerms); and its placeholders kept: no line has one the
- * source hasn't, and every line but a zero, one or two form has them all.
- */
-export function keepsPlaceholders(source: CatalogLine[], lines: string[]): boolean {
-  return problemsWith(source, lines).length === 0;
-}
-
-/** What's wrong with a translated entry, in words Void's AI is told when it's asked again. */
-export function problemsWith(source: CatalogLine[], lines: string[]): string[] {
-  if (lines.length !== source.length)
-    return [`Give exactly ${source.length} line(s), one per source line, in order.`];
-  const problems: string[] = [];
-  const words = (t: string) => t.trim().split(/\s+/).length;
-  const all = new Set(source.flatMap((l) => [...placeholders(l.translation)]));
-  lines.forEach((line, i) => {
-    const src = source[i]!.translation;
-    if (!line.trim()) problems.push(`Line ${i + 1} is empty.`);
-    // Pieces of the request's JSON in the line (Llama's Arabic plural once read
-    // `form": "zero", "target": "…"`, 2026-11-15).
-    if (/"\s*:\s*"|\b(?:form|source|target|lines|id)"\s*:/.test(line))
-      problems.push(`Line ${i + 1} has JSON in it: give only the translated sentence.`);
-    else if (line.trim() === src.trim() && words(line) >= 3)
-      problems.push(`Line ${i + 1} is still the source text: translate it.`);
-    for (const t of keptTerms(src))
-      if (!line.includes(t)) problems.push(`Line ${i + 1} must keep "${t}" exactly as written.`);
-    const has = placeholders(line);
-    for (const x of has)
-      if (!all.has(x)) problems.push(`Line ${i + 1} has ${x}, which the source hasn't: remove it.`);
-    const worded = Object.values(source[i]!.variations).some((v) => WORDED.has(v));
-    if (!worded)
-      for (const x of all)
-        if (!has.has(x)) problems.push(`Line ${i + 1} must keep the placeholder ${x} exactly.`);
-  });
-  return problems;
-}
-
-/** A glossary word's stem: Arabic's article (ال) and the prefixes before it don't count. */
-const stem = (w: string) => w.replace(/^(?:[وفبلك]?ال)/, "");
-
-/**
- * The glossary's words the translation doesn't use, in words for Void's AI: a term the entry's
- * source uses ("strings") should be written as the app writes it ("ข้อความ").
- */
-export function glossaryMisses(
-  glossary: { source: string; translation: string }[],
-  lines: string[],
-): string[] {
-  const text = lines.join(" ");
-  return glossary
-    .filter((g) => !g.translation.split(/\s+/).every((w) => text.includes(stem(w))))
-    .map((g) => `The app writes "${g.source}" as "${g.translation}": use that word, not another.`);
-}
 /**
  * The rules Claude Code translates by, for Void's AI too: fbtee's own translating skill (steps 3
  * to 5: match the catalog, read the description and the code, keep placeholders, the plural and
@@ -464,9 +393,9 @@ export type TranslateCall = (body: unknown) => Promise<Record<string, unknown> |
 
 /**
  * One string through Void's AI, as `vp dev` translates it: sent, checked (problemsWith), and asked
- * again with what was wrong, up to twice. Every check's problem must be gone; a glossary word not
- * used is asked about too, and accepted on the last answer. The test strings go through the same
- * (e2e/translator/). Undefined when Void's AI isn't there.
+ * again with what was wrong, up to twice (judge.ts: problemsWith, glossaryMisses). Every problem must
+ * be gone; a glossary word not used is asked about too, and accepted on the last answer. The test
+ * strings go through the same (e2e/translator/). Undefined when Void's AI isn't there.
  */
 export async function translateEntry(
   call: TranslateCall,
@@ -484,6 +413,8 @@ export async function translateEntry(
     guide?: string;
     /** Another model than the language's own (models.ts), for trying one (e2e/translator/). */
     model?: string;
+    /** AI Gateway's cache on: the translator test (ai.ts ask). */
+    cache?: boolean;
   },
 ): Promise<{ lines: string[]; problems: string[]; attempts: number } | undefined> {
   const source = o.entry.lines.map((l) => ({ translation: l.text, variations: l.variations }));
@@ -501,17 +432,18 @@ export async function translateEntry(
       glossary,
       guide: o.guide,
       model: o.model,
+      cache: o.cache,
       feedback: feedback.length ? { answer: out, problems: feedback } : undefined,
     });
     attempts++;
     if (!answer) return;
     out = ((answer.lines ?? []) as string[][])[0] ?? [];
-    const hard = problemsWith(source, out);
+    const hard = problemsWith(source, out, o.to);
     const soft = glossaryMisses(glossary, out);
     feedback = [...hard, ...soft];
     if (!hard.length && (!soft.length || attempts === 3)) break;
   }
-  return { lines: out, problems: problemsWith(source, out), attempts };
+  return { lines: out, problems: problemsWith(source, out, o.to), attempts };
 }
 
 /**
@@ -589,7 +521,7 @@ export async function translateWithVoidAi(
       if (!answer) return false;
       const out = answer.lines;
       const entry = batch[0]!;
-      if (!problemsWith(entry.translations!, out).length) {
+      if (!problemsWith(entry.translations!, out, m.locale).length) {
         entry.translations = entry.translations!.map((l, k) => ({ ...l, translation: out[k]! }));
         entry.status = "translated";
         done++;

@@ -66,9 +66,6 @@ export default defineConfig({
       "test:production": { command: "vpx scripts/production.ts", cache: false },
       // void-fbtee installed into fresh `void init` apps, as a user's app installs it.
       "test:fresh": { command: "vpx e2e/fresh/check.ts", cache: false },
-      // How well Void's AI translates the example's strings, by model, with the example's
-      // `vp dev` running: `vp run measure:translator <model,model>` (scripts/translator.ts).
-      "measure:translator": { command: "vpx scripts/translator.ts", cache: false },
       // Vite+'s, Void's and void-fbtee's setup commands, run again: fails if any changes a file.
       "check:tools": { command: "node scripts/check-tools.mjs", cache: false },
       // In a Claude cloud session: the dev server (vp run dev) on a public https address through

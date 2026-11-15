@@ -27,6 +27,7 @@ async function ask<T>(
   user: string,
   schema: object,
   model: TranslationModel = LLAMA,
+  cache = false,
 ): Promise<T> {
   const result = await ai.run(
     model.id as never,
@@ -50,12 +51,16 @@ async function ask<T>(
       seed: 1,
     } as never,
     // Through the account's AI Gateway ("default", Cloudflare's own, made on a first request), so
-    // every translation request is in the gateway's logs, and never from its cache: the loop asks
-    // again when an answer is wrong, and a cached wrong first answer would come back every time.
-    // What's kept is what passed the checks, in the catalog. The binding's third argument, which
-    // Void passes on (AI Gateway docs, "Workers Bindings"; Void's runtime/ai.mjs makeDirectBackend);
-    // proven both ways by e2e/translator/cache.test.ts and the gateway's logs (2026-11-15).
-    { gateway: { id: "default", skipCache: true } } as never,
+    // every request is in the gateway's logs. Its cache is off for vp dev: a string is asked for
+    // once, and its accepted answer is kept in the catalog. The translator test turns it on
+    // (`cache`): at temperature 0 a cached answer is the one the model would give anyway, so a
+    // rerun costs only the requests that changed, and a retry, which carries what was wrong, is a
+    // new request, never cached. The binding's third argument, which Void passes on (AI Gateway
+    // docs, "Workers Bindings"; Void's runtime/ai.mjs makeDirectBackend); proven both ways by
+    // e2e/translator/cache.test.ts and the gateway's logs (2026-11-15).
+    {
+      gateway: { id: "default", ...(cache ? { cacheTtl: 7 * 86400 } : { skipCache: true }) },
+    } as never,
   );
   const r = result as { response?: unknown; choices?: { message?: { content?: unknown } }[] };
   const answer = r.response ?? r.choices?.[0]?.message?.content;
@@ -132,6 +137,7 @@ export async function translateStrings(
     guide,
     feedback,
     model,
+    cache,
   }: {
     from: string;
     to: string;
@@ -141,6 +147,8 @@ export async function translateStrings(
     /** The last answer and what was wrong with it, when it's asked again. */
     feedback?: { answer: string[]; problems: string[] };
     model?: string;
+    /** AI Gateway's cache on (the translator test). */
+    cache?: boolean;
   },
 ): Promise<string[][]> {
   const items = entries.map((e, i) => ({
@@ -196,6 +204,7 @@ export async function translateStrings(
       required: ["entries"],
     },
     model ? modelById(model) : modelFor(to),
+    cache,
   );
   // A model without JSON Mode may give a line as an object ({ "form": "other", "target": "…" }):
   // its translation, not its first field (SEA-LION's Thai once read "other", 2026-11-15).
@@ -248,12 +257,46 @@ export type DevRequest =
       glossary?: { source: string; translation: string }[];
       guide?: string;
       feedback?: { answer: string[]; problems: string[] };
+      cache?: boolean;
       /** The measurement only (scripts/translator.ts): another model to try. */
       model?: string;
     }
   | { kind: "page"; from: string; to: string; text: string }
+  /** The meaning score (judge.ts): each pair is a source and its translation. */
+  | { kind: "meaning"; pairs: [string, string][] }
   /** The cache test only (e2e/translator/cache.test.ts). */
   | { kind: "cache-probe"; cache: "on" | "off" };
+
+/** Workers AI's multilingual embeddings model: Cloudflare, "100+ languages" (changelog 2025-03-17). */
+export const MEANING_MODEL = "@cf/baai/bge-m3";
+
+/**
+ * How close each translation's meaning is to its source's, 0 to 1: the cosine of their
+ * embeddings from one multilingual model, which puts a sentence and its translation near each
+ * other. A signal for the judge (judge.ts), not a verdict: it misses a single wrong word in a long
+ * sentence, and catches a translation that says something else.
+ */
+export async function meaningScores(pairs: [string, string][]): Promise<number[]> {
+  if (!pairs.length) return [];
+  const result = (await ai.run(
+    MEANING_MODEL as never,
+    { text: pairs.flat() } as never,
+    { gateway: { id: "default", cacheTtl: 7 * 86400 } } as never,
+  )) as { data?: number[][] };
+  const v = result.data ?? [];
+  const cos = (a: number[], b: number[]) => {
+    let dot = 0,
+      na = 0,
+      nb = 0;
+    for (let i = 0; i < a.length; i++) {
+      dot += a[i]! * b[i]!;
+      na += a[i]! * a[i]!;
+      nb += b[i]! * b[i]!;
+    }
+    return na && nb ? dot / Math.sqrt(na * nb) : 0;
+  };
+  return pairs.map((_, i) => cos(v[2 * i] ?? [], v[2 * i + 1] ?? []));
+}
 
 /**
  * One request that comes out differently each time the model answers it (a high temperature, no
@@ -308,7 +351,9 @@ export async function devTranslate(request: Request, token: string): Promise<Res
         ? { lines: await translateStrings(body.entries, body) }
         : body.kind === "page"
           ? { page: await translatePage(body.text, body) }
-          : await cacheProbe(body.cache);
+          : body.kind === "meaning"
+            ? { scores: await meaningScores(body.pairs) }
+            : await cacheProbe(body.cache);
     return Response.json(result);
   } catch (error) {
     // 503: no Void's AI here (Void's own message, "ai: Not available…"); 502: it answered
