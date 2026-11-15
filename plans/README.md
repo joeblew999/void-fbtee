@@ -11,11 +11,13 @@ what it changes; this list is the only place that says when.
 3. `language-picker.md`: one control for choosing among a hundred languages, the visitor's own
    first, in the package; the header's row of language links goes. Built before the upgrade, so
    its tests run on 1.9.1 there.
-4. `void-1.9.md`: Void 1.8.0 to 1.9.1. pnpm installs a release only once it's 24 hours old, so not
+4. `void-ai-translate.md`: vp dev translates with Void's AI when the app uses it, else Claude
+   Code (the user's choice, 2026-11-15). Open questions first.
+5. `void-1.9.md`: Void 1.8.0 to 1.9.1. pnpm installs a release only once it's 24 hours old, so not
    before 2026-11-15 03:27 UTC (1.9.1 was published 2026-11-14 03:27 UTC).
-5. `primitives.md`: void-fbtee's missing primitives, moved out of the example into the package.
-6. `use-cases.md`: one event, many people, as data, built on the primitives.
-7. `video-conferencing.md`: `void-moq`, built on all of the above.
+6. `primitives.md`: void-fbtee's missing primitives, moved out of the example into the package.
+7. `use-cases.md`: one event, many people, as data, built on the primitives.
+8. `video-conferencing.md`: `void-moq`, built on all of the above.
 
 Waiting on others, not in the order:
 
