@@ -78,14 +78,18 @@ server's Worker.
 
 ## Decided: what's cached (2026-11-15)
 
-Only answers that passed the checks are kept, and they're kept where the app keeps its text: the
-catalog (vp dev never sends an accepted string again), a translated page with its recorded
-original, a stored post's translation (event_texts). AI Gateway's cache is never used for
-translating (ai.ts: `skipCache`): the loop asks again when an answer is wrong, and a cached wrong
-first answer would come back every time. Temperature 0 and a fixed seed make the same request give
-the same answer, so test runs compare without a cache.
-Checked 2026-11-15 (e2e/translator/cache.test.ts, `vp test run --project translator
-e2e/translator/cache.test.ts --silent=false`): with the cache allowed, the same request at a high
-temperature gave two different answers, twice, so AI Gateway isn't caching Void's AI requests in
-dev on a direct Cloudflare account. `skipCache` stays: a team platform or a gateway with caching
-turned on would cache, and then it matters.
+Only answers that passed the checks are kept, where the app keeps its text: the catalog (vp dev
+never sends an accepted string again), a translated page with its recorded original, a stored
+post's translation (event_texts). AI Gateway's cache is never used for translating: the loop asks
+again when an answer is wrong, and a cached wrong first answer would come back every time.
+
+How it's controlled, on the example's own Cloudflare account: `ai.run()`'s third argument is the
+Workers AI binding's own (Void passes it on: runtime/ai.mjs makeDirectBackend). `gateway.id` sends
+a request through AI Gateway, `cacheTtl` turns its cache on, `skipCache` off (Cloudflare's AI
+Gateway docs, "Workers Bindings", 2026-11-05). Without an `id` a request skips AI Gateway, so the
+options do nothing: that was the first, wrong version of the cache test. Proven 2026-11-15 by
+e2e/translator/cache.test.ts (the raw response's cf-aig-cache-status: HIT twice with the cache on,
+MISS with it off) and the gateway's own logs (`cached: true`, then `false`). The account's
+"default" gateway exists (made 2026-09-25) with its cache off unless a request asks
+(`cache_ttl: 0`). Translation requests go through it with `skipCache`, so they're in its logs.
+Temperature 0 and a fixed seed make them give the same answer each time, so test runs compare.

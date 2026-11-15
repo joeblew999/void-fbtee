@@ -49,15 +49,13 @@ async function ask<T>(
       temperature: 0,
       seed: 1,
     } as never,
-    // Void sends Workers AI through AI Gateway (guide/ai.md, "Cloudflare Gateway Models"), which
-    // can answer a request it has seen from its cache. Never for a translation: the loop sends a
-    // string, checks the answer and asks again with what was wrong, so a cached wrong first answer
-    // would come back every time the string is sent, pinned. What's cached is what passed: the
-    // catalog (vp dev writes an accepted string to it and never sends it again), a page with its
-    // recorded original, a stored post's translation. Temperature 0 and the seed still give the
-    // same request the same answer, so runs compare. In dev on a direct Cloudflare account the
-    // gateway didn't cache at all (e2e/translator/cache.test.ts, 2026-11-15); a team platform may.
-    { gateway: { skipCache: true } } as never,
+    // Through the account's AI Gateway ("default", Cloudflare's own, made on a first request), so
+    // every translation request is in the gateway's logs, and never from its cache: the loop asks
+    // again when an answer is wrong, and a cached wrong first answer would come back every time.
+    // What's kept is what passed the checks, in the catalog. The binding's third argument, which
+    // Void passes on (AI Gateway docs, "Workers Bindings"; Void's runtime/ai.mjs makeDirectBackend);
+    // proven both ways by e2e/translator/cache.test.ts and the gateway's logs (2026-11-15).
+    { gateway: { id: "default", skipCache: true } } as never,
   );
   const r = result as { response?: unknown; choices?: { message?: { content?: unknown } }[] };
   const answer = r.response ?? r.choices?.[0]?.message?.content;
@@ -254,27 +252,44 @@ export type DevRequest =
       model?: string;
     }
   | { kind: "page"; from: string; to: string; text: string }
-  /** The cache test only (e2e/translator/cache.test.ts): one request, cache allowed or not. */
-  | { kind: "cache-probe"; skipCache: boolean };
+  /** The cache test only (e2e/translator/cache.test.ts). */
+  | { kind: "cache-probe"; cache: "on" | "off" };
 
 /**
  * One request that comes out differently each time the model answers it (a high temperature, no
- * seed), with AI Gateway's cache allowed or skipped: two answers word for word the same came from
- * the cache. For the cache test, not for translating.
+ * seed), through AI Gateway's default gateway with its cache on (`cacheTtl`, seconds) or off
+ * (`skipCache`). Cloudflare: the `id` is what sends a binding request through AI Gateway; "default"
+ * is created on the first authenticated request (AI Gateway, "Workers Bindings", 2026-11-05). Two
+ * answers word for word the same came from the cache. For the cache test, not for translating.
  */
-async function cacheProbe(skipCache: boolean): Promise<string> {
-  const result = await ai.run(
+async function cacheProbe(
+  cache: "on" | "off",
+): Promise<{ answer: string; headers: Record<string, string> }> {
+  // The raw response (Void's direct backend returns it with `returnRawResponse`), for AI Gateway's
+  // own headers: cf-aig-cache-status says HIT or MISS, cf-aig-log-id that the gateway saw it.
+  const res = (await ai.run(
     LLAMA.id as never,
     {
       messages: [{ role: "user", content: "Write one short sentence about the sea." }],
       max_tokens: 64,
       temperature: 1.5,
     } as never,
-    (skipCache ? { gateway: { skipCache: true } } : undefined) as never,
+    {
+      gateway:
+        cache === "on" ? { id: "default", cacheTtl: 300 } : { id: "default", skipCache: true },
+      returnRawResponse: true,
+    } as never,
+  )) as unknown as Response;
+  const headers = Object.fromEntries(
+    [...res.headers].filter(([k]) => k.startsWith("cf-aig") || k === "content-type"),
   );
-  const r = result as { response?: unknown; choices?: { message?: { content?: unknown } }[] };
-  const answer = r.response ?? r.choices?.[0]?.message?.content;
-  return typeof answer === "string" ? answer : JSON.stringify(answer ?? "");
+  const r = (await res.json()) as {
+    response?: unknown;
+    result?: { response?: unknown };
+    choices?: { message?: { content?: unknown } }[];
+  };
+  const answer = r.response ?? r.result?.response ?? r.choices?.[0]?.message?.content;
+  return { answer: typeof answer === "string" ? answer : JSON.stringify(answer ?? ""), headers };
 }
 
 /**
@@ -293,7 +308,7 @@ export async function devTranslate(request: Request, token: string): Promise<Res
         ? { lines: await translateStrings(body.entries, body) }
         : body.kind === "page"
           ? { page: await translatePage(body.text, body) }
-          : { answer: await cacheProbe(body.skipCache) };
+          : await cacheProbe(body.cache);
     return Response.json(result);
   } catch (error) {
     // 503: no Void's AI here (Void's own message, "ai: Not available…"); 502: it answered
