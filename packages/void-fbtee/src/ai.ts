@@ -292,10 +292,11 @@ export const MEANING_MODEL = "@cf/baai/bge-m3";
  */
 export async function meaningScores(pairs: [string, string][]): Promise<number[]> {
   if (!pairs.length) return [];
+  // Through AI Gateway like every request, its cache off, as for translating (ask).
   const result = (await ai.run(
     MEANING_MODEL as never,
     { text: pairs.flat() } as never,
-    { gateway: { id: "default", cacheTtl: 7 * 86400 } } as never,
+    { gateway: { id: "default", skipCache: true } } as never,
   )) as { data?: number[][] };
   const v = result.data ?? [];
   const cos = (a: number[], b: number[]) => {

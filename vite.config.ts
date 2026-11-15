@@ -145,7 +145,8 @@ export default defineConfig({
       e2e("dev", 4),
       e2e("deployed", 5, { oneFileAtATime: false }),
       // Void's AI translating the package's test strings into many languages, on the dev server.
-      e2e("translator", 6, { setup: "dev" }),
+      // Its output is every answer, passed or not: what the run is for.
+      { test: { ...e2e("translator", 6, { setup: "dev" }).test, silent: false } },
     ],
   },
 });

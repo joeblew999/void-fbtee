@@ -21,9 +21,12 @@
     "@cf/qwen/qwen3.8-27b": {
       "jsonMode": false,
       "options": {
-        "reasoning_effort": "low"
+        "reasoning_effort": "low",
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        }
       },
-      "why": "reasoning xhigh by default; low is its lowest (model page, reasoning_effort: low, medium, xhigh, checked 2026-11-15)"
+      "why": "reasoning xhigh by default; low is its lowest (model page, reasoning_effort: low, medium, xhigh, checked 2026-11-15), and still 195 tokens and 27 s a string (AI Gateway's logs, 2026-11-15); enable_thinking false too, Qwen's own chat template switch, to be proven by the logs"
     },
     "@cf/openai/gpt-oss-120b": {
       "jsonMode": false,
