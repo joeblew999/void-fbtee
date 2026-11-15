@@ -52,15 +52,29 @@ and src/models.json, the model per language, which vp dev and the app's own tran
 test/unit/translator-data.test.ts checks the data on every `vp test`: every catalog complete, every
 translation passing the judge in its script, every language with a model.
 
-For each language and string, the test sets that string back to "new" (as fbtee's prepare writes a
-new one), the rest of the catalog staying translated, and runs vp dev's own translateWithVoidAi on
-it: the examples and glossary are the catalog's, as in a real app. The catalog's translation is the
-reference. An answer vp dev wouldn't keep (judge problems it couldn't get fixed), or one a person
-marked wrong, fails the test; one marked right passes; the rest are listed as unreviewed, lowest
-signals first, for a person to read. Every result goes to test/translator/scores.json, committed:
-the git diff is what changed. Each cycle changes either data (a model, a reference, a verdict, a
-string) or code (how a string is sent, the judge); a change is kept only if no language gets more
-wrong answers or lower signals.
+For each language and string, one test sets that string back to "new" (as fbtee's prepare writes
+a new one), the rest of the catalog staying translated, and runs vp dev's own translateWithVoidAi
+on it: the examples and glossary are the catalog's, as in a real app. One string per test, so no
+test waits on more than one (a single test for a language's 21 strings ran past Void's 120 seconds
+with a slower model, 2026-11-15). The catalog's translation is the reference. An answer vp dev
+wouldn't keep, or one judged wrong in verdicts.json, is wrong; one judged right is right; the rest
+are unreviewed, for Claude Code to judge. Every result goes to test/translator/scores.json,
+committed: the git diff is what changed.
+
+Two runs, the same command:
+
+- `TRANSLATOR_PICK=1 vp run test:translator`: every model in models.json on each language. At the
+  end, the one with the most right answers is written into models.json as the language's (source
+  "measured"), unless answers are still unreviewed: they're listed, Claude Code judges them into
+  verdicts.json, and the next pick run makes the pick. Judged answers stay judged, so after the
+  first time it's two runs.
+- `vp run test:translator`: each language with its own model; a wrong answer fails its string.
+
+Each model's own settings are in models.json too (`models`): JSON Mode, and options sent with every
+request that turn its thinking off or to its lowest. A translation needs no thinking, and without
+them GLM 4.7 Flash spent all 8192 tokens thinking and gave no answer, Qwen 31 seconds and Gemma 4
+nine on one string (AI Gateway's logs, 2026-11-15). An answer with no content, or cut off at
+max_tokens, is an unusable answer (ai.ts ask), left for Claude Code.
 
 ## Still to do
 
@@ -75,3 +89,10 @@ wrong answers or lower signals.
   piled up, about 5 GB, 2026-11-15). Stop the whole process group, as e2e/dev/setup.ts does for a
   server it started, and say so in the README's "Testing".
 - Native speakers to review the references and verdicts.
+- The pick run runs languages one after another; each language's catalog is its own file, so they
+  could run at the same time, cutting the first full run from hours to minutes.
+- Test the runtime path the same way: the example's translate queue runs in `vp dev` too (Void's
+  guide/queues.md), so a posted event's translations can be judged with the same verdicts.
+- GLM 4.7 Flash's and gpt-oss-120b's thinking settings aren't on their Cloudflare model pages as
+  read here: the first pick run's AI Gateway logs show whether they took (no `reasoning`, few
+  output tokens).

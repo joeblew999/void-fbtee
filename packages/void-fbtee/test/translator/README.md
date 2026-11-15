@@ -11,7 +11,10 @@ so a change to it shows as a diff beside the scores it produced:
   translated as their English source: they aren't test strings.
 - `verdicts.json`: what a person decided about an answer, by locale, then the entry's hash: each
   answer read (its lines joined by "\n"), right or wrong, why when wrong, who and when.
-- `scores.json`: each run's results, written by the test, never by hand.
+- `scores.json`: each run's results, written by the test, never by hand (a pick run's under
+  "<locale> <model>").
+- The models to pick from, and each language's model, are in `src/models.json`: a pick run
+  (`TRANSLATOR_PICK=1 vp run test:translator`) writes the winner there.
 
 Adding a language: add it to `app/vite.config.ts`, run the data test (`vp test`), which says what
 its catalog lacks, and translate every entry. Adding a string: add it to `app/src/strings.tsx`
