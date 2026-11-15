@@ -126,6 +126,11 @@ dialect in six strings). So it stays; any change to it is measured the same way
    open (Inkling 20 with 2 not answered: timed out). Inkling is paid-only, 20 requests a minute,
    and three times Gemma's price a token ($0.30 and $1.00 a million in and out, against $0.10 and
    $0.30; Workers AI pricing, checked 2026-11-15).
+   Decided 2026-11-15: Gemma 4 stays for every language. Ten more strings right (of 276) isn't
+   worth a second, paid-only model at 20 a minute. What the day cost, from AI Gateway's analytics:
+   $1.55 for 10,459 requests, Inkling $0.51 of it; Inkling gave about 340 output tokens an answer
+   against Gemma's 50, so it may still think with reasoning_effort "none" (not checked: only
+   matters if it's ever chosen).
 4. Paid-only models (DeepSeek V4.1 Flash, Inkling 2 Small) are 20 requests a minute each
    (models.json perMinute). Done: the limit is per model (translate.ts routeCall). Open: a retry
    waits behind every request already queued for its model, so with these models a test can wait
