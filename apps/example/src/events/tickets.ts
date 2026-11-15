@@ -36,7 +36,7 @@ export function ticketPage(ticket: TicketFor): Promise<string> {
       // The booking email's subject: the same words, translated once.
       heading: fbs(
         ["Your seat at ", fbs.param("event", ticket.title)],
-        "Booking email subject: a seat is booked at this event",
+        "Booking email subject: the reader has booked a seat at an event; {event} is the event's title",
       ),
       title: { text: ticket.title, ...langAttrs(ticket.titleLocale) },
       rows: [

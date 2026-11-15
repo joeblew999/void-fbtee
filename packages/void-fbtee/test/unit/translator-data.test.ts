@@ -37,6 +37,7 @@ for (const locale of locales) {
           source,
           e.translations.map((l) => l.translation),
           locale,
+          "en-US",
         ),
         `${locale} ${texts[hash]}`,
       ).toEqual([]);

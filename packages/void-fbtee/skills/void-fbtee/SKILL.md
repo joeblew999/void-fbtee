@@ -72,11 +72,26 @@ remove lines.
 ## Writing strings
 
 When you write or change the app's code, mark every piece of text a person sees as you write it,
-each with a description that tells a translator where it shows and what it means:
-`<fbt desc="Button that saves the event">Save</fbt>`. That's writing the code, not translating:
+each with a description: `<fbt desc="Button that saves the event">Save</fbt>`. That's writing the
+code, not translating:
 `vp dev` collects what's marked and translates it, and nothing marks text for you. Text left
 unmarked is never translated; `vp check` reports it (fbtee's `no-unwrapped-strings`), so fix it
 there. Names that stay as they are (the app's own, a product's) go in that rule's `ignoredWords`.
+
+**The description is all a translator knows** of the text, with the code around it: Void's AI is
+sent it with every string, and so is Claude Code. So it says:
+
+- what's happening and to whom: "Told to the reader right after they book a seat at an event:
+  their seat is confirmed", not "Told to the reader who just booked" (a seat, a table or a job?);
+- which sense a word has, where it has several ("book a seat", "open a page", "post an event");
+- what each placeholder holds, and which is which: "{translated} is how many strings are
+  translated, {total} how many there are"; "{price} is an amount of money, already formatted";
+  "{pages} is the names of the site's pages, joined as an 'or' list". fbtee has no description
+  for a placeholder, so the string's description names them;
+- then where it shows: "Booking form error", "Heading of the events page".
+
+A description is part of the string's key (fbtee hashes the text and its description), so a new
+description makes a new entry: `vp dev` translates it again.
 
 `<fbt>` for text in components; `fbs("…", "…")` wherever a plain string is needed: an attribute
 (`aria-label`, `placeholder`), a title, an email, anything stored or sent. `fbs` returns a string

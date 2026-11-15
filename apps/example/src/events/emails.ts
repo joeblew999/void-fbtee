@@ -118,14 +118,14 @@ export function bookingEmail(
           fbs.param("time", startsAt(booking, locale)),
           ".",
         ],
-        "Booking email: the event, and when it starts on the clock where it happens",
+        "Booking email: the reader has a seat at an event; {event} is the event's title, {time} when it starts on the clock where it happens, already formatted",
       ),
       ...ticket.line,
       fbs("The event's page:", "Booking email: before the link to the event's page"),
     ];
     const subject = fbs(
       ["Your seat at ", fbs.param("event", booking.title)],
-      "Booking email subject: a seat is booked at this event",
+      "Booking email subject: the reader has booked a seat at an event; {event} is the event's title",
     );
     return written(subject, lines, booking.url, booking, locale, dir, ticket.attachments);
   });
@@ -137,7 +137,7 @@ export function linkEmail(post: EventFor & { locale: AppLocale; link: string }):
     const lines = [
       fbs(
         ["You posted ", fbs.param("event", post.title), "."],
-        "Private link email: the event the reader just posted",
+        "Private link email: the reader has just posted an event; {event} is its title",
       ),
       fbs(
         "Keep this email: the link below is the only way to delete your event later. Anyone with it can delete the event, so don't share it.",
@@ -146,7 +146,7 @@ export function linkEmail(post: EventFor & { locale: AppLocale; link: string }):
     ];
     const subject = fbs(
       ["Your private link for ", fbs.param("event", post.title)],
-      "Private link email subject: the link to delete the event the reader posted",
+      "Private link email subject: the private link to delete the event the reader posted; {event} is its title",
     );
     return written(subject, lines, post.link, post, locale, dir);
   });
@@ -172,13 +172,13 @@ export function cancellationEmail(
           fbs.param("time", startsAt(booking, locale)),
           ", has been cancelled by its organiser. Your seat is gone with it.",
         ],
-        "Cancellation email: the event the reader booked, and when it would have started, is cancelled",
+        "Cancellation email: the event the reader had a seat at is cancelled by its organiser; {event} is its title, {time} when it would have started, already formatted",
       ),
       fbs("Other events:", "Cancellation email: before the link to the events list"),
     ];
     const subject = fbs(
       [fbs.param("event", booking.title), " is cancelled"],
-      "Cancellation email subject: the event the reader booked is cancelled",
+      "Cancellation email subject: the event the reader had a seat at is cancelled; {event} is its title",
     );
     const events = booking.origin + routeUrl("/[lang]/events");
     return written(subject, lines, events, booking, locale, dir);
@@ -214,14 +214,14 @@ export function reminderEmail(
           fbs.param("time", startsAt(booking, locale)),
           ".",
         ],
-        "Reminder email: the event the reader booked starts within a day, and when",
+        "Reminder email: the event the reader has a seat at starts within a day; {event} is its title, {time} when it starts, already formatted",
       ),
       ...ticket.line,
       fbs("The event's page:", "Reminder email: before the link to the event's page"),
     ];
     const subject = fbs(
       ["Reminder: ", fbs.param("event", booking.title)],
-      "Reminder email subject: the event the reader booked starts within a day",
+      "Reminder email subject: the event the reader has a seat at starts within a day; {event} is its title",
     );
     const page = booking.origin + routeUrl("/[lang]/events/[id]", { params: { id: booking.id } });
     return written(subject, lines, page, booking, locale, dir, ticket.attachments);

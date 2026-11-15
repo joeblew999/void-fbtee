@@ -86,7 +86,7 @@ export default function TemporalPage({ worker }: Props) {
               total={total}
               none={null}
             >
-              <fbt desc="How many Temporal rows the polyfill on the Worker got the same as Cloudflare's own Temporal">
+              <fbt desc="Temporal page: how many rows the polyfill on the Worker got the same as Cloudflare's own Temporal; {same} is how many are the same, {total} how many rows there are">
                 The polyfill on the Worker:{" "}
                 <fbt:param name="same">{count(worker.polyfill)}</fbt:param> of{" "}
                 <fbt:param name="total" number={total}>
@@ -108,7 +108,7 @@ export default function TemporalPage({ worker }: Props) {
                     </fbt>
                   }
                 >
-                  <fbt desc="How many Temporal rows the browser's own Temporal got the same as the Worker">
+                  <fbt desc="Temporal page: how many rows the browser's own Temporal got the same as the Worker; {same} is how many are the same, {total} how many rows there are">
                     Your browser's own Temporal:{" "}
                     <fbt:param name="same">{count(browser.own)}</fbt:param> of{" "}
                     <fbt:param name="total" number={total}>
@@ -124,7 +124,7 @@ export default function TemporalPage({ worker }: Props) {
                   total={total}
                   none={null}
                 >
-                  <fbt desc="How many Temporal rows the polyfill in the browser got the same as the Worker">
+                  <fbt desc="Temporal page: how many rows the polyfill in the browser got the same as the Worker; {same} is how many are the same, {total} how many rows there are">
                     The polyfill in your browser:{" "}
                     <fbt:param name="same">{count(browser.polyfill)}</fbt:param> of{" "}
                     <fbt:param name="total" number={total}>

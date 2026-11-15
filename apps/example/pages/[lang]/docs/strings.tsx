@@ -18,8 +18,9 @@ function points(): Point[] {
       why: (
         <fbt desc="Strings page point: text in components is written in fbt elements, each with a description for the translator">
           Text in a component is written inside an fbt element, with a description that tells the
-          translator where it shows and what it means. vp dev collects every one, as you save, into
-          each language's catalog, i18n/translations, a file in the app's repository.
+          translator what's happening, what each placeholder holds and where the text shows: all the
+          context a translator gets. vp dev collects every one, as you save, into each language's
+          catalog, i18n/translations, a file in the app's repository.
         </fbt>
       ),
       code: [
@@ -151,7 +152,7 @@ export default function StringsPage() {
                   <bdi dir="ltr">{rules.select(count)}</bdi>
                 </td>
                 <td className="py-2">
-                  <fbt desc="How many nights are booked">
+                  <fbt desc="How many nights of a stay the reader has booked; {number} is the count">
                     You booked{" "}
                     <fbt:plural count={count} many="nights" showCount="yes">
                       night

@@ -78,10 +78,12 @@ function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut:
     return (
       <div className="space-y-3">
         <p className="font-medium" data-testid="booked">
-          <fbt desc="Shown after booking a seat on an event">You're booked. See you there!</fbt>
+          <fbt desc="Shown to the reader right after they book a seat at an event, and it means: you have a seat now, and we'll see you at the event. Short, like the English">
+            You're booked. See you there!
+          </fbt>
         </p>
         <p className="text-sm text-muted-foreground">
-          <fbt desc="Shown after booking: the PDF ticket is emailed, and can be downloaded here">
+          <fbt desc="Shown right after booking a seat: the PDF ticket is on its way by email, or can be downloaded now; {link} is a link whose text is 'download it now'">
             Your ticket is on its way by email, or{" "}
             <fbt:param name="link">
               <a href={`/tickets/${ticket}`} className="underline" data-testid="ticket">
@@ -401,7 +403,7 @@ export default function Event({ event, text, left, deletable }: Props) {
           {event.venue && (
             <p className="flex items-center gap-2 text-muted-foreground" data-testid="event-venue">
               <MapPin aria-hidden className="size-4 shrink-0 text-brand" />
-              <fbt desc="Where an event happens, as its organiser wrote it">
+              <fbt desc="Where an event happens; {venue} is the place, as its organiser wrote it">
                 Where:{" "}
                 <fbt:param name="venue">
                   <bdi {...langAttrs(event.locale)}>{event.venue}</bdi>
@@ -431,7 +433,7 @@ export default function Event({ event, text, left, deletable }: Props) {
                 className="cursor-pointer hover:text-foreground"
                 data-testid="event-translated"
               >
-                <fbt desc="Note under an event: its text was machine-translated from this language">
+                <fbt desc="Note under an event: its text was machine-translated from the language its poster wrote it in; {language} is that language's name">
                   Translated by machine from{" "}
                   <fbt:param name="language">
                     <Formatted>{written!}</Formatted>
@@ -450,7 +452,7 @@ export default function Event({ event, text, left, deletable }: Props) {
           )}
           {!text && event.locale !== locale && (
             <p className="text-muted-foreground text-sm" data-testid="event-written-in">
-              <fbt desc="Note under an event shown as its poster wrote it, in another language">
+              <fbt desc="Note under an event shown as its poster wrote it, in another language; {language} is that language's name">
                 Written in{" "}
                 <fbt:param name="language">
                   <Formatted>{written!}</Formatted>

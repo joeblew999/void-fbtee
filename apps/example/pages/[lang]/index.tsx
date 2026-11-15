@@ -13,7 +13,7 @@ import type { Props } from "./index.server";
 
 /** The code of the plural below (the formatter keeps it on fewer lines there), wrapped to fit a
  * phone's width: what it takes to translate a line. */
-const CODE = `<fbt desc="How many nights are booked">
+const CODE = `<fbt desc="How many nights of a stay the reader has booked; {number} is the count">
   You booked{" "}
   <fbt:plural
     count={count}
@@ -63,7 +63,7 @@ export default defineConfig({
   {
     name: "th-TH.json",
     code: `"d20AdENCUCFEupNI3bkyqg==": {
-  "description": "How many nights are booked",
+  "description": "How many nights of a stay the reader has booked; {number} is the count",
   "status": "translated",
   "translations": [
     { "translation": "คุณจองไว้ {number} คืน" }
@@ -80,7 +80,7 @@ function Slow({ late }: { late: Props["late"] }) {
   const { count } = use(late);
   return (
     <p data-testid="deferred" className="text-muted-foreground">
-      <fbt desc="Text rendered from deferred loader data">
+      <fbt desc="Intl page: text from data that arrives after the page: the nights left in a stay; {number} is the count">
         Deferred:{" "}
         <fbt:plural count={count} many="nights" showCount="yes">
           night
@@ -146,7 +146,7 @@ function CodeWindow({ count, late }: Props) {
         {/* A fixed height: switching language changes the words, never the layout around them. */}
         <div className="min-h-16 space-y-1">
           <p className="text-2xl font-medium" data-testid="plural">
-            <fbt desc="How many nights are booked">
+            <fbt desc="How many nights of a stay the reader has booked; {number} is the count">
               You booked{" "}
               <fbt:plural count={count} many="nights" showCount="yes">
                 night

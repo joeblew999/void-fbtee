@@ -45,7 +45,7 @@ export function SeatsLeft({ left, ...props }: ComponentProps<"span"> & { left: n
   return (
     <Flap value={left} tone={left ? "default" : "out"} {...props}>
       {left ? (
-        <fbt desc="How many seats an event has left">
+        <fbt desc="How many seats at an event are still free to book; {number} is the count">
           <fbt:plural count={left} many="seats left" showCount="yes">
             seat left
           </fbt:plural>

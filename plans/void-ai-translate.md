@@ -184,6 +184,24 @@ when checked), not code:
 Left for Claude Code to fix in the catalog: Hindi's swapped numbers and added words (3 or 4).
 Then one run with Gemma, judged, to measure it.
 
+### Done (2026-11-15)
+
+- Skills: void-fbtee's says what a description must say; the translating skill, to choose words
+  by it.
+- Descriptions: 50 of the example's 349 rewritten (the rest already said what happens), all 23 of
+  the test app's; their entries and verdicts moved to the new keys (fbtee keys an entry by text
+  and description).
+- grammar.json and judge.ts: count lines differ where a noun is counted, no both-genders word on a
+  man's or a woman's line, no capital mid-sentence (not German; Anda keeps its), no English left
+  in another script, Korean particles both ways, Thai's full stop, comma and doubled marks, and a
+  form for more than one number (Russian's one: 1, 21, 31) keeps {number}. vp dev sends a
+  problem back and asks again; vp build reports what needs only the translation. Over every
+  judged answer: 36 of 112 wrong ones caught, none of 462 right ones.
+- Gemma 4 after it: 263 of 276 right (259 before). Gemma often gives the same answer again after a
+  check's problem (Catálogo, String), so the string is left for Claude Code, as designed. Still
+  wrong: "You're booked." in German, Spanish, French, Russian, Vietnamese (the word for booking a
+  person); Hindi's swapped numbers; added words; Arabic's 100 and up.
+
 ## Where it stands (2026-11-15)
 
 Gemma 4 on the full test set (23 strings, every construct), through the real path (prepared(),

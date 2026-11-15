@@ -35,7 +35,7 @@ export function EventTime({ startsAt, className }: { startsAt: string; className
       {reader !== start.timeZoneId && (
         <div className="min-h-5 text-muted-foreground" data-testid="event-yours">
           {reader && (
-            <fbt desc="An event's start time on the reader's own clock">
+            <fbt desc="When an event starts, on the reader's own clock; {time} is that time, already formatted">
               Your time: <fbt:param name="time">{at(reader)}</fbt:param>
             </fbt>
           )}

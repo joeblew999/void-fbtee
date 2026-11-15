@@ -27,11 +27,11 @@ const PRONOUN = {
 function ListInSentence({ or }: { or: boolean }) {
   const items = [fbs.c("Home"), fbs.c("Events"), fbs.c("Docs")];
   return or ? (
-    <fbt desc="Strings page: which of the site's menu pages to open, its words as an 'or' list">
+    <fbt desc="Strings page: a question asking the reader which page to open; {pages} is the names of the site's menu pages, joined as an 'or' list">
       Open <fbt:list conjunction="or" items={items} name="pages" />?
     </fbt>
   ) : (
-    <fbt desc="Strings page: the site's menu, its words as a list inside the sentence">
+    <fbt desc="Strings page: what the site's menu holds; {pages} is the names of its pages, joined as an 'and' list">
       The menu has <fbt:list items={items} name="pages" />.
     </fbt>
   );
@@ -39,7 +39,7 @@ function ListInSentence({ or }: { or: boolean }) {
 
 function Enum({ name, way }: { name: string; way: Way }) {
   return (
-    <fbt desc="Strings page: how someone takes part in an event, chosen from a fixed set">
+    <fbt desc="Strings page: how someone attends an event, in person at the venue or online over the internet, chosen from a fixed set; {name} is the person's name">
       <fbt:param name="name">{name}</fbt:param> takes part{" "}
       <fbt:enum enum-range={{ there: "in person", online: "online" }} value={way} />.
     </fbt>
@@ -48,7 +48,7 @@ function Enum({ name, way }: { name: string; way: Way }) {
 
 function Name({ name, gender }: { name: string; gender: IntlVariations }) {
   return (
-    <fbt desc="Strings page: someone booked a seat, worded by their gender">
+    <fbt desc="Strings page: someone booked a seat at an event, worded by their gender; {name} is their name">
       <fbt:name name="name" gender={gender}>
         {name}
       </fbt:name>{" "}
@@ -59,7 +59,7 @@ function Name({ name, gender }: { name: string; gender: IntlVariations }) {
 
 function Seats({ name, count }: { name: string; count: number }) {
   return (
-    <fbt desc="Strings page: someone booked a number of seats">
+    <fbt desc="Strings page: someone booked seats at an event; {name} is their name, {number} how many seats">
       <fbt:param name="name">{name}</fbt:param> booked{" "}
       <fbt:plural count={count} many="seats" showCount="ifMany">
         a seat
@@ -70,7 +70,7 @@ function Seats({ name, count }: { name: string; count: number }) {
 
 function Pronoun({ name, gender }: { name: string; gender: GenderConst }) {
   return (
-    <fbt desc="Strings page: someone checked their own ticket, with a pronoun by their gender">
+    <fbt desc="Strings page: someone looked over their own ticket for an event, with a pronoun by their gender; {name} is their name">
       <fbt:param name="name">{name}</fbt:param> checked{" "}
       <fbt:pronoun type="possessive" gender={gender} human={true} /> ticket.
     </fbt>
@@ -79,7 +79,7 @@ function Pronoun({ name, gender }: { name: string; gender: GenderConst }) {
 
 function SameParam({ name }: { name: string }) {
   return (
-    <fbt desc="Strings page: the same name twice in one sentence">
+    <fbt desc="Strings page: the same person named twice: they booked a seat at an event, and they got its ticket by email; {name} is their name">
       <fbt:param name="name">{name}</fbt:param> booked, and <fbt:same-param name="name" /> got the
       ticket by email.
     </fbt>
@@ -94,7 +94,10 @@ function SameParam({ name }: { name: string }) {
 function ForTheReader({ gender }: { gender: Gender }) {
   const { fbt } = useFbt();
   return (
-    <fbt desc="Strings page: told to the reader who just booked" subject={NAME_GENDER[gender]}>
+    <fbt
+      desc="Strings page: said to the reader right after they book a seat at an event, and it means: you have a seat now. Short, like the English"
+      subject={NAME_GENDER[gender]}
+    >
       You're booked.
     </fbt>
   );

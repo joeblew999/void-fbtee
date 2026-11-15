@@ -25,106 +25,6 @@
       ],
       "types": []
     },
-    "5jxwLMzaf8YB/FQfN7jMjA==": {
-      "description": "Greeting at the top of an email, with the person's name",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Halo {name}, tiket Anda terlampir.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "0/yUVSiGyC2JT0/i90uO0A==": {
-      "description": "Progress line on the docs page: how many strings are translated",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "{translated} dari {total} string diterjemahkan",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "hk43hC7uwc3/d6Rkg/7KdQ==": {
-      "description": "How many seats are left at an event",
-      "status": "translated",
-      "tokens": [
-        "number"
-      ],
-      "translations": [
-        {
-          "translation": "Tersisa {number} kursi",
-          "variations": {}
-        }
-      ],
-      "types": [
-        28
-      ]
-    },
-    "YPVBS6NNHhGVrCKVfko+lw==": {
-      "description": "How many seats are left at an event",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Tersisa 1 kursi",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "zMoep4eguZ3OejsIbcWbjg==": {
-      "description": "Docs line saying which command to run to start the dev server",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Jalankan vp dev untuk memulai aplikasi.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "E3kkP1xBWrE61ZBOek87xg==": {
-      "description": "Docs line saying where the app's agent instructions are",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "AGENTS.md milik aplikasi memberi tahu agen coding Anda apa yang harus dilakukan.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "XheCGRJ31SRnsGZhKLgJRA==": {
-      "description": "Docs line saying which tools translate the app",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Void's AI atau Claude Code menerjemahkan yang baru.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "kBctHh0b7gp5b2Q3AfqxOA==": {
-      "description": "Docs line saying where the catalogs are",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Katalog setiap bahasa ada di i18n/translations.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "hUJ62HRBMHBewxRvZblIMw==": {
       "description": "Heading of the page's last section, asking whether the reader is ready",
       "status": "translated",
@@ -313,8 +213,108 @@
       ],
       "types": []
     },
-    "AQ6/02zzfwk50FSEF0wKtA==": {
-      "description": "Question asking which of the site's pages to open, its names as an 'or' list",
+    "aTxrVbbbtviBYdu7q8gmbw==": {
+      "description": "The opening of the email that brings a person their ticket for an event, attached to the email as a file; {name} is the person's name",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Halo {name}, tiket Anda terlampir.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9/dZfNYlwleIwdmKcwnS+w==": {
+      "description": "Progress line on the docs page: {translated} is how many of the app's strings are translated, {total} how many strings there are",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{translated} dari {total} string diterjemahkan",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pyuIHcl9IjiwEfzc6+OZQw==": {
+      "description": "How many seats at an event are still free to book; {number} is the count",
+      "status": "translated",
+      "tokens": [
+        "number"
+      ],
+      "translations": [
+        {
+          "translation": "Tersisa {number} kursi",
+          "variations": {}
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "2tgDvNA6Od319736N286sA==": {
+      "description": "How many seats at an event are still free to book; {number} is the count",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Tersisa 1 kursi",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "09b89Zb6/2guenpK63iZMA==": {
+      "description": "Docs line: the command to run to start the app's development server; vp dev is the command",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Jalankan vp dev untuk memulai aplikasi.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "aOr2rDSLx0VoK+PMk5gbhQ==": {
+      "description": "Docs line: the app's file AGENTS.md holds the instructions for the reader's coding agent, an AI program that writes code",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "AGENTS.md milik aplikasi memberi tahu agen coding Anda apa yang harus dilakukan.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6qtkEoMvWJcwCD/YhwVjIg==": {
+      "description": "Docs line: which tools translate the app's new text; Void's AI and Claude Code are product names",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Void's AI atau Claude Code menerjemahkan yang baru.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GngCwiYC5Fp4nHFouxII9A==": {
+      "description": "Docs line: the folder where each language's catalog, its file of translations, is kept",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Katalog setiap bahasa ada di i18n/translations.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "y2kf6tnvS5IDBT7zWl+KEg==": {
+      "description": "A question asking the reader which page to open; {pages} is the names of the site's pages, joined as an 'or' list",
       "status": "translated",
       "tokens": [],
       "translations": [
@@ -325,8 +325,8 @@
       ],
       "types": []
     },
-    "fRQVudyYBFiDmWyed6yR7A==": {
-      "description": "How someone takes part in an event, chosen from a fixed set",
+    "SqyHSxm458nHnDTZIYB/yQ==": {
+      "description": "How someone attends an event, in person at the venue or online over the internet, chosen from a fixed set; {name} is the person's name",
       "status": "translated",
       "tokens": [],
       "translations": [
@@ -337,8 +337,8 @@
       ],
       "types": []
     },
-    "iP10/gSomcvt/+9NrQA7XQ==": {
-      "description": "How someone takes part in an event, chosen from a fixed set",
+    "9LmfrJDa+FBXxWZQhzAXKg==": {
+      "description": "How someone attends an event, in person at the venue or online over the internet, chosen from a fixed set; {name} is the person's name",
       "status": "translated",
       "tokens": [],
       "translations": [
@@ -349,8 +349,8 @@
       ],
       "types": []
     },
-    "Oeto9jViL+xxuaYfiMdwwg==": {
-      "description": "Someone booked a seat, worded by their gender",
+    "83YkUpgDBMTt/Cz6TXsrOA==": {
+      "description": "Someone booked a seat at an event, worded by their gender; {name} is their name",
       "status": "translated",
       "tokens": [
         "name"
@@ -379,8 +379,8 @@
         3
       ]
     },
-    "jE1zcxOCdGCCTd7j0RhSjA==": {
-      "description": "Someone checked their own ticket, with a pronoun by their gender",
+    "UO9emhWU2lRH/Nwz9ozarA==": {
+      "description": "Someone looked over their own ticket for an event, with a pronoun by their gender; {name} is their name",
       "status": "translated",
       "tokens": [],
       "translations": [
@@ -391,8 +391,8 @@
       ],
       "types": []
     },
-    "bTo3iX4JuIh7tcnM8z1nHg==": {
-      "description": "Someone checked their own ticket, with a pronoun by their gender",
+    "CqonQmEc/N3vbjGf+BsVNw==": {
+      "description": "Someone looked over their own ticket for an event, with a pronoun by their gender; {name} is their name",
       "status": "translated",
       "tokens": [],
       "translations": [
@@ -403,8 +403,8 @@
       ],
       "types": []
     },
-    "3jFQRFLYFLOxE6C21bq6GA==": {
-      "description": "Someone checked their own ticket, with a pronoun by their gender",
+    "4vT44Uyb06TJE7aYnZidlw==": {
+      "description": "Someone looked over their own ticket for an event, with a pronoun by their gender; {name} is their name",
       "status": "translated",
       "tokens": [],
       "translations": [
@@ -415,8 +415,8 @@
       ],
       "types": []
     },
-    "AHgdPbajKOCj4zXFKNEbbg==": {
-      "description": "The same person's name twice in one sentence",
+    "rmCWSSwpXNM5H2tpTUZWrQ==": {
+      "description": "The same person named twice: they booked a seat at an event, and they got its ticket by email; {name} is their name",
       "status": "translated",
       "tokens": [],
       "translations": [
@@ -427,38 +427,8 @@
       ],
       "types": []
     },
-    "iQJF/J4mB7QMxMxmCJJLOw==": {
-      "description": "Told to the reader who just booked, worded by their gender",
-      "status": "translated",
-      "tokens": [
-        "__subject__"
-      ],
-      "translations": [
-        {
-          "translation": "Anda sudah terdaftar.",
-          "variations": {
-            "0": 1
-          }
-        },
-        {
-          "translation": "Anda sudah terdaftar.",
-          "variations": {
-            "0": 2
-          }
-        },
-        {
-          "translation": "Anda sudah terdaftar.",
-          "variations": {
-            "0": 3
-          }
-        }
-      ],
-      "types": [
-        3
-      ]
-    },
-    "Nr+WWEAaNhdmcsZktc6jkQ==": {
-      "description": "Someone booked a number of seats, worded by their gender and the count",
+    "BLfjFQihY/oKXnV+ttV8lQ==": {
+      "description": "Someone booked seats at an event, worded by their gender and the count; {who} is their name, {seats} how many seats",
       "status": "translated",
       "tokens": [
         "who",
@@ -487,6 +457,36 @@
       "types": [
         3,
         28
+      ]
+    },
+    "inm0pERemiUvjR6IcJeoVw==": {
+      "description": "Said to the reader right after they book a seat at an event, and it means: you have a seat now. Short, like the English. Worded by the reader's gender",
+      "status": "translated",
+      "tokens": [
+        "__subject__"
+      ],
+      "translations": [
+        {
+          "translation": "Anda sudah terdaftar.",
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "Anda sudah terdaftar.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "Anda sudah terdaftar.",
+          "variations": {
+            "0": 3
+          }
+        }
+      ],
+      "types": [
+        3
       ]
     }
   }

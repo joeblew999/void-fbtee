@@ -447,12 +447,12 @@ export async function translateEntry(
       const src = source[i]?.translation ?? "";
       return src.match(/^\s*/)![0] + l.trim() + src.match(/\s*$/)![0];
     });
-    const hard = problemsWith(source, out, o.to);
+    const hard = problemsWith(source, out, o.to, o.from);
     const soft = glossaryMisses(glossary, out);
     feedback = [...hard, ...soft];
     if (!hard.length && (!soft.length || attempts === 3)) break;
   }
-  return { lines: out, problems: problemsWith(source, out, o.to), attempts };
+  return { lines: out, problems: problemsWith(source, out, o.to, o.from), attempts };
 }
 
 /**
@@ -558,7 +558,7 @@ export async function translateCatalog(
       });
       if (!answer) return;
       const out = answer.lines;
-      const problems = problemsWith(entry.translations!, out, locale);
+      const problems = problemsWith(entry.translations!, out, locale, p.config.sourceLocale);
       // Not kept: say what was wrong with its last answer, so the reason is in the log.
       if (problems.length) {
         log(`${texts[hash]} → ${JSON.stringify(out)}: ${problems.join(" ")}`);

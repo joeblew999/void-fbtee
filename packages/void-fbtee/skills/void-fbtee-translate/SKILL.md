@@ -14,8 +14,9 @@ reads it as a skill. What to edit and which commands to run is in the void-fbtee
 Each string is a catalog entry: its source lines, a description, the code around it, and the
 app's own translations as examples.
 
-- The description says where the text shows and what it means. It's there to explain: never put
-  its words in the translation.
+- The description says what's happening, to whom, what each placeholder holds and where the text
+  shows. Choose the words by it: "book a seat at an event" is not reserving a table or hiring a
+  person. It's there to explain: never put its words in the translation.
 - Say everything the source says, the same way: a statement stays a statement, a question a
   question, an instruction an instruction, in the same tense. Add nothing and leave nothing out:
   no "successfully" after "booked", no "with this email" after "attached", no "the same" before a

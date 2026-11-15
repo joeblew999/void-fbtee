@@ -3,7 +3,7 @@
   "Home": "Navigation: the home page",
   "Docs": "Navigation: the documentation",
   "Post an event": "Heading of the form for posting a new event",
-  "Sold out": "Badge: an event has no seats left",
+  "Sold out": "Badge on an event: every seat is booked, none left to book",
   "i18n for Void apps": "Home page heading",
   "Seats": "A count of seats at an event: a column heading or a form label",
   "Time zones": "A heading: named time zones",

@@ -58,7 +58,11 @@ function Piece({
 /** Inside <InLanguage>: this runtime's fbt, so it's in that language. */
 function Booked() {
   const { fbt } = useFbt();
-  return <fbt desc="Strings page: told to the reader who just booked">You're booked.</fbt>;
+  return (
+    <fbt desc="Strings page: said to the reader right after they book a seat at an event, and it means: you have a seat now. Short, like the English">
+      You're booked.
+    </fbt>
+  );
 }
 
 /** The second look for the picker: a row of pills, open at once below, no search box styling. */

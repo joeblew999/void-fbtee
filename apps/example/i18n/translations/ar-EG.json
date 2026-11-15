@@ -1,114 +1,6 @@
 {
   "fb-locale": "ar-EG",
   "translations": {
-    "W2S4HeMOJcq2xOy3+nXfaw==": {
-      "description": "Text rendered from deferred loader data",
-      "status": "translated",
-      "tokens": [
-        "number"
-      ],
-      "translations": [
-        {
-          "translation": "لاحقًا: لم تتبقَّ أي ليلة",
-          "variations": {
-            "0": 16
-          }
-        },
-        {
-          "translation": "لاحقًا: تبقّت ليلتان",
-          "variations": {
-            "0": 8
-          }
-        },
-        {
-          "translation": "لاحقًا: تبقّت {number} ليالٍ",
-          "variations": {
-            "0": 20
-          }
-        },
-        {
-          "translation": "لاحقًا: تبقّت {number} ليلة",
-          "variations": {
-            "0": 12
-          }
-        },
-        {
-          "translation": "لاحقًا: تبقّت {number} ليلة",
-          "variations": {
-            "0": 24
-          }
-        }
-      ],
-      "types": [
-        28
-      ]
-    },
-    "HEbq6lwochMG+bINu8ib4w==": {
-      "description": "Text rendered from deferred loader data",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "لاحقًا: تبقّت ليلة واحدة",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "d20AdENCUCFEupNI3bkyqg==": {
-      "description": "How many nights are booked",
-      "status": "translated",
-      "tokens": [
-        "number"
-      ],
-      "translations": [
-        {
-          "translation": "لم تحجز أي ليلة",
-          "variations": {
-            "0": 16
-          }
-        },
-        {
-          "translation": "حجزت ليلتين",
-          "variations": {
-            "0": 8
-          }
-        },
-        {
-          "translation": "حجزت {number} ليالٍ",
-          "variations": {
-            "0": 20
-          }
-        },
-        {
-          "translation": "حجزت {number} ليلة",
-          "variations": {
-            "0": 12
-          }
-        },
-        {
-          "translation": "حجزت {number} ليلة",
-          "variations": {
-            "0": 24
-          }
-        }
-      ],
-      "types": [
-        28
-      ]
-    },
-    "firIdTpNp5HR3/x49jpnZA==": {
-      "description": "How many nights are booked",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "حجزت ليلة واحدة",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "IYUmtYxQtGdt1MucjXrsVA==": {
       "description": "Label with meaning 'at least number'",
       "status": "translated",
@@ -349,54 +241,6 @@
       ],
       "types": []
     },
-    "FbSCJUsAz2v5ZsAnATiLFw==": {
-      "description": "How many rows the browser formatted exactly as the Worker did",
-      "status": "translated",
-      "tokens": [
-        "total"
-      ],
-      "translations": [
-        {
-          "translation": "{same} من {total} صف متطابقة في متصفحك.",
-          "variations": {
-            "0": 16
-          }
-        },
-        {
-          "translation": "{same} من صف واحد متطابق في متصفحك.",
-          "variations": {
-            "0": 4
-          }
-        },
-        {
-          "translation": "{same} من صفّين متطابقة في متصفحك.",
-          "variations": {
-            "0": 8
-          }
-        },
-        {
-          "translation": "{same} من {total} صفوف متطابقة في متصفحك.",
-          "variations": {
-            "0": 20
-          }
-        },
-        {
-          "translation": "{same} من {total} صفًا متطابقة في متصفحك.",
-          "variations": {
-            "0": 12
-          }
-        },
-        {
-          "translation": "{same} من {total} صف متطابقة في متصفحك.",
-          "variations": {
-            "0": 24
-          }
-        }
-      ],
-      "types": [
-        28
-      ]
-    },
     "jFQA2JEUnikrWL/p4Txfag==": {
       "description": "Page fact: the page's language",
       "status": "translated",
@@ -469,18 +313,6 @@
       ],
       "types": []
     },
-    "35eUzHEgHoZEQ3Zuj5MDGA==": {
-      "description": "The same moment in the visitor's own time zone",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "بتوقيتك المحلي: {time}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "GT3+qur89p160RfLJ/9CmQ==": {
       "description": "Home page heading",
       "status": "translated",
@@ -512,18 +344,6 @@
       "translations": [
         {
           "translation": "صفحات markdown مترجمة إلى كل اللغات.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "sSw++VHCYLbGRvCqi93qhQ==": {
-      "description": "An event's start time on the reader's own clock",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "بتوقيتك: {time}",
           "variations": {}
         }
       ],
@@ -673,18 +493,6 @@
       ],
       "types": []
     },
-    "8iI5+J5iHJYOuCRoSsmG+g==": {
-      "description": "Shown after booking a seat on an event",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تم حجزك. نراك هناك!",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "pqpH8iaZyoOLqrE2GYYamA==": {
       "description": "Booking form label: the booker's name",
       "status": "translated",
@@ -752,84 +560,6 @@
       "translations": [
         {
           "translation": "احجز مقعدًا",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "z0y3w4ix7fjn6Gfpky7afQ==": {
-      "description": "How many seats an event has left",
-      "status": "translated",
-      "tokens": [
-        "number"
-      ],
-      "translations": [
-        {
-          "translation": "لم يتبقَّ أي مقعد",
-          "variations": {
-            "0": 16
-          }
-        },
-        {
-          "translation": "تبقّى مقعدان",
-          "variations": {
-            "0": 8
-          }
-        },
-        {
-          "translation": "تبقّت {number} مقاعد",
-          "variations": {
-            "0": 20
-          }
-        },
-        {
-          "translation": "تبقّى {number} مقعدًا",
-          "variations": {
-            "0": 12
-          }
-        },
-        {
-          "translation": "تبقّى {number} مقعد",
-          "variations": {
-            "0": 24
-          }
-        }
-      ],
-      "types": [
-        28
-      ]
-    },
-    "vEMyyfPJPzzmHW8XeXGuyQ==": {
-      "description": "How many seats an event has left",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تبقّى مقعد واحد",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "lUEE32CdWTk+U9F7rmd09g==": {
-      "description": "Badge: an event has no seats left",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "اكتمل الحجز",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "WuCoCUNhGtauyKMWXLhgug==": {
-      "description": "Note under an event: its text was machine-translated from this language",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ترجمة آلية من {language}",
           "variations": {}
         }
       ],
@@ -1303,54 +1033,6 @@
       ],
       "types": []
     },
-    "uf52IScFDECmh/bEfLha4Q==": {
-      "description": "How many Temporal rows the browser's own Temporal got the same as the Worker",
-      "status": "translated",
-      "tokens": [
-        "total"
-      ],
-      "translations": [
-        {
-          "translation": "Temporal الخاص بمتصفحك: {same} من {total} متطابقة.",
-          "variations": {
-            "0": 16
-          }
-        },
-        {
-          "translation": "Your browser's own Temporal: {same} of {total} the same.",
-          "variations": {
-            "0": 4
-          }
-        },
-        {
-          "translation": "Your browser's own Temporal: {same} of {total} the same.",
-          "variations": {
-            "0": 8
-          }
-        },
-        {
-          "translation": "Your browser's own Temporal: {same} of {total} the same.",
-          "variations": {
-            "0": 20
-          }
-        },
-        {
-          "translation": "Your browser's own Temporal: {same} of {total} the same.",
-          "variations": {
-            "0": 12
-          }
-        },
-        {
-          "translation": "Your browser's own Temporal: {same} of {total} the same.",
-          "variations": {
-            "0": 24
-          }
-        }
-      ],
-      "types": [
-        28
-      ]
-    },
     "2xLRymCBC6CIAHj3ozPOjw==": {
       "description": "The visitor's browser has no Temporal of its own",
       "status": "translated",
@@ -1362,54 +1044,6 @@
         }
       ],
       "types": []
-    },
-    "tI0QvUJqhhk8IJMdGyOetg==": {
-      "description": "How many Temporal rows the polyfill in the browser got the same as the Worker",
-      "status": "translated",
-      "tokens": [
-        "total"
-      ],
-      "translations": [
-        {
-          "translation": "الـ polyfill في متصفحك: {same} من {total} متطابقة.",
-          "variations": {
-            "0": 16
-          }
-        },
-        {
-          "translation": "The polyfill in your browser: {same} of {total} the same.",
-          "variations": {
-            "0": 4
-          }
-        },
-        {
-          "translation": "The polyfill in your browser: {same} of {total} the same.",
-          "variations": {
-            "0": 8
-          }
-        },
-        {
-          "translation": "The polyfill in your browser: {same} of {total} the same.",
-          "variations": {
-            "0": 20
-          }
-        },
-        {
-          "translation": "The polyfill in your browser: {same} of {total} the same.",
-          "variations": {
-            "0": 12
-          }
-        },
-        {
-          "translation": "The polyfill in your browser: {same} of {total} the same.",
-          "variations": {
-            "0": 24
-          }
-        }
-      ],
-      "types": [
-        28
-      ]
     },
     "9ScYgwZCVdYOiiihIPP1+w==": {
       "description": "Temporal table column: the result with the browser's own Temporal",
@@ -1603,72 +1237,6 @@
       ],
       "types": []
     },
-    "gi0X6ltCIDT8dCC+9MsHYA==": {
-      "description": "A number of nights, on the Intl page",
-      "status": "translated",
-      "tokens": [
-        "number"
-      ],
-      "translations": [
-        {
-          "translation": "لا ليالٍ",
-          "variations": {
-            "0": 16
-          }
-        },
-        {
-          "translation": "ليلتان",
-          "variations": {
-            "0": 8
-          }
-        },
-        {
-          "translation": "{number} ليالٍ",
-          "variations": {
-            "0": 20
-          }
-        },
-        {
-          "translation": "{number} ليلة",
-          "variations": {
-            "0": 12
-          }
-        },
-        {
-          "translation": "{number} ليلة",
-          "variations": {
-            "0": 24
-          }
-        }
-      ],
-      "types": [
-        28
-      ]
-    },
-    "dnovwbPDT9HPYhWQC5XDMQ==": {
-      "description": "A number of nights, on the Intl page",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ليلة واحدة",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "eOge5YhaIboyjqmL9qPTEQ==": {
-      "description": "A price, on the Intl page",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "السعر: {price}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "1MRfK1NgI+jnW+SPgLHuJw==": {
       "description": "Home feature fact: the same calls run on the server and in the browser",
       "status": "translated",
@@ -1693,30 +1261,6 @@
       ],
       "types": []
     },
-    "JMUFEsR2aVIYLh5D8SwgUw==": {
-      "description": "Intl page: supported values the Worker has and the browser doesn't",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "على الـ Worker فقط: {values}.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "/OwgldRgQFQTO49MR6gfCA==": {
-      "description": "Intl page: supported values the browser has and the Worker doesn't",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "في متصفحك فقط: {values}.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "vPMkXbm9YaPzpmLXKomnWg==": {
       "description": "Intl page introduction",
       "status": "translated",
@@ -1736,18 +1280,6 @@
       "translations": [
         {
           "translation": "الصف المميَّز هو حيث يكتب محرك متصفحك القيمة بشكل مختلف، فلكل محرك بيانات اللغات الخاصة به. تعرض الصفحات نص الخادم، لذا لا تعتمد على تطابق الاثنين. أما قوائم القيم المدعومة في النهاية فهي خاصة بكل محرك، لذا لا تتم مقارنتها.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "jGvk/eFwEkjOdG/NBrvu8g==": {
-      "description": "Where the times on the Intl page are shown",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "الأوقات أدناه هي {instant}، معروضة بتوقيت {zone}.",
           "variations": {}
         }
       ],
@@ -1824,54 +1356,6 @@
         }
       ],
       "types": []
-    },
-    "4Kbft/ENivNWEOtkOOYDbg==": {
-      "description": "How many Temporal rows the polyfill on the Worker got the same as Cloudflare's own Temporal",
-      "status": "translated",
-      "tokens": [
-        "total"
-      ],
-      "translations": [
-        {
-          "translation": "الـ polyfill على الـ Worker: {same} من {total} متطابقة.",
-          "variations": {
-            "0": 16
-          }
-        },
-        {
-          "translation": "The polyfill on the Worker: {same} of {total} the same.",
-          "variations": {
-            "0": 4
-          }
-        },
-        {
-          "translation": "The polyfill on the Worker: {same} of {total} the same.",
-          "variations": {
-            "0": 8
-          }
-        },
-        {
-          "translation": "The polyfill on the Worker: {same} of {total} the same.",
-          "variations": {
-            "0": 20
-          }
-        },
-        {
-          "translation": "The polyfill on the Worker: {same} of {total} the same.",
-          "variations": {
-            "0": 12
-          }
-        },
-        {
-          "translation": "The polyfill on the Worker: {same} of {total} the same.",
-          "variations": {
-            "0": 24
-          }
-        }
-      ],
-      "types": [
-        28
-      ]
     },
     "mTDc+BXpwQqqK+pea+yfZw==": {
       "description": "Temporal page: which Temporal runs where",
@@ -1957,18 +1441,6 @@
       ],
       "types": []
     },
-    "yQWkaSa7g32Txe088/rP+w==": {
-      "description": "Note under an event shown as its poster wrote it, in another language",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "مكتوبة باللغة {language}.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "/aRZulxMqHQep4BC9smXmg==": {
       "description": "Events page description, for search results",
       "status": "translated",
@@ -2000,18 +1472,6 @@
       "translations": [
         {
           "translation": "أين أنت",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "cL5JMpI7L0qvqM9nTfTOUQ==": {
-      "description": "Where an event happens, as its organiser wrote it",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "المكان: {venue}",
           "variations": {}
         }
       ],
@@ -2197,18 +1657,6 @@
       ],
       "types": []
     },
-    "/ptyln/thM7mcTTa7De/DQ==": {
-      "description": "Booking email subject: a seat is booked at this event",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "مقعدك في {event}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "uqAg3PARSaWYjmk791nVVg==": {
       "description": "Booking email: greeting, with the name the booker gave",
       "status": "translated",
@@ -2216,18 +1664,6 @@
       "translations": [
         {
           "translation": "مرحبًا {name}،",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "kaGrE79ybuG3k2gtLFVorA==": {
-      "description": "Booking email: the event, and when it starts on the clock where it happens",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "لديك مقعد في {event}. تبدأ {time}.",
           "variations": {}
         }
       ],
@@ -2377,18 +1813,6 @@
       ],
       "types": []
     },
-    "ARzrpeAlrVLrYD66ltJGvg==": {
-      "description": "Private link email: the event the reader just posted",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "لقد نشرت {event}.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "M3pc8E4cZ9kvHeB4GhuKGw==": {
       "description": "Private link email: why to keep the link, and to keep it private",
       "status": "translated",
@@ -2396,18 +1820,6 @@
       "translations": [
         {
           "translation": "احتفظ بهذا البريد: الرابط أدناه هو الطريقة الوحيدة لحذف فعاليتك لاحقًا. يستطيع أي شخص يملكه حذف الفعالية، فلا تشاركه.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "65WKp3H1dRlZ+vpPMKzq7g==": {
-      "description": "Private link email subject: the link to delete the event the reader posted",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "رابطك الخاص لـ {event}",
           "variations": {}
         }
       ],
@@ -2425,18 +1837,6 @@
       ],
       "types": []
     },
-    "O8KHpBEzXPn0V72AgFNfTw==": {
-      "description": "Cancellation email: the event the reader booked, and when it would have started, is cancelled",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ألغى المنظم {event} التي كانت ستقام {time}، وأُلغي مقعدك معها.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "qvACgHb8I2u1PdwubuKCtQ==": {
       "description": "Cancellation email: before the link to the events list",
       "status": "translated",
@@ -2444,18 +1844,6 @@
       "translations": [
         {
           "translation": "فعاليات أخرى:",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "CaDCDI/FGJybudJ1kgNDHA==": {
-      "description": "Cancellation email subject: the event the reader booked is cancelled",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تم إلغاء {event}",
           "variations": {}
         }
       ],
@@ -2473,18 +1861,6 @@
       ],
       "types": []
     },
-    "JiiV+8Yfat7Shcnld2I0fA==": {
-      "description": "Reminder email: the event the reader booked starts within a day, and when",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تذكير: لديك مقعد في {event}، التي تبدأ {time}.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "ww1rNR/RLXZcmijwRDG+Ug==": {
       "description": "Reminder email: before the link to the event's page",
       "status": "translated",
@@ -2492,18 +1868,6 @@
       "translations": [
         {
           "translation": "صفحة الفعالية:",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "XokEpBv9y2oU/MYmCGZGmA==": {
-      "description": "Reminder email subject: the event the reader booked starts within a day",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تذكير: {event}",
           "variations": {}
         }
       ],
@@ -2805,18 +2169,6 @@
       "translations": [
         {
           "translation": "الترجمة",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "tMTvUgdJP4qo/QlJCTb6ww==": {
-      "description": "Docs: link at the end of a page to void-fbtee's skill, its full reference",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "المرجع الكامل في {link}.",
           "variations": {}
         }
       ],
@@ -3314,30 +2666,6 @@
       ],
       "types": []
     },
-    "EYkqTAts0TYxkS2Z2dl5oQ==": {
-      "description": "Translating page: how many of a catalog's strings are translated",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تُرجم {translated} من {strings} نصًا",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "y21dje6+O2aW8hjr7VbxIQ==": {
-      "description": "Translating page: link to the events, whose posts are translated by Workers AI",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يترجم Workers AI الفعاليات: {link}.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "kWZkiGUUPLl04F06tVbaXg==": {
       "description": "Translating page: link text to the list of events",
       "status": "translated",
@@ -3405,18 +2733,6 @@
       "translations": [
         {
           "translation": "ملفات PDF",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "ygGN8B/pTj/WJdjj0BSjRQ==": {
-      "description": "Shown after booking: the PDF ticket is emailed, and can be downloaded here",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تذكرتك في طريقها إليك بالبريد الإلكتروني، أو {link}.",
           "variations": {}
         }
       ],
@@ -3758,114 +3074,6 @@
       ],
       "types": []
     },
-    "wslJzxORlTJzxeD0lWVayA==": {
-      "description": "Strings page: the site's menu, its words as a list inside the sentence",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تضم القائمة {pages}.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "a6RutNoEAizv/Rqo6g8TCw==": {
-      "description": "Strings page: how someone takes part in an event, chosen from a fixed set",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "مشاركة {name}: حضوريًا.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "OYa/dzUl3KVTLjx4UuaYwA==": {
-      "description": "Strings page: how someone takes part in an event, chosen from a fixed set",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "مشاركة {name}: عبر الإنترنت.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Ykl5ci4CbSxY96rgkgXBfg==": {
-      "description": "Strings page: someone booked a seat, worded by their gender",
-      "status": "translated",
-      "tokens": [
-        "name"
-      ],
-      "translations": [
-        {
-          "translation": "حجز {name} مقعدًا.",
-          "variations": {
-            "0": 1
-          }
-        },
-        {
-          "translation": "حجزت {name} مقعدًا.",
-          "variations": {
-            "0": 2
-          }
-        },
-        {
-          "translation": "تم حجز مقعد باسم {name}.",
-          "variations": {
-            "0": 3
-          }
-        }
-      ],
-      "types": [
-        3
-      ]
-    },
-    "hl+18clzmkueXyxBRAm6dw==": {
-      "description": "Strings page: the same name twice in one sentence",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تم الحجز باسم {name}، ووصلت التذكرة إلى {name} بالبريد الإلكتروني.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "5Jf1Uen6KRT21ot3NTL4ew==": {
-      "description": "Strings page: told to the reader who just booked",
-      "status": "translated",
-      "tokens": [
-        "__subject__"
-      ],
-      "translations": [
-        {
-          "translation": "أنت مسجَّل.",
-          "variations": {
-            "0": 1
-          }
-        },
-        {
-          "translation": "أنتِ مسجَّلة.",
-          "variations": {
-            "0": 2
-          }
-        },
-        {
-          "translation": "تم تأكيد حجزك.",
-          "variations": {
-            "0": 3
-          }
-        }
-      ],
-      "types": [
-        3
-      ]
-    },
     "l1rZHZvHHLbW/a/yEblXwQ==": {
       "description": "Strings page piece title: a list inside a sentence",
       "status": "translated",
@@ -3981,42 +3189,6 @@
       "translations": [
         {
           "translation": "النصوص بواسطة fbtee، والتواريخ بواسطة Temporal، وكل ما عدا ذلك بواسطة Intl الخاص بالمنصة. هذا المثال متاح بـ{languages}.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "0ninRllHFSy0f8sMESsm1w==": {
-      "description": "Strings page: someone checked their own ticket, with a pronoun by their gender",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تمّت مراجعة {name} لتذكرتها.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "moH0FtiyxrwnNEDnFVgNHg==": {
-      "description": "Strings page: someone checked their own ticket, with a pronoun by their gender",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تمّت مراجعة {name} لتذكرته.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "85XCoag9WLA3pTjGs4A8hw==": {
-      "description": "Strings page: someone checked their own ticket, with a pronoun by their gender",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تمّت مراجعة {name} لتذكرتهم.",
           "variations": {}
         }
       ],
@@ -4274,18 +3446,6 @@
       ],
       "types": []
     },
-    "T/Fd107+cRPo9L/ZSoliFw==": {
-      "description": "Strings page: which of the site's menu pages to open, its words as an 'or' list",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "هل تفتح {pages}؟",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "VYxtalkiJK9DcU+bKG+cMw==": {
       "description": "Strings page form: a person's name",
       "status": "translated",
@@ -4430,60 +3590,6 @@
       ],
       "types": []
     },
-    "XHzdG8B22ASNVbpH2NxUVw==": {
-      "description": "Strings page: someone booked a number of seats",
-      "status": "translated",
-      "tokens": [
-        "number"
-      ],
-      "translations": [
-        {
-          "translation": "لا مقاعد محجوزة باسم {name}.",
-          "variations": {
-            "0": 16
-          }
-        },
-        {
-          "translation": "مقعدان محجوزان باسم {name}.",
-          "variations": {
-            "0": 8
-          }
-        },
-        {
-          "translation": "{number} مقاعد محجوزة باسم {name}.",
-          "variations": {
-            "0": 20
-          }
-        },
-        {
-          "translation": "{number} مقعدًا محجوزًا باسم {name}.",
-          "variations": {
-            "0": 12
-          }
-        },
-        {
-          "translation": "{number} مقعد محجوز باسم {name}.",
-          "variations": {
-            "0": 24
-          }
-        }
-      ],
-      "types": [
-        28
-      ]
-    },
-    "unOSd4bSf6iUcwRSuh8HbQ==": {
-      "description": "Strings page: someone booked a number of seats",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "مقعد واحد محجوز باسم {name}.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "zZI6c3ThG+E++mZB6VNlUA==": {
       "description": "A count of seats at an event: a column heading or a form label",
       "tokens": [],
@@ -4580,18 +3686,6 @@
       "translations": [
         {
           "translation": "تسجّل كل نسخة إصدار الأصل الذي تُرجمت منه. وعندما يتغيّر الأصل، يُبلغ vp dev بأن النسخة قديمة ويترجمها من جديد، ويفشل vp build بسببها، كما سيُظهر العمود أعلاه.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "/JYtNQhGueReTylg2T2snw==": {
-      "description": "Strings page point: text in components is written in fbt elements, each with a description for the translator",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يُكتب النص في المكوّن داخل عنصر fbt، مع وصف يخبر المترجم أين يظهر وماذا يعني. ويجمع vp dev كل واحد منها، أثناء الحفظ، في كتالوج كل لغة، i18n/translations، وهو ملف في مستودع التطبيق.",
           "variations": {}
         }
       ],
@@ -4700,6 +3794,912 @@
       "translations": [
         {
           "translation": "عند الحفظ، يضيف إلى كل لغة النصوص الجديدة، معلمة جديدة. بمجرد توقفك، يترجمها الذكاء الاصطناعي من Void أو Claude Code، ويبلّغ الخادم التطويري ما تبقى. تظهر الترجمة المعدلة على الفور.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sMtlR6Z8zMzZ6LalfCQsVQ==": {
+      "description": "When an event starts, on the reader's own clock; {time} is that time, already formatted",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "بتوقيتك: {time}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pyuIHcl9IjiwEfzc6+OZQw==": {
+      "description": "How many seats at an event are still free to book; {number} is the count",
+      "status": "translated",
+      "tokens": [
+        "number"
+      ],
+      "translations": [
+        {
+          "translation": "لم يتبقَّ أي مقعد",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "تبقّى مقعدان",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "تبقّت {number} مقاعد",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "تبقّى {number} مقعدًا",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "تبقّى {number} مقعد",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "2tgDvNA6Od319736N286sA==": {
+      "description": "How many seats at an event are still free to book; {number} is the count",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تبقّى مقعد واحد",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Wo/Tv3txNj2D7xq3Z3LYrQ==": {
+      "description": "Badge on an event: every seat is booked, none left to book",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "اكتمل الحجز",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MCmwkI2tzOKSvQGdkgHelg==": {
+      "description": "Docs: the last line of a page, pointing to void-fbtee's skill, its full reference; {link} is a link whose text is void-fbtee's skill",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المرجع الكامل في {link}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vYtTVMmhUpzQJxmTFPDFMw==": {
+      "description": "Strings page: a question asking the reader which page to open; {pages} is the names of the site's menu pages, joined as an 'or' list",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "هل تفتح {pages}؟",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GHvNxmBkCOuhJpHk/CVdRA==": {
+      "description": "Strings page: what the site's menu holds; {pages} is the names of its pages, joined as an 'and' list",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تضم القائمة {pages}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1iRhgvB2HIGstP0vJWcmRA==": {
+      "description": "Strings page: how someone attends an event, in person at the venue or online over the internet, chosen from a fixed set; {name} is the person's name",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مشاركة {name}: حضوريًا.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KowaTACm5EqwMvl1AlV36w==": {
+      "description": "Strings page: how someone attends an event, in person at the venue or online over the internet, chosen from a fixed set; {name} is the person's name",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مشاركة {name}: عبر الإنترنت.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FmYCSyKNMYHFcurKzrIYBw==": {
+      "description": "Strings page: someone booked a seat at an event, worded by their gender; {name} is their name",
+      "status": "translated",
+      "tokens": [
+        "name"
+      ],
+      "translations": [
+        {
+          "translation": "حجز {name} مقعدًا.",
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "حجزت {name} مقعدًا.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "تم حجز مقعد باسم {name}.",
+          "variations": {
+            "0": 3
+          }
+        }
+      ],
+      "types": [
+        3
+      ]
+    },
+    "YTVupDM8i+JxeTsyzilxQQ==": {
+      "description": "Strings page: someone booked seats at an event; {name} is their name, {number} how many seats",
+      "status": "translated",
+      "tokens": [
+        "number"
+      ],
+      "translations": [
+        {
+          "translation": "لا مقاعد محجوزة باسم {name}.",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "مقعدان محجوزان باسم {name}.",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "{number} مقاعد محجوزة باسم {name}.",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "{number} مقعدًا محجوزًا باسم {name}.",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "{number} مقعد محجوز باسم {name}.",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "0Nrc8Co3U/Yd5XokcA/uNg==": {
+      "description": "Strings page: someone booked seats at an event; {name} is their name, {number} how many seats",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مقعد واحد محجوز باسم {name}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pNo/5gVeY95SnIOyU/Vp/A==": {
+      "description": "Strings page: someone looked over their own ticket for an event, with a pronoun by their gender; {name} is their name",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تمّت مراجعة {name} لتذكرتها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "A1bfZTZ9qaUxo/jmE7FUhw==": {
+      "description": "Strings page: someone looked over their own ticket for an event, with a pronoun by their gender; {name} is their name",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تمّت مراجعة {name} لتذكرته.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/tj0XCj9mTqyMKaRkIh2KA==": {
+      "description": "Strings page: someone looked over their own ticket for an event, with a pronoun by their gender; {name} is their name",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تمّت مراجعة {name} لتذكرتهم.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Bl+oIHfy3dAmRUMkw47GvQ==": {
+      "description": "Strings page: the same person named twice: they booked a seat at an event, and they got its ticket by email; {name} is their name",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تم الحجز باسم {name}، ووصلت التذكرة إلى {name} بالبريد الإلكتروني.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sjX/HQUWa3qC/vdBK95EIw==": {
+      "description": "Intl page: a number of nights of a stay, as in a hotel booking; {number} is the count",
+      "status": "translated",
+      "tokens": [
+        "number"
+      ],
+      "translations": [
+        {
+          "translation": "لا ليالٍ",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "ليلتان",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "{number} ليالٍ",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "{number} ليلة",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "{number} ليلة",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "J2T2wrYrFmoE4uH2cCzEbg==": {
+      "description": "Intl page: a number of nights of a stay, as in a hotel booking; {number} is the count",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ليلة واحدة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RNYKT0m1B0N/sALi05CtXA==": {
+      "description": "Intl page: what something costs; {price} is an amount of money, already formatted with its currency",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "السعر: {price}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "75g1ge6mloe7/wwoynaTZA==": {
+      "description": "Intl page: text from data that arrives after the page: the nights left in a stay; {number} is the count",
+      "status": "translated",
+      "tokens": [
+        "number"
+      ],
+      "translations": [
+        {
+          "translation": "لاحقًا: لم تتبقَّ أي ليلة",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "لاحقًا: تبقّت ليلتان",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "لاحقًا: تبقّت {number} ليالٍ",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "لاحقًا: تبقّت {number} ليلة",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "لاحقًا: تبقّت {number} ليلة",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "K4uzZ/fJ05y+kNoHKIHV1g==": {
+      "description": "Intl page: text from data that arrives after the page: the nights left in a stay; {number} is the count",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لاحقًا: تبقّت ليلة واحدة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QpU/a6qlWEEQiQ9R4/DwkQ==": {
+      "description": "How many nights of a stay the reader has booked; {number} is the count",
+      "status": "translated",
+      "tokens": [
+        "number"
+      ],
+      "translations": [
+        {
+          "translation": "لم تحجز أي ليلة",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "حجزت ليلتين",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "حجزت {number} ليالٍ",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "حجزت {number} ليلة",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "حجزت {number} ليلة",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "DepO5trxUyoC/tjAuGTdLw==": {
+      "description": "How many nights of a stay the reader has booked; {number} is the count",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "حجزت ليلة واحدة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "f2fUGBQtV93QslUDtyxDPA==": {
+      "description": "Shown right after booking a seat: the PDF ticket is on its way by email, or can be downloaded now; {link} is a link whose text is 'download it now'",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تذكرتك في طريقها إليك بالبريد الإلكتروني، أو {link}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2P+wymX8zVP2aPh5A3uH7Q==": {
+      "description": "Where an event happens; {venue} is the place, as its organiser wrote it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المكان: {venue}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CIqN9/BBTtCIe2vF7NfBYQ==": {
+      "description": "Note under an event: its text was machine-translated from the language its poster wrote it in; {language} is that language's name",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ترجمة آلية من {language}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Y7yNVVxNprAIPIMr8b8QEg==": {
+      "description": "Note under an event shown as its poster wrote it, in another language; {language} is that language's name",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مكتوبة باللغة {language}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YVf2mAV+Lu3LjjTd2p3gPg==": {
+      "description": "Intl page: supported values the Worker has and the browser doesn't; {values} is a list of them",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "على الـ Worker فقط: {values}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kLdz73lBQ4AKylL2ddEi+A==": {
+      "description": "Intl page: supported values the browser has and the Worker doesn't; {values} is a list of them",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "في متصفحك فقط: {values}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BmMTtbikAdQBfJNSHlsnDg==": {
+      "description": "Intl page: how many rows the browser formatted exactly as the Worker did; {same} is how many are the same, {total} how many rows there are",
+      "status": "translated",
+      "tokens": [
+        "total"
+      ],
+      "translations": [
+        {
+          "translation": "{same} من {total} صف متطابقة في متصفحك.",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "{same} من صف واحد متطابق في متصفحك.",
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "{same} من صفّين متطابقة في متصفحك.",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "{same} من {total} صفوف متطابقة في متصفحك.",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "{same} من {total} صفًا متطابقة في متصفحك.",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "{same} من {total} صف متطابقة في متصفحك.",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "gG2Z8UvMHFqo0ZJ8WVUAYg==": {
+      "description": "Intl page: which moment the times below show, and in which time zone; {instant} is that moment, already formatted, {zone} a time zone's name",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الأوقات أدناه هي {instant}، معروضة بتوقيت {zone}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mxossMzgQYIUJvwrIjKzoQ==": {
+      "description": "The same moment in the visitor's own time zone; {time} is that time, already formatted",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "بتوقيتك المحلي: {time}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6OwibbMT4w5UBc/wNCOcbg==": {
+      "description": "Temporal page: how many rows the polyfill on the Worker got the same as Cloudflare's own Temporal; {same} is how many are the same, {total} how many rows there are",
+      "status": "translated",
+      "tokens": [
+        "total"
+      ],
+      "translations": [
+        {
+          "translation": "الـ polyfill على الـ Worker: {same} من {total} متطابقة.",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "The polyfill on the Worker: {same} of {total} the same.",
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "The polyfill on the Worker: {same} of {total} the same.",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "The polyfill on the Worker: {same} of {total} the same.",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "The polyfill on the Worker: {same} of {total} the same.",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "The polyfill on the Worker: {same} of {total} the same.",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "ux1ckl4KnGcx6j3DWxAqiQ==": {
+      "description": "Temporal page: how many rows the browser's own Temporal got the same as the Worker; {same} is how many are the same, {total} how many rows there are",
+      "status": "translated",
+      "tokens": [
+        "total"
+      ],
+      "translations": [
+        {
+          "translation": "Temporal الخاص بمتصفحك: {same} من {total} متطابقة.",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "Your browser's own Temporal: {same} of {total} the same.",
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "Your browser's own Temporal: {same} of {total} the same.",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "Your browser's own Temporal: {same} of {total} the same.",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "Your browser's own Temporal: {same} of {total} the same.",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "Your browser's own Temporal: {same} of {total} the same.",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "OUq58lQUIlL8t9SsKPK/0g==": {
+      "description": "Temporal page: how many rows the polyfill in the browser got the same as the Worker; {same} is how many are the same, {total} how many rows there are",
+      "status": "translated",
+      "tokens": [
+        "total"
+      ],
+      "translations": [
+        {
+          "translation": "الـ polyfill في متصفحك: {same} من {total} متطابقة.",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "The polyfill in your browser: {same} of {total} the same.",
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "The polyfill in your browser: {same} of {total} the same.",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "The polyfill in your browser: {same} of {total} the same.",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "The polyfill in your browser: {same} of {total} the same.",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "The polyfill in your browser: {same} of {total} the same.",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "JA5wLKwdZbt5CZs55OQ7SQ==": {
+      "description": "Translating page: how many of a catalog's strings are translated; {translated} is how many are translated, {strings} how many strings there are",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تُرجم {translated} من {strings} نصًا",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Pl/C+9vrq4vM+QiVa2sFuw==": {
+      "description": "Translating page: the events people post are translated by Workers AI; {link} is a link to the events whose text is 'see them'",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يترجم Workers AI الفعاليات: {link}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "daZwA7a3sR4W2t05xan4fw==": {
+      "description": "Booking email: the reader has a seat at an event; {event} is the event's title, {time} when it starts on the clock where it happens, already formatted",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لديك مقعد في {event}. تبدأ {time}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "w6QyRVIytetbTQkmcN1nzg==": {
+      "description": "Booking email subject: the reader has booked a seat at an event; {event} is the event's title",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مقعدك في {event}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LxAH3+PgiKQ07a3YgavAAQ==": {
+      "description": "Private link email: the reader has just posted an event; {event} is its title",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لقد نشرت {event}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Az/vNr2zZCLfSrbRNtq/6g==": {
+      "description": "Private link email subject: the private link to delete the event the reader posted; {event} is its title",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "رابطك الخاص لـ {event}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/R89OA5GUYekRxWiCvTRSA==": {
+      "description": "Cancellation email: the event the reader had a seat at is cancelled by its organiser; {event} is its title, {time} when it would have started, already formatted",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ألغى المنظم {event} التي كانت ستقام {time}، وأُلغي مقعدك معها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hbIy42QceIJ1mbs3FWf7WQ==": {
+      "description": "Cancellation email subject: the event the reader had a seat at is cancelled; {event} is its title",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تم إلغاء {event}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UsFwsrTwe/3AzqvJm6d67A==": {
+      "description": "Reminder email: the event the reader has a seat at starts within a day; {event} is its title, {time} when it starts, already formatted",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تذكير: لديك مقعد في {event}، التي تبدأ {time}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qC42lQTtoDRiJUHpV1PmbQ==": {
+      "description": "Reminder email subject: the event the reader has a seat at starts within a day; {event} is its title",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تذكير: {event}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qxa4l1H7kCC3JQD+LJ7viA==": {
+      "description": "Strings page: said to the reader right after they book a seat at an event, and it means: you have a seat now. Short, like the English",
+      "status": "translated",
+      "tokens": [
+        "__subject__"
+      ],
+      "translations": [
+        {
+          "translation": "أنت مسجَّل.",
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "أنتِ مسجَّلة.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "تم تأكيد حجزك.",
+          "variations": {
+            "0": 3
+          }
+        }
+      ],
+      "types": [
+        3
+      ]
+    },
+    "pYQquciq1BA6IzmnxI/yIw==": {
+      "description": "Shown to the reader right after they book a seat at an event, and it means: you have a seat now, and we'll see you at the event. Short, like the English",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تم حجزك. نراك هناك!",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9kCCBAQFabdShyYb4xm7WQ==": {
+      "description": "Strings page point: text in components is written in fbt elements, each with a description for the translator",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يُكتب النص في المكوّن داخل عنصر fbt، مع وصف يخبر المترجم بما يحدث، وبما يحمله كل عنصر نائب، وأين يظهر النص: وهو كل ما يعرفه المترجم عن السياق. ويجمع vp dev كل واحد منها، أثناء الحفظ، في كتالوج كل لغة، i18n/translations، وهو ملف في مستودع التطبيق.",
           "variations": {}
         }
       ],

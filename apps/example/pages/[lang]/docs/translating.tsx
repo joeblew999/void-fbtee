@@ -191,7 +191,7 @@ export default function TranslatingPage({ catalogs }: Props) {
                   {`i18n/translations/${c.locale}.json`}
                 </td>
                 <td className="py-2">
-                  <fbt desc="Translating page: how many of a catalog's strings are translated">
+                  <fbt desc="Translating page: how many of a catalog's strings are translated; {translated} is how many are translated, {strings} how many strings there are">
                     <fbt:param name="translated">
                       <Formatted>{number.format(c.translated)}</Formatted>
                     </fbt:param>{" "}
@@ -207,7 +207,7 @@ export default function TranslatingPage({ catalogs }: Props) {
           </tbody>
         </table>
         <p className="text-muted-foreground">
-          <fbt desc="Translating page: link to the events, whose posts are translated by Workers AI">
+          <fbt desc="Translating page: the events people post are translated by Workers AI; {link} is a link to the events whose text is 'see them'">
             The events are translated by Workers AI:{" "}
             <fbt:param name="link">
               <Link href={routeUrl("/[lang]/events")} className="underline">

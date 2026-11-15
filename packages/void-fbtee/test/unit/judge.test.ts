@@ -31,3 +31,98 @@ test("kept terms: commands, file names and paths, without a sentence's full stop
     "i18n/translations",
   ]);
 });
+
+// The grammar checks (grammar.json), each on an answer Gemma 4 gave in the translator test
+// (verdicts.json, 2026-11-15), and on the right one.
+const forms = (text: string, codes: number[][]) =>
+  codes.map((c) => ({
+    translation: text,
+    variations: Object.fromEntries(c.map((v, i) => [i, v])),
+  }));
+
+test("a count's one and other lines differ where a noun is counted", () => {
+  const src = forms("{who} booked {seats} seats.", [
+    [1, 4],
+    [1, 24],
+  ]);
+  const same = ["{who} hat {seats} Plätze gebucht.", "{who} hat {seats} Plätze gebucht."];
+  expect(problemsWith(src, same, "de-DE", "en-US").join()).toMatch(
+    /Lines 1 \(one\) and 2 \(other\)/,
+  );
+  expect(
+    problemsWith(
+      src,
+      ["{who} hat {seats} Platz gebucht.", "{who} hat {seats} Plätze gebucht."],
+      "de-DE",
+      "en-US",
+    ),
+  ).toEqual([]);
+  // No noun counted: "{number}+" is the same in every form.
+  expect(
+    problemsWith(forms("{number}+", [[4], [24]]), ["{number}+", "{number}+"], "de-DE", "en-US"),
+  ).toEqual([]);
+});
+
+test("a male or female line has no word written for both", () => {
+  const src = forms("{name} booked a seat.", [[1], [2], [3]]);
+  const lines = [
+    "{name} забронировал(а) место.",
+    "{name} забронировала место.",
+    "{name} забронировал(а) место.",
+  ];
+  expect(problemsWith(src, lines, "ru-RU", "en-US").join()).toMatch(/Line 1 is for a man/);
+  lines[0] = "{name} забронировал место.";
+  expect(problemsWith(src, lines, "ru-RU", "en-US")).toEqual([]);
+});
+
+test("no capital in the middle of a sentence, but Anda and names keep theirs", () => {
+  const src = "Each language's catalog is in i18n/translations.";
+  expect(
+    problemsWith(
+      line(src),
+      ["El Catálogo de cada idioma está en i18n/translations."],
+      "es-ES",
+    ).join(),
+  ).toMatch(/"Catálogo"/);
+  expect(
+    problemsWith(line(src), ["El catálogo de cada idioma está en i18n/translations."], "es-ES"),
+  ).toEqual([]);
+  expect(
+    problemsWith(
+      line("Ready to translate your app?"),
+      ["Siap menerjemahkan aplikasi Anda?"],
+      "id-ID",
+    ),
+  ).toEqual([]);
+});
+
+test("no English left in a language in another script, Korean particles both ways, Thai punctuation", () => {
+  const agents = "The app's AGENTS.md tells your coding agent what to do.";
+  expect(
+    problemsWith(
+      line(agents),
+      ["应用的 AGENTS.md 会告知你的 coding agent 该做什么。"],
+      "zh-CN",
+    ).join(),
+  ).toMatch(/"coding agent"/);
+  expect(
+    problemsWith(line(agents), ["应用的 AGENTS.md 会告诉你的编程助手该做什么。"], "zh-CN"),
+  ).toEqual([]);
+  expect(problemsWith(line("Open {pages}?"), ["{pages}를 여시겠습니까?"], "ko-KR").join()).toMatch(
+    /을\(를\)/,
+  );
+  expect(problemsWith(line("Open {pages}?"), ["{pages}을(를) 열까요?"], "ko-KR")).toEqual([]);
+  expect(problemsWith(line("Save"), ["บันทึก."], "th-TH").join()).toMatch(/full stop/);
+});
+
+test("Russian's one form is also 21, so its line keeps {number}", () => {
+  const src = forms("{who} booked {seats} seats.", [[4], [20]]);
+  expect(
+    problemsWith(
+      src,
+      ["{who} забронировал одно место.", "{who} забронировал {seats} места."],
+      "ru-RU",
+      "en-US",
+    ).join(),
+  ).toMatch(/keep the placeholder \{seats\}/);
+});

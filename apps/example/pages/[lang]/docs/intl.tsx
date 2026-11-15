@@ -29,12 +29,12 @@ function ListDifference({ worker, browser }: { worker: string; browser: string }
     <>
       {browser.split(":")[0]}.{" "}
       {onlyWorker.length > 0 && (
-        <fbt desc="Intl page: supported values the Worker has and the browser doesn't">
+        <fbt desc="Intl page: supported values the Worker has and the browser doesn't; {values} is a list of them">
           Only on the Worker: <fbt:param name="values">{onlyWorker.join(", ")}</fbt:param>.
         </fbt>
       )}{" "}
       {onlyBrowser.length > 0 && (
-        <fbt desc="Intl page: supported values the browser has and the Worker doesn't">
+        <fbt desc="Intl page: supported values the browser has and the Worker doesn't; {values} is a list of them">
           Only in your browser: <fbt:param name="values">{onlyBrowser.join(", ")}</fbt:param>.
         </fbt>
       )}
@@ -69,7 +69,7 @@ export default function IntlPage({ worker }: Props) {
                 variant={same === keys.length ? "secondary" : "outline"}
                 data-testid="intl-match"
               >
-                <fbt desc="How many rows the browser formatted exactly as the Worker did">
+                <fbt desc="Intl page: how many rows the browser formatted exactly as the Worker did; {same} is how many are the same, {total} how many rows there are">
                   <fbt:param name="same">{number(same)}</fbt:param> of{" "}
                   <fbt:param name="total" number={keys.length}>
                     {number(keys.length)}
@@ -93,7 +93,7 @@ export default function IntlPage({ worker }: Props) {
         <>
           <PageFacts />
           <p className="text-sm text-muted-foreground">
-            <fbt desc="Where the times on the Intl page are shown">
+            <fbt desc="Intl page: which moment the times below show, and in which time zone; {instant} is that moment, already formatted, {zone} a time zone's name">
               The times below are <fbt:param name="instant">{INSTANT}</fbt:param>, shown in{" "}
               <fbt:param name="zone">{ZONE}</fbt:param>.
             </fbt>
@@ -223,7 +223,7 @@ function YourTimeZone() {
   return (
     <p className="min-h-5 text-sm" data-testid="your-time">
       {zone && (
-        <fbt desc="The same moment in the visitor's own time zone">
+        <fbt desc="The same moment in the visitor's own time zone; {time} is that time, already formatted">
           In your time zone:{" "}
           <fbt:param name="time">
             {new Intl.DateTimeFormat(locale, {

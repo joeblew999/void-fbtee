@@ -58,7 +58,7 @@ export function Section({
 export function SkillLink({ section }: { section: string }) {
   return (
     <p className="text-sm text-muted-foreground">
-      <fbt desc="Docs: link at the end of a page to void-fbtee's skill, its full reference">
+      <fbt desc="Docs: the last line of a page, pointing to void-fbtee's skill, its full reference; {link} is a link whose text is void-fbtee's skill">
         The full reference is in{" "}
         <fbt:param name="link">
           <a href={`${SKILL}#${section}`} className="underline">

@@ -63,7 +63,7 @@ function BoardRow({ e }: { e: Row }) {
         <div className="col-span-2 row-start-3 flex flex-wrap gap-x-3 text-muted-foreground text-sm md:col-span-1 md:col-start-3 md:row-start-1 md:grid md:gap-1 md:pt-1">
           <span className="min-h-5 md:text-foreground" data-testid="event-yours">
             {yours && reader && (
-              <fbt desc="An event's start time on the reader's own clock">
+              <fbt desc="When an event starts, on the reader's own clock; {time} is that time, already formatted">
                 Your time:{" "}
                 <fbt:param name="time">
                   {otherDay(e.starts_at, reader) ? `${yours.weekday} ${yours.time}` : yours.time}

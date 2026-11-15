@@ -418,7 +418,7 @@ export const SECTIONS: { id: SectionId; rows: Row[] }[] = [
           () =>
             fbt(
               [fbt.plural("night", n, { many: "nights", showCount: "yes" })],
-              "A number of nights, on the Intl page",
+              "Intl page: a number of nights of a stay, as in a hotel booking; {number} is the count",
             ),
         ),
       ),
@@ -439,7 +439,7 @@ export const SECTIONS: { id: SectionId; rows: Row[] }[] = [
                 new Intl.NumberFormat(l, { style: "currency", currency: "THB" }).format(1234.5),
               ),
             ],
-            "A price, on the Intl page",
+            "Intl page: what something costs; {price} is an amount of money, already formatted with its currency",
           ),
       ),
     ],

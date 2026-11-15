@@ -1,0 +1,101 @@
+{
+  "$comment": "What each language's grammar asks of a translation, checked by judge.ts grammarProblems: in vp dev (a problem goes back to Void's AI), the translator test, and vp build (the checks that need only the translation). Languages by BCP 47 subtag. Found by the translator test's run in 12 languages (e2e/translator/, verdicts.json), 2026-11-15.",
+  "pluralLinesDiffer": {
+    "why": "Pairs of plural forms whose lines must differ when a noun is counted: in the source language, a placeholder followed by a plural noun (countedNoun: \"{seats} seats\", not \"{number}+\"; fbtee keeps only the plural English), because the noun changes between them (Unicode CLDR plural rules; each language's grammar). Gemma 4 gave the same line to both: 1 Plätze, 1 plazas, 1 places, 1 सीटें, Russian's other line мест. Not Arabic's many and other: a feminine noun (ليلة) looks the same in both without its vowel marks.",
+    "languages": {
+      "de": [["one", "other"]],
+      "es": [["one", "other"]],
+      "fr": [["one", "other"]],
+      "it": [["one", "other"]],
+      "pt": [["one", "other"]],
+      "nl": [["one", "other"]],
+      "hi": [["one", "other"]],
+      "ru": [
+        ["one", "few"],
+        ["one", "many"],
+        ["few", "many"],
+        ["many", "other"]
+      ],
+      "uk": [
+        ["one", "few"],
+        ["one", "many"],
+        ["few", "many"],
+        ["many", "other"]
+      ],
+      "pl": [
+        ["one", "few"],
+        ["one", "many"],
+        ["few", "many"]
+      ],
+      "ar": [["few", "many"]]
+    },
+    "countedNoun": {
+      "en": "\\}\\s+(?!(?:is|was|has|does|this|its)\\b)[a-z]+s\\b"
+    }
+  },
+  "bothGenders": {
+    "why": "A word written for either gender at once (Russian забронировал(а), Spanish reservado/a): right only on the line for a person whose gender isn't known. Gemma 4 wrote забронировал(а) on the male lines.",
+    "patterns": ["\\p{L}\\(\\p{L}{1,3}\\)", "\\p{L}/\\p{L}{1,3}(?!\\p{L})", "\\p{L}·\\p{L}"]
+  },
+  "capitals": {
+    "why": "Languages in Latin, Cyrillic or Greek letters that write a word lower-case in the middle of a sentence unless it's a name; German capitalises every noun, so it isn't checked. Gemma 4 wrote Catálogo, String, Chuỗi, Chaînes. Indonesian and Malay always write Anda (you) with a capital.",
+    "notChecked": ["de", "lb"],
+    "alwaysCapital": {
+      "id": ["Anda"],
+      "ms": ["Anda"]
+    }
+  },
+  "noEnglishWords": {
+    "why": "Languages in another script, where English words left in Latin letters are untranslated text (only names, commands, file names and placeholders stay). Gemma 4 left \"coding agent\" in Thai and Chinese.",
+    "languages": [
+      "th",
+      "zh",
+      "ja",
+      "ko",
+      "ar",
+      "hi",
+      "he",
+      "fa",
+      "km",
+      "lo",
+      "my",
+      "ka",
+      "hy",
+      "am",
+      "bn",
+      "ta",
+      "te"
+    ],
+    "kept": ["fbtee", "lang", "dir", "hreflang"]
+  },
+  "particles": {
+    "why": "A particle right after a placeholder: the word it stands for may end in a consonant or a vowel, so both forms are written, as the app does (을(를)). Gemma 4 wrote {pages}를.",
+    "languages": {
+      "ko": [
+        ["을", "를"],
+        ["이", "가"],
+        ["은", "는"],
+        ["과", "와"]
+      ]
+    }
+  },
+  "punctuation": {
+    "why": "Marks a language doesn't write, and misspellings a rule can see. Thai: no full stop at the end and no comma after Thai words or a name (a comma between code words, html, head, stays); a tone mark or vowel mark written twice is misspelt. Found in the translator test's Thai verdicts, 2026-11-15.",
+    "languages": {
+      "th": [
+        [
+          "[\\u0E00-\\u0E7F}]\\s*,",
+          "has a comma after Thai words or a name, which Thai doesn't use: leave it out"
+        ],
+        [
+          "[\\u0E00-\\u0E7F}]\\.\\s*$",
+          "ends with a full stop, which Thai doesn't use: leave it out"
+        ],
+        [
+          "[\\u0E48-\\u0E4B]{2}|([\\u0E31\\u0E34-\\u0E3A\\u0E47-\\u0E4E])\\1",
+          "has a mark written twice over one letter, which is misspelt: write it once"
+        ]
+      ]
+    }
+  }
+}

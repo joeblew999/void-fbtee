@@ -3,7 +3,8 @@
 import { createHash } from "node:crypto";
 import { existsSync, globSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
-import { catalogLocales, missing, type Project } from "./catalogs";
+import { catalogFile, catalogLocales, collect, missing, type Project } from "./catalogs";
+import { grammarProblems } from "./judge";
 import { firstFile, hasI18nMiddleware, HOME_PAGES, LAYOUTS, VOID_CONFIGS } from "./app-files";
 import { sourceOf, translatedOf } from "./locales";
 
@@ -242,6 +243,32 @@ export function check(p: Project): string[] {
       problems.push(`strings: ${r.locale}: untranslated ${JSON.stringify(text)}`);
     if (r.builtin)
       problems.push(`strings: ${r.locale}: ${r.builtin} of fbtee's built-in strings untranslated`);
+  }
+
+  // The grammar of what's translated: what each language asks of its lines (judge.ts
+  // grammarProblems, grammar.json), the same as vp dev checks each answer.
+  const { texts } = collect(p);
+  for (const locale of translatedOf(p.config).map((l) => l.locale)) {
+    const file = catalogFile(p, locale);
+    if (!existsSync(file)) continue;
+    const catalog = JSON.parse(readFileSync(file, "utf8")) as {
+      translations: Record<
+        string,
+        {
+          status?: string;
+          translations?: { translation: string; variations: Record<string, number> }[];
+        }
+      >;
+    };
+    for (const [hash, entry] of Object.entries(catalog.translations)) {
+      if (entry.status === "new" || !entry.translations?.length) continue;
+      for (const what of grammarProblems(
+        entry.translations,
+        entry.translations.map((l) => l.translation),
+        locale,
+      ))
+        problems.push(`strings: ${locale}: ${JSON.stringify(texts[hash] ?? hash)}: ${what}`);
+    }
   }
 
   // Markdown pages: every page in every locale, translated from the current original.
