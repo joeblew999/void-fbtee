@@ -33,6 +33,9 @@ jobs:
       - run: vp check
       - run: vp run check:tools
       - run: vp run test:unit
+      # Every string translated and every markdown copy up to date with its original, in every
+      # language: the example's `i18n:check` (void-fbtee check), the same command as locally.
+      - run: vp run -r i18n:check
       # Vite+'s CI guide's last step, `vp build`; at a workspace root it's every package's build
       # (vite-plus/docs/guide/monorepo.md): void-fbtee packed, the example built. So a change that
       # breaks the build fails here, in a pull request too, not first at deploy.

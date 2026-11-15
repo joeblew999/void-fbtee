@@ -76,7 +76,7 @@ function points(): Point[] {
       code: [
         {
           file: "vite.config.ts",
-          line: "voidFbtee({ sourceLocale, locales, site: SITE, common }),",
+          line: "voidFbtee({ sourceLocale, locales, site: SITE, common, failOnMissing: true }),",
         },
         { file: "src/shell/SiteHeader.tsx", line: "return <fbt common>Events</fbt>;" },
       ],
