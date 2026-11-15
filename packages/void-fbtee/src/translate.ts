@@ -66,7 +66,8 @@ export function translateTask(p: Project): TranslateTask | undefined {
   });
   if (!strings.length && !pageLines.length) return;
   const prompt = [
-    `Translate this Void app. First read ${skillPath(p.root)} (the void-fbtee skill) and follow it.`,
+    `Translate this Void app. First read ${skillPath(p.root)} (the void-fbtee skill) and follow it; ` +
+      `how to translate is in ${translatingSkillPath(p.root)}.`,
     "",
     ...(strings.length ? ["Strings (fbtee catalogs):", ...strings, ""] : []),
     ...(pageLines.length ? ["Markdown pages:", ...pageLines, ""] : []),
@@ -267,6 +268,30 @@ interface CatalogEntry {
   translations?: CatalogLine[];
 }
 
+/**
+ * fbtee's own rules for translating its catalog entries: its skill's steps 3 to 5 (match the
+ * catalog's style, read the description and the code, keep placeholders, the plural and gender
+ * variants), from the app's installed fbtee, so they're always that fbtee's own. The other steps
+ * are commands for an agent. Sent with every `<fbt>` request (ai.ts rulesFor).
+ */
+export function fbteeRules(root: string): string | undefined {
+  try {
+    const skill = readFileSync(
+      join(root, "node_modules/fbtee/skills/fbtee-translate/SKILL.md"),
+      "utf8",
+    );
+    const steps = skill.split("\n").filter((l) => /^[345]\. /.test(l));
+    return steps.length ? steps.join("\n") : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** The translating skill, the same text Void's AI is sent (ai.ts TRANSLATING), as the app has it. */
+export function translatingSkillPath(root: string): string {
+  return skillPath(root).replace("skills/void-fbtee/", "skills/void-fbtee-translate/");
+}
+
 /** A few lines of the code a string is written in, around it, from fbtee's collected phrases. */
 export function sourceContext(p: Project, hash: string): string | undefined {
   const phrase = (
@@ -390,6 +415,9 @@ export async function translateEntry(
     glossary?: { source: string; translation: string }[];
     /** Another model than the language's own (models.ts), for trying one (e2e/translator/). */
     model?: string;
+    /** The translator test turns the rules off to measure them; fbtee's own rules (fbteeRules). */
+    rules?: boolean;
+    fbtee?: string;
     /** AI Gateway's cache on: the translator test, per string from verdicts.json (ai.ts ask). */
     cache?: boolean;
   },
@@ -409,6 +437,8 @@ export async function translateEntry(
       glossary,
       model: o.model,
       cache: o.cache,
+      rules: o.rules,
+      fbtee: o.fbtee,
       feedback: feedback.length ? { answer: out, problems: feedback } : undefined,
     });
     attempts++;
@@ -441,7 +471,7 @@ export async function translateWithVoidAi(
   token: string,
   log: (line: string) => void,
   /** The translator test's: AI Gateway's cache on, another model (e2e/translator/). */
-  test: { cache?: boolean; model?: string; locale?: string } = {},
+  test: { cache?: boolean; model?: string; locale?: string; rules?: boolean } = {},
 ): Promise<boolean> {
   const call = async (body: unknown): Promise<Record<string, unknown> | undefined> => {
     const res = await fetch(url, {
@@ -466,6 +496,7 @@ export async function translateWithVoidAi(
   const rel = (f: string) => relative(p.root, f).split(sep).join("/");
 
   const { texts, builtinHashes } = collect(p);
+  const fbtee = fbteeRules(p.root);
   // The translator test runs languages side by side: each call then only touches its own.
   for (const m of missing(p).filter((m) => !test.locale || m.locale === test.locale)) {
     const file = catalogFile(p, m.locale);
@@ -500,6 +531,7 @@ export async function translateWithVoidAi(
         entry: toSend[0]!,
         examples: examplesFor(finished, toSend),
         glossary,
+        fbtee,
         ...test,
       });
       if (!answer) return false;
@@ -526,7 +558,13 @@ export async function translateWithVoidAi(
   for (const page of markdownPages(p)) {
     if (page.state !== "missing" && page.state !== "stale") continue;
     const original = readFileSync(page.original, "utf8");
-    const answer = await call({ kind: "page", from, to: page.locale, text: original });
+    const answer = await call({
+      kind: "page",
+      from,
+      to: page.locale,
+      text: original,
+      rules: test.rules,
+    });
     if (!answer) return false;
     const copy = typeof answer.page === "string" ? answer.page : "";
     if (!copy.trim()) continue;

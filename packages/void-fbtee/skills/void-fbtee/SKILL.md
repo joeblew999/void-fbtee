@@ -27,11 +27,11 @@ Translate only this way, never by other means, so the app's own tooling is what'
    `voidFbtee()` in `vite.config.ts`), already prepared by `vp dev`: new strings have
    `"status": "new"`, fbtee's built-in strings included. Don't run `fbtee collect` or
    `fbtee prepare-translations`: the dev server does that.
-2. Translate every entry with `"status": "new"` by fbtee's own skill:
-   `node_modules/fbtee/skills/fbtee-translate/SKILL.md`. Follow its steps 3 to 5 (match the
-   locale's existing style, read each description and the source, keep placeholders exactly, then
-   mark the entry done).
-3. What's specific to void-fbtee apps is below.
+2. Translate every entry with `"status": "new"` by fbtee's own skill,
+   `node_modules/fbtee/skills/fbtee-translate/SKILL.md`, steps 3 to 5, and void-fbtee's
+   translating skill, `node_modules/void-fbtee/skills/void-fbtee-translate/SKILL.md`: how to
+   translate, the same rules Void's AI is sent. Then mark the entry done.
+3. What's specific to editing a void-fbtee app's catalogs is below.
 
 **Page titles and descriptions.** A page's `head()` (Void's `defineHead`, in its `.server.ts`)
 runs inside void-fbtee's per-request state, so its text is `fbs("…", "…")` and is in the catalogs
@@ -56,33 +56,17 @@ the rest): an app written in Arabic, say. Then the dev server makes a catalog fo
 holding only the strings with a count. You write each form there in the source language itself, so
 2, 11 and 100 each get their own grammar. Its lines are marked `"status": "new"` like any other.
 
-**Gender.** fbtee's skill covers the rest of an entry; two things are void-fbtee's. A `<fbt:name>`
-or `<fbt:pronoun>` entry already has `"types": [3]`: give it one line per gender, `variations`
-`{"0": 1}` male, `{"0": 2}` female, `{"0": 3}` unknown, where the language changes its words
-(Arabic does, Thai mostly doesn't, and one line with `{}` is then fine). A sentence spoken to the
-reader can change by the reader's gender too, set by `<InLanguage gender>`: add
-`"tokens": ["__viewing_user__"], "types": [3]` to that entry and the same three lines. Never change
-the hash keys.
+**Gender, in the catalog.** A `<fbt:name>` or `<fbt:pronoun>` entry already has
+`"types": [3]`: give it one line per gender where the language changes its words, `variations`
+`{"0": 1}` male, `{"0": 2}` female, `{"0": 3}` unknown (one line with `{}` where it doesn't). A
+sentence spoken to the reader can change by the reader's gender too, set by `<InLanguage gender>`:
+add `"tokens": ["__viewing_user__"], "types": [3]` to that entry and the same three lines. Never
+change the hash keys.
 
-**Plurals.** A string with a count has one line per plural form the language uses (the dev server adds
-them; fbtee's own prepare-translations doesn't). Each line's `variations` names its form by
-fbtee's code: 16 zero, 4 one, 8 two, 20 few, 12 many, 24 other. Write each line in that form's
-grammar; the form a count falls in is `new Intl.PluralRules(locale).select(n)`, the rule fbtee's
-runtime uses. A form may leave out `{number}` where the language does (Arabic two: "ليلتان").
-Don't add or remove lines. A `<fbt:plural>` also comes as a separate entry for exactly 1 ("1 night"
-next to "{number} nights"): translate both. A plural that hides its count (`showCount="no"`, "One
-seat is left" / "seats are left") has its lines too.
-
-**fbtee's built-in strings.** Every catalog has 12 from fbtee (`fbtee/Strings.json`): how `list()`
-joins items and number labels ("{number}+"). Use the locale's own conventions; for the list
-strings, CLDR's where fbtee can write them, as `Intl.ListFormat` prints them
-(`{ type: "disjunction" }` gives the "or" lists). fbtee joins every item but the last with one
-string, `{previous items}, {following items}`, the same for "and", "or" and plain lists, so it holds
-the language's comma: CLDR's Arabic "and" list, `A وB وC`, would make the "or" list `A وB أو C`.
-Arabic is then `A، B وC`.
-
-**Right-to-left locales** (`ar-EG`): void-fbtee sets `<html dir="rtl">`, so write natural text with
-no direction marks (U+200E, U+200F).
+**Plurals, in the catalog.** A string with a count has one line per plural form the language uses
+(the dev server adds them; fbtee's own prepare-translations doesn't). Each line's `variations`
+names its form by fbtee's code: 16 zero, 4 one, 8 two, 20 few, 12 many, 24 other. Don't add or
+remove lines.
 
 ## Writing strings
 
@@ -278,22 +262,8 @@ sign-in (`void cloudflare login`); for the preview, mark the binding remote in `
 Pages under `pages/<source locale>/` have a copy per locale at the same path under
 `pages/<locale>/` (the locale's URL segment). Translate the whole file:
 
-- **Translate:** headings, paragraphs, lists, link text, image alt text, and frontmatter values
-  meant for people (`title`, `description`). Keep the keys, and values that are data (dates,
-  numbers, slugs, file names).
-- **Keep exactly:** the `<script>` block at the top (first in the file; its import paths stay the
-  same), components and islands with their props, code blocks, inline code, URLs, HTML
-  attributes, and the page's structure (same headings in the same order). That includes links to
-  the site's own pages: they're written relative (`../events`, or `./other.md` for a markdown
-  page, which @void/md turns into its route), so the copy's links stay in its language as they
-  are. In an original, write them that way, never with the language (`/en-US/events`).
-- **Boxes and alerts** (`::: tip …`, `> [!NOTE] …`): translate the title after the marker, and
-  keep the marker (`tip`, `[!NOTE]`) as it is. The original gives every one a title (@void/md's
-  own default titles are English: "TIP", "WARNING", "Details"); `vp dev` and `vp build` report one
-  without, in the original or a copy.
-- **Also keep exactly:** heading ids (`{#times}`, so `#times` links work in every copy) and other
-  `{…}` attributes, footnote labels (`[^dst]`; translate the footnote's text), the keys in
-  `<kbd>`, and code blocks with their meta (`{4} :line-numbers`) and `// [!code …]` comments.
+- **How to translate it:** `node_modules/void-fbtee/skills/void-fbtee-translate/SKILL.md`,
+  "Markdown pages": what's translated and what's kept exactly.
 - **Dates, times, numbers:** a page shows them through a component that formats them with `Intl`
   (an island, with the value as a prop), not as written-out text. Leave the component as it is;
   if the original has one written out, keep it as written and say so in your summary. An island

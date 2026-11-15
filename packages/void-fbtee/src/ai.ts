@@ -1,7 +1,10 @@
 // Translating with Void's AI (`ai` from `void/ai`: Workers AI), in the app's Worker. One
 // translator for everything: what people post, at runtime (an app's queue calls translate()), and
 // the app's own strings and pages while `vp dev` runs (the dev server's route calls
-// translateStrings() and translatePage(): plugin.ts, devTranslate below).
+// translateStrings() and translatePage(): plugin.ts, devTranslate below). Each is told how to
+// translate by the translating skill (skills/void-fbtee-translate/SKILL.md, bundled into the code:
+// TRANSLATING), the text a coding agent reads too: instructions() below, the one place a request
+// is worded.
 //
 // Void's AI is there wherever Void runs the app's code: dev, the preview and Cloudflare, in a
 // route, a queue or a job (found 2026-11-13, plans/quiet-harbor-atlas.md, 7b). Void only connects
@@ -11,7 +14,15 @@
 //
 // Which model translates into which language, and why: models.ts.
 import { ai } from "void/ai";
+import skill from "../skills/void-fbtee-translate/SKILL.md?raw";
 import { LLAMA, modelById, modelFor, type TranslationModel } from "./models";
+
+/**
+ * How to translate: the translating skill (skills/void-fbtee-translate/SKILL.md), the same text a
+ * coding agent reads, bundled into the code so it travels with it. Its frontmatter is the
+ * skill's own label, not a rule.
+ */
+export const TRANSLATING = skill.replace(/^---\n[\s\S]*?\n---\n+/, "").trim();
 
 /** A language's English name, for the prompt ("Thai" for "th-TH"). */
 const named = (locale: string) =>
@@ -96,9 +107,13 @@ export async function translate<K extends string>(
 ): Promise<Record<K, string>> {
   const keys = Object.keys(fields) as K[];
   const out = await ask<Record<K, string>>(
-    `You translate ${about}. Translate naturally, the way a local would write it; keep names of ` +
-      `people and places. Reply with JSON only: an object with the same keys.`,
-    `From ${named(from)} into ${named(to)}:\n${JSON.stringify(fields)}`,
+    instructions(
+      "post",
+      about,
+      { from, to },
+      "Reply with JSON only: an object with the same keys.",
+    ),
+    JSON.stringify(fields),
     {
       type: "object",
       properties: Object.fromEntries(keys.map((k) => [k, { type: "string" }])),
@@ -109,8 +124,62 @@ export async function translate<K extends string>(
   return Object.fromEntries(keys.map((k) => [k, String(out[k] ?? "")])) as Record<K, string>;
 }
 
-/** fbtee's plural form codes, as its catalogs name them in each line's `variations`. */
+/** What's translated: the app's `<fbt>` text, what people post, a markdown page. */
+export type Kind = "fbt" | "post" | "page";
+
+/** The skill's sections each kind is sent (its `## ` headings). */
+const SECTIONS: Record<Kind, string[]> = {
+  fbt: [
+    "The app's strings",
+    "Counts: one line per plural form",
+    "People: one line per gender",
+    "fbtee's built-in strings",
+    "Languages",
+  ],
+  post: ["What people post", "Languages"],
+  page: ["Markdown pages", "Languages"],
+};
+
+const bySection = new Map(
+  TRANSLATING.split(/^## /m)
+    .slice(1)
+    .map((part) => [part.slice(0, part.indexOf("\n")).trim(), `## ${part.trim()}`] as const),
+);
+for (const heading of Object.values(SECTIONS).flat())
+  if (!bySection.has(heading)) throw new Error(`the translating skill has no "## ${heading}"`);
+
+/**
+ * How a kind of text is translated: the translating skill's sections for it, and for `<fbt>` text
+ * fbtee's own rules first (fbtee's skill, steps 3 to 5, read from the app's installed fbtee by
+ * vp dev: translate.ts fbteeRules), so every AI gets the same rules a coding agent reads.
+ */
+export function rulesFor(kind: Kind, fbtee?: string): string {
+  return [
+    ...(kind === "fbt" && fbtee ? [`## fbtee's own rules\n\n${fbtee}`] : []),
+    ...SECTIONS[kind].map((h) => bySection.get(h)!),
+  ].join("\n\n");
+}
+
+/** What every request says, whatever the kind: what it is, the rules (unless the translator test
+ * turns them off to measure them), and how to reply. */
+function instructions(
+  kind: Kind,
+  what: string,
+  { from, to, rules = true, fbtee }: { from: string; to: string; rules?: boolean; fbtee?: string },
+  reply: string,
+): string {
+  const into = from === to ? `in ${named(to)} itself` : `from ${named(from)} into ${named(to)}`;
+  return [`You translate ${what}, ${into}.`, ...(rules ? [rulesFor(kind, fbtee)] : []), reply].join(
+    "\n\n",
+  );
+}
+
+/** fbtee's variation codes, as its catalogs name them in each line's `variations`: a gender
+ * (a name's, a pronoun's, the reader's) or a plural form. */
 const FORMS: Record<number, string> = {
+  1: "male",
+  2: "female",
+  3: "unknown gender",
   16: "zero",
   4: "one",
   8: "two",
@@ -151,9 +220,15 @@ export async function translateStrings(
     feedback,
     model,
     cache,
+    rules,
+    fbtee,
   }: {
     from: string;
     to: string;
+    /** The translator test turns the rules off to measure them. */
+    rules?: boolean;
+    /** fbtee's own rules, from the app's installed fbtee (translate.ts fbteeRules). */
+    fbtee?: string;
     examples?: Example[];
     glossary?: { source: string; translation: string }[];
     /** The last answer and what was wrong with it, when it's asked again. */
@@ -177,20 +252,14 @@ export async function translateStrings(
     })),
   }));
   const out = await ask<{ entries: { id: number; lines: string[] }[] }>(
-    "You translate the text of a web app's user interface. For each entry, read its description " +
-      "(where the text shows and what it means) and translate each line. The description is only " +
-      "there to explain: never put its words in the translation. Say everything the source says, " +
-      "the same way, as a statement, question or instruction, and in its tense, adding nothing and " +
-      "leaving nothing out. Keep every {placeholder} " +
-      "exactly as written, untranslated. A line marked with a plural form (zero, one, two, few, " +
-      "many, other) is the sentence for counts in that form of the target language: write it in " +
-      "that form's grammar; the zero, one and two forms may say the number in words instead of " +
-      "{number}. Each entry's keep_exactly words (commands, file names, paths, product names) " +
-      "stay exactly as written, in Latin letters, never translated or explained. The examples " +
-      "are the app's own translations: use the same words for the same things, and the same " +
-      "style. An entry's code is the source around it, to show where the text appears. " +
-      "Write right-to-left text naturally, with no direction marks (U+200E, U+200F). " +
-      `Write ${from === to ? `in ${named(to)} itself` : `in ${named(to)}`}. Reply with JSON only.`,
+    instructions(
+      "fbt",
+      "the text of a web app's user interface",
+      { from, to, rules, fbtee },
+      "Each entry comes with its description, its code (the source around it, to show where the " +
+        "text appears), its keep_exactly words and its lines, each marked with its form. Reply " +
+        "with JSON only.",
+    ),
     (glossary.length
       ? `The app's own words for these terms: always use them, never another word:\n${JSON.stringify(glossary)}\n\n`
       : "") +
@@ -245,16 +314,16 @@ export async function translateStrings(
  */
 export async function translatePage(
   text: string,
-  { from, to }: { from: string; to: string },
+  { from, to, rules }: { from: string; to: string; rules?: boolean },
 ): Promise<string> {
   const out = await ask<{ page: string }>(
-    "You translate markdown pages of a website. Translate the prose, headings, list items, table " +
-      "cells, link text, box and alert titles, and the frontmatter's title and description. Keep " +
-      "exactly as written: the frontmatter's other keys and values, the <script> block, every " +
-      "component tag with its props (<Name ... />), code blocks and inline code, link targets, " +
-      "{#ids} and other {...} attributes, ::: and > [!NOTE] markers, [[toc]] and footnote labels. " +
+    instructions(
+      "page",
+      "markdown pages of a website",
+      { from, to, rules },
       "Don't add a translatedFrom line. Reply with JSON only: the whole page as one string.",
-    `From ${named(from)} into ${named(to)}:\n${text}`,
+    ),
+    text,
     { type: "object", properties: { page: { type: "string" } }, required: ["page"] },
     modelFor(to),
   );
@@ -272,10 +341,13 @@ export type DevRequest =
       glossary?: { source: string; translation: string }[];
       feedback?: { answer: string[]; problems: string[] };
       cache?: boolean;
-      /** The translator test only (e2e/translator/): another model to try. */
+      /** fbtee's own rules, from the app's installed fbtee (translate.ts fbteeRules). */
+      fbtee?: string;
+      /** The translator test only (e2e/translator/): another model to try; the rules off. */
       model?: string;
+      rules?: boolean;
     }
-  | { kind: "page"; from: string; to: string; text: string }
+  | { kind: "page"; from: string; to: string; text: string; rules?: boolean }
   /** The meaning score (judge.ts): each pair is a source and its translation. */
   | { kind: "meaning"; pairs: [string, string][] }
   /** The cache test only (e2e/translator/cache.test.ts). */

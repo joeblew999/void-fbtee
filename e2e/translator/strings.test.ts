@@ -19,7 +19,10 @@
 //   Nothing fails on a wrong answer; at the end the model with the most right answers is written
 //   into models.json as the language's, unless unreviewed answers could change that: they're
 //   listed for Claude Code to judge, and the pick is made on the next run.
-// TRANSLATOR_LANGUAGES picks languages (th-TH,ar-EG). AI Gateway's cache is on for a string with an
+// TRANSLATOR_LANGUAGES picks languages (th-TH,ar-EG). TRANSLATOR_MODELS picks models for a pick run,
+// which then only reports (models.json is written only when every model ran). TRANSLATOR_RULES=0
+// sends no translating skill, to measure it (scored as "<language> <model> no-rules").
+// AI Gateway's cache is on for a string with an
 // answer judged right, off for the rest (ai.ts ask).
 import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -37,6 +40,8 @@ const DATA = join(import.meta.dirname, "../../packages/void-fbtee/test/translato
 const SCORES = join(DATA, "scores.json");
 const MODELS = join(import.meta.dirname, "../../packages/void-fbtee/src/models.json");
 const PICK = process.env.TRANSLATOR_PICK === "1";
+const ONLY = process.env.TRANSLATOR_MODELS?.split(",");
+const RULES = process.env.TRANSLATOR_RULES !== "0";
 const TODAY = new Date().toISOString().slice(0, 10);
 
 // A copy of the test app, inside the package so fbtee resolves from its node_modules.
@@ -88,6 +93,7 @@ async function translateOne(to: string, model: string, hash: string): Promise<Re
     const cache = VERDICTS[to]?.[hash]?.some((v) => v.right) ?? false;
     const log: string[] = [];
     const ran = await translateWithVoidAi(p, url, token(), (l) => log.push(l), {
+      rules: RULES,
       cache,
       model,
       locale: to,
@@ -140,7 +146,7 @@ function writeScores(to: string, model: string, results: Result[]): void {
   const all = existsSync(SCORES)
     ? (JSON.parse(readFileSync(SCORES, "utf8")) as Record<string, unknown>)
     : {};
-  all[PICK ? `${to} ${model}` : to] = {
+  all[(PICK ? `${to} ${model}` : to) + (RULES ? "" : " no-rules")] = {
     date: TODAY,
     model,
     right: count(results, "right"),
@@ -182,6 +188,8 @@ function pick(to: string, byModel: Map<string, Result[]>, strings: number): void
     );
   if (unreviewed.length)
     console.log(`${to}: ${unreviewed.length} unjudged answers that can't change the pick`);
+  // Only some models, or without the skill: a measurement, not a pick.
+  if (ONLY || !RULES) return;
   const data = JSON.parse(readFileSync(MODELS, "utf8")) as {
     languages: { language: string; name: string; model: string; source: string; why: string }[];
   };
@@ -210,7 +218,9 @@ const hashes = Object.keys(
 // file. Within one language, its models and strings one after another (they share that file).
 describe("languages", { concurrent: true }, () => {
   for (const to of LANGUAGES) {
-    const models = PICK ? CANDIDATES.map((m) => m.id) : [modelFor(to).id];
+    const models = PICK
+      ? CANDIDATES.map((m) => m.id).filter((m) => !ONLY || ONLY.includes(m))
+      : [modelFor(to).id];
     describe(to, { concurrent: false }, () => {
       const byModel = new Map<string, Result[]>();
       for (const model of models) {

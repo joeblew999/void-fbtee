@@ -1,4 +1,5 @@
 // Builds the package with `vp pack` (tsdown). Virtual modules are made by the plugin at the app's build time.
+import { readFileSync } from "node:fs";
 import { connect } from "node:net";
 import { defineConfig } from "vite-plus";
 
@@ -31,6 +32,20 @@ export default defineConfig({
     },
     format: ["esm"],
     dts: true,
+    // A file imported with `?raw` becomes its text, inside the build, as Vite does it (and so
+    // Vitest, running the source): the translating skill travels in dist/ai.mjs, in Node (vp dev)
+    // and in the Worker (an app's queue) alike, where there's no file to read.
+    plugins: [
+      {
+        name: "void-fbtee:raw",
+        load(id: string) {
+          if (!id.endsWith("?raw")) return;
+          const file = id.slice(0, -"?raw".length);
+          this.addWatchFile(file);
+          return `export default ${JSON.stringify(readFileSync(file, "utf8"))};`;
+        },
+      },
+    ],
     // Nothing from node_modules is bundled, code or types: a copy would differ from the app's
     // own (Hono's types once came in through the middleware's, as Void's defineMiddleware returns
     // Hono's type). onlyBundle makes any bundled package a build error.
