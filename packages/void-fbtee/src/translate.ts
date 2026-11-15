@@ -441,7 +441,7 @@ export async function translateWithVoidAi(
   token: string,
   log: (line: string) => void,
   /** The translator test's: AI Gateway's cache on, another model (e2e/translator/). */
-  test: { cache?: boolean; model?: string } = {},
+  test: { cache?: boolean; model?: string; locale?: string } = {},
 ): Promise<boolean> {
   const call = async (body: unknown): Promise<Record<string, unknown> | undefined> => {
     const res = await fetch(url, {
@@ -466,7 +466,8 @@ export async function translateWithVoidAi(
   const rel = (f: string) => relative(p.root, f).split(sep).join("/");
 
   const { texts, builtinHashes } = collect(p);
-  for (const m of missing(p)) {
+  // The translator test runs languages side by side: each call then only touches its own.
+  for (const m of missing(p).filter((m) => !test.locale || m.locale === test.locale)) {
     const file = catalogFile(p, m.locale);
     if (!existsSync(file)) continue;
     const catalog = JSON.parse(readFileSync(file, "utf8")) as {
@@ -504,7 +505,11 @@ export async function translateWithVoidAi(
       if (!answer) return false;
       const out = answer.lines;
       const entry = batch[0]!;
-      if (!problemsWith(entry.translations!, out, m.locale).length) {
+      const problems = problemsWith(entry.translations!, out, m.locale);
+      // Not kept: say what was wrong with its last answer, so the reason is in the log.
+      if (problems.length)
+        log(`${texts[hashOf.get(entry)!]} → ${JSON.stringify(out)}: ${problems.join(" ")}`);
+      if (!problems.length) {
         entry.translations = entry.translations!.map((l, k) => ({ ...l, translation: out[k]! }));
         entry.status = "translated";
         done++;

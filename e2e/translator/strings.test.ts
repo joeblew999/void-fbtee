@@ -87,7 +87,11 @@ async function translateOne(to: string, model: string, hash: string): Promise<Re
     // Cached only once an answer to it was judged right (verdicts.json).
     const cache = VERDICTS[to]?.[hash]?.some((v) => v.right) ?? false;
     const log: string[] = [];
-    const ran = await translateWithVoidAi(p, url, token(), (l) => log.push(l), { cache, model });
+    const ran = await translateWithVoidAi(p, url, token(), (l) => log.push(l), {
+      cache,
+      model,
+      locale: to,
+    });
     expect(ran, `Void's AI isn't available: ${log.join(" ")}`).toBe(true);
     const after = (JSON.parse(readFileSync(file, "utf8")) as Catalog).translations[hash]!;
     const kept = after.status === "translated";
@@ -202,27 +206,31 @@ const hashes = Object.keys(
   (JSON.parse(readFileSync(catalogFile(p, LANGUAGES[0]!), "utf8")) as Catalog).translations,
 ).filter((h) => !builtinHashes.has(h));
 
-for (const to of LANGUAGES) {
-  const models = PICK ? CANDIDATES.map((m) => m.id) : [modelFor(to).id];
-  describe(to, () => {
-    const byModel = new Map<string, Result[]>();
-    for (const model of models) {
-      describe(model, () => {
-        const results: Result[] = [];
-        byModel.set(model, results);
-        for (const hash of hashes)
-          test.skipIf(!!skip)(texts[hash]!, async () => {
-            const r = await translateOne(to, model, hash);
-            results.push(r);
-            const mark = r.verdict === "wrong" ? "✗" : r.verdict === "right" ? "✓" : "?";
-            console.log(
-              `${to} ${model.split("/").pop()} ${mark} ${r.text} (meaning ${r.meaning ?? "-"}, chrF ${r.chrF ?? "-"}): ${r.got.join(" | ")}${r.why ? ` — ${r.why}` : ""}`,
-            );
-            if (!PICK) expect(r.verdict, `${to}: ${r.text}: ${r.why}`).not.toBe("wrong");
-          });
-        afterAll(() => writeScores(to, model, results));
-      });
-    }
-    if (PICK) afterAll(() => pick(to, byModel, hashes.length));
-  });
-}
+// Languages side by side, up to Vitest's maxConcurrency (5) at a time: each has its own catalog
+// file. Within one language, its models and strings one after another (they share that file).
+describe("languages", { concurrent: true }, () => {
+  for (const to of LANGUAGES) {
+    const models = PICK ? CANDIDATES.map((m) => m.id) : [modelFor(to).id];
+    describe(to, { concurrent: false }, () => {
+      const byModel = new Map<string, Result[]>();
+      for (const model of models) {
+        describe(model, () => {
+          const results: Result[] = [];
+          byModel.set(model, results);
+          for (const hash of hashes)
+            test.skipIf(!!skip)(texts[hash]!, async () => {
+              const r = await translateOne(to, model, hash);
+              results.push(r);
+              const mark = r.verdict === "wrong" ? "✗" : r.verdict === "right" ? "✓" : "?";
+              console.log(
+                `${to} ${model.split("/").pop()} ${mark} ${r.text} (meaning ${r.meaning ?? "-"}, chrF ${r.chrF ?? "-"}): ${r.got.join(" | ")}${r.why ? ` — ${r.why}` : ""}`,
+              );
+              if (!PICK) expect(r.verdict, `${to}: ${r.text}: ${r.why}`).not.toBe("wrong");
+            });
+          afterAll(() => writeScores(to, model, results));
+        });
+      }
+      if (PICK) afterAll(() => pick(to, byModel, hashes.length));
+    });
+  }
+});
