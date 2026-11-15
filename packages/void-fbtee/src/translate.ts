@@ -280,7 +280,7 @@ export function keptTerms(text: string): string[] {
     text.match(
       /\bvp [a-z]+\b|[\w-]+\.(?:md|mdx|ts|tsx|js|json|ya?ml)\b|\b[\w.-]+(?:\/[\w.-]+)+|\b[a-z0-9]+(?:-[a-z0-9]+)+\b/g,
     ) ?? []
-  );
+  ).map((t) => t.replace(/[.-]+$/, "")); // a sentence's own full stop isn't part of a path
 }
 
 /**

@@ -4,7 +4,7 @@
 // (models.ts). Each answer must pass the checks `vp dev` applies before it writes one
 // (translate.ts problemsWith): one line per form, nothing left in English, placeholders,
 // commands, file names and paths kept. `vp run test:translator` (the dev server's setup: yours if
-// it's running, else it starts one); TRANSLATOR_LANGUAGES picks the languages (default below);
+// it's running, else it starts one); TRANSLATOR_LANGUAGES picks the languages (default: every one in references.ts);
 // TRANSLATOR_MODEL tries another model than each language's own, scored as "<language> <model>".
 //
 // Where a string has a reference translation for the language (strings.ts `ref`), the answer is
@@ -22,6 +22,7 @@ import {
 } from "../../packages/void-fbtee/src/translate";
 import { modelFor } from "../../packages/void-fbtee/src/models";
 import { chrF } from "../../packages/void-fbtee/test/translator/score";
+import { REFERENCES } from "../../packages/void-fbtee/test/translator/references";
 import { formsFor, STRINGS } from "../../packages/void-fbtee/test/translator/strings";
 import { EXAMPLE } from "../preview/setup";
 
@@ -32,10 +33,8 @@ type Scores = Record<string, unknown>;
 const readScores = (): Scores =>
   existsSync(SCORES) ? (JSON.parse(readFileSync(SCORES, "utf8")) as Scores) : {};
 const MODEL = process.env.TRANSLATOR_MODEL;
-const LANGUAGES = (
-  process.env.TRANSLATOR_LANGUAGES ??
-  "th-TH,ar-EG,vi-VN,id-ID,ja-JP,zh-CN,ko-KR,hi-IN,de-DE,fr-FR,es-ES,ru-RU"
-).split(",");
+// Every language with references (references.ts), unless TRANSLATOR_LANGUAGES picks some.
+const LANGUAGES = process.env.TRANSLATOR_LANGUAGES?.split(",") ?? Object.keys(REFERENCES);
 
 for (const to of LANGUAGES) {
   test.skipIf(!!skip)(
@@ -81,7 +80,7 @@ for (const to of LANGUAGES) {
         });
         const out = answer?.lines ?? [];
         const problems = answer ? answer.problems : ["no answer: Void's AI isn't available"];
-        const ref = t.ref?.[to];
+        const ref = REFERENCES[to]?.[t.name];
         const score =
           ref && out.length === ref.length
             ? Math.round(out.reduce((a, l, i) => a + chrF(l, ref[i]!), 0) / out.length)

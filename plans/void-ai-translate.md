@@ -73,3 +73,5 @@ server's Worker.
   package with an app of its own (packages/void-fbtee/test/translator/app/: voidFbtee() and one
   file importing void/ai), started and stopped by the test (its whole process group), run as
   `vp run void-fbtee#test:translator`. Later, the user's call (2026-11-15).
+- The test strings are all English source. An app written in another language (the Thai-source
+  fresh app) is never tested: add source strings in another language, with references.
