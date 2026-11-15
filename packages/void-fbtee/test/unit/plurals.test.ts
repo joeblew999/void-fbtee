@@ -10,7 +10,7 @@ import {
 } from "@nkzw/fbtee-compiler";
 import { createFbteeRuntime } from "fbtee";
 import {
-  addPluralForms,
+  addVariants,
   CATEGORY_CODE,
   pluralCategories,
   pluralSlots,
@@ -35,7 +35,7 @@ const ONE = hashOf["1 night"]!;
 
 const prepare = (locale: string, existing?: object) =>
   JSON.parse(
-    addPluralForms(
+    addVariants(
       prepareTranslationsBatchSync(JSON.stringify({ phrases }), [
         existing ? { locale, existingJson: JSON.stringify(existing) } : { locale },
       ])[0]!,
@@ -177,7 +177,7 @@ const left = (n) => <fbt desc="seats left, count hidden"><fbt:plural count={n} m
 `;
   const ph = JSON.parse(collectSync("h.jsx", HIDDEN, { collectPackager: "text" }).output!).phrases;
   const prepared = JSON.parse(
-    addPluralForms(
+    addVariants(
       prepareTranslationsBatchSync(JSON.stringify({ phrases: ph }), [{ locale: "ar-EG" }])[0]!,
       pluralSlots(ph),
       "ar-EG",
@@ -219,5 +219,63 @@ const left = (n) => <fbt desc="seats left, count hidden"><fbt:plural count={n} m
       "مقاعد كثيرة",
       "مقاعد",
     ]);
+  });
+});
+
+// A person's gender, alone and with a count: fbtee names the tokens (types 3 a gender, 28 a
+// count), void-fbtee adds a line per gender and per combination, each keyed by its own token, and
+// fbtee's runtime picks the right one. Before, a name and a count in one string had its plural
+// lines filed under the name's key (2026-11-15).
+describe("a name's gender, alone and with a count", () => {
+  const PEOPLE = `import { fbt } from "fbtee";
+const booked = (name, g) => <fbt desc="someone booked"><fbt:name name="name" gender={g}>{name}</fbt:name> booked.</fbt>;
+const seats = (name, g, n) => <fbt desc="someone booked seats"><fbt:name name="name" gender={g}>{name}</fbt:name> booked <fbt:plural count={n} many="seats" showCount="yes">seat</fbt:plural>.</fbt>;
+`;
+  const ph = JSON.parse(collectSync("p.jsx", PEOPLE, { collectPackager: "text" }).output!).phrases;
+  const prepared = JSON.parse(
+    addVariants(
+      prepareTranslationsBatchSync(JSON.stringify({ phrases: ph }), [{ locale: "ar-EG" }])[0]!,
+      pluralSlots(ph),
+      "ar-EG",
+    ),
+  ) as { "fb-locale": string; translations: Record<string, PluralEntry> };
+  const G: Record<number, string> = { 1: "he", 2: "she", 3: "they" };
+
+  test("a line per gender, and per gender and plural form, each keyed by its own token", () => {
+    const shapes = Object.values(prepared.translations)
+      .filter((e) => e.tokens?.includes("name"))
+      .map((e) => ({ tokens: e.tokens, lines: e.translations!.length, status: e.status }));
+    expect(shapes).toContainEqual({ tokens: ["name"], lines: 3, status: "new" });
+    // Arabic's five forms besides exactly one, times three genders.
+    expect(shapes).toContainEqual({ tokens: ["name", "number"], lines: 15, status: "new" });
+  });
+
+  test("fbtee's runtime picks the line for the person's gender and the count", () => {
+    for (const e of Object.values(prepared.translations)) {
+      for (const l of e.translations!) {
+        const v = l.variations ?? {};
+        const who = G[Number(v[0])] ?? "x";
+        l.translation = e.tokens?.includes("number")
+          ? `${who} {name} ${Number(v[1])} {number}`
+          : `${who} {name}`;
+      }
+      e.status = "translated";
+    }
+    const table = JSON.parse(
+      translateSync(JSON.stringify({ phrases: ph, translationGroups: [prepared] }), true),
+    )["ar-EG"];
+    const { fbt } = createFbteeRuntime({ locale: "ar-EG", translations: { "ar-EG": table } });
+    const code = transformSync("p.jsx", PEOPLE, { lang: "jsx" }).code.replace(/^import .*$/m, "");
+    // oxlint-disable-next-line no-implied-eval
+    const [booked, seats] = new Function("fbt", `${code}; return [booked, seats];`)(fbt);
+    expect([1, 2, 3].map((g) => String(booked("Sara", g)))).toEqual([
+      "he Sara",
+      "she Sara",
+      "they Sara",
+    ]);
+    // 3 is few (20) in Arabic, 11 many (12); the count in Arabic's own digits, as Intl writes it.
+    const n = (x: number) => new Intl.NumberFormat("ar-EG").format(x);
+    expect(String(seats("Sara", 2, 3))).toBe(`she Sara ${CATEGORY_CODE.few} ${n(3)}`);
+    expect(String(seats("Ali", 1, 11))).toBe(`he Ali ${CATEGORY_CODE.many} ${n(11)}`);
   });
 });

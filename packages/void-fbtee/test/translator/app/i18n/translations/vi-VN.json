@@ -358,7 +358,21 @@
       "translations": [
         {
           "translation": "{name} đã đặt một chỗ.",
-          "variations": {}
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "{name} đã đặt một chỗ.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "{name} đã đặt một chỗ.",
+          "variations": {
+            "0": 3
+          }
         }
       ],
       "types": [

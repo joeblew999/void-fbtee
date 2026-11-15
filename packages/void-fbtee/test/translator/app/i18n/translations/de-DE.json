@@ -374,7 +374,21 @@
       "translations": [
         {
           "translation": "{name} hat einen Platz gebucht.",
-          "variations": {}
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "{name} hat einen Platz gebucht.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "{name} hat einen Platz gebucht.",
+          "variations": {
+            "0": 3
+          }
         }
       ],
       "types": [

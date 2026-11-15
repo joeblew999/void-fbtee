@@ -382,7 +382,21 @@
       "translations": [
         {
           "translation": "{name} a réservé une place.",
-          "variations": {}
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "{name} a réservé une place.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "{name} a réservé une place.",
+          "variations": {
+            "0": 3
+          }
         }
       ],
       "types": [

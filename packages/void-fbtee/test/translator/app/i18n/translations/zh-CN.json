@@ -358,7 +358,21 @@
       "translations": [
         {
           "translation": "{name}预订了一个座位。",
-          "variations": {}
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "{name}预订了一个座位。",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "{name}预订了一个座位。",
+          "variations": {
+            "0": 3
+          }
         }
       ],
       "types": [

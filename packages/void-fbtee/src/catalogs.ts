@@ -15,7 +15,7 @@ import {
   translateSync,
 } from "@nkzw/fbtee-compiler";
 import { translatedOf, type LocaleConfig } from "./locales";
-import { addPluralForms, pluralCategories, pluralSlots } from "./plurals";
+import { addVariants, pluralCategories, pluralSlots } from "./plurals";
 
 // Where an app's strings can be: every folder of code in Void's project structure (Void's docs,
 // reference/structure.md: pages, routes, middleware, crons, queues, email, durable-objects, src),
@@ -157,7 +157,7 @@ export const catalogLocales = (p: Project) => [
 /**
  * What preparing writes (the dev server, on start and on each save): every translated locale's catalog after fbtee's own
  * prepare-translations (new strings marked "new", finished ones kept, stale ones removed), plus a
- * line for each plural form the locale needs (plurals.ts).
+ * line for each plural form and gender the locale needs (plurals.ts addVariants).
  */
 export function prepared(p: Project): { locale: string; json: string; existed: boolean }[] {
   const { phrases } = collect(p);
@@ -167,11 +167,13 @@ export function prepared(p: Project): { locale: string; json: string; existed: b
     return existsSync(file) ? { locale, existingJson: readFileSync(file, "utf8") } : { locale };
   });
   const out = prepareTranslationsBatchSync(JSON.stringify({ phrases }), inputs);
-  // fbtee's prepare leaves plural forms out; add a line for each form the locale needs.
+  // fbtee's prepare gives each string one line; add a line for each plural form and gender
+  // (plurals.ts addVariants). The source language's catalog is only for counts its code can't
+  // write (sourceNeedsCatalog): gender there is the code's own.
   const slots = pluralSlots(phrases);
   return out.map((json, i) => {
     const locale = locales[i]!;
-    let full = addPluralForms(json, slots, locale);
+    let full = addVariants(json, slots, locale, { genders: locale !== p.config.sourceLocale });
     // The source language's catalog holds only the strings with a count: the rest is the code's.
     if (locale === p.config.sourceLocale) {
       const catalog = JSON.parse(full) as Catalog;

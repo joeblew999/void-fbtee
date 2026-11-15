@@ -358,7 +358,21 @@
       "translations": [
         {
           "translation": "{name} memesan satu kursi.",
-          "variations": {}
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "{name} memesan satu kursi.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "{name} memesan satu kursi.",
+          "variations": {
+            "0": 3
+          }
         }
       ],
       "types": [

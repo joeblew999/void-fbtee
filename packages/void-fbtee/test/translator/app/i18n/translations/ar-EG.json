@@ -448,7 +448,21 @@
       "translations": [
         {
           "translation": "حجز {name} مقعدًا.",
-          "variations": {}
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "حجزت {name} مقعدًا.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "تم حجز مقعد باسم {name}.",
+          "variations": {
+            "0": 3
+          }
         }
       ],
       "types": [

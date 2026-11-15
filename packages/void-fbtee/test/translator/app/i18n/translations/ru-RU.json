@@ -417,8 +417,22 @@
       ],
       "translations": [
         {
+          "translation": "{name} забронировал место.",
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "{name} забронировала место.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
           "translation": "{name}: место забронировано.",
-          "variations": {}
+          "variations": {
+            "0": 3
+          }
         }
       ],
       "types": [

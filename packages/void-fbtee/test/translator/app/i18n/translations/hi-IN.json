@@ -382,7 +382,21 @@
       "translations": [
         {
           "translation": "{name} ने एक सीट बुक की।",
-          "variations": {}
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "{name} ने एक सीट बुक की।",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "{name} ने एक सीट बुक की।",
+          "variations": {
+            "0": 3
+          }
         }
       ],
       "types": [

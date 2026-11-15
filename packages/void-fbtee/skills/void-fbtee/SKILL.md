@@ -56,12 +56,13 @@ the rest): an app written in Arabic, say. Then the dev server makes a catalog fo
 holding only the strings with a count. You write each form there in the source language itself, so
 2, 11 and 100 each get their own grammar. Its lines are marked `"status": "new"` like any other.
 
-**Gender, in the catalog.** A `<fbt:name>` or `<fbt:pronoun>` entry already has
-`"types": [3]`: give it one line per gender where the language changes its words, `variations`
-`{"0": 1}` male, `{"0": 2}` female, `{"0": 3}` unknown (one line with `{}` where it doesn't). A
-sentence spoken to the reader can change by the reader's gender too, set by `<InLanguage gender>`:
-add `"tokens": ["__viewing_user__"], "types": [3]` to that entry and the same three lines. Never
-change the hash keys.
+**Gender, in the catalog.** A `<fbt:name>` entry has `"types": [3]`, and the dev server gives it
+one line per gender, `variations` `{"0": 1}` male, `{"0": 2}` female, `{"0": 3}` unknown, in every
+language: fill all three, the same sentence where the language doesn't change its words. With a
+count too, a line for each gender and plural form, each keyed by its own token's index. A sentence
+spoken to the reader can change by the reader's gender, set by `<InLanguage gender>`: add
+`"tokens": ["__viewing_user__"], "types": [3]` to that entry, and the dev server adds its three
+lines. Never change the hash keys.
 
 **Plurals, in the catalog.** A string with a count has one line per plural form the language uses
 (the dev server adds them; fbtee's own prepare-translations doesn't). Each line's `variations`

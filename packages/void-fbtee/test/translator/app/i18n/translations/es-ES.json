@@ -374,7 +374,21 @@
       "translations": [
         {
           "translation": "{name} reservó una plaza.",
-          "variations": {}
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "{name} reservó una plaza.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "{name} reservó una plaza.",
+          "variations": {
+            "0": 3
+          }
         }
       ],
       "types": [

@@ -419,25 +419,6 @@
         "by": "Claude Code, 2026-11-15"
       }
     ],
-    "Oeto9jViL+xxuaYfiMdwwg==": [
-      {
-        "answer": "{name} จองที่นั่งแล้ว",
-        "right": true,
-        "by": "Claude Code, 2026-11-15"
-      },
-      {
-        "answer": "{name} จองที่นั่งแล้ว.",
-        "right": false,
-        "why": "Ends with a full stop, which Thai doesn't use.",
-        "by": "Claude Code, 2026-11-15"
-      },
-      {
-        "answer": "{name} จองที่นั่้งแล้ว",
-        "right": false,
-        "why": "Misspelt Thai (stacked tone marks or vowels).",
-        "by": "Claude Code, 2026-11-15"
-      }
-    ],
     "jE1zcxOCdGCCTd7j0RhSjA==": [
       {
         "answer": "{name} ตรวจตั๋วของเธอแล้ว",
@@ -888,13 +869,6 @@
     "iP10/gSomcvt/+9NrQA7XQ==": [
       {
         "answer": "يشارك {name} عبر الإنترنت.",
-        "right": true,
-        "by": "Claude Code, 2026-11-15"
-      }
-    ],
-    "Oeto9jViL+xxuaYfiMdwwg==": [
-      {
-        "answer": "حجز {name} مقعدًا.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }

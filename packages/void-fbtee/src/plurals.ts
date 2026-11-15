@@ -1,8 +1,9 @@
-// Plural forms in catalogs. fbtee's compiler and runtime handle every CLDR plural category, and
-// since fbtee 6 its prepare-translations names each string's count (`tokens`, `types`), but it
-// still gives each string one line, so a catalog doesn't show a translator which forms a language
-// needs. This adds them: one line per plural category the locale uses, in fbtee's own format,
-// which its translateSync then compiles.
+// Variants in catalogs: a count's plural forms and a person's gender. fbtee's compiler and runtime
+// handle both, and since fbtee 6 its prepare-translations names each string's tokens (`tokens`,
+// `types`: 28 a count, 3 a gender), but it still gives each string one line, so a catalog doesn't
+// show a translator which lines a language needs. This adds them, in fbtee's own format, which its
+// translateSync then compiles: one line per plural category the locale uses (Intl.PluralRules),
+// per gender (fbtee's three), and per combination of the two.
 //
 // The format, from fbtee's source (checked against 6.0.0):
 // - A line's `variations` maps the token's index to its category's code (fbtee src/IntlVariations.tsx).
@@ -116,26 +117,49 @@ const keyOf = (v: Record<string, number | string> | undefined) =>
       .sort((a, b) => a[0]! - b[0]!),
   );
 
+/** fbtee's IntlVariations codes for a person's gender (fbtee src/IntlVariations.tsx). */
+export const GENDER_CODE = { male: 1, female: 2, unknown: 3 } as const;
+
+/** fbtee's `types` for a token: a count (BITMASK_NUMBER) or a person's gender (BITMASK_GENDER). */
+const NUMBER = 28;
+const GENDER = 3;
+
 /**
- * One entry with a line for every plural category the locale needs. Lines already there are
- * kept. Lines it adds carry the entry's current text and mark the entry "new", so it counts as
- * untranslated until someone writes each form. Returns the entry unchanged when the locale
- * needs no plural forms for it.
+ * One entry with a line for every variant fbtee's own data says it has, in the locale: for each
+ * of its tokens (fbtee 6's prepare names them, `tokens` with their `types`), a count's plural
+ * categories (Intl.PluralRules) or a person's three genders, every combination of them, each line's
+ * `variations` keyed by its token's index. Gender is the same three in every language: where a
+ * language doesn't change its words, its lines read the same. Lines already there are kept.
+ * Lines it adds carry the entry's current text and mark the entry "new", so it counts as
+ * untranslated until someone writes each one. Returns the entry unchanged when it has no variants.
  */
-export function withPluralForms(entry: PluralEntry, slots: Slots, locale: string): PluralEntry {
-  const perToken = slots.map((s) => pluralCategories(locale, s.exactlyOne));
-  if (perToken.every((c) => c.length === 1)) return entry;
-  const tokens = slots.map((s) => s.token);
-  const lines = entry.translations ?? [];
-  const hasForms = JSON.stringify(entry.tokens ?? []) === JSON.stringify(tokens);
-  const existing = new Map(hasForms ? lines.map((l) => [keyOf(l.variations), l]) : []);
-  const fallback = lines.find((l) => !Object.keys(l.variations ?? {}).length) ?? lines[0];
-  let added = false;
-  // Every combination of categories, one line each (two counts in one string multiply).
-  let combos: Record<string, number>[] = [{}];
-  perToken.forEach((cats, i) => {
-    combos = combos.flatMap((c) => cats.map((cat) => ({ ...c, [i]: CATEGORY_CODE[cat] })));
+export function withVariants(
+  entry: PluralEntry,
+  slots: Slots,
+  locale: string,
+  { genders = true }: { genders?: boolean } = {},
+): PluralEntry {
+  // fbtee's own tokens, or for a catalog written before it named them, the counts alone.
+  const tokens = entry.tokens?.length ? entry.tokens : slots.map((s) => s.token);
+  const types = entry.types?.length ? entry.types : slots.map(() => NUMBER);
+  const values = tokens.map((token, i): number[] => {
+    if (types[i] === NUMBER) {
+      const slot = slots.find((s) => s.token === token);
+      return pluralCategories(locale, slot?.exactlyOne ?? false).map((c) => CATEGORY_CODE[c]);
+    }
+    if (types[i] === GENDER && genders) return Object.values(GENDER_CODE);
+    return [];
   });
+  if (values.every((v) => v.length <= 1)) return entry;
+  const lines = entry.translations ?? [];
+  const existing = new Map(lines.map((l) => [keyOf(l.variations), l]));
+  const fallback = lines.find((l) => !Object.keys(l.variations ?? {}).length) ?? lines[0];
+  let combos: Record<string, number>[] = [{}];
+  values.forEach((codes, i) => {
+    if (codes.length > 1)
+      combos = combos.flatMap((c) => codes.map((code) => ({ ...c, [i]: code })));
+  });
+  let added = false;
   const translations = combos.map((variations) => {
     const line = existing.get(keyOf(variations));
     if (line) return line;
@@ -144,17 +168,22 @@ export function withPluralForms(entry: PluralEntry, slots: Slots, locale: string
   });
   return {
     ...entry,
+    tokens,
+    types,
     ...(added ? { status: "new" } : {}),
     translations,
   };
 }
 
-/** A prepared catalog (fbtee's JSON) with plural forms added to every string with a count. */
-export function addPluralForms(json: string, slots: Map<string, Slots>, locale: string): string {
+/** A prepared catalog (fbtee's JSON) with every entry's variants added (withVariants). */
+export function addVariants(
+  json: string,
+  slots: Map<string, Slots>,
+  locale: string,
+  options?: { genders?: boolean },
+): string {
   const catalog = JSON.parse(json) as { translations: Record<string, PluralEntry> };
-  for (const [hash, entry] of Object.entries(catalog.translations)) {
-    const s = slots.get(hash);
-    if (s) catalog.translations[hash] = withPluralForms(entry, s, locale);
-  }
+  for (const [hash, entry] of Object.entries(catalog.translations))
+    catalog.translations[hash] = withVariants(entry, slots.get(hash) ?? [], locale, options);
   return JSON.stringify(catalog);
 }

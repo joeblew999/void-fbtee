@@ -3507,7 +3507,21 @@
       "translations": [
         {
           "translation": "{name} จองที่นั่งแล้ว",
-          "variations": {}
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "{name} จองที่นั่งแล้ว",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "{name} จองที่นั่งแล้ว",
+          "variations": {
+            "0": 3
+          }
         }
       ],
       "types": [

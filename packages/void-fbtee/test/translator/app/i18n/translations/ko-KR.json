@@ -358,7 +358,21 @@
       "translations": [
         {
           "translation": "{name}님이 좌석을 예약했습니다.",
-          "variations": {}
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "{name}님이 좌석을 예약했습니다.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "{name}님이 좌석을 예약했습니다.",
+          "variations": {
+            "0": 3
+          }
         }
       ],
       "types": [
