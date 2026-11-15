@@ -18,6 +18,8 @@ import {
   use,
   useCallback,
   useContext,
+  useMemo,
+  useState,
   useSyncExternalStore,
   type ReactNode,
   type ComponentProps,
@@ -36,6 +38,7 @@ import { Temporal } from "temporal-polyfill";
 import config from "virtual:void-fbtee/config";
 import { currentTranslations } from "./current";
 import { langAttrs, localeFromPath, type Lang, type Locale } from "./locales";
+import { languageEntries, normalize, visitorsOwn, type LanguageEntry } from "./language-list";
 import { translationsFor } from "./runtime";
 export { langAttrs } from "./locales";
 import { install, documentI18n } from "./install";
@@ -264,3 +267,116 @@ const serverNow = (iso: string) => {
   if (!instant) serverInstants.set(iso, (instant = Temporal.Instant.from(iso)));
   return instant;
 };
+
+/** The picker's parts, each with a `data-part` attribute and a class name from `classNames`. */
+export type LanguagePickerPart =
+  | "root"
+  | "summary"
+  | "panel"
+  | "search"
+  | "yours-label"
+  | "yours"
+  | "list"
+  | "item"
+  | "name"
+  | "page-name";
+
+export interface LanguagePickerProps {
+  /** The control's accessible name, in the app's words (`fbs("Language", …)`). */
+  label?: string;
+  /** The search box's placeholder, in the app's words. Also its accessible name. */
+  placeholder?: string;
+  /** Shown above the visitor's own languages, in the app's words ("Your language"). */
+  yours?: ReactNode;
+  /** A language's own name where the app wants another than Intl's, by locale. */
+  names?: Readonly<Record<string, string>>;
+  /** Class names by part: the look is the app's; the package has no CSS. */
+  classNames?: Partial<Record<LanguagePickerPart, string>>;
+}
+
+/**
+ * Choosing another language: one control, the same size for 3 languages or 300
+ * (plans/language-picker.md). Closed, it shows the page's language, named in itself. Open: the
+ * visitor's own languages first (navigator.languages, matched by fbtee's rule, as "/" matches
+ * them), then every language, each named in itself and in the page's language, in the page
+ * language's order, with a search box. Each is a plain link to this page in that language:
+ * nothing is remembered. A <details>, so it opens with no JavaScript, on every page; the search
+ * box and the visitor's own come once the page hydrates (not on markdown and island pages, whose
+ * layouts Void doesn't hydrate: there the full list is all). No CSS: each part has `data-part` and
+ * the class name given for it; the states are `open`, `data-current`, `data-yours`, and on the
+ * root `data-yours-elsewhere` when the visitor's own language isn't the page's.
+ */
+export function LanguagePicker({
+  label,
+  placeholder,
+  yours,
+  names,
+  classNames = {},
+}: LanguagePickerProps) {
+  const { locale: page, path } = useLocale();
+  const locales = useLocales();
+  const hydrated = useHydrated();
+  const [query, setQuery] = useState("");
+  const part = (name: LanguagePickerPart) => ({ "data-part": name, className: classNames[name] });
+
+  const entries = useMemo(() => languageEntries(locales, page, names), [locales, page, names]);
+  const own = useMemo(
+    () => (hydrated ? visitorsOwn(locales.map((l) => l.locale)) : []),
+    [hydrated, locales],
+  );
+  const wanted = normalize(query.trim());
+  const shown = (e: LanguageEntry) => !wanted || e.search.includes(wanted);
+
+  const item = (e: LanguageEntry) => (
+    <li key={e.locale} hidden={!shown(e) || undefined}>
+      <a
+        {...part("item")}
+        href={`/${e.segment}${path}`}
+        hrefLang={e.locale}
+        lang={e.locale}
+        dir={e.dir}
+        aria-current={e.locale === page ? "true" : undefined}
+        data-current={e.locale === page ? "" : undefined}
+        data-yours={own.includes(e.locale) ? "" : undefined}
+      >
+        <Formatted {...part("name")}>{e.name}</Formatted>
+        {e.pageName !== e.name && (
+          <Formatted {...part("page-name")} lang={page}>
+            {e.pageName}
+          </Formatted>
+        )}
+      </a>
+    </li>
+  );
+  const current = entries.find((e) => e.locale === page)!;
+  const mine = own.map((l) => entries.find((e) => e.locale === l)!);
+  return (
+    <details
+      {...part("root")}
+      data-yours-elsewhere={own.length && own[0] !== page ? "" : undefined}
+    >
+      <summary {...part("summary")} aria-label={label} lang={page}>
+        <Formatted>{current.name}</Formatted>
+      </summary>
+      <div {...part("panel")}>
+        {hydrated && (
+          <input
+            {...part("search")}
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder={placeholder}
+            aria-label={placeholder}
+          />
+        )}
+        {mine.length > 0 && !wanted && (
+          <>
+            {yours && <div {...part("yours-label")}>{yours}</div>}
+            <ul {...part("yours")}>{mine.map(item)}</ul>
+          </>
+        )}
+        <ul {...part("list")}>{entries.map(item)}</ul>
+      </div>
+    </details>
+  );
+}

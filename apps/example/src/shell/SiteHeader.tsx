@@ -1,11 +1,11 @@
-// The site header, in the root layout: the pages, and this page in every language, each named in
-// its own language (Intl.DisplayNames). Plain links, so crawlers find every language version, and
-// no JavaScript, so it works on markdown pages too. They're for someone who wants another language
-// on purpose: "/" already sends each visitor to their own. One row on desktop; on a phone the
-// page links move to a second row that scrolls sideways.
-import { fbt } from "fbtee";
+// The site header, in the root layout: the pages, and void-fbtee's language picker, for someone
+// who wants another language on purpose ("/" already sends each visitor to their own). The picker
+// is one control however many languages the app has, and the package gives it no look: it's
+// styled here, with the header's own classes. One row on desktop; on a phone the page links move
+// to a second row that scrolls sideways.
+import { fbs, fbt } from "fbtee";
 import { routeUrl } from "void-fbtee/routes";
-import { Formatted, Link, useLocale, useLocales } from "void-fbtee/react";
+import { LanguagePicker, Link, useLocale } from "void-fbtee/react";
 import { buttonVariants } from "@/ui/button";
 import { REPO } from "@/shell/project";
 import { cn } from "@/ui/utils";
@@ -31,8 +31,7 @@ function label(page: (typeof PAGES)[number]) {
 const testId = (page: (typeof PAGES)[number]) => `nav-${rest(page).slice(1) || "home"}`;
 
 export default function SiteHeader() {
-  const { locale, path } = useLocale();
-  const locales = useLocales();
+  const { path } = useLocale();
   // None on a page that's none of these, such as the not-found page for an unknown address.
   const current = PAGES.findLast((p) => (rest(p) === "" ? path === "" : path.startsWith(rest(p))));
   return (
@@ -63,31 +62,26 @@ export default function SiteHeader() {
           ))}
         </nav>
         <div className="ms-auto flex h-14 items-center gap-1">
-          {locales.map((l) => (
-            <Link
-              key={l.locale}
-              // This page in another language: the one link whose page is known only at run time,
-              // so Void's types can't check it. Every [lang] page exists in every language, and
-              // void-fbtee check fails if a markdown page lacks a copy in one.
-              href={`/${l.segment}${path}`}
-              hrefLang={l.locale}
-              lang={l.locale}
-              aria-current={l.locale === locale ? "true" : undefined}
-              className={cn(
+          <LanguagePicker
+            label={fbs("Language", "The language picker in the site header, for screen readers")}
+            placeholder={fbs("Search languages", "Placeholder of the language picker's search box")}
+            yours={fbt("Your language", "Above the visitor's own languages in the language picker")}
+            classNames={{
+              root: "relative [&[data-yours-elsewhere]>summary]:text-brand",
+              summary: cn(
                 buttonVariants({ variant: "ghost", size: "sm" }),
-                l.locale === locale
-                  ? "text-foreground underline decoration-brand decoration-2 underline-offset-8"
-                  : "text-muted-foreground",
-              )}
-              data-testid={`to-${l.locale}`}
-            >
-              <Formatted>
-                {new Intl.DisplayNames(l.locale, { type: "language" }).of(
-                  new Intl.Locale(l.locale).language,
-                )!}
-              </Formatted>
-            </Link>
-          ))}
+                "cursor-pointer list-none text-foreground [&::-webkit-details-marker]:hidden",
+              ),
+              panel:
+                "absolute end-0 top-full z-50 mt-1 max-h-[66vh] w-72 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-lg border bg-background p-2 shadow-lg",
+              search:
+                "mb-2 h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+              "yours-label": "px-2 pb-1 text-xs text-muted-foreground",
+              yours: "mb-2 border-b pb-2",
+              item: "flex items-baseline justify-between gap-3 rounded-md px-2 py-1.5 text-sm hover:bg-muted data-[current]:underline data-[current]:decoration-brand data-[current]:decoration-2 data-[current]:underline-offset-4",
+              "page-name": "text-xs text-muted-foreground",
+            }}
+          />
           <a
             href={REPO}
             className={cn(

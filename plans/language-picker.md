@@ -1,6 +1,6 @@
 # plans/language-picker.md: choosing a language when there are a hundred
 
-Status: proposed 2026-11-15, waiting for the user's OK. It replaces `plans/language-notice.md`
+Status: built 2026-11-15, on the user's word. It replaces `plans/language-notice.md`
 (the visitor's own languages, shown first here, are what the notice was for) and the header item
 of `plans/many-languages.md`. Its place in the order: `plans/README.md`.
 
@@ -88,6 +88,17 @@ order.
 **The same for everyone in the cache.** The server renders the same list for everyone (the
 `Accept-Language` header isn't read, so the page stays cached once per language); "yours first" is
 the browser's own work after load, inside the closed `<details>`, so nothing moves on screen.
+
+## Settled when building (2026-11-15, Void 1.8.0)
+
+- **The script:** none. The search box and "yours first" are the component's own React, after
+  hydration (`useHydrated()`). On code pages the root layout hydrates, so they're there; on
+  markdown and island pages it doesn't, and the picker is the full plain list, which still works.
+  Simpler than a script in every page's head, and nothing outside React touches React's DOM.
+- **Names Intl doesn't have:** `Intl.DisplayNames` with `fallback: "code"` gives the code itself.
+- **Styling:** none in the package; the example's is `className`s in `SiteHeader.tsx`.
+- **Storage:** Void itself keeps scroll positions in `sessionStorage` (`void:scroll:…`,
+  `void/dist/pages/client.mjs`); the test allows those and nothing else.
 
 ## To check first, on the Void the repo runs then
 

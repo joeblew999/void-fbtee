@@ -93,6 +93,11 @@ page's language. `gender` (`"male"`, `"female"` or `"unknown"`) is the reader's,
 person gave it. Use fbtee's other pieces as its README describes: `<fbt:list>` for a list in a sentence (not
 `String(list(…))`), `<fbt:enum>` for a choice from a fixed set, `<fbt:name>` and
 `<fbt:pronoun>` for a person's gender, `<fbt:same-param>` for a value used twice.
+For choosing another language, use `<LanguagePicker />` from `void-fbtee/react`, not a row of
+links: it reads the app's languages from `voidFbtee({ locales })` (never list them yourself), puts
+the visitor's own first, and has a search box. It has no look: pass `classNames` per part, in the
+app's own styling, and its words (`label`, `placeholder`, `yours`) as the app's fbtee strings
+(`fbs("Language", "…")`), so they're translated with the rest.
 Not fbtee's own language switching (`createLocaleContext`, `useLocaleContext().setLocale`): with
 void-fbtee each language has its own address, so a page never changes language where it stands; a
 link to the other language's address does.

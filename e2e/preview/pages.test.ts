@@ -42,7 +42,9 @@ test("Link: same language stays client-side, another language loads a fresh page
   await p.waitForURL("**/th-TH/events");
   await seeText(p, "events-title", "กิจกรรมที่กำลังจะมาถึง");
   expect(loads).toBe(1);
-  await p.getByTestId("to-ar-EG").click();
+  // The language picker: opened, then this page in Arabic.
+  await p.locator('[data-part="summary"]').click();
+  await p.locator('[data-part="list"] a[hreflang="ar-EG"]').click();
   await p.waitForURL("**/ar-EG/events");
   await seeText(p, "events-title", "الفعاليات القادمة");
   expect(await p.getByTestId("nav-events").textContent()).toBe("الفعاليات");

@@ -3897,6 +3897,42 @@
         }
       ],
       "types": []
+    },
+    "i8Y9tJaaoDwfPdXN87wmBg==": {
+      "description": "The language picker in the site header, for screen readers",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ภาษา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OhMSDFYDAfBzn5ysA8vliQ==": {
+      "description": "Placeholder of the language picker's search box",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ค้นหาภาษา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fljYgj2M/SdGQgJLRFAiYQ==": {
+      "description": "Above the visitor's own languages in the language picker",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ภาษาของคุณ",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

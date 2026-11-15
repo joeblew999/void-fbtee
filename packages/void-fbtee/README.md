@@ -79,6 +79,16 @@ or a crawler that names none, gets the fallback language: the source language, o
 `voidFbtee({ fallbackLocale: "en-US" })`. Every other address keeps its language, for everyone. An
 app with its own page at `"/"` sets `voidFbtee({ redirectHome: false })`.
 
+`<LanguagePicker />` (`void-fbtee/react`) is for someone choosing another language on purpose:
+one control however many languages the app has. Closed, it names the page's language in itself;
+open, the visitor's own languages first, then every language the app has (from `voidFbtee({
+locales })`, none written anywhere else), named in itself and in the page's language, with a
+search box. Each is a plain link to this page in that language, so nothing is remembered. It has
+no look of its own: give each part a class (`classNames={{ summary: "…", item: "…" }}`), and style
+its states from its attributes (`open`, `data-current`, `data-yours`, `data-yours-elsewhere`). Its
+words are the app's, in fbtee: `label`, `placeholder`, `yours`. The example's header
+(`apps/example/src/shell/SiteHeader.tsx`) shows one.
+
 Labels used on several pages can be fbtee's common strings: each described once, in
 `voidFbtee({ common })` (text → description), then written `<fbt common>Events</fbt>`. The example
 keeps them in `i18n/common_strings.json`:

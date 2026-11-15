@@ -8,10 +8,11 @@ what it changes; this list is the only place that says when.
 2. `their-own-language.md`: every visitor lands in their own language (the front-door bug). Built
    on Void 1.8.0, where everything it relies on was checked; its tests are what the upgrade then
    runs on 1.9.1.
-3. `void-1.9.md`: Void 1.8.0 to 1.9.1. pnpm installs a release only once it's 24 hours old, so not
+3. `language-picker.md`: one control for choosing among a hundred languages, the visitor's own
+   first, in the package; the header's row of language links goes. Built before the upgrade, so
+   its tests run on 1.9.1 there.
+4. `void-1.9.md`: Void 1.8.0 to 1.9.1. pnpm installs a release only once it's 24 hours old, so not
    before 2026-11-15 03:27 UTC (1.9.1 was published 2026-11-14 03:27 UTC).
-4. `language-picker.md`: one control for choosing among a hundred languages, the visitor's own
-   first, in the package; the header's row of language links goes.
 5. `primitives.md`: void-fbtee's missing primitives, moved out of the example into the package.
 6. `use-cases.md`: one event, many people, as data, built on the primitives.
 7. `video-conferencing.md`: `void-moq`, built on all of the above.
