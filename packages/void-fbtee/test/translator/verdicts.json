@@ -317,6 +317,11 @@
         "answer": "Void's AI หรือ Claude Code แปลส่วนที่เป็นของใหม่",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Void's AI หรือ Claude Code แปลสิ่งใหม่",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "kBctHh0b7gp5b2Q3AfqxOA==": [
@@ -377,6 +382,11 @@
       },
       {
         "answer": "พร้อมแปลแอปของคุณหรือยัง?",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "พร้อมแปลแอปของคุณแล้วหรือยัง?",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -516,6 +526,11 @@
         "answer": "{name} ตรวจตั๋วของเขาหรือเธอแล้ว",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} ตรวจตั๋วของตนเองแล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "AHgdPbajKOCj4zXFKNEbbg==": [
@@ -570,6 +585,11 @@
     "Nr+WWEAaNhdmcsZktc6jkQ==": [
       {
         "answer": "{who} จองแล้ว {seats} ที่นั่ง\n{who} จองแล้ว {seats} ที่นั่ง\n{who} จองแล้ว {seats} ที่นั่ง",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{who} จอง {seats} ที่นั่งแล้ว\n{who} จอง {seats} ที่นั่งแล้ว\n{who} จอง {seats} ที่นั่งแล้ว",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -789,6 +809,11 @@
         "right": false,
         "why": "Egyptian dialect; the app writes Modern Standard Arabic.",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "نفّذ vp dev لبدء تشغيل التطبيق.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "E3kkP1xBWrE61ZBOek87xg==": [
@@ -827,6 +852,11 @@
       },
       {
         "answer": "يخبر ملف AGENTS.md الخاص بالتطبيق وكيل البرمجة الخاص بك بما يجب فعله.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "يخبر ملف AGENTS.md الخاص بالتطبيق وكيل البرمجة لديك بما يجب فعله.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -1130,11 +1160,21 @@
         "answer": "Sobald Ihr Event veröffentlicht wurde, wird es in jeder Sprache angezeigt.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Ihr Event erscheint in jeder Sprache, sobald es gepostet ist.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "5jxwLMzaf8YB/FQfN7jMjA==": [
       {
         "answer": "Hallo {name}, Ihr Ticket ist beigefügt.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Hallo {name}, Ihr Ticket ist im Anhang.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -1186,6 +1226,11 @@
         "answer": "Der Katalog jeder Sprache befindet sich in i18n/translations.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Der Katalog jeder Sprache liegt in i18n/translations.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "hUJ62HRBMHBewxRvZblIMw==": [
@@ -1214,11 +1259,22 @@
         "answer": "{pages} öffnen?",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Öffnen Sie {pages}?",
+        "right": false,
+        "why": "\"Öffnen Sie {pages}?\" is an order with a question mark; needs \"{pages} öffnen?\" or \"Möchten Sie …\"",
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "fRQVudyYBFiDmWyed6yR7A==": [
       {
         "answer": "{name} nimmt persönlich teil.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} nimmt vor Ort teil.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -1262,6 +1318,11 @@
         "right": false,
         "why": "says \"ihr Ticket\" (her ticket) where the person's gender isn't known",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} hat das eigene Ticket geprüft.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "AHgdPbajKOCj4zXFKNEbbg==": [
@@ -1295,6 +1356,11 @@
         "answer": "{who} hat {seats} Sitzplatz gebucht.\n{who} hat {seats} Sitze gebucht.\n{who} hat {seats} Sitzplatz gebucht.\n{who} hat {seats} Sitze gebucht.\n{who} hat {seats} Sitzplatz gebucht.\n{who} hat {seats} Sitze gebucht.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{who} hat {seats} Platz gebucht.\n{who} hat {seats} Plätze gebucht.\n{who} hat {seats} Platz gebucht.\n{who} hat {seats} Plätze gebucht.\n{who} hat {seats} Platz gebucht.\n{who} hat {seats} Plätze gebucht.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ]
   },
@@ -1309,6 +1375,11 @@
     "Ri2u0XMS+wJCFqdr60QG5A==": [
       {
         "answer": "Tu evento aparecerá en todos los idiomas una vez que se haya publicado.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Tu evento aparece en todos los idiomas una vez publicado.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -1358,11 +1429,21 @@
         "answer": "El archivo AGENTS.md de la aplicación le indica a tu agente de programación qué hacer.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "El AGENTS.md de la aplicación le dice a tu agente de código qué hacer.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "XheCGRJ31SRnsGZhKLgJRA==": [
       {
         "answer": "Void's AI o Claude Code traducen lo nuevo.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Void's AI o Claude Code traduce lo nuevo.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -1468,6 +1549,12 @@
         "answer": "Has reservado.\nHas reservado.\nHas reservado.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Estás reservado.\nEstás reservada.\nEstás reservado/a.",
+        "right": false,
+        "why": "\"Estás reservado\" says the person is reserved, like a table; the unknown line writes \"reservado/a\"",
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "Nr+WWEAaNhdmcsZktc6jkQ==": [
@@ -1495,6 +1582,11 @@
     "Ri2u0XMS+wJCFqdr60QG5A==": [
       {
         "answer": "Votre événement s'affiche dans toutes les langues une fois qu'il est publié.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Votre événement s'affiche dans toutes les langues une fois publié.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -1554,6 +1646,11 @@
         "answer": "Lancez vp dev pour démarrer l'application.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Exécutez vp dev pour démarrer l'application.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "E3kkP1xBWrE61ZBOek87xg==": [
@@ -1564,6 +1661,11 @@
       },
       {
         "answer": "Le fichier AGENTS.md de l'application indique à votre agent de codage quoi faire.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "L'AGENTS.md de l'application indique à votre agent de codage ce qu'il doit faire.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -1615,6 +1717,11 @@
         "answer": "{name} participe en personne.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} participe en présentiel.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "iP10/gSomcvt/+9NrQA7XQ==": [
@@ -1657,12 +1764,23 @@
         "answer": "{name} a réservé, et {name} a reçu le billet par e-mail.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} a réservé et {name} a reçu le billet par e-mail.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "iQJF/J4mB7QMxMxmCJJLOw==": [
       {
         "answer": "Vous avez réservé.\nVous avez réservé.\nVous avez réservé.",
         "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Vous êtes réservé.\nVous êtes réservée.\nVous êtes réservé.",
+        "right": false,
+        "why": "\"Vous êtes réservé\" says the person is reserved, like a table; the unknown line is the male form",
         "by": "Claude Code, 2026-11-15"
       }
     ],
@@ -1696,6 +1814,11 @@
     "Ri2u0XMS+wJCFqdr60QG5A==": [
       {
         "answer": "एक बार पोस्ट हो जाने के बाद आपका इवेंट हर भाषा में दिखाई देता है।",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "आपका इवेंट पोस्ट होने के बाद हर भाषा में दिखता है।",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -1754,6 +1877,11 @@
         "answer": "1 सीट बची है",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "1 सीट बची",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "zMoep4eguZ3OejsIbcWbjg==": [
@@ -1766,6 +1894,11 @@
     "E3kkP1xBWrE61ZBOek87xg==": [
       {
         "answer": "ऐप का AGENTS.md आपके कोडिंग एजेंट को बताता है कि क्या करना है।",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "ऐप की AGENTS.md आपके कोडिंग एजेंट को बताती है कि क्या करना है।",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -1806,6 +1939,11 @@
         "answer": "स्ट्रिंग्स",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "स्ट्रिंग",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "zJo185mkHlmtxuQdGecjUg==": [
@@ -1818,6 +1956,11 @@
     "AQ6/02zzfwk50FSEF0wKtA==": [
       {
         "answer": "क्या {pages} खोलें?",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{pages} खोलें?",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -1839,6 +1982,11 @@
     "Oeto9jViL+xxuaYfiMdwwg==": [
       {
         "answer": "{name} ने एक सीट बुक की।\n{name} ने एक सीट बुक की।\n{name} ने एक सीट बुक की।",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} ने सीट बुक की।\n{name} ने सीट बुक की।\n{name} ने सीट बुक की।",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -1874,11 +2022,21 @@
         "answer": "{name} ने बुकिंग की, और {name} को ईमेल द्वारा टिकट मिल गया।",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} ने बुकिंग की, और {name} को टिकट ईमेल से मिला।",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "iQJF/J4mB7QMxMxmCJJLOw==": [
       {
         "answer": "आपकी बुकिंग हो गई है।\nआपकी बुकिंग हो गई है।\nआपकी बुकिंग हो गई है।",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "आप बुक हो गए हैं।\nआप बुक हो गई हैं।\nआपकी बुकिंग हो गई है।",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -1908,6 +2066,11 @@
     "Ri2u0XMS+wJCFqdr60QG5A==": [
       {
         "answer": "Acara Anda akan muncul dalam setiap bahasa setelah diposting.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Acara Anda tampil dalam setiap bahasa setelah diposting.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -1964,11 +2127,21 @@
         "answer": "AGENTS.md pada aplikasi memberi tahu agen pengodean Anda apa yang harus dilakukan.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "AGENTS.md aplikasi memberi tahu agen coding Anda apa yang harus dilakukan.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "XheCGRJ31SRnsGZhKLgJRA==": [
       {
         "answer": "Void's AI atau Claude Code menerjemahkan hal-hal baru.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Void's AI atau Claude Code menerjemahkan yang baru.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -1983,6 +2156,11 @@
     "hUJ62HRBMHBewxRvZblIMw==": [
       {
         "answer": "Siap untuk menerjemahkan aplikasi Anda?",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Siap menerjemahkan aplikasi Anda?",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -2032,6 +2210,11 @@
         "answer": "{name} memesan sebuah kursi.\n{name} memesan sebuah kursi.\n{name} memesan sebuah kursi.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} memesan kursi.\n{name} memesan kursi.\n{name} memesan kursi.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "jE1zcxOCdGCCTd7j0RhSjA==": [
@@ -2063,6 +2246,11 @@
       },
       {
         "answer": "{name} memesan, dan {name} menerima tiketnya melalui email.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} memesan, dan {name} menerima tiket lewat email.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -2100,6 +2288,11 @@
         "answer": "投稿されると、イベントはすべての言語で表示されます。",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "投稿すると、イベントはすべての言語で表示されます。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "5jxwLMzaf8YB/FQfN7jMjA==": [
@@ -2122,6 +2315,11 @@
       },
       {
         "answer": "翻訳済み文字列: {total} 中 {translated}",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{total} 文字列中 {translated} 文字列を翻訳済み",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -2152,11 +2350,21 @@
         "answer": "アプリの AGENTS.md は、コーディングエージェントに何をすべきかを指示します。",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "アプリの AGENTS.md は、コーディングエージェントに何をすべきかを伝えます。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "XheCGRJ31SRnsGZhKLgJRA==": [
       {
         "answer": "Void's AI または Claude Code が、新しい内容を翻訳します。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Void's AI または Claude Code が新しい内容を翻訳します。",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -2297,6 +2505,11 @@
         "right": false,
         "why": "drops さん after {who} on the third line",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{who}さんが{seats}席を予約しました。\n{who}さんが{seats}席を予約しました。\n{who}さんが{seats}席を予約しました。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ]
   },
@@ -2318,11 +2531,21 @@
         "answer": "게시되면 이벤트가 모든 언어로 표시됩니다.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "회원님의 이벤트는 게시되면 모든 언어로 표시됩니다.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "5jxwLMzaf8YB/FQfN7jMjA==": [
       {
         "answer": "안녕하세요 {name}님, 티켓이 첨부되었습니다.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name}님, 안녕하세요. 티켓이 첨부되어 있습니다.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -2335,6 +2558,11 @@
       },
       {
         "answer": "{translated} / {total}개의 문자열 번역됨",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{total}개 문자열 중 {translated}개 번역됨",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -2358,6 +2586,11 @@
         "answer": "앱을 시작하려면 vp dev를 실행하세요.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "vp dev를 실행하여 앱을 시작하세요.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "E3kkP1xBWrE61ZBOek87xg==": [
@@ -2368,6 +2601,11 @@
       },
       {
         "answer": "앱의 AGENTS.md는 코딩 에이전트에게 무엇을 해야 할지 알려줍니다.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "앱의 AGENTS.md가 사용자의 코딩 에이전트에게 무엇을 해야 하는지 알려줍니다.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -2525,6 +2763,11 @@
         "answer": "Ваше мероприятие будет отображаться на всех языках после публикации.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Ваше мероприятие отображается на всех языках после публикации.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "5jxwLMzaf8YB/FQfN7jMjA==": [
@@ -2532,11 +2775,21 @@
         "answer": "Здравствуйте, {name}, ваш билет во вложении.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Здравствуйте, {name}, ваш билет прикреплён.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "0/yUVSiGyC2JT0/i90uO0A==": [
       {
         "answer": "Переведено {translated} из {total} строк",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Строки: переведено {translated} из {total}",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -2565,11 +2818,21 @@
         "answer": "Осталось 1 место",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "1 место осталось",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "zMoep4eguZ3OejsIbcWbjg==": [
       {
         "answer": "Запустите vp dev, чтобы начать работу с приложением.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Запустите vp dev, чтобы запустить приложение.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -2583,6 +2846,11 @@
       },
       {
         "answer": "Файл AGENTS.md в приложении говорит вашему ИИ-агенту для написания кода, что делать.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "AGENTS.md приложения говорит вашему кодинг-агенту, что делать.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -2602,6 +2870,11 @@
         "answer": "Void's AI или Claude Code переводит новые данные.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Void's AI или Claude Code переводит новое.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "kBctHh0b7gp5b2Q3AfqxOA==": [
@@ -2614,6 +2887,11 @@
     "hUJ62HRBMHBewxRvZblIMw==": [
       {
         "answer": "Готовы перевести свое приложение?",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Готовы перевести ваше приложение?",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -2642,6 +2920,11 @@
     "fRQVudyYBFiDmWyed6yR7A==": [
       {
         "answer": "{name} участвует лично.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} участвует очно.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -2756,6 +3039,11 @@
         "answer": "Sự kiện của bạn sẽ hiển thị bằng mọi ngôn ngữ sau khi được đăng.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Sự kiện của bạn hiển thị bằng mọi ngôn ngữ sau khi được đăng.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "5jxwLMzaf8YB/FQfN7jMjA==": [
@@ -2843,11 +3131,21 @@
         "right": false,
         "why": "\"đại lý\" is a sales agent or dealer, not a coding agent",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "AGENTS.md của ứng dụng cho tác nhân lập trình của bạn biết phải làm gì.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "XheCGRJ31SRnsGZhKLgJRA==": [
       {
         "answer": "Void's AI hoặc Claude Code dịch những nội dung mới.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Void's AI hoặc Claude Code dịch những gì mới.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -2857,11 +3155,21 @@
         "answer": "Danh mục của mỗi ngôn ngữ nằm trong i18n/translations.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Danh mục của từng ngôn ngữ nằm trong i18n/translations.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "hUJ62HRBMHBewxRvZblIMw==": [
       {
         "answer": "Bạn đã sẵn sàng để dịch ứng dụng của mình chưa?",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Sẵn sàng dịch ứng dụng của bạn chưa?",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -2940,6 +3248,11 @@
         "answer": "{name} đã đặt chỗ, và {name} đã nhận được vé qua email.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} đã đặt, và {name} đã nhận vé qua email.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "iQJF/J4mB7QMxMxmCJJLOw==": [
@@ -2981,6 +3294,11 @@
         "answer": "发布后，你的活动将以每种语言显示。",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "你的活动发布后，将以每种语言显示。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "5jxwLMzaf8YB/FQfN7jMjA==": [
@@ -2991,6 +3309,11 @@
       },
       {
         "answer": "你好 {name}，你的票已随附。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "你好，{name}，你的票已附上。",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -3024,6 +3347,11 @@
     "zMoep4eguZ3OejsIbcWbjg==": [
       {
         "answer": "运行 vp dev 来启动应用。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "运行 vp dev 启动应用。",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -3076,6 +3404,11 @@
         "answer": "Void's AI 或 Claude Code 会翻译新增内容。",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Void's AI 或 Claude Code 翻译新增内容。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "kBctHh0b7gp5b2Q3AfqxOA==": [
@@ -3117,6 +3450,11 @@
         "answer": "要打开 {pages} 吗？",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "打开{pages}？",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "fRQVudyYBFiDmWyed6yR7A==": [
@@ -3124,11 +3462,21 @@
         "answer": "{name}亲自参加。",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name}现场参加。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "iP10/gSomcvt/+9NrQA7XQ==": [
       {
         "answer": "{name}在线参加。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name}线上参加。",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -3183,11 +3531,21 @@
         "answer": "{name}已预订，并且{name}通过电子邮件收到了门票。",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name}已预订，{name}通过电子邮件收到了门票。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "iQJF/J4mB7QMxMxmCJJLOw==": [
       {
         "answer": "你已预订。\n你已预订。\n你已预订。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "你预订了。\n你预订了。\n你预订了。",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
