@@ -1,10 +1,13 @@
 // The translator test: Void's AI, on the dev server, translating the test app's strings
 // (packages/void-fbtee/test/translator/: app/src/strings.tsx, fbtee strings in real code) into every
 // language the app has, exactly as `vp dev` does: translateWithVoidAi on the app's own fbtee
-// catalogs. One test per string, so no test waits on more than one string. Each string is made new
-// on its own, by vp dev's own prepare (catalogs.ts prepared(): fbtee's prepare-translations and the
-// variant lines), the rest of the catalog staying translated, so the examples and glossary are the
-// catalog's own, as in a real app. The translation the catalog had is the reference. Each answer:
+// catalogs. Each string is made new on its own, by vp dev's own prepare (catalogs.ts prepared():
+// fbtee's prepare-translations and the variant lines), the rest of its catalog staying
+// translated, so the examples and glossary are the catalog's own, as in a real app; in memory,
+// so every string in every language is sent at once (translate.ts translateCatalog, under
+// Workers AI's per-minute limit), and the run takes about as long as its slowest answer. One test
+// per string, each waiting for its own answer. The translation the catalog had is the reference.
+// Each answer:
 // - with problems (judge.ts: wrong script, English left, a placeholder or command changed), or one
 //   judged wrong (verdicts.json): wrong; judged right: right;
 // - nobody has judged it: unreviewed, for Claude Code to judge into verdicts.json;
@@ -26,11 +29,11 @@
 // answer judged right, off for the rest (ai.ts ask).
 import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { afterAll, describe, expect, inject, test } from "vite-plus/test";
+import { afterAll, beforeAll, describe, expect, inject, test } from "vite-plus/test";
 import { catalogFile, collect, prepared } from "../../packages/void-fbtee/src/catalogs";
 import { loadProject } from "../../packages/void-fbtee/src/commands";
 import { CANDIDATES, modelFor } from "../../packages/void-fbtee/src/models";
-import { translateWithVoidAi } from "../../packages/void-fbtee/src/translate";
+import { routeCall, translateCatalog } from "../../packages/void-fbtee/src/translate";
 import { chrF } from "../../packages/void-fbtee/test/translator/score";
 import { EXAMPLE } from "../preview/setup";
 
@@ -78,73 +81,97 @@ const token = () =>
   readFileSync(join(EXAMPLE, "node_modules/.void-fbtee/dev-token"), "utf8").trim();
 const url = `${site}/__void-fbtee/translate`;
 
-/** One string into one language with one model, as vp dev translates it, judged. */
-async function translateOne(to: string, model: string, hash: string): Promise<Result> {
-  const file = catalogFile(p, to);
-  const reference = readFileSync(file, "utf8");
+type Entry = Catalog["translations"][string];
+
+/** Each language's catalog as committed: the references. */
+const reference = Object.fromEntries(
+  LANGUAGES.map((to) => [to, readFileSync(catalogFile(p, to), "utf8")]),
+);
+
+/**
+ * Each app string as vp dev's prepare writes it when it's just been written: gone from every
+ * catalog, then the dev server's own prepare (fbtee's prepare-translations and void-fbtee's
+ * variant lines, catalogs.ts prepared()) writes it back new. Done once for all strings (each entry
+ * is prepared on its own), then the catalogs are put back.
+ */
+function freshEntries(): Record<string, Record<string, Entry>> {
   try {
-    // The string new again, the way vp dev makes one: gone from the catalog, then the dev
-    // server's own prepare (fbtee's prepare-translations and void-fbtee's variant lines,
-    // catalogs.ts prepared()) writes it back as fbtee would for a string just written.
-    const catalog = JSON.parse(reference) as Catalog;
-    const byKey = new Map(
-      catalog.translations[hash]!.translations.map((l) => [key(l.variations), l.translation]),
+    for (const to of LANGUAGES) {
+      const catalog = JSON.parse(reference[to]!) as Catalog;
+      for (const hash of hashes) delete catalog.translations[hash];
+      writeFileSync(catalogFile(p, to), JSON.stringify(catalog, null, 2) + "\n");
+    }
+    return Object.fromEntries(
+      prepared(p)
+        .filter((x) => LANGUAGES.includes(x.locale))
+        .map((x) => [x.locale, (JSON.parse(x.json) as Catalog).translations]),
     );
-    delete catalog.translations[hash];
-    writeFileSync(file, JSON.stringify(catalog, null, 2) + "\n");
-    const fresh = prepared(p).find((x) => x.locale === to)!;
-    writeFileSync(file, fresh.json);
-    const lines = (JSON.parse(fresh.json) as Catalog).translations[hash]!.translations;
-    expect(
-      lines.map((l) => key(l.variations)).sort(),
-      "prepare gives the string the same lines as its reference",
-    ).toEqual([...byKey.keys()].sort());
-    const ref = lines.map((l) => byKey.get(key(l.variations))!);
-    // Cached only once an answer to it was judged right (verdicts.json).
-    const cache = VERDICTS[to]?.[hash]?.some((v) => v.right) ?? false;
-    const log: string[] = [];
-    const ran = await translateWithVoidAi(p, url, token(), (l) => log.push(l), {
-      rules: RULES,
-      cache,
-      model,
-      locale: to,
-    });
-    expect(ran, `Void's AI isn't available: ${log.join(" ")}`).toBe(true);
-    const after = (JSON.parse(readFileSync(file, "utf8")) as Catalog).translations[hash]!;
-    const kept = after.status === "translated";
-    const got = kept ? after.translations.map((l) => l.translation) : [];
-    const score =
-      got.length === ref.length
-        ? Math.round(got.reduce((a, l, i) => a + chrF(l, ref[i]!), 0) / got.length)
-        : undefined;
-    const res = got.length
-      ? await fetch(url, {
-          method: "POST",
-          headers: { "content-type": "application/json", "x-void-fbtee-token": token() },
-          body: JSON.stringify({ kind: "meaning", pairs: got.map((l) => [texts[hash]!, l]) }),
-        })
-      : undefined;
-    const scores = ((await res?.json()) as { scores?: number[] } | undefined)?.scores ?? [];
-    const meaning = scores.length
-      ? Math.round((100 * scores.reduce((a, b) => a + b, 0)) / scores.length)
-      : undefined;
-    const judged = VERDICTS[to]?.[hash]?.find((v) => v.answer === got.join("\n"));
-    return {
-      text: texts[hash]!,
-      hash,
-      cache,
-      // Not kept: vp dev's judge found problems it couldn't get fixed (the log says which).
-      verdict: !kept ? "wrong" : judged ? (judged.right ? "right" : "wrong") : "unreviewed",
-      ...(!kept && { why: log.join(" ") || "not kept" }),
-      ...(judged && !judged.right && { why: judged.why }),
-      ...(meaning !== undefined && { meaning }),
-      ...(score !== undefined && { chrF: score }),
-      reference: ref,
-      got,
-    };
   } finally {
-    writeFileSync(file, reference);
+    for (const to of LANGUAGES) writeFileSync(catalogFile(p, to), reference[to]!);
   }
+}
+
+/** One string into one language with one model, as vp dev translates it, judged. */
+async function translateOne(
+  to: string,
+  model: string,
+  hash: string,
+  fresh: Entry,
+): Promise<Result> {
+  // The committed catalog with this one string new: what vp dev has when it's just been written.
+  const catalog = JSON.parse(reference[to]!) as Catalog;
+  const byKey = new Map(
+    catalog.translations[hash]!.translations.map((l) => [key(l.variations), l.translation]),
+  );
+  catalog.translations[hash] = structuredClone(fresh);
+  const lines = fresh.translations;
+  expect(
+    lines.map((l) => key(l.variations)).sort(),
+    "prepare gives the string the same lines as its reference",
+  ).toEqual([...byKey.keys()].sort());
+  const ref = lines.map((l) => byKey.get(key(l.variations))!);
+  // Cached only once an answer to it was judged right (verdicts.json).
+  const cache = VERDICTS[to]?.[hash]?.some((v) => v.right) ?? false;
+  const log: string[] = [];
+  const say = (l: string) => log.push(l);
+  const ran = await translateCatalog(p, routeCall(url, token(), say), to, catalog, say, {
+    rules: RULES,
+    cache,
+    model,
+  });
+  expect(ran, `Void's AI isn't available: ${log.join(" ")}`).toBeDefined();
+  const after = catalog.translations[hash]!;
+  const kept = after.status === "translated";
+  const got = kept ? after.translations.map((l) => l.translation) : [];
+  const score =
+    got.length === ref.length
+      ? Math.round(got.reduce((a, l, i) => a + chrF(l, ref[i]!), 0) / got.length)
+      : undefined;
+  const res = got.length
+    ? await fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-void-fbtee-token": token() },
+        body: JSON.stringify({ kind: "meaning", pairs: got.map((l) => [texts[hash]!, l]) }),
+      })
+    : undefined;
+  const scores = ((await res?.json()) as { scores?: number[] } | undefined)?.scores ?? [];
+  const meaning = scores.length
+    ? Math.round((100 * scores.reduce((a, b) => a + b, 0)) / scores.length)
+    : undefined;
+  const judged = VERDICTS[to]?.[hash]?.find((v) => v.answer === got.join("\n"));
+  return {
+    text: texts[hash]!,
+    hash,
+    cache,
+    // Not kept: vp dev's judge found problems it couldn't get fixed (the log says which).
+    verdict: !kept ? "wrong" : judged ? (judged.right ? "right" : "wrong") : "unreviewed",
+    ...(!kept && { why: log.join(" ") || "not kept" }),
+    ...(judged && !judged.right && { why: judged.why }),
+    ...(meaning !== undefined && { meaning }),
+    ...(score !== undefined && { chrF: score }),
+    reference: ref,
+    got,
+  };
 }
 
 /** A line's variations as one comparable key ({"0": 2, "1": 20} → "0:2,1:20"). */
@@ -232,22 +259,37 @@ const hashes = Object.keys(
   (JSON.parse(readFileSync(catalogFile(p, LANGUAGES[0]!), "utf8")) as Catalog).translations,
 ).filter((h) => !builtinHashes.has(h));
 
-// Languages side by side, up to Vitest's maxConcurrency (5) at a time: each has its own catalog
-// file. Within one language, its models and strings one after another (they share that file).
-describe("languages", { concurrent: true }, () => {
+const models = (to: string) =>
+  PICK ? CANDIDATES.map((m) => m.id).filter((m) => !ONLY || ONLY.includes(m)) : [modelFor(to).id];
+
+// Every string in every language with every model, sent at once before the first test: each
+// test then waits only for its own answer.
+const started = new Map<string, Promise<Result>>();
+const job = (to: string, model: string, hash: string) => `${to} ${model} ${hash}`;
+beforeAll(() => {
+  if (skip) return;
+  const fresh = freshEntries();
+  for (const to of LANGUAGES)
+    for (const model of models(to))
+      for (const hash of hashes) {
+        const run = translateOne(to, model, hash, fresh[to]![hash]!);
+        // Its failure is its own test's, when that test awaits it.
+        run.catch(() => {});
+        started.set(job(to, model, hash), run);
+      }
+});
+
+describe("languages", () => {
   for (const to of LANGUAGES) {
-    const models = PICK
-      ? CANDIDATES.map((m) => m.id).filter((m) => !ONLY || ONLY.includes(m))
-      : [modelFor(to).id];
-    describe(to, { concurrent: false }, () => {
+    describe(to, () => {
       const byModel = new Map<string, Result[]>();
-      for (const model of models) {
+      for (const model of models(to)) {
         describe(model, () => {
           const results: Result[] = [];
           byModel.set(model, results);
           for (const hash of hashes)
             test.skipIf(!!skip)(texts[hash]!, async () => {
-              const r = await translateOne(to, model, hash);
+              const r = await started.get(job(to, model, hash))!;
               results.push(r);
               const mark = r.verdict === "wrong" ? "✗" : r.verdict === "right" ? "✓" : "?";
               console.log(

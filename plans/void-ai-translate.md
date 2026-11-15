@@ -105,9 +105,13 @@ dialect in six strings). So it stays; any change to it is measured the same way
    judge expects those lines; the test's references get them. Arabic "{name} checked her ticket"
    came back masculine from two models, the one structural gap the runs showed.
 2. Thai's and Arabic's picks again, with the skill (Thai's Inkling pick was made without it).
-3. The other ten languages.
-4. Languages side by side: Vitest 5 runs one file's suites one after another whatever their
-   `concurrent` option (tried 2026-11-15), so through a queue, or a file per language.
+3. The other ten languages: translated (2026-11-15 run below), 230 answers to judge into
+   verdicts.json.
+4. Done 2026-11-15: everything at once. Each string is made new in memory (no catalog file
+   written per string), every string in every language is sent at once (translate.ts
+   translateCatalog), under Workers AI's 300 a minute (routeCall), and each test waits for its own
+   answer. All 12 languages with Gemma 4: 41 s, against about 14 minutes one after another. vp dev
+   translates the same way: every new string in every language at once.
 
 ## Where it stands (2026-11-15)
 
@@ -136,8 +140,6 @@ Open, from this round:
   piled up, about 5 GB, 2026-11-15). Stop the whole process group, as e2e/dev/setup.ts does for a
   server it started, and say so in the README's "Testing".
 - Native speakers to review the references and verdicts.
-- The pick run runs languages one after another; each language's catalog is its own file, so they
-  could run at the same time, cutting the first full run from hours to minutes.
 - Test the runtime path the same way: the example's translate queue runs in `vp dev` too (Void's
   guide/queues.md), so a posted event's translations can be judged with the same verdicts.
 - gpt-oss-120b's thinking setting (`reasoning_effort: low`) isn't on its Cloudflare model page as

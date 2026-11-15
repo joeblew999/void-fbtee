@@ -310,11 +310,8 @@ export function sourceContext(p: Project, hash: string): string | undefined {
   }
 }
 
-/**
- * One entry per request: sent three at a time, Llama 3.3 mixed their lines up and most failed the
- * checks; each alone, the same entries passed (2026-11-15).
- */
-const BATCH = 1;
+// One entry per request (translateCatalog): sent three at a time, Llama 3.3 mixed their lines
+// up and most failed the checks; each alone, the same entries passed (2026-11-15).
 /** How many of the catalog's own translations go with each request, as examples. */
 const EXAMPLES = 12;
 
@@ -458,22 +455,32 @@ export async function translateEntry(
 }
 
 /**
- * Translate what's new with Void's AI, through the dev server's own route (ai.ts devTranslate,
- * in the app's Worker): each catalog's new entries, and each markdown page missing or out of
- * date. Every answer is checked as the build checks it (placeholders kept; a page's kept parts,
- * title and description), and only what passes is written: an entry marked translated, a page
- * stamped. Resolves false when Void's AI isn't there (the app doesn't use `void/ai`, or no
- * Cloudflare sign-in), with nothing written.
+ * Workers AI's limit for text generation: 300 requests a minute, free or paid plan, for every
+ * model that isn't paid-only (Cloudflare, Workers AI "Limits", checked 2026-11-15). Every request
+ * to the dev server's translate route goes through this, a little under it, counting the last
+ * minute's; past it a request waits for the minute to move on, rather than being refused.
  */
-export async function translateWithVoidAi(
-  p: Project,
-  url: string,
-  token: string,
-  log: (line: string) => void,
-  /** The translator test's: AI Gateway's cache on, another model (e2e/translator/). */
-  test: { cache?: boolean; model?: string; locale?: string; rules?: boolean } = {},
-): Promise<boolean> {
-  const call = async (body: unknown): Promise<Record<string, unknown> | undefined> => {
+const PER_MINUTE = 290;
+const sent: number[] = [];
+async function underLimit(): Promise<void> {
+  for (;;) {
+    const now = Date.now();
+    while (sent.length && now - sent[0]! >= 60_000) sent.shift();
+    if (sent.length < PER_MINUTE) {
+      sent.push(now);
+      return;
+    }
+    await new Promise((r) => setTimeout(r, 60_000 - (now - sent[0]!) + 10));
+  }
+}
+
+/**
+ * Requests to the dev server's translate route (ai.ts devTranslate), each under Workers AI's
+ * per-minute limit. Undefined: Void's AI isn't there (503); an empty answer: one unusable (502).
+ */
+export function routeCall(url: string, token: string, log: (line: string) => void): TranslateCall {
+  return async (body) => {
+    await underLimit();
     const res = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json", "x-void-fbtee-token": token },
@@ -492,95 +499,136 @@ export async function translateWithVoidAi(
     if (!res.ok) throw new Error(`the dev server's translate route answered ${res.status}`);
     return (await res.json()) as Record<string, unknown>;
   };
-  const from = p.config.sourceLocale;
-  const rel = (f: string) => relative(p.root, f).split(sep).join("/");
+}
 
+/** The translator test's: Workers AI's cache, another model, one language, the rules off. */
+export interface CatalogRun {
+  cache?: boolean;
+  model?: string;
+  locale?: string;
+  rules?: boolean;
+}
+
+/**
+ * Every new entry of one language's catalog through Void's AI, all at once: each is its own
+ * request (translateEntry), so they run side by side, under Workers AI's limit (routeCall). An
+ * answer that passes the checks is written into the catalog object (its lines, "translated"); the
+ * file is the caller's. The examples and glossary are the catalog's finished entries as it was
+ * when the run began: entries asked at the same time can't be each other's examples. Undefined
+ * when Void's AI isn't there.
+ */
+export async function translateCatalog(
+  p: Project,
+  call: TranslateCall,
+  locale: string,
+  catalog: { translations: Record<string, CatalogEntry> },
+  log: (line: string) => void,
+  test: CatalogRun = {},
+): Promise<{ done: number; open: number } | undefined> {
   const { texts, builtinHashes } = collect(p);
   const fbtee = fbteeRules(p.root);
-  // The translator test runs languages side by side: each call then only touches its own.
-  for (const m of missing(p).filter((m) => !test.locale || m.locale === test.locale)) {
-    const file = catalogFile(p, m.locale);
-    if (!existsSync(file)) continue;
-    const catalog = JSON.parse(readFileSync(file, "utf8")) as {
-      translations: Record<string, CatalogEntry>;
-    };
-    // The app's own translations, each with its source text, as examples (not written back).
-    // Not fbtee's built-in strings: list joiners ("{list of items} and {last item}"), no use as
-    // an example, and English where an app hasn't translated them yet.
-    const finished = Object.entries(catalog.translations)
-      .filter(([hash]) => !builtinHashes.has(hash))
-      .map(([hash, e]) => ({ ...e, source: texts[hash] }));
-    // Each open entry's hash, kept beside it (not in the entry, which is written back).
-    const hashOf = new Map<CatalogEntry, string>();
-    const open = Object.entries(catalog.translations)
-      .filter(([, e]) => e.status === "new" && e.translations?.length)
-      .map(([hash, e]) => (hashOf.set(e, hash), e));
-    let done = 0;
-    for (let i = 0; i < open.length; i += BATCH) {
-      const batch = open.slice(i, i + BATCH);
-      const toSend = batch.map((e) => ({
-        description: e.description ?? "",
-        lines: e.translations!.map((l) => ({ text: l.translation, variations: l.variations })),
-        keep: [...new Set(e.translations!.flatMap((l) => keptTerms(l.translation)))],
-        context: sourceContext(p, hashOf.get(e)!),
-      }));
-      const glossary = glossaryFor(finished, toSend, Object.keys(p.common ?? {}));
+  // The app's own translations, each with its source text, as examples (not written back).
+  // Not fbtee's built-in strings: list joiners ("{list of items} and {last item}"), no use as
+  // an example, and English where an app hasn't translated them yet.
+  const finished = Object.entries(catalog.translations)
+    .filter(([hash]) => !builtinHashes.has(hash))
+    .map(([hash, e]) => ({ ...e, source: texts[hash] }));
+  const open = Object.entries(catalog.translations).filter(
+    ([, e]) => e.status === "new" && e.translations?.length,
+  );
+  const results = await Promise.all(
+    open.map(async ([hash, entry]) => {
+      const toSend = {
+        description: entry.description ?? "",
+        lines: entry.translations!.map((l) => ({ text: l.translation, variations: l.variations })),
+        keep: [...new Set(entry.translations!.flatMap((l) => keptTerms(l.translation)))],
+        context: sourceContext(p, hash),
+      };
       const answer = await translateEntry(call, {
-        from,
-        to: m.locale,
-        entry: toSend[0]!,
-        examples: examplesFor(finished, toSend),
-        glossary,
+        from: p.config.sourceLocale,
+        to: locale,
+        entry: toSend,
+        examples: examplesFor(finished, [toSend]),
+        glossary: glossaryFor(finished, [toSend], Object.keys(p.common ?? {})),
         fbtee,
         ...test,
       });
-      if (!answer) return false;
+      if (!answer) return;
       const out = answer.lines;
-      const entry = batch[0]!;
-      const problems = problemsWith(entry.translations!, out, m.locale);
+      const problems = problemsWith(entry.translations!, out, locale);
       // Not kept: say what was wrong with its last answer, so the reason is in the log.
-      if (problems.length)
-        log(`${texts[hashOf.get(entry)!]} → ${JSON.stringify(out)}: ${problems.join(" ")}`);
-      if (!problems.length) {
-        entry.translations = entry.translations!.map((l, k) => ({ ...l, translation: out[k]! }));
-        entry.status = "translated";
-        done++;
-        // An example for the entries after it, so a run writes each name and term one way.
-        finished.push({ ...entry, source: texts[hashOf.get(entry)!] });
+      if (problems.length) {
+        log(`${texts[hash]} → ${JSON.stringify(out)}: ${problems.join(" ")}`);
+        return false;
       }
-      // Written as it goes, so the dev server shows each batch at once.
+      entry.translations = entry.translations!.map((l, k) => ({ ...l, translation: out[k]! }));
+      entry.status = "translated";
+      return true;
+    }),
+  );
+  if (results.includes(undefined)) return;
+  return { done: results.filter(Boolean).length, open: open.length };
+}
+
+/**
+ * Translate what's new with Void's AI, through the dev server's own route (ai.ts devTranslate,
+ * in the app's Worker): every catalog's new entries and every markdown page missing or out of
+ * date, all at once (translateCatalog, routeCall). Every answer is checked as the build checks it
+ * (placeholders kept; a page's kept parts, title and description), and only what passes is
+ * written: an entry marked translated, a page stamped. Resolves false when Void's AI isn't there
+ * (the app doesn't use `void/ai`, or no Cloudflare sign-in); what passed is still written.
+ */
+export async function translateWithVoidAi(
+  p: Project,
+  url: string,
+  token: string,
+  log: (line: string) => void,
+  test: CatalogRun = {},
+): Promise<boolean> {
+  const call = routeCall(url, token, log);
+  const from = p.config.sourceLocale;
+  const rel = (f: string) => relative(p.root, f).split(sep).join("/");
+
+  const catalogs = missing(p)
+    .filter((m) => !test.locale || m.locale === test.locale)
+    .map(async (m) => {
+      const file = catalogFile(p, m.locale);
+      if (!existsSync(file)) return true;
+      const catalog = JSON.parse(readFileSync(file, "utf8")) as {
+        translations: Record<string, CatalogEntry>;
+      };
+      const ran = await translateCatalog(p, call, m.locale, catalog, log, test);
+      // What passed is written even when another answer found Void's AI gone.
       writeFileSync(file, JSON.stringify(catalog, null, 2) + "\n");
-    }
-    if (open.length) log(`${rel(file)}: ${done} of ${open.length} translated with Void's AI`);
-  }
+      if (ran?.open) log(`${rel(file)}: ${ran.done} of ${ran.open} translated with Void's AI`);
+      return !!ran;
+    });
 
   const source = sourceOf(p.config);
-  for (const page of markdownPages(p)) {
-    if (page.state !== "missing" && page.state !== "stale") continue;
-    const original = readFileSync(page.original, "utf8");
-    const answer = await call({
-      kind: "page",
-      from,
-      to: page.locale,
-      text: original,
-      rules: test.rules,
+  const pages = markdownPages(p)
+    .filter((page) => page.state === "missing" || page.state === "stale")
+    .map(async (page) => {
+      const original = readFileSync(page.original, "utf8");
+      const answer = await call({
+        kind: "page",
+        from,
+        to: page.locale,
+        text: original,
+        rules: test.rules,
+      });
+      if (!answer) return false;
+      const copy = typeof answer.page === "string" ? answer.page : "";
+      if (!copy.trim()) return true;
+      const same = (a: string[], b: string[]) => a.join("\n") === b.join("\n");
+      if (missingHead(original, copy).length || !same(keptParts(original), keptParts(copy))) {
+        log(`${rel(page.file)}: Void's AI changed what a copy must keep; left for another way`);
+        return true;
+      }
+      mkdirSync(dirname(page.file), { recursive: true });
+      writeFileSync(page.file, copy.endsWith("\n") ? copy : copy + "\n");
+      stamp(p, page.file);
+      log(`${rel(page.file)}: translated with Void's AI from ${source.segment}/${page.path}`);
+      return true;
     });
-    if (!answer) return false;
-    const copy = typeof answer.page === "string" ? answer.page : "";
-    if (!copy.trim()) continue;
-    const same = (a: string[], b: string[]) => a.join("\n") === b.join("\n");
-    if (
-      !copy.trim() ||
-      missingHead(original, copy).length ||
-      !same(keptParts(original), keptParts(copy))
-    ) {
-      log(`${rel(page.file)}: Void's AI changed what a copy must keep; left for another way`);
-      continue;
-    }
-    mkdirSync(dirname(page.file), { recursive: true });
-    writeFileSync(page.file, copy.endsWith("\n") ? copy : copy + "\n");
-    stamp(p, page.file);
-    log(`${rel(page.file)}: translated with Void's AI from ${source.segment}/${page.path}`);
-  }
-  return true;
+  return (await Promise.all([...catalogs, ...pages])).every(Boolean);
 }
