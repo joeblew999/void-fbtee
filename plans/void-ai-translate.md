@@ -57,3 +57,15 @@ server's Worker.
   kept parts fails, whatever its score.
 - **The docs follow in the same change:** the skill, the READMEs, the Translating page and the
   home page then say "vp dev translates, with Void's AI or Claude Code".
+
+## Found while building it (2026-11-15), to follow up
+
+- Stopping the dev server with `fuser -k 5173/tcp` leaves its workerd processes running: 46 had
+  piled up, holding about 5 GB, and `vp check` was killed for lack of memory. Stop the whole
+  process group instead (what e2e/dev/setup.ts does for a server it started), and say so in the
+  README's "Testing".
+- Arabic with Llama 3.3 (test/translator/scores.json, chrF 65): an English word left in a line,
+  "coding agent" as "terminal", the zero form of a count written as "{number} seats". Next cycle:
+  try the models Cloudflare recommends for Arabic and for frontier quality (models.ts), on the
+  test strings.
+- The test strings' references are Claude Code's, not reviewed by a native speaker.
