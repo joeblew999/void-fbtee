@@ -1,4 +1,4 @@
-// `void-fbtee prepare` and `check`, on copies of test/unit/fixture (two strings: "Hello" translated
+// Preparing (what the dev server does) and `check` (what the build runs), on copies of test/unit/fixture (two strings: "Hello" translated
 // into German, "Goodbye" not; no Thai catalog; none of void-fbtee's setup files).
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -56,6 +56,18 @@ describe("check", () => {
   test("setup problems go once the app is set up", () => {
     setUp();
     expect(check(p).filter((l) => l.startsWith("setup:"))).toEqual([]);
+  });
+
+  test("a language taken out of the app's list: its catalog and markdown pages are reported", () => {
+    setUp();
+    write("i18n/translations/fr-FR.json", "{}\n");
+    write("pages/fr-FR/docs/tour.md", "# Visite\n");
+    // An app's own folder, not a language: left alone.
+    write("pages/events/notes.md", "# Notes\n");
+    expect(check(p).filter((l) => l.startsWith("languages:"))).toEqual([
+      "languages: i18n/translations/fr-FR.json is for a language no longer in the app's list: delete it",
+      "languages: pages/fr-FR/ is for a language no longer in the app's list: delete it",
+    ]);
   });
 
   test('a fixed "/" redirect to one language, or an own "/" page, is reported', () => {

@@ -1,8 +1,9 @@
-// The void-fbtee command's commands, as functions (the CLI in cli.ts runs them; tests call them).
-import { mkdirSync, writeFileSync } from "node:fs";
+// Reading the app's project from its config, and preparing its catalogs (the dev server does).
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import { loadConfigFromFile } from "vite";
 import { catalogFile, prepared, type Project } from "./catalogs";
+import { runner } from "./translate";
 import type { VoidFbteeApi } from "./plugin";
 
 /**
@@ -24,7 +25,7 @@ export async function loadProject(root: string): Promise<Project> {
   const api = plugins.find((p) => p?.name === "void-fbtee")?.api;
   if (!api)
     throw new Error(
-      `void-fbtee: no voidFbtee() plugin in ${relative(process.cwd(), loaded?.path ?? root) || "vite.config.ts"}. Run \`void-fbtee init\` first.`,
+      `void-fbtee: no voidFbtee() plugin in ${relative(process.cwd(), loaded?.path ?? root) || "vite.config.ts"}. Run \`${runner(root)} exec void-fbtee init\` first.`,
     );
   return { ...api.project(), root: loaded?.config.root ? resolve(root, loaded.config.root) : root };
 }
@@ -33,9 +34,13 @@ export function prepare(p: Project): string[] {
   const written: string[] = [];
   for (const { locale, json } of prepared(p)) {
     const file = catalogFile(p, locale);
-    mkdirSync(dirname(file), { recursive: true });
     // fbtee's CLI writes catalogs with two-space indentation and a final newline; so do we.
-    writeFileSync(file, JSON.stringify(JSON.parse(json), null, 2) + "\n");
+    const text = JSON.stringify(JSON.parse(json), null, 2) + "\n";
+    // Only a catalog that changed is written: the dev server prepares on every save
+    // (plugin.ts), and an unchanged file left alone is no reload and no diff.
+    if (existsSync(file) && readFileSync(file, "utf8") === text) continue;
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, text);
     written.push(relative(p.root, file));
   }
   return written;

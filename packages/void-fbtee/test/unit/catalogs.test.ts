@@ -52,23 +52,17 @@ describe("fbtee's built-in strings", () => {
   });
 });
 
-describe("failOnMissing", () => {
-  const run = (failOnMissing: boolean) =>
-    build({
+describe("vp build", () => {
+  test("fails on anything check finds, untranslated strings included", async () => {
+    const run = build({
       root,
       // Only the plugin given here, not the fixture's vite.config.ts as well.
       configFile: false,
       logLevel: "silent",
       build: { write: false },
-      plugins: voidFbtee({ ...project().config, src: ["src/**/*.tsx"], failOnMissing }),
+      plugins: voidFbtee({ ...project().config, src: ["src/**/*.tsx"] }),
     });
-
-  test("fails the build when a locale has untranslated strings", async () => {
-    await expect(run(true)).rejects.toThrow(/untranslated strings \(failOnMissing is on\)/);
-  });
-
-  test("off by default: the build passes", async () => {
-    await expect(run(false)).resolves.toBeDefined();
+    await expect(run).rejects.toThrow(/to fix before this can build[\s\S]*strings: /);
   });
 });
 

@@ -1,4 +1,4 @@
-// The app's files that `void-fbtee init` writes or edits and `void-fbtee check` reads: where each
+// The app's files that `void-fbtee init` writes or edits and check() reads: where each
 // is, by the names Void and Vite accept, and how to tell the setup is there.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";

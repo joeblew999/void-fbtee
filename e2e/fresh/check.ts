@@ -64,7 +64,7 @@ const APPS: Record<string, App> = {
   },
 };
 
-// The Thai-source app's translations, as a developer (or `void-fbtee translate`) writes them: by
+// The Thai-source app's translations, as the agent `vp dev` hands them to writes them: by
 // source text, one line per plural form each language uses (fbtee's codes: 16 zero, 8 two, 20 few,
 // 12 many, 24 other), with exactly 1 its own entry. English then has one line, "other".
 const FROM_THAI: Record<string, Record<string, string | Record<number, string>>> = {
@@ -191,7 +191,9 @@ for (const target of targets) {
 
   const installed = realpathSync(join(dir, "node_modules/void-fbtee"));
   check(
-    run(...exec(app.pm, "void-fbtee", "--help"), dir, { capture: true }).includes("translate"),
+    run(...exec(app.pm, "void-fbtee", "--help"), dir, { capture: true }).includes(
+      "void-fbtee init",
+    ),
     `${target}: void-fbtee --help`,
   );
   // void-fbtee's own pages and Void's docs examples (e2e/fresh/app/: pages/, routes/, crons/),
@@ -203,7 +205,7 @@ for (const target of targets) {
   }
   cpSync(join(import.meta.dirname, "app"), dir, { recursive: true });
   // The example's languages (its translations are copied in below); init adds the plugin,
-  // middleware, flags, scripts and peers.
+  // middleware, flags and peers.
   const said = run(...exec(app.pm, "void-fbtee", "init", "--locales", TRANSLATED.join(",")), dir, {
     capture: true,
   });
@@ -216,11 +218,10 @@ for (const target of targets) {
   run(app.pm, app.pm === "npm" ? ["install", "zod"] : ["add", "zod", "--no-frozen-lockfile"], dir);
   checkOwnDependencies(target, dir, installed);
 
-  run(...exec(app.pm, "void-fbtee", "check"), dir);
-  check(true, `${target}: void-fbtee check passes`);
+  // The build checks everything (void-fbtee's plugin fails it on anything left).
   run(...exec(app.pm, app.toolchain === "vite-plus" ? "vp" : "vite", "build"), dir);
   run(...exec(app.pm, "tsc", "--noEmit"), dir);
-  check(true, `${target}: builds and typechecks`);
+  check(true, `${target}: builds (translations checked) and typechecks`);
   if (app.source === "git") continue;
 
   checkTypes(target, dir, app.pm);
@@ -234,7 +235,8 @@ for (const target of targets) {
 
 /**
  * An app written in Thai: init with `--source-locale th-TH`, its pages (e2e/fresh/thai/), init's
- * own pages rewritten in Thai as its to-do asks, prepare, the translations, check, a build, and the
+ * own pages rewritten in Thai as its to-do asks, `vp dev` (which prepares), a build that fails
+ * until the strings are translated, the translations, a build that passes, and the
  * dev server in all three languages, with "/" following the browser and Thai the fallback, and
  * then with `fallbackLocale: "en-US"`. It has no Zod, so it also checks the
  * build without it under `pnpm exec`, whose NODE_PATH once made void-fbtee think Zod was there.
@@ -263,7 +265,19 @@ async function thaiSource(target: string, dir: string, app: App, installed: stri
   );
   run(...install(app.pm), dir);
   checkOwnDependencies(target, dir, installed);
-  run(...exec(app.pm, "void-fbtee", "prepare"), dir);
+  // `vp dev` prepares as it starts: each language's catalog, every string marked new. (CI is set,
+  // so it starts no agent: it reports.)
+  await withDev(app, dir, async (_base, page) => void (await page("/en-US")));
+  check(
+    existsSync(join(dir, "i18n/translations/en-US.json")),
+    `${target}: vp dev made each language's catalog as it started`,
+  );
+  check(
+    /untranslated|not translated|to fix before this can build/.test(
+      failing(...exec(app.pm, "vp", "build"), dir),
+    ),
+    `${target}: vp build fails while strings are untranslated`,
+  );
   check(
     !existsSync(join(dir, `i18n/translations/${source}.json`)),
     `${target}: no catalog for Thai, the source: it writes every count one way`,
@@ -299,11 +313,9 @@ async function thaiSource(target: string, dir: string, app: App, installed: stri
       if (entry.status === "new") entry.status = "translated";
     writeFileSync(file, JSON.stringify(catalog, null, 2) + "\n");
   }
-  run(...exec(app.pm, "void-fbtee", "check"), dir);
-  check(true, `${target}: void-fbtee check passes`);
   run(...exec(app.pm, "vp", "build"), dir);
   run(...exec(app.pm, "tsc", "--noEmit"), dir);
-  check(true, `${target}: builds and typechecks`);
+  check(true, `${target}: builds (translations checked) and typechecks`);
 
   const homeFor = (base: string, accept?: string) =>
     fetch(`${base}/`, {

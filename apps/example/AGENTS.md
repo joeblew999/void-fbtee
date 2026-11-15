@@ -11,6 +11,6 @@
 
 - This app is translated with [void-fbtee](https://github.com/joeblew999/void-fbtee): fbtee strings, Temporal dates, Intl formatting.
 - For anything about translations, read `node_modules/void-fbtee/skills/void-fbtee/SKILL.md` first.
-- To translate new strings and pages, run the `i18n:translate` script (or ask: "translate the app"). To see what's missing, run `i18n:check`.
+- Translating is part of the dev server: `vp dev` prepares each new string, translates what's new once you pause, and reports what's left. `vp build` fails on anything left. There are no i18n scripts.
 
 <!--/injected-by-void-fbtee-->

@@ -50,9 +50,7 @@ export default defineConfig({
     // site: the deployed address, so the dev server and Worker Previews name it in canonical,
     // hreflang, og:url and the sitemap. common: labels used on several pages, each described once
     // (fbtee's common strings), written <fbt common>Events</fbt>.
-    // failOnMissing: an untranslated string fails the build, so `vp build` and the deploy (here
-    // and in CI) can't ship one: the translations are done before anything goes out.
-    voidFbtee({ sourceLocale, locales, site: SITE, common, failOnMissing: true }),
+    voidFbtee({ sourceLocale, locales, site: SITE, common }),
     voidPlugin(),
     voidReact({ react: { compiler: true } }),
     voidMarkdown(),

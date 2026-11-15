@@ -15,7 +15,7 @@ every language, and code with no page: a scheduled job, a queue consumer, an ema
 validation messages are in the page's language too. The Vite plugin works only in a Void app: it swaps
 modules in Void's server environment (Cloudflare's own Temporal, fbtee's per-request build, Void's
 own Hono), and the rest goes where Void looks for it (`middleware/99.i18n.ts`, `void.config.ts`),
-which `void-fbtee init` sets up and `void-fbtee check` checks. React only, as fbtee is. It works
+which `vp exec void-fbtee init` sets up and `vp build` checks. React only, as fbtee is. It works
 with Vite+ and with plain Vite, and with npm and pnpm.
 
 The rule it follows is the one for dates in a database: data stays neutral (UTC instants with zone
@@ -50,14 +50,15 @@ Then, in the app's folder:
 vp install
 vp exec void-fbtee init --locales ar-EG,th-TH
 vp install
-vp run i18n:translate
+vp dev      # prepares and translates as you work
+vp build    # fails on anything untranslated
 ```
 
 `init` adds only what's missing, so it's safe to run again. Once the app has a home page under
 `pages/[lang]/`, it also writes Void's not-found and error pages in the page's language
 (`pages/_not-found.tsx`, `pages/_error.tsx`), unless the app has its own; and a sitemap with
-every page in every language (`routes/sitemap.xml.ts`). `void-fbtee check` lists
-anything untranslated or not set up, and `void-fbtee --help` lists the commands.
+every page in every language (`routes/sitemap.xml.ts`). `init` is void-fbtee's only command;
+everything after it is Vite+'s own (below).
 
 Then give it the site's own address, so every copy of the site (the dev server, a Worker Preview)
 names the real one in each page's canonical, hreflang and `og:url`, and in the sitemap
@@ -69,7 +70,7 @@ voidFbtee({ sourceLocale, locales, site: "https://example.com" });
 
 `https://`, the host alone (no path, no trailing slash). Without it, each page uses the address
 its request came to. With it, a copy at another address answers `X-Robots-Tag: noindex`, so it
-stays out of search results. `void-fbtee init --site https://example.com` adds it. A change to `voidFbtee()`'s options needs the dev server restarted: Vite reads
+stays out of search results. `vp exec void-fbtee init --site https://example.com` adds it. A change to `voidFbtee()`'s options needs the dev server restarted: Vite reads
 the plugin once, when it starts.
 
 `"/"` sends each visitor to their own language: the first of their browser's languages the app
@@ -159,17 +160,14 @@ The SKILL's "Translated PDFs" lists what it takes; the example's PDFs docs page 
 ## Built into Vite+
 
 Translation isn't a separate tool to remember: it's part of each command a Vite+ app already
-runs, the same on a developer's machine as in CI.
+runs, the same on a developer's machine as in CI. There are no i18n scripts.
 
-| Command                 | What it does about translations                                                                              |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `vp check`              | Lints with fbtee's strict rules: text nobody wrapped for translation is an error.                            |
-| `vp dev`                | Says what's untranslated as you work; an edited catalog shows at once.                                       |
-| `vp run i18n:prepare`   | Adds every new string to each language's catalog, with that language's plural and gender forms, marked new.  |
-| `vp run i18n:translate` | Claude Code translates what's new, strings and markdown pages, by fbtee's own skill.                         |
-| `vp run i18n:check`     | Fails if a string is untranslated, or a markdown page's copy is older than its original.                     |
-| `vp build`              | With `voidFbtee({ failOnMissing: true })`, fails on an untranslated string, so `void deploy` can't ship one. |
-| CI                      | The same commands on every push: `vp check`, `vp run i18n:check`, `vp build`, then the deploy.               |
+| Command    | What it does about translations                                                                                                                                                                                                                                                                                                      |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `vp dev`   | As it starts and on each save, adds new strings to every catalog, with each language's plural and gender forms, marked new. Once you pause, Claude Code translates what's new, strings and markdown pages, by fbtee's own skill: a `claude` on your machine, or the Claude Code session the dev server runs in. Reports what's left. |
+| `vp build` | Fails on anything left: an untranslated string or page, a page older than its original, a setup problem. So `void deploy`, and CI, can't ship one.                                                                                                                                                                                   |
+| `vp check` | Lints with fbtee's strict rules: text nobody wrapped for translation is an error.                                                                                                                                                                                                                                                    |
+| CI         | The same commands on every push: `vp check`, `vp build`, then the deploy.                                                                                                                                                                                                                                                            |
 
 Words a product uses everywhere (its menu, its own terms) go once in `i18n/common_strings.json`,
 fbtee's common strings, with their description, and are written `<fbt common>Seats</fbt>` or

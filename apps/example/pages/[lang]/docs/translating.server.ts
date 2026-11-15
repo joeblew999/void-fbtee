@@ -24,7 +24,7 @@ export const loader = defineHandler(() => ({
     return {
       locale: file.replace(/^.*\/(.+)\.json$/, "$1"),
       strings: all.length,
-      // As void-fbtee check counts them (its catalogs.ts): what prepare adds is "new" until it's
+      // As void-fbtee's build check counts them (its catalogs.ts): what the dev server adds is "new" until it's
       // translated, and an entry with no translation isn't.
       translated: all.filter((e) => e.status !== "new" && e.translations?.length).length,
     };

@@ -1,9 +1,9 @@
-// What `void-fbtee check` checks, as plain functions. Each problem is one
+// What `vp build` and `vp dev` check (the plugin runs check()), as plain functions. Each problem is one
 // line a person can act on.
 import { createHash } from "node:crypto";
-import { existsSync, globSync, readFileSync } from "node:fs";
+import { existsSync, globSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
-import { missing, type Project } from "./catalogs";
+import { catalogLocales, missing, type Project } from "./catalogs";
 import { firstFile, hasI18nMiddleware, HOME_PAGES, LAYOUTS, VOID_CONFIGS } from "./app-files";
 import { sourceOf, translatedOf } from "./locales";
 
@@ -157,10 +157,49 @@ function partsDiffer(original: string, copy: string): string | undefined {
     .join("; ");
 }
 
+/**
+ * What a language taken out of the app's list leaves behind: its catalog and its markdown pages'
+ * folder. Named for the developer to delete (nothing is deleted for them). A folder under pages/
+ * counts only if it's named as a language Intl knows ("de-DE", not "events") and holds markdown.
+ */
+export function leftovers(p: Project): string[] {
+  const out: string[] = [];
+  const catalogs = join(p.root, p.translations);
+  const wanted = new Set(catalogLocales(p));
+  if (existsSync(catalogs))
+    for (const f of readdirSync(catalogs))
+      if (f.endsWith(".json") && !wanted.has(f.slice(0, -".json".length)))
+        out.push(`${p.translations}/${f}`);
+  const pages = join(p.root, "pages");
+  const segments = new Set(p.config.locales.map((l) => l.segment as string));
+  if (existsSync(pages))
+    for (const d of readdirSync(pages, { withFileTypes: true }))
+      if (d.isDirectory() && !segments.has(d.name) && isLanguage(d.name))
+        if (globSync("**/*.{md,mdx}", { cwd: join(pages, d.name) }).length)
+          out.push(`pages/${d.name}/`);
+  return out;
+}
+
+function isLanguage(name: string): boolean {
+  try {
+    const [tag] = Intl.getCanonicalLocales(name);
+    const language = new Intl.Locale(tag!).language;
+    return (
+      new Intl.DisplayNames("en", { type: "language", fallback: "none" }).of(language) !== undefined
+    );
+  } catch {
+    return false;
+  }
+}
+
 /** Problems, one line each. Empty when everything is in order. */
 export function check(p: Project): string[] {
   const problems: string[] = [];
   const rel = (f: string) => relative(p.root, f);
+
+  // A language taken out of the app's list: what it left behind, to delete.
+  for (const left of leftovers(p))
+    problems.push(`languages: ${left} is for a language no longer in the app's list: delete it`);
 
   // Setup (what `void-fbtee init` writes).
   if (!hasI18nMiddleware(p.root))

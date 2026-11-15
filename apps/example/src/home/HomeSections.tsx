@@ -21,12 +21,16 @@ import { buttonVariants } from "@/ui/button";
 import { REPO, SETUP, type Offsite } from "@/shell/project";
 import { cn } from "@/ui/utils";
 
-/** The install, as the README gives it, after the dependency is added to package.json. */
+/**
+ * The whole cycle, as the README gives it, after the dependency is added to package.json: set up
+ * once, then Vite+'s own commands. vp dev translates as you work; vp build fails on anything left.
+ */
 const COMMANDS = [
   "vp install",
   "vp exec void-fbtee init --locales ar-EG,th-TH",
   "vp install",
-  "vp run i18n:translate",
+  "vp dev",
+  "vp build",
 ];
 
 /** A file name inside a sentence: kept whole and left to right, in any language. */
@@ -116,8 +120,8 @@ function features(): Feature[] {
         <fbt key="2" desc="Home feature fact about plurals">
           Plurals follow each language's own rules: Arabic has six forms.
         </fbt>,
-        <fbt key="3" desc="Home feature fact about the check command">
-          void-fbtee check lists anything still untranslated.
+        <fbt key="3" desc="Home feature fact: the build fails on anything untranslated">
+          vp build fails on anything still untranslated.
         </fbt>,
       ],
     },
@@ -182,8 +186,11 @@ function features(): Feature[] {
       ),
       href: routeUrl("/[lang]/docs/translating"),
       facts: [
-        <fbt key="1" desc="Home feature fact about the translate command (vp run i18n:translate)">
-          vp run i18n:translate hands the work to Claude Code, with void-fbtee's skill.
+        <fbt
+          key="1"
+          desc="Home feature fact: the dev server hands new strings to Claude Code once you pause"
+        >
+          vp dev hands what's new to Claude Code, with void-fbtee's skill, once you pause.
         </fbt>,
         <fbt key="2" desc="Home feature fact: translations are files in the app's repository">
           Translations are files in your repo, ready to review.

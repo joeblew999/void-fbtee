@@ -6,7 +6,7 @@
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vite-plus/test";
-import { copyFixture } from "./copy-fixture";
+import { copyFixture, makeBuildable } from "./copy-fixture";
 import { createBuilder, type Plugin, type Rollup } from "vite";
 import { voidMarkdown } from "@void/md/plugin";
 import { voidReact } from "@void/react/plugin";
@@ -19,6 +19,7 @@ beforeAll(() => {
     join(root, "src/probe.ts"),
     `import { Temporal } from "temporal-polyfill";\nimport config from "virtual:void-fbtee/config";\nexport const temporal = Temporal;\nexport const locales = config.locales.map((l) => l.locale);\n`,
   );
+  makeBuildable(root, options);
 });
 afterAll(() => rmSync(root, { recursive: true, force: true }));
 
@@ -123,6 +124,7 @@ describe("markdown pages", () => {
       join(dir, "src/md.ts"),
       `import pages from "virtual:void-fbtee/md-pages";\nexport const found = pages.map((p) => p.path + "|" + p.frontmatter.title);\n`,
     );
+    makeBuildable(dir, options);
     try {
       const builder = await createBuilder({
         root: dir,

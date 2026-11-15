@@ -52,7 +52,7 @@ const AGENTS_BLOCK = `${AGENTS_START}
 
 - This app is translated with [void-fbtee](https://github.com/joeblew999/void-fbtee): fbtee strings, Temporal dates, Intl formatting.
 - For anything about translations, read \`${SKILL}\` first.
-- To translate new strings and pages, run the \`i18n:translate\` script (or ask: "translate the app"). To see what's missing, run \`i18n:check\`.
+- Translating is part of the dev server: \`vp dev\` prepares each new string, translates what's new once you pause, and reports what's left. \`vp build\` fails on anything left. There are no i18n scripts.
 
 ${AGENTS_END}`;
 
@@ -276,20 +276,23 @@ export async function init(o: InitOptions): Promise<InitResult> {
       Object.entries(pkg[field] as Record<string, string>).sort(([a], [b]) => a.localeCompare(b)),
     );
 
-  // 2. Scripts.
-  const scripts = {
-    "i18n:prepare": "void-fbtee prepare",
-    "i18n:check": "void-fbtee check",
-    "i18n:translate": "void-fbtee translate",
-  };
-  const newScripts = Object.entries(scripts).filter(([k]) => !pkg.scripts?.[k]);
-  for (const [k, v] of newScripts) (pkg.scripts ??= {})[k] = v;
-  if (added.length || newScripts.length) {
+  // 2. Scripts: none. vp dev and vp build do the work, so the i18n:* scripts an earlier init
+  // added (their void-fbtee commands are gone) are taken out.
+  const oldScripts = Object.entries(pkg.scripts ?? {})
+    .filter(
+      ([k, v]) =>
+        k.startsWith("i18n:") && /^void-fbtee (prepare|check|translate|stamp)\b/.test(String(v)),
+    )
+    .map(([k]) => k);
+  for (const k of oldScripts) delete pkg.scripts![k];
+  if (added.length || oldScripts.length) {
     writeJson(at("package.json"), pkg);
     written.add("package.json");
     if (added.length) done.push(`package.json: added ${added.map(([n]) => n).join(", ")}`);
-    if (newScripts.length)
-      done.push(`package.json: added scripts ${newScripts.map(([k]) => k).join(", ")}`);
+    if (oldScripts.length)
+      done.push(
+        `package.json: removed scripts ${oldScripts.join(", ")} (vp dev and vp build do it)`,
+      );
   }
 
   // 3. Middleware.
@@ -339,7 +342,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
   const englishPages = errorPages.filter((p) => written.has(`pages/${p.name}.tsx`));
   if (englishPages.length && new Intl.Locale(o.sourceLocale).language !== "en")
     todo.push(
-      `${englishPages.map((p) => `pages/${p.name}.tsx`).join(" and ")}: their text is in English; write it in ${o.sourceLocale}, the code's language, then run void-fbtee prepare`,
+      `${englishPages.map((p) => `pages/${p.name}.tsx`).join(" and ")}: their text is in English; write it in ${o.sourceLocale}, the code's language; the dev server then translates it`,
     );
 
   // 4c. The sitemap, where the app has none.
@@ -518,7 +521,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
   // 8. The catalogs folder.
   if (!existsSync(at(DEFAULT_TRANSLATIONS))) {
     mkdirSync(at(DEFAULT_TRANSLATIONS), { recursive: true });
-    done.push(`${DEFAULT_TRANSLATIONS}/: created (void-fbtee prepare fills it)`);
+    done.push(`${DEFAULT_TRANSLATIONS}/: created (the dev server fills it)`);
   }
 
   // 9. AGENTS.md: point coding agents at void-fbtee's skill, like Void's own block.
@@ -565,6 +568,8 @@ export async function init(o: InitOptions): Promise<InitResult> {
   // Vite+ apps run everything through vp (it picks the package manager itself).
   const pm = vitePlus ? "vp" : packageManager(o.root);
   if (added.length) todo.unshift(`${pm} install (for the added dependencies)`);
-  todo.push(`${pm} run i18n:prepare (makes each locale's catalog), then ${pm} run i18n:translate`);
+  todo.push(
+    `${vitePlus ? "vp dev" : `${pm} run dev`}: makes each language's catalog and translates what's new as you work; ${vitePlus ? "vp build" : `${pm} run build`} fails on anything left`,
+  );
   return { done, todo };
 }

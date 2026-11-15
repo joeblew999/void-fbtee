@@ -51,7 +51,7 @@ function snapshot(root: string, dir = root): Record<string, string> {
 test("wires void-fbtee into a Vite+ app, and a second run changes nothing", async () => {
   const root = app("vite-plus");
   const first = await init(options(root));
-  expect(first.done.length).toBe(12);
+  expect(first.done.length).toBe(11);
 
   const vite = read(root, "vite.config.ts");
   expect(vite).toContain(`import { defineConfig } from "vite-plus";`);
@@ -94,7 +94,8 @@ test("wires void-fbtee into a Vite+ app, and a second run changes nothing", asyn
   expect(pkg.devDependencies["@nkzw/eslint-plugin-fbtee"]).toBe(
     own.devDependencies["@nkzw/eslint-plugin-fbtee"],
   );
-  expect(pkg.scripts["i18n:translate"]).toBe("void-fbtee translate");
+  // No scripts: vp dev and vp build do the work.
+  expect(Object.keys(pkg.scripts ?? {}).filter((k) => k.startsWith("i18n:"))).toEqual([]);
 
   const agents = read(root, "AGENTS.md");
   expect(agents).toContain("node_modules/void-fbtee/skills/void-fbtee/SKILL.md");
@@ -161,12 +162,24 @@ test("in an app written in Thai, init says to write its two pages' English text 
   withHome(thai);
   const { todo } = await init({ root: thai, sourceLocale: "th-TH", locales: ["th-TH", "en-US"] });
   expect(todo).toContain(
-    "pages/_not-found.tsx and pages/_error.tsx: their text is in English; write it in th-TH, the code's language, then run void-fbtee prepare",
+    "pages/_not-found.tsx and pages/_error.tsx: their text is in English; write it in th-TH, the code's language; the dev server then translates it",
   );
   const english = app("vite-plus");
   withHome(english);
   const { todo: none } = await init({ root: english, sourceLocale: "en-GB", locales: ["en-GB"] });
   expect(none.some((line) => line.includes("their text is in English"))).toBe(false);
+});
+
+test("removes the i18n scripts an older init added, and only those", async () => {
+  const older = app("vite-plus");
+  const pkg = JSON.parse(read(older, "package.json"));
+  pkg.scripts = { ...pkg.scripts, "i18n:check": "void-fbtee check", "i18n:mine": "node mine.js" };
+  writeFileSync(join(older, "package.json"), JSON.stringify(pkg, null, 2));
+  const { done } = await init(options(older));
+  const after = JSON.parse(read(older, "package.json")).scripts;
+  expect(after["i18n:check"]).toBeUndefined();
+  expect(after["i18n:mine"]).toBe("node mine.js");
+  expect(done.some((line) => line.includes("removed scripts i18n:check"))).toBe(true);
 });
 
 test('removes the fixed "/" redirect an older init wrote, and only that one', async () => {

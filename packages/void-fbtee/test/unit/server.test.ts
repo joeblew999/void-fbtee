@@ -5,7 +5,7 @@ import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterAll, beforeAll, describe, expect, test } from "vite-plus/test";
-import { copyFixture } from "./copy-fixture";
+import { copyFixture, makeBuildable } from "./copy-fixture";
 import { createBuilder, type Plugin } from "vite";
 import { langAttrs } from "../../src/locales";
 import { voidFbtee } from "../../src/plugin";
@@ -101,17 +101,19 @@ export const map = () =>
   }).text();
 `,
   );
+  const options = {
+    sourceLocale: "en-US",
+    locales: ["en-US", "de-DE", "ar-EG"],
+    // German falls back to English, for textLocales and pickText.
+    fallbackLocales: { "de-DE": ["en-US"] },
+    src: ["src/**/*.tsx"],
+  };
+  makeBuildable(root, options);
   const builder = await createBuilder({
     root,
     configFile: false,
     logLevel: "silent",
-    plugins: voidFbtee({
-      sourceLocale: "en-US",
-      locales: ["en-US", "de-DE", "ar-EG"],
-      // German falls back to English, for textLocales and pickText.
-      fallbackLocales: { "de-DE": ["en-US"] },
-      src: ["src/**/*.tsx"],
-    }) as Plugin[],
+    plugins: voidFbtee(options) as Plugin[],
     environments: {
       worker: {
         consumer: "server",

@@ -1,23 +1,31 @@
 ---
 name: void-fbtee
-description: Translate a Void app that uses void-fbtee (fbtee strings in i18n/translations/, markdown pages under pages/<locale>/) and fix its i18n setup. Use when asked to translate the app, add a language, update translations or fix void-fbtee check problems.
+description: Translate a Void app that uses void-fbtee (fbtee strings in i18n/translations/, markdown pages under pages/<locale>/) and fix its i18n setup. Use when asked to translate the app, add a language, update translations or fix what `vp dev` or `vp build` reports.
 ---
 
 # Translate a Void app with void-fbtee
 
-Commands: `void-fbtee --help` (run them with `vp exec` in a Vite+ app, else through the app's
-package manager, e.g. `pnpm exec void-fbtee check`).
+The app's own Vite+ commands do the work; there are no i18n scripts or other commands. Setting
+an app up is the one void-fbtee command: `vp exec void-fbtee init`. After that:
 
-`void-fbtee translate` hands this work to Claude Code (`claude -p`). Run inside Claude Code, it
-doesn't start a second one: it prints the prompt for the session it runs in. Then you do the work
-here, by this skill.
+- `vp dev` prepares: as it starts and on each save, every new string goes into every catalog,
+  marked new. Once the saves pause, it translates what's new with Claude Code: a `claude -p` on
+  the developer's machine, or, when the dev server runs in a Claude Code session, the prompt in
+  its log for that session ("void-fbtee: … entries with "status": "new""). When you see it,
+  translate here, by this skill. It records each markdown page you mark done and reports what's
+  left, until "all translated, nothing to fix".
+- `vp build` (and so `void deploy` and CI) fails on anything left: untranslated strings and
+  pages, setup problems, a removed language's leftovers. Its message lists them.
+- `vp check` runs fbtee's lint rules (text no one wrapped for translation).
+
+Translate only this way, never by other means, so the app's own tooling is what's used.
 
 ## Strings
 
-1. If you can run commands, run `void-fbtee prepare` first. It updates every locale's catalog in
-   `i18n/translations/` (the locales come from `voidFbtee()` in `vite.config.ts`): new strings get
-   `"status": "new"`. Use it instead of `fbtee collect` and `fbtee prepare-translations`; it also
-   adds fbtee's built-in strings. If you were given a list of files, they're already prepared.
+1. The catalogs are in `i18n/translations/`, one per language (the languages come from
+   `voidFbtee()` in `vite.config.ts`), already prepared by `vp dev`: new strings have
+   `"status": "new"`, fbtee's built-in strings included. Don't run `fbtee collect` or
+   `fbtee prepare-translations`: the dev server does that.
 2. Translate every entry with `"status": "new"` by fbtee's own skill:
    `node_modules/fbtee/skills/fbtee-translate/SKILL.md`. Follow its steps 3 to 5 (match the
    locale's existing style, read each description and the source, keep placeholders exactly, then
@@ -39,11 +47,11 @@ it is, and `jsonLd` escapes what visitors typed so it can't end the script. Its 
 language the page shows it in (`inLanguage`).
 
 **Where things are.** Catalogs: `i18n/translations/<locale>.json`, one per locale except the source
-locale; `prepare` writes them, you edit them, nothing else under `i18n/`. Locales:
+locale; the dev server writes them, you edit them, nothing else under `i18n/`. Locales:
 `voidFbtee({ sourceLocale, locales })` in `vite.config.ts`. The source locale (the code's language)
 takes its text from the code, so it usually has no catalog. The exception is a source language with
 more plural forms than a `<fbt:plural>` can write in the code (the text for exactly 1, and `many` for
-the rest): an app written in Arabic, say. Then `prepare` makes a catalog for the source language too,
+the rest): an app written in Arabic, say. Then the dev server makes a catalog for the source language too,
 holding only the strings with a count. You write each form there in the source language itself, so
 2, 11 and 100 each get their own grammar. Its lines are marked `"status": "new"` like any other.
 
@@ -55,7 +63,7 @@ reader can change by the reader's gender too, set by `<InLanguage gender>`: add
 `"tokens": ["__viewing_user__"], "types": [3]` to that entry and the same three lines. Never change
 the hash keys.
 
-**Plurals.** A string with a count has one line per plural form the language uses (`prepare` adds
+**Plurals.** A string with a count has one line per plural form the language uses (the dev server adds
 them; fbtee's own prepare-translations doesn't). Each line's `variations` names its form by
 fbtee's code: 16 zero, 4 one, 8 two, 20 few, 12 many, 24 other. Write each line in that form's
 grammar; the form a count falls in is `new Intl.PluralRules(locale).select(n)`, the rule fbtee's
@@ -273,7 +281,7 @@ Pages under `pages/<source locale>/` have a copy per locale at the same path und
   are. In an original, write them that way, never with the language (`/en-US/events`).
 - **Boxes and alerts** (`::: tip …`, `> [!NOTE] …`): translate the title after the marker, and
   keep the marker (`tip`, `[!NOTE]`) as it is. The original gives every one a title (@void/md's
-  own default titles are English: "TIP", "WARNING", "Details"); `void-fbtee check` reports one
+  own default titles are English: "TIP", "WARNING", "Details"); `vp dev` and `vp build` report one
   without, in the original or a copy.
 - **Also keep exactly:** heading ids (`{#times}`, so `#times` links work in every copy) and other
   `{…}` attributes, footnote labels (`[^dst]`; translate the footnote's text), the keys in
@@ -284,19 +292,18 @@ Pages under `pages/<source locale>/` have a copy per locale at the same path und
   goes on a line of its own, between paragraphs: @void/md cuts the page's HTML at each island, so
   one inside a list item, a table or a sentence breaks the HTML around it (the list falls apart).
 - **translatedFrom:** each translated page records the original it came from in its frontmatter.
-  Don't write it yourself: `void-fbtee translate` records it, and after a hand translation run
-  `void-fbtee stamp pages/<locale>/<path>.md`. For a page `check` reports out of date, compare it
-  with the original and change only what changed.
+  Don't write its value yourself: when a page is done (translated, or checked and right), set
+  `translatedFrom: done`, and the dev server replaces it with the original's version. For a page
+  reported out of date, compare it with the original and change only what changed.
 
 ## Finish
 
-Run `void-fbtee check` if you can; it exits 1 and lists anything still missing. When
-`void-fbtee translate` started you, don't run anything: it records the pages and runs check
-itself. Report one line per file: done, or what's left and why.
+Don't run anything: the dev server checks as you save and reports what's left in its log, and
+`vp build` fails on it. Report one line per file: done, or what's left and why.
 
 ## Setup problems
 
-If check reports `setup:` problems, `void-fbtee init` fixes most of them (it only adds what's
+If `vp dev` or `vp build` reports `setup:` problems, `vp exec void-fbtee init` fixes most of them (it only adds what's
 missing; where it can't safely edit a file it prints the line to add). The pieces:
 
 - `src/locales.ts`: the languages once (`export const locales = [...] as const`) and their type
@@ -325,11 +332,11 @@ missing; where it can't safely edit a file it prints the line to add). The piece
   `voidFbtee({ fallbackLocale })` (default the source language), with a 302 nobody caches. Every
   other address keeps its language. An app with its own `pages/index.*` sets
   `voidFbtee({ redirectHome: false })`. A fixed `"/"` redirect to one language (`init` wrote one
-  before 0.6.0, and removes it) sends everyone there; `check` reports it.
+  before 0.6.0, and removes it) sends everyone there; the build reports it.
 - tsconfig: `"fbtee/ReactTypes"` in `compilerOptions.types`; `"lib"` with `ES2025`, `DOM`,
   `DOM.Iterable`.
 - Vite+: `lint.jsPlugins` with `@nkzw/eslint-plugin-fbtee` and fbtee's strict rules in the
   workspace root's `vite.config.ts` (`init` prints the rules). Strict also warns of text no one
   wrapped for translation (`vp lint` lists it); names that stay as they are (the app's,
   products') go in that rule's `ignoredWords`.
-- Scripts `i18n:prepare`, `i18n:check`, `i18n:translate`; a void-fbtee section in `AGENTS.md`.
+- A void-fbtee section in `AGENTS.md`. No scripts: an older init's `i18n:*` scripts are removed.

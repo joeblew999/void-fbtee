@@ -40,7 +40,8 @@ function points(): Point[] {
       why: (
         <fbt desc="Markdown page point: each copy records which version of the original it was translated from, and check reports it when the original changes">
           Each copy records the version of the original it was translated from. When the original
-          changes, void-fbtee check reports the copy as out of date, as the column above would show.
+          changes, vp dev reports the copy as out of date and translates it again, and vp build
+          fails on it, as the column above would show.
         </fbt>
       ),
       code: [

@@ -12,32 +12,40 @@
 //   own "native if present", and so do tests under Vitest, which run in Node.js.
 // - Builds each locale's catalog in-process from i18n/translations/<locale>.json and the app's
 //   source (plus fbtee's built-in strings), as `virtual:void-fbtee/catalogs`. Nothing generated
-//   goes in git. Shared with the void-fbtee command: catalogs.ts.
-// - Reports untranslated strings once per run: a warning in dev, a report in a build, and with
-//   `failOnMissing` a failed build, so `void deploy` (which runs `vite build`) can't ship gaps.
+//   goes in git. catalogs.ts.
+// - `vp dev` does the translation work: on start and on each save it prepares the catalogs (a new
+//   string is in each, marked new), once you pause it translates what's new (translate.ts), it
+//   records each page the agent marks done, and it reports everything `check` finds.
+// - `vp build` fails on anything `check` finds, so `void deploy` (which builds) can't ship gaps.
 // - Browser: every app module that uses <fbt> or fbs first imports `void-fbtee/client`, which
 //   installs the page's catalog (top-level await). Islands hydrate without the layout's
 //   I18nProvider, so this is what gives them their strings.
 import { createRequire } from "node:module";
 import { existsSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, matchesGlob, relative, sep } from "node:path";
+import { prepare } from "./commands";
+import { markedDone, stamp, translateApp } from "./translate";
+import { check } from "./check";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
 import type { FallbackLocales } from "fbtee";
-import { resolveLocales, type LocaleConfig, type LocaleInput } from "./locales";
+import { resolveLocales, sourceOf, type LocaleConfig, type LocaleInput } from "./locales";
 import {
   DEFAULT_SRC,
   DEFAULT_TRANSLATIONS,
   catalogFile,
   catalogLocales,
   collect,
-  formatMissing,
-  missing,
   runtimeCatalog,
   runtimeTexts,
   type Project,
 } from "./catalogs";
 import { checkSite } from "./site";
+
+/** How long the dev server waits after the last save before preparing (milliseconds). */
+const PREPARE_DELAY = 300;
+/** How long after the last save the dev server waits before translating: a pause. */
+const TRANSLATE_DELAY = 5_000;
 
 /** voidFbtee({ fallbackLocale }), canonical and one of the app's, or the source language. */
 function checkFallback(fallback: string | undefined, config: LocaleConfig): string {
@@ -57,11 +65,6 @@ export interface VoidFbteeOptions {
   translations?: string;
   /** Source files to collect strings from. Default: every folder of code in a Void app (DEFAULT_SRC, catalogs.ts). */
   src?: string[];
-  /**
-   * Fail `vite build` (and so `void deploy`) when any locale has untranslated strings, fbtee's
-   * own built-in strings included. Never fails the dev server. Default false: the build reports.
-   */
-  failOnMissing?: boolean;
   /**
    * fbtee's own `fallbackLocales` option, passed to fbtee as is: catalogs to try after a
    * locale's natural parents (de-AT -> de) and before the source text. See fbtee's README,
@@ -95,7 +98,7 @@ export interface VoidFbteeOptions {
   common?: Record<string, string>;
 }
 
-/** What the plugin exposes on its `api`, for the void-fbtee command (read with resolveConfig). */
+/** What the plugin exposes on its `api`, read from the config without running the plugin (loadProject, for tests). */
 export interface VoidFbteeApi {
   options: VoidFbteeOptions;
   project(): Project;
@@ -136,15 +139,11 @@ const isClient = (env: { config: { consumer: "client" | "server" } } | undefined
   env?.config.consumer === "client";
 const SERVER_TEMPORAL = `const Temporal = globalThis.Temporal;
 if (!Temporal)
-  throw new Error('void-fbtee: no Temporal on the server. Add Cloudflare\\'s "temporal" compatibility flag (void.config.ts: worker.compatibility_flags), or run void-fbtee init.');
+  throw new Error('void-fbtee: no Temporal on the server. Add Cloudflare\\'s "temporal" compatibility flag (void.config.ts: worker.compatibility_flags), or run vp exec void-fbtee init.');
 export { Temporal };
 export const Intl = globalThis.Intl;
 export const toTemporalInstant = Date.prototype.toTemporalInstant;
 `;
-
-// Void builds the browser and the worker as separate Vite builds, each with its own copy of the
-// plugin; report once per app and command in this process.
-const reportedRuns = new Set<string>();
 
 export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   const config: LocaleConfig = resolveLocales(options.sourceLocale, options.locales);
@@ -158,6 +157,54 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   let root = process.cwd();
   let command: "build" | "serve" = "serve";
   let devServer: ViteDevServer | undefined;
+  let prepareTimer: ReturnType<typeof setTimeout> | undefined;
+  let translateTimer: ReturnType<typeof setTimeout> | undefined;
+  // One translation at a time; a save during one asks for another after it.
+  let translating: Promise<void> | undefined;
+  let translateAgain = false;
+  // The prompt last handed to the Claude Code session, so a pause doesn't show it again.
+  let handedOut: string | undefined;
+  const log = (text: string) =>
+    text.split("\n").forEach((l) => devServer?.config.logger.info(`void-fbtee: ${l}`));
+  const report = (problems: string[]) =>
+    log(
+      problems.length
+        ? `${problems.length} to fix:\n${problems.join("\n")}`
+        : "all translated, nothing to fix",
+    );
+  // Tests (Vitest's server, CI) don't start an agent: they report.
+  const agentAllowed = () => !underVitest && !process.env.CI;
+  // After a save, once you pause: translate what's new (a source file or original page saved), or
+  // only report (a catalog or translated page saved, which is the translating itself).
+  let translateWanted = false;
+  const translateSoon = (translate = true) => {
+    translateWanted ||= translate;
+    clearTimeout(translateTimer);
+    translateTimer = setTimeout(() => {
+      const wanted = translateWanted;
+      translateWanted = false;
+      if (translating) {
+        // The agent's own edits, while it works: it reports when it's done.
+        if (!wanted) return;
+        translateAgain = true;
+        return;
+      }
+      if (!wanted || !agentAllowed()) return report(check(project()));
+      translating = translateApp(project(), root, log, handedOut)
+        .then((result) => {
+          handedOut = result.prompt;
+          report(result.problems);
+        })
+        .catch((error) => log(`couldn't translate: ${String(error)}`))
+        .finally(() => {
+          translating = undefined;
+          if (translateAgain) {
+            translateAgain = false;
+            translateSoon();
+          }
+        });
+    }, TRANSLATE_DELAY);
+  };
   // Whether the app uses @void/md, as void-md tells its own adapters (by plugin name): no peer
   // dependency on it, which an app without markdown pages would have to install anyway.
   let hasMarkdown = false;
@@ -189,45 +236,82 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         (p) => p.name === "vitest" || p.name.startsWith("vitest:"),
       );
     },
-    // Once per run (the first environment to start): the dev server warns, a build reports, and
-    // with failOnMissing a build fails, so `void deploy` (which runs `vite build`) can't ship gaps.
+    // A build fails on anything check finds (untranslated strings, pages, setup, a removed
+    // language's leftovers), so `void deploy`, which builds, can't ship gaps. Each environment's
+    // build checks (Void builds the browser and the worker separately): the first one fails.
     buildStart() {
-      const run = `${root}|${command}`;
-      if (reportedRuns.has(run)) return;
-      reportedRuns.add(run);
-      const report = formatMissing(missing(project()));
-      if (!report) return;
-      if (command === "build" && options.failOnMissing)
-        this.error(`void-fbtee: untranslated strings (failOnMissing is on):\n${report}`);
-      this.warn(`untranslated strings (they show in ${config.sourceLocale}):\n${report}`);
+      if (command !== "build") return;
+      const problems = check(project());
+      if (problems.length)
+        this.error(
+          `void-fbtee: ${problems.length} to fix before this can build (vp dev translates them):\n${problems.join("\n")}`,
+        );
     },
     configureServer(server) {
       devServer = server;
       server.watcher.add(join(root, translationsDir));
+      // Once as it starts, as on every save: a language just added to the app's list (the dev
+      // server restarts when its config changes) gets its catalog, with every string marked new,
+      // then everything that isn't translated is, once the start has settled.
+      try {
+        const written = prepare(project());
+        if (written.length) log(`prepared ${written.join(", ")}`);
+      } catch (error) {
+        server.config.logger.warn(`void-fbtee: couldn't prepare: ${String(error)}`);
+      }
+      translateSoon();
     },
     // Vite calls this for every watched file event, once per environment; act once (client).
     // A hook rather than watcher listeners: Vite, Void and Cloudflare's plugin already put Node
     // near its 10-listener warning on the watcher.
     watchChange(file, { event }) {
       const dir = join(root, translationsDir);
-      if (!devServer || !isClient(this.environment) || !file.startsWith(dir)) return;
-      // A catalog added or removed: the virtual catalog modules change, so reload. An edit is a
-      // normal hot update (the file is a watched dependency of its catalog module).
-      if (event !== "update") {
-        for (const env of Object.values(devServer.environments)) {
-          for (const l of config.locales) {
-            const mod = env.moduleGraph.getModuleById("\0" + CATALOG_PREFIX + l.locale);
-            if (mod) env.moduleGraph.invalidateModule(mod);
+      if (!devServer || !isClient(this.environment)) return;
+      const rel = relative(root, file).split(sep).join("/");
+      if (rel.startsWith("..")) return;
+      // A markdown page the agent marked done: record which version of the original it's from.
+      // That write is another save, which then finds the page recorded.
+      if (/\.mdx?$/.test(file) && event !== "delete" && existsSync(file)) {
+        try {
+          if (markedDone(readFileSync(file, "utf8"))) {
+            stamp(project(), file);
+            log(`recorded ${rel}`);
+            return;
           }
+        } catch (error) {
+          log(`couldn't record ${rel}: ${String(error)}`);
         }
-        devServer.ws.send({ type: "full-reload" });
       }
-      const report = formatMissing(missing(project()));
-      devServer.config.logger.info(
-        report
-          ? `void-fbtee: untranslated strings:\n${report}`
-          : "void-fbtee: all strings translated",
-      );
+      const source = !file.startsWith(dir) && src.some((glob) => matchesGlob(rel, glob));
+      if (file.startsWith(dir)) {
+        // A catalog added or removed: the virtual catalog modules change, so reload. An edit is
+        // a normal hot update (the file is a watched dependency of its catalog module).
+        if (event !== "update") {
+          for (const env of Object.values(devServer.environments)) {
+            for (const l of config.locales) {
+              const mod = env.moduleGraph.getModuleById("\0" + CATALOG_PREFIX + l.locale);
+              if (mod) env.moduleGraph.invalidateModule(mod);
+            }
+          }
+          devServer.ws.send({ type: "full-reload" });
+        }
+      } else if (source) {
+        // A source file saved: prepare (fbtee's collect and prepare-translations), so a new
+        // string is in every catalog, marked new, at once. Waits for saves to settle; writes
+        // only catalogs that change (commands.ts).
+        clearTimeout(prepareTimer);
+        prepareTimer = setTimeout(() => {
+          try {
+            const written = prepare(project());
+            if (written.length) log(`prepared ${written.join(", ")}: translating once you pause`);
+          } catch (error) {
+            devServer?.config.logger.warn(`void-fbtee: couldn't prepare: ${String(error)}`);
+          }
+        }, PREPARE_DELAY);
+      } else if (!/\.mdx?$/.test(file) || !rel.startsWith("pages/")) return;
+      // Then, once you pause: translate what's new, or report what's left.
+      const original = `pages/${sourceOf(config).segment}/`;
+      translateSoon(source || rel.startsWith(original));
     },
     configEnvironment(name, env) {
       // The virtual modules must reach void-fbtee's own files, so it is never pre-bundled.

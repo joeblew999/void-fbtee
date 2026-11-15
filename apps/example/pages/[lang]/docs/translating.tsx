@@ -14,22 +14,25 @@ function points(): Point[] {
     {
       id: "claude",
       title: (
-        <fbt desc="Translating page point title: the translate script hands the work to Claude Code">
-          One command, by Claude Code
+        <fbt desc="Translating page point title: the dev server translates, with Claude Code">
+          vp dev translates, by Claude Code
         </fbt>
       ),
       why: (
-        <fbt desc="Translating page point: the translate script prepares the catalogs and hands the work to Claude Code with void-fbtee's skill">
-          vp run i18n:translate collects the new strings into each catalog, then hands the work to
-          Claude Code with void-fbtee's skill: the strings, and the markdown pages that changed. The
-          app's AGENTS.md says so too, so asking Claude Code to translate the app does the same.
+        <fbt desc="Translating page point: the dev server prepares new strings and, once you pause, hands them to Claude Code with void-fbtee's skill">
+          There's nothing to run. As you save, vp dev adds each new string to every language's
+          catalog, and once you pause, it hands what's new to Claude Code with void-fbtee's skill:
+          the strings, and the markdown pages that changed. The app's AGENTS.md says so too.
         </fbt>
       ),
       code: [
-        { file: "package.json", line: '"i18n:translate": "void-fbtee translate",' },
+        {
+          file: "vite.config.ts",
+          line: "voidFbtee({ sourceLocale, locales, site: SITE, common }),",
+        },
         {
           file: "AGENTS.md",
-          line: '- To translate new strings and pages, run the `i18n:translate` script (or ask: "translate the app"). To see what\'s missing, run `i18n:check`.',
+          line: "- Translating is part of the dev server: `vp dev` prepares each new string, translates what's new once you pause, and reports what's left. `vp build` fails on anything left. There are no i18n scripts.",
         },
       ],
     },
@@ -84,6 +87,36 @@ function points(): Point[] {
 function stages(): { command: string; what: ReactNode; where: string }[] {
   return [
     {
+      command: "vp exec void-fbtee init",
+      what: (
+        <fbt desc="Translating page: what void-fbtee init does, once, to set an app up">
+          Once: sets the app up. void-fbtee's only command.
+        </fbt>
+      ),
+      where: "package.json (void-fbtee)",
+    },
+    {
+      command: "vp dev",
+      what: (
+        <fbt desc="Translating page: what the dev server does about translations, preparing, translating and reporting by itself">
+          As you save, adds new strings to every language, marked new. Once you pause, Claude Code
+          translates them, and the dev server reports what's left. An edited translation shows at
+          once.
+        </fbt>
+      ),
+      where: "vite.config.ts (voidFbtee)",
+    },
+    {
+      command: "vp build",
+      what: (
+        <fbt desc="Translating page: what the build does about translations">
+          Fails on anything left: an untranslated string or page, a page older than its original, a
+          setup problem. So a deploy can't ship one.
+        </fbt>
+      ),
+      where: "vite.config.ts (voidFbtee)",
+    },
+    {
       command: "vp check",
       what: (
         <fbt desc="Translating page: what vp check does about translations">
@@ -93,57 +126,10 @@ function stages(): { command: string; what: ReactNode; where: string }[] {
       where: "vite.config.ts",
     },
     {
-      command: "vp dev",
-      what: (
-        <fbt desc="Translating page: what the dev server does about translations">
-          Says what's untranslated as you work, and shows an edited translation at once.
-        </fbt>
-      ),
-      where: "vite.config.ts (voidFbtee)",
-    },
-    {
-      command: "vp run i18n:prepare",
-      what: (
-        <fbt desc="Translating page: what i18n:prepare does">
-          Adds every new string to each language's catalog, with the forms that language needs,
-          marked new.
-        </fbt>
-      ),
-      where: "package.json",
-    },
-    {
-      command: "vp run i18n:translate",
-      what: (
-        <fbt desc="Translating page: what i18n:translate does">
-          Claude Code translates what's new, strings and markdown pages, by fbtee's own skill.
-        </fbt>
-      ),
-      where: "package.json",
-    },
-    {
-      command: "vp run i18n:check",
-      what: (
-        <fbt desc="Translating page: what i18n:check does">
-          Fails if a string is untranslated or a page's copy is older than its original.
-        </fbt>
-      ),
-      where: "package.json",
-    },
-    {
-      command: "vp build",
-      what: (
-        <fbt desc="Translating page: what the build does about translations">
-          Fails on an untranslated string, so a deploy can't ship one.
-        </fbt>
-      ),
-      where: "vite.config.ts (failOnMissing)",
-    },
-    {
       command: "CI",
       what: (
         <fbt desc="Translating page: what CI does about translations">
-          Runs the same commands on every push: check, i18n:check, build, then deploys and checks
-          the live site.
+          Runs the same commands on every push: check, build, then deploys and checks the live site.
         </fbt>
       ),
       where: ".github/workflows/ci.yml",

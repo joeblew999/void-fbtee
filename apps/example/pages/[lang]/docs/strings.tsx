@@ -18,7 +18,7 @@ function points(): Point[] {
       why: (
         <fbt desc="Strings page point: text in components is written in fbt elements, each with a description for the translator">
           Text in a component is written inside an fbt element, with a description that tells the
-          translator where it shows and what it means. void-fbtee prepare collects every one into
+          translator where it shows and what it means. vp dev collects every one, as you save, into
           each language's catalog, i18n/translations, a file in the app's repository.
         </fbt>
       ),
@@ -51,8 +51,8 @@ function points(): Point[] {
       why: (
         <fbt desc="Strings page point: a count has one translation per plural form the language uses">
           A sentence with a count gets one translation for each plural form the language has: one in
-          Thai, two in English, six in Arabic. void-fbtee prepare adds the lines each language
-          needs, and the reader's count picks the right one, as in the table above.
+          Thai, two in English, six in Arabic. vp dev adds the lines each language needs, and the
+          reader's count picks the right one, as in the table above.
         </fbt>
       ),
       code: [
@@ -76,7 +76,7 @@ function points(): Point[] {
       code: [
         {
           file: "vite.config.ts",
-          line: "voidFbtee({ sourceLocale, locales, site: SITE, common, failOnMissing: true }),",
+          line: "common,",
         },
         { file: "src/shell/SiteHeader.tsx", line: "return <fbt common>Events</fbt>;" },
       ],
@@ -85,12 +85,12 @@ function points(): Point[] {
       id: "check",
       title: <fbt desc="Strings page point title: finding what's untranslated">Nothing missed</fbt>,
       why: (
-        <fbt desc="Strings page point: void-fbtee check lists what is untranslated, and the lint rules catch text not marked">
-          void-fbtee check lists every string still untranslated in any language, and fbtee's lint
-          rules report text written in a component without fbt.
+        <fbt desc="Strings page point: the build fails on any untranslated string, and the lint rules catch text not marked">
+          vp build fails on any string still untranslated in any language, and fbtee's lint rules
+          (vp check) report text written in a component without fbt.
         </fbt>
       ),
-      code: [{ file: "package.json", line: '"i18n:check": "void-fbtee check",' }],
+      code: [{ file: ".github/workflows/ci.yml", line: "- run: vp run -r build" }],
     },
   ];
 }

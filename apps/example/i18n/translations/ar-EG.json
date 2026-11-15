@@ -955,18 +955,6 @@
       ],
       "types": []
     },
-    "EPORB6pVCBAyS1k9iojeYw==": {
-      "description": "Home feature fact about the check command",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يعرض void-fbtee check كل ما لم يُترجم بعد.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "sjKkcyIzeAcfN6dmuNNMBw==": {
       "description": "Home feature title: dates and times",
       "status": "translated",
@@ -1106,18 +1094,6 @@
       "translations": [
         {
           "translation": "يترجمها الذكاء الاصطناعي، وتراجعها أنت",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "G7RXnz19kUZWTq5YW/DqhQ==": {
-      "description": "Home feature fact about the translate command (vp run i18n:translate)",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يسلّم vp run i18n:translate العمل إلى Claude Code مع مهارة void-fbtee.",
           "variations": {}
         }
       ],
@@ -2894,18 +2870,6 @@
       ],
       "types": []
     },
-    "WUZ4TnxzXPNCQAYx/NWQqQ==": {
-      "description": "Markdown page point: each copy records which version of the original it was translated from, and check reports it when the original changes",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تسجّل كل نسخة إصدار الأصل الذي تُرجمت منه. وعندما يتغيّر الأصل، يُبلغ void-fbtee check بأن النسخة قديمة، كما سيظهر في العمود أعلاه.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "A/OTAM3Acd6zaLfNmnG5vg==": {
       "description": "Markdown page point title: dates and numbers in a markdown page",
       "status": "translated",
@@ -3158,18 +3122,6 @@
       ],
       "types": []
     },
-    "7rhYxSaDtuj+fF/XDSIenA==": {
-      "description": "Strings page point: text in components is written in fbt elements, each with a description for the translator",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يُكتب النص في المكوّن داخل عنصر fbt، مع وصف يخبر المترجم أين يظهر وماذا يعني. ويجمع void-fbtee prepare كل واحد في فهرس كل لغة، i18n/translations، وهو ملف في مستودع التطبيق.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "dJBLP1ojMmgmJXaGGrvtzQ==": {
       "description": "Strings page point title: plain strings for attributes",
       "status": "translated",
@@ -3201,18 +3153,6 @@
       "translations": [
         {
           "translation": "الجمع، لكل لغة قواعدها",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "hZSIYveQUjjD/aMtzy9bVQ==": {
-      "description": "Strings page point: a count has one translation per plural form the language uses",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "للجملة التي فيها عدد ترجمة لكل صيغة جمع في اللغة: واحدة في التايلاندية، واثنتان في الإنجليزية، وست في العربية. ويضيف void-fbtee prepare الأسطر التي تحتاجها كل لغة، ويختار عدد القارئ السطر الصحيح، كما في الجدول أعلاه.",
           "variations": {}
         }
       ],
@@ -3254,18 +3194,6 @@
       ],
       "types": []
     },
-    "+E7jk91kiDc3/q8UErfn1Q==": {
-      "description": "Strings page point: void-fbtee check lists what is untranslated, and the lint rules catch text not marked",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يسرد void-fbtee check كل نص لم يُترجم بعد في أي لغة، وتُبلغ قواعد فحص fbtee عن نص مكتوب في مكوّن بلا fbt.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "hC/uuazRUITa0nHQfPmwyg==": {
       "description": "Strings page section title: one sentence with a count, shown for several counts",
       "status": "translated",
@@ -3297,30 +3225,6 @@
       "translations": [
         {
           "translation": "الجملة نفسها لستة أعداد، بلغة هذه الصفحة. والعمود الثاني صيغة الجمع التي تضع فيها اللغة كل عدد، كما يسمّيها Intl.PluralRules.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "i/MdP3gsGmDEKBj4uhRyAA==": {
-      "description": "Translating page point title: the translate script hands the work to Claude Code",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "أمر واحد، يقوم به Claude Code",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "jtUuydgLCMbWwHfQ2CIwGQ==": {
-      "description": "Translating page point: the translate script prepares the catalogs and hands the work to Claude Code with void-fbtee's skill",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يجمع vp run i18n:translate النصوص الجديدة في كل فهرس، ثم يسلّم العمل إلى Claude Code مع مهارة void-fbtee: النصوص، وصفحات Markdown التي تغيّرت. وملف AGENTS.md في التطبيق يقول ذلك أيضًا، فطلب ترجمة التطبيق من Claude Code يفعل الشيء نفسه.",
           "variations": {}
         }
       ],
@@ -4635,72 +4539,6 @@
       ],
       "types": []
     },
-    "nOK1JdlK2UOv/MvETYysEA==": {
-      "description": "Translating page: what the dev server does about translations",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يخبرك بما لم يُترجم أثناء عملك، ويعرض الترجمة المعدَّلة فورًا.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "/zRE+2DoVCiBY6n3ofmSQw==": {
-      "description": "Translating page: what i18n:prepare does",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يضيف كل نص جديد إلى فهرس كل لغة، بالصيغ التي تحتاجها تلك اللغة، ويعلّمه بأنه جديد.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "8W0DBmCvpoesZN0arc01Qw==": {
-      "description": "Translating page: what i18n:translate does",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يترجم Claude Code ما هو جديد، النصوص وصفحات Markdown، وفق مهارة fbtee نفسها.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "pZcOnJfQ40G2gUwhBAApgg==": {
-      "description": "Translating page: what i18n:check does",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يفشل إذا بقي نص دون ترجمة أو كانت نسخة صفحة أقدم من أصلها.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "OdiBbTOSPGsgV7z4VYt7Ew==": {
-      "description": "Translating page: what the build does about translations",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يفشل عند وجود نص غير مترجم، فلا يمكن للنشر أن يُخرجه.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "nfjc2yJmKXnKeTkY1mv24g==": {
-      "description": "Translating page: what CI does about translations",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يشغّل الأوامر نفسها مع كل دفع: check وi18n:check وbuild، ثم ينشر ويفحص الموقع الحي.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "98k5o/AJ4acxS0KZZMV2xg==": {
       "description": "Translating page section title: translation built into Vite+'s commands",
       "tokens": [],
@@ -4718,6 +4556,150 @@
       "translations": [
         {
           "translation": "الترجمة ليست أداة منفصلة: إنها جزء من كل أمر يشغّله تطبيق Vite+ أصلًا، كما هو على جهازك وفي CI.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "655gsLEO0SW1CifODjXhpw==": {
+      "description": "Home feature fact: the build fails on anything untranslated",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يفشل vp build إذا بقي أي شيء غير مترجم.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9Fg1wa5OVWLcirO302dDBA==": {
+      "description": "Home feature fact: the dev server hands new strings to Claude Code once you pause",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يسلّم vp dev الجديد إلى Claude Code، مع مهارة void-fbtee، عندما تتوقف.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OyxyHsMTb19siPl9d13hGg==": {
+      "description": "Markdown page point: each copy records which version of the original it was translated from, and check reports it when the original changes",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تسجّل كل نسخة إصدار الأصل الذي تُرجمت منه. وعندما يتغيّر الأصل، يُبلغ vp dev بأن النسخة قديمة ويترجمها من جديد، ويفشل vp build بسببها، كما سيُظهر العمود أعلاه.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/JYtNQhGueReTylg2T2snw==": {
+      "description": "Strings page point: text in components is written in fbt elements, each with a description for the translator",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يُكتب النص في المكوّن داخل عنصر fbt، مع وصف يخبر المترجم أين يظهر وماذا يعني. ويجمع vp dev كل واحد منها، أثناء الحفظ، في كتالوج كل لغة، i18n/translations، وهو ملف في مستودع التطبيق.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "C6STfhplFeU7B0Ur/lFlNg==": {
+      "description": "Strings page point: a count has one translation per plural form the language uses",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الجملة التي فيها عدد تحصل على ترجمة لكل صيغة جمع في اللغة: واحدة في التايلاندية، واثنتان في الإنجليزية، وست في العربية. يضيف vp dev الأسطر التي تحتاجها كل لغة، ويختار عدد القارئ السطر الصحيح، كما في الجدول أعلاه.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/WNY/KEU6PiQ/6Qz1I2xpg==": {
+      "description": "Strings page point: the build fails on any untranslated string, and the lint rules catch text not marked",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يفشل vp build إذا بقي أي نص غير مترجم في أي لغة، وتُبلغ قواعد lint في fbtee (vp check) عن النص المكتوب في مكوّن دون fbt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xBpH5kB/9vb+YTuTDgk23g==": {
+      "description": "Translating page point title: the dev server translates, with Claude Code",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "vp dev يترجم، بواسطة Claude Code",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "no8hIs+9AetKHzwKOPrcGA==": {
+      "description": "Translating page point: the dev server prepares new strings and, once you pause, hands them to Claude Code with void-fbtee's skill",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لا شيء لتشغيله. أثناء الحفظ، يضيف vp dev كل نص جديد إلى كتالوج كل لغة، وعندما تتوقف، يسلّم الجديد إلى Claude Code مع مهارة void-fbtee: النصوص، وصفحات markdown التي تغيّرت. وملف AGENTS.md في التطبيق يقول ذلك أيضًا.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FJ/lBvh3mGS3BKL16lV73A==": {
+      "description": "Translating page: what void-fbtee init does, once, to set an app up",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مرة واحدة: يُعدّ التطبيق. وهو الأمر الوحيد في void-fbtee.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7QBEzIrKVqKX8/OaD1PXkw==": {
+      "description": "Translating page: what the dev server does about translations, preparing, translating and reporting by itself",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "أثناء الحفظ، يضيف النصوص الجديدة إلى كل لغة، موسومة بأنها جديدة. وعندما تتوقف، يترجمها Claude Code، ويُبلغ خادم التطوير بما تبقّى. وتظهر الترجمة المعدّلة فورًا.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9PlusVxA/lrWcJwlu5EpsA==": {
+      "description": "Translating page: what the build does about translations",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يفشل إذا بقي أي شيء: نص أو صفحة غير مترجمة، أو صفحة أقدم من أصلها، أو مشكلة في الإعداد. لذا لا يمكن للنشر أن يحمل أيًا منها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "X9n7ejivG8fJSwBpv0Mw0w==": {
+      "description": "Translating page: what CI does about translations",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يشغّل الأوامر نفسها مع كل push: ‏check، ثم build، ثم ينشر ويتحقق من الموقع الحي.",
           "variations": {}
         }
       ],

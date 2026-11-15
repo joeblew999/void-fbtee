@@ -5,9 +5,6 @@
   "scripts": {
     "build": "vp build",
     "dev": "vp dev",
-    "i18n:check": "void-fbtee check",
-    "i18n:prepare": "void-fbtee prepare",
-    "i18n:translate": "void-fbtee translate",
     "icons": "pwa-assets-generator",
     "og-image": "vpx scripts/og-image.ts",
     "test": "vp test run",

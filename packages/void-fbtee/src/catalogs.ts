@@ -1,6 +1,6 @@
-// The app's strings and catalogs, in-process with fbtee's own compiler. Shared by the Vite
-// plugin (runtime catalogs, missing-translation report) and the void-fbtee command (prepare,
-// check), so they all count "missing" the same way.
+// The app's strings and catalogs, in-process with fbtee's own compiler. Used by the Vite
+// plugin for everything: runtime catalogs, preparing, translating and checking, so they all
+// count "missing" the same way.
 //
 // - Strings are collected from the app's source plus fbtee's built-in strings
 //   (fbtee/Strings.json), as fbtee's own CLI does by default (--include-default-strings).
@@ -20,7 +20,7 @@ import { addPluralForms, pluralCategories, pluralSlots } from "./plurals";
 // Where an app's strings can be: every folder of code in Void's project structure (Void's docs,
 // reference/structure.md: pages, routes, middleware, crons, queues, email, durable-objects, src),
 // plus components/ and lib/, which apps commonly add. A string used only in a scheduled job or an
-// email is collected like any other, so `void-fbtee check` reports it untranslated.
+// email is collected like any other, so `vp dev` translates it and `vp build` fails without it.
 export const DEFAULT_SRC = [
   "pages/**/*.{ts,tsx,js,jsx}",
   "routes/**/*.{ts,tsx,js,jsx}",
@@ -155,7 +155,7 @@ export const catalogLocales = (p: Project) => [
 ];
 
 /**
- * What `void-fbtee prepare` writes: every translated locale's catalog after fbtee's own
+ * What preparing writes (the dev server, on start and on each save): every translated locale's catalog after fbtee's own
  * prepare-translations (new strings marked "new", finished ones kept, stale ones removed), plus a
  * line for each plural form the locale needs (plurals.ts).
  */

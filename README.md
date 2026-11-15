@@ -92,12 +92,8 @@ vp run tailscale:logout   # takes it off again; remove the machine at
 
 On a Mac, just open http://localhost:5173.
 
-Translations (from `apps/example`):
-
-```sh
-vp run i18n:translate    # translate what's new or changed
-vp run i18n:check        # anything missing or out of date
-```
+Translations: `vp dev` prepares and translates as you work (once you pause), and `vp build`
+fails on anything left. There are no i18n scripts.
 
 Production (Void's own commands):
 

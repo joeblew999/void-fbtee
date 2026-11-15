@@ -1,6 +1,7 @@
-// `void-fbtee translate` and `stamp`. translate gives the work to a coding
-// agent: `claude -p`, with void-fbtee's skill, allowed to read and edit files and nothing else.
-// The skill does the translating; this file only says what's missing and checks the result.
+// Translating, as `vp dev` does it (plugin.ts): the work goes to a coding agent, `claude -p` with
+// void-fbtee's skill, allowed to read and edit files and nothing else, or the Claude Code session
+// the dev server runs in, given the prompt. The skill does the translating; this file only says
+// what's missing, records each translated page's original, and checks the result.
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
@@ -15,6 +16,7 @@ import {
   type MarkdownPage,
 } from "./check";
 import { sourceOf } from "./locales";
+import { check } from "./check";
 
 /** void-fbtee's own folder (dist/ is one level down), where skills/ ships. */
 export const packageDir = () => dirname(dirname(fileURLToPath(import.meta.url)));
@@ -65,11 +67,18 @@ export function translateTask(p: Project): TranslateTask | undefined {
     "",
     ...(strings.length ? ["Strings (fbtee catalogs):", ...strings, ""] : []),
     ...(pageLines.length ? ["Markdown pages:", ...pageLines, ""] : []),
-    "Edit only these files. Don't add translatedFrom lines: void-fbtee records them when you're done,",
-    "then runs void-fbtee check. Finish with one line per file: done, or what's left and why.",
+    `Edit only these files. When a markdown page is done (translated, or checked and right), set "${TRANSLATED_FROM}: ${DONE}" in its`,
+    "frontmatter: the dev server replaces it with the version of the original it's from, then checks everything.",
+    "Finish with one line per file: done, or what's left and why.",
   ].join("\n");
   return { prompt, pages };
 }
+
+/** What the agent writes as a page's translatedFrom when it's done with it (the prompt says so). */
+export const DONE = "done";
+/** A page the agent has marked done, for the dev server to stamp. */
+export const markedDone = (text: string) =>
+  new RegExp(`^${TRANSLATED_FROM}:\\s*"?${DONE}"?\\s*$`, "m").test(text);
 
 /**
  * Record in a translated page which version of the original it was translated from:
@@ -184,4 +193,61 @@ function showEvent(root: string, line: string) {
     console.log("");
     console.log(event.result ?? `claude finished: ${event.subtype}`);
   }
+}
+
+/**
+ * Translate what's new: Claude Code translates (a `claude -p` here, or the Claude Code session the
+ * dev server runs in, given the prompt), then the pages it wrote are stamped and everything is
+ * checked. The dev server runs it once you pause after a save. Resolves with what's left: the
+ * check's problems, or the prompt handed to the session.
+ */
+export async function translateApp(
+  p: Project,
+  root: string,
+  log: (line: string) => void = console.log,
+  handedOut?: string,
+): Promise<{ problems: string[]; prompt?: string }> {
+  const task = translateTask(p);
+  if (!task) {
+    // Nothing for an agent to do.
+  } else if (insideClaudeCode() || !hasClaude()) {
+    // Inside Claude Code already (it sets CLAUDECODE=1 in its shell): that agent does the work.
+    // A second `claude -p` started there has no sign-in of its own in a Claude cloud session, and
+    // on a laptop it would be a second agent without the first one's context.
+    // The same prompt as last time: the session is still on it, so don't show it again.
+    if (task.prompt !== handedOut) {
+      log(
+        insideClaudeCode()
+          ? "You're running in Claude Code, so translate in this session: follow this prompt. The dev server records each page marked done and reports what's left.\n"
+          : "Claude Code (claude) isn't installed here. Give this prompt to your coding agent; the dev server records each page marked done and reports what's left.\n",
+      );
+      log(task.prompt);
+    }
+    return { problems: check(p), prompt: task.prompt };
+  } else {
+    log(
+      `\n$ claude -p <prompt> --permission-mode acceptEdits --allowedTools ${AGENT_TOOLS.join(",")}\n`,
+    );
+    log(task.prompt.replace(/^/gm, "  > "));
+    log("");
+    const before = new Map(
+      task.pages.map((page) => [
+        page.file,
+        existsSync(page.file) ? readFileSync(page.file, "utf8") : undefined,
+      ]),
+    );
+    const code = await runClaude(root, task.prompt);
+    if (code !== 0) log(`\nclaude exited with ${code}`);
+    // Pages the agent wrote, and unrecorded ones it checked. An untouched stale page stays stale.
+    const unrecorded = new Set(
+      task.pages.filter((x) => x.state === "unrecorded").map((x) => x.file),
+    );
+    for (const [file, text] of before) {
+      if (!existsSync(file)) continue;
+      if (readFileSync(file, "utf8") === text && !(code === 0 && unrecorded.has(file))) continue;
+      stamp(p, file);
+      log(`stamped ${relative(root, file)}`);
+    }
+  }
+  return { problems: check(p) };
 }

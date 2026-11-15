@@ -1,5 +1,5 @@
-// `void-fbtee translate`'s task list and `stamp`, on copies of test/unit/fixture ("Hello" translated
-// into German, "Goodbye" not; no Thai catalog). Running claude itself is checked on the example
+// The dev server's translation task list, `markedDone` and `stamp`, on copies of
+// test/unit/fixture ("Hello" translated into German, "Goodbye" not; no Thai catalog). Running claude itself is checked on the example
 // app, by hand, as the plan's step 6; these tests don't call it.
 import {
   cpSync,
@@ -19,7 +19,7 @@ import type { Project } from "../../src/catalogs";
 import { check, markdownPages, missingHead } from "../../src/check";
 import { loadProject, prepare } from "../../src/commands";
 import { init } from "../../src/init";
-import { stamp, translateTask } from "../../src/translate";
+import { markedDone, stamp, translateTask } from "../../src/translate";
 
 let root: string;
 let p: Project;
@@ -74,6 +74,22 @@ test("stamp records the original's version, and check then sees the page as up t
     readFileSync(join(root, "pages/de-DE/blog/hello.md"), "utf8").match(/translatedFrom/g),
   ).toHaveLength(1);
   expect(stateOf("de-DE")).toBe("ok");
+});
+
+test("a page the agent marks done is unrecorded until the dev server stamps it", () => {
+  write("pages/en-US/blog/hello.md", POST);
+  write("pages/de-DE/blog/hello.md", POST.replace("date:", "translatedFrom: done\ndate:"));
+  const text = readFileSync(join(root, "pages/de-DE/blog/hello.md"), "utf8");
+  expect(markedDone(text)).toBe(true);
+  expect(stateOf("de-DE")).toBe("unrecorded");
+  stamp(p, join(root, "pages/de-DE/blog/hello.md"));
+  const after = readFileSync(join(root, "pages/de-DE/blog/hello.md"), "utf8");
+  expect(markedDone(after)).toBe(false);
+  expect(after.match(/translatedFrom/g)).toHaveLength(1);
+  expect(stateOf("de-DE")).toBe("ok");
+  // The prompt tells the agent to mark pages done.
+  write("pages/en-US/blog/other.md", POST);
+  expect(translateTask(p)!.prompt).toContain('set "translatedFrom: done"');
 });
 
 test("check reports a copy whose components or their values differ from the original's", () => {
