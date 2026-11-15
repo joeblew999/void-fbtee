@@ -312,6 +312,106 @@
         }
       ],
       "types": []
+    },
+    "AQ6/02zzfwk50FSEF0wKtA==": {
+      "description": "Question asking which of the site's pages to open, its names as an 'or' list",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{pages}을(를) 여시겠어요?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fRQVudyYBFiDmWyed6yR7A==": {
+      "description": "How someone takes part in an event, chosen from a fixed set",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name}님은 현장에서 참여합니다.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iP10/gSomcvt/+9NrQA7XQ==": {
+      "description": "How someone takes part in an event, chosen from a fixed set",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name}님은 온라인으로 참여합니다.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Oeto9jViL+xxuaYfiMdwwg==": {
+      "description": "Someone booked a seat, worded by their gender",
+      "status": "translated",
+      "tokens": [
+        "name"
+      ],
+      "translations": [
+        {
+          "translation": "{name}님이 좌석을 예약했습니다.",
+          "variations": {}
+        }
+      ],
+      "types": [
+        3
+      ]
+    },
+    "jE1zcxOCdGCCTd7j0RhSjA==": {
+      "description": "Someone checked their own ticket, with a pronoun by their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name}님이 자신의 티켓을 확인했습니다.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bTo3iX4JuIh7tcnM8z1nHg==": {
+      "description": "Someone checked their own ticket, with a pronoun by their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name}님이 자신의 티켓을 확인했습니다.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3jFQRFLYFLOxE6C21bq6GA==": {
+      "description": "Someone checked their own ticket, with a pronoun by their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name}님이 자신의 티켓을 확인했습니다.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AHgdPbajKOCj4zXFKNEbbg==": {
+      "description": "The same person's name twice in one sentence",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name}님이 예약했고, {name}님이 이메일로 티켓을 받았습니다.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

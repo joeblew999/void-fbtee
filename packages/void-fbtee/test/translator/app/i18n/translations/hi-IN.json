@@ -336,6 +336,106 @@
         }
       ],
       "types": []
+    },
+    "AQ6/02zzfwk50FSEF0wKtA==": {
+      "description": "Question asking which of the site's pages to open, its names as an 'or' list",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{pages} खोलें?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fRQVudyYBFiDmWyed6yR7A==": {
+      "description": "How someone takes part in an event, chosen from a fixed set",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} व्यक्तिगत रूप से भाग लेते हैं।",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iP10/gSomcvt/+9NrQA7XQ==": {
+      "description": "How someone takes part in an event, chosen from a fixed set",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} ऑनलाइन भाग लेते हैं।",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Oeto9jViL+xxuaYfiMdwwg==": {
+      "description": "Someone booked a seat, worded by their gender",
+      "status": "translated",
+      "tokens": [
+        "name"
+      ],
+      "translations": [
+        {
+          "translation": "{name} ने एक सीट बुक की।",
+          "variations": {}
+        }
+      ],
+      "types": [
+        3
+      ]
+    },
+    "jE1zcxOCdGCCTd7j0RhSjA==": {
+      "description": "Someone checked their own ticket, with a pronoun by their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} ने अपना टिकट जाँचा।",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bTo3iX4JuIh7tcnM8z1nHg==": {
+      "description": "Someone checked their own ticket, with a pronoun by their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} ने अपना टिकट जाँचा।",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3jFQRFLYFLOxE6C21bq6GA==": {
+      "description": "Someone checked their own ticket, with a pronoun by their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} ने अपना टिकट जाँचा।",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AHgdPbajKOCj4zXFKNEbbg==": {
+      "description": "The same person's name twice in one sentence",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} ने बुकिंग की, और {name} को टिकट ईमेल से मिला।",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

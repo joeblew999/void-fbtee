@@ -2,10 +2,10 @@
   "th-TH": {
     "date": "2026-11-15",
     "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
-    "right": 11,
+    "right": 19,
     "wrong": 2,
     "unreviewed": [],
-    "meaning": 85,
+    "meaning": 88,
     "chrF": 91,
     "results": [
       {
@@ -33,20 +33,21 @@
         "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
         "cache": true,
         "verdict": "right",
-        "meaning": 90,
-        "chrF": 76,
+        "meaning": 92,
+        "chrF": 89,
         "reference": ["สวัสดี {name} ตั๋วของคุณแนบมาแล้ว"],
-        "got": ["สวัสดีครับ/ค่ะ {name} ตั๋วของคุณแนบมาด้วยแล้ว"]
+        "got": ["สวัสดี {name} ตั๋วของคุณแนบมาด้วยแล้ว"]
       },
       {
         "text": "{translated} of {total} strings translated",
         "hash": "0/yUVSiGyC2JT0/i90uO0A==",
         "cache": true,
-        "verdict": "right",
+        "verdict": "wrong",
+        "why": "แปล without แล้ว reads as an instruction, \"translate {translated} of {total} strings\", not that they're done.",
         "meaning": 86,
-        "chrF": 92,
+        "chrF": 84,
         "reference": ["แปลแล้ว {translated} จาก {total} ข้อความ"],
-        "got": ["{translated} จาก {total} ข้อความแปลแล้ว"]
+        "got": ["แปล {translated} จาก {total} ข้อความ"]
       },
       {
         "text": "{number} seats left",
@@ -122,13 +123,12 @@
       {
         "text": "Strings",
         "hash": "7f0YPbDQynykALmEKflP3Q==",
-        "cache": false,
-        "verdict": "wrong",
-        "why": "Adds \"of the app\" (ของแอป): the heading is the term alone, ข้อความ.",
-        "meaning": 51,
-        "chrF": 78,
+        "cache": true,
+        "verdict": "right",
+        "meaning": 62,
+        "chrF": 100,
         "reference": ["ข้อความ"],
-        "got": ["ข้อความของแอป"]
+        "got": ["ข้อความ"]
       },
       {
         "text": "Catalog",
@@ -139,6 +139,86 @@
         "chrF": 100,
         "reference": ["แค็ตตาล็อก"],
         "got": ["แค็ตตาล็อก"]
+      },
+      {
+        "text": "Open {pages}?",
+        "hash": "AQ6/02zzfwk50FSEF0wKtA==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 94,
+        "chrF": 68,
+        "reference": ["เปิด {pages} ไหม?"],
+        "got": ["เปิด {pages} หรือไม่?"]
+      },
+      {
+        "text": "{name} takes part in person.",
+        "hash": "fRQVudyYBFiDmWyed6yR7A==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 82,
+        "chrF": 100,
+        "reference": ["{name} เข้าร่วมด้วยตนเอง"],
+        "got": ["{name} เข้าร่วมด้วยตนเอง"]
+      },
+      {
+        "text": "{name} takes part online.",
+        "hash": "iP10/gSomcvt/+9NrQA7XQ==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 88,
+        "chrF": 76,
+        "reference": ["{name} เข้าร่วมทางออนไลน์"],
+        "got": ["{name} เข้าร่วมออนไลน์"]
+      },
+      {
+        "text": "{name} booked a seat.",
+        "hash": "Oeto9jViL+xxuaYfiMdwwg==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 94,
+        "chrF": 100,
+        "reference": ["{name} จองที่นั่งแล้ว"],
+        "got": ["{name} จองที่นั่งแล้ว"]
+      },
+      {
+        "text": "{name} checked her ticket.",
+        "hash": "jE1zcxOCdGCCTd7j0RhSjA==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 95,
+        "chrF": 100,
+        "reference": ["{name} ตรวจตั๋วของเธอแล้ว"],
+        "got": ["{name} ตรวจตั๋วของเธอแล้ว"]
+      },
+      {
+        "text": "{name} checked his ticket.",
+        "hash": "bTo3iX4JuIh7tcnM8z1nHg==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 95,
+        "chrF": 100,
+        "reference": ["{name} ตรวจตั๋วของเขาแล้ว"],
+        "got": ["{name} ตรวจตั๋วของเขาแล้ว"]
+      },
+      {
+        "text": "{name} checked their ticket.",
+        "hash": "3jFQRFLYFLOxE6C21bq6GA==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 92,
+        "chrF": 66,
+        "reference": ["{name} ตรวจตั๋วของตัวเองแล้ว"],
+        "got": ["{name} ตรวจตั๋วของเขา/เธอแล้ว"]
+      },
+      {
+        "text": "{name} booked, and {name} got the ticket by email.",
+        "hash": "AHgdPbajKOCj4zXFKNEbbg==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 92,
+        "chrF": 88,
+        "reference": ["{name} จองแล้ว และ {name} ได้รับตั๋วทางอีเมล"],
+        "got": ["{name} จอง และ {name} ได้รับตั๋วทางอีเมล"]
       }
     ]
   }

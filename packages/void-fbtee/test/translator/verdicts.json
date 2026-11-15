@@ -19,12 +19,23 @@
         "answer": "สวัสดีครับ/ค่ะ {name} ตั๋วของคุณแนบมาด้วยแล้ว",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "สวัสดี {name} ตั๋วของคุณแนบมาด้วยแล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "0/yUVSiGyC2JT0/i90uO0A==": [
       {
         "answer": "{translated} จาก {total} ข้อความแปลแล้ว",
         "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "แปล {translated} จาก {total} ข้อความ",
+        "right": false,
+        "why": "แปล without แล้ว reads as an instruction, \"translate {translated} of {total} strings\", not that they're done.",
         "by": "Claude Code, 2026-11-15"
       }
     ],
@@ -55,6 +66,12 @@
         "right": false,
         "why": "Drops ของ (\"of\"): reads \"app AGENTS.md\"; should be AGENTS.md ของแอป.",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "แอปพลิเคชัน AGENTS.md บอกเอเจนต์โค้ดของคุณว่าจะต้องทำอะไร",
+        "right": false,
+        "why": "Drops ของ: \"application AGENTS.md\", not \"the app's AGENTS.md\" (AGENTS.md ของแอป).",
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "XheCGRJ31SRnsGZhKLgJRA==": [
@@ -84,11 +101,72 @@
         "right": false,
         "why": "Adds \"of the app\" (ของแอป): the heading is the term alone, ข้อความ.",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "ข้อความ",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "zJo185mkHlmtxuQdGecjUg==": [
       {
         "answer": "แค็ตตาล็อก",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "AQ6/02zzfwk50FSEF0wKtA==": [
+      {
+        "answer": "เปิด {pages} หรือไม่?",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "fRQVudyYBFiDmWyed6yR7A==": [
+      {
+        "answer": "{name} เข้าร่วมด้วยตนเอง",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "iP10/gSomcvt/+9NrQA7XQ==": [
+      {
+        "answer": "{name} เข้าร่วมออนไลน์",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "Oeto9jViL+xxuaYfiMdwwg==": [
+      {
+        "answer": "{name} จองที่นั่งแล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "jE1zcxOCdGCCTd7j0RhSjA==": [
+      {
+        "answer": "{name} ตรวจตั๋วของเธอแล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "bTo3iX4JuIh7tcnM8z1nHg==": [
+      {
+        "answer": "{name} ตรวจตั๋วของเขาแล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "3jFQRFLYFLOxE6C21bq6GA==": [
+      {
+        "answer": "{name} ตรวจตั๋วของเขา/เธอแล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "AHgdPbajKOCj4zXFKNEbbg==": [
+      {
+        "answer": "{name} จอง และ {name} ได้รับตั๋วทางอีเมล",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }

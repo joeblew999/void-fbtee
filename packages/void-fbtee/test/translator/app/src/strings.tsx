@@ -2,7 +2,7 @@
 // thing a translation can get wrong. Each is a real fbtee string with its description, so fbtee's
 // collect and prepare make the catalogs, as for any app. Add a string when Void's AI gets a new
 // kind of thing wrong, and its translation to every catalog in i18n/translations/.
-import { fbt } from "fbtee";
+import { fbt, GenderConst, IntlVariations } from "fbtee";
 
 /** A label. */
 export const save = () => <fbt desc="Button that saves the event the person is editing">Save</fbt>;
@@ -79,4 +79,45 @@ export const terms = () => (
     <fbt common>Strings</fbt>
     <fbt common>Catalog</fbt>
   </>
+);
+
+/** A list, "a, b or c" (fbtee joins it in each language's own words). */
+export const open = (items: string[]) => (
+  <fbt desc="Question asking which of the site's pages to open, its names as an 'or' list">
+    Open <fbt:list conjunction="or" items={items} name="pages" />?
+  </fbt>
+);
+
+/** A choice from a fixed set: one line per choice. */
+export const takesPart = (name: string, way: "there" | "online") => (
+  <fbt desc="How someone takes part in an event, chosen from a fixed set">
+    <fbt:param name="name">{name}</fbt:param> takes part{" "}
+    <fbt:enum enum-range={{ there: "in person", online: "online" }} value={way} />.
+  </fbt>
+);
+
+/** A name with its gender: one line per gender. */
+export const booked = (name: string, gender: IntlVariations) => (
+  <fbt desc="Someone booked a seat, worded by their gender">
+    <fbt:name name="name" gender={gender}>
+      {name}
+    </fbt:name>{" "}
+    booked a seat.
+  </fbt>
+);
+
+/** A pronoun by gender: one line per pronoun. */
+export const checked = (name: string, gender: GenderConst) => (
+  <fbt desc="Someone checked their own ticket, with a pronoun by their gender">
+    <fbt:param name="name">{name}</fbt:param> checked{" "}
+    <fbt:pronoun type="possessive" gender={gender} human={true} /> ticket.
+  </fbt>
+);
+
+/** The same value twice in one sentence. */
+export const twice = (name: string) => (
+  <fbt desc="The same person's name twice in one sentence">
+    <fbt:param name="name">{name}</fbt:param> booked, and <fbt:same-param name="name" /> got the
+    ticket by email.
+  </fbt>
 );

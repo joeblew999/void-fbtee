@@ -372,6 +372,106 @@
         }
       ],
       "types": []
+    },
+    "AQ6/02zzfwk50FSEF0wKtA==": {
+      "description": "Question asking which of the site's pages to open, its names as an 'or' list",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Открыть {pages}?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fRQVudyYBFiDmWyed6yR7A==": {
+      "description": "How someone takes part in an event, chosen from a fixed set",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} участвует лично.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iP10/gSomcvt/+9NrQA7XQ==": {
+      "description": "How someone takes part in an event, chosen from a fixed set",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} участвует онлайн.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Oeto9jViL+xxuaYfiMdwwg==": {
+      "description": "Someone booked a seat, worded by their gender",
+      "status": "translated",
+      "tokens": [
+        "name"
+      ],
+      "translations": [
+        {
+          "translation": "{name}: место забронировано.",
+          "variations": {}
+        }
+      ],
+      "types": [
+        3
+      ]
+    },
+    "jE1zcxOCdGCCTd7j0RhSjA==": {
+      "description": "Someone checked their own ticket, with a pronoun by their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} проверила свой билет.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bTo3iX4JuIh7tcnM8z1nHg==": {
+      "description": "Someone checked their own ticket, with a pronoun by their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} проверил свой билет.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3jFQRFLYFLOxE6C21bq6GA==": {
+      "description": "Someone checked their own ticket, with a pronoun by their gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} проверил(а) свой билет.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AHgdPbajKOCj4zXFKNEbbg==": {
+      "description": "The same person's name twice in one sentence",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} забронировал(а) место, и {name} получил(а) билет по электронной почте.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

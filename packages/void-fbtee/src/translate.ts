@@ -437,7 +437,12 @@ export async function translateEntry(
     });
     attempts++;
     if (!answer) return;
-    out = ((answer.lines ?? []) as string[][])[0] ?? [];
+    // Each line with its source line's own leading and trailing spaces, whatever the model added
+    // (SEA-LION's Thai once began " {name} จอง…", 2026-11-15).
+    out = (((answer.lines ?? []) as string[][])[0] ?? []).map((l, i) => {
+      const src = source[i]?.translation ?? "";
+      return src.match(/^\s*/)![0] + l.trim() + src.match(/\s*$/)![0];
+    });
     const hard = problemsWith(source, out, o.to);
     const soft = glossaryMisses(glossary, out);
     feedback = [...hard, ...soft];
