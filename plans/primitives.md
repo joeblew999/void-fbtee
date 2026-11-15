@@ -55,7 +55,7 @@ on 2026-11-14.
 
 **Content people write**
 
-6. **`translate(text, { from, to })`:** Workers AI with the model and prompt chosen and measured
+6. **`translate(text, { from, to })`** (built first, in plans/void-ai-translate.md): Workers AI with the model and prompt chosen and measured
    (now in `queues/translate.ts`). It's also used by `void-moq`'s captions.
 7. **Translated content, whole:**
    - a table helper for "this row's text in another language" (`db/schema/event_texts.ts` is the

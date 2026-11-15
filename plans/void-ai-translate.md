@@ -26,6 +26,18 @@ Claude Code otherwise. There's no setting: it picks the engine itself.
   guide/ai.md also lists Gateway models (`google/gemini-2.5-flash`, `openai/gpt-4.1-mini`).
   Pick the one that passes the example's catalogs and pages (Arabic plurals, Thai) in a trial.
 
+## One translator, used in every place Void runs app code
+
+Found 2026-11-13 (plans/quiet-harbor-atlas.md, step 7b): Void's AI is there wherever Void runs the
+app's code. That's dev, the preview and Cloudflare, in a route, a queue or a job, always through
+the same `ai` from `void/ai`. So there's one translator, not two:
+
+- `translate(text, { from, to })` moves into the package. It's plans/primitives.md item 6, now
+  built first, here. It's the model and prompt queues/translate.ts measured, extended for
+  catalog entries: the description, placeholders, plural forms.
+- The example's queue (posted events, at runtime) calls it, and so does the dev route
+  (catalogs and pages, under `vp dev`). Both use one model and one measure.
+
 ## Proven already
 
 Void's AI answers during `vp dev` in a Claude cloud session, with the keyring sign-in and no
