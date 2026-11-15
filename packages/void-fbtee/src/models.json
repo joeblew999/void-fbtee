@@ -59,9 +59,9 @@
     {
       "language": "th",
       "name": "Thai",
-      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "model": "@cf/thinkingmachines/inkling-2-small",
       "source": "measured",
-      "why": "chrF 80, 10/10 pass (2026-11-15); Cloudflare's changelog 2025-09-24 lists Thai"
+      "why": "21/21 right, the translator test's pick run (2026-11-15); then deepseek-v4.1-flash-1017 19, gemma-4-26b-a4b-it 19, gemma-sea-lion-v4-27b-it 18, llama-3.3-70b-instruct-fp8-fast 14, gpt-oss-120b 14, qwen3.8-27b 14"
     },
     {
       "language": "vi",

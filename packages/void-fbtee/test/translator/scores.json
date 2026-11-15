@@ -1,19 +1,12 @@
 {
   "th-TH": {
     "date": "2026-11-15",
-    "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
-    "right": 14,
-    "wrong": 1,
-    "unreviewed": [
-      "Open {pages}?",
-      "{name} checked their ticket.",
-      "Your event shows in every language once it's posted.",
-      "Void's AI or Claude Code translates what's new.",
-      "{name} booked, and {name} got the ticket by email.",
-      "Each language's catalog is in i18n/translations."
-    ],
+    "model": "@cf/thinkingmachines/inkling-2-small",
+    "right": 21,
+    "wrong": 0,
+    "unreviewed": [],
     "meaning": 88,
-    "chrF": 91,
+    "chrF": 94,
     "results": [
       {
         "text": "Save",
@@ -29,31 +22,31 @@
         "text": "Your event shows in every language once it's posted.",
         "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
         "cache": true,
-        "verdict": "unreviewed",
-        "meaning": 89,
-        "chrF": 82,
+        "verdict": "right",
+        "meaning": 95,
+        "chrF": 89,
         "reference": ["อีเวนต์ของคุณจะแสดงในทุกภาษาเมื่อโพสต์แล้ว"],
-        "got": ["กิจกรรมของคุณจะแสดงในทุกภาษาเมื่อโพสต์แล้ว"]
+        "got": ["อีเวนต์ของคุณแสดงในทุกภาษาเมื่อโพสต์แล้ว"]
       },
       {
         "text": "Hello {name}, your ticket is attached.",
         "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
         "cache": true,
         "verdict": "right",
-        "meaning": 92,
-        "chrF": 89,
+        "meaning": 90,
+        "chrF": 88,
         "reference": ["สวัสดี {name} ตั๋วของคุณแนบมาแล้ว"],
-        "got": ["สวัสดี {name} ตั๋วของคุณแนบมาด้วยแล้ว"]
+        "got": ["สวัสดี {name} ตั๋วของคุณแนบมาด้วย"]
       },
       {
         "text": "{translated} of {total} strings translated",
         "hash": "0/yUVSiGyC2JT0/i90uO0A==",
         "cache": true,
         "verdict": "right",
-        "meaning": 86,
-        "chrF": 92,
+        "meaning": 87,
+        "chrF": 100,
         "reference": ["แปลแล้ว {translated} จาก {total} ข้อความ"],
-        "got": ["{translated} จาก {total} ข้อความแปลแล้ว"]
+        "got": ["แปลแล้ว {translated} จาก {total} ข้อความ"]
       },
       {
         "text": "{number} seats left",
@@ -88,43 +81,42 @@
       {
         "text": "The app's AGENTS.md tells your coding agent what to do.",
         "hash": "E3kkP1xBWrE61ZBOek87xg==",
-        "cache": false,
-        "verdict": "wrong",
-        "why": "Drops ของ (\"of\"): reads \"app AGENTS.md\"; should be AGENTS.md ของแอป.",
-        "meaning": 91,
-        "chrF": 59,
+        "cache": true,
+        "verdict": "right",
+        "meaning": 92,
+        "chrF": 100,
         "reference": ["AGENTS.md ของแอปบอกเอเจนต์เขียนโค้ดของคุณว่าต้องทำอะไร"],
-        "got": ["แอป AGENTS.md บอกเอเจนต์โค้ดของคุณว่าจะทำอะไร"]
+        "got": ["AGENTS.md ของแอปบอกเอเจนต์เขียนโค้ดของคุณว่าต้องทำอะไร"]
       },
       {
         "text": "Void's AI or Claude Code translates what's new.",
         "hash": "XheCGRJ31SRnsGZhKLgJRA==",
         "cache": true,
-        "verdict": "unreviewed",
-        "meaning": 93,
-        "chrF": 95,
+        "verdict": "right",
+        "meaning": 94,
+        "chrF": 85,
         "reference": ["Void's AI หรือ Claude Code แปลสิ่งที่ใหม่"],
-        "got": ["Void's AI หรือ Claude Code แปลสิ่งที่ใหม่อยู่เสมอ"]
+        "got": ["Void's AI หรือ Claude Code แปลสิ่งใหม่ๆ"]
       },
       {
         "text": "Each language's catalog is in i18n/translations.",
         "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
         "cache": true,
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 94,
         "chrF": 100,
         "reference": ["แค็ตตาล็อกของแต่ละภาษาอยู่ใน i18n/translations"],
-        "got": ["แค็ตตาล็อกของแต่ละภาษาอยู่ใน i18n/translations."]
+        "got": ["แค็ตตาล็อกของแต่ละภาษาอยู่ใน i18n/translations"]
       },
       {
         "text": "Ready to translate your app?",
         "hash": "hUJ62HRBMHBewxRvZblIMw==",
         "cache": true,
         "verdict": "right",
-        "meaning": 95,
-        "chrF": 86,
+        "meaning": 94,
+        "chrF": 76,
         "reference": ["พร้อมแปลแอปของคุณแล้วหรือยัง"],
-        "got": ["พร้อมที่จะแปลแอปของคุณแล้วหรือยัง?"]
+        "got": ["พร้อมแปลแอปของคุณหรือยัง?"]
       },
       {
         "text": "Strings",
@@ -150,11 +142,11 @@
         "text": "Open {pages}?",
         "hash": "AQ6/02zzfwk50FSEF0wKtA==",
         "cache": true,
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 93,
-        "chrF": 67,
+        "chrF": 93,
         "reference": ["เปิด {pages} ไหม?"],
-        "got": ["เปิด {pages} หรือไม่"]
+        "got": ["เปิด {pages} ไหม"]
       },
       {
         "text": "{name} takes part in person.",
@@ -210,17 +202,17 @@
         "text": "{name} checked their ticket.",
         "hash": "3jFQRFLYFLOxE6C21bq6GA==",
         "cache": true,
-        "verdict": "unreviewed",
-        "meaning": 94,
-        "chrF": 67,
+        "verdict": "right",
+        "meaning": 91,
+        "chrF": 68,
         "reference": ["{name} ตรวจตั๋วของตัวเองแล้ว"],
-        "got": ["{name} ตรวจตั๋วของพวกเขาแล้ว"]
+        "got": ["{name} ตรวจตั๋วของเขาแล้ว"]
       },
       {
         "text": "{name} booked, and {name} got the ticket by email.",
         "hash": "AHgdPbajKOCj4zXFKNEbbg==",
         "cache": true,
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 93,
         "chrF": 100,
         "reference": ["{name} จองแล้ว และ {name} ได้รับตั๋วทางอีเมล"],
@@ -678,9 +670,9 @@
   "th-TH @cf/google/gemma-4-26b-a4b-it": {
     "date": "2026-11-15",
     "model": "@cf/google/gemma-4-26b-a4b-it",
-    "right": 18,
+    "right": 19,
     "wrong": 2,
-    "unreviewed": ["The app's AGENTS.md tells your coding agent what to do."],
+    "unreviewed": [],
     "meaning": 87,
     "chrF": 89,
     "results": [
@@ -758,7 +750,7 @@
         "text": "The app's AGENTS.md tells your coding agent what to do.",
         "hash": "E3kkP1xBWrE61ZBOek87xg==",
         "cache": true,
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 94,
         "chrF": 71,
         "reference": ["AGENTS.md ของแอปบอกเอเจนต์เขียนโค้ดของคุณว่าต้องทำอะไร"],
