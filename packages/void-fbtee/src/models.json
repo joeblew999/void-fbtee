@@ -13,10 +13,10 @@
       "jsonMode": false,
       "options": {
         "chat_template_kwargs": {
-          "enable_thinking": true
+          "enable_thinking": false
         }
       },
-      "why": "thinking on (the user's call, 2026-11-15, to compare with it off: 20/23 Thai and Arabic, median 23 tokens out, about 1.7 s a string, AI Gateway's logs and the translator test); chat_template_kwargs.enable_thinking as Cloudflare's Workers AI get-started sets it (checked 2026-11-15)"
+      "why": "thinking on by default; off as Cloudflare's Workers AI get-started does it (checked 2026-11-15)"
     },
     "@cf/qwen/qwen3.8-27b": {
       "jsonMode": false,
