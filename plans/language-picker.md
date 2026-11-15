@@ -19,6 +19,27 @@ sitemap.
 
 Every app with many languages has this problem, so it's solved once, in the package.
 
+## What fbtee has for this
+
+Checked in fbtee 6.0.0 (its README, "Locale Context", and `lib/index.d.mts`'s exports, 2026-11-15):
+no picker component. What it has:
+
+- **Choosing from the browser's languages:** `createLocaleContext({ clientLocales:
+  navigator.languages, … })`, by its matching rule. The picker's "yours first" uses that same
+  rule, through `negotiate()` (a copy of it, tested equal; `plans/their-own-language.md`).
+- **Names for the languages:** `availableLanguages`, a map the app writes by hand (`['de-DE',
+  'Deutsch']`). The picker names them with `Intl.DisplayNames` instead, which has every language's
+  name in every language, so an app writes none; an app can still pass its own for a language
+  where it wants another (`names={{ "zh-Hant": "繁體中文" }}`), as fbtee's map does.
+- **Changing the language in place:** `useLocaleContext().setLocale()`. Not used: with void-fbtee
+  each language has its own address, so a choice is a link to it (the skill says why).
+- **Its own text, translated:** the picker has words of its own: its label, the search box's
+  placeholder, and the "yours" mark. A package can't ship English text into an app's catalogs
+  (prepare collects the app's own code), so they're props, written by the app in fbtee as any of
+  its strings (`label={fbs("Language", "…")}`), translated with the rest. Left out, the picker has
+  no words: the current language's name for the label, no placeholder, and the mark as an
+  attribute only.
+
 ## The rule it keeps
 
 From `plans/their-own-language.md`: a visitor's language comes only from their locale or the
@@ -86,13 +107,14 @@ the browser's own work after load, inside the closed `<details>`, so nothing mov
 
 - **Package (`packages/void-fbtee/`):**
   - `src/react.tsx`: `<LanguagePicker />`, unstyled: `className` per part, `data-part` and state
-    attributes, no CSS;
+    attributes, no CSS; its words (`label`, `placeholder`, `yours`) and any `names` as props;
   - the script that adds search and "yours first" (where, from "To check first");
   - `README.md` and `skills/void-fbtee/SKILL.md`: what it is and the rule it keeps.
 - **Example (`apps/example/`):**
   - `src/shell/SiteHeader.tsx`: the row of language links (`:66–90`) goes, `<LanguagePicker />` in
     its place, and its opening comment says why;
-  - `src/shell/SiteHeader.tsx` again: its look, with the example's own `buttonVariants` and
+  - `src/shell/SiteHeader.tsx` again: its words in fbtee (`fbs`), translated by
+    `i18n:translate` with the app's other strings; its look, with the example's own `buttonVariants` and
     Tailwind classes passed as `className`, as its links have now; `pages/style.css` only if a
     state (`[open]`, `[data-yours]`) needs a rule Tailwind can't say in a class.
 - **Plans:**
@@ -118,6 +140,8 @@ markdown page (`/en-US/docs/intl`, `/en-US/docs`, `/en-US/docs/tour`), in Englis
   `localStorage` or `sessionStorage`), and the page still caches once per language (the existing
   cache tests);
 - the page hydrates with no errors;
+- its words are the app's, in the page's language (Thai on a Thai page), and `i18n:check` is
+  clean;
 - the package adds no CSS: its build has no stylesheet, and the picker with no `className` renders
   no `class` attributes at all.
 
