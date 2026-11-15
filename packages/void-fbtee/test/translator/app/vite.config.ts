@@ -26,6 +26,12 @@ export default defineConfig({
         "zh-CN",
       ],
       src: ["src/**/*.tsx"],
+      // The app's own terms (fbtee's common strings), as a real app keeps them: written the same way
+      // everywhere, and what vp dev's glossary gives Void's AI (translate.ts glossaryFor).
+      common: {
+        Strings: "Heading: the app's text, marked in the code for translation",
+        Catalog: "Heading: a language's file of translations",
+      },
     }),
   ],
 });

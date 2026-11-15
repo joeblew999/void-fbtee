@@ -72,3 +72,11 @@ export const ready = () => (
     Ready to translate your app?
   </fbt>
 );
+
+/** The app's own terms (its common strings, vite.config.ts), used as headings. */
+export const terms = () => (
+  <>
+    <fbt common>Strings</fbt>
+    <fbt common>Catalog</fbt>
+  </>
+);

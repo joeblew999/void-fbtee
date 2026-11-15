@@ -12,9 +12,9 @@
 //   reference (score.ts).
 // Everything goes to test/translator/scores.json, committed: the git diff is what changed.
 //
-// AI Gateway's cache is on (ai.ts ask): at temperature 0 a cached answer is the one the model gives
-// anyway, so a rerun costs only what changed. TRANSLATOR_FRESH=1 turns it off, to see whether
-// Cloudflare changed a model behind its name. TRANSLATOR_LANGUAGES picks languages;
+// AI Gateway's cache is off (ai.ts ask, skipCache): it would keep wrong answers as well as right
+// ones and hand them back on every rerun. What's kept is only what passes, in the catalog, as in
+// vp dev. TRANSLATOR_CACHE=1 turns the cache on, for a cheap rerun when nothing changed. TRANSLATOR_LANGUAGES picks languages;
 // TRANSLATOR_MODEL tries another model, scored as "<language> <model>". `vp run test:translator`.
 import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -31,7 +31,7 @@ const site = inject("prod" as never) as string;
 const DATA = join(import.meta.dirname, "../../packages/void-fbtee/test/translator");
 const SCORES = join(DATA, "scores.json");
 const MODEL = process.env.TRANSLATOR_MODEL;
-const CACHE = process.env.TRANSLATOR_FRESH !== "1";
+const CACHE = process.env.TRANSLATOR_CACHE === "1";
 
 // A copy of the test app, inside the package so fbtee resolves from its node_modules.
 const app = mkdtempSync(join(DATA, ".tmp-"));

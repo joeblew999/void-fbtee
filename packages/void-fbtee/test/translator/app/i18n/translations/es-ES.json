@@ -304,6 +304,30 @@
         }
       ],
       "types": []
+    },
+    "7f0YPbDQynykALmEKflP3Q==": {
+      "description": "Heading: the app's text, marked in the code for translation",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Cadenas",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zJo185mkHlmtxuQdGecjUg==": {
+      "description": "Heading: a language's file of translations",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Catálogo",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

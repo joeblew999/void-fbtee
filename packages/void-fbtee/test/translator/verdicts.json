@@ -1,1 +1,97 @@
-{}
+{
+  "th-TH": {
+    "KVIsARQPJHkNMbpjskkfBg==": [
+      {
+        "answer": "บันทึก",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "Ri2u0XMS+wJCFqdr60QG5A==": [
+      {
+        "answer": "เมื่อคุณโพสต์แล้ว อีเวนต์ของคุณจะแสดงในทุกภาษา",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "5jxwLMzaf8YB/FQfN7jMjA==": [
+      {
+        "answer": "สวัสดีครับ/ค่ะ {name} ตั๋วของคุณแนบมาด้วยแล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "0/yUVSiGyC2JT0/i90uO0A==": [
+      {
+        "answer": "{translated} จาก {total} ข้อความแปลแล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "hk43hC7uwc3/d6Rkg/7KdQ==": [
+      {
+        "answer": "เหลือ {number} ที่นั่ง",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "YPVBS6NNHhGVrCKVfko+lw==": [
+      {
+        "answer": "เหลือ 1 ที่นั่ง",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "zMoep4eguZ3OejsIbcWbjg==": [
+      {
+        "answer": "รัน vp dev เพื่อเริ่มแอป",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "E3kkP1xBWrE61ZBOek87xg==": [
+      {
+        "answer": "แอป AGENTS.md บอกเอเจนต์โค้ดของคุณว่าจะทำอะไร",
+        "right": false,
+        "why": "Drops ของ (\"of\"): reads \"app AGENTS.md\"; should be AGENTS.md ของแอป.",
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "XheCGRJ31SRnsGZhKLgJRA==": [
+      {
+        "answer": "Void's AI หรือ Claude Code แปลสิ่งที่ใหม่",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "kBctHh0b7gp5b2Q3AfqxOA==": [
+      {
+        "answer": "แค็ตตาล็อกของแต่ละภาษาอยู่ใน i18n/translations",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "hUJ62HRBMHBewxRvZblIMw==": [
+      {
+        "answer": "พร้อมที่จะแปลแอปของคุณแล้วหรือยัง?",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "7f0YPbDQynykALmEKflP3Q==": [
+      {
+        "answer": "ข้อความของแอป",
+        "right": false,
+        "why": "Adds \"of the app\" (ของแอป): the heading is the term alone, ข้อความ.",
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "zJo185mkHlmtxuQdGecjUg==": [
+      {
+        "answer": "แค็ตตาล็อก",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ]
+  }
+}

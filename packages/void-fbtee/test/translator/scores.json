@@ -2,29 +2,17 @@
   "th-TH": {
     "date": "2026-11-15",
     "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
-    "cache": "on",
-    "right": 0,
-    "wrong": 0,
-    "unreviewed": [
-      "The app's AGENTS.md tells your coding agent what to do.",
-      "Save",
-      "{translated} of {total} strings translated",
-      "Hello {name}, your ticket is attached.",
-      "Your event shows in every language once it's posted.",
-      "Ready to translate your app?",
-      "Each language's catalog is in i18n/translations.",
-      "{number} seats left",
-      "1 seat left",
-      "Run vp dev to start the app.",
-      "Void's AI or Claude Code translates what's new."
-    ],
-    "meaning": 89,
-    "chrF": 88,
+    "cache": "off",
+    "right": 10,
+    "wrong": 2,
+    "unreviewed": ["Hello {name}, your ticket is attached."],
+    "meaning": 85,
+    "chrF": 90,
     "results": [
       {
         "text": "Save",
         "hash": "KVIsARQPJHkNMbpjskkfBg==",
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 54,
         "chrF": 100,
         "reference": ["บันทึก"],
@@ -33,7 +21,7 @@
       {
         "text": "Your event shows in every language once it's posted.",
         "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 94,
         "chrF": 86,
         "reference": ["อีเวนต์ของคุณจะแสดงในทุกภาษาเมื่อโพสต์แล้ว"],
@@ -43,24 +31,24 @@
         "text": "Hello {name}, your ticket is attached.",
         "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
         "verdict": "unreviewed",
-        "meaning": 90,
-        "chrF": 76,
+        "meaning": 89,
+        "chrF": 72,
         "reference": ["สวัสดี {name} ตั๋วของคุณแนบมาแล้ว"],
-        "got": ["สวัสดีครับ/ค่ะ {name} ตั๋วของคุณแนบมาด้วยแล้ว"]
+        "got": ["สวัสดีครับ/ค่ะ {name} ตั๋วของคุณแนบมาด้วยแล้วครับ/ค่ะ"]
       },
       {
         "text": "{translated} of {total} strings translated",
         "hash": "0/yUVSiGyC2JT0/i90uO0A==",
-        "verdict": "unreviewed",
-        "meaning": 82,
-        "chrF": 72,
+        "verdict": "right",
+        "meaning": 86,
+        "chrF": 92,
         "reference": ["แปลแล้ว {translated} จาก {total} ข้อความ"],
-        "got": ["{translated} จาก {total} สตริงแปลแล้ว"]
+        "got": ["{translated} จาก {total} ข้อความแปลแล้ว"]
       },
       {
         "text": "{number} seats left",
         "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 93,
         "chrF": 100,
         "reference": ["เหลือ {number} ที่นั่ง"],
@@ -69,7 +57,7 @@
       {
         "text": "1 seat left",
         "hash": "YPVBS6NNHhGVrCKVfko+lw==",
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 93,
         "chrF": 100,
         "reference": ["เหลือ 1 ที่นั่ง"],
@@ -78,7 +66,7 @@
       {
         "text": "Run vp dev to start the app.",
         "hash": "zMoep4eguZ3OejsIbcWbjg==",
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 94,
         "chrF": 100,
         "reference": ["รัน vp dev เพื่อเริ่มแอป"],
@@ -87,7 +75,8 @@
       {
         "text": "The app's AGENTS.md tells your coding agent what to do.",
         "hash": "E3kkP1xBWrE61ZBOek87xg==",
-        "verdict": "unreviewed",
+        "verdict": "wrong",
+        "why": "Drops ของ (\"of\"): reads \"app AGENTS.md\"; should be AGENTS.md ของแอป.",
         "meaning": 91,
         "chrF": 59,
         "reference": ["AGENTS.md ของแอปบอกเอเจนต์เขียนโค้ดของคุณว่าต้องทำอะไร"],
@@ -96,7 +85,7 @@
       {
         "text": "Void's AI or Claude Code translates what's new.",
         "hash": "XheCGRJ31SRnsGZhKLgJRA==",
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 95,
         "chrF": 100,
         "reference": ["Void's AI หรือ Claude Code แปลสิ่งที่ใหม่"],
@@ -105,20 +94,39 @@
       {
         "text": "Each language's catalog is in i18n/translations.",
         "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 94,
-        "chrF": 94,
+        "chrF": 100,
         "reference": ["แค็ตตาล็อกของแต่ละภาษาอยู่ใน i18n/translations"],
-        "got": ["แคตตาล็อกของแต่ละภาษาอยู่ใน i18n/translations"]
+        "got": ["แค็ตตาล็อกของแต่ละภาษาอยู่ใน i18n/translations"]
       },
       {
         "text": "Ready to translate your app?",
         "hash": "hUJ62HRBMHBewxRvZblIMw==",
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 95,
         "chrF": 86,
         "reference": ["พร้อมแปลแอปของคุณแล้วหรือยัง"],
         "got": ["พร้อมที่จะแปลแอปของคุณแล้วหรือยัง?"]
+      },
+      {
+        "text": "Strings",
+        "hash": "7f0YPbDQynykALmEKflP3Q==",
+        "verdict": "wrong",
+        "why": "Adds \"of the app\" (ของแอป): the heading is the term alone, ข้อความ.",
+        "meaning": 51,
+        "chrF": 78,
+        "reference": ["ข้อความ"],
+        "got": ["ข้อความของแอป"]
+      },
+      {
+        "text": "Catalog",
+        "hash": "zJo185mkHlmtxuQdGecjUg==",
+        "verdict": "right",
+        "meaning": 72,
+        "chrF": 100,
+        "reference": ["แค็ตตาล็อก"],
+        "got": ["แค็ตตาล็อก"]
       }
     ]
   }

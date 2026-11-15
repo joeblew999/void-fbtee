@@ -288,6 +288,30 @@
         }
       ],
       "types": []
+    },
+    "7f0YPbDQynykALmEKflP3Q==": {
+      "description": "Heading: the app's text, marked in the code for translation",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "문자열",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zJo185mkHlmtxuQdGecjUg==": {
+      "description": "Heading: a language's file of translations",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "카탈로그",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }
