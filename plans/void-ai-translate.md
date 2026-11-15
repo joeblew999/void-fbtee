@@ -18,8 +18,7 @@ left.
 - **How a string is sent** (src/translate.ts `translateEntry`, the same for `vp dev` and the test):
   alone, with the catalog's closest own translations as examples (not fbtee's built-in strings),
   the app's words for its terms (glossary), the words to keep and the code around it, at
-  temperature 0 with a fixed seed. Not the skills' rules: they're for Claude Code (commands, files),
-  and were a page of noise around a one-line job (2026-11-15). An answer the judge finds problems in goes back with what was
+  temperature 0 with a fixed seed, and the translating skill (below). An answer the judge finds problems in goes back with what was
   wrong, up to twice; only one with none is kept.
 - **One judge,** src/judge.ts. Problems, which mean an answer is never kept: lines missing, JSON in
   a line, text left in English, the wrong script (the language's likely script, Intl.Locale
@@ -76,34 +75,33 @@ them GLM 4.7 Flash spent all 8192 tokens thinking and gave no answer, Qwen 31 se
 nine on one string (AI Gateway's logs, 2026-11-15). An answer with no content, or cut off at
 max_tokens, is an unusable answer (ai.ts ask), left for Claude Code.
 
-## Next: Void's AI for plain text, Claude Code for templates (to approve)
+## How to translate: one skill for every AI (built 2026-11-15)
 
-What went wrong (2026-11-15). The app's strings with placeholders are templates: in most languages
-the words around `{name}`, `{number}` or `{pages}` change with what goes in. Gender and plural
-forms fbtee can carry as variants (each catalog entry's `tokens` and `types`); case (Russian,
-German, Arabic names), a particle chosen by the value's sound (Korean 을/를), agreement with a
-list's items, it can't: the translation has to be written so any value fits, which is reasoning.
-The models Void's AI runs here don't think (and shouldn't: a translation needs none, and their
-thinking made them too slow), so on every template their answers scattered (Arabic genders,
-Korean "{pages}을(를)", Llama's JSON round `{translated}`), and every new answer needed judging.
-On plain text the same models were right in about a second (Thai 2026-11-15: SEA-LION, Gemma 4,
-DeepSeek, Inkling). vp dev sent every string the same way, one line with its braces; the judge
-took back that many lines.
+skills/void-fbtee-translate/SKILL.md says how to translate the app's `<fbt>` text, what people
+post and markdown pages, nothing about files or commands, so any AI can follow all of it. vp pack
+bundles it into dist/ai.mjs (a `?raw` import, the pack plugin in packages/void-fbtee/vite.config.ts),
+so it travels with the code to vp dev and to the Worker (an app's queue), and every app that installs
+void-fbtee has it. ai.ts `instructions()` is the one place a request is worded: the skill's sections
+for its kind, and for `<fbt>` text fbtee's own skill, steps 3 to 5, read from the app's installed
+fbtee (translate.ts `fbteeRules`), never a copy. Claude Code reads the same two skills; the main
+skill keeps only what's about editing the catalogs and pages.
 
-The change, one piece of work, nothing built before it's approved:
+Measured (Gemma 4, the translator test, 2026-11-15, every answer judged by Claude Code): Thai 20/21
+with the skill, 18/21 without; Arabic 20/21 with it, 14/21 without (without it Gemma wrote Egyptian
+dialect in six strings). So it stays; any change to it is measured the same way
+(`TRANSLATOR_PICK=1 TRANSLATOR_MODELS=<model> [TRANSLATOR_RULES=0] vp run test:translator`).
 
-1. Split by what fbtee says. An entry with no tokens (no `{…}`) goes to Void's AI, as now. An
-   entry with tokens goes to Claude Code, as void-fbtee does without Void's AI: fbtee's own skill
-   (node_modules/fbtee/skills/fbtee-translate/SKILL.md) is written for that, reading the code,
-   adding "the plural and gender variants required by the target language".
-2. vp dev's report says which are left for Claude Code, as it does now for an answer it couldn't
-   keep.
-3. The runtime queue doesn't change: people's posts are plain text.
-4. The translator test sends only plain-text entries to Void's AI; the template entries are
-   checked as Claude Code's work (data test: every variant line present, the judge passing).
-   Verdicts given to Void's AI answers for template entries go.
-5. Thai's pick (Inkling, 2026-11-15) was made counting template entries: redone on plain text.
-   Then the other languages, the work through a queue so they run side by side.
+## Next (to approve)
+
+1. Gender variants for `<fbt:name>`, `<fbt:pronoun>` and the reader's gender: vp dev gives such an
+   entry one line per gender (fbtee's `types: [3]`) in the languages that change their words, as it
+   does plural forms, each line marked with its gender (ai.ts FORMS has male, female, unknown); the
+   judge expects those lines; the test's references get them. Arabic "{name} checked her ticket"
+   came back masculine from two models, the one structural gap the runs showed.
+2. Thai's and Arabic's picks again, with the skill (Thai's Inkling pick was made without it).
+3. The other ten languages.
+4. Languages side by side: Vitest 5 runs one file's suites one after another whatever their
+   `concurrent` option (tried 2026-11-15), so through a queue, or a file per language.
 
 ## Still to do
 

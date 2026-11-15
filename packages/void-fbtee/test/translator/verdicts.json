@@ -39,6 +39,11 @@
         "answer": "อีเวนต์ของคุณแสดงในทุกภาษาเมื่อโพสต์แล้ว",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "เมื่อโพสต์แล้ว กิจกรรมของคุณจะแสดงในทุกภาษา",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "5jxwLMzaf8YB/FQfN7jMjA==": [
@@ -74,6 +79,18 @@
         "answer": "สวัสดี {name} ตั๋วของคุณแนบมาด้วย",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "สวัสดีคุณ {name} ตั๋วของคุณแนบมาพร้อมกับข้อความนี้แล้ว",
+        "right": false,
+        "why": "Adds \"with this message\", which the source doesn't say.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "สวัสดีคุณ {name} ตั๋วของคุณแนบมาพร้อมกับอีเมลนี้แล้ว",
+        "right": false,
+        "why": "Adds \"with this email\", which the source doesn't say.",
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "0/yUVSiGyC2JT0/i90uO0A==": [
@@ -108,6 +125,11 @@
         "answer": "แปลข้อความแล้ว {translated} จาก {total}",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "แปลข้อความแล้ว {translated} จาก {total} ข้อความ",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "hk43hC7uwc3/d6Rkg/7KdQ==": [
@@ -138,6 +160,11 @@
       },
       {
         "answer": "เรียกใช้ vp dev เพื่อเริ่มแอป",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "รัน vp dev เพื่อเริ่มการทำงานของแอป",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -187,6 +214,11 @@
         "answer": "AGENTS.md ของแอปจะบอกโค้ดดิ้งเอเจนต์ของคุณว่าต้องทำอะไร",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "AGENTS.md ของแอปจะบอกเอเจนต์การเขียนโค้ดของคุณว่าต้องทำอะไร",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "XheCGRJ31SRnsGZhKLgJRA==": [
@@ -228,6 +260,11 @@
         "answer": "Void's AI หรือ Claude Code แปลสิ่งใหม่ๆ",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Void's AI หรือ Claude Code จะแปลส่วนที่เป็นข้อมูลใหม่",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "kBctHh0b7gp5b2Q3AfqxOA==": [
@@ -257,6 +294,11 @@
         "answer": "แค็ตตาล็อกของทุกภาษาอยุ่ใน i18n/translations",
         "right": false,
         "why": "ทุกภาษา is \"all languages\", not each one's; misspelt อยุ่.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "แค็ตตาล็อกของแต่ละภาษาอยู่ที่ i18n/translations",
+        "right": true,
         "by": "Claude Code, 2026-11-15"
       }
     ],
@@ -431,6 +473,11 @@
         "answer": "{name} ตรวจตั๋วของเขาแล้ว",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} ตรวจตั๋วของเขาหรือเธอแล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "AHgdPbajKOCj4zXFKNEbbg==": [
@@ -501,6 +548,12 @@
         "answer": "يظهر حدثك بجميع اللغات بمجرد نشره.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "بمجرد نشر فعاليتك، هتظهر بكل اللغات.",
+        "right": false,
+        "why": "Egyptian dialect; the app writes Modern Standard Arabic.",
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "5jxwLMzaf8YB/FQfN7jMjA==": [
@@ -552,6 +605,11 @@
         "answer": "{translated} من {total} من النصوص مترجمة",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "تمت ترجمة {translated} من أصل {total} من النصوص",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "hk43hC7uwc3/d6Rkg/7KdQ==": [
@@ -592,6 +650,18 @@
         "right": false,
         "why": "The zero form says a number of seats are left; the many form (11 to 99) needs the accusative مقعدًا.",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "لم يتبقَّ أي مقعد\nتبقّى {number} مقعدين\nتبقّى {number} مقاعد\nتبقّى {number} مقعدًا\nتبقّى {number} مقعد",
+        "right": false,
+        "by": "Claude Code, 2026-11-15",
+        "why": "The two form uses the accusative مقعدين where the subject needs مقعدان (and Arabic says two without the number)."
+      },
+      {
+        "answer": "تبقّى {number} مقاعد\nتبقّى {number} مقاعد\nتبقّى {number} مقاعد\nتبقّى {number} مقاعد\nتبقّى {number} مقعد",
+        "right": false,
+        "why": "The same plural for every form: zero, two and 11 to 99 each need their own.",
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "YPVBS6NNHhGVrCKVfko+lw==": [
@@ -609,6 +679,12 @@
         "answer": "مقعد واحد متبقٍ",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "فاضل مقعد واحد",
+        "right": false,
+        "why": "Egyptian dialect; the app writes Modern Standard Arabic.",
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "zMoep4eguZ3OejsIbcWbjg==": [
@@ -620,6 +696,12 @@
       {
         "answer": "شغّل vp dev لتشغيل التطبيق.",
         "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "شغّل vp dev عشان تبدأ التطبيق.",
+        "right": false,
+        "why": "Egyptian dialect; the app writes Modern Standard Arabic.",
         "by": "Claude Code, 2026-11-15"
       }
     ],
@@ -649,6 +731,12 @@
       {
         "answer": "يخبر AGENTS.md الخاص بالتطبيق وكيل الترميز الخاص بك بما يجب فعله.",
         "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "ملف AGENTS.md الخاص بالتطبيق بيعرف وكيل البرمجة بتاعك يعمل إيه.",
+        "right": false,
+        "why": "Egyptian dialect; the app writes Modern Standard Arabic.",
         "by": "Claude Code, 2026-11-15"
       }
     ],
@@ -685,6 +773,17 @@
         "right": false,
         "why": "Past tense (\"translated\"); the source says it translates.",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "يُترجم Void's AI أو Claude Code كل ما هو جديد.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Void's AI أو Claude Code بيترجموا كل جديد.",
+        "right": false,
+        "why": "Egyptian dialect; the app writes Modern Standard Arabic.",
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "kBctHh0b7gp5b2Q3AfqxOA==": [
@@ -700,6 +799,11 @@
       },
       {
         "answer": "الفهرس الخاص بكل لغة موجود في i18n/translations.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "يوجد الفهرس الخاص بكل لغة في i18n/translations.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -863,6 +967,11 @@
       },
       {
         "answer": "حجز {name}، ووصلت التذكرة إلى {name} عبر البريد الإلكتروني.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "حجز {name}، ووصلت التذكرة لـ {name} عبر البريد الإلكتروني.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }

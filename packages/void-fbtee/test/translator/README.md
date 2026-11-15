@@ -19,3 +19,6 @@ so a change to it shows as a diff beside the scores it produced:
 Adding a language: add it to `app/vite.config.ts`, run the data test (`vp test`), which says what
 its catalog lacks, and translate every entry. Adding a string: add it to `app/src/strings.tsx`
 and its translation to every catalog.
+
+What Void's AI is told is the translating skill, `skills/void-fbtee-translate/SKILL.md`, with
+fbtee's own steps 3 to 5: `TRANSLATOR_RULES=0` leaves it out, to measure it.
