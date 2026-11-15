@@ -7,7 +7,7 @@ import { expect, test } from "vite-plus/test";
 import { catalogFile, collect, missing } from "../../src/catalogs";
 import { loadProject } from "../../src/commands";
 import { problemsWith } from "../../src/judge";
-import { CHOICES, choiceFor, modelFor } from "../../src/models";
+import { CANDIDATES, CHOICES, choiceFor, modelById, modelFor } from "../../src/models";
 
 const APP = join(import.meta.dirname, "../translator/app");
 const p = await loadProject(APP);
@@ -46,11 +46,12 @@ for (const locale of locales) {
   });
 }
 
-test("models.json: one entry per language, each a Workers AI model with its source", () => {
+test("models.json: one entry per language, each naming one of its models, with its source", () => {
   const languages = CHOICES.map((c) => c.language);
   expect(new Set(languages).size, "no language twice").toBe(languages.length);
+  expect(CANDIDATES.every((m) => m.id.startsWith("@cf/"))).toBe(true);
   for (const c of CHOICES) {
-    expect(c.model, c.language).toMatch(/^@cf\//);
+    expect(() => modelById(c.model), c.language).not.toThrow();
     expect(c.why, c.language).not.toBe("");
   }
 });

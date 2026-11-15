@@ -49,21 +49,35 @@ async function ask<T>(
       // page, "temperature", 0 to 5, checked 2026-11-15); `seed` is its own reproducibility knob.
       temperature: 0,
       seed: 1,
+      // Its thinking off or at its lowest (models.json): a translation needs none.
+      ...model.options,
     } as never,
     // Through the account's AI Gateway ("default", Cloudflare's own, made on a first request), so
     // every request is in the gateway's logs. Its cache is off for vp dev: a string is asked for
-    // once, and its accepted answer is kept in the catalog. The translator test turns it on
-    // (`cache`): at temperature 0 a cached answer is the one the model would give anyway, so a
-    // rerun costs only the requests that changed, and a retry, which carries what was wrong, is a
-    // new request, never cached. The binding's third argument, which Void passes on (AI Gateway
+    // once, and its accepted answer is kept in the catalog. The translator test turns it on for a
+    // string whose answer was judged right (`cache`, from verdicts.json), so a wrong or unjudged
+    // one is asked fresh every run. The binding's third argument, which Void passes on (AI Gateway
     // docs, "Workers Bindings"; Void's runtime/ai.mjs makeDirectBackend); proven both ways by
     // e2e/translator/cache.test.ts and the gateway's logs (2026-11-15).
     {
       gateway: { id: "default", ...(cache ? { cacheTtl: 7 * 86400 } : { skipCache: true }) },
+      // One replica per model, so the system prompt, the same for every string, is prefix-cached
+      // across requests (Workers AI's "Prompt caching" page: x-session-affinity, through the
+      // binding's extraHeaders, checked 2026-11-15).
+      extraHeaders: { "x-session-affinity": `void-fbtee-${model.id}` },
     } as never,
   );
-  const r = result as { response?: unknown; choices?: { message?: { content?: unknown } }[] };
+  const r = result as {
+    response?: unknown;
+    choices?: { message?: { content?: unknown }; finish_reason?: string }[];
+  };
   const answer = r.response ?? r.choices?.[0]?.message?.content;
+  // No answer: a thinking model that spent max_tokens thinking (GLM 4.7 Flash's 8192 tokens, all
+  // reasoning, content null, in the gateway's logs, 2026-11-15) or one cut off mid-answer.
+  if (answer === null || answer === undefined || r.choices?.[0]?.finish_reason === "length")
+    throw new Error(
+      `${model.id} gave no complete answer (${r.choices?.[0]?.finish_reason ?? "no content"})`,
+    );
   if (typeof answer !== "string") return answer as T;
   // Without JSON Mode, the object may come with words or a fence around it.
   const start = answer.indexOf("{");
