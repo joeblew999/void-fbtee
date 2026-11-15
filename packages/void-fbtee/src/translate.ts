@@ -267,28 +267,6 @@ interface CatalogEntry {
   translations?: CatalogLine[];
 }
 
-/**
- * The rules Claude Code translates by, for Void's AI too: fbtee's own translating skill (steps 3
- * to 5: match the catalog, read the description and the code, keep placeholders, the plural and
- * gender forms) and void-fbtee's skill's "Strings" section (catalogs, plurals, gender, RTL).
- */
-export function translatingRules(root: string): string {
-  const read = (rel: string) => {
-    try {
-      return readFileSync(join(root, rel), "utf8");
-    } catch {
-      return "";
-    }
-  };
-  const fbtee = read("node_modules/fbtee/skills/fbtee-translate/SKILL.md")
-    .split("\n")
-    .filter((l) => /^[345]\. /.test(l))
-    .join("\n");
-  const own = read(skillPath(root));
-  const strings = own.match(/^## Strings\n([\s\S]*?)^## /m)?.[1]?.trim() ?? "";
-  return [fbtee, strings].filter(Boolean).join("\n\n");
-}
-
 /** A few lines of the code a string is written in, around it, from fbtee's collected phrases. */
 export function sourceContext(p: Project, hash: string): string | undefined {
   const phrase = (
@@ -410,7 +388,6 @@ export async function translateEntry(
     };
     examples?: unknown[];
     glossary?: { source: string; translation: string }[];
-    guide?: string;
     /** Another model than the language's own (models.ts), for trying one (e2e/translator/). */
     model?: string;
     /** AI Gateway's cache on: the translator test, per string from verdicts.json (ai.ts ask). */
@@ -430,7 +407,6 @@ export async function translateEntry(
       entries: [o.entry],
       examples: o.examples ?? [],
       glossary,
-      guide: o.guide,
       model: o.model,
       cache: o.cache,
       feedback: feedback.length ? { answer: out, problems: feedback } : undefined,
@@ -489,8 +465,7 @@ export async function translateWithVoidAi(
   const from = p.config.sourceLocale;
   const rel = (f: string) => relative(p.root, f).split(sep).join("/");
 
-  const { texts } = collect(p);
-  const guide = translatingRules(p.root);
+  const { texts, builtinHashes } = collect(p);
   for (const m of missing(p)) {
     const file = catalogFile(p, m.locale);
     if (!existsSync(file)) continue;
@@ -498,10 +473,11 @@ export async function translateWithVoidAi(
       translations: Record<string, CatalogEntry>;
     };
     // The app's own translations, each with its source text, as examples (not written back).
-    const finished = Object.entries(catalog.translations).map(([hash, e]) => ({
-      ...e,
-      source: texts[hash],
-    }));
+    // Not fbtee's built-in strings: list joiners ("{list of items} and {last item}"), no use as
+    // an example, and English where an app hasn't translated them yet.
+    const finished = Object.entries(catalog.translations)
+      .filter(([hash]) => !builtinHashes.has(hash))
+      .map(([hash, e]) => ({ ...e, source: texts[hash] }));
     // Each open entry's hash, kept beside it (not in the entry, which is written back).
     const hashOf = new Map<CatalogEntry, string>();
     const open = Object.entries(catalog.translations)
@@ -523,7 +499,6 @@ export async function translateWithVoidAi(
         entry: toSend[0]!,
         examples: examplesFor(finished, toSend),
         glossary,
-        guide,
         ...test,
       });
       if (!answer) return false;

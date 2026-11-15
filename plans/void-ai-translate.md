@@ -16,9 +16,10 @@ left.
   docs, llmgateway.io's recommendations, or measured by the translator test. All checked against
   Cloudflare's catalog and its November 2026 deprecation list (2026-11-15).
 - **How a string is sent** (src/translate.ts `translateEntry`, the same for `vp dev` and the test):
-  alone, with the catalog's closest own translations as examples, the app's words for its terms
-  (glossary), the words to keep, the code around it and the skills' translating rules, at
-  temperature 0 with a fixed seed. An answer the judge finds problems in goes back with what was
+  alone, with the catalog's closest own translations as examples (not fbtee's built-in strings),
+  the app's words for its terms (glossary), the words to keep and the code around it, at
+  temperature 0 with a fixed seed. Not the skills' rules: they're for Claude Code (commands, files),
+  and were a page of noise around a one-line job (2026-11-15). An answer the judge finds problems in goes back with what was
   wrong, up to twice; only one with none is kept.
 - **One judge,** src/judge.ts. Problems, which mean an answer is never kept: lines missing, JSON in
   a line, text left in English, the wrong script (the language's likely script, Intl.Locale

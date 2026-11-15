@@ -12,6 +12,11 @@
         "answer": "เมื่อคุณโพสต์แล้ว อีเวนต์ของคุณจะแสดงในทุกภาษา",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "กิจกรรมของคุณจะแสดงในทุกภาษาเมื่อโพสต์แล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "5jxwLMzaf8YB/FQfN7jMjA==": [
@@ -79,12 +84,24 @@
         "answer": "Void's AI หรือ Claude Code แปลสิ่งที่ใหม่",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Void's AI หรือ Claude Code แปลสิ่งที่ใหม่อยู่เสมอ",
+        "right": false,
+        "why": "Adds อยู่เสมอ (\"always\"), which the source doesn't say.",
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "kBctHh0b7gp5b2Q3AfqxOA==": [
       {
         "answer": "แค็ตตาล็อกของแต่ละภาษาอยู่ใน i18n/translations",
         "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "แค็ตตาล็อกของแต่ละภาษาอยู่ใน i18n/translations.",
+        "right": false,
+        "why": "Ends with a full stop, which Thai doesn't use.",
         "by": "Claude Code, 2026-11-15"
       }
     ],
@@ -118,6 +135,11 @@
     "AQ6/02zzfwk50FSEF0wKtA==": [
       {
         "answer": "เปิด {pages} หรือไม่?",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "เปิด {pages} หรือไม่",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -162,11 +184,22 @@
         "answer": "{name} ตรวจตั๋วของเขา/เธอแล้ว",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} ตรวจตั๋วของพวกเขาแล้ว",
+        "right": false,
+        "why": "ของพวกเขา is plural \"their\" (a group's ticket), not one person whose gender isn't known (ของตัวเอง, ของเขา/เธอ).",
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "AHgdPbajKOCj4zXFKNEbbg==": [
       {
         "answer": "{name} จอง และ {name} ได้รับตั๋วทางอีเมล",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} จองแล้ว และ {name} ได้รับตั๋วทางอีเมล",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }

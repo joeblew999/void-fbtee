@@ -2,9 +2,16 @@
   "th-TH": {
     "date": "2026-11-15",
     "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
-    "right": 19,
-    "wrong": 2,
-    "unreviewed": [],
+    "right": 14,
+    "wrong": 1,
+    "unreviewed": [
+      "Open {pages}?",
+      "{name} checked their ticket.",
+      "Your event shows in every language once it's posted.",
+      "Void's AI or Claude Code translates what's new.",
+      "{name} booked, and {name} got the ticket by email.",
+      "Each language's catalog is in i18n/translations."
+    ],
     "meaning": 88,
     "chrF": 91,
     "results": [
@@ -22,11 +29,11 @@
         "text": "Your event shows in every language once it's posted.",
         "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
         "cache": true,
-        "verdict": "right",
-        "meaning": 94,
-        "chrF": 86,
+        "verdict": "unreviewed",
+        "meaning": 89,
+        "chrF": 82,
         "reference": ["อีเวนต์ของคุณจะแสดงในทุกภาษาเมื่อโพสต์แล้ว"],
-        "got": ["เมื่อคุณโพสต์แล้ว อีเวนต์ของคุณจะแสดงในทุกภาษา"]
+        "got": ["กิจกรรมของคุณจะแสดงในทุกภาษาเมื่อโพสต์แล้ว"]
       },
       {
         "text": "Hello {name}, your ticket is attached.",
@@ -42,12 +49,11 @@
         "text": "{translated} of {total} strings translated",
         "hash": "0/yUVSiGyC2JT0/i90uO0A==",
         "cache": true,
-        "verdict": "wrong",
-        "why": "แปล without แล้ว reads as an instruction, \"translate {translated} of {total} strings\", not that they're done.",
+        "verdict": "right",
         "meaning": 86,
-        "chrF": 84,
+        "chrF": 92,
         "reference": ["แปลแล้ว {translated} จาก {total} ข้อความ"],
-        "got": ["แปล {translated} จาก {total} ข้อความ"]
+        "got": ["{translated} จาก {total} ข้อความแปลแล้ว"]
       },
       {
         "text": "{number} seats left",
@@ -94,21 +100,21 @@
         "text": "Void's AI or Claude Code translates what's new.",
         "hash": "XheCGRJ31SRnsGZhKLgJRA==",
         "cache": true,
-        "verdict": "right",
-        "meaning": 95,
-        "chrF": 100,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 95,
         "reference": ["Void's AI หรือ Claude Code แปลสิ่งที่ใหม่"],
-        "got": ["Void's AI หรือ Claude Code แปลสิ่งที่ใหม่"]
+        "got": ["Void's AI หรือ Claude Code แปลสิ่งที่ใหม่อยู่เสมอ"]
       },
       {
         "text": "Each language's catalog is in i18n/translations.",
         "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
         "cache": true,
-        "verdict": "right",
+        "verdict": "unreviewed",
         "meaning": 94,
         "chrF": 100,
         "reference": ["แค็ตตาล็อกของแต่ละภาษาอยู่ใน i18n/translations"],
-        "got": ["แค็ตตาล็อกของแต่ละภาษาอยู่ใน i18n/translations"]
+        "got": ["แค็ตตาล็อกของแต่ละภาษาอยู่ใน i18n/translations."]
       },
       {
         "text": "Ready to translate your app?",
@@ -144,11 +150,11 @@
         "text": "Open {pages}?",
         "hash": "AQ6/02zzfwk50FSEF0wKtA==",
         "cache": true,
-        "verdict": "right",
-        "meaning": 94,
-        "chrF": 68,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 67,
         "reference": ["เปิด {pages} ไหม?"],
-        "got": ["เปิด {pages} หรือไม่?"]
+        "got": ["เปิด {pages} หรือไม่"]
       },
       {
         "text": "{name} takes part in person.",
@@ -204,21 +210,21 @@
         "text": "{name} checked their ticket.",
         "hash": "3jFQRFLYFLOxE6C21bq6GA==",
         "cache": true,
-        "verdict": "right",
-        "meaning": 92,
-        "chrF": 66,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 67,
         "reference": ["{name} ตรวจตั๋วของตัวเองแล้ว"],
-        "got": ["{name} ตรวจตั๋วของเขา/เธอแล้ว"]
+        "got": ["{name} ตรวจตั๋วของพวกเขาแล้ว"]
       },
       {
         "text": "{name} booked, and {name} got the ticket by email.",
         "hash": "AHgdPbajKOCj4zXFKNEbbg==",
         "cache": true,
-        "verdict": "right",
-        "meaning": 92,
-        "chrF": 88,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
         "reference": ["{name} จองแล้ว และ {name} ได้รับตั๋วทางอีเมล"],
-        "got": ["{name} จอง และ {name} ได้รับตั๋วทางอีเมล"]
+        "got": ["{name} จองแล้ว และ {name} ได้รับตั๋วทางอีเมล"]
       }
     ]
   }

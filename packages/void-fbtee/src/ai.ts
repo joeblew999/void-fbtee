@@ -134,7 +134,6 @@ export async function translateStrings(
     to,
     examples = [],
     glossary = [],
-    guide,
     feedback,
     model,
     cache,
@@ -143,7 +142,6 @@ export async function translateStrings(
     to: string;
     examples?: Example[];
     glossary?: { source: string; translation: string }[];
-    guide?: string;
     /** The last answer and what was wrong with it, when it's asked again. */
     feedback?: { answer: string[]; problems: string[] };
     model?: string;
@@ -166,7 +164,10 @@ export async function translateStrings(
   }));
   const out = await ask<{ entries: { id: number; lines: string[] }[] }>(
     "You translate the text of a web app's user interface. For each entry, read its description " +
-      "(where the text shows and what it means) and translate each line. Keep every {placeholder} " +
+      "(where the text shows and what it means) and translate each line. The description is only " +
+      "there to explain: never put its words in the translation. Say everything the source says, " +
+      "the same way, as a statement, question or instruction, and in its tense, adding nothing and " +
+      "leaving nothing out. Keep every {placeholder} " +
       "exactly as written, untranslated. A line marked with a plural form (zero, one, two, few, " +
       "many, other) is the sentence for counts in that form of the target language: write it in " +
       "that form's grammar; the zero, one and two forms may say the number in words instead of " +
@@ -174,8 +175,8 @@ export async function translateStrings(
       "stay exactly as written, in Latin letters, never translated or explained. The examples " +
       "are the app's own translations: use the same words for the same things, and the same " +
       "style. An entry's code is the source around it, to show where the text appears. " +
-      `Write ${from === to ? `in ${named(to)} itself` : `in ${named(to)}`}. Reply with JSON only.` +
-      (guide ? `\n\nThe project's own rules for translating it:\n${guide}` : ""),
+      "Write right-to-left text naturally, with no direction marks (U+200E, U+200F). " +
+      `Write ${from === to ? `in ${named(to)} itself` : `in ${named(to)}`}. Reply with JSON only.`,
     (glossary.length
       ? `The app's own words for these terms: always use them, never another word:\n${JSON.stringify(glossary)}\n\n`
       : "") +
@@ -255,10 +256,9 @@ export type DevRequest =
       entries: StringEntry[];
       examples?: Example[];
       glossary?: { source: string; translation: string }[];
-      guide?: string;
       feedback?: { answer: string[]; problems: string[] };
       cache?: boolean;
-      /** The measurement only (scripts/translator.ts): another model to try. */
+      /** The translator test only (e2e/translator/): another model to try. */
       model?: string;
     }
   | { kind: "page"; from: string; to: string; text: string }
