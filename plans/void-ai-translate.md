@@ -84,3 +84,8 @@ original, a stored post's translation (event_texts). AI Gateway's cache is never
 translating (ai.ts: `skipCache`): the loop asks again when an answer is wrong, and a cached wrong
 first answer would come back every time. Temperature 0 and a fixed seed make the same request give
 the same answer, so test runs compare without a cache.
+Checked 2026-11-15 (e2e/translator/cache.test.ts, `vp test run --project translator
+e2e/translator/cache.test.ts --silent=false`): with the cache allowed, the same request at a high
+temperature gave two different answers, twice, so AI Gateway isn't caching Void's AI requests in
+dev on a direct Cloudflare account. `skipCache` stays: a team platform or a gateway with caching
+turned on would cache, and then it matters.

@@ -55,7 +55,8 @@ async function ask<T>(
     // would come back every time the string is sent, pinned. What's cached is what passed: the
     // catalog (vp dev writes an accepted string to it and never sends it again), a page with its
     // recorded original, a stored post's translation. Temperature 0 and the seed still give the
-    // same request the same answer, so runs compare.
+    // same request the same answer, so runs compare. In dev on a direct Cloudflare account the
+    // gateway didn't cache at all (e2e/translator/cache.test.ts, 2026-11-15); a team platform may.
     { gateway: { skipCache: true } } as never,
   );
   const r = result as { response?: unknown; choices?: { message?: { content?: unknown } }[] };
@@ -252,7 +253,29 @@ export type DevRequest =
       /** The measurement only (scripts/translator.ts): another model to try. */
       model?: string;
     }
-  | { kind: "page"; from: string; to: string; text: string };
+  | { kind: "page"; from: string; to: string; text: string }
+  /** The cache test only (e2e/translator/cache.test.ts): one request, cache allowed or not. */
+  | { kind: "cache-probe"; skipCache: boolean };
+
+/**
+ * One request that comes out differently each time the model answers it (a high temperature, no
+ * seed), with AI Gateway's cache allowed or skipped: two answers word for word the same came from
+ * the cache. For the cache test, not for translating.
+ */
+async function cacheProbe(skipCache: boolean): Promise<string> {
+  const result = await ai.run(
+    LLAMA.id as never,
+    {
+      messages: [{ role: "user", content: "Write one short sentence about the sea." }],
+      max_tokens: 64,
+      temperature: 1.5,
+    } as never,
+    (skipCache ? { gateway: { skipCache: true } } : undefined) as never,
+  );
+  const r = result as { response?: unknown; choices?: { message?: { content?: unknown } }[] };
+  const answer = r.response ?? r.choices?.[0]?.message?.content;
+  return typeof answer === "string" ? answer : JSON.stringify(answer ?? "");
+}
 
 /**
  * The dev server's route, `POST /__void-fbtee/translate`: only under `vp dev` (the plugin's
@@ -268,7 +291,9 @@ export async function devTranslate(request: Request, token: string): Promise<Res
     const result =
       body.kind === "strings"
         ? { lines: await translateStrings(body.entries, body) }
-        : { page: await translatePage(body.text, body) };
+        : body.kind === "page"
+          ? { page: await translatePage(body.text, body) }
+          : { answer: await cacheProbe(body.skipCache) };
     return Response.json(result);
   } catch (error) {
     // 503: no Void's AI here (Void's own message, "ai: Not available…"); 502: it answered
