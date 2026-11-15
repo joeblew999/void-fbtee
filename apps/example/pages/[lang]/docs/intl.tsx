@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import { INSTANT, runAll, SECTIONS, ZONE } from "@/docs/intl";
 import { sectionTitle } from "@/docs/intl-titles";
 import { listDifference, showInvisible } from "@/docs/differs";
+import { ComponentsLink } from "@/docs/Points";
 import { RowsSection } from "@/docs/RowsSection";
 import { useBrowserOnce } from "@/docs/useBrowserOnce";
 import { DocsPage } from "@/docs/DocsPage";
@@ -153,6 +154,7 @@ export default function IntlPage({ worker }: Props) {
           })}
         />
       ))}
+      <ComponentsLink names={["Formatted", "useTimeZone", "useNow"]} />
     </DocsPage>
   );
 }

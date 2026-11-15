@@ -4149,6 +4149,18 @@
         }
       ],
       "types": []
+    },
+    "eV1s9krFs/WU5TQk0xqOmw==": {
+      "description": "Docs: the void-fbtee pieces a page uses, each linking to where the Components page explains it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ใช้ในหน้านี้ และอธิบายไว้ในหน้าคอมโพเนนต์: {pieces}",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

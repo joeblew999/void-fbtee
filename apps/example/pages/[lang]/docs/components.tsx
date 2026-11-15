@@ -33,7 +33,11 @@ function Piece({
   children?: ReactNode;
 }) {
   return (
-    <div className="space-y-2 rounded-lg border p-4" data-testid={`component-${name}`}>
+    <div
+      id={name}
+      className="scroll-mt-20 space-y-2 rounded-lg border p-4"
+      data-testid={`component-${name}`}
+    >
       <h3 className="font-mono text-sm font-medium" dir="ltr">
         {name}
       </h3>

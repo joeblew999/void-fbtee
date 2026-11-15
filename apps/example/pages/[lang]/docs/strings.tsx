@@ -2,7 +2,7 @@
 // with one plural shown in this page's language (Arabic has six forms), and the lines that do it.
 import { fbt } from "fbtee";
 import { DocsPage } from "@/docs/DocsPage";
-import { Points, Section, SkillLink, type Point } from "@/docs/Points";
+import { ComponentsLink, Points, Section, SkillLink, type Point } from "@/docs/Points";
 import { StringPieces } from "@/docs/StringPieces";
 import { Formatted, useLocale } from "void-fbtee/react";
 
@@ -173,6 +173,7 @@ export default function StringsPage() {
           </fbt>
         </p>
         <StringPieces />
+        <ComponentsLink names={["InLanguage", "Formatted"]} />
       </Section>
       <Section id={sections[2].id} title={sections[2].title}>
         <Points points={points()} />

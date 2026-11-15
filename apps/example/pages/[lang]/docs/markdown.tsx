@@ -7,7 +7,7 @@ import type { RouteUrl } from "void/routes";
 import { langAttrs } from "void-fbtee/locales";
 import { Link, useLocales } from "void-fbtee/react";
 import { DocsPage } from "@/docs/DocsPage";
-import { Points, Section, SkillLink, type Point } from "@/docs/Points";
+import { ComponentsLink, Points, Section, SkillLink, type Point } from "@/docs/Points";
 
 function points(): Point[] {
   return [
@@ -187,6 +187,7 @@ export default function MarkdownPage() {
       </Section>
       <Section id={sections[1].id} title={sections[1].title}>
         <Points points={points()} />
+        <ComponentsLink names={["langAttrs", "useLocales"]} />
         <SkillLink section="markdown-pages" />
       </Section>
     </DocsPage>

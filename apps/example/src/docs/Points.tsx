@@ -3,6 +3,9 @@
 // left to right in every language: code reads that way.
 import type { ReactNode } from "react";
 import { fbt } from "fbtee";
+import type { RouteUrl } from "void/routes";
+import { routeUrl } from "void-fbtee/routes";
+import { Link } from "void-fbtee/react";
 import { SKILL } from "@/shell/project";
 
 export interface Point {
@@ -64,6 +67,33 @@ export function SkillLink({ section }: { section: string }) {
             </fbt>
           </a>
         </fbt:param>.
+      </fbt>
+    </p>
+  );
+}
+
+/**
+ * The void-fbtee pieces a page uses, each explained once, on the Components page: linked there
+ * rather than explained again. Their names are code, so left to right in every language.
+ */
+export function ComponentsLink({ names }: { names: string[] }) {
+  return (
+    <p className="text-sm text-muted-foreground" data-testid="components-link">
+      <fbt desc="Docs: the void-fbtee pieces a page uses, each linking to where the Components page explains it">
+        Used here, and explained on the Components page:{" "}
+        <fbt:list
+          items={names.map((name) => (
+            <Link
+              key={name}
+              href={`${routeUrl("/[lang]/docs/components")}#${name}` as RouteUrl}
+              className="font-mono text-xs underline"
+              dir="ltr"
+            >
+              {name}
+            </Link>
+          ))}
+          name="pieces"
+        />.
       </fbt>
     </p>
   );

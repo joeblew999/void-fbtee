@@ -7,7 +7,7 @@ import type { RouteUrl } from "void/routes";
 import { langAttrs } from "void-fbtee/locales";
 import { Link, useLocale, useLocales } from "void-fbtee/react";
 import { DocsPage } from "@/docs/DocsPage";
-import { Points, Section, SkillLink, type Point } from "@/docs/Points";
+import { ComponentsLink, Points, Section, SkillLink, type Point } from "@/docs/Points";
 
 function points(): Point[] {
   return [
@@ -193,6 +193,7 @@ export default function RightToLeftPage() {
       </Section>
       <Section id={sections[2].id} title={sections[2].title}>
         <Points points={points()} />
+        <ComponentsLink names={["langAttrs", "useLocales", "Link", "LanguagePicker"]} />
         <SkillLink section="strings" />
       </Section>
     </DocsPage>

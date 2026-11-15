@@ -5,7 +5,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { fbt } from "fbtee";
 import { DocsPage } from "@/docs/DocsPage";
-import { Points, Section, type Point } from "@/docs/Points";
+import { ComponentsLink, Points, Section, type Point } from "@/docs/Points";
 import type { Props } from "./emails.server";
 
 type Shown = Props["booking"];
@@ -242,6 +242,7 @@ export default function EmailsPage({ booking, link }: Props) {
       </Section>
       <Section id={all.sections[1].id} title={all.sections[1].title}>
         <Points points={all.points} />
+        <ComponentsLink names={["langAttrs"]} />
       </Section>
     </DocsPage>
   );

@@ -636,3 +636,22 @@ test.skipIf(!!process.env.E2E_URL)(
     expect(config.compatibilityFlags).toContain("temporal");
   },
 );
+
+// The topic pages link the void-fbtee pieces they use to the Components page, where each is
+// explained once: every such link lands on a piece that's there, in every language.
+test("each topic page's link to a piece lands on the Components page's piece", async () => {
+  for (const locale of LOCALES) {
+    const components = await (await get(`/${locale}/docs/components`)).text();
+    for (const topic of ["strings", "intl", "right-to-left", "markdown", "emails"]) {
+      const html = await (await get(`/${locale}/docs/${topic}`)).text();
+      const block = html.match(/data-testid="components-link"[\s\S]*?<\/p>/)?.[0];
+      expect(block, `${locale} ${topic}`).toBeDefined();
+      const pieces = [...block!.matchAll(/href="\/[^"#]+\/docs\/components#([^"]+)"/g)].map(
+        (m) => m[1]!,
+      );
+      expect(pieces.length, `${locale} ${topic}`).toBeGreaterThan(0);
+      for (const piece of pieces)
+        expect(components, `${locale} ${topic} → ${piece}`).toContain(`id="${piece}"`);
+    }
+  }
+});
