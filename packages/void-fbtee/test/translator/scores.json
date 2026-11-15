@@ -1,4 +1,300 @@
 {
+  "ar-EG": {
+    "date": "2026-11-15",
+    "model": "@cf/google/gemma-4-26b-a4b-it",
+    "right": 19,
+    "wrong": 0,
+    "unreviewed": [
+      "{number} seats left",
+      "1 seat left",
+      "You're booked.",
+      "{who} booked {seats} seats."
+    ],
+    "meaning": 84,
+    "chrF": 81,
+    "results": [
+      {
+        "text": "Save",
+        "hash": "KVIsARQPJHkNMbpjskkfBg==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 69,
+        "chrF": 100,
+        "reference": ["حفظ"],
+        "got": ["حفظ"]
+      },
+      {
+        "text": "Your event shows in every language once it's posted.",
+        "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 85,
+        "chrF": 73,
+        "reference": ["تظهر فعاليتك بكل اللغات بمجرد نشرها."],
+        "got": ["ستظهر فعاليتك بكل لغة بمجرد نشرها."]
+      },
+      {
+        "text": "Hello {name}, your ticket is attached.",
+        "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 86,
+        "chrF": 75,
+        "reference": ["مرحبًا {name}، تذكرتك مرفقة."],
+        "got": ["أهلاً {name}، تذكرتك مرفقة."]
+      },
+      {
+        "text": "{translated} of {total} strings translated",
+        "hash": "0/yUVSiGyC2JT0/i90uO0A==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 89,
+        "chrF": 60,
+        "reference": ["تُرجم {translated} من {total} نصًا"],
+        "got": ["تمت ترجمة {translated} من أصل {total} من النصوص"]
+      },
+      {
+        "text": "{number} seats left",
+        "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
+        "cache": true,
+        "verdict": "unreviewed",
+        "meaning": 80,
+        "chrF": 67,
+        "reference": [
+          "لم يتبقَّ أي مقعد",
+          "تبقّى مقعدان",
+          "تبقّت {number} مقاعد",
+          "تبقّى {number} مقعدًا",
+          "تبقّى {number} مقعد"
+        ],
+        "got": [
+          "لا توجد مقاعد متبقية",
+          "تبقّى {number} مقعدين",
+          "تبقّى {number} مقاعد",
+          "تبقّى {number} مقعدًا",
+          "تبقّى {number} مقعد"
+        ]
+      },
+      {
+        "text": "1 seat left",
+        "hash": "YPVBS6NNHhGVrCKVfko+lw==",
+        "cache": true,
+        "verdict": "unreviewed",
+        "meaning": 91,
+        "chrF": 59,
+        "reference": ["تبقّى مقعد واحد"],
+        "got": ["متبقي مقعد واحد"]
+      },
+      {
+        "text": "Run vp dev to start the app.",
+        "hash": "zMoep4eguZ3OejsIbcWbjg==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["شغّل vp dev لبدء التطبيق."],
+        "got": ["شغّل vp dev لبدء التطبيق."]
+      },
+      {
+        "text": "The app's AGENTS.md tells your coding agent what to do.",
+        "hash": "E3kkP1xBWrE61ZBOek87xg==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 86,
+        "chrF": 60,
+        "reference": ["يخبر ملف AGENTS.md في التطبيق وكيل البرمجة لديك بما يفعله."],
+        "got": ["ملف AGENTS.md الخاص بالتطبيق يخبر وكيل البرمجة الخاص بك بما يجب فعله."]
+      },
+      {
+        "text": "Void's AI or Claude Code translates what's new.",
+        "hash": "XheCGRJ31SRnsGZhKLgJRA==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 94,
+        "chrF": 87,
+        "reference": ["يترجم Void's AI أو Claude Code ما هو جديد."],
+        "got": ["يُترجم Void's AI أو Claude Code كل ما هو جديد."]
+      },
+      {
+        "text": "Each language's catalog is in i18n/translations.",
+        "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 90,
+        "chrF": 100,
+        "reference": ["فهرس كل لغة موجود في i18n/translations."],
+        "got": ["فهرس كل لغة موجود في i18n/translations."]
+      },
+      {
+        "text": "Ready to translate your app?",
+        "hash": "hUJ62HRBMHBewxRvZblIMw==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 94,
+        "chrF": 55,
+        "reference": ["هل أنت مستعد لترجمة تطبيقك؟"],
+        "got": ["جاهز لترجمة تطبيقك؟"]
+      },
+      {
+        "text": "Strings",
+        "hash": "7f0YPbDQynykALmEKflP3Q==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 65,
+        "chrF": 100,
+        "reference": ["النصوص"],
+        "got": ["النصوص"]
+      },
+      {
+        "text": "Catalog",
+        "hash": "zJo185mkHlmtxuQdGecjUg==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 38,
+        "chrF": 100,
+        "reference": ["الفهرس"],
+        "got": ["الفهرس"]
+      },
+      {
+        "text": "Open {pages}?",
+        "hash": "AQ6/02zzfwk50FSEF0wKtA==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["هل تريد فتح {pages}؟"],
+        "got": ["هل تريد فتح {pages}؟"]
+      },
+      {
+        "text": "{name} takes part in person.",
+        "hash": "fRQVudyYBFiDmWyed6yR7A==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 93,
+        "chrF": 61,
+        "reference": ["يشارك {name} حضوريًا."],
+        "got": ["يشارك {name} شخصيًا."]
+      },
+      {
+        "text": "{name} takes part online.",
+        "hash": "iP10/gSomcvt/+9NrQA7XQ==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["يشارك {name} عبر الإنترنت."],
+        "got": ["يشارك {name} عبر الإنترنت."]
+      },
+      {
+        "text": "{name} booked a seat.",
+        "hash": "Oeto9jViL+xxuaYfiMdwwg==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 94,
+        "chrF": 79,
+        "reference": ["حجز {name} مقعدًا.", "حجزت {name} مقعدًا.", "تم حجز مقعد باسم {name}."],
+        "got": ["حجز {name} مقعدًا.", "حجزت {name} مقعدًا.", "حجز {name} مقعدًا."]
+      },
+      {
+        "text": "{name} checked her ticket.",
+        "hash": "jE1zcxOCdGCCTd7j0RhSjA==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 90,
+        "chrF": 100,
+        "reference": ["تحققت {name} من تذكرتها."],
+        "got": ["تحققت {name} من تذكرتها."]
+      },
+      {
+        "text": "{name} checked his ticket.",
+        "hash": "bTo3iX4JuIh7tcnM8z1nHg==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 79,
+        "chrF": 100,
+        "reference": ["تحقق {name} من تذكرته."],
+        "got": ["تحقق {name} من تذكرته."]
+      },
+      {
+        "text": "{name} checked their ticket.",
+        "hash": "3jFQRFLYFLOxE6C21bq6GA==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 76,
+        "chrF": 100,
+        "reference": ["تحقق {name} من تذكرته."],
+        "got": ["تحقق {name} من تذكرته."]
+      },
+      {
+        "text": "{name} booked, and {name} got the ticket by email.",
+        "hash": "AHgdPbajKOCj4zXFKNEbbg==",
+        "cache": true,
+        "verdict": "right",
+        "meaning": 93,
+        "chrF": 80,
+        "reference": ["حجز {name}، وتلقى {name} التذكرة عبر البريد الإلكتروني."],
+        "got": ["حجز {name}، وحصل {name} على التذكرة عبر البريد الإلكتروني."]
+      },
+      {
+        "text": "You're booked.",
+        "hash": "iQJF/J4mB7QMxMxmCJJLOw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 77,
+        "chrF": 11,
+        "reference": ["أنت مسجَّل.", "أنتِ مسجَّلة.", "تم تأكيد حجزك."],
+        "got": ["تم الحجز بنجاح.", "تم الحجز بنجاح.", "تم الحجز بنجاح."]
+      },
+      {
+        "text": "{who} booked {seats} seats.",
+        "hash": "Nr+WWEAaNhdmcsZktc6jkQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 89,
+        "chrF": 89,
+        "reference": [
+          "لم يحجز {who} أي مقعد.",
+          "حجز {who} مقعدًا واحدًا.",
+          "حجز {who} مقعدين.",
+          "حجز {who} {seats} مقاعد.",
+          "حجز {who} {seats} مقعدًا.",
+          "حجز {who} {seats} مقعد.",
+          "لم تحجز {who} أي مقعد.",
+          "حجزت {who} مقعدًا واحدًا.",
+          "حجزت {who} مقعدين.",
+          "حجزت {who} {seats} مقاعد.",
+          "حجزت {who} {seats} مقعدًا.",
+          "حجزت {who} {seats} مقعد.",
+          "لم يحجز {who} أي مقعد.",
+          "حجز {who} مقعدًا واحدًا.",
+          "حجز {who} مقعدين.",
+          "حجز {who} {seats} مقاعد.",
+          "حجز {who} {seats} مقعدًا.",
+          "حجز {who} {seats} مقعد."
+        ],
+        "got": [
+          "حجز {who} {seats} مقعدًا.",
+          "حجز {who} مقعدًا واحدًا.",
+          "حجز {who} مقعدين.",
+          "حجز {who} {seats} مقاعد.",
+          "حجز {who} {seats} مقعدًا.",
+          "حجز {who} {seats} مقعدًا.",
+          "حجزت {who} {seats} مقعدًا.",
+          "حجزت {who} مقعدًا واحدًا.",
+          "حجزت {who} مقعدين.",
+          "حجزت {who} {seats} مقاعد.",
+          "حجزت {who} {seats} مقعدًا.",
+          "حجزت {who} {seats} مقعدًا.",
+          "حجز {who} {seats} مقعدًا.",
+          "حجز {who} مقعدًا واحدًا.",
+          "حجز {who} مقعدين.",
+          "حجز {who} {seats} مقاعد.",
+          "حجز {who} {seats} مقعدًا.",
+          "حجز {who} {seats} مقعدًا."
+        ]
+      }
+    ]
+  },
   "ar-EG @cf/aisingapore/gemma-sea-lion-v4-27b-it": {
     "date": "2026-11-15",
     "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
@@ -2741,12 +3037,18 @@
   },
   "th-TH": {
     "date": "2026-11-15",
-    "model": "@cf/thinkingmachines/inkling-2-small",
-    "right": 21,
-    "wrong": 0,
-    "unreviewed": [],
+    "model": "@cf/google/gemma-4-26b-a4b-it",
+    "right": 17,
+    "wrong": 1,
+    "unreviewed": [
+      "Hello {name}, your ticket is attached.",
+      "{name} takes part in person.",
+      "{name} booked a seat.",
+      "You're booked.",
+      "{who} booked {seats} seats."
+    ],
     "meaning": 88,
-    "chrF": 94,
+    "chrF": 88,
     "results": [
       {
         "text": "Save",
@@ -2763,20 +3065,20 @@
         "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
         "cache": true,
         "verdict": "right",
-        "meaning": 95,
-        "chrF": 89,
+        "meaning": 89,
+        "chrF": 76,
         "reference": ["อีเวนต์ของคุณจะแสดงในทุกภาษาเมื่อโพสต์แล้ว"],
-        "got": ["อีเวนต์ของคุณแสดงในทุกภาษาเมื่อโพสต์แล้ว"]
+        "got": ["เมื่อโพสต์แล้ว กิจกรรมของคุณจะแสดงในทุกภาษา"]
       },
       {
         "text": "Hello {name}, your ticket is attached.",
         "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
         "cache": true,
-        "verdict": "right",
-        "meaning": 90,
-        "chrF": 88,
+        "verdict": "unreviewed",
+        "meaning": 88,
+        "chrF": 81,
         "reference": ["สวัสดี {name} ตั๋วของคุณแนบมาแล้ว"],
-        "got": ["สวัสดี {name} ตั๋วของคุณแนบมาด้วย"]
+        "got": ["สวัสดี {name} ตั๋วของคุณแนบมาพร้อมกับข้อความนี้แล้ว"]
       },
       {
         "text": "{translated} of {total} strings translated",
@@ -2822,21 +3124,22 @@
         "text": "The app's AGENTS.md tells your coding agent what to do.",
         "hash": "E3kkP1xBWrE61ZBOek87xg==",
         "cache": true,
-        "verdict": "right",
-        "meaning": 92,
-        "chrF": 100,
+        "verdict": "wrong",
+        "why": "Leaves \"coding agent\" in English.",
+        "meaning": 96,
+        "chrF": 54,
         "reference": ["AGENTS.md ของแอปบอกเอเจนต์เขียนโค้ดของคุณว่าต้องทำอะไร"],
-        "got": ["AGENTS.md ของแอปบอกเอเจนต์เขียนโค้ดของคุณว่าต้องทำอะไร"]
+        "got": ["AGENTS.md ของแอปจะบอกให้ coding agent ของคุณรู้ว่าต้องทำอะไร"]
       },
       {
         "text": "Void's AI or Claude Code translates what's new.",
         "hash": "XheCGRJ31SRnsGZhKLgJRA==",
         "cache": true,
         "verdict": "right",
-        "meaning": 94,
-        "chrF": 85,
+        "meaning": 93,
+        "chrF": 68,
         "reference": ["Void's AI หรือ Claude Code แปลสิ่งที่ใหม่"],
-        "got": ["Void's AI หรือ Claude Code แปลสิ่งใหม่ๆ"]
+        "got": ["Void's AI หรือ Claude Code จะแปลส่วนที่เป็นของใหม่"]
       },
       {
         "text": "Each language's catalog is in i18n/translations.",
@@ -2853,10 +3156,10 @@
         "hash": "hUJ62HRBMHBewxRvZblIMw==",
         "cache": true,
         "verdict": "right",
-        "meaning": 94,
-        "chrF": 76,
+        "meaning": 95,
+        "chrF": 63,
         "reference": ["พร้อมแปลแอปของคุณแล้วหรือยัง"],
-        "got": ["พร้อมแปลแอปของคุณหรือยัง?"]
+        "got": ["พร้อมที่จะแปลแอปของคุณหรือยัง?"]
       },
       {
         "text": "Strings",
@@ -2884,19 +3187,19 @@
         "cache": true,
         "verdict": "right",
         "meaning": 93,
-        "chrF": 93,
+        "chrF": 67,
         "reference": ["เปิด {pages} ไหม?"],
-        "got": ["เปิด {pages} ไหม"]
+        "got": ["เปิด {pages} หรือไม่"]
       },
       {
         "text": "{name} takes part in person.",
         "hash": "fRQVudyYBFiDmWyed6yR7A==",
         "cache": true,
-        "verdict": "right",
-        "meaning": 82,
-        "chrF": 100,
+        "verdict": "unreviewed",
+        "meaning": 84,
+        "chrF": 84,
         "reference": ["{name} เข้าร่วมด้วยตนเอง"],
-        "got": ["{name} เข้าร่วมด้วยตนเอง"]
+        "got": ["{name} เข้าร่วมด้วยตัวเอง"]
       },
       {
         "text": "{name} takes part online.",
@@ -2904,19 +3207,19 @@
         "cache": true,
         "verdict": "right",
         "meaning": 88,
-        "chrF": 76,
+        "chrF": 100,
         "reference": ["{name} เข้าร่วมทางออนไลน์"],
-        "got": ["{name} เข้าร่วมออนไลน์"]
+        "got": ["{name} เข้าร่วมทางออนไลน์"]
       },
       {
         "text": "{name} booked a seat.",
         "hash": "Oeto9jViL+xxuaYfiMdwwg==",
         "cache": true,
-        "verdict": "right",
-        "meaning": 94,
-        "chrF": 100,
-        "reference": ["{name} จองที่นั่งแล้ว"],
-        "got": ["{name} จองที่นั่งแล้ว"]
+        "verdict": "unreviewed",
+        "meaning": 92,
+        "chrF": 93,
+        "reference": ["{name} จองที่นั่งแล้ว", "{name} จองที่นั่งแล้ว", "{name} จองที่นั่งแล้ว"],
+        "got": ["{name} จองที่นั่งแล้ว", "{name} จองที่นั่งของเธอแล้ว", "{name} จองที่นั่งแล้ว"]
       },
       {
         "text": "{name} checked her ticket.",
@@ -2943,10 +3246,10 @@
         "hash": "3jFQRFLYFLOxE6C21bq6GA==",
         "cache": true,
         "verdict": "right",
-        "meaning": 91,
-        "chrF": 68,
+        "meaning": 92,
+        "chrF": 66,
         "reference": ["{name} ตรวจตั๋วของตัวเองแล้ว"],
-        "got": ["{name} ตรวจตั๋วของเขาแล้ว"]
+        "got": ["{name} ตรวจตั๋วของเขา/เธอแล้ว"]
       },
       {
         "text": "{name} booked, and {name} got the ticket by email.",
@@ -2957,6 +3260,30 @@
         "chrF": 100,
         "reference": ["{name} จองแล้ว และ {name} ได้รับตั๋วทางอีเมล"],
         "got": ["{name} จองแล้ว และ {name} ได้รับตั๋วทางอีเมล"]
+      },
+      {
+        "text": "You're booked.",
+        "hash": "iQJF/J4mB7QMxMxmCJJLOw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 83,
+        "chrF": 100,
+        "reference": ["คุณจองแล้ว", "คุณจองแล้ว", "คุณจองแล้ว"],
+        "got": ["คุณจองแล้ว", "คุณจองแล้ว", "คุณจองแล้ว"]
+      },
+      {
+        "text": "{who} booked {seats} seats.",
+        "hash": "Nr+WWEAaNhdmcsZktc6jkQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 81,
+        "reference": [
+          "{who} จอง {seats} ที่นั่งแล้ว",
+          "{who} จอง {seats} ที่นั่งแล้ว",
+          "{who} จอง {seats} ที่นั่งแล้ว"
+        ],
+        "got": ["{who} จองแล้ว {seats} ที่นั่ง", "{who} จองแล้ว {seats} ที่นั่ง", "{who} จองแล้ว {seats} ที่นั่ง"]
       }
     ]
   },

@@ -91,6 +91,12 @@
         "right": false,
         "why": "Adds \"with this email\", which the source doesn't say.",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "สวัสดี {name} ตั๋วของคุณแนบมาพร้อมกับข้อความนี้แล้ว",
+        "right": false,
+        "by": "Claude Code, 2026-11-15",
+        "why": "Adds \"with this message\", which the source doesn't say."
       }
     ],
     "0/yUVSiGyC2JT0/i90uO0A==": [
@@ -393,6 +399,11 @@
         "right": false,
         "why": "พบปะ is meeting up, not taking part in person.",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} เข้าร่วมด้วยตัวเอง",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "iP10/gSomcvt/+9NrQA7XQ==": [
@@ -493,6 +504,26 @@
     "Oeto9jViL+xxuaYfiMdwwg==": [
       {
         "answer": "{name} จองที่นั่งแล้ว\n{name} จองที่นั่งแล้ว\n{name} จองที่นั่งแล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} จองที่นั่งแล้ว\n{name} จองที่นั่งของเธอแล้ว\n{name} จองที่นั่งแล้ว",
+        "right": false,
+        "by": "Claude Code, 2026-11-15",
+        "why": "The female line adds ของเธอ (\"her seat\"), which the source doesn't say."
+      }
+    ],
+    "iQJF/J4mB7QMxMxmCJJLOw==": [
+      {
+        "answer": "คุณจองแล้ว\nคุณจองแล้ว\nคุณจองแล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "Nr+WWEAaNhdmcsZktc6jkQ==": [
+      {
+        "answer": "{who} จองแล้ว {seats} ที่นั่ง\n{who} จองแล้ว {seats} ที่นั่ง\n{who} จองแล้ว {seats} ที่นั่ง",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -650,6 +681,12 @@
         "right": false,
         "why": "The same plural for every form: zero, two and 11 to 99 each need their own.",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "لا توجد مقاعد متبقية\nتبقّى {number} مقعدين\nتبقّى {number} مقاعد\nتبقّى {number} مقعدًا\nتبقّى {number} مقعد",
+        "right": false,
+        "by": "Claude Code, 2026-11-15",
+        "why": "The two form uses the accusative مقعدين where the subject needs مقعدان (and Arabic says two without the number)."
       }
     ],
     "YPVBS6NNHhGVrCKVfko+lw==": [
@@ -672,6 +709,11 @@
         "answer": "فاضل مقعد واحد",
         "right": false,
         "why": "Egyptian dialect; the app writes Modern Standard Arabic.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "متبقي مقعد واحد",
+        "right": true,
         "by": "Claude Code, 2026-11-15"
       }
     ],
@@ -962,6 +1004,22 @@
         "answer": "حجز {name} مقعدًا.\nحجزت {name} مقعدًا.\nحجز {name} مقعدًا.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "iQJF/J4mB7QMxMxmCJJLOw==": [
+      {
+        "answer": "تم الحجز بنجاح.\nتم الحجز بنجاح.\nتم الحجز بنجاح.",
+        "right": false,
+        "by": "Claude Code, 2026-11-15",
+        "why": "تم الحجز بنجاح adds \"successfully\", and doesn't address the reader."
+      }
+    ],
+    "Nr+WWEAaNhdmcsZktc6jkQ==": [
+      {
+        "answer": "حجز {who} {seats} مقعدًا.\nحجز {who} مقعدًا واحدًا.\nحجز {who} مقعدين.\nحجز {who} {seats} مقاعد.\nحجز {who} {seats} مقعدًا.\nحجز {who} {seats} مقعدًا.\nحجزت {who} {seats} مقعدًا.\nحجزت {who} مقعدًا واحدًا.\nحجزت {who} مقعدين.\nحجزت {who} {seats} مقاعد.\nحجزت {who} {seats} مقعدًا.\nحجزت {who} {seats} مقعدًا.\nحجز {who} {seats} مقعدًا.\nحجز {who} مقعدًا واحدًا.\nحجز {who} مقعدين.\nحجز {who} {seats} مقاعد.\nحجز {who} {seats} مقعدًا.\nحجز {who} {seats} مقعدًا.",
+        "right": false,
+        "by": "Claude Code, 2026-11-15",
+        "why": "The zero lines say \"booked 0 seats\" (لم يحجز أي مقعد is \"booked no seat\"), and the other form, 100 and up, takes مقعد, not مقعدًا."
       }
     ]
   }
