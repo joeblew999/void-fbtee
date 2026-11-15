@@ -2,16 +2,16 @@
   "th-TH": {
     "date": "2026-11-15",
     "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
-    "cache": "off",
-    "right": 10,
+    "right": 11,
     "wrong": 2,
-    "unreviewed": ["Hello {name}, your ticket is attached."],
+    "unreviewed": [],
     "meaning": 85,
-    "chrF": 90,
+    "chrF": 91,
     "results": [
       {
         "text": "Save",
         "hash": "KVIsARQPJHkNMbpjskkfBg==",
+        "cache": true,
         "verdict": "right",
         "meaning": 54,
         "chrF": 100,
@@ -21,6 +21,7 @@
       {
         "text": "Your event shows in every language once it's posted.",
         "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
+        "cache": true,
         "verdict": "right",
         "meaning": 94,
         "chrF": 86,
@@ -30,15 +31,17 @@
       {
         "text": "Hello {name}, your ticket is attached.",
         "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
-        "verdict": "unreviewed",
-        "meaning": 89,
-        "chrF": 72,
+        "cache": true,
+        "verdict": "right",
+        "meaning": 90,
+        "chrF": 76,
         "reference": ["สวัสดี {name} ตั๋วของคุณแนบมาแล้ว"],
-        "got": ["สวัสดีครับ/ค่ะ {name} ตั๋วของคุณแนบมาด้วยแล้วครับ/ค่ะ"]
+        "got": ["สวัสดีครับ/ค่ะ {name} ตั๋วของคุณแนบมาด้วยแล้ว"]
       },
       {
         "text": "{translated} of {total} strings translated",
         "hash": "0/yUVSiGyC2JT0/i90uO0A==",
+        "cache": true,
         "verdict": "right",
         "meaning": 86,
         "chrF": 92,
@@ -48,6 +51,7 @@
       {
         "text": "{number} seats left",
         "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
+        "cache": true,
         "verdict": "right",
         "meaning": 93,
         "chrF": 100,
@@ -57,6 +61,7 @@
       {
         "text": "1 seat left",
         "hash": "YPVBS6NNHhGVrCKVfko+lw==",
+        "cache": true,
         "verdict": "right",
         "meaning": 93,
         "chrF": 100,
@@ -66,6 +71,7 @@
       {
         "text": "Run vp dev to start the app.",
         "hash": "zMoep4eguZ3OejsIbcWbjg==",
+        "cache": true,
         "verdict": "right",
         "meaning": 94,
         "chrF": 100,
@@ -75,6 +81,7 @@
       {
         "text": "The app's AGENTS.md tells your coding agent what to do.",
         "hash": "E3kkP1xBWrE61ZBOek87xg==",
+        "cache": false,
         "verdict": "wrong",
         "why": "Drops ของ (\"of\"): reads \"app AGENTS.md\"; should be AGENTS.md ของแอป.",
         "meaning": 91,
@@ -85,6 +92,7 @@
       {
         "text": "Void's AI or Claude Code translates what's new.",
         "hash": "XheCGRJ31SRnsGZhKLgJRA==",
+        "cache": true,
         "verdict": "right",
         "meaning": 95,
         "chrF": 100,
@@ -94,6 +102,7 @@
       {
         "text": "Each language's catalog is in i18n/translations.",
         "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
+        "cache": true,
         "verdict": "right",
         "meaning": 94,
         "chrF": 100,
@@ -103,6 +112,7 @@
       {
         "text": "Ready to translate your app?",
         "hash": "hUJ62HRBMHBewxRvZblIMw==",
+        "cache": true,
         "verdict": "right",
         "meaning": 95,
         "chrF": 86,
@@ -112,6 +122,7 @@
       {
         "text": "Strings",
         "hash": "7f0YPbDQynykALmEKflP3Q==",
+        "cache": false,
         "verdict": "wrong",
         "why": "Adds \"of the app\" (ของแอป): the heading is the term alone, ข้อความ.",
         "meaning": 51,
@@ -122,6 +133,7 @@
       {
         "text": "Catalog",
         "hash": "zJo185mkHlmtxuQdGecjUg==",
+        "cache": true,
         "verdict": "right",
         "meaning": 72,
         "chrF": 100,

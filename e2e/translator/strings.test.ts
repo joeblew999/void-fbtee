@@ -12,9 +12,9 @@
 //   reference (score.ts).
 // Everything goes to test/translator/scores.json, committed: the git diff is what changed.
 //
-// AI Gateway's cache is off (ai.ts ask, skipCache): it would keep wrong answers as well as right
-// ones and hand them back on every rerun. What's kept is only what passes, in the catalog, as in
-// vp dev. TRANSLATOR_CACHE=1 turns the cache on, for a cheap rerun when nothing changed. TRANSLATOR_LANGUAGES picks languages;
+// AI Gateway's cache is set per string by verdicts.json: on for a string with an answer judged
+// right (settled, so a rerun gets it back cheaply), off for the rest, so a wrong or unjudged one
+// is asked fresh every run and never handed back from the cache. TRANSLATOR_LANGUAGES picks languages;
 // TRANSLATOR_MODEL tries another model, scored as "<language> <model>". `vp run test:translator`.
 import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -31,7 +31,6 @@ const site = inject("prod" as never) as string;
 const DATA = join(import.meta.dirname, "../../packages/void-fbtee/test/translator");
 const SCORES = join(DATA, "scores.json");
 const MODEL = process.env.TRANSLATOR_MODEL;
-const CACHE = process.env.TRANSLATOR_CACHE === "1";
 
 // A copy of the test app, inside the package so fbtee resolves from its node_modules.
 const app = mkdtempSync(join(DATA, ".tmp-"));
@@ -54,6 +53,7 @@ const VERDICTS = JSON.parse(readFileSync(join(DATA, "verdicts.json"), "utf8")) a
 interface Result {
   text: string;
   hash: string;
+  cache: boolean;
   verdict: "right" | "wrong" | "unreviewed";
   why?: string;
   meaning?: number;
@@ -83,9 +83,11 @@ for (const to of LANGUAGES) {
         entry.translations = entry.translations.map((l) => ({ ...l, translation: texts[hash]! }));
         entry.status = "new";
         writeFileSync(file, JSON.stringify(catalog, null, 2) + "\n");
+        // Cached only once an answer to it was judged right (verdicts.json).
+        const cache = VERDICTS[to]?.[hash]?.some((v) => v.right) ?? false;
         const log: string[] = [];
         const ran = await translateWithVoidAi(p, url, token, (l) => log.push(l), {
-          cache: CACHE,
+          cache,
           model: MODEL,
         });
         expect(ran, `Void's AI isn't available: ${log.join(" ")}`).toBe(true);
@@ -111,6 +113,7 @@ for (const to of LANGUAGES) {
         results.push({
           text: texts[hash]!,
           hash,
+          cache,
           // Not kept: vp dev's judge found problems it couldn't get fixed (the log says which).
           verdict: !kept ? "wrong" : judged ? (judged.right ? "right" : "wrong") : "unreviewed",
           ...(!kept && { why: log.join(" ") || "not kept" }),
@@ -141,7 +144,6 @@ for (const to of LANGUAGES) {
       all[MODEL ? `${to} ${MODEL}` : to] = {
         date: new Date().toISOString().slice(0, 10),
         model: MODEL ?? modelFor(to).id,
-        cache: CACHE ? "on" : "off",
         right: count("right"),
         wrong: count("wrong"),
         unreviewed,

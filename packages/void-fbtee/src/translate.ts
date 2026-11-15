@@ -413,7 +413,7 @@ export async function translateEntry(
     guide?: string;
     /** Another model than the language's own (models.ts), for trying one (e2e/translator/). */
     model?: string;
-    /** AI Gateway's cache on (off unless asked): the translator test (ai.ts ask). */
+    /** AI Gateway's cache on: the translator test, per string from verdicts.json (ai.ts ask). */
     cache?: boolean;
   },
 ): Promise<{ lines: string[]; problems: string[]; attempts: number } | undefined> {

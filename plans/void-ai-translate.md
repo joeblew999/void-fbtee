@@ -28,10 +28,10 @@ left.
   person's verdict (test/translator/verdicts.json).
 - **What's cached:** only answers that passed, where the app keeps its text: the catalog (an
   accepted string is never sent again), a translated page with its recorded original, a stored
-  post's translation (event_texts). AI Gateway's cache is off everywhere (`vp dev`, the
-  runtime queue, the translator test): it can't tell a right answer from a wrong one, so it would
-  keep both and hand a wrong one back on every rerun. `TRANSLATOR_CACHE=1` turns it on in the test,
-  only for a cheap rerun when nothing changed.
+  post's translation (event_texts). AI Gateway's cache can't tell a right answer from a
+  wrong one, so it's off for `vp dev` and the runtime queue. In the translator test it's set per
+  string by the data, verdicts.json: on for a string with an answer judged right, off for the rest,
+  so a wrong or unjudged one is asked fresh every run.
 - **How the cache is controlled,** on the example's own Cloudflare account: `ai.run()`'s third
   argument is the Workers AI binding's (Void passes it on: runtime/ai.mjs `makeDirectBackend`).
   `gateway.id` sends a request through AI Gateway, `cacheTtl` turns its cache on, `skipCache` off
