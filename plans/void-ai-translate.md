@@ -26,11 +26,22 @@ Claude Code otherwise. There's no setting: it picks the engine itself.
   guide/ai.md also lists Gateway models (`google/gemini-2.5-flash`, `openai/gpt-4.1-mini`).
   Pick the one that passes the example's catalogs and pages (Arabic plurals, Thai) in a trial.
 
-## Open questions, before building
+## Proven already
 
-- Is "the app imports `void/ai`" the right signal? An app that doesn't use AI shouldn't need a
-  Cloudflare sign-in just to run `vp dev`.
-- Does the middleware's dev route need a check that only the dev server can call it? It must
-  not exist in a build.
-- Docs, the skill, the README and the home page then say: vp dev translates, with Void's AI or
-  Claude Code.
+Void's AI answers during `vp dev` in a Claude cloud session, with the keyring sign-in and no
+API key: e2e/dev/events.test.ts ("a new post is translated by Workers AI, live") passed on
+2026-11-15. It posts an event, and queues/translate.ts translates it with `ai.run` in the dev
+server's Worker.
+
+## Decided (2026-11-15)
+
+- **The signal is "the app uses `void/ai`".** That's what makes Void connect dev to
+  Cloudflare, so an app without AI never needs a Cloudflare sign-in just to run `vp dev`.
+- **The route exists only under `vp dev`.** The plugin adds it only when it serves, never in a
+  build, and it answers only requests that carry a token the plugin made at start.
+- **The model is picked by measurement**, as queues/translate.ts's was (2026-11-13). Start from
+  its model, Llama 3.3 70B. Run it on the example's catalogs and pages, with the Claude-written
+  translations as the reference. A model that breaks a placeholder, a plural form or a page's
+  kept parts fails, whatever its score.
+- **The docs follow in the same change:** the skill, the READMEs, the Translating page and the
+  home page then say "vp dev translates, with Void's AI or Claude Code".
