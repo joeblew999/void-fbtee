@@ -14,7 +14,11 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, inject, test } from "vite-plus/test";
-import { problemsWith } from "../../packages/void-fbtee/src/translate";
+import {
+  keptTerms,
+  translateEntry,
+  translatingRules,
+} from "../../packages/void-fbtee/src/translate";
 import { modelFor } from "../../packages/void-fbtee/src/models";
 import { chrF } from "../../packages/void-fbtee/test/translator/score";
 import { formsFor, STRINGS } from "../../packages/void-fbtee/test/translator/strings";
@@ -35,6 +39,7 @@ for (const to of LANGUAGES) {
   test.skipIf(!!skip)(
     `Void's AI translates the test strings into ${to} (${modelFor(to).id})`,
     async () => {
+      const guide = translatingRules(EXAMPLE);
       const token = readFileSync(
         join(EXAMPLE, "node_modules/.void-fbtee/dev-token"),
         "utf8",
@@ -43,28 +48,36 @@ for (const to of LANGUAGES) {
       const results: {
         name: string;
         ok: boolean;
+        attempts: number;
         problems: string[];
         got: string[];
         chrF?: number;
       }[] = [];
       for (const t of STRINGS) {
         const s = t.plural ? { ...t, lines: formsFor(to, t.lines[0]!.text) } : t;
-        const res = await fetch(`${site}/__void-fbtee/translate`, {
-          method: "POST",
-          headers: { "content-type": "application/json", "x-void-fbtee-token": token },
-          body: JSON.stringify({
-            kind: "strings",
-            from: "en-US",
-            to,
-            entries: [{ description: s.description, lines: s.lines }],
-          }),
+        // As vp dev sends it, asked again with what was wrong (translate.ts translateEntry), with
+        // the skills' rules; no catalog here, so no examples or glossary.
+        const call = async (body: unknown) => {
+          const res = await fetch(`${site}/__void-fbtee/translate`, {
+            method: "POST",
+            headers: { "content-type": "application/json", "x-void-fbtee-token": token },
+            body: JSON.stringify(body),
+          });
+          if (res.status === 503) return undefined;
+          return (await res.json().catch(() => ({}))) as Record<string, unknown>;
+        };
+        const answer = await translateEntry(call, {
+          from: "en-US",
+          to,
+          entry: {
+            description: s.description,
+            lines: s.lines,
+            keep: [...new Set(s.lines.flatMap((l) => keptTerms(l.text)))],
+          },
+          guide,
         });
-        const body = (await res.json().catch(() => ({}))) as { lines?: string[][]; error?: string };
-        const out = body.lines?.[0] ?? [];
-        const source = s.lines.map((l) => ({ translation: l.text, variations: l.variations }));
-        const problems = res.ok
-          ? problemsWith(source, out)
-          : [`answered ${res.status}: ${body.error}`];
+        const out = answer?.lines ?? [];
+        const problems = answer ? answer.problems : ["no answer: Void's AI isn't available"];
         const ref = t.ref?.[to];
         const score =
           ref && out.length === ref.length
@@ -73,6 +86,7 @@ for (const to of LANGUAGES) {
         results.push({
           name: s.name,
           ok: !problems.length,
+          attempts: answer?.attempts ?? 0,
           problems,
           got: out,
           ...(score !== undefined && { chrF: score }),

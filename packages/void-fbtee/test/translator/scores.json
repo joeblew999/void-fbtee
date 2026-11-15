@@ -2,8 +2,8 @@
   "ar-EG": {
     "date": "2026-11-15",
     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "passed": "9/10",
-    "chrF": 63,
+    "passed": "10/10",
+    "chrF": 65,
     "results": [
       {
         "name": "a label",
@@ -16,8 +16,8 @@
         "name": "a sentence",
         "ok": true,
         "problems": [],
-        "got": ["يعرض حدثك باللغة كلها بمجرد نشره"],
-        "chrF": 36
+        "got": ["يظهر حدثك في كل اللغة بعد النشر."],
+        "chrF": 25
       },
       {
         "name": "a placeholder",
@@ -30,50 +30,50 @@
         "name": "two placeholders",
         "ok": true,
         "problems": [],
-        "got": ["تم ترجمة {translated} من {total} سلاسل"],
-        "chrF": 70
+        "got": ["translated {translated} من {total} سطر مترجم"],
+        "chrF": 67
       },
       {
         "name": "a plural",
         "ok": true,
         "problems": [],
         "got": [
-          "form\": \"zero\", \"source\": \"لا مقاعد متاحة\"",
-          "form\": \"one\", \"source\": \"مقعد واحد متاح\"",
-          "form\": \"two\", \"source\": \"مقعدان متاحان\"",
-          "form\": \"few\", \"source\": \"{number} مقاعد متاحة\"",
-          "form\": \"many\", \"source\": \"{number} مقعد متاح\"",
-          "form\": \"other\", \"source\": \"{number} مقعد متاح\""
+          "{number} مقعد متاح",
+          "مقعد واحد متاح",
+          "مقعدان متاحان",
+          "{number} مقاعد متاحة",
+          "{number} مقعد متاح",
+          "{number} مقعد متاح"
         ],
-        "chrF": 37
+        "chrF": 51
       },
       {
         "name": "a command",
         "ok": true,
         "problems": [],
-        "got": ["شغّل vp dev لتشغيل التطبيق."],
-        "chrF": 68
+        "got": ["تشغيل vp dev لبدء التطبيق."],
+        "chrF": 85
       },
       {
         "name": "a file name",
-        "ok": false,
-        "problems": ["Line 1 is still the source text: translate it."],
-        "got": ["The app's AGENTS.md tells your coding agent what to do."],
-        "chrF": 14
+        "ok": true,
+        "problems": [],
+        "got": ["يشرح ملف AGENTS.md للطرفية ما يجب القيام به."],
+        "chrF": 32
       },
       {
         "name": "a product name",
         "ok": true,
         "problems": [],
-        "got": ["Void's AI أو Claude Code يترجمان ما هو جديد."],
-        "chrF": 82
+        "got": ["الذكاء الاصطناعي من Void أو Claude Code يترجم ما هو جديد."],
+        "chrF": 58
       },
       {
         "name": "a path",
         "ok": true,
         "problems": [],
-        "got": ["كل كتالوج للغة موجود في i18n/translations."],
-        "chrF": 83
+        "got": ["كتلوج كل لغة موجود في i18n/translations."],
+        "chrF": 87
       },
       {
         "name": "a question",
@@ -87,8 +87,8 @@
   "th-TH": {
     "date": "2026-11-15",
     "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
-    "passed": "8/10",
-    "chrF": 70,
+    "passed": "10/10",
+    "chrF": 80,
     "results": [
       {
         "name": "a label",
@@ -106,38 +106,38 @@
       },
       {
         "name": "a placeholder",
-        "ok": false,
-        "problems": ["Line 1 must keep the placeholder {name} exactly."],
-        "got": ["only"],
-        "chrF": 1
+        "ok": true,
+        "problems": [],
+        "got": ["สวัสดีค่ะ/ครับ {name} ตั๋วของคุณแนบมาด้วยแล้วค่ะ/ครับ"],
+        "chrF": 72
       },
       {
         "name": "two placeholders",
         "ok": true,
         "problems": [],
-        "got": ["แปล {translated} จาก {total} สตริง"],
-        "chrF": 63
+        "got": ["แปล {translated} จาก {total} สตริงแล้ว"],
+        "chrF": 66
       },
       {
         "name": "a plural",
-        "ok": false,
-        "problems": ["Line 1 must keep the placeholder {number} exactly."],
-        "got": ["other"],
-        "chrF": 4
+        "ok": true,
+        "problems": [],
+        "got": ["{number} ที่นั่งเหลือ"],
+        "chrF": 85
       },
       {
         "name": "a command",
         "ok": true,
         "problems": [],
-        "got": ["รัน vp dev เพื่อเริ่มแอป"],
-        "chrF": 100
+        "got": ["รัน `vp dev` เพื่อเริ่มต้นแอปพลิเคชัน"],
+        "chrF": 55
       },
       {
         "name": "a file name",
         "ok": true,
         "problems": [],
-        "got": ["ไฟล์ AGENTS.md ของแอปจะบอกเอเจนต์การเขียนโค้ดของคุณว่าจะทำอะไร"],
-        "chrF": 75
+        "got": ["AGENTS.md ของแอปจะบอกเอเจนต์โค้ดของคุณว่าจะทำอะไร"],
+        "chrF": 68
       },
       {
         "name": "a product name",
@@ -150,8 +150,8 @@
         "name": "a path",
         "ok": true,
         "problems": [],
-        "got": ["แคตตาล็อกของแต่ละภาษาอยู่ใน i18n/translations."],
-        "chrF": 94
+        "got": ["แคตตาล็อกของแต่ละภาษาอยู่ที่ i18n/translations."],
+        "chrF": 83
       },
       {
         "name": "a question",

@@ -185,14 +185,19 @@ export async function translateStrings(
     },
     model ? modelById(model) : modelFor(to),
   );
-  // A model without JSON Mode may give a line as an object ({ "translation": "…" }): its text.
+  // A model without JSON Mode may give a line as an object ({ "form": "other", "target": "…" }):
+  // its translation, not its first field (SEA-LION's Thai once read "other", 2026-11-15).
+  const lineOf = (o: Record<string, unknown>) => {
+    for (const k of ["translation", "target", "text", "line", "output"])
+      if (typeof o[k] === "string") return o[k];
+    const strings = Object.values(o).filter((v): v is string => typeof v === "string");
+    return strings.sort((a, b) => b.length - a.length)[0] ?? "";
+  };
   const text = (l: unknown): string =>
     typeof l === "string"
       ? l
       : l && typeof l === "object"
-        ? String(
-            Object.values(l as Record<string, unknown>).find((v) => typeof v === "string") ?? "",
-          )
+        ? lineOf(l as Record<string, unknown>)
         : "";
   return entries.map((_, i) => (out.entries?.find((e) => e.id === i)?.lines ?? []).map(text));
 }

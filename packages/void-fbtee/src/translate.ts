@@ -303,6 +303,10 @@ export function problemsWith(source: CatalogLine[], lines: string[]): string[] {
   lines.forEach((line, i) => {
     const src = source[i]!.translation;
     if (!line.trim()) problems.push(`Line ${i + 1} is empty.`);
+    // Pieces of the request's JSON in the line (Llama's Arabic plural once read
+    // `form": "zero", "target": "…"`, 2026-11-15).
+    if (/"\s*:\s*"|\b(?:form|source|target|lines|id)"\s*:/.test(line))
+      problems.push(`Line ${i + 1} has JSON in it: give only the translated sentence.`);
     else if (line.trim() === src.trim() && words(line) >= 3)
       problems.push(`Line ${i + 1} is still the source text: translate it.`);
     for (const t of keptTerms(src))
@@ -455,6 +459,58 @@ export function glossaryFor(
     .map((e) => ({ source: e.source!, translation: e.translations![0]!.translation }));
 }
 
+/** One request to the dev server's translate route (ai.ts devTranslate); undefined: no Void's AI. */
+export type TranslateCall = (body: unknown) => Promise<Record<string, unknown> | undefined>;
+
+/**
+ * One string through Void's AI, as `vp dev` translates it: sent, checked (problemsWith), and asked
+ * again with what was wrong, up to twice. Every check's problem must be gone; a glossary word not
+ * used is asked about too, and accepted on the last answer. The test strings go through the same
+ * (e2e/translator/). Undefined when Void's AI isn't there.
+ */
+export async function translateEntry(
+  call: TranslateCall,
+  o: {
+    from: string;
+    to: string;
+    entry: {
+      description: string;
+      lines: { text: string; variations: Record<string, number> }[];
+      keep?: string[];
+      context?: string;
+    };
+    examples?: unknown[];
+    glossary?: { source: string; translation: string }[];
+    guide?: string;
+  },
+): Promise<{ lines: string[]; problems: string[]; attempts: number } | undefined> {
+  const source = o.entry.lines.map((l) => ({ translation: l.text, variations: l.variations }));
+  const glossary = o.glossary ?? [];
+  let feedback: string[] = [];
+  let out: string[] = [];
+  let attempts = 0;
+  for (; attempts < 3;) {
+    const answer = await call({
+      kind: "strings",
+      from: o.from,
+      to: o.to,
+      entries: [o.entry],
+      examples: o.examples ?? [],
+      glossary,
+      guide: o.guide,
+      feedback: feedback.length ? { answer: out, problems: feedback } : undefined,
+    });
+    attempts++;
+    if (!answer) return;
+    out = ((answer.lines ?? []) as string[][])[0] ?? [];
+    const hard = problemsWith(source, out);
+    const soft = glossaryMisses(glossary, out);
+    feedback = [...hard, ...soft];
+    if (!hard.length && (!soft.length || attempts === 3)) break;
+  }
+  return { lines: out, problems: problemsWith(source, out), attempts };
+}
+
 /**
  * Translate what's new with Void's AI, through the dev server's own route (ai.ts devTranslate,
  * in the app's Worker): each catalog's new entries, and each markdown page missing or out of
@@ -519,28 +575,16 @@ export async function translateWithVoidAi(
         context: sourceContext(p, hashOf.get(e)!),
       }));
       const glossary = glossaryFor(finished, toSend, Object.keys(p.common ?? {}));
-      // Asked again with what was wrong, up to twice: every check's problem must be gone; a
-      // glossary word not used is asked about, and accepted on the last answer.
-      let feedback: string[] = [];
-      let out: string[] = [];
-      for (let attempt = 0; attempt < 3; attempt++) {
-        const answer = await call({
-          kind: "strings",
-          from,
-          to: m.locale,
-          entries: toSend,
-          examples: examplesFor(finished, toSend),
-          glossary,
-          guide,
-          feedback: feedback.length ? { answer: out, problems: feedback } : undefined,
-        });
-        if (!answer) return false;
-        out = ((answer.lines ?? []) as string[][])[0] ?? [];
-        const hard = problemsWith(batch[0]!.translations!, out);
-        const soft = glossaryMisses(glossary, out);
-        feedback = [...hard, ...soft];
-        if (!hard.length && (!soft.length || attempt === 2)) break;
-      }
+      const answer = await translateEntry(call, {
+        from,
+        to: m.locale,
+        entry: toSend[0]!,
+        examples: examplesFor(finished, toSend),
+        glossary,
+        guide,
+      });
+      if (!answer) return false;
+      const out = answer.lines;
       const entry = batch[0]!;
       if (!problemsWith(entry.translations!, out).length) {
         entry.translations = entry.translations!.map((l, k) => ({ ...l, translation: out[k]! }));
