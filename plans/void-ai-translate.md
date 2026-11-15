@@ -69,3 +69,7 @@ server's Worker.
   try the models Cloudflare recommends for Arabic and for frontier quality (models.ts), on the
   test strings.
 - The test strings' references are Claude Code's, not reviewed by a native speaker.
+- The translator test runs through the example's dev server (e2e/translator/). Move it into the
+  package with an app of its own (packages/void-fbtee/test/translator/app/: voidFbtee() and one
+  file importing void/ai), started and stopped by the test (its whole process group), run as
+  `vp run void-fbtee#test:translator`. Later, the user's call (2026-11-15).

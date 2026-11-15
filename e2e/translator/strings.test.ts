@@ -4,7 +4,8 @@
 // (models.ts). Each answer must pass the checks `vp dev` applies before it writes one
 // (translate.ts problemsWith): one line per form, nothing left in English, placeholders,
 // commands, file names and paths kept. `vp run test:translator` (the dev server's setup: yours if
-// it's running, else it starts one); TRANSLATOR_LANGUAGES picks the languages (default below).
+// it's running, else it starts one); TRANSLATOR_LANGUAGES picks the languages (default below);
+// TRANSLATOR_MODEL tries another model than each language's own, scored as "<language> <model>".
 //
 // Where a string has a reference translation for the language (strings.ts `ref`), the answer is
 // scored against it (chrF, score.ts); without one, the checks catch what breaks an app, but not
@@ -30,6 +31,7 @@ const SCORES = join(import.meta.dirname, "../../packages/void-fbtee/test/transla
 type Scores = Record<string, unknown>;
 const readScores = (): Scores =>
   existsSync(SCORES) ? (JSON.parse(readFileSync(SCORES, "utf8")) as Scores) : {};
+const MODEL = process.env.TRANSLATOR_MODEL;
 const LANGUAGES = (
   process.env.TRANSLATOR_LANGUAGES ??
   "th-TH,ar-EG,vi-VN,id-ID,ja-JP,zh-CN,ko-KR,hi-IN,de-DE,fr-FR,es-ES,ru-RU"
@@ -37,7 +39,7 @@ const LANGUAGES = (
 
 for (const to of LANGUAGES) {
   test.skipIf(!!skip)(
-    `Void's AI translates the test strings into ${to} (${modelFor(to).id})`,
+    `Void's AI translates the test strings into ${to} (${MODEL ?? modelFor(to).id})`,
     async () => {
       const guide = translatingRules(EXAMPLE);
       const token = readFileSync(
@@ -75,6 +77,7 @@ for (const to of LANGUAGES) {
             keep: [...new Set(s.lines.flatMap((l) => keptTerms(l.text)))],
           },
           guide,
+          model: MODEL,
         });
         const out = answer?.lines ?? [];
         const problems = answer ? answer.problems : ["no answer: Void's AI isn't available"];
@@ -99,9 +102,9 @@ for (const to of LANGUAGES) {
       }
       const scored = results.filter((r) => r.chrF !== undefined);
       const scores = readScores();
-      scores[to] = {
+      scores[MODEL ? `${to} ${MODEL}` : to] = {
         date: new Date().toISOString().slice(0, 10),
-        model: modelFor(to).id,
+        model: MODEL ?? modelFor(to).id,
         passed: `${results.filter((r) => r.ok).length}/${results.length}`,
         ...(scored.length && {
           chrF: Math.round(scored.reduce((a, r) => a + r.chrF!, 0) / scored.length),

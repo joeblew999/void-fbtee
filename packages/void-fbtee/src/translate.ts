@@ -482,6 +482,8 @@ export async function translateEntry(
     examples?: unknown[];
     glossary?: { source: string; translation: string }[];
     guide?: string;
+    /** Another model than the language's own (models.ts), for trying one (e2e/translator/). */
+    model?: string;
   },
 ): Promise<{ lines: string[]; problems: string[]; attempts: number } | undefined> {
   const source = o.entry.lines.map((l) => ({ translation: l.text, variations: l.variations }));
@@ -498,6 +500,7 @@ export async function translateEntry(
       examples: o.examples ?? [],
       glossary,
       guide: o.guide,
+      model: o.model,
       feedback: feedback.length ? { answer: out, problems: feedback } : undefined,
     });
     attempts++;
