@@ -105,8 +105,15 @@ dialect in six strings). So it stays; any change to it is measured the same way
    judge expects those lines; the test's references get them. Arabic "{name} checked her ticket"
    came back masculine from two models, the one structural gap the runs showed.
 2. Thai's and Arabic's picks again, with the skill (Thai's Inkling pick was made without it).
-3. The other ten languages: translated (2026-11-15 run below), 230 answers to judge into
-   verdicts.json.
+3. Done 2026-11-15: all 12 languages translated with Gemma 4 and every answer judged into
+   verdicts.json: 253 of 276 right. The 23 wrong, mostly: a seat count's one-seat line given
+   the plural (German, Spanish, French, Hindi, Russian), Russian's male lines written
+   "забронировал(а)", a word capitalised mid-sentence (Spanish, French, Indonesian, Vietnamese),
+   "their" given as someone else's or as "his"/"her" (German, Vietnamese, Chinese), words added
+   ("successfully", "with this email", 同じ). Next: the skill's rules for those, then a run.
+   AI Gateway's cache is now keyed by the request and the string's round (ai.ts ask,
+   `cacheKey`): every answer is stored the first time it's asked, so a judged answer comes back
+   the same until the skill, the examples or the model change.
 4. Done 2026-11-15: everything at once. Each string is made new in memory (no catalog file
    written per string), every string in every language is sent at once (translate.ts
    translateCatalog), under Workers AI's 300 a minute (routeCall), and each test waits for its own

@@ -94,6 +94,10 @@ export function problemsWith(source: SourceLine[], lines: string[], to?: string)
   lines.forEach((line, i) => {
     const src = source[i]!.translation;
     if (!line.trim()) problems.push(`Line ${i + 1} is empty.`);
+    // Another string's answer run into this one (Gemma's Chinese "Strings" came back
+    // "字符串\n目录", "Strings" and "Catalog", 2026-11-15).
+    if (line.trim().includes("\n") && !src.includes("\n"))
+      problems.push(`Line ${i + 1} is more than one line: give only its own translation.`);
     // Pieces of the request's JSON in the line (Llama's Arabic plural once read
     // `form": "zero", "target": "…"`, 2026-11-15).
     if (/"\s*:\s*"|\b(?:form|source|target|lines|id)"\s*:/.test(line))

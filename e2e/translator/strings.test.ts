@@ -25,8 +25,9 @@
 // TRANSLATOR_LANGUAGES picks languages (th-TH,ar-EG). TRANSLATOR_MODELS picks models for a pick run,
 // which then only reports (models.json is written only when every model ran). TRANSLATOR_RULES=0
 // sends no translating skill, to measure it (scored as "<language> <model> no-rules").
-// AI Gateway's cache is on for a string with an
-// answer judged right, off for the rest (ai.ts ask).
+// AI Gateway's cache is on, keyed by the request and the string's round: how many of its answers
+// were judged wrong (ai.ts ask). An answer is stored the first time it's asked, so a judged one
+// comes back the same next run; a string judged wrong is asked fresh.
 import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, inject, test } from "vite-plus/test";
@@ -68,7 +69,7 @@ const VERDICTS = JSON.parse(readFileSync(join(DATA, "verdicts.json"), "utf8")) a
 interface Result {
   text: string;
   hash: string;
-  cache: boolean;
+  cache: string;
   verdict: "right" | "wrong" | "unreviewed";
   why?: string;
   meaning?: number;
@@ -130,8 +131,8 @@ async function translateOne(
     "prepare gives the string the same lines as its reference",
   ).toEqual([...byKey.keys()].sort());
   const ref = lines.map((l) => byKey.get(key(l.variations))!);
-  // Cached only once an answer to it was judged right (verdicts.json).
-  const cache = VERDICTS[to]?.[hash]?.some((v) => v.right) ?? false;
+  // The string's round: a new one each time an answer to it is judged wrong (verdicts.json).
+  const cache = `round ${VERDICTS[to]?.[hash]?.filter((v) => !v.right).length ?? 0}`;
   const log: string[] = [];
   const say = (l: string) => log.push(l);
   const ran = await translateCatalog(p, routeCall(url, token(), say), to, catalog, say, {

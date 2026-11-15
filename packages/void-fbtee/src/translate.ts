@@ -415,8 +415,8 @@ export async function translateEntry(
     /** The translator test turns the rules off to measure them; fbtee's own rules (fbteeRules). */
     rules?: boolean;
     fbtee?: string;
-    /** AI Gateway's cache on: the translator test, per string from verdicts.json (ai.ts ask). */
-    cache?: boolean;
+    /** AI Gateway's cache on, with this round in its key: the translator test (ai.ts ask). */
+    cache?: string;
   },
 ): Promise<{ lines: string[]; problems: string[]; attempts: number } | undefined> {
   const source = o.entry.lines.map((l) => ({ translation: l.text, variations: l.variations }));
@@ -503,7 +503,7 @@ export function routeCall(url: string, token: string, log: (line: string) => voi
 
 /** The translator test's: Workers AI's cache, another model, one language, the rules off. */
 export interface CatalogRun {
-  cache?: boolean;
+  cache?: string;
   model?: string;
   locale?: string;
   rules?: boolean;

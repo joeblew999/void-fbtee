@@ -39,40 +39,61 @@ async function ask<T>(
   user: string,
   schema: object,
   model: TranslationModel = LLAMA,
-  cache = false,
+  cache?: string,
 ): Promise<T> {
+  const input = {
+    messages: [
+      {
+        role: "system",
+        content: model.jsonMode
+          ? system
+          : `${system}\n\nReply with one JSON object and nothing else, no code fence, matching this JSON Schema: ${JSON.stringify(schema)}`,
+      },
+      { role: "user", content: user },
+    ],
+    ...(model.jsonMode ? { response_format: { type: "json_schema", json_schema: schema } } : {}),
+    // Workers AI's default is 256 tokens, which cuts a page or a batch of strings off mid-JSON.
+    max_tokens: 8192,
+    // A translation, not a story: the model's most likely answer, and the same one for the same
+    // request. Workers AI's default is 0.6 for some models and 0.15 for others (each model's
+    // page, "temperature", 0 to 5, checked 2026-11-15); `seed` is its own reproducibility knob.
+    temperature: 0,
+    seed: 1,
+    // Its thinking off or at its lowest (models.json): a translation needs none.
+    ...model.options,
+  };
+  // The gateway's cache key: the request itself (its model and everything sent), and the
+  // translator test's round for the string (`cache`), so one round's answer comes back every run
+  // and a new round is asked fresh.
+  const key = cache
+    ? `void-fbtee ${cache} ${[
+        ...new Uint8Array(
+          await crypto.subtle.digest(
+            "SHA-256",
+            new TextEncoder().encode(JSON.stringify([model.id, input])),
+          ),
+        ),
+      ]
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("")}`
+    : undefined;
   const result = await ai.run(
     model.id as never,
-    {
-      messages: [
-        {
-          role: "system",
-          content: model.jsonMode
-            ? system
-            : `${system}\n\nReply with one JSON object and nothing else, no code fence, matching this JSON Schema: ${JSON.stringify(schema)}`,
-        },
-        { role: "user", content: user },
-      ],
-      ...(model.jsonMode ? { response_format: { type: "json_schema", json_schema: schema } } : {}),
-      // Workers AI's default is 256 tokens, which cuts a page or a batch of strings off mid-JSON.
-      max_tokens: 8192,
-      // A translation, not a story: the model's most likely answer, and the same one for the same
-      // request. Workers AI's default is 0.6 for some models and 0.15 for others (each model's
-      // page, "temperature", 0 to 5, checked 2026-11-15); `seed` is its own reproducibility knob.
-      temperature: 0,
-      seed: 1,
-      // Its thinking off or at its lowest (models.json): a translation needs none.
-      ...model.options,
-    } as never,
+    input as never,
     // Through the account's AI Gateway ("default", Cloudflare's own, made on a first request), so
     // every request is in the gateway's logs. Its cache is off for vp dev: a string is asked for
-    // once, and its accepted answer is kept in the catalog. The translator test turns it on for a
-    // string whose answer was judged right (`cache`, from verdicts.json), so a wrong or unjudged
-    // one is asked fresh every run. The binding's third argument, which Void passes on (AI Gateway
-    // docs, "Workers Bindings"; Void's runtime/ai.mjs makeDirectBackend); proven both ways by
-    // e2e/translator/cache.test.ts and the gateway's logs (2026-11-15).
+    // once, and its accepted answer is kept in the catalog. The translator test keeps it on, keyed
+    // by the request and the string's round (`cacheKey`, Cloudflare's GatewayOptions): an answer
+    // is stored the first time it's asked, so once judged right it comes back the same; a string
+    // judged wrong gets a new round, and so a fresh answer. The binding's third argument, which
+    // Void passes on (AI Gateway docs, "Workers Bindings"; Void's runtime/ai.mjs
+    // makeDirectBackend); proven both ways by e2e/translator/cache.test.ts and the gateway's logs
+    // (2026-11-15).
     {
-      gateway: { id: "default", ...(cache ? { cacheTtl: 7 * 86400 } : { skipCache: true }) },
+      gateway: {
+        id: "default",
+        ...(key ? { cacheKey: key, cacheTtl: 30 * 86400 } : { skipCache: true }),
+      },
       // One replica per model, so the system prompt, the same for every string, is prefix-cached
       // across requests (Workers AI's "Prompt caching" page: x-session-affinity, through the
       // binding's extraHeaders, checked 2026-11-15).
@@ -221,8 +242,8 @@ export async function translateStrings(
     /** The last answer and what was wrong with it, when it's asked again. */
     feedback?: { answer: string[]; problems: string[] };
     model?: string;
-    /** AI Gateway's cache on (the translator test). */
-    cache?: boolean;
+    /** AI Gateway's cache on, with this round in its key (the translator test; ask). */
+    cache?: string;
   },
 ): Promise<string[][]> {
   const items = entries.map((e, i) => ({
@@ -327,7 +348,7 @@ export type DevRequest =
       examples?: Example[];
       glossary?: { source: string; translation: string }[];
       feedback?: { answer: string[]; problems: string[] };
-      cache?: boolean;
+      cache?: string;
       /** fbtee's own rules, from the app's installed fbtee (translate.ts fbteeRules). */
       fbtee?: string;
       /** The translator test only (e2e/translator/): another model to try; the rules off. */
