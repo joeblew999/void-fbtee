@@ -82,6 +82,15 @@ function sidebar(lang: Lang) {
           href: routeUrl("/[lang]/docs/translating"),
         },
         {
+          slug: "components",
+          title: (
+            <fbt desc="Docs page title: the page about void-fbtee's React components and hooks">
+              Components
+            </fbt>
+          ),
+          href: routeUrl("/[lang]/docs/components"),
+        },
+        {
           slug: "emails",
           title: (
             <fbt desc="Docs page title: the page about the app's translated emails">Emails</fbt>

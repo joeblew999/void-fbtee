@@ -33,8 +33,12 @@ for (const engine of ["chromium", "webkit"] as const) {
           for (const l of LOCALES) {
             const a = p.locator(item(l));
             expect(await a.getAttribute("href"), l).toBe(`/${l}${path}`);
-            expect(await a.getAttribute("lang"), l).toBe(l);
-            expect(await a.getAttribute("dir"), l).toBe(l === "ar-EG" ? "rtl" : "ltr");
+            // Each name in its own language and direction; the row itself follows the page's,
+            // so Arabic's name sits where every other language's does.
+            const name = a.locator('[data-part="name"]');
+            expect(await name.getAttribute("lang"), l).toBe(l);
+            expect(await name.getAttribute("dir"), l).toBe(l === "ar-EG" ? "rtl" : "ltr");
+            expect(await a.getAttribute("dir"), l).toBeNull();
           }
           expect(await p.locator(item(page)).getAttribute("aria-current")).toBe("true");
           // A Thai browser: Thai first, marked as theirs, where the page is hydrated; the plain

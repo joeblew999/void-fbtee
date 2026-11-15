@@ -333,13 +333,15 @@ export function LanguagePicker({
         {...part("item")}
         href={`/${e.segment}${path}`}
         hrefLang={e.locale}
-        lang={e.locale}
-        dir={e.dir}
         aria-current={e.locale === page ? "true" : undefined}
         data-current={e.locale === page ? "" : undefined}
         data-yours={own.includes(e.locale) ? "" : undefined}
       >
-        <Formatted {...part("name")}>{e.name}</Formatted>
+        {/* Its own language and direction on the name only: the row follows the page's, so an
+            Arabic row is laid out as every other row is. */}
+        <Formatted {...part("name")} lang={e.locale} dir={e.dir}>
+          {e.name}
+        </Formatted>
         {e.pageName !== e.name && (
           <Formatted {...part("page-name")} lang={page}>
             {e.pageName}

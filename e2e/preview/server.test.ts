@@ -23,6 +23,7 @@ const PAGES = [
   "/docs/markdown",
   "/docs/right-to-left",
   "/docs/translating",
+  "/docs/components",
   "/docs/emails",
   "/docs/pdfs",
   "/docs/tour",

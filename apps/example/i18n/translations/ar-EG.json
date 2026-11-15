@@ -4261,6 +4261,222 @@
         }
       ],
       "types": []
+    },
+    "lOX+vW31NF1aiAgkzf7bJQ==": {
+      "description": "Docs page title: the page about void-fbtee's React components and hooks",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المكونات",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "W7AWZSrFRNq+uOcTbJTdZA==": {
+      "description": "Components page section title: the React components",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المكونات",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PYzARl3RwBWydFdjTeOeqQ==": {
+      "description": "Components page section title: the language picker, styled two ways",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "منتقي اللغة، بشكلين",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vQ6KX/ePBpVy8HY9HFoHWA==": {
+      "description": "Components page section title: the React hooks",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الخطافات (Hooks)",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "V6GubWL2aJQK5q1PpyHE2Q==": {
+      "description": "Components page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "كل ما يقدمه void-fbtee لصفحات التطبيق، من void-fbtee/react: مكوناته وخطافاته، والغرض من كل منها، وكل منها وهو يعمل، والسطر الذي يستخدمه.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hFhXolQSiGFM6pGXfcp8EQ==": {
+      "description": "Components page: I18nProvider goes once in the root layout and makes every page's strings work",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يوضع مرة واحدة حول التطبيق، في التخطيط الجذري، لتكون نصوص كل صفحة بلغتها منذ العرض الأول.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RvkuITj0lNvKl2/Ms/xraA==": {
+      "description": "Components page: Link keeps the page's language in the address it links to",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "رابط Void، مع لغة الصفحة في العنوان الذي يذهب إليه.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8UR9f3QwkT3C4WObfh/2Bw==": {
+      "description": "Components page: Formatted holds text the server formatted, so the browser keeps it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "نص يُنسَّق أثناء العرض، مثل التاريخ، يبقى كما كتبه الخادم، لأن كل متصفح ينسّق بشكل مختلف قليلًا.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SnB18Zhpb+7066DFudP1og==": {
+      "description": "Components page: InLanguage shows part of a page in another language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "جزء من الصفحة بلغة أخرى، بسمة lang واتجاه خاصين به، وبصيغة تناسب جنس القارئ حيث تحتاج اللغة ذلك.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7oLWCb7iWYp7m4LHDk3dLw==": {
+      "description": "Components page: the language picker is one control for any number of languages, with no look of its own",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "عنصر تحكم واحد لاختيار لغة أخرى، مهما كان عدد لغات التطبيق: لغة القارئ أولًا، ثم كل اللغات، مع مربع بحث. ليس له شكل خاص به: التطبيق يمنحه شكله.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "g+//TZljTm9Wnro1JapvJw==": {
+      "description": "Components page: the same picker, styled two ways, to show its look is the app's",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المكون نفسه مرتين، بأسماء أصناف مختلفة: شكل الترويسة، وصف من الأزرار المستديرة. الترتيب والأسماء والروابط والبحث من الحزمة؛ أما الشكل فمن التطبيق.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3VJcFjVUPSXajPC5MR4m/w==": {
+      "description": "Components page: useLocale gives the page's language, direction and address",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لغة الصفحة واتجاهها والعنوان الذي يلي اللغة.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UM5NMaHty7YzYBBdkj8FaQ==": {
+      "description": "Components page: useLocales gives every language the app has, from its settings",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "كل لغة لدى التطبيق، من إعداداته: لا قائمة خاصة بها أبدًا.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wkfN0LcW4VDHAskNcNnK3w==": {
+      "description": "Components page: useHydrated is false on the server and while hydrating, then true",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "خطأ على الخادم وأثناء بدء الصفحة، ثم صحيح: لما يعرفه المتصفح وحده، ليطابق العرض الأول عرض الخادم.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "t3YP7NofNOC98rdulUeQ2g==": {
+      "description": "Components page: useNow gives the current moment, the server's at first, then the browser's clock",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الآن: لحظة الخادم أولًا، ليعرض الاثنان الشيء نفسه، ثم ساعة المتصفح.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0f0XPtcyZdzVqSt5xH6qvw==": {
+      "description": "Components page: useTimeZone gives the reader's own time zone, once the browser knows it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المنطقة الزمنية للقارئ نفسه، حين يعرفها المتصفح؛ لا شيء على الخادم.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tr1Hd5cZV0bL+5EmRadBAA==": {
+      "description": "Components page: useForm is Void's form with the page's language in its address",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "نموذج Void، يرسل إلى العنوان بلغة الصفحة، فتكون إجابته وأخطاؤه بها أيضًا.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OI+j+2UTcOhXRflX/tc3jA==": {
+      "description": "Components page: langAttrs marks text in another language with its lang and direction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "lang وdir لنص بلغة غير لغة الصفحة، مثل ما ينشره الناس.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

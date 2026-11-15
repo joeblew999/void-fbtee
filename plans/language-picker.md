@@ -74,8 +74,9 @@ example's lives in the example.
    - a search box that filters as you type, on either name or the code (`th`, `ar-EG`), ignoring
      case and accents.
 4. **Each entry** is a link to this page at that language's address (`/<segment><path>`, as the
-   header's links are now), with `lang`, `dir`, `hreflang` and, for the current one,
-   `aria-current`.
+   header's links are now), with `hreflang` and, for the current one, `aria-current`; its name
+   carries the language's own `lang` and `dir`. Not the whole link: there, Arabic's `rtl` turned
+   its row round, its two names the other way from every other row (seen in Chromium, 2026-11-15).
 
 **It works without JavaScript.** The control is a `<details>` and `<summary>`: the browser opens and
 closes it, keyboard included, with no script. Inside is the plain list of links, sorted, so it

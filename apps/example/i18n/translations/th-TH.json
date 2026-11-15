@@ -3933,6 +3933,222 @@
         }
       ],
       "types": []
+    },
+    "lOX+vW31NF1aiAgkzf7bJQ==": {
+      "description": "Docs page title: the page about void-fbtee's React components and hooks",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "คอมโพเนนต์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "W7AWZSrFRNq+uOcTbJTdZA==": {
+      "description": "Components page section title: the React components",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "คอมโพเนนต์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PYzARl3RwBWydFdjTeOeqQ==": {
+      "description": "Components page section title: the language picker, styled two ways",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ตัวเลือกภาษา สองแบบ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vQ6KX/ePBpVy8HY9HFoHWA==": {
+      "description": "Components page section title: the React hooks",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ฮุก",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "V6GubWL2aJQK5q1PpyHE2Q==": {
+      "description": "Components page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ทุกอย่างที่ void-fbtee ให้กับหน้าเว็บของแอป จาก void-fbtee/react: คอมโพเนนต์และฮุก แต่ละตัวมีไว้ทำอะไร ตัวอย่างการทำงาน และบรรทัดที่ใช้งาน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hFhXolQSiGFM6pGXfcp8EQ==": {
+      "description": "Components page: I18nProvider goes once in the root layout and makes every page's strings work",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ใส่ครั้งเดียวครอบทั้งแอป ในเลย์เอาต์หลัก เพื่อให้ข้อความของทุกหน้าเป็นภาษาของหน้านั้นตั้งแต่การแสดงผลครั้งแรก",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RvkuITj0lNvKl2/Ms/xraA==": {
+      "description": "Components page: Link keeps the page's language in the address it links to",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ลิงก์ของ Void ที่มีภาษาของหน้าอยู่ในที่อยู่ที่ลิงก์ไป",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8UR9f3QwkT3C4WObfh/2Bw==": {
+      "description": "Components page: Formatted holds text the server formatted, so the browser keeps it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ข้อความที่จัดรูปแบบระหว่างแสดงผล เช่น วันที่ คงไว้ตามที่เซิร์ฟเวอร์เขียน เพราะแต่ละเบราว์เซอร์จัดรูปแบบต่างกันเล็กน้อย",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SnB18Zhpb+7066DFudP1og==": {
+      "description": "Components page: InLanguage shows part of a page in another language",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ส่วนหนึ่งของหน้าในอีกภาษา พร้อม lang และทิศทางของตัวเอง และใช้ถ้อยคำตามเพศของผู้อ่านเมื่อภาษานั้นต้องการ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7oLWCb7iWYp7m4LHDk3dLw==": {
+      "description": "Components page: the language picker is one control for any number of languages, with no look of its own",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ตัวควบคุมเดียวสำหรับเลือกภาษาอื่น ไม่ว่าแอปจะมีกี่ภาษา: ภาษาของผู้อ่านก่อน แล้วทุกภาษา พร้อมช่องค้นหา ไม่มีหน้าตาของตัวเอง แอปเป็นผู้กำหนด",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "g+//TZljTm9Wnro1JapvJw==": {
+      "description": "Components page: the same picker, styled two ways, to show its look is the app's",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "คอมโพเนนต์เดียวกันสองครั้ง ด้วยชื่อคลาสต่างกัน: แบบของส่วนหัว และแบบปุ่มเม็ดยาเรียงแถว ลำดับ ชื่อ ลิงก์ และการค้นหาเป็นของแพ็กเกจ ส่วนหน้าตาเป็นของแอป",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3VJcFjVUPSXajPC5MR4m/w==": {
+      "description": "Components page: useLocale gives the page's language, direction and address",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ภาษาของหน้า ทิศทาง และที่อยู่หลังภาษา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UM5NMaHty7YzYBBdkj8FaQ==": {
+      "description": "Components page: useLocales gives every language the app has, from its settings",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ทุกภาษาที่แอปมี จากการตั้งค่าของแอป ไม่ใช่รายการแยกของตัวเอง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wkfN0LcW4VDHAskNcNnK3w==": {
+      "description": "Components page: useHydrated is false on the server and while hydrating, then true",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เป็นเท็จบนเซิร์ฟเวอร์และระหว่างที่หน้าเริ่มทำงาน แล้วเป็นจริง: สำหรับสิ่งที่เบราว์เซอร์เท่านั้นรู้ เพื่อให้การแสดงผลครั้งแรกตรงกับของเซิร์ฟเวอร์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "t3YP7NofNOC98rdulUeQ2g==": {
+      "description": "Components page: useNow gives the current moment, the server's at first, then the browser's clock",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ตอนนี้: เวลาของเซิร์ฟเวอร์ก่อน เพื่อให้ทั้งสองแสดงผลเหมือนกัน แล้วเป็นนาฬิกาของเบราว์เซอร์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0f0XPtcyZdzVqSt5xH6qvw==": {
+      "description": "Components page: useTimeZone gives the reader's own time zone, once the browser knows it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เขตเวลาของผู้อ่านเอง เมื่อเบราว์เซอร์รู้แล้ว บนเซิร์ฟเวอร์ไม่มี",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tr1Hd5cZV0bL+5EmRadBAA==": {
+      "description": "Components page: useForm is Void's form with the page's language in its address",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ฟอร์มของ Void ที่ส่งไปยังที่อยู่ในภาษาของหน้า เพื่อให้คำตอบและข้อผิดพลาดเป็นภาษานั้นด้วย",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OI+j+2UTcOhXRflX/tc3jA==": {
+      "description": "Components page: langAttrs marks text in another language with its lang and direction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "lang และ dir สำหรับข้อความในภาษาอื่นที่ไม่ใช่ภาษาของหน้า เช่น สิ่งที่ผู้คนโพสต์",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }
