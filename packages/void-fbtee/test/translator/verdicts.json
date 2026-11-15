@@ -489,6 +489,13 @@
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
+    ],
+    "Oeto9jViL+xxuaYfiMdwwg==": [
+      {
+        "answer": "{name} จองที่นั่งแล้ว\n{name} จองที่นั่งแล้ว\n{name} จองที่นั่งแล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
     ]
   },
   "ar-EG": {
@@ -946,6 +953,13 @@
       },
       {
         "answer": "حجز {name}، ووصلت التذكرة لـ {name} عبر البريد الإلكتروني.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "Oeto9jViL+xxuaYfiMdwwg==": [
+      {
+        "answer": "حجز {name} مقعدًا.\nحجزت {name} مقعدًا.\nحجز {name} مقعدًا.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }

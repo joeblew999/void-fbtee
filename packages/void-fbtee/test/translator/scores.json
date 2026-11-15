@@ -512,16 +512,11 @@
   "ar-EG @cf/google/gemma-4-26b-a4b-it": {
     "date": "2026-11-15",
     "model": "@cf/google/gemma-4-26b-a4b-it",
-    "right": 17,
-    "wrong": 0,
-    "unreviewed": [
-      "{translated} of {total} strings translated",
-      "{number} seats left",
-      "Void's AI or Claude Code translates what's new.",
-      "Each language's catalog is in i18n/translations."
-    ],
+    "right": 18,
+    "wrong": 1,
+    "unreviewed": ["1 seat left", "{name} booked a seat."],
     "meaning": 84,
-    "chrF": 86,
+    "chrF": 85,
     "results": [
       {
         "text": "Save",
@@ -557,7 +552,7 @@
         "text": "{translated} of {total} strings translated",
         "hash": "0/yUVSiGyC2JT0/i90uO0A==",
         "cache": true,
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 89,
         "chrF": 60,
         "reference": ["تُرجم {translated} من {total} نصًا"],
@@ -567,7 +562,8 @@
         "text": "{number} seats left",
         "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
         "cache": true,
-        "verdict": "unreviewed",
+        "verdict": "wrong",
+        "why": "The two form uses the accusative مقعدين where the subject needs مقعدان (and Arabic says two without the number).",
         "meaning": 80,
         "chrF": 75,
         "reference": [
@@ -589,11 +585,11 @@
         "text": "1 seat left",
         "hash": "YPVBS6NNHhGVrCKVfko+lw==",
         "cache": true,
-        "verdict": "right",
-        "meaning": 85,
+        "verdict": "unreviewed",
+        "meaning": 91,
         "chrF": 59,
         "reference": ["تبقّى مقعد واحد"],
-        "got": ["مقعد واحد متبقٍ"]
+        "got": ["متبقي مقعد واحد"]
       },
       {
         "text": "Run vp dev to start the app.",
@@ -619,7 +615,7 @@
         "text": "Void's AI or Claude Code translates what's new.",
         "hash": "XheCGRJ31SRnsGZhKLgJRA==",
         "cache": true,
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 94,
         "chrF": 87,
         "reference": ["يترجم Void's AI أو Claude Code ما هو جديد."],
@@ -629,7 +625,7 @@
         "text": "Each language's catalog is in i18n/translations.",
         "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
         "cache": true,
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 87,
         "chrF": 67,
         "reference": ["فهرس كل لغة موجود في i18n/translations."],
@@ -698,12 +694,12 @@
       {
         "text": "{name} booked a seat.",
         "hash": "Oeto9jViL+xxuaYfiMdwwg==",
-        "cache": true,
-        "verdict": "right",
-        "meaning": 93,
-        "chrF": 100,
-        "reference": ["حجز {name} مقعدًا."],
-        "got": ["حجز {name} مقعدًا."]
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 79,
+        "reference": ["حجز {name} مقعدًا.", "حجزت {name} مقعدًا.", "تم حجز مقعد باسم {name}."],
+        "got": ["حجز {name} مقعدًا.", "حجزت {name} مقعدًا.", "حجز {name} مقعدًا."]
       },
       {
         "text": "{name} checked her ticket.",
@@ -3414,15 +3410,10 @@
   "th-TH @cf/google/gemma-4-26b-a4b-it": {
     "date": "2026-11-15",
     "model": "@cf/google/gemma-4-26b-a4b-it",
-    "right": 17,
-    "wrong": 0,
-    "unreviewed": [
-      "Your event shows in every language once it's posted.",
-      "Hello {name}, your ticket is attached.",
-      "The app's AGENTS.md tells your coding agent what to do.",
-      "{name} checked their ticket."
-    ],
-    "meaning": 87,
+    "right": 18,
+    "wrong": 1,
+    "unreviewed": ["{name} takes part in person.", "{name} booked a seat."],
+    "meaning": 88,
     "chrF": 90,
     "results": [
       {
@@ -3439,7 +3430,7 @@
         "text": "Your event shows in every language once it's posted.",
         "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
         "cache": true,
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 89,
         "chrF": 76,
         "reference": ["อีเวนต์ของคุณจะแสดงในทุกภาษาเมื่อโพสต์แล้ว"],
@@ -3449,7 +3440,8 @@
         "text": "Hello {name}, your ticket is attached.",
         "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
         "cache": true,
-        "verdict": "unreviewed",
+        "verdict": "wrong",
+        "why": "Adds \"with this message\", which the source doesn't say.",
         "meaning": 87,
         "chrF": 72,
         "reference": ["สวัสดี {name} ตั๋วของคุณแนบมาแล้ว"],
@@ -3499,7 +3491,7 @@
         "text": "The app's AGENTS.md tells your coding agent what to do.",
         "hash": "E3kkP1xBWrE61ZBOek87xg==",
         "cache": true,
-        "verdict": "unreviewed",
+        "verdict": "right",
         "meaning": 93,
         "chrF": 88,
         "reference": ["AGENTS.md ของแอปบอกเอเจนต์เขียนโค้ดของคุณว่าต้องทำอะไร"],
@@ -3569,11 +3561,11 @@
         "text": "{name} takes part in person.",
         "hash": "fRQVudyYBFiDmWyed6yR7A==",
         "cache": true,
-        "verdict": "right",
-        "meaning": 82,
-        "chrF": 100,
+        "verdict": "unreviewed",
+        "meaning": 84,
+        "chrF": 84,
         "reference": ["{name} เข้าร่วมด้วยตนเอง"],
-        "got": ["{name} เข้าร่วมด้วยตนเอง"]
+        "got": ["{name} เข้าร่วมด้วยตัวเอง"]
       },
       {
         "text": "{name} takes part online.",
@@ -3588,12 +3580,12 @@
       {
         "text": "{name} booked a seat.",
         "hash": "Oeto9jViL+xxuaYfiMdwwg==",
-        "cache": true,
-        "verdict": "right",
+        "cache": false,
+        "verdict": "unreviewed",
         "meaning": 94,
         "chrF": 100,
-        "reference": ["{name} จองที่นั่งแล้ว"],
-        "got": ["{name} จองที่นั่งแล้ว"]
+        "reference": ["{name} จองที่นั่งแล้ว", "{name} จองที่นั่งแล้ว", "{name} จองที่นั่งแล้ว"],
+        "got": ["{name} จองที่นั่งแล้ว", "{name} จองที่นั่งแล้ว", "{name} จองที่นั่งแล้ว"]
       },
       {
         "text": "{name} checked her ticket.",
@@ -3619,11 +3611,11 @@
         "text": "{name} checked their ticket.",
         "hash": "3jFQRFLYFLOxE6C21bq6GA==",
         "cache": true,
-        "verdict": "unreviewed",
-        "meaning": 91,
-        "chrF": 65,
+        "verdict": "right",
+        "meaning": 92,
+        "chrF": 66,
         "reference": ["{name} ตรวจตั๋วของตัวเองแล้ว"],
-        "got": ["{name} ตรวจตั๋วของเขาหรือเธอแล้ว"]
+        "got": ["{name} ตรวจตั๋วของเขา/เธอแล้ว"]
       },
       {
         "text": "{name} booked, and {name} got the ticket by email.",
