@@ -17,6 +17,28 @@
         "answer": "กิจกรรมของคุณจะแสดงในทุกภาษาเมื่อโพสต์แล้ว",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "อีเวนต์ของคุณจะแสดงในทุกภาษาหลังจากโพสต์แล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "เหตุการณ์ของคุณจะแสดงในภาษาทุกภาษาเมื่อโพสต์แล้ว",
+        "right": false,
+        "why": "เหตุการณ์ is an incident, not an event listing.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "อีเวนต์ของคุณจะแสดงในทุ่กภาษาเมื่่อโพสแล้ว",
+        "right": false,
+        "why": "Misspelt Thai (stacked tone marks or vowels).",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "อีเวนต์ของคุณแสดงในทุกภาษาเมื่อโพสต์แล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "5jxwLMzaf8YB/FQfN7jMjA==": [
@@ -27,6 +49,29 @@
       },
       {
         "answer": "สวัสดี {name} ตั๋วของคุณแนบมาด้วยแล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "สวัสดี {name} ตั๋วของคุณแนบมาพร้อมกับอีเมลนี้แล้ว",
+        "right": false,
+        "why": "Adds \"with this email\", which the source doesn't say.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "สวัสดี {name}, ตั๋วของคุณมีแนบมาด้วย.",
+        "right": false,
+        "why": "A comma after the name and a full stop, which Thai doesn't use.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "สวัสดี {name}, ตั๋วของคุณแนบมาด้วย.",
+        "right": false,
+        "why": "A comma after the name and a full stop, which Thai doesn't use.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "สวัสดี {name} ตั๋วของคุณแนบมาด้วย",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -42,6 +87,27 @@
         "right": false,
         "why": "แปล without แล้ว reads as an instruction, \"translate {translated} of {total} strings\", not that they're done.",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "แปลแล้ว {translated} จาก {total} ข้อความ",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{translated} ของ {total} ข้อความแปลแล้ว",
+        "right": false,
+        "why": "ของ is possessive (\"{translated}'s\"); \"of\" in a count is จาก.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{translated} จาก {total} ข้อความที่แปลแล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "แปลข้อความแล้ว {translated} จาก {total}",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "hk43hC7uwc3/d6Rkg/7KdQ==": [
@@ -56,11 +122,22 @@
         "answer": "เหลือ 1 ที่นั่ง",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "1 ที่นั่งเหลือ",
+        "right": false,
+        "why": "Wrong word order: Thai says เหลือ 1 ที่นั่ง.",
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "zMoep4eguZ3OejsIbcWbjg==": [
       {
         "answer": "รัน vp dev เพื่อเริ่มแอป",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "เรียกใช้ vp dev เพื่อเริ่มแอป",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -77,6 +154,39 @@
         "right": false,
         "why": "Drops ของ: \"application AGENTS.md\", not \"the app's AGENTS.md\" (AGENTS.md ของแอป).",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "AGENTS.md ของแอปบอกเอเจนต์เขียนโค้ดของคุณว่าต้องทำอะไร",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "AGENTS.md ของแอปจะบอกให้ coding agent ของคุณรู้ว่าต้องทำอะไร",
+        "right": false,
+        "why": "Leaves \"coding agent\" in English.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "แอป AGENTS.md บอกเอเย่นต์เขียนโค้ดของคุณว่าต้องทำอะไร",
+        "right": false,
+        "why": "Drops ของ: \"app AGENTS.md\", not \"the app's AGENTS.md\".",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "AGENTS.md ของแอปบอกเอเจนต์โค้ดของคุณว่าต้องทำอะไร",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "AGENTS.md ของแอปบอกรหัสโค้ดของคุณว่่าต้องทําอะไร",
+        "right": false,
+        "why": "รหัสโค้ด is \"code\", not the coding agent; misspelt ว่่า.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "AGENTS.md ของแอปจะบอกโค้ดดิ้งเอเจนต์ของคุณว่าต้องทำอะไร",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "XheCGRJ31SRnsGZhKLgJRA==": [
@@ -89,6 +199,34 @@
         "answer": "Void's AI หรือ Claude Code แปลสิ่งที่ใหม่อยู่เสมอ",
         "right": false,
         "why": "Adds อยู่เสมอ (\"always\"), which the source doesn't say.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "AI ของ Void หรือ Claude Code แปลสิ่งใหม่ ๆ",
+        "right": false,
+        "why": "Translates the product name Void's AI, which stays as written.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Void's AI หรือ Claude Code จะแปลส่วนที่เป็นของใหม่",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Void's AI หรือ Claude Code แปลสิ่งใหม่.",
+        "right": false,
+        "why": "Ends with a full stop, which Thai doesn't use.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "AI ของ Void หรือ Claude Code แปลสิ่งใหม่ๆ",
+        "right": false,
+        "why": "Translates the product name Void's AI, which stays as written.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Void's AI หรือ Claude Code แปลสิ่งใหม่ๆ",
+        "right": true,
         "by": "Claude Code, 2026-11-15"
       }
     ],
@@ -103,11 +241,48 @@
         "right": false,
         "why": "Ends with a full stop, which Thai doesn't use.",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "แค็ตตาล็อกของภาษาแต่ละภาษาอยู่ที่ i18n/translations",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "แค็ตตาล็อกของแต่ละภาษาจะอยู่ใน i18n/translations.",
+        "right": false,
+        "why": "Ends with a full stop, which Thai doesn't use.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "แค็ตตาล็อกของทุกภาษาอยุ่ใน i18n/translations",
+        "right": false,
+        "why": "ทุกภาษา is \"all languages\", not each one's; misspelt อยุ่.",
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "hUJ62HRBMHBewxRvZblIMw==": [
       {
         "answer": "พร้อมที่จะแปลแอปของคุณแล้วหรือยัง?",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "พร้อมที่จะแปลแอปของคุณหรือยัง",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "พร้อมที่จะแปลแอปของคุณหรือยัง?",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "พร้อมที่จะแปลแอปของคุณหรือไม่?",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "พร้อมแปลแอปของคุณหรือยัง?",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }
@@ -142,12 +317,39 @@
         "answer": "เปิด {pages} หรือไม่",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "เปิด {pages} หรือ?",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "เปิด {pages}?",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "เปิด {pages} ไหม",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "fRQVudyYBFiDmWyed6yR7A==": [
       {
         "answer": "{name} เข้าร่วมด้วยตนเอง",
         "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} เข้าร่วมแบบตัวต่อตัว.",
+        "right": false,
+        "why": "ตัวต่อตัว is one-to-one, not in person; and a full stop.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} เข้าร่วมแบบพบปะ",
+        "right": false,
+        "why": "พบปะ is meeting up, not taking part in person.",
         "by": "Claude Code, 2026-11-15"
       }
     ],
@@ -156,12 +358,41 @@
         "answer": "{name} เข้าร่วมออนไลน์",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} เข้าร่วมทางออนไลน์",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} เข้าร่วมออนไลน์.",
+        "right": false,
+        "why": "Ends with a full stop, which Thai doesn't use.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} เข้าร่วมนออนไลน์",
+        "right": false,
+        "why": "Misspelt Thai (stacked tone marks or vowels).",
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "Oeto9jViL+xxuaYfiMdwwg==": [
       {
         "answer": "{name} จองที่นั่งแล้ว",
         "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} จองที่นั่งแล้ว.",
+        "right": false,
+        "why": "Ends with a full stop, which Thai doesn't use.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} จองที่นั่้งแล้ว",
+        "right": false,
+        "why": "Misspelt Thai (stacked tone marks or vowels).",
         "by": "Claude Code, 2026-11-15"
       }
     ],
@@ -190,6 +421,16 @@
         "right": false,
         "why": "ของพวกเขา is plural \"their\" (a group's ticket), not one person whose gender isn't known (ของตัวเอง, ของเขา/เธอ).",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} ตรวจตั๋วแล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} ตรวจตั๋วของเขาแล้ว",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "AHgdPbajKOCj4zXFKNEbbg==": [
@@ -200,6 +441,23 @@
       },
       {
         "answer": "{name} จองแล้ว และ {name} ได้รับตั๋วทางอีเมล",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} จองที่นั่งแล้ว และ {name} ได้รับตั๋วทางอีเมล",
+        "right": false,
+        "why": "Adds ที่นั่ง (\"a seat\"), which the source doesn't say.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} จอง, และ {name} ได้รับตั๋วทางอีเมล.",
+        "right": false,
+        "why": "A comma and a full stop, which Thai doesn't use.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} จองแล้ว และ {name} ได้ตั๋วทางอีเมลแล้ว",
         "right": true,
         "by": "Claude Code, 2026-11-15"
       }

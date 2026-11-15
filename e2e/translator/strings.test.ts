@@ -17,8 +17,8 @@
 //   fails its string's test.
 // - `TRANSLATOR_PICK=1 vp run test:translator`: each language with every model in models.json.
 //   Nothing fails on a wrong answer; at the end the model with the most right answers is written
-//   into models.json as the language's, unless some answers are still unreviewed: those are listed
-//   for Claude Code to judge, and the pick is made on the next run.
+//   into models.json as the language's, unless unreviewed answers could change that: they're
+//   listed for Claude Code to judge, and the pick is made on the next run.
 // TRANSLATOR_LANGUAGES picks languages (th-TH,ar-EG). AI Gateway's cache is on for a string with an
 // answer judged right, off for the rest (ai.ts ask).
 import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -167,11 +167,17 @@ function pick(to: string, byModel: Map<string, Result[]>, strings: number): void
     .map(([model, rs]) => ({ model, right: count(rs, "right"), chrF: mean(rs, "chrF") ?? 0 }))
     .sort((a, b) => b.right - a.right || b.chrF - a.chrF);
   console.log(`${to}: ${tally.map((t) => `${t.model} ${t.right}/${strings}`).join(", ")}`);
-  if (unreviewed.length)
+  const best = tally[0]!;
+  // Unjudged answers matter only where they could change the pick: another model whose right
+  // answers plus its unjudged ones reach the leader's.
+  const open = (m: string) => count(byModel.get(m)!, "unreviewed");
+  const contested = tally.slice(1).some((t) => t.right + open(t.model) >= best.right);
+  if (contested || open(best.model))
     throw new Error(
       `${to}: ${unreviewed.length} answers to judge in verdicts.json, then run again:\n${unreviewed.join("\n")}`,
     );
-  const best = tally[0]!;
+  if (unreviewed.length)
+    console.log(`${to}: ${unreviewed.length} unjudged answers that can't change the pick`);
   const data = JSON.parse(readFileSync(MODELS, "utf8")) as {
     languages: { language: string; name: string; model: string; source: string; why: string }[];
   };
