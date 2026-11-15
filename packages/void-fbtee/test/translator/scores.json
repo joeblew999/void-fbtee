@@ -1,0 +1,125 @@
+{
+  "th-TH": {
+    "date": "2026-11-15",
+    "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+    "cache": "on",
+    "right": 0,
+    "wrong": 0,
+    "unreviewed": [
+      "The app's AGENTS.md tells your coding agent what to do.",
+      "Save",
+      "{translated} of {total} strings translated",
+      "Hello {name}, your ticket is attached.",
+      "Your event shows in every language once it's posted.",
+      "Ready to translate your app?",
+      "Each language's catalog is in i18n/translations.",
+      "{number} seats left",
+      "1 seat left",
+      "Run vp dev to start the app.",
+      "Void's AI or Claude Code translates what's new."
+    ],
+    "meaning": 89,
+    "chrF": 88,
+    "results": [
+      {
+        "text": "Save",
+        "hash": "KVIsARQPJHkNMbpjskkfBg==",
+        "verdict": "unreviewed",
+        "meaning": 54,
+        "chrF": 100,
+        "reference": ["บันทึก"],
+        "got": ["บันทึก"]
+      },
+      {
+        "text": "Your event shows in every language once it's posted.",
+        "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 86,
+        "reference": ["อีเวนต์ของคุณจะแสดงในทุกภาษาเมื่อโพสต์แล้ว"],
+        "got": ["เมื่อคุณโพสต์แล้ว อีเวนต์ของคุณจะแสดงในทุกภาษา"]
+      },
+      {
+        "text": "Hello {name}, your ticket is attached.",
+        "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 76,
+        "reference": ["สวัสดี {name} ตั๋วของคุณแนบมาแล้ว"],
+        "got": ["สวัสดีครับ/ค่ะ {name} ตั๋วของคุณแนบมาด้วยแล้ว"]
+      },
+      {
+        "text": "{translated} of {total} strings translated",
+        "hash": "0/yUVSiGyC2JT0/i90uO0A==",
+        "verdict": "unreviewed",
+        "meaning": 82,
+        "chrF": 72,
+        "reference": ["แปลแล้ว {translated} จาก {total} ข้อความ"],
+        "got": ["{translated} จาก {total} สตริงแปลแล้ว"]
+      },
+      {
+        "text": "{number} seats left",
+        "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["เหลือ {number} ที่นั่ง"],
+        "got": ["เหลือ {number} ที่นั่ง"]
+      },
+      {
+        "text": "1 seat left",
+        "hash": "YPVBS6NNHhGVrCKVfko+lw==",
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["เหลือ 1 ที่นั่ง"],
+        "got": ["เหลือ 1 ที่นั่ง"]
+      },
+      {
+        "text": "Run vp dev to start the app.",
+        "hash": "zMoep4eguZ3OejsIbcWbjg==",
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 100,
+        "reference": ["รัน vp dev เพื่อเริ่มแอป"],
+        "got": ["รัน vp dev เพื่อเริ่มแอป"]
+      },
+      {
+        "text": "The app's AGENTS.md tells your coding agent what to do.",
+        "hash": "E3kkP1xBWrE61ZBOek87xg==",
+        "verdict": "unreviewed",
+        "meaning": 91,
+        "chrF": 59,
+        "reference": ["AGENTS.md ของแอปบอกเอเจนต์เขียนโค้ดของคุณว่าต้องทำอะไร"],
+        "got": ["แอป AGENTS.md บอกเอเจนต์โค้ดของคุณว่าจะทำอะไร"]
+      },
+      {
+        "text": "Void's AI or Claude Code translates what's new.",
+        "hash": "XheCGRJ31SRnsGZhKLgJRA==",
+        "verdict": "unreviewed",
+        "meaning": 95,
+        "chrF": 100,
+        "reference": ["Void's AI หรือ Claude Code แปลสิ่งที่ใหม่"],
+        "got": ["Void's AI หรือ Claude Code แปลสิ่งที่ใหม่"]
+      },
+      {
+        "text": "Each language's catalog is in i18n/translations.",
+        "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 94,
+        "reference": ["แค็ตตาล็อกของแต่ละภาษาอยู่ใน i18n/translations"],
+        "got": ["แคตตาล็อกของแต่ละภาษาอยู่ใน i18n/translations"]
+      },
+      {
+        "text": "Ready to translate your app?",
+        "hash": "hUJ62HRBMHBewxRvZblIMw==",
+        "verdict": "unreviewed",
+        "meaning": 95,
+        "chrF": 86,
+        "reference": ["พร้อมแปลแอปของคุณแล้วหรือยัง"],
+        "got": ["พร้อมที่จะแปลแอปของคุณแล้วหรือยัง?"]
+      }
+    ]
+  }
+}
