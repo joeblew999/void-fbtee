@@ -82,5 +82,7 @@ Translate the whole page, keeping its structure: the same headings in the same o
   where Thai puts them. Loanwords in Thai letters are fine (แอป, แค็ตตาล็อก).
 - Arabic: Modern Standard Arabic, not a dialect. Arabic punctuation (، ؟). No direction marks
   (U+200E, U+200F): the page sets right to left itself. A number followed by a noun takes the
-  noun's form for that number (two: the dual; 3 to 10: plural; 11 to 99: singular, accusative).
+  noun's form for that number: zero says none (لم يتبقَّ أي مقعد, not "0 seats"); two, the dual,
+  without the number (مقعدان as a subject, مقعدين as an object); 3 to 10, plural (مقاعد); 11 to 99,
+  singular, accusative (مقعدًا); 100 and up, singular (مقعد).
 - Right-to-left languages in general: natural text, no direction marks.

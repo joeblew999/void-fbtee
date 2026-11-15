@@ -109,6 +109,20 @@ dialect in six strings). So it stays; any change to it is measured the same way
 4. Languages side by side: Vitest 5 runs one file's suites one after another whatever their
    `concurrent` option (tried 2026-11-15), so through a queue, or a file per language.
 
+## Where it stands (2026-11-15)
+
+Gemma 4 on the full test set (23 strings, every construct), through the real path (prepared(),
+translateWithVoidAi, the judge): Thai 20/23, Arabic 20/23. Thai misses: a word added ("with this
+message", "her seat"), and the AGENTS.md line leaving "coding agent" in English. Arabic misses: plural
+forms (the two form's case, zero and 100-and-up), and "you're booked" reworded. The skill's Arabic
+number rule then got zero and 100-and-up, which it lacked: to be measured on the next run.
+
+Open, from this round:
+
+- `<InLanguage gender>` now feeds only fbtee's runtime gender: with the reader's sentences on
+  `subject=`, is anything left that uses it? If not, it goes (react.tsx, the skill, the docs page).
+- A judge check for a word added that the source doesn't have, which is most of what's left.
+
 ## Still to do
 
 - Move the translator test into the package with an app of its own
