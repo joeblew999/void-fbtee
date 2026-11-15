@@ -4,7 +4,7 @@ Status: proposed 2026-11-14 and reviewed by a separate agent the same day. Then 
 itself, `"/"`, on the user's word: the first version redirected every address without a language,
 which needed Void internals (Hono's `matchedRoutes` in Void's registration order, in no Void doc)
 and a long list of exceptions. The notice offering a visitor their own language is now its own
-plan, `plans/language-notice.md`. Built 2026-11-14 on the user's "go". Its place in the order:
+plan, `plans/language-notice.md`, since replaced by `plans/language-picker.md`. Built 2026-11-14 on the user's "go". Its place in the order:
 `plans/README.md`.
 
 ## The bug
@@ -160,7 +160,8 @@ set up. So:
   https://void-fbtee-example.gedw99.workers.dev, 2026-11-14). A browser may keep it, and the site
   can't take it back: such a visitor still lands on English until their browser forgets it. Every
   link the site and its emails give carries its language, so it's only `"/"`. The notice
-  (`plans/language-notice.md`) would offer them their own language; without it, they have the
+  (now `plans/language-picker.md`, the visitor's own languages first) would offer them their own
+  language; without it, they have the
   header's links. From now on `init` never writes a permanent redirect.
 
 ## What changes
