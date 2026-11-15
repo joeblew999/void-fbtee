@@ -1,66 +1,64 @@
-// The translator test: Void's AI, on the dev server, translating the package's English test
-// strings (packages/void-fbtee/test/translator/strings.ts) into every language that has their
-// references (references.ts), each with its own model (models.ts), exactly as `vp dev` translates
-// a new string (translate.ts translateEntry: sent, judged, asked again with what was wrong), and
-// with the help `vp dev` gives: the language's other test strings as examples, as a catalog's own
-// translations would be. Each answer is judged (judge.ts):
-// - problems (wrong script, text left in English, a placeholder or command changed) fail the test;
-// - a person's verdict (verdicts.ts): an answer marked wrong fails, one marked right passes;
-// - signals, recorded, never failing: the meaning score (ai.ts meaningScores: how close the
-//   translation's meaning is to the source's) and the score against the reference (score.ts chrF).
-// Answers nobody has judged are listed as unreviewed, lowest signals first, for a person to read.
-// Everything goes to packages/void-fbtee/test/translator/scores.json, committed: the git diff is
-// what changed.
+// The translator test: Void's AI, on the dev server, translating the test app's strings
+// (packages/void-fbtee/test/translator/: app/src/strings.tsx, fbtee strings in real code) into every
+// language the app has, exactly as `vp dev` does: translateWithVoidAi on the app's own fbtee
+// catalogs, with each language's model (models.json). Each string is reset to "new" on its own
+// (its source text on every line, as fbtee's prepare writes a new one), the rest of the catalog
+// staying translated, so the examples and glossary are the catalog's own, as in a real app. The
+// translation the catalog had is the reference. Each answer:
+// - with problems (judge.ts: wrong script, English left, a placeholder or command changed), or one
+//   a person marked wrong (verdicts.json): fails the test; marked right: passes;
+// - nobody has judged it: listed as unreviewed, lowest signals first, for a person to read;
+// - signals, recorded, never failing: the meaning score (ai.ts meaningScores) and chrF against the
+//   reference (score.ts).
+// Everything goes to test/translator/scores.json, committed: the git diff is what changed.
 //
 // AI Gateway's cache is on (ai.ts ask): at temperature 0 a cached answer is the one the model gives
 // anyway, so a rerun costs only what changed. TRANSLATOR_FRESH=1 turns it off, to see whether
 // Cloudflare changed a model behind its name. TRANSLATOR_LANGUAGES picks languages;
 // TRANSLATOR_MODEL tries another model, scored as "<language> <model>". `vp run test:translator`.
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { expect, inject, test } from "vite-plus/test";
-import { keptTerms } from "../../packages/void-fbtee/src/judge";
+import { afterAll, expect, inject, test } from "vite-plus/test";
+import { catalogFile, collect } from "../../packages/void-fbtee/src/catalogs";
+import { loadProject } from "../../packages/void-fbtee/src/commands";
 import { modelFor } from "../../packages/void-fbtee/src/models";
-import { translateEntry, translatingRules } from "../../packages/void-fbtee/src/translate";
-import { REFERENCES } from "../../packages/void-fbtee/test/translator/references";
+import { translateWithVoidAi } from "../../packages/void-fbtee/src/translate";
 import { chrF } from "../../packages/void-fbtee/test/translator/score";
-import { formsFor, STRINGS } from "../../packages/void-fbtee/test/translator/strings";
-import { VERDICTS } from "../../packages/void-fbtee/test/translator/verdicts";
 import { EXAMPLE } from "../preview/setup";
 
 const skip = inject("devSkip" as never) as string;
 const site = inject("prod" as never) as string;
-const SCORES = join(import.meta.dirname, "../../packages/void-fbtee/test/translator/scores.json");
+const DATA = join(import.meta.dirname, "../../packages/void-fbtee/test/translator");
+const SCORES = join(DATA, "scores.json");
 const MODEL = process.env.TRANSLATOR_MODEL;
 const CACHE = process.env.TRANSLATOR_FRESH !== "1";
-const LANGUAGES = process.env.TRANSLATOR_LANGUAGES?.split(",") ?? Object.keys(REFERENCES);
 
-const readScores = (): Record<string, unknown> =>
-  existsSync(SCORES) ? (JSON.parse(readFileSync(SCORES, "utf8")) as Record<string, unknown>) : {};
+// A copy of the test app, inside the package so fbtee resolves from its node_modules.
+const app = mkdtempSync(join(DATA, ".tmp-"));
+cpSync(join(DATA, "app"), app, { recursive: true });
+afterAll(() => rmSync(app, { recursive: true, force: true }));
+const p = await loadProject(app);
+const { texts, builtinHashes } = collect(p);
+const LANGUAGES =
+  process.env.TRANSLATOR_LANGUAGES?.split(",") ??
+  p.config.locales.map((l) => l.locale).filter((l) => l !== p.config.sourceLocale);
 
-/** One request to the dev server's translate route (ai.ts devTranslate). */
-function route(token: string) {
-  return async (body: unknown) => {
-    const res = await fetch(`${site}/__void-fbtee/translate`, {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-void-fbtee-token": token },
-      body: JSON.stringify(body),
-    });
-    if (res.status === 503) return undefined;
-    return (await res.json().catch(() => ({}))) as Record<string, unknown>;
-  };
-}
+type Line = { translation: string; variations: Record<string, number> };
+type Catalog = { translations: Record<string, { status?: string; translations: Line[] }> };
+type Verdict = { answer: string; right: boolean; why?: string; by: string };
+const VERDICTS = JSON.parse(readFileSync(join(DATA, "verdicts.json"), "utf8")) as Record<
+  string,
+  Record<string, Verdict[]>
+>;
 
 interface Result {
-  name: string;
-  /** right: problems none and judged right, or not yet judged; wrong: problems, or judged wrong. */
+  text: string;
+  hash: string;
   verdict: "right" | "wrong" | "unreviewed";
-  problems: string[];
   why?: string;
-  attempts: number;
-  /** 0 to 100: the meaning score (meaningScores × 100) and the score against the reference. */
   meaning?: number;
   chrF?: number;
+  reference: string[];
   got: string[];
 }
 
@@ -72,66 +70,58 @@ for (const to of LANGUAGES) {
         join(EXAMPLE, "node_modules/.void-fbtee/dev-token"),
         "utf8",
       ).trim();
-      const call = route(token);
-      const guide = translatingRules(EXAMPLE);
-      const refs = REFERENCES[to] ?? {};
+      const url = `${site}/__void-fbtee/translate`;
+      const file = catalogFile(p, to);
+      const reference = readFileSync(file, "utf8");
       const results: Result[] = [];
-      for (const t of STRINGS) {
-        const s = t.plural ? { ...t, lines: formsFor(to, t.lines[0]!.text) } : t;
-        // The language's other strings, as a catalog's own translations would be: never this one.
-        const examples = STRINGS.filter((o) => o.name !== t.name && !o.plural && refs[o.name]).map(
-          (o) => ({
-            description: o.description,
-            source: o.lines[0]!.text,
-            translation: refs[o.name]![0]!,
-          }),
-        );
-        const answer = await translateEntry(call, {
-          from: "en-US",
-          to,
-          entry: {
-            description: s.description,
-            lines: s.lines,
-            keep: [...new Set(s.lines.flatMap((l) => keptTerms(l.text)))],
-          },
-          examples,
-          guide,
-          model: MODEL,
+      for (const hash of Object.keys((JSON.parse(reference) as Catalog).translations)) {
+        if (builtinHashes.has(hash)) continue;
+        // This string new again, the rest as they were.
+        const catalog = JSON.parse(reference) as Catalog;
+        const entry = catalog.translations[hash]!;
+        const ref = entry.translations.map((l) => l.translation);
+        entry.translations = entry.translations.map((l) => ({ ...l, translation: texts[hash]! }));
+        entry.status = "new";
+        writeFileSync(file, JSON.stringify(catalog, null, 2) + "\n");
+        const log: string[] = [];
+        const ran = await translateWithVoidAi(p, url, token, (l) => log.push(l), {
           cache: CACHE,
+          model: MODEL,
         });
-        const got = answer?.lines ?? [];
-        const problems = answer ? answer.problems : ["no answer: Void's AI isn't available"];
-        const ref = refs[t.name];
+        expect(ran, `Void's AI isn't available: ${log.join(" ")}`).toBe(true);
+        const after = (JSON.parse(readFileSync(file, "utf8")) as Catalog).translations[hash]!;
+        const kept = after.status === "translated";
+        const got = kept ? after.translations.map((l) => l.translation) : [];
         const score =
-          ref && got.length === ref.length
+          got.length === ref.length
             ? Math.round(got.reduce((a, l, i) => a + chrF(l, ref[i]!), 0) / got.length)
             : undefined;
-        const meaning = got.length
-          ? ((await call({ kind: "meaning", pairs: got.map((l, i) => [s.lines[i]!.text, l]) })) as
-              | { scores?: number[] }
-              | undefined)
+        const res = got.length
+          ? await fetch(url, {
+              method: "POST",
+              headers: { "content-type": "application/json", "x-void-fbtee-token": token },
+              body: JSON.stringify({ kind: "meaning", pairs: got.map((l) => [texts[hash]!, l]) }),
+            })
           : undefined;
-        const m = meaning?.scores?.length
-          ? Math.round((100 * meaning.scores.reduce((a, b) => a + b, 0)) / meaning.scores.length)
+        const scores = ((await res?.json()) as { scores?: number[] } | undefined)?.scores ?? [];
+        const meaning = scores.length
+          ? Math.round((100 * scores.reduce((a, b) => a + b, 0)) / scores.length)
           : undefined;
-        const judged = VERDICTS[to]?.[t.name]?.find((v) => v.answer === got.join("\n"));
+        const judged = VERDICTS[to]?.[hash]?.find((v) => v.answer === got.join("\n"));
         results.push({
-          name: t.name,
-          verdict: problems.length
-            ? "wrong"
-            : judged
-              ? judged.right
-                ? "right"
-                : "wrong"
-              : "unreviewed",
-          problems,
+          text: texts[hash]!,
+          hash,
+          // Not kept: vp dev's judge found problems it couldn't get fixed (the log says which).
+          verdict: !kept ? "wrong" : judged ? (judged.right ? "right" : "wrong") : "unreviewed",
+          ...(!kept && { why: log.join(" ") || "not kept" }),
           ...(judged && !judged.right && { why: judged.why }),
-          attempts: answer?.attempts ?? 0,
-          ...(m !== undefined && { meaning: m }),
+          ...(meaning !== undefined && { meaning }),
           ...(score !== undefined && { chrF: score }),
+          reference: ref,
           got,
         });
       }
+      writeFileSync(file, reference);
       const count = (v: Result["verdict"]) => results.filter((r) => r.verdict === v).length;
       const mean = (k: "meaning" | "chrF") => {
         const xs = results.flatMap((r) => (r[k] === undefined ? [] : [r[k]!]));
@@ -140,13 +130,15 @@ for (const to of LANGUAGES) {
       const unreviewed = results
         .filter((r) => r.verdict === "unreviewed")
         .sort((a, b) => (a.meaning ?? 0) + (a.chrF ?? 0) - ((b.meaning ?? 0) + (b.chrF ?? 0)))
-        .map((r) => r.name);
+        .map((r) => r.text);
       for (const r of results)
         console.log(
-          `${to} ${r.verdict === "wrong" ? "✗" : r.verdict === "right" ? "✓" : "?"} ${r.name} (meaning ${r.meaning ?? "-"}, chrF ${r.chrF ?? "-"}): ${r.got.join(" | ")}`,
+          `${to} ${r.verdict === "wrong" ? "✗" : r.verdict === "right" ? "✓" : "?"} ${r.text} (meaning ${r.meaning ?? "-"}, chrF ${r.chrF ?? "-"}): ${r.got.join(" | ")}`,
         );
-      const scores = readScores();
-      scores[MODEL ? `${to} ${MODEL}` : to] = {
+      const all = existsSync(SCORES)
+        ? (JSON.parse(readFileSync(SCORES, "utf8")) as Record<string, unknown>)
+        : {};
+      all[MODEL ? `${to} ${MODEL}` : to] = {
         date: new Date().toISOString().slice(0, 10),
         model: MODEL ?? modelFor(to).id,
         cache: CACHE ? "on" : "off",
@@ -160,15 +152,13 @@ for (const to of LANGUAGES) {
       writeFileSync(
         SCORES,
         JSON.stringify(
-          Object.fromEntries(Object.entries(scores).sort(([a], [b]) => a.localeCompare(b))),
+          Object.fromEntries(Object.entries(all).sort(([a], [b]) => a.localeCompare(b))),
           null,
           2,
         ) + "\n",
       );
       expect(
-        results
-          .filter((r) => r.verdict === "wrong")
-          .map((r) => `${r.name}: ${r.why ?? r.problems.join(" ")}`),
+        results.filter((r) => r.verdict === "wrong").map((r) => `${r.text}: ${r.why}`),
         `${to}: wrong answers`,
       ).toEqual([]);
     },

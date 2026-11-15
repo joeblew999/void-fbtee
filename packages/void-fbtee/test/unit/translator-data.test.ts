@@ -1,26 +1,56 @@
-// The translator test's own data, before anything is sent to Void's AI (e2e/translator/): every
-// language has a reference for every test string, a count one line per plural form the language
-// uses, and each reference passes the checks the answers must pass (judge.ts problemsWith, in
-// its script);
-// and every language has a model (models.ts).
+// The translator test's own data (test/translator/), before anything is sent to Void's AI: every
+// language's catalog has every test string translated, each translation passes the judge in its
+// script (judge.ts problemsWith), and every language has a model (models.ts).
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
-import { CHOICES, modelFor } from "../../src/models";
+import { catalogFile, collect, missing } from "../../src/catalogs";
+import { loadProject } from "../../src/commands";
 import { problemsWith } from "../../src/judge";
-import { REFERENCES } from "../translator/references";
-import { formsFor, STRINGS } from "../translator/strings";
+import { CHOICES, choiceFor, modelFor } from "../../src/models";
 
-for (const [locale, refs] of Object.entries(REFERENCES)) {
-  test(`${locale}: a reference for every test string, each passing the checks`, () => {
-    expect(Object.keys(refs).sort()).toEqual(STRINGS.map((s) => s.name).sort());
-    for (const s of STRINGS) {
-      const lines = s.plural ? formsFor(locale, s.lines[0]!.text) : s.lines;
-      const source = lines.map((l) => ({ translation: l.text, variations: l.variations }));
-      expect(problemsWith(source, refs[s.name]!, locale), `${locale} ${s.name}`).toEqual([]);
+const APP = join(import.meta.dirname, "../translator/app");
+const p = await loadProject(APP);
+const { texts, builtinHashes } = collect(p);
+const locales = p.config.locales.map((l) => l.locale).filter((l) => l !== p.config.sourceLocale);
+
+test("every catalog has every string translated", () => {
+  expect(missing(p).filter((m) => m.app.length || m.builtin || m.noCatalog)).toEqual([]);
+});
+
+for (const locale of locales) {
+  test(`${locale}: each test string's translation passes the judge, and the language has a model`, () => {
+    const cat = JSON.parse(readFileSync(catalogFile(p, locale), "utf8")) as {
+      translations: Record<
+        string,
+        { translations: { translation: string; variations: Record<string, number> }[] }
+      >;
+    };
+    for (const [hash, e] of Object.entries(cat.translations)) {
+      if (builtinHashes.has(hash)) continue;
+      const source = e.translations.map((l) => ({
+        translation: texts[hash]!,
+        variations: l.variations,
+      }));
+      expect(
+        problemsWith(
+          source,
+          e.translations.map((l) => l.translation),
+          locale,
+        ),
+        `${locale} ${texts[hash]}`,
+      ).toEqual([]);
     }
-  });
-
-  test(`${locale}: has its own model`, () => {
-    expect(CHOICES[new Intl.Locale(locale).language], locale).toBeDefined();
+    expect(choiceFor(locale), `${locale} has its own entry in models.json`).toBeDefined();
     expect(modelFor(locale).id).toMatch(/^@cf\//);
   });
 }
+
+test("models.json: one entry per language, each a Workers AI model with its source", () => {
+  const languages = CHOICES.map((c) => c.language);
+  expect(new Set(languages).size, "no language twice").toBe(languages.length);
+  for (const c of CHOICES) {
+    expect(c.model, c.language).toMatch(/^@cf\//);
+    expect(c.why, c.language).not.toBe("");
+  }
+});

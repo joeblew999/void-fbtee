@@ -1,0 +1,387 @@
+{
+  "$comment": "The Workers AI model that translates into each language, one entry per language (BCP 47 language subtag), read by models.ts for vp dev, the app's own translate() and the translator test alike. source: cloudflare (Cloudflare's own docs name the language for the model), llmgateway (https://llmgateway.io/models/translation, a third party's recommendation, until the translator test measures it), measured (the translator test, test/translator/scores.json); why says what. Checked 2026-11-15: every model is in Cloudflare's catalog and not on its November 2026 deprecation list (changelog 2026-11-05). jsonMode: the model is on Workers AI's JSON Mode page. Not used: IndicTrans2 (from English only, takes no description or examples), m2m100 (sentences alone; chrF 29.6 against Llama 3.3's 53.0 on the example's events, 2026-11-13). Any language not listed: default.",
+  "default": {
+    "model": "@cf/zai-org/glm-4.7-flash",
+    "jsonMode": false,
+    "source": "cloudflare",
+    "why": "model page: multilingual, 100+ languages"
+  },
+  "languages": [
+    {
+      "language": "th",
+      "name": "Thai",
+      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "jsonMode": false,
+      "source": "measured",
+      "why": "chrF 80, 10/10 pass (2026-11-15); Cloudflare's changelog 2025-09-24 lists Thai"
+    },
+    {
+      "language": "vi",
+      "name": "Vietnamese",
+      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "changelog 2025-09-24 lists the language"
+    },
+    {
+      "language": "id",
+      "name": "Indonesian",
+      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "changelog 2025-09-24 lists the language"
+    },
+    {
+      "language": "ms",
+      "name": "Malay",
+      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "changelog 2025-09-24 lists the language"
+    },
+    {
+      "language": "tl",
+      "name": "Tagalog",
+      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "changelog 2025-09-24 lists the language"
+    },
+    {
+      "language": "fil",
+      "name": "Filipino",
+      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "changelog 2025-09-24 lists Tagalog"
+    },
+    {
+      "language": "km",
+      "name": "Khmer",
+      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "changelog 2025-09-24 lists the language"
+    },
+    {
+      "language": "lo",
+      "name": "Lao",
+      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "changelog 2025-09-24 lists the language"
+    },
+    {
+      "language": "my",
+      "name": "Burmese",
+      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "changelog 2025-09-24 lists the language"
+    },
+    {
+      "language": "ta",
+      "name": "Tamil",
+      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "changelog 2025-09-24 lists the language"
+    },
+    {
+      "language": "zh",
+      "name": "Chinese",
+      "model": "@cf/qwen/qwen3.8-27b",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Qwen and GLM for Chinese, Japanese and Korean"
+    },
+    {
+      "language": "ja",
+      "name": "Japanese",
+      "model": "@cf/qwen/qwen3.8-27b",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Qwen and GLM for Chinese, Japanese and Korean"
+    },
+    {
+      "language": "ko",
+      "name": "Korean",
+      "model": "@cf/qwen/qwen3.8-27b",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Qwen and GLM for Chinese, Japanese and Korean"
+    },
+    {
+      "language": "ar",
+      "name": "Arabic",
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "jsonMode": true,
+      "source": "measured",
+      "why": "chrF 65, 10/10 pass (2026-11-15); llmgateway suggests gpt-oss-120b, untested"
+    },
+    {
+      "language": "he",
+      "name": "Hebrew",
+      "model": "@cf/openai/gpt-oss-120b",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "gpt-oss-120b or Llama 3.3 for Arabic, Hebrew, Turkish, Russian, Ukrainian"
+    },
+    {
+      "language": "fa",
+      "name": "Persian",
+      "model": "@cf/openai/gpt-oss-120b",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "gpt-oss-120b or Llama 3.3 for right-to-left and Slavic languages"
+    },
+    {
+      "language": "tr",
+      "name": "Turkish",
+      "model": "@cf/openai/gpt-oss-120b",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "gpt-oss-120b or Llama 3.3 for Arabic, Hebrew, Turkish, Russian, Ukrainian"
+    },
+    {
+      "language": "ru",
+      "name": "Russian",
+      "model": "@cf/openai/gpt-oss-120b",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "gpt-oss-120b or Llama 3.3 for Arabic, Hebrew, Turkish, Russian, Ukrainian"
+    },
+    {
+      "language": "uk",
+      "name": "Ukrainian",
+      "model": "@cf/openai/gpt-oss-120b",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "gpt-oss-120b or Llama 3.3 for Arabic, Hebrew, Turkish, Russian, Ukrainian"
+    },
+    {
+      "language": "hi",
+      "name": "Hindi",
+      "model": "@cf/zai-org/glm-4.7-flash",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+    },
+    {
+      "language": "bn",
+      "name": "Bengali",
+      "model": "@cf/zai-org/glm-4.7-flash",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+    },
+    {
+      "language": "ur",
+      "name": "Urdu",
+      "model": "@cf/zai-org/glm-4.7-flash",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+    },
+    {
+      "language": "gu",
+      "name": "Gujarati",
+      "model": "@cf/zai-org/glm-4.7-flash",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+    },
+    {
+      "language": "mr",
+      "name": "Marathi",
+      "model": "@cf/zai-org/glm-4.7-flash",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+    },
+    {
+      "language": "te",
+      "name": "Telugu",
+      "model": "@cf/zai-org/glm-4.7-flash",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+    },
+    {
+      "language": "kn",
+      "name": "Kannada",
+      "model": "@cf/zai-org/glm-4.7-flash",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+    },
+    {
+      "language": "ml",
+      "name": "Malayalam",
+      "model": "@cf/zai-org/glm-4.7-flash",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+    },
+    {
+      "language": "pa",
+      "name": "Punjabi",
+      "model": "@cf/zai-org/glm-4.7-flash",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+    },
+    {
+      "language": "ne",
+      "name": "Nepali",
+      "model": "@cf/zai-org/glm-4.7-flash",
+      "jsonMode": false,
+      "source": "cloudflare",
+      "why": "IndicTrans2 can't take our prompt; GLM 4.7 Flash covers 100+ languages"
+    },
+    {
+      "language": "en",
+      "name": "English",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "de",
+      "name": "German",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "fr",
+      "name": "French",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "es",
+      "name": "Spanish",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "it",
+      "name": "Italian",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "pt",
+      "name": "Portuguese",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "nl",
+      "name": "Dutch",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "pl",
+      "name": "Polish",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "sv",
+      "name": "Swedish",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "da",
+      "name": "Danish",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "nb",
+      "name": "Norwegian Bokmål",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "no",
+      "name": "Norwegian",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "fi",
+      "name": "Finnish",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "cs",
+      "name": "Czech",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "ro",
+      "name": "Romanian",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "hu",
+      "name": "Hungarian",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "el",
+      "name": "Greek",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    },
+    {
+      "language": "bg",
+      "name": "Bulgarian",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "jsonMode": false,
+      "source": "llmgateway",
+      "why": "Gemma 4 for European languages"
+    }
+  ]
+}

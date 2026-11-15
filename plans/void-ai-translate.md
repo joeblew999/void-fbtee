@@ -42,18 +42,24 @@ left.
 
 ## The translator test
 
-`vp run test:translator` (e2e/translator/, on the example's dev server). The data is in the
-package: test/translator/strings.ts (English strings, each testing one thing a translation can get
-wrong), references.ts (each string in 12 languages, written by Claude Code, not yet reviewed by
-native speakers), verdicts.ts (what a person decided about an answer).
-test/unit/translator-data.test.ts checks the data on every `vp test`: every language has every
-string, the right plural forms, references that pass the judge, and a model.
+`vp run test:translator` (e2e/translator/, on the example's dev server). Its data, in the package
+(test/translator/, README.md there): a test app in fbtee's own format, app/src/strings.tsx (the
+test strings as real `<fbt>`, each testing one thing a translation can get wrong) and its catalogs,
+app/i18n/translations/<locale>.json, every entry translated (the references: written by Claude
+Code, not yet reviewed by native speakers); verdicts.json, what a person decided about an answer;
+and src/models.json, the model per language, which vp dev and the app's own translate() read too.
+test/unit/translator-data.test.ts checks the data on every `vp test`: every catalog complete, every
+translation passing the judge in its script, every language with a model.
 
-Each string is sent as `vp dev` sends it, with the language's other strings as examples. An answer
-with problems, or one a person marked wrong, fails the test; one marked right passes; the rest are
-listed as unreviewed, lowest signals first, for a person to read. Every result goes to
-test/translator/scores.json, committed: the git diff is what changed. A change to the prompt, the
-judge or a model is kept only if no language gets more wrong answers or lower signals.
+For each language and string, the test sets that string back to "new" (as fbtee's prepare writes a
+new one), the rest of the catalog staying translated, and runs vp dev's own translateWithVoidAi on
+it: the examples and glossary are the catalog's, as in a real app. The catalog's translation is the
+reference. An answer vp dev wouldn't keep (judge problems it couldn't get fixed), or one a person
+marked wrong, fails the test; one marked right passes; the rest are listed as unreviewed, lowest
+signals first, for a person to read. Every result goes to test/translator/scores.json, committed:
+the git diff is what changed. Each cycle changes either data (a model, a reference, a verdict, a
+string) or code (how a string is sent, the judge); a change is kept only if no language gets more
+wrong answers or lower signals.
 
 ## Still to do
 

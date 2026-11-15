@@ -459,6 +459,8 @@ export async function translateWithVoidAi(
   url: string,
   token: string,
   log: (line: string) => void,
+  /** The translator test's: AI Gateway's cache on, another model (e2e/translator/). */
+  test: { cache?: boolean; model?: string } = {},
 ): Promise<boolean> {
   const call = async (body: unknown): Promise<Record<string, unknown> | undefined> => {
     const res = await fetch(url, {
@@ -517,6 +519,7 @@ export async function translateWithVoidAi(
         examples: examplesFor(finished, toSend),
         glossary,
         guide,
+        ...test,
       });
       if (!answer) return false;
       const out = answer.lines;
