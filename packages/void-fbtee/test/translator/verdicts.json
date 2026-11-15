@@ -462,5 +462,410 @@
         "by": "Claude Code, 2026-11-15"
       }
     ]
+  },
+  "ar-EG": {
+    "KVIsARQPJHkNMbpjskkfBg==": [
+      {
+        "answer": "احفظ",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "حفظ",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "Ri2u0XMS+wJCFqdr60QG5A==": [
+      {
+        "answer": "يظهر الحدث الخاص بك بكل لغة بمجرد نشره.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "يظهر حدثك بكل اللغات بمجرد نشره.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "ستظهر فعاليتك بكل لغة بمجرد نشرها.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "يظهر حدثك في كل لغة بمجرد نشره.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "يظهر حدثك بجميع اللغات بمجرد نشره.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "5jxwLMzaf8YB/FQfN7jMjA==": [
+      {
+        "answer": "مرحبًا {name}، تم إرفاق تذكرتك.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "مرحبًا {name}، تذكرتك مرفقة.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "أهلاً {name}، تذكرتك مرفقة.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "0/yUVSiGyC2JT0/i90uO0A==": [
+      {
+        "answer": "{translated} من {total} النصوص مترجمة",
+        "right": false,
+        "why": "A number followed by a definite plural ({total} النصوص) isn't Arabic grammar.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "تمت ترجمة {translated} من {total} من النصوص",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "تمت ترجمة {translated} من أصل {total} النصوص",
+        "right": false,
+        "why": "A number followed by a definite plural ({total} النصوص) isn't Arabic grammar.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{translated} من {total} نصوص مترجمة",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "تمت ترجمة {translated} من أصل {total} نصوص",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{translated} من {total} من النصوص مترجمة",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "hk43hC7uwc3/d6Rkg/7KdQ==": [
+      {
+        "answer": "تبقّى {number} مقعدًا\nتبقّى {number} مقعدين\nتبقّى {number} مقاعد\nتبقّى {number} مقاعد\nتبقّى {number} مقعدًا",
+        "right": false,
+        "why": "The zero form says a number of seats are left, and the two form uses the accusative مقعدين where the subject needs مقعدان.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "لا مقاعد متبقية\nمقعدان متبقيان\n{number} مقاعد متبقية\n{number} مقعدًا متبقيًا\n{number} مقعد متبقٍ",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "لم يتبقَّ أي مقعد\nتبقّى {number} مقاعد\nتبقّى {number} مقاعد\nتبقّى {number} مقعدًا\nتبقّى {number} مقعد",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "لا توجد مقاعد متاحة\nمقعد واحد متاح\nمقدان {number} متاحان\nمقدّ {number} متاحة\nمقدّ {number} متاحة",
+        "right": false,
+        "why": "Misspelt (مقدان, مقدّ for مقعد), and the two form says one seat.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "لا مقاعد متبقية\nمقعدان متبقيان\nتبقّى {number} مقاعد\nتبقّى {number} مقعدًا\nتبقّى {number} مقعد",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "لا توجد مقاعد متبقية\nتبقّى مقعدان\nتبقّى {number} مقاعد\nتبقّى {number} مقعدًا\nتبقّى {number} مقعد",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "تبقّى {number} مقاعد\nتبقّى مقعدان\nتبقّى {number} مقاعد\nتبقّى {number} مقعد\nتبقّى {number} مقعد",
+        "right": false,
+        "why": "The zero form says a number of seats are left; the many form (11 to 99) needs the accusative مقعدًا.",
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "YPVBS6NNHhGVrCKVfko+lw==": [
+      {
+        "answer": "مقعد واحد متبقي",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "مقعد واحد متاح",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "مقعد واحد متبقٍ",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "zMoep4eguZ3OejsIbcWbjg==": [
+      {
+        "answer": "شغّل vp dev لبدء التطبيق.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "شغّل vp dev لتشغيل التطبيق.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "E3kkP1xBWrE61ZBOek87xg==": [
+      {
+        "answer": "يخبرك AGENTS.md الخاص بالتطبيق وكيل الترميز الخاص بك بما يجب فعله.",
+        "right": false,
+        "why": "يخبرك (\"tells you\") gives the verb two objects: the agent is the one told.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "ملف AGENTS.md الخاص بالتطبيق بيقول لوكيل البرمجة بتاعك يعمل إيه.",
+        "right": false,
+        "why": "Egyptian dialect (بيقول، بتاعك، إيه); the app writes Modern Standard Arabic.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "ملف AGENTS.md الخاص بالتطبيق يخبر وكيل البرمجة الخاص بك بما يجب فعله.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "يخبر AGENTS.md الخاص بالتطبيق وكيل البرمجة الخاص بك بما يجب فعله.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "يخبر AGENTS.md الخاص بالتطبيق وكيل الترميز الخاص بك بما يجب فعله.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "XheCGRJ31SRnsGZhKLgJRA==": [
+      {
+        "answer": "يُترجم الذكاء الاصطناعي Void أو Claude Code ما هو جديد.",
+        "right": false,
+        "why": "Translates the product name Void's AI, which stays as written.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "يترجم Void's AI أو Claude Code ما هو جديد.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "يقوم Void's AI أو Claude Code بترجمة كل ما هو جديد.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Void's AI أو Claude Code يترجمان ما هو جديد.",
+        "right": false,
+        "why": "A dual verb with \"or\": one of the two translates, so the verb is singular (يترجم).",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Void's AI أو Claude Code يترجم ما هو جديد.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "ترجم Void's AI أو Claude Code الجديد.",
+        "right": false,
+        "why": "Past tense (\"translated\"); the source says it translates.",
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "kBctHh0b7gp5b2Q3AfqxOA==": [
+      {
+        "answer": "يوجد فهرس كل لغة في i18n/translations.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "فهرس كل لغة موجود في i18n/translations.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "الفهرس الخاص بكل لغة موجود في i18n/translations.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "hUJ62HRBMHBewxRvZblIMw==": [
+      {
+        "answer": "جاهز لترجمة تطبيقك؟",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "جاهز تترجم تطبيقك؟",
+        "right": false,
+        "why": "Colloquial (جاهز تترجم); the app writes Modern Standard Arabic.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "هل أنت مستعد لترجمة تطبيقك؟",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "7f0YPbDQynykALmEKflP3Q==": [
+      {
+        "answer": "نصوص",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "النصوص",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "zJo185mkHlmtxuQdGecjUg==": [
+      {
+        "answer": "فهرس",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "الفهرس",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "AQ6/02zzfwk50FSEF0wKtA==": [
+      {
+        "answer": "افتح {pages}؟",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "أفتح {pages}؟",
+        "right": false,
+        "why": "First person (\"shall I open\"); the question asks the reader.",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "هل تريد فتح {pages}؟",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "فتح {pages}؟",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "fRQVudyYBFiDmWyed6yR7A==": [
+      {
+        "answer": "يشارك {name} شخصيًا.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "يشارك {name} حضوريًا.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "iP10/gSomcvt/+9NrQA7XQ==": [
+      {
+        "answer": "يشارك {name} عبر الإنترنت.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "Oeto9jViL+xxuaYfiMdwwg==": [
+      {
+        "answer": "حجز {name} مقعدًا.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "jE1zcxOCdGCCTd7j0RhSjA==": [
+      {
+        "answer": "تحققت {name} من تذكرتها.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "تحقق {name} من تذكرته.",
+        "right": false,
+        "why": "Masculine, for a woman's own ticket.",
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "bTo3iX4JuIh7tcnM8z1nHg==": [
+      {
+        "answer": "تحقق {name} من تذكرته.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "تحقق {name} من تذكره.",
+        "right": false,
+        "why": "تذكره means \"remembering him\", not his ticket (تذكرته).",
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "3jFQRFLYFLOxE6C21bq6GA==": [
+      {
+        "answer": "تحققت {name} من تذكرتها.",
+        "right": false,
+        "why": "Feminine, for someone whose gender isn't known (masculine is Arabic's unmarked form).",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "تحقق {name} من تذكرته.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} تحققت من تذكرتها.",
+        "right": false,
+        "why": "Feminine, for someone whose gender isn't known.",
+        "by": "Claude Code, 2026-11-15"
+      }
+    ],
+    "AHgdPbajKOCj4zXFKNEbbg==": [
+      {
+        "answer": "حجز {name}، وحصل {name} على التذكرة عبر البريد الإلكتروني.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "حجز {name}، ووصلت التذكرة إلى {name} بالبريد الإلكتروني.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "حجز {name}، وحصل {name} على التذكرة بالبريد الإلكتروني.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "حجز {name}، و{name} حصل على التذكرة عبر البريد الإلكتروني.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "حجز {name}، ووصلت التذكرة إلى {name} عبر البريد الإلكتروني.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      }
+    ]
   }
 }

@@ -1,4 +1,2522 @@
 {
+  "ar-EG @cf/aisingapore/gemma-sea-lion-v4-27b-it": {
+    "date": "2026-11-15",
+    "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+    "right": 0,
+    "wrong": 0,
+    "unreviewed": [
+      "Save",
+      "Your event shows in every language once it's posted.",
+      "Hello {name}, your ticket is attached.",
+      "{translated} of {total} strings translated",
+      "{number} seats left",
+      "1 seat left",
+      "Run vp dev to start the app.",
+      "The app's AGENTS.md tells your coding agent what to do.",
+      "Void's AI or Claude Code translates what's new.",
+      "Each language's catalog is in i18n/translations.",
+      "Ready to translate your app?",
+      "Strings",
+      "Catalog",
+      "Open {pages}?",
+      "{name} takes part in person.",
+      "{name} takes part online.",
+      "{name} booked a seat.",
+      "{name} checked her ticket.",
+      "{name} checked his ticket.",
+      "{name} checked their ticket.",
+      "{name} booked, and {name} got the ticket by email."
+    ],
+    "meaning": 86,
+    "chrF": 73,
+    "results": [
+      {
+        "text": "Save",
+        "hash": "KVIsARQPJHkNMbpjskkfBg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 69,
+        "chrF": 90,
+        "reference": ["حفظ"],
+        "got": ["احفظ"]
+      },
+      {
+        "text": "Your event shows in every language once it's posted.",
+        "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 39,
+        "reference": ["تظهر فعاليتك بكل اللغات بمجرد نشرها."],
+        "got": ["يظهر الحدث الخاص بك بكل لغة بمجرد نشره."]
+      },
+      {
+        "text": "Hello {name}, your ticket is attached.",
+        "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 85,
+        "chrF": 68,
+        "reference": ["مرحبًا {name}، تذكرتك مرفقة."],
+        "got": ["مرحبًا {name}، تم إرفاق تذكرتك."]
+      },
+      {
+        "text": "{translated} of {total} strings translated",
+        "hash": "0/yUVSiGyC2JT0/i90uO0A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 88,
+        "chrF": 72,
+        "reference": ["تُرجم {translated} من {total} نصًا"],
+        "got": ["{translated} من {total} النصوص مترجمة"]
+      },
+      {
+        "text": "{number} seats left",
+        "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 82,
+        "chrF": 63,
+        "reference": [
+          "لم يتبقَّ أي مقعد",
+          "تبقّى مقعدان",
+          "تبقّت {number} مقاعد",
+          "تبقّى {number} مقعدًا",
+          "تبقّى {number} مقعد"
+        ],
+        "got": [
+          "تبقّى {number} مقعدًا",
+          "تبقّى {number} مقعدين",
+          "تبقّى {number} مقاعد",
+          "تبقّى {number} مقاعد",
+          "تبقّى {number} مقعدًا"
+        ]
+      },
+      {
+        "text": "1 seat left",
+        "hash": "YPVBS6NNHhGVrCKVfko+lw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 92,
+        "chrF": 59,
+        "reference": ["تبقّى مقعد واحد"],
+        "got": ["مقعد واحد متبقي"]
+      },
+      {
+        "text": "Run vp dev to start the app.",
+        "hash": "zMoep4eguZ3OejsIbcWbjg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["شغّل vp dev لبدء التطبيق."],
+        "got": ["شغّل vp dev لبدء التطبيق."]
+      },
+      {
+        "text": "The app's AGENTS.md tells your coding agent what to do.",
+        "hash": "E3kkP1xBWrE61ZBOek87xg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 86,
+        "chrF": 52,
+        "reference": ["يخبر ملف AGENTS.md في التطبيق وكيل البرمجة لديك بما يفعله."],
+        "got": ["يخبرك AGENTS.md الخاص بالتطبيق وكيل الترميز الخاص بك بما يجب فعله."]
+      },
+      {
+        "text": "Void's AI or Claude Code translates what's new.",
+        "hash": "XheCGRJ31SRnsGZhKLgJRA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 64,
+        "reference": ["يترجم Void's AI أو Claude Code ما هو جديد."],
+        "got": ["يُترجم الذكاء الاصطناعي Void أو Claude Code ما هو جديد."]
+      },
+      {
+        "text": "Each language's catalog is in i18n/translations.",
+        "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 79,
+        "reference": ["فهرس كل لغة موجود في i18n/translations."],
+        "got": ["يوجد فهرس كل لغة في i18n/translations."]
+      },
+      {
+        "text": "Ready to translate your app?",
+        "hash": "hUJ62HRBMHBewxRvZblIMw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 55,
+        "reference": ["هل أنت مستعد لترجمة تطبيقك؟"],
+        "got": ["جاهز لترجمة تطبيقك؟"]
+      },
+      {
+        "text": "Strings",
+        "hash": "7f0YPbDQynykALmEKflP3Q==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 64,
+        "chrF": 58,
+        "reference": ["النصوص"],
+        "got": ["نصوص"]
+      },
+      {
+        "text": "Catalog",
+        "hash": "zJo185mkHlmtxuQdGecjUg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 60,
+        "chrF": 58,
+        "reference": ["الفهرس"],
+        "got": ["فهرس"]
+      },
+      {
+        "text": "Open {pages}?",
+        "hash": "AQ6/02zzfwk50FSEF0wKtA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 96,
+        "chrF": 62,
+        "reference": ["هل تريد فتح {pages}؟"],
+        "got": ["افتح {pages}؟"]
+      },
+      {
+        "text": "{name} takes part in person.",
+        "hash": "fRQVudyYBFiDmWyed6yR7A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 61,
+        "reference": ["يشارك {name} حضوريًا."],
+        "got": ["يشارك {name} شخصيًا."]
+      },
+      {
+        "text": "{name} takes part online.",
+        "hash": "iP10/gSomcvt/+9NrQA7XQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["يشارك {name} عبر الإنترنت."],
+        "got": ["يشارك {name} عبر الإنترنت."]
+      },
+      {
+        "text": "{name} booked a seat.",
+        "hash": "Oeto9jViL+xxuaYfiMdwwg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["حجز {name} مقعدًا."],
+        "got": ["حجز {name} مقعدًا."]
+      },
+      {
+        "text": "{name} checked her ticket.",
+        "hash": "jE1zcxOCdGCCTd7j0RhSjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 100,
+        "reference": ["تحققت {name} من تذكرتها."],
+        "got": ["تحققت {name} من تذكرتها."]
+      },
+      {
+        "text": "{name} checked his ticket.",
+        "hash": "bTo3iX4JuIh7tcnM8z1nHg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 79,
+        "chrF": 100,
+        "reference": ["تحقق {name} من تذكرته."],
+        "got": ["تحقق {name} من تذكرته."]
+      },
+      {
+        "text": "{name} checked their ticket.",
+        "hash": "3jFQRFLYFLOxE6C21bq6GA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 86,
+        "chrF": 78,
+        "reference": ["تحقق {name} من تذكرته."],
+        "got": ["تحققت {name} من تذكرتها."]
+      },
+      {
+        "text": "{name} booked, and {name} got the ticket by email.",
+        "hash": "AHgdPbajKOCj4zXFKNEbbg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 80,
+        "reference": ["حجز {name}، وتلقى {name} التذكرة عبر البريد الإلكتروني."],
+        "got": ["حجز {name}، وحصل {name} على التذكرة عبر البريد الإلكتروني."]
+      }
+    ]
+  },
+  "ar-EG @cf/deepseek-ai/deepseek-v4.1-flash-1017": {
+    "date": "2026-11-15",
+    "model": "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
+    "right": 0,
+    "wrong": 0,
+    "unreviewed": [
+      "Save",
+      "Your event shows in every language once it's posted.",
+      "Hello {name}, your ticket is attached.",
+      "{translated} of {total} strings translated",
+      "{number} seats left",
+      "1 seat left",
+      "Run vp dev to start the app.",
+      "The app's AGENTS.md tells your coding agent what to do.",
+      "Void's AI or Claude Code translates what's new.",
+      "Each language's catalog is in i18n/translations.",
+      "Ready to translate your app?",
+      "Strings",
+      "Catalog",
+      "Open {pages}?",
+      "{name} takes part in person.",
+      "{name} takes part online.",
+      "{name} booked a seat.",
+      "{name} checked her ticket.",
+      "{name} checked his ticket.",
+      "{name} checked their ticket.",
+      "{name} booked, and {name} got the ticket by email."
+    ],
+    "meaning": 85,
+    "chrF": 84,
+    "results": [
+      {
+        "text": "Save",
+        "hash": "KVIsARQPJHkNMbpjskkfBg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 69,
+        "chrF": 100,
+        "reference": ["حفظ"],
+        "got": ["حفظ"]
+      },
+      {
+        "text": "Your event shows in every language once it's posted.",
+        "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 64,
+        "reference": ["تظهر فعاليتك بكل اللغات بمجرد نشرها."],
+        "got": ["يظهر حدثك بكل اللغات بمجرد نشره."]
+      },
+      {
+        "text": "Hello {name}, your ticket is attached.",
+        "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 84,
+        "chrF": 100,
+        "reference": ["مرحبًا {name}، تذكرتك مرفقة."],
+        "got": ["مرحبًا {name}، تذكرتك مرفقة."]
+      },
+      {
+        "text": "{translated} of {total} strings translated",
+        "hash": "0/yUVSiGyC2JT0/i90uO0A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 70,
+        "reference": ["تُرجم {translated} من {total} نصًا"],
+        "got": ["تمت ترجمة {translated} من {total} من النصوص"]
+      },
+      {
+        "text": "{number} seats left",
+        "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 84,
+        "chrF": 56,
+        "reference": [
+          "لم يتبقَّ أي مقعد",
+          "تبقّى مقعدان",
+          "تبقّت {number} مقاعد",
+          "تبقّى {number} مقعدًا",
+          "تبقّى {number} مقعد"
+        ],
+        "got": [
+          "لا مقاعد متبقية",
+          "مقعدان متبقيان",
+          "{number} مقاعد متبقية",
+          "{number} مقعدًا متبقيًا",
+          "{number} مقعد متبقٍ"
+        ]
+      },
+      {
+        "text": "1 seat left",
+        "hash": "YPVBS6NNHhGVrCKVfko+lw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 92,
+        "chrF": 59,
+        "reference": ["تبقّى مقعد واحد"],
+        "got": ["مقعد واحد متبقي"]
+      },
+      {
+        "text": "Run vp dev to start the app.",
+        "hash": "zMoep4eguZ3OejsIbcWbjg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["شغّل vp dev لبدء التطبيق."],
+        "got": ["شغّل vp dev لبدء التطبيق."]
+      },
+      {
+        "text": "The app's AGENTS.md tells your coding agent what to do.",
+        "hash": "E3kkP1xBWrE61ZBOek87xg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 87,
+        "chrF": 53,
+        "reference": ["يخبر ملف AGENTS.md في التطبيق وكيل البرمجة لديك بما يفعله."],
+        "got": ["ملف AGENTS.md الخاص بالتطبيق بيقول لوكيل البرمجة بتاعك يعمل إيه."]
+      },
+      {
+        "text": "Void's AI or Claude Code translates what's new.",
+        "hash": "XheCGRJ31SRnsGZhKLgJRA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 95,
+        "chrF": 100,
+        "reference": ["يترجم Void's AI أو Claude Code ما هو جديد."],
+        "got": ["يترجم Void's AI أو Claude Code ما هو جديد."]
+      },
+      {
+        "text": "Each language's catalog is in i18n/translations.",
+        "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 100,
+        "reference": ["فهرس كل لغة موجود في i18n/translations."],
+        "got": ["فهرس كل لغة موجود في i18n/translations."]
+      },
+      {
+        "text": "Ready to translate your app?",
+        "hash": "hUJ62HRBMHBewxRvZblIMw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 33,
+        "reference": ["هل أنت مستعد لترجمة تطبيقك؟"],
+        "got": ["جاهز تترجم تطبيقك؟"]
+      },
+      {
+        "text": "Strings",
+        "hash": "7f0YPbDQynykALmEKflP3Q==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 65,
+        "chrF": 100,
+        "reference": ["النصوص"],
+        "got": ["النصوص"]
+      },
+      {
+        "text": "Catalog",
+        "hash": "zJo185mkHlmtxuQdGecjUg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 38,
+        "chrF": 100,
+        "reference": ["الفهرس"],
+        "got": ["الفهرس"]
+      },
+      {
+        "text": "Open {pages}?",
+        "hash": "AQ6/02zzfwk50FSEF0wKtA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 96,
+        "chrF": 62,
+        "reference": ["هل تريد فتح {pages}؟"],
+        "got": ["أفتح {pages}؟"]
+      },
+      {
+        "text": "{name} takes part in person.",
+        "hash": "fRQVudyYBFiDmWyed6yR7A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 91,
+        "chrF": 100,
+        "reference": ["يشارك {name} حضوريًا."],
+        "got": ["يشارك {name} حضوريًا."]
+      },
+      {
+        "text": "{name} takes part online.",
+        "hash": "iP10/gSomcvt/+9NrQA7XQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["يشارك {name} عبر الإنترنت."],
+        "got": ["يشارك {name} عبر الإنترنت."]
+      },
+      {
+        "text": "{name} booked a seat.",
+        "hash": "Oeto9jViL+xxuaYfiMdwwg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["حجز {name} مقعدًا."],
+        "got": ["حجز {name} مقعدًا."]
+      },
+      {
+        "text": "{name} checked her ticket.",
+        "hash": "jE1zcxOCdGCCTd7j0RhSjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 100,
+        "reference": ["تحققت {name} من تذكرتها."],
+        "got": ["تحققت {name} من تذكرتها."]
+      },
+      {
+        "text": "{name} checked his ticket.",
+        "hash": "bTo3iX4JuIh7tcnM8z1nHg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 79,
+        "chrF": 100,
+        "reference": ["تحقق {name} من تذكرته."],
+        "got": ["تحقق {name} من تذكرته."]
+      },
+      {
+        "text": "{name} checked their ticket.",
+        "hash": "3jFQRFLYFLOxE6C21bq6GA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 76,
+        "chrF": 100,
+        "reference": ["تحقق {name} من تذكرته."],
+        "got": ["تحقق {name} من تذكرته."]
+      },
+      {
+        "text": "{name} booked, and {name} got the ticket by email.",
+        "hash": "AHgdPbajKOCj4zXFKNEbbg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 92,
+        "chrF": 71,
+        "reference": ["حجز {name}، وتلقى {name} التذكرة عبر البريد الإلكتروني."],
+        "got": ["حجز {name}، ووصلت التذكرة إلى {name} بالبريد الإلكتروني."]
+      }
+    ]
+  },
+  "ar-EG @cf/google/gemma-4-26b-a4b-it": {
+    "date": "2026-11-15",
+    "model": "@cf/google/gemma-4-26b-a4b-it",
+    "right": 0,
+    "wrong": 0,
+    "unreviewed": [
+      "Save",
+      "Your event shows in every language once it's posted.",
+      "Hello {name}, your ticket is attached.",
+      "{translated} of {total} strings translated",
+      "{number} seats left",
+      "1 seat left",
+      "Run vp dev to start the app.",
+      "The app's AGENTS.md tells your coding agent what to do.",
+      "Void's AI or Claude Code translates what's new.",
+      "Each language's catalog is in i18n/translations.",
+      "Ready to translate your app?",
+      "Strings",
+      "Catalog",
+      "Open {pages}?",
+      "{name} takes part in person.",
+      "{name} takes part online.",
+      "{name} booked a seat.",
+      "{name} checked her ticket.",
+      "{name} checked his ticket.",
+      "{name} checked their ticket.",
+      "{name} booked, and {name} got the ticket by email."
+    ],
+    "meaning": 84,
+    "chrF": 85,
+    "results": [
+      {
+        "text": "Save",
+        "hash": "KVIsARQPJHkNMbpjskkfBg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 69,
+        "chrF": 100,
+        "reference": ["حفظ"],
+        "got": ["حفظ"]
+      },
+      {
+        "text": "Your event shows in every language once it's posted.",
+        "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 85,
+        "chrF": 73,
+        "reference": ["تظهر فعاليتك بكل اللغات بمجرد نشرها."],
+        "got": ["ستظهر فعاليتك بكل لغة بمجرد نشرها."]
+      },
+      {
+        "text": "Hello {name}, your ticket is attached.",
+        "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 86,
+        "chrF": 75,
+        "reference": ["مرحبًا {name}، تذكرتك مرفقة."],
+        "got": ["أهلاً {name}، تذكرتك مرفقة."]
+      },
+      {
+        "text": "{translated} of {total} strings translated",
+        "hash": "0/yUVSiGyC2JT0/i90uO0A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 88,
+        "chrF": 60,
+        "reference": ["تُرجم {translated} من {total} نصًا"],
+        "got": ["تمت ترجمة {translated} من أصل {total} النصوص"]
+      },
+      {
+        "text": "{number} seats left",
+        "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 80,
+        "chrF": 74,
+        "reference": [
+          "لم يتبقَّ أي مقعد",
+          "تبقّى مقعدان",
+          "تبقّت {number} مقاعد",
+          "تبقّى {number} مقعدًا",
+          "تبقّى {number} مقعد"
+        ],
+        "got": [
+          "لم يتبقَّ أي مقعد",
+          "تبقّى {number} مقاعد",
+          "تبقّى {number} مقاعد",
+          "تبقّى {number} مقعدًا",
+          "تبقّى {number} مقعد"
+        ]
+      },
+      {
+        "text": "1 seat left",
+        "hash": "YPVBS6NNHhGVrCKVfko+lw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 92,
+        "chrF": 59,
+        "reference": ["تبقّى مقعد واحد"],
+        "got": ["مقعد واحد متبقي"]
+      },
+      {
+        "text": "Run vp dev to start the app.",
+        "hash": "zMoep4eguZ3OejsIbcWbjg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["شغّل vp dev لبدء التطبيق."],
+        "got": ["شغّل vp dev لبدء التطبيق."]
+      },
+      {
+        "text": "The app's AGENTS.md tells your coding agent what to do.",
+        "hash": "E3kkP1xBWrE61ZBOek87xg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 86,
+        "chrF": 60,
+        "reference": ["يخبر ملف AGENTS.md في التطبيق وكيل البرمجة لديك بما يفعله."],
+        "got": ["ملف AGENTS.md الخاص بالتطبيق يخبر وكيل البرمجة الخاص بك بما يجب فعله."]
+      },
+      {
+        "text": "Void's AI or Claude Code translates what's new.",
+        "hash": "XheCGRJ31SRnsGZhKLgJRA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 81,
+        "reference": ["يترجم Void's AI أو Claude Code ما هو جديد."],
+        "got": ["يقوم Void's AI أو Claude Code بترجمة كل ما هو جديد."]
+      },
+      {
+        "text": "Each language's catalog is in i18n/translations.",
+        "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 100,
+        "reference": ["فهرس كل لغة موجود في i18n/translations."],
+        "got": ["فهرس كل لغة موجود في i18n/translations."]
+      },
+      {
+        "text": "Ready to translate your app?",
+        "hash": "hUJ62HRBMHBewxRvZblIMw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 55,
+        "reference": ["هل أنت مستعد لترجمة تطبيقك؟"],
+        "got": ["جاهز لترجمة تطبيقك؟"]
+      },
+      {
+        "text": "Strings",
+        "hash": "7f0YPbDQynykALmEKflP3Q==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 65,
+        "chrF": 100,
+        "reference": ["النصوص"],
+        "got": ["النصوص"]
+      },
+      {
+        "text": "Catalog",
+        "hash": "zJo185mkHlmtxuQdGecjUg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 38,
+        "chrF": 100,
+        "reference": ["الفهرس"],
+        "got": ["الفهرس"]
+      },
+      {
+        "text": "Open {pages}?",
+        "hash": "AQ6/02zzfwk50FSEF0wKtA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["هل تريد فتح {pages}؟"],
+        "got": ["هل تريد فتح {pages}؟"]
+      },
+      {
+        "text": "{name} takes part in person.",
+        "hash": "fRQVudyYBFiDmWyed6yR7A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 61,
+        "reference": ["يشارك {name} حضوريًا."],
+        "got": ["يشارك {name} شخصيًا."]
+      },
+      {
+        "text": "{name} takes part online.",
+        "hash": "iP10/gSomcvt/+9NrQA7XQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["يشارك {name} عبر الإنترنت."],
+        "got": ["يشارك {name} عبر الإنترنت."]
+      },
+      {
+        "text": "{name} booked a seat.",
+        "hash": "Oeto9jViL+xxuaYfiMdwwg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["حجز {name} مقعدًا."],
+        "got": ["حجز {name} مقعدًا."]
+      },
+      {
+        "text": "{name} checked her ticket.",
+        "hash": "jE1zcxOCdGCCTd7j0RhSjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 100,
+        "reference": ["تحققت {name} من تذكرتها."],
+        "got": ["تحققت {name} من تذكرتها."]
+      },
+      {
+        "text": "{name} checked his ticket.",
+        "hash": "bTo3iX4JuIh7tcnM8z1nHg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 79,
+        "chrF": 100,
+        "reference": ["تحقق {name} من تذكرته."],
+        "got": ["تحقق {name} من تذكرته."]
+      },
+      {
+        "text": "{name} checked their ticket.",
+        "hash": "3jFQRFLYFLOxE6C21bq6GA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 76,
+        "chrF": 100,
+        "reference": ["تحقق {name} من تذكرته."],
+        "got": ["تحقق {name} من تذكرته."]
+      },
+      {
+        "text": "{name} booked, and {name} got the ticket by email.",
+        "hash": "AHgdPbajKOCj4zXFKNEbbg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 80,
+        "reference": ["حجز {name}، وتلقى {name} التذكرة عبر البريد الإلكتروني."],
+        "got": ["حجز {name}، وحصل {name} على التذكرة عبر البريد الإلكتروني."]
+      }
+    ]
+  },
+  "ar-EG @cf/meta/llama-3.3-70b-instruct-fp8-fast": {
+    "date": "2026-11-15",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "right": 0,
+    "wrong": 1,
+    "unreviewed": [
+      "Save",
+      "Your event shows in every language once it's posted.",
+      "Hello {name}, your ticket is attached.",
+      "{number} seats left",
+      "1 seat left",
+      "Run vp dev to start the app.",
+      "The app's AGENTS.md tells your coding agent what to do.",
+      "Void's AI or Claude Code translates what's new.",
+      "Each language's catalog is in i18n/translations.",
+      "Ready to translate your app?",
+      "Strings",
+      "Catalog",
+      "Open {pages}?",
+      "{name} takes part in person.",
+      "{name} takes part online.",
+      "{name} booked a seat.",
+      "{name} checked her ticket.",
+      "{name} checked his ticket.",
+      "{name} checked their ticket.",
+      "{name} booked, and {name} got the ticket by email."
+    ],
+    "meaning": 84,
+    "chrF": 71,
+    "results": [
+      {
+        "text": "Save",
+        "hash": "KVIsARQPJHkNMbpjskkfBg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 69,
+        "chrF": 100,
+        "reference": ["حفظ"],
+        "got": ["حفظ"]
+      },
+      {
+        "text": "Your event shows in every language once it's posted.",
+        "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 34,
+        "reference": ["تظهر فعاليتك بكل اللغات بمجرد نشرها."],
+        "got": ["يظهر حدثك في كل لغة بمجرد نشره."]
+      },
+      {
+        "text": "Hello {name}, your ticket is attached.",
+        "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 84,
+        "chrF": 100,
+        "reference": ["مرحبًا {name}، تذكرتك مرفقة."],
+        "got": ["مرحبًا {name}، تذكرتك مرفقة."]
+      },
+      {
+        "text": "{translated} of {total} strings translated",
+        "hash": "0/yUVSiGyC2JT0/i90uO0A==",
+        "cache": false,
+        "verdict": "wrong",
+        "why": "{translated} of {total} strings translated → [\"translated form\\\": \\\"{translated} من {total} النصوص تمت ترجمتها\\\"\"]: Line 1 has JSON in it: give only the translated sentence. i18n/translations/ar-EG.json: 0 of 1 translated with Void's AI",
+        "reference": ["تُرجم {translated} من {total} نصًا"],
+        "got": []
+      },
+      {
+        "text": "{number} seats left",
+        "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 65,
+        "chrF": 34,
+        "reference": [
+          "لم يتبقَّ أي مقعد",
+          "تبقّى مقعدان",
+          "تبقّت {number} مقاعد",
+          "تبقّى {number} مقعدًا",
+          "تبقّى {number} مقعد"
+        ],
+        "got": [
+          "لا توجد مقاعد متاحة",
+          "مقعد واحد متاح",
+          "مقدان {number} متاحان",
+          "مقدّ {number} متاحة",
+          "مقدّ {number} متاحة"
+        ]
+      },
+      {
+        "text": "1 seat left",
+        "hash": "YPVBS6NNHhGVrCKVfko+lw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 86,
+        "chrF": 53,
+        "reference": ["تبقّى مقعد واحد"],
+        "got": ["مقعد واحد متاح"]
+      },
+      {
+        "text": "Run vp dev to start the app.",
+        "hash": "zMoep4eguZ3OejsIbcWbjg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 68,
+        "reference": ["شغّل vp dev لبدء التطبيق."],
+        "got": ["شغّل vp dev لتشغيل التطبيق."]
+      },
+      {
+        "text": "The app's AGENTS.md tells your coding agent what to do.",
+        "hash": "E3kkP1xBWrE61ZBOek87xg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 89,
+        "chrF": 60,
+        "reference": ["يخبر ملف AGENTS.md في التطبيق وكيل البرمجة لديك بما يفعله."],
+        "got": ["يخبر AGENTS.md الخاص بالتطبيق وكيل البرمجة الخاص بك بما يجب فعله."]
+      },
+      {
+        "text": "Void's AI or Claude Code translates what's new.",
+        "hash": "XheCGRJ31SRnsGZhKLgJRA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 97,
+        "chrF": 82,
+        "reference": ["يترجم Void's AI أو Claude Code ما هو جديد."],
+        "got": ["Void's AI أو Claude Code يترجمان ما هو جديد."]
+      },
+      {
+        "text": "Each language's catalog is in i18n/translations.",
+        "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 100,
+        "reference": ["فهرس كل لغة موجود في i18n/translations."],
+        "got": ["فهرس كل لغة موجود في i18n/translations."]
+      },
+      {
+        "text": "Ready to translate your app?",
+        "hash": "hUJ62HRBMHBewxRvZblIMw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 55,
+        "reference": ["هل أنت مستعد لترجمة تطبيقك؟"],
+        "got": ["جاهز لترجمة تطبيقك؟"]
+      },
+      {
+        "text": "Strings",
+        "hash": "7f0YPbDQynykALmEKflP3Q==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 64,
+        "chrF": 58,
+        "reference": ["النصوص"],
+        "got": ["نصوص"]
+      },
+      {
+        "text": "Catalog",
+        "hash": "zJo185mkHlmtxuQdGecjUg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 60,
+        "chrF": 58,
+        "reference": ["الفهرس"],
+        "got": ["فهرس"]
+      },
+      {
+        "text": "Open {pages}?",
+        "hash": "AQ6/02zzfwk50FSEF0wKtA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 95,
+        "chrF": 63,
+        "reference": ["هل تريد فتح {pages}؟"],
+        "got": ["فتح {pages}؟"]
+      },
+      {
+        "text": "{name} takes part in person.",
+        "hash": "fRQVudyYBFiDmWyed6yR7A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 61,
+        "reference": ["يشارك {name} حضوريًا."],
+        "got": ["يشارك {name} شخصيًا."]
+      },
+      {
+        "text": "{name} takes part online.",
+        "hash": "iP10/gSomcvt/+9NrQA7XQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["يشارك {name} عبر الإنترنت."],
+        "got": ["يشارك {name} عبر الإنترنت."]
+      },
+      {
+        "text": "{name} booked a seat.",
+        "hash": "Oeto9jViL+xxuaYfiMdwwg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["حجز {name} مقعدًا."],
+        "got": ["حجز {name} مقعدًا."]
+      },
+      {
+        "text": "{name} checked her ticket.",
+        "hash": "jE1zcxOCdGCCTd7j0RhSjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 75,
+        "chrF": 73,
+        "reference": ["تحققت {name} من تذكرتها."],
+        "got": ["تحقق {name} من تذكرته."]
+      },
+      {
+        "text": "{name} checked his ticket.",
+        "hash": "bTo3iX4JuIh7tcnM8z1nHg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 74,
+        "chrF": 85,
+        "reference": ["تحقق {name} من تذكرته."],
+        "got": ["تحقق {name} من تذكره."]
+      },
+      {
+        "text": "{name} checked their ticket.",
+        "hash": "3jFQRFLYFLOxE6C21bq6GA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 87,
+        "chrF": 62,
+        "reference": ["تحقق {name} من تذكرته."],
+        "got": ["{name} تحققت من تذكرتها."]
+      },
+      {
+        "text": "{name} booked, and {name} got the ticket by email.",
+        "hash": "AHgdPbajKOCj4zXFKNEbbg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 92,
+        "chrF": 69,
+        "reference": ["حجز {name}، وتلقى {name} التذكرة عبر البريد الإلكتروني."],
+        "got": ["حجز {name}، وحصل {name} على التذكرة بالبريد الإلكتروني."]
+      }
+    ]
+  },
+  "ar-EG @cf/openai/gpt-oss-120b": {
+    "date": "2026-11-15",
+    "model": "@cf/openai/gpt-oss-120b",
+    "right": 0,
+    "wrong": 0,
+    "unreviewed": [
+      "Save",
+      "Your event shows in every language once it's posted.",
+      "Hello {name}, your ticket is attached.",
+      "{translated} of {total} strings translated",
+      "{number} seats left",
+      "1 seat left",
+      "Run vp dev to start the app.",
+      "The app's AGENTS.md tells your coding agent what to do.",
+      "Void's AI or Claude Code translates what's new.",
+      "Each language's catalog is in i18n/translations.",
+      "Ready to translate your app?",
+      "Strings",
+      "Catalog",
+      "Open {pages}?",
+      "{name} takes part in person.",
+      "{name} takes part online.",
+      "{name} booked a seat.",
+      "{name} checked her ticket.",
+      "{name} checked his ticket.",
+      "{name} checked their ticket.",
+      "{name} booked, and {name} got the ticket by email."
+    ],
+    "meaning": 85,
+    "chrF": 79,
+    "results": [
+      {
+        "text": "Save",
+        "hash": "KVIsARQPJHkNMbpjskkfBg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 69,
+        "chrF": 90,
+        "reference": ["حفظ"],
+        "got": ["احفظ"]
+      },
+      {
+        "text": "Your event shows in every language once it's posted.",
+        "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 64,
+        "reference": ["تظهر فعاليتك بكل اللغات بمجرد نشرها."],
+        "got": ["يظهر حدثك بكل اللغات بمجرد نشره."]
+      },
+      {
+        "text": "Hello {name}, your ticket is attached.",
+        "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 85,
+        "chrF": 68,
+        "reference": ["مرحبًا {name}، تذكرتك مرفقة."],
+        "got": ["مرحبًا {name}، تم إرفاق تذكرتك."]
+      },
+      {
+        "text": "{translated} of {total} strings translated",
+        "hash": "0/yUVSiGyC2JT0/i90uO0A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 88,
+        "chrF": 78,
+        "reference": ["تُرجم {translated} من {total} نصًا"],
+        "got": ["{translated} من {total} نصوص مترجمة"]
+      },
+      {
+        "text": "{number} seats left",
+        "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 80,
+        "chrF": 68,
+        "reference": [
+          "لم يتبقَّ أي مقعد",
+          "تبقّى مقعدان",
+          "تبقّت {number} مقاعد",
+          "تبقّى {number} مقعدًا",
+          "تبقّى {number} مقعد"
+        ],
+        "got": [
+          "لا مقاعد متبقية",
+          "مقعدان متبقيان",
+          "تبقّى {number} مقاعد",
+          "تبقّى {number} مقعدًا",
+          "تبقّى {number} مقعد"
+        ]
+      },
+      {
+        "text": "1 seat left",
+        "hash": "YPVBS6NNHhGVrCKVfko+lw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 92,
+        "chrF": 59,
+        "reference": ["تبقّى مقعد واحد"],
+        "got": ["مقعد واحد متبقي"]
+      },
+      {
+        "text": "Run vp dev to start the app.",
+        "hash": "zMoep4eguZ3OejsIbcWbjg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 68,
+        "reference": ["شغّل vp dev لبدء التطبيق."],
+        "got": ["شغّل vp dev لتشغيل التطبيق."]
+      },
+      {
+        "text": "The app's AGENTS.md tells your coding agent what to do.",
+        "hash": "E3kkP1xBWrE61ZBOek87xg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 87,
+        "chrF": 52,
+        "reference": ["يخبر ملف AGENTS.md في التطبيق وكيل البرمجة لديك بما يفعله."],
+        "got": ["يخبر AGENTS.md الخاص بالتطبيق وكيل الترميز الخاص بك بما يجب فعله."]
+      },
+      {
+        "text": "Void's AI or Claude Code translates what's new.",
+        "hash": "XheCGRJ31SRnsGZhKLgJRA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 98,
+        "chrF": 83,
+        "reference": ["يترجم Void's AI أو Claude Code ما هو جديد."],
+        "got": ["Void's AI أو Claude Code يترجم ما هو جديد."]
+      },
+      {
+        "text": "Each language's catalog is in i18n/translations.",
+        "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 100,
+        "reference": ["فهرس كل لغة موجود في i18n/translations."],
+        "got": ["فهرس كل لغة موجود في i18n/translations."]
+      },
+      {
+        "text": "Ready to translate your app?",
+        "hash": "hUJ62HRBMHBewxRvZblIMw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 100,
+        "reference": ["هل أنت مستعد لترجمة تطبيقك؟"],
+        "got": ["هل أنت مستعد لترجمة تطبيقك؟"]
+      },
+      {
+        "text": "Strings",
+        "hash": "7f0YPbDQynykALmEKflP3Q==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 65,
+        "chrF": 100,
+        "reference": ["النصوص"],
+        "got": ["النصوص"]
+      },
+      {
+        "text": "Catalog",
+        "hash": "zJo185mkHlmtxuQdGecjUg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 60,
+        "chrF": 58,
+        "reference": ["الفهرس"],
+        "got": ["فهرس"]
+      },
+      {
+        "text": "Open {pages}?",
+        "hash": "AQ6/02zzfwk50FSEF0wKtA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 95,
+        "chrF": 63,
+        "reference": ["هل تريد فتح {pages}؟"],
+        "got": ["فتح {pages}؟"]
+      },
+      {
+        "text": "{name} takes part in person.",
+        "hash": "fRQVudyYBFiDmWyed6yR7A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 61,
+        "reference": ["يشارك {name} حضوريًا."],
+        "got": ["يشارك {name} شخصيًا."]
+      },
+      {
+        "text": "{name} takes part online.",
+        "hash": "iP10/gSomcvt/+9NrQA7XQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["يشارك {name} عبر الإنترنت."],
+        "got": ["يشارك {name} عبر الإنترنت."]
+      },
+      {
+        "text": "{name} booked a seat.",
+        "hash": "Oeto9jViL+xxuaYfiMdwwg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["حجز {name} مقعدًا."],
+        "got": ["حجز {name} مقعدًا."]
+      },
+      {
+        "text": "{name} checked her ticket.",
+        "hash": "jE1zcxOCdGCCTd7j0RhSjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 75,
+        "chrF": 73,
+        "reference": ["تحققت {name} من تذكرتها."],
+        "got": ["تحقق {name} من تذكرته."]
+      },
+      {
+        "text": "{name} checked his ticket.",
+        "hash": "bTo3iX4JuIh7tcnM8z1nHg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 79,
+        "chrF": 100,
+        "reference": ["تحقق {name} من تذكرته."],
+        "got": ["تحقق {name} من تذكرته."]
+      },
+      {
+        "text": "{name} checked their ticket.",
+        "hash": "3jFQRFLYFLOxE6C21bq6GA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 76,
+        "chrF": 100,
+        "reference": ["تحقق {name} من تذكرته."],
+        "got": ["تحقق {name} من تذكرته."]
+      },
+      {
+        "text": "{name} booked, and {name} got the ticket by email.",
+        "hash": "AHgdPbajKOCj4zXFKNEbbg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 80,
+        "reference": ["حجز {name}، وتلقى {name} التذكرة عبر البريد الإلكتروني."],
+        "got": ["حجز {name}، و{name} حصل على التذكرة عبر البريد الإلكتروني."]
+      }
+    ]
+  },
+  "ar-EG @cf/qwen/qwen3.8-27b": {
+    "date": "2026-11-15",
+    "model": "@cf/qwen/qwen3.8-27b",
+    "right": 0,
+    "wrong": 0,
+    "unreviewed": [
+      "Save",
+      "Your event shows in every language once it's posted.",
+      "Hello {name}, your ticket is attached.",
+      "{translated} of {total} strings translated",
+      "{number} seats left",
+      "1 seat left",
+      "Run vp dev to start the app.",
+      "The app's AGENTS.md tells your coding agent what to do.",
+      "Void's AI or Claude Code translates what's new.",
+      "Each language's catalog is in i18n/translations.",
+      "Ready to translate your app?",
+      "Strings",
+      "Catalog",
+      "Open {pages}?",
+      "{name} takes part in person.",
+      "{name} takes part online.",
+      "{name} booked a seat.",
+      "{name} checked her ticket.",
+      "{name} checked his ticket.",
+      "{name} checked their ticket.",
+      "{name} booked, and {name} got the ticket by email."
+    ],
+    "meaning": 84,
+    "chrF": 87,
+    "results": [
+      {
+        "text": "Save",
+        "hash": "KVIsARQPJHkNMbpjskkfBg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 69,
+        "chrF": 100,
+        "reference": ["حفظ"],
+        "got": ["حفظ"]
+      },
+      {
+        "text": "Your event shows in every language once it's posted.",
+        "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 92,
+        "chrF": 52,
+        "reference": ["تظهر فعاليتك بكل اللغات بمجرد نشرها."],
+        "got": ["يظهر حدثك بجميع اللغات بمجرد نشره."]
+      },
+      {
+        "text": "Hello {name}, your ticket is attached.",
+        "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 84,
+        "chrF": 100,
+        "reference": ["مرحبًا {name}، تذكرتك مرفقة."],
+        "got": ["مرحبًا {name}، تذكرتك مرفقة."]
+      },
+      {
+        "text": "{translated} of {total} strings translated",
+        "hash": "0/yUVSiGyC2JT0/i90uO0A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 88,
+        "chrF": 66,
+        "reference": ["تُرجم {translated} من {total} نصًا"],
+        "got": ["تمت ترجمة {translated} من أصل {total} نصوص"]
+      },
+      {
+        "text": "{number} seats left",
+        "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 77,
+        "chrF": 79,
+        "reference": [
+          "لم يتبقَّ أي مقعد",
+          "تبقّى مقعدان",
+          "تبقّت {number} مقاعد",
+          "تبقّى {number} مقعدًا",
+          "تبقّى {number} مقعد"
+        ],
+        "got": [
+          "لا توجد مقاعد متبقية",
+          "تبقّى مقعدان",
+          "تبقّى {number} مقاعد",
+          "تبقّى {number} مقعدًا",
+          "تبقّى {number} مقعد"
+        ]
+      },
+      {
+        "text": "1 seat left",
+        "hash": "YPVBS6NNHhGVrCKVfko+lw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 85,
+        "chrF": 59,
+        "reference": ["تبقّى مقعد واحد"],
+        "got": ["مقعد واحد متبقٍ"]
+      },
+      {
+        "text": "Run vp dev to start the app.",
+        "hash": "zMoep4eguZ3OejsIbcWbjg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["شغّل vp dev لبدء التطبيق."],
+        "got": ["شغّل vp dev لبدء التطبيق."]
+      },
+      {
+        "text": "The app's AGENTS.md tells your coding agent what to do.",
+        "hash": "E3kkP1xBWrE61ZBOek87xg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 86,
+        "chrF": 60,
+        "reference": ["يخبر ملف AGENTS.md في التطبيق وكيل البرمجة لديك بما يفعله."],
+        "got": ["ملف AGENTS.md الخاص بالتطبيق يخبر وكيل البرمجة الخاص بك بما يجب فعله."]
+      },
+      {
+        "text": "Void's AI or Claude Code translates what's new.",
+        "hash": "XheCGRJ31SRnsGZhKLgJRA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 91,
+        "chrF": 78,
+        "reference": ["يترجم Void's AI أو Claude Code ما هو جديد."],
+        "got": ["ترجم Void's AI أو Claude Code الجديد."]
+      },
+      {
+        "text": "Each language's catalog is in i18n/translations.",
+        "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 100,
+        "reference": ["فهرس كل لغة موجود في i18n/translations."],
+        "got": ["فهرس كل لغة موجود في i18n/translations."]
+      },
+      {
+        "text": "Ready to translate your app?",
+        "hash": "hUJ62HRBMHBewxRvZblIMw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 100,
+        "reference": ["هل أنت مستعد لترجمة تطبيقك؟"],
+        "got": ["هل أنت مستعد لترجمة تطبيقك؟"]
+      },
+      {
+        "text": "Strings",
+        "hash": "7f0YPbDQynykALmEKflP3Q==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 65,
+        "chrF": 100,
+        "reference": ["النصوص"],
+        "got": ["النصوص"]
+      },
+      {
+        "text": "Catalog",
+        "hash": "zJo185mkHlmtxuQdGecjUg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 38,
+        "chrF": 100,
+        "reference": ["الفهرس"],
+        "got": ["الفهرس"]
+      },
+      {
+        "text": "Open {pages}?",
+        "hash": "AQ6/02zzfwk50FSEF0wKtA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 96,
+        "chrF": 62,
+        "reference": ["هل تريد فتح {pages}؟"],
+        "got": ["افتح {pages}؟"]
+      },
+      {
+        "text": "{name} takes part in person.",
+        "hash": "fRQVudyYBFiDmWyed6yR7A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 91,
+        "chrF": 100,
+        "reference": ["يشارك {name} حضوريًا."],
+        "got": ["يشارك {name} حضوريًا."]
+      },
+      {
+        "text": "{name} takes part online.",
+        "hash": "iP10/gSomcvt/+9NrQA7XQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["يشارك {name} عبر الإنترنت."],
+        "got": ["يشارك {name} عبر الإنترنت."]
+      },
+      {
+        "text": "{name} booked a seat.",
+        "hash": "Oeto9jViL+xxuaYfiMdwwg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["حجز {name} مقعدًا."],
+        "got": ["حجز {name} مقعدًا."]
+      },
+      {
+        "text": "{name} checked her ticket.",
+        "hash": "jE1zcxOCdGCCTd7j0RhSjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 100,
+        "reference": ["تحققت {name} من تذكرتها."],
+        "got": ["تحققت {name} من تذكرتها."]
+      },
+      {
+        "text": "{name} checked his ticket.",
+        "hash": "bTo3iX4JuIh7tcnM8z1nHg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 79,
+        "chrF": 100,
+        "reference": ["تحقق {name} من تذكرته."],
+        "got": ["تحقق {name} من تذكرته."]
+      },
+      {
+        "text": "{name} checked their ticket.",
+        "hash": "3jFQRFLYFLOxE6C21bq6GA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 76,
+        "chrF": 100,
+        "reference": ["تحقق {name} من تذكرته."],
+        "got": ["تحقق {name} من تذكرته."]
+      },
+      {
+        "text": "{name} booked, and {name} got the ticket by email.",
+        "hash": "AHgdPbajKOCj4zXFKNEbbg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 76,
+        "reference": ["حجز {name}، وتلقى {name} التذكرة عبر البريد الإلكتروني."],
+        "got": ["حجز {name}، ووصلت التذكرة إلى {name} عبر البريد الإلكتروني."]
+      }
+    ]
+  },
+  "ar-EG @cf/thinkingmachines/inkling-2-small": {
+    "date": "2026-11-15",
+    "model": "@cf/thinkingmachines/inkling-2-small",
+    "right": 0,
+    "wrong": 0,
+    "unreviewed": [
+      "Save",
+      "Your event shows in every language once it's posted.",
+      "Hello {name}, your ticket is attached.",
+      "{translated} of {total} strings translated",
+      "{number} seats left",
+      "1 seat left",
+      "Run vp dev to start the app.",
+      "The app's AGENTS.md tells your coding agent what to do.",
+      "Void's AI or Claude Code translates what's new.",
+      "Each language's catalog is in i18n/translations.",
+      "Ready to translate your app?",
+      "Strings",
+      "Catalog",
+      "Open {pages}?",
+      "{name} takes part in person.",
+      "{name} takes part online.",
+      "{name} booked a seat.",
+      "{name} checked her ticket.",
+      "{name} checked his ticket.",
+      "{name} checked their ticket.",
+      "{name} booked, and {name} got the ticket by email."
+    ],
+    "meaning": 85,
+    "chrF": 85,
+    "results": [
+      {
+        "text": "Save",
+        "hash": "KVIsARQPJHkNMbpjskkfBg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 69,
+        "chrF": 90,
+        "reference": ["حفظ"],
+        "got": ["احفظ"]
+      },
+      {
+        "text": "Your event shows in every language once it's posted.",
+        "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 34,
+        "reference": ["تظهر فعاليتك بكل اللغات بمجرد نشرها."],
+        "got": ["يظهر حدثك في كل لغة بمجرد نشره."]
+      },
+      {
+        "text": "Hello {name}, your ticket is attached.",
+        "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 84,
+        "chrF": 100,
+        "reference": ["مرحبًا {name}، تذكرتك مرفقة."],
+        "got": ["مرحبًا {name}، تذكرتك مرفقة."]
+      },
+      {
+        "text": "{translated} of {total} strings translated",
+        "hash": "0/yUVSiGyC2JT0/i90uO0A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 71,
+        "reference": ["تُرجم {translated} من {total} نصًا"],
+        "got": ["{translated} من {total} من النصوص مترجمة"]
+      },
+      {
+        "text": "{number} seats left",
+        "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 79,
+        "chrF": 76,
+        "reference": [
+          "لم يتبقَّ أي مقعد",
+          "تبقّى مقعدان",
+          "تبقّت {number} مقاعد",
+          "تبقّى {number} مقعدًا",
+          "تبقّى {number} مقعد"
+        ],
+        "got": [
+          "تبقّى {number} مقاعد",
+          "تبقّى مقعدان",
+          "تبقّى {number} مقاعد",
+          "تبقّى {number} مقعد",
+          "تبقّى {number} مقعد"
+        ]
+      },
+      {
+        "text": "1 seat left",
+        "hash": "YPVBS6NNHhGVrCKVfko+lw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 92,
+        "chrF": 59,
+        "reference": ["تبقّى مقعد واحد"],
+        "got": ["مقعد واحد متبقي"]
+      },
+      {
+        "text": "Run vp dev to start the app.",
+        "hash": "zMoep4eguZ3OejsIbcWbjg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 68,
+        "reference": ["شغّل vp dev لبدء التطبيق."],
+        "got": ["شغّل vp dev لتشغيل التطبيق."]
+      },
+      {
+        "text": "The app's AGENTS.md tells your coding agent what to do.",
+        "hash": "E3kkP1xBWrE61ZBOek87xg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 89,
+        "chrF": 60,
+        "reference": ["يخبر ملف AGENTS.md في التطبيق وكيل البرمجة لديك بما يفعله."],
+        "got": ["يخبر AGENTS.md الخاص بالتطبيق وكيل البرمجة الخاص بك بما يجب فعله."]
+      },
+      {
+        "text": "Void's AI or Claude Code translates what's new.",
+        "hash": "XheCGRJ31SRnsGZhKLgJRA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 95,
+        "chrF": 100,
+        "reference": ["يترجم Void's AI أو Claude Code ما هو جديد."],
+        "got": ["يترجم Void's AI أو Claude Code ما هو جديد."]
+      },
+      {
+        "text": "Each language's catalog is in i18n/translations.",
+        "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 84,
+        "chrF": 88,
+        "reference": ["فهرس كل لغة موجود في i18n/translations."],
+        "got": ["الفهرس الخاص بكل لغة موجود في i18n/translations."]
+      },
+      {
+        "text": "Ready to translate your app?",
+        "hash": "hUJ62HRBMHBewxRvZblIMw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 100,
+        "reference": ["هل أنت مستعد لترجمة تطبيقك؟"],
+        "got": ["هل أنت مستعد لترجمة تطبيقك؟"]
+      },
+      {
+        "text": "Strings",
+        "hash": "7f0YPbDQynykALmEKflP3Q==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 65,
+        "chrF": 100,
+        "reference": ["النصوص"],
+        "got": ["النصوص"]
+      },
+      {
+        "text": "Catalog",
+        "hash": "zJo185mkHlmtxuQdGecjUg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 38,
+        "chrF": 100,
+        "reference": ["الفهرس"],
+        "got": ["الفهرس"]
+      },
+      {
+        "text": "Open {pages}?",
+        "hash": "AQ6/02zzfwk50FSEF0wKtA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 96,
+        "chrF": 62,
+        "reference": ["هل تريد فتح {pages}؟"],
+        "got": ["افتح {pages}؟"]
+      },
+      {
+        "text": "{name} takes part in person.",
+        "hash": "fRQVudyYBFiDmWyed6yR7A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 91,
+        "chrF": 100,
+        "reference": ["يشارك {name} حضوريًا."],
+        "got": ["يشارك {name} حضوريًا."]
+      },
+      {
+        "text": "{name} takes part online.",
+        "hash": "iP10/gSomcvt/+9NrQA7XQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["يشارك {name} عبر الإنترنت."],
+        "got": ["يشارك {name} عبر الإنترنت."]
+      },
+      {
+        "text": "{name} booked a seat.",
+        "hash": "Oeto9jViL+xxuaYfiMdwwg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 100,
+        "reference": ["حجز {name} مقعدًا."],
+        "got": ["حجز {name} مقعدًا."]
+      },
+      {
+        "text": "{name} checked her ticket.",
+        "hash": "jE1zcxOCdGCCTd7j0RhSjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 100,
+        "reference": ["تحققت {name} من تذكرتها."],
+        "got": ["تحققت {name} من تذكرتها."]
+      },
+      {
+        "text": "{name} checked his ticket.",
+        "hash": "bTo3iX4JuIh7tcnM8z1nHg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 79,
+        "chrF": 100,
+        "reference": ["تحقق {name} من تذكرته."],
+        "got": ["تحقق {name} من تذكرته."]
+      },
+      {
+        "text": "{name} checked their ticket.",
+        "hash": "3jFQRFLYFLOxE6C21bq6GA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 76,
+        "chrF": 100,
+        "reference": ["تحقق {name} من تذكرته."],
+        "got": ["تحقق {name} من تذكرته."]
+      },
+      {
+        "text": "{name} booked, and {name} got the ticket by email.",
+        "hash": "AHgdPbajKOCj4zXFKNEbbg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 80,
+        "reference": ["حجز {name}، وتلقى {name} التذكرة عبر البريد الإلكتروني."],
+        "got": ["حجز {name}، وحصل {name} على التذكرة عبر البريد الإلكتروني."]
+      }
+    ]
+  },
+  "de-DE @cf/aisingapore/gemma-sea-lion-v4-27b-it": {
+    "date": "2026-11-15",
+    "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+    "right": 0,
+    "wrong": 0,
+    "unreviewed": [
+      "Save",
+      "Your event shows in every language once it's posted.",
+      "Hello {name}, your ticket is attached.",
+      "{translated} of {total} strings translated",
+      "{number} seats left",
+      "1 seat left",
+      "Run vp dev to start the app.",
+      "The app's AGENTS.md tells your coding agent what to do.",
+      "Void's AI or Claude Code translates what's new.",
+      "Each language's catalog is in i18n/translations.",
+      "Ready to translate your app?",
+      "Strings",
+      "Catalog",
+      "Open {pages}?",
+      "{name} takes part in person.",
+      "{name} takes part online.",
+      "{name} booked a seat.",
+      "{name} checked her ticket.",
+      "{name} checked his ticket.",
+      "{name} checked their ticket.",
+      "{name} booked, and {name} got the ticket by email."
+    ],
+    "meaning": 92,
+    "chrF": 89,
+    "results": [
+      {
+        "text": "Save",
+        "hash": "KVIsARQPJHkNMbpjskkfBg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 67,
+        "chrF": 100,
+        "reference": ["Speichern"],
+        "got": ["Speichern"]
+      },
+      {
+        "text": "Your event shows in every language once it's posted.",
+        "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 91,
+        "chrF": 74,
+        "reference": [
+          "Ihre Veranstaltung erscheint in jeder Sprache, sobald sie veröffentlicht ist."
+        ],
+        "got": [
+          "Ihre Veranstaltung wird in jeder Sprache angezeigt, sobald sie veröffentlicht wurde."
+        ]
+      },
+      {
+        "text": "Hello {name}, your ticket is attached.",
+        "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 97,
+        "chrF": 100,
+        "reference": ["Hallo {name}, Ihr Ticket ist angehängt."],
+        "got": ["Hallo {name}, Ihr Ticket ist angehängt."]
+      },
+      {
+        "text": "{translated} of {total} strings translated",
+        "hash": "0/yUVSiGyC2JT0/i90uO0A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 89,
+        "chrF": 100,
+        "reference": ["{translated} von {total} Strings übersetzt"],
+        "got": ["{translated} von {total} Strings übersetzt"]
+      },
+      {
+        "text": "{number} seats left",
+        "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 83,
+        "chrF": 83,
+        "reference": ["Noch {number} Plätze frei"],
+        "got": ["{number} Plätze frei"]
+      },
+      {
+        "text": "1 seat left",
+        "hash": "YPVBS6NNHhGVrCKVfko+lw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 88,
+        "chrF": 69,
+        "reference": ["Noch 1 Platz frei"],
+        "got": ["1 Platz frei"]
+      },
+      {
+        "text": "Run vp dev to start the app.",
+        "hash": "zMoep4eguZ3OejsIbcWbjg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 95,
+        "chrF": 100,
+        "reference": ["Führen Sie vp dev aus, um die App zu starten."],
+        "got": ["Führen Sie vp dev aus, um die App zu starten."]
+      },
+      {
+        "text": "The app's AGENTS.md tells your coding agent what to do.",
+        "hash": "E3kkP1xBWrE61ZBOek87xg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 69,
+        "reference": ["Die AGENTS.md der App sagt Ihrem Coding-Agenten, was zu tun ist."],
+        "got": ["Die AGENTS.md der App teilt Ihrem Coding-Agenten mit, was er tun soll."]
+      },
+      {
+        "text": "Void's AI or Claude Code translates what's new.",
+        "hash": "XheCGRJ31SRnsGZhKLgJRA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 98,
+        "chrF": 100,
+        "reference": ["Void's AI oder Claude Code übersetzt, was neu ist."],
+        "got": ["Void's AI oder Claude Code übersetzt, was neu ist."]
+      },
+      {
+        "text": "Each language's catalog is in i18n/translations.",
+        "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 81,
+        "reference": ["Der Katalog jeder Sprache liegt in i18n/translations."],
+        "got": ["Der Katalog jeder Sprache befindet sich in i18n/translations."]
+      },
+      {
+        "text": "Ready to translate your app?",
+        "hash": "hUJ62HRBMHBewxRvZblIMw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 96,
+        "chrF": 100,
+        "reference": ["Bereit, Ihre App zu übersetzen?"],
+        "got": ["Bereit, Ihre App zu übersetzen?"]
+      },
+      {
+        "text": "Strings",
+        "hash": "7f0YPbDQynykALmEKflP3Q==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 100,
+        "chrF": 100,
+        "reference": ["Strings"],
+        "got": ["Strings"]
+      },
+      {
+        "text": "Catalog",
+        "hash": "zJo185mkHlmtxuQdGecjUg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 85,
+        "chrF": 100,
+        "reference": ["Katalog"],
+        "got": ["Katalog"]
+      },
+      {
+        "text": "Open {pages}?",
+        "hash": "AQ6/02zzfwk50FSEF0wKtA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 56,
+        "reference": ["{pages} öffnen?"],
+        "got": ["Öffnen Sie {pages}?"]
+      },
+      {
+        "text": "{name} takes part in person.",
+        "hash": "fRQVudyYBFiDmWyed6yR7A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 96,
+        "chrF": 100,
+        "reference": ["{name} nimmt persönlich teil."],
+        "got": ["{name} nimmt persönlich teil."]
+      },
+      {
+        "text": "{name} takes part online.",
+        "hash": "iP10/gSomcvt/+9NrQA7XQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 99,
+        "chrF": 100,
+        "reference": ["{name} nimmt online teil."],
+        "got": ["{name} nimmt online teil."]
+      },
+      {
+        "text": "{name} booked a seat.",
+        "hash": "Oeto9jViL+xxuaYfiMdwwg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 100,
+        "reference": ["{name} hat einen Platz gebucht."],
+        "got": ["{name} hat einen Platz gebucht."]
+      },
+      {
+        "text": "{name} checked her ticket.",
+        "hash": "jE1zcxOCdGCCTd7j0RhSjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 96,
+        "chrF": 100,
+        "reference": ["{name} hat ihr Ticket geprüft."],
+        "got": ["{name} hat ihr Ticket geprüft."]
+      },
+      {
+        "text": "{name} checked his ticket.",
+        "hash": "bTo3iX4JuIh7tcnM8z1nHg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 97,
+        "chrF": 100,
+        "reference": ["{name} hat sein Ticket geprüft."],
+        "got": ["{name} hat sein Ticket geprüft."]
+      },
+      {
+        "text": "{name} checked their ticket.",
+        "hash": "3jFQRFLYFLOxE6C21bq6GA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 95,
+        "chrF": 64,
+        "reference": ["{name} hat das eigene Ticket geprüft."],
+        "got": ["{name} hat ihr Ticket geprüft."]
+      },
+      {
+        "text": "{name} booked, and {name} got the ticket by email.",
+        "hash": "AHgdPbajKOCj4zXFKNEbbg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 75,
+        "reference": ["{name} hat gebucht, und {name} hat das Ticket per E-Mail erhalten."],
+        "got": ["{name} hat gebucht und {name} hat die Fahrkarte per E-Mail erhalten."]
+      }
+    ]
+  },
+  "de-DE @cf/google/gemma-4-26b-a4b-it": {
+    "date": "2026-11-15",
+    "model": "@cf/google/gemma-4-26b-a4b-it",
+    "right": 0,
+    "wrong": 1,
+    "unreviewed": [
+      "Save",
+      "Your event shows in every language once it's posted.",
+      "Hello {name}, your ticket is attached.",
+      "{translated} of {total} strings translated",
+      "1 seat left",
+      "Run vp dev to start the app.",
+      "The app's AGENTS.md tells your coding agent what to do.",
+      "Void's AI or Claude Code translates what's new.",
+      "Each language's catalog is in i18n/translations.",
+      "Ready to translate your app?",
+      "Strings",
+      "Catalog",
+      "Open {pages}?",
+      "{name} takes part in person.",
+      "{name} takes part online.",
+      "{name} booked a seat.",
+      "{name} checked her ticket.",
+      "{name} checked his ticket.",
+      "{name} checked their ticket.",
+      "{name} booked, and {name} got the ticket by email."
+    ],
+    "meaning": 93,
+    "chrF": 90,
+    "results": [
+      {
+        "text": "Save",
+        "hash": "KVIsARQPJHkNMbpjskkfBg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 67,
+        "chrF": 100,
+        "reference": ["Speichern"],
+        "got": ["Speichern"]
+      },
+      {
+        "text": "Your event shows in every language once it's posted.",
+        "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 93,
+        "chrF": 35,
+        "reference": [
+          "Ihre Veranstaltung erscheint in jeder Sprache, sobald sie veröffentlicht ist."
+        ],
+        "got": ["Ihr Event wird in jeder Sprache angezeigt, sobald es gepostet wurde."]
+      },
+      {
+        "text": "Hello {name}, your ticket is attached.",
+        "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 95,
+        "chrF": 73,
+        "reference": ["Hallo {name}, Ihr Ticket ist angehängt."],
+        "got": ["Hallo {name}, Ihr Ticket ist beigefügt."]
+      },
+      {
+        "text": "{translated} of {total} strings translated",
+        "hash": "0/yUVSiGyC2JT0/i90uO0A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 89,
+        "chrF": 100,
+        "reference": ["{translated} von {total} Strings übersetzt"],
+        "got": ["{translated} von {total} Strings übersetzt"]
+      },
+      {
+        "text": "{number} seats left",
+        "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
+        "cache": false,
+        "verdict": "wrong",
+        "why": "{number} seats left → [\"only\"]: Line 1 must keep the placeholder {number} exactly. i18n/translations/de-DE.json: 0 of 1 translated with Void's AI",
+        "reference": ["Noch {number} Plätze frei"],
+        "got": []
+      },
+      {
+        "text": "1 seat left",
+        "hash": "YPVBS6NNHhGVrCKVfko+lw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 90,
+        "chrF": 100,
+        "reference": ["Noch 1 Platz frei"],
+        "got": ["Noch 1 Platz frei"]
+      },
+      {
+        "text": "Run vp dev to start the app.",
+        "hash": "zMoep4eguZ3OejsIbcWbjg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 95,
+        "chrF": 100,
+        "reference": ["Führen Sie vp dev aus, um die App zu starten."],
+        "got": ["Führen Sie vp dev aus, um die App zu starten."]
+      },
+      {
+        "text": "The app's AGENTS.md tells your coding agent what to do.",
+        "hash": "E3kkP1xBWrE61ZBOek87xg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 96,
+        "chrF": 100,
+        "reference": ["Die AGENTS.md der App sagt Ihrem Coding-Agenten, was zu tun ist."],
+        "got": ["Die AGENTS.md der App sagt Ihrem Coding-Agenten, was zu tun ist."]
+      },
+      {
+        "text": "Void's AI or Claude Code translates what's new.",
+        "hash": "XheCGRJ31SRnsGZhKLgJRA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 98,
+        "chrF": 100,
+        "reference": ["Void's AI oder Claude Code übersetzt, was neu ist."],
+        "got": ["Void's AI oder Claude Code übersetzt, was neu ist."]
+      },
+      {
+        "text": "Each language's catalog is in i18n/translations.",
+        "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 81,
+        "reference": ["Der Katalog jeder Sprache liegt in i18n/translations."],
+        "got": ["Der Katalog jeder Sprache befindet sich in i18n/translations."]
+      },
+      {
+        "text": "Ready to translate your app?",
+        "hash": "hUJ62HRBMHBewxRvZblIMw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 96,
+        "chrF": 100,
+        "reference": ["Bereit, Ihre App zu übersetzen?"],
+        "got": ["Bereit, Ihre App zu übersetzen?"]
+      },
+      {
+        "text": "Strings",
+        "hash": "7f0YPbDQynykALmEKflP3Q==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 100,
+        "chrF": 100,
+        "reference": ["Strings"],
+        "got": ["Strings"]
+      },
+      {
+        "text": "Catalog",
+        "hash": "zJo185mkHlmtxuQdGecjUg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 85,
+        "chrF": 100,
+        "reference": ["Katalog"],
+        "got": ["Katalog"]
+      },
+      {
+        "text": "Open {pages}?",
+        "hash": "AQ6/02zzfwk50FSEF0wKtA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 100,
+        "chrF": 44,
+        "reference": ["{pages} öffnen?"],
+        "got": ["Open {pages}?"]
+      },
+      {
+        "text": "{name} takes part in person.",
+        "hash": "fRQVudyYBFiDmWyed6yR7A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 96,
+        "chrF": 100,
+        "reference": ["{name} nimmt persönlich teil."],
+        "got": ["{name} nimmt persönlich teil."]
+      },
+      {
+        "text": "{name} takes part online.",
+        "hash": "iP10/gSomcvt/+9NrQA7XQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 99,
+        "chrF": 100,
+        "reference": ["{name} nimmt online teil."],
+        "got": ["{name} nimmt online teil."]
+      },
+      {
+        "text": "{name} booked a seat.",
+        "hash": "Oeto9jViL+xxuaYfiMdwwg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 100,
+        "reference": ["{name} hat einen Platz gebucht."],
+        "got": ["{name} hat einen Platz gebucht."]
+      },
+      {
+        "text": "{name} checked her ticket.",
+        "hash": "jE1zcxOCdGCCTd7j0RhSjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 96,
+        "chrF": 100,
+        "reference": ["{name} hat ihr Ticket geprüft."],
+        "got": ["{name} hat ihr Ticket geprüft."]
+      },
+      {
+        "text": "{name} checked his ticket.",
+        "hash": "bTo3iX4JuIh7tcnM8z1nHg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 97,
+        "chrF": 100,
+        "reference": ["{name} hat sein Ticket geprüft."],
+        "got": ["{name} hat sein Ticket geprüft."]
+      },
+      {
+        "text": "{name} checked their ticket.",
+        "hash": "3jFQRFLYFLOxE6C21bq6GA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 95,
+        "chrF": 67,
+        "reference": ["{name} hat das eigene Ticket geprüft."],
+        "got": ["{name} hat sein Ticket geprüft."]
+      },
+      {
+        "text": "{name} booked, and {name} got the ticket by email.",
+        "hash": "AHgdPbajKOCj4zXFKNEbbg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 100,
+        "reference": ["{name} hat gebucht, und {name} hat das Ticket per E-Mail erhalten."],
+        "got": ["{name} hat gebucht, und {name} hat das Ticket per E-Mail erhalten."]
+      }
+    ]
+  },
+  "de-DE @cf/meta/llama-3.3-70b-instruct-fp8-fast": {
+    "date": "2026-11-15",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "right": 0,
+    "wrong": 0,
+    "unreviewed": [
+      "Save",
+      "Your event shows in every language once it's posted.",
+      "Hello {name}, your ticket is attached.",
+      "{translated} of {total} strings translated",
+      "{number} seats left",
+      "1 seat left",
+      "Run vp dev to start the app.",
+      "The app's AGENTS.md tells your coding agent what to do.",
+      "Void's AI or Claude Code translates what's new.",
+      "Each language's catalog is in i18n/translations.",
+      "Ready to translate your app?",
+      "Strings",
+      "Catalog",
+      "Open {pages}?",
+      "{name} takes part in person.",
+      "{name} takes part online.",
+      "{name} booked a seat.",
+      "{name} checked her ticket.",
+      "{name} checked his ticket.",
+      "{name} checked their ticket.",
+      "{name} booked, and {name} got the ticket by email."
+    ],
+    "meaning": 91,
+    "chrF": 86,
+    "results": [
+      {
+        "text": "Save",
+        "hash": "KVIsARQPJHkNMbpjskkfBg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 67,
+        "chrF": 100,
+        "reference": ["Speichern"],
+        "got": ["Speichern"]
+      },
+      {
+        "text": "Your event shows in every language once it's posted.",
+        "hash": "Ri2u0XMS+wJCFqdr60QG5A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 91,
+        "chrF": 50,
+        "reference": [
+          "Ihre Veranstaltung erscheint in jeder Sprache, sobald sie veröffentlicht ist."
+        ],
+        "got": ["Ihr Ereignis wird in jeder Sprache angezeigt, sobald es veröffentlicht wurde."]
+      },
+      {
+        "text": "Hello {name}, your ticket is attached.",
+        "hash": "5jxwLMzaf8YB/FQfN7jMjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 97,
+        "chrF": 100,
+        "reference": ["Hallo {name}, Ihr Ticket ist angehängt."],
+        "got": ["Hallo {name}, Ihr Ticket ist angehängt."]
+      },
+      {
+        "text": "{translated} of {total} strings translated",
+        "hash": "0/yUVSiGyC2JT0/i90uO0A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 89,
+        "chrF": 100,
+        "reference": ["{translated} von {total} Strings übersetzt"],
+        "got": ["{translated} von {total} Strings übersetzt"]
+      },
+      {
+        "text": "{number} seats left",
+        "hash": "hk43hC7uwc3/d6Rkg/7KdQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 83,
+        "chrF": 83,
+        "reference": ["Noch {number} Plätze frei"],
+        "got": ["{number} Plätze frei"]
+      },
+      {
+        "text": "1 seat left",
+        "hash": "YPVBS6NNHhGVrCKVfko+lw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 88,
+        "chrF": 69,
+        "reference": ["Noch 1 Platz frei"],
+        "got": ["1 Platz frei"]
+      },
+      {
+        "text": "Run vp dev to start the app.",
+        "hash": "zMoep4eguZ3OejsIbcWbjg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 95,
+        "chrF": 100,
+        "reference": ["Führen Sie vp dev aus, um die App zu starten."],
+        "got": ["Führen Sie vp dev aus, um die App zu starten."]
+      },
+      {
+        "text": "The app's AGENTS.md tells your coding agent what to do.",
+        "hash": "E3kkP1xBWrE61ZBOek87xg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 92,
+        "chrF": 71,
+        "reference": ["Die AGENTS.md der App sagt Ihrem Coding-Agenten, was zu tun ist."],
+        "got": ["Die AGENTS.md der App teilt Ihrem Codieragenten mit, was zu tun ist."]
+      },
+      {
+        "text": "Void's AI or Claude Code translates what's new.",
+        "hash": "XheCGRJ31SRnsGZhKLgJRA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 96,
+        "chrF": 91,
+        "reference": ["Void's AI oder Claude Code übersetzt, was neu ist."],
+        "got": ["Void's KI oder Claude Code übersetzt, was neu ist."]
+      },
+      {
+        "text": "Each language's catalog is in i18n/translations.",
+        "hash": "kBctHh0b7gp5b2Q3AfqxOA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 66,
+        "reference": ["Der Katalog jeder Sprache liegt in i18n/translations."],
+        "got": ["Jeder Sprach-Katalog befindet sich in i18n/translations."]
+      },
+      {
+        "text": "Ready to translate your app?",
+        "hash": "hUJ62HRBMHBewxRvZblIMw==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 96,
+        "chrF": 100,
+        "reference": ["Bereit, Ihre App zu übersetzen?"],
+        "got": ["Bereit, Ihre App zu übersetzen?"]
+      },
+      {
+        "text": "Strings",
+        "hash": "7f0YPbDQynykALmEKflP3Q==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 74,
+        "chrF": 59,
+        "reference": ["Strings"],
+        "got": ["Strings -> Zeichenfolgen"]
+      },
+      {
+        "text": "Catalog",
+        "hash": "zJo185mkHlmtxuQdGecjUg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 85,
+        "chrF": 100,
+        "reference": ["Katalog"],
+        "got": ["Katalog"]
+      },
+      {
+        "text": "Open {pages}?",
+        "hash": "AQ6/02zzfwk50FSEF0wKtA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 56,
+        "reference": ["{pages} öffnen?"],
+        "got": ["Öffnen Sie {pages}?"]
+      },
+      {
+        "text": "{name} takes part in person.",
+        "hash": "fRQVudyYBFiDmWyed6yR7A==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 96,
+        "chrF": 100,
+        "reference": ["{name} nimmt persönlich teil."],
+        "got": ["{name} nimmt persönlich teil."]
+      },
+      {
+        "text": "{name} takes part online.",
+        "hash": "iP10/gSomcvt/+9NrQA7XQ==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 99,
+        "chrF": 100,
+        "reference": ["{name} nimmt online teil."],
+        "got": ["{name} nimmt online teil."]
+      },
+      {
+        "text": "{name} booked a seat.",
+        "hash": "Oeto9jViL+xxuaYfiMdwwg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 100,
+        "reference": ["{name} hat einen Platz gebucht."],
+        "got": ["{name} hat einen Platz gebucht."]
+      },
+      {
+        "text": "{name} checked her ticket.",
+        "hash": "jE1zcxOCdGCCTd7j0RhSjA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 96,
+        "chrF": 100,
+        "reference": ["{name} hat ihr Ticket geprüft."],
+        "got": ["{name} hat ihr Ticket geprüft."]
+      },
+      {
+        "text": "{name} checked his ticket.",
+        "hash": "bTo3iX4JuIh7tcnM8z1nHg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 97,
+        "chrF": 100,
+        "reference": ["{name} hat sein Ticket geprüft."],
+        "got": ["{name} hat sein Ticket geprüft."]
+      },
+      {
+        "text": "{name} checked their ticket.",
+        "hash": "3jFQRFLYFLOxE6C21bq6GA==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 95,
+        "chrF": 64,
+        "reference": ["{name} hat das eigene Ticket geprüft."],
+        "got": ["{name} hat ihr Ticket geprüft."]
+      },
+      {
+        "text": "{name} booked, and {name} got the ticket by email.",
+        "hash": "AHgdPbajKOCj4zXFKNEbbg==",
+        "cache": false,
+        "verdict": "unreviewed",
+        "meaning": 94,
+        "chrF": 100,
+        "reference": ["{name} hat gebucht, und {name} hat das Ticket per E-Mail erhalten."],
+        "got": ["{name} hat gebucht, und {name} hat das Ticket per E-Mail erhalten."]
+      }
+    ]
+  },
   "th-TH": {
     "date": "2026-11-15",
     "model": "@cf/thinkingmachines/inkling-2-small",

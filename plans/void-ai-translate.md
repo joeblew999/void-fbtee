@@ -76,6 +76,41 @@ them GLM 4.7 Flash spent all 8192 tokens thinking and gave no answer, Qwen 31 se
 nine on one string (AI Gateway's logs, 2026-11-15). An answer with no content, or cut off at
 max_tokens, is an unusable answer (ai.ts ask), left for Claude Code.
 
+## Next: send templates as sentences (to approve)
+
+What went wrong (2026-11-15). The app's strings are templates: in most languages the words around
+`{name}`, `{number}` and `{pages}` change with what goes in. fbtee says which in every catalog
+entry (`tokens` and `types`: `"tokens": ["name"], "types": [3]` is a name whose gender changes the
+wording), and its own skill (node_modules/fbtee/skills/fbtee-translate/SKILL.md, step 4) says to add
+"the plural and gender variants required by the target language". vp dev only did that for plural
+forms. Everything else went to Void's AI as one line with its braces, and the judge
+(judge.ts `problemsWith`) took back exactly that many lines. A model that doesn't think can't
+choose a gender it isn't told, so each model guessed differently: the scattered answers, the
+Arabic gender verdicts, the endless new answers to judge. Thinking models aren't the fix; a
+translation needs none.
+
+The change, one piece of work, nothing built before it's approved:
+
+1. Variants from fbtee's own data. For each entry, its `tokens`/`types` (and the reader's gender,
+   `__viewing_user__`) say which variants it has: a name or pronoun one line per gender
+   (`{"0": 1}` male, `{"0": 2}` female, `{"0": 3}` unknown), a count one line per plural form (as
+   now), several tokens every combination fbtee writes. A language whose words don't change for
+   one keeps the one line, as the skill allows (Thai mostly doesn't change for gender).
+2. Real sentences, not braces. Each line goes to Void's AI with real values in place of its
+   placeholders: a name the model keeps as written, of that line's gender; a number that falls in
+   that line's plural form (`Intl.PluralRules` picks it for the language); a real list for a list.
+   The answer gets its placeholders back where those values are. A form that writes its number in
+   words (Arabic's two, مقعدان) has no number to put back, which fbtee already allows.
+3. The judge checks each line against its own variant, and the line count against the variants,
+   not against the English.
+4. The same for the runtime queue (translate(), people's posts): it's plain text, no placeholders,
+   so it doesn't change; models.json's choices are measured on it too before a language's model
+   changes there.
+5. Test data: each catalog's references get their variant lines where the language needs them;
+   the verdicts given to one-line answers for those entries are removed (they couldn't be right).
+6. Then the pick run, with the work going through a queue (the example's Void queue runs in
+   vp dev too) so languages and models run side by side.
+
 ## Still to do
 
 - Move the translator test into the package with an app of its own
