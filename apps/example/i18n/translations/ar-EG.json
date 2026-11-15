@@ -4573,18 +4573,6 @@
       ],
       "types": []
     },
-    "9Fg1wa5OVWLcirO302dDBA==": {
-      "description": "Home feature fact: the dev server hands new strings to Claude Code once you pause",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يسلّم vp dev الجديد إلى Claude Code، مع مهارة void-fbtee، عندما تتوقف.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "OyxyHsMTb19siPl9d13hGg==": {
       "description": "Markdown page point: each copy records which version of the original it was translated from, and check reports it when the original changes",
       "status": "translated",
@@ -4633,30 +4621,6 @@
       ],
       "types": []
     },
-    "xBpH5kB/9vb+YTuTDgk23g==": {
-      "description": "Translating page point title: the dev server translates, with Claude Code",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "vp dev يترجم، بواسطة Claude Code",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "no8hIs+9AetKHzwKOPrcGA==": {
-      "description": "Translating page point: the dev server prepares new strings and, once you pause, hands them to Claude Code with void-fbtee's skill",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "لا شيء لتشغيله. أثناء الحفظ، يضيف vp dev كل نص جديد إلى كتالوج كل لغة، وعندما تتوقف، يسلّم الجديد إلى Claude Code مع مهارة void-fbtee: النصوص، وصفحات markdown التي تغيّرت. وملف AGENTS.md في التطبيق يقول ذلك أيضًا.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "FJ/lBvh3mGS3BKL16lV73A==": {
       "description": "Translating page: what void-fbtee init does, once, to set an app up",
       "status": "translated",
@@ -4664,18 +4628,6 @@
       "translations": [
         {
           "translation": "مرة واحدة: يُعدّ التطبيق. وهو الأمر الوحيد في void-fbtee.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "7QBEzIrKVqKX8/OaD1PXkw==": {
-      "description": "Translating page: what the dev server does about translations, preparing, translating and reporting by itself",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "أثناء الحفظ، يضيف النصوص الجديدة إلى كل لغة، موسومة بأنها جديدة. وعندما تتوقف، يترجمها Claude Code، ويُبلغ خادم التطوير بما تبقّى. وتظهر الترجمة المعدّلة فورًا.",
           "variations": {}
         }
       ],
@@ -4700,6 +4652,54 @@
       "translations": [
         {
           "translation": "يشغّل الأوامر نفسها مع كل push: ‏check، ثم build، ثم ينشر ويتحقق من الموقع الحي.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+eGjH8PHTlpgxZsnNcfIrA==": {
+      "description": "Home feature fact: the dev server translates new strings with Void's AI or Claude Code once you pause",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يترجم vp dev ما هو جديد باستخدام الذكاء الاصطناعي من Void أو Claude Code، بمجرد توقفك.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zv6OgqGuv2aGlwiMTYo5GA==": {
+      "description": "Translating page point title: the dev server translates, with Void's AI or Claude Code",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يترجم vp dev، باستخدام الذكاء الاصطناعي من Void أو Claude Code",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "11+A/r80oBTKWFIt6+Kyww==": {
+      "description": "Translating page point: the dev server prepares new strings and, once you pause, translates them with Void's AI, else Claude Code",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لا يوجد شيء للتشغيل. عند الحفظ، يضيف vp dev كل سلسلة جديدة إلى فهرس كل لغة. بمجرد توقفك، يترجم ما هو جديد، النصوص وصفحات Markdown التي تغيرت: باستخدام الذكاء الاصطناعي من Void، في الـ Worker الخاص بالتطبيق، عندما يستخدم التطبيق ذلك، وباستخدام Claude Code ومهارة void-fbtee لأي شيء متبقٍ. نفس المترجم يقوم بما ينشره الناس.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "aa7Dj+dRbjgFFxCuexgioA==": {
+      "description": "Translating page: what the dev server does about translations, preparing, translating with Void's AI or Claude Code, and reporting by itself",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "عند الحفظ، يضيف إلى كل لغة النصوص الجديدة، معلمة جديدة. بمجرد توقفك، يترجمها الذكاء الاصطناعي من Void أو Claude Code، ويبلّغ الخادم التطويري ما تبقى. تظهر الترجمة المعدلة على الفور.",
           "variations": {}
         }
       ],

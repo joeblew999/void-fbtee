@@ -4219,18 +4219,6 @@
       ],
       "types": []
     },
-    "9Fg1wa5OVWLcirO302dDBA==": {
-      "description": "Home feature fact: the dev server hands new strings to Claude Code once you pause",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "vp dev ส่งสิ่งที่ใหม่ให้ Claude Code พร้อมสกิลของ void-fbtee เมื่อคุณหยุดพัก",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "OyxyHsMTb19siPl9d13hGg==": {
       "description": "Markdown page point: each copy records which version of the original it was translated from, and check reports it when the original changes",
       "status": "translated",
@@ -4279,30 +4267,6 @@
       ],
       "types": []
     },
-    "xBpH5kB/9vb+YTuTDgk23g==": {
-      "description": "Translating page point title: the dev server translates, with Claude Code",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "vp dev แปลให้ ด้วย Claude Code",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "no8hIs+9AetKHzwKOPrcGA==": {
-      "description": "Translating page point: the dev server prepares new strings and, once you pause, hands them to Claude Code with void-fbtee's skill",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ไม่มีอะไรต้องรัน ขณะที่คุณบันทึก vp dev จะเพิ่มข้อความใหม่แต่ละข้อความลงในแค็ตตาล็อกของทุกภาษา และเมื่อคุณหยุดพัก ก็จะส่งสิ่งที่ใหม่ให้ Claude Code พร้อมสกิลของ void-fbtee: ทั้งข้อความ และหน้า markdown ที่เปลี่ยนไป AGENTS.md ของแอปก็บอกไว้เช่นกัน",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "FJ/lBvh3mGS3BKL16lV73A==": {
       "description": "Translating page: what void-fbtee init does, once, to set an app up",
       "status": "translated",
@@ -4310,18 +4274,6 @@
       "translations": [
         {
           "translation": "ครั้งเดียว: ตั้งค่าแอป เป็นคำสั่งเดียวของ void-fbtee",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "7QBEzIrKVqKX8/OaD1PXkw==": {
-      "description": "Translating page: what the dev server does about translations, preparing, translating and reporting by itself",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ขณะที่คุณบันทึก จะเพิ่มข้อความใหม่ลงในทุกภาษาโดยทำเครื่องหมายว่าใหม่ เมื่อคุณหยุดพัก Claude Code จะแปลให้ และเซิร์ฟเวอร์สำหรับพัฒนาจะรายงานสิ่งที่เหลือ คำแปลที่แก้ไขจะแสดงทันที",
           "variations": {}
         }
       ],
@@ -4346,6 +4298,54 @@
       "translations": [
         {
           "translation": "รันคำสั่งเดียวกันทุกครั้งที่ push: check, build จากนั้น deploy และตรวจสอบเว็บไซต์จริง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+eGjH8PHTlpgxZsnNcfIrA==": {
+      "description": "Home feature fact: the dev server translates new strings with Void's AI or Claude Code once you pause",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "vp dev แปลสิ่งที่ใหม่ด้วย Void's AI หรือ Claude Code เมื่อคุณหยุด",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zv6OgqGuv2aGlwiMTYo5GA==": {
+      "description": "Translating page point title: the dev server translates, with Void's AI or Claude Code",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "vp dev แปลด้วย Void's AI หรือ Claude Code",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "11+A/r80oBTKWFIt6+Kyww==": {
+      "description": "Translating page point: the dev server prepares new strings and, once you pause, translates them with Void's AI, else Claude Code",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ไม่มีอะไรให้รัน ขณะที่คุณบันทึก vp dev จะเพิ่มข้อความใหม่แต่ละรายการไปยังแค็ตตาล็อกของแต่ละภาษา เมื่อคุณหยุด มันจะแปลสิ่งที่ใหม่ ทั้งข้อความและหน้า Markdown ที่เปลี่ยนแปลง ด้วย Void's AI ใน Worker ของแอปเอง เมื่อแอปใช้ และด้วย Claude Code และ skill ของ void-fbtee สำหรับส่วนที่เหลือ ตัวแปลเดียวกันทำสิ่งที่ผู้คนโพสต์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "aa7Dj+dRbjgFFxCuexgioA==": {
+      "description": "Translating page: what the dev server does about translations, preparing, translating with Void's AI or Claude Code, and reporting by itself",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ขณะที่คุณบันทึก จะเพิ่มข้อความใหม่ไปยังทุกภาษา โดยทำเครื่องหมายว่าเป็นข้อความใหม่ เมื่อคุณหยุด Void's AI หรือ Claude Code จะแปลข้อความเหล่านั้น และ dev server จะรายงานสิ่งที่เหลืออยู่ การแปลที่แก้ไขจะแสดงขึ้นทันที",
           "variations": {}
         }
       ],

@@ -27,6 +27,7 @@ export default defineConfig({
       head: "src/head.ts",
       server: "src/server.ts",
       routes: "src/routes.ts",
+      ai: "src/ai.ts",
     },
     format: ["esm"],
     dts: true,

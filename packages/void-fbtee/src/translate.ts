@@ -3,14 +3,16 @@
 // the dev server runs in, given the prompt. The skill does the translating; this file only says
 // what's missing, records each translated page's original, and checks the result.
 import { spawn, spawnSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import { catalogFile, missing, type Project } from "./catalogs";
+import { catalogFile, collect, missing, type Project } from "./catalogs";
 import {
   frontmatter,
+  keptParts,
   markdownHash,
   markdownPages,
+  missingHead,
   TRANSLATED_FROM,
   TRANSLATED_FROM_LINE,
   type MarkdownPage,
@@ -250,4 +252,330 @@ export async function translateApp(
     }
   }
   return { problems: check(p) };
+}
+
+interface CatalogLine {
+  translation: string;
+  variations: Record<string, number>;
+}
+interface CatalogEntry {
+  description?: string;
+  /** Not in fbtee's file: the source text, added here for examplesFor. */
+  source?: string;
+  status?: string;
+  translations?: CatalogLine[];
+}
+
+/** The {placeholders} in a line. */
+const placeholders = (text: string) => new Set(text.match(/\{[^{}]+\}/g) ?? []);
+/** Forms that may say the number in words (zero, one, two), so may leave {number} out. */
+const WORDED = new Set([16, 4, 8]);
+
+/**
+ * What a translation keeps exactly as the source writes it: commands (`vp dev`), file names
+ * (`AGENTS.md`), paths (`i18n/translations`) and lower-case names with a hyphen (`void-fbtee`).
+ */
+export function keptTerms(text: string): string[] {
+  return (
+    text.match(
+      /\bvp [a-z]+\b|[\w-]+\.(?:md|mdx|ts|tsx|js|json|ya?ml)\b|\b[\w.-]+(?:\/[\w.-]+)+|\b[a-z0-9]+(?:-[a-z0-9]+)+\b/g,
+    ) ?? []
+  );
+}
+
+/**
+ * Whether a translated entry is usable, by the skill's rules: one line per source line, none
+ * empty; no line left in the source language (a line of three words or more, unchanged); every
+ * command, file name and path kept (keptTerms); and its placeholders kept: no line has one the
+ * source hasn't, and every line but a zero, one or two form has them all.
+ */
+export function keepsPlaceholders(source: CatalogLine[], lines: string[]): boolean {
+  return problemsWith(source, lines).length === 0;
+}
+
+/** What's wrong with a translated entry, in words Void's AI is told when it's asked again. */
+export function problemsWith(source: CatalogLine[], lines: string[]): string[] {
+  if (lines.length !== source.length)
+    return [`Give exactly ${source.length} line(s), one per source line, in order.`];
+  const problems: string[] = [];
+  const words = (t: string) => t.trim().split(/\s+/).length;
+  const all = new Set(source.flatMap((l) => [...placeholders(l.translation)]));
+  lines.forEach((line, i) => {
+    const src = source[i]!.translation;
+    if (!line.trim()) problems.push(`Line ${i + 1} is empty.`);
+    else if (line.trim() === src.trim() && words(line) >= 3)
+      problems.push(`Line ${i + 1} is still the source text: translate it.`);
+    for (const t of keptTerms(src))
+      if (!line.includes(t)) problems.push(`Line ${i + 1} must keep "${t}" exactly as written.`);
+    const has = placeholders(line);
+    for (const x of has)
+      if (!all.has(x)) problems.push(`Line ${i + 1} has ${x}, which the source hasn't: remove it.`);
+    const worded = Object.values(source[i]!.variations).some((v) => WORDED.has(v));
+    if (!worded)
+      for (const x of all)
+        if (!has.has(x)) problems.push(`Line ${i + 1} must keep the placeholder ${x} exactly.`);
+  });
+  return problems;
+}
+
+/** A glossary word's stem: Arabic's article (ال) and the prefixes before it don't count. */
+const stem = (w: string) => w.replace(/^(?:[وفبلك]?ال)/, "");
+
+/**
+ * The glossary's words the translation doesn't use, in words for Void's AI: a term the entry's
+ * source uses ("strings") should be written as the app writes it ("ข้อความ").
+ */
+export function glossaryMisses(
+  glossary: { source: string; translation: string }[],
+  lines: string[],
+): string[] {
+  const text = lines.join(" ");
+  return glossary
+    .filter((g) => !g.translation.split(/\s+/).every((w) => text.includes(stem(w))))
+    .map((g) => `The app writes "${g.source}" as "${g.translation}": use that word, not another.`);
+}
+/**
+ * The rules Claude Code translates by, for Void's AI too: fbtee's own translating skill (steps 3
+ * to 5: match the catalog, read the description and the code, keep placeholders, the plural and
+ * gender forms) and void-fbtee's skill's "Strings" section (catalogs, plurals, gender, RTL).
+ */
+export function translatingRules(root: string): string {
+  const read = (rel: string) => {
+    try {
+      return readFileSync(join(root, rel), "utf8");
+    } catch {
+      return "";
+    }
+  };
+  const fbtee = read("node_modules/fbtee/skills/fbtee-translate/SKILL.md")
+    .split("\n")
+    .filter((l) => /^[345]\. /.test(l))
+    .join("\n");
+  const own = read(skillPath(root));
+  const strings = own.match(/^## Strings\n([\s\S]*?)^## /m)?.[1]?.trim() ?? "";
+  return [fbtee, strings].filter(Boolean).join("\n\n");
+}
+
+/** A few lines of the code a string is written in, around it, from fbtee's collected phrases. */
+export function sourceContext(p: Project, hash: string): string | undefined {
+  const phrase = (
+    collect(p).phrases as {
+      hashToLeaf?: Record<string, unknown>;
+      filename?: string;
+      loc?: { start: { line: number }; end: { line: number } };
+    }[]
+  ).find((ph) => ph.hashToLeaf && hash in ph.hashToLeaf);
+  if (!phrase?.filename || !phrase.loc || phrase.filename.includes("node_modules")) return;
+  try {
+    const lines = readFileSync(join(p.root, phrase.filename), "utf8").split("\n");
+    return lines.slice(Math.max(0, phrase.loc.start.line - 4), phrase.loc.end.line + 2).join("\n");
+  } catch {
+    return;
+  }
+}
+
+/**
+ * One entry per request: sent three at a time, Llama 3.3 mixed their lines up and most failed the
+ * checks; each alone, the same entries passed (2026-11-15).
+ */
+const BATCH = 1;
+/** How many of the catalog's own translations go with each request, as examples. */
+const EXAMPLES = 12;
+
+const wordsOf = (t: string) => new Set(t.toLowerCase().match(/[a-z0-9']+/g) ?? []);
+/** The names in a text: capitalised words and runs of them ("Void's AI", "Claude Code"). */
+const namesOf = (t: string) =>
+  new Set(t.match(/\b[A-Z][\w']*(?: [A-Z][\w']*)*/g)?.filter((n) => n.length > 1) ?? []);
+
+/**
+ * The catalog's own finished translations closest to these entries (most words in common with
+ * their source and description), as examples of the app's words and style for Void's AI.
+ */
+export function examplesFor(
+  done: CatalogEntry[],
+  entries: { description: string; lines: { text: string }[] }[],
+  n = EXAMPLES,
+): { description: string; source: string; translation: string }[] {
+  const want = wordsOf(
+    entries.map((e) => e.description + " " + e.lines.map((l) => l.text).join(" ")).join(" "),
+  );
+  // A name the entry uses counts five times a word: the examples then show how the app already
+  // writes it, so it's written the same way everywhere.
+  const names = namesOf(entries.map((e) => e.lines.map((l) => l.text).join(" ")).join(" "));
+  const pool = done.filter(
+    (e) => e.status === "translated" && e.translations?.length === 1 && e.source,
+  );
+  // A word counts by how rare it is in the catalog (its inverse document frequency): "string"
+  // picks the entries that show how the app says "string"; "the" and "to" pick nothing.
+  const seen = new Map<string, number>();
+  for (const e of pool) for (const w of wordsOf(e.source!)) seen.set(w, (seen.get(w) ?? 0) + 1);
+  const weight = (w: string) => Math.log((pool.length + 1) / ((seen.get(w) ?? 0) + 1));
+  return pool
+    .map((e) => {
+      const has = wordsOf(e.source!);
+      const shared = [...namesOf(e.source!)].filter((x) => names.has(x)).length;
+      const words = [...has].filter((w) => want.has(w)).reduce((a, w) => a + weight(w), 0);
+      return { e, score: words + 5 * shared };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, n)
+    .map(({ e }) => ({
+      description: e.description ?? "",
+      source: e.source!,
+      translation: e.translations![0]!.translation,
+    }));
+}
+
+/**
+ * The app's own words for the terms an entry uses: its one-word entries ("Strings", "Language")
+ * and its common strings (fbtee's `common`, the app's own list of terms), when the entry uses that
+ * word. Void's AI is told to use them, so a term is written the way the rest of the app writes it.
+ * Longer entries ("Post them") aren't terms: asked to use them, the model tacked them on.
+ */
+export function glossaryFor(
+  done: CatalogEntry[],
+  entries: { lines: { text: string }[] }[],
+  common: string[] = [],
+): { source: string; translation: string }[] {
+  const singular = (w: string) => w.replace(/s$/, "");
+  const want = new Set(
+    [...wordsOf(entries.map((e) => e.lines.map((l) => l.text).join(" ")).join(" "))].map(singular),
+  );
+  const terms = new Set(common);
+  return done
+    .filter(
+      (e) =>
+        e.status === "translated" &&
+        e.translations?.length === 1 &&
+        e.source &&
+        (terms.has(e.source) || /^[A-Za-z]{4,}$/.test(e.source.trim())) &&
+        [...wordsOf(e.source)].every((w) => want.has(singular(w))),
+    )
+    .slice(0, 20)
+    .map((e) => ({ source: e.source!, translation: e.translations![0]!.translation }));
+}
+
+/**
+ * Translate what's new with Void's AI, through the dev server's own route (ai.ts devTranslate,
+ * in the app's Worker): each catalog's new entries, and each markdown page missing or out of
+ * date. Every answer is checked as the build checks it (placeholders kept; a page's kept parts,
+ * title and description), and only what passes is written: an entry marked translated, a page
+ * stamped. Resolves false when Void's AI isn't there (the app doesn't use `void/ai`, or no
+ * Cloudflare sign-in), with nothing written.
+ */
+export async function translateWithVoidAi(
+  p: Project,
+  url: string,
+  token: string,
+  log: (line: string) => void,
+): Promise<boolean> {
+  const call = async (body: unknown): Promise<Record<string, unknown> | undefined> => {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-void-fbtee-token": token },
+      body: JSON.stringify(body),
+    });
+    if (res.status === 503) {
+      const { error } = (await res.json().catch(() => ({}))) as { error?: string };
+      log(`Void's AI isn't available here (${error ?? "no answer"}), so Claude Code translates`);
+      return undefined;
+    }
+    if (res.status === 502) {
+      const { error } = (await res.json().catch(() => ({}))) as { error?: string };
+      log(`Void's AI gave an unusable answer (${error ?? "no answer"}); left for Claude Code`);
+      return {};
+    }
+    if (!res.ok) throw new Error(`the dev server's translate route answered ${res.status}`);
+    return (await res.json()) as Record<string, unknown>;
+  };
+  const from = p.config.sourceLocale;
+  const rel = (f: string) => relative(p.root, f).split(sep).join("/");
+
+  const { texts } = collect(p);
+  const guide = translatingRules(p.root);
+  for (const m of missing(p)) {
+    const file = catalogFile(p, m.locale);
+    if (!existsSync(file)) continue;
+    const catalog = JSON.parse(readFileSync(file, "utf8")) as {
+      translations: Record<string, CatalogEntry>;
+    };
+    // The app's own translations, each with its source text, as examples (not written back).
+    const finished = Object.entries(catalog.translations).map(([hash, e]) => ({
+      ...e,
+      source: texts[hash],
+    }));
+    // Each open entry's hash, kept beside it (not in the entry, which is written back).
+    const hashOf = new Map<CatalogEntry, string>();
+    const open = Object.entries(catalog.translations)
+      .filter(([, e]) => e.status === "new" && e.translations?.length)
+      .map(([hash, e]) => (hashOf.set(e, hash), e));
+    let done = 0;
+    for (let i = 0; i < open.length; i += BATCH) {
+      const batch = open.slice(i, i + BATCH);
+      const toSend = batch.map((e) => ({
+        description: e.description ?? "",
+        lines: e.translations!.map((l) => ({ text: l.translation, variations: l.variations })),
+        keep: [...new Set(e.translations!.flatMap((l) => keptTerms(l.translation)))],
+        context: sourceContext(p, hashOf.get(e)!),
+      }));
+      const glossary = glossaryFor(finished, toSend, Object.keys(p.common ?? {}));
+      // Asked again with what was wrong, up to twice: every check's problem must be gone; a
+      // glossary word not used is asked about, and accepted on the last answer.
+      let feedback: string[] = [];
+      let out: string[] = [];
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const answer = await call({
+          kind: "strings",
+          from,
+          to: m.locale,
+          entries: toSend,
+          examples: examplesFor(finished, toSend),
+          glossary,
+          guide,
+          feedback: feedback.length ? { answer: out, problems: feedback } : undefined,
+        });
+        if (!answer) return false;
+        out = ((answer.lines ?? []) as string[][])[0] ?? [];
+        const hard = problemsWith(batch[0]!.translations!, out);
+        const soft = glossaryMisses(glossary, out);
+        feedback = [...hard, ...soft];
+        if (!hard.length && (!soft.length || attempt === 2)) break;
+      }
+      const entry = batch[0]!;
+      if (!problemsWith(entry.translations!, out).length) {
+        entry.translations = entry.translations!.map((l, k) => ({ ...l, translation: out[k]! }));
+        entry.status = "translated";
+        done++;
+        // An example for the entries after it, so a run writes each name and term one way.
+        finished.push({ ...entry, source: texts[hashOf.get(entry)!] });
+      }
+      // Written as it goes, so the dev server shows each batch at once.
+      writeFileSync(file, JSON.stringify(catalog, null, 2) + "\n");
+    }
+    if (open.length) log(`${rel(file)}: ${done} of ${open.length} translated with Void's AI`);
+  }
+
+  const source = sourceOf(p.config);
+  for (const page of markdownPages(p)) {
+    if (page.state !== "missing" && page.state !== "stale") continue;
+    const original = readFileSync(page.original, "utf8");
+    const answer = await call({ kind: "page", from, to: page.locale, text: original });
+    if (!answer) return false;
+    const copy = typeof answer.page === "string" ? answer.page : "";
+    if (!copy.trim()) continue;
+    const same = (a: string[], b: string[]) => a.join("\n") === b.join("\n");
+    if (
+      !copy.trim() ||
+      missingHead(original, copy).length ||
+      !same(keptParts(original), keptParts(copy))
+    ) {
+      log(`${rel(page.file)}: Void's AI changed what a copy must keep; left for another way`);
+      continue;
+    }
+    mkdirSync(dirname(page.file), { recursive: true });
+    writeFileSync(page.file, copy.endsWith("\n") ? copy : copy + "\n");
+    stamp(p, page.file);
+    log(`${rel(page.file)}: translated with Void's AI from ${source.segment}/${page.path}`);
+  }
+  return true;
 }

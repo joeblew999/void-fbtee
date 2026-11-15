@@ -9,9 +9,10 @@ The app's own Vite+ commands do the work; there are no i18n scripts or other com
 an app up is the one void-fbtee command: `vp exec void-fbtee init`. After that:
 
 - `vp dev` prepares: as it starts and on each save, every new string goes into every catalog,
-  marked new. Once the saves pause, it translates what's new with Claude Code: a `claude -p` on
-  the developer's machine, or, when the dev server runs in a Claude Code session, the prompt in
-  its log for that session ("void-fbtee: … entries with "status": "new""). When you see it,
+  marked new. Once the saves pause, it translates what's new: with Void's AI first, when the app
+  uses `void/ai` (in the app's own Worker, every answer checked as the build checks it), then
+  with Claude Code for anything left: a `claude -p` on the developer's machine, or, when the dev
+  server runs in a Claude Code session, the prompt in its log for that session ("void-fbtee: … entries with "status": "new""). When you see it,
   translate here, by this skill. It records each markdown page you mark done and reports what's
   left, until "all translated, nothing to fix".
 - `vp build` (and so `void deploy` and CI) fails on anything left: untranslated strings and
@@ -84,6 +85,13 @@ Arabic is then `A، B وC`.
 no direction marks (U+200E, U+200F).
 
 ## Writing strings
+
+When you write or change the app's code, mark every piece of text a person sees as you write it,
+each with a description that tells a translator where it shows and what it means:
+`<fbt desc="Button that saves the event">Save</fbt>`. That's writing the code, not translating:
+`vp dev` collects what's marked and translates it, and nothing marks text for you. Text left
+unmarked is never translated; `vp check` reports it (fbtee's `no-unwrapped-strings`), so fix it
+there. Names that stay as they are (the app's own, a product's) go in that rule's `ignoredWords`.
 
 `<fbt>` for text in components; `fbs("…", "…")` wherever a plain string is needed: an attribute
 (`aria-label`, `placeholder`), a title, an email, anything stored or sent. `fbs` returns a string

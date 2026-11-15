@@ -14,17 +14,20 @@
 //   source (plus fbtee's built-in strings), as `virtual:void-fbtee/catalogs`. Nothing generated
 //   goes in git. catalogs.ts.
 // - `vp dev` does the translation work: on start and on each save it prepares the catalogs (a new
-//   string is in each, marked new), once you pause it translates what's new (translate.ts), it
-//   records each page the agent marks done, and it reports everything `check` finds.
+//   string is in each, marked new); once you pause it translates what's new, with Void's AI when
+//   the app has it (its own Worker, through a route only `vp dev` has: ai.ts) and Claude Code for
+//   anything left (translate.ts); it records each page the agent marks done, and it reports
+//   everything `check` finds.
 // - `vp build` fails on anything `check` finds, so `void deploy` (which builds) can't ship gaps.
 // - Browser: every app module that uses <fbt> or fbs first imports `void-fbtee/client`, which
 //   installs the page's catalog (top-level await). Islands hydrate without the layout's
 //   I18nProvider, so this is what gives them their strings.
 import { createRequire } from "node:module";
-import { existsSync, readFileSync } from "node:fs";
+import { randomUUID } from "node:crypto";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, matchesGlob, relative, sep } from "node:path";
 import { prepare } from "./commands";
-import { markedDone, stamp, translateApp } from "./translate";
+import { markedDone, stamp, translateApp, translateWithVoidAi } from "./translate";
 import { check } from "./check";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
@@ -118,6 +121,9 @@ const MD_PAGES_ID = "virtual:void-fbtee/md-pages";
  * Without Zod 4, it does nothing.
  */
 const ZOD_ID = "virtual:void-fbtee/zod";
+/** `vp dev` only: the dev server's route for translating with Void's AI (ai.ts devTranslate). */
+const DEV_ID = "virtual:void-fbtee/dev";
+export const DEV_TRANSLATE_PATH = "/__void-fbtee/translate";
 /**
  * The app's pages in every language: each page under pages/[lang]/ whose only parameter is the
  * language, from Void's own list of the app's pages (PagePathMap in the .void/routes.d.ts Void
@@ -157,6 +163,8 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   let root = process.cwd();
   let command: "build" | "serve" = "serve";
   let devServer: ViteDevServer | undefined;
+  // What the dev server's translate route answers to: made fresh each run, never in a build.
+  const devToken = randomUUID();
   let prepareTimer: ReturnType<typeof setTimeout> | undefined;
   let translateTimer: ReturnType<typeof setTimeout> | undefined;
   // One translation at a time; a save during one asks for another after it.
@@ -190,7 +198,18 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         return;
       }
       if (!wanted || !agentAllowed()) return report(check(project()));
-      translating = translateApp(project(), root, log, handedOut)
+      // Void's AI first, through the dev server's own route, when the app has it; then Claude
+      // Code for anything left (none, or what didn't pass the checks).
+      const base = devServer?.resolvedUrls?.local[0];
+      const url = base && new URL(DEV_TRANSLATE_PATH, base).href;
+      translating = (
+        url ? translateWithVoidAi(project(), url, devToken, log) : Promise.resolve(false)
+      )
+        .catch((error) => {
+          log(`Void's AI couldn't translate: ${String(error)}`);
+          return false;
+        })
+        .then(() => translateApp(project(), root, log, handedOut))
         .then((result) => {
           handedOut = result.prompt;
           report(result.problems);
@@ -259,7 +278,16 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       } catch (error) {
         server.config.logger.warn(`void-fbtee: couldn't prepare: ${String(error)}`);
       }
-      translateSoon();
+      // The route's token, where the measurement of translators reads it (scripts/translator.ts),
+      // as Void keeps its own dev trigger token in a file (.void/dev-trigger-token).
+      try {
+        const dir = join(root, "node_modules/.void-fbtee");
+        mkdirSync(dir, { recursive: true });
+        writeFileSync(join(dir, "dev-token"), devToken);
+      } catch {}
+      // Once it's listening: Void's AI is reached through the dev server's own address.
+      if (server.httpServer) server.httpServer.once("listening", () => translateSoon());
+      else translateSoon();
     },
     // Vite calls this for every watched file event, once per environment; act once (client).
     // A hook rather than watcher listeners: Vite, Void and Cloudflare's plugin already put Node
@@ -341,6 +369,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           id === TEXTS_ID ||
           id === MD_PAGES_ID ||
           id === ZOD_ID ||
+          id === DEV_ID ||
           id === PAGES_ID ||
           id.startsWith(CATALOG_PREFIX)
         )
@@ -388,6 +417,11 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           const core = await this.resolve("zod/v4/core", join(root, "package.json"));
           return zodMessages(root, Boolean(core && !core.external), config);
         }
+        // The route exists only under `vp dev`, on the server, and answers only the dev server.
+        if (id === "\0" + DEV_ID)
+          return command === "serve" && !isClient(this.environment)
+            ? `import { devTranslate } from "void-fbtee/ai";\nexport default { path: ${JSON.stringify(DEV_TRANSLATE_PATH)}, handle: (r) => devTranslate(r, ${JSON.stringify(devToken)}) };`
+            : "export default undefined;";
         if (id === "\0" + PAGES_ID) {
           const file = join(root, ".void/routes.d.ts");
           if (existsSync(file)) this.addWatchFile(file);

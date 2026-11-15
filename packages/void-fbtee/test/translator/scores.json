@@ -1,0 +1,165 @@
+{
+  "ar-EG": {
+    "date": "2026-11-15",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "passed": "9/10",
+    "chrF": 63,
+    "results": [
+      {
+        "name": "a label",
+        "ok": true,
+        "problems": [],
+        "got": ["حفظ"],
+        "chrF": 100
+      },
+      {
+        "name": "a sentence",
+        "ok": true,
+        "problems": [],
+        "got": ["يعرض حدثك باللغة كلها بمجرد نشره"],
+        "chrF": 36
+      },
+      {
+        "name": "a placeholder",
+        "ok": true,
+        "problems": [],
+        "got": ["مرحبا {name}، تذكرتك مرفقة."],
+        "chrF": 85
+      },
+      {
+        "name": "two placeholders",
+        "ok": true,
+        "problems": [],
+        "got": ["تم ترجمة {translated} من {total} سلاسل"],
+        "chrF": 70
+      },
+      {
+        "name": "a plural",
+        "ok": true,
+        "problems": [],
+        "got": [
+          "form\": \"zero\", \"source\": \"لا مقاعد متاحة\"",
+          "form\": \"one\", \"source\": \"مقعد واحد متاح\"",
+          "form\": \"two\", \"source\": \"مقعدان متاحان\"",
+          "form\": \"few\", \"source\": \"{number} مقاعد متاحة\"",
+          "form\": \"many\", \"source\": \"{number} مقعد متاح\"",
+          "form\": \"other\", \"source\": \"{number} مقعد متاح\""
+        ],
+        "chrF": 37
+      },
+      {
+        "name": "a command",
+        "ok": true,
+        "problems": [],
+        "got": ["شغّل vp dev لتشغيل التطبيق."],
+        "chrF": 68
+      },
+      {
+        "name": "a file name",
+        "ok": false,
+        "problems": ["Line 1 is still the source text: translate it."],
+        "got": ["The app's AGENTS.md tells your coding agent what to do."],
+        "chrF": 14
+      },
+      {
+        "name": "a product name",
+        "ok": true,
+        "problems": [],
+        "got": ["Void's AI أو Claude Code يترجمان ما هو جديد."],
+        "chrF": 82
+      },
+      {
+        "name": "a path",
+        "ok": true,
+        "problems": [],
+        "got": ["كل كتالوج للغة موجود في i18n/translations."],
+        "chrF": 83
+      },
+      {
+        "name": "a question",
+        "ok": true,
+        "problems": [],
+        "got": ["جاهز لترجمة تطبيقك؟"],
+        "chrF": 55
+      }
+    ]
+  },
+  "th-TH": {
+    "date": "2026-11-15",
+    "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+    "passed": "8/10",
+    "chrF": 70,
+    "results": [
+      {
+        "name": "a label",
+        "ok": true,
+        "problems": [],
+        "got": ["บันทึก"],
+        "chrF": 100
+      },
+      {
+        "name": "a sentence",
+        "ok": true,
+        "problems": [],
+        "got": ["เมื่อคุณโพสต์แล้ว อีเวนต์ของคุณจะแสดงในทุกภาษา"],
+        "chrF": 86
+      },
+      {
+        "name": "a placeholder",
+        "ok": false,
+        "problems": ["Line 1 must keep the placeholder {name} exactly."],
+        "got": ["only"],
+        "chrF": 1
+      },
+      {
+        "name": "two placeholders",
+        "ok": true,
+        "problems": [],
+        "got": ["แปล {translated} จาก {total} สตริง"],
+        "chrF": 63
+      },
+      {
+        "name": "a plural",
+        "ok": false,
+        "problems": ["Line 1 must keep the placeholder {number} exactly."],
+        "got": ["other"],
+        "chrF": 4
+      },
+      {
+        "name": "a command",
+        "ok": true,
+        "problems": [],
+        "got": ["รัน vp dev เพื่อเริ่มแอป"],
+        "chrF": 100
+      },
+      {
+        "name": "a file name",
+        "ok": true,
+        "problems": [],
+        "got": ["ไฟล์ AGENTS.md ของแอปจะบอกเอเจนต์การเขียนโค้ดของคุณว่าจะทำอะไร"],
+        "chrF": 75
+      },
+      {
+        "name": "a product name",
+        "ok": true,
+        "problems": [],
+        "got": ["Void's AI หรือ Claude Code แปลสิ่งที่ใหม่เท่านั้น"],
+        "chrF": 95
+      },
+      {
+        "name": "a path",
+        "ok": true,
+        "problems": [],
+        "got": ["แคตตาล็อกของแต่ละภาษาอยู่ใน i18n/translations."],
+        "chrF": 94
+      },
+      {
+        "name": "a question",
+        "ok": true,
+        "problems": [],
+        "got": ["พร้อมที่จะแปลแอปของคุณแล้วหรือยัง"],
+        "chrF": 86
+      }
+    ]
+  }
+}

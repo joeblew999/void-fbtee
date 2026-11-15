@@ -50,6 +50,9 @@ export default defineConfig({
       // Yours if `vp run dev` is running, else it starts one. Not at the same time as test:preview:
       // they share the local database.
       "test:dev": { command: "vp test run --project dev", cache: false },
+      // Void's AI translating the package's English test strings into many languages, each with
+      // its model, checked as vp dev checks (e2e/translator/). On the dev server, as test:dev.
+      "test:translator": { command: "vp test run --project translator", cache: false },
       // Every page in every language, in Chromium, WebKit (Safari's engine) and WebKit as today's
       // iPhones have it (no built-in Temporal), on the preview (e2e/browsers/). Run it when pages
       // change; not in CI.
@@ -63,6 +66,9 @@ export default defineConfig({
       "test:production": { command: "vpx scripts/production.ts", cache: false },
       // void-fbtee installed into fresh `void init` apps, as a user's app installs it.
       "test:fresh": { command: "vpx e2e/fresh/check.ts", cache: false },
+      // How well Void's AI translates the example's strings, by model, with the example's
+      // `vp dev` running: `vp run measure:translator <model,model>` (scripts/translator.ts).
+      "measure:translator": { command: "vpx scripts/translator.ts", cache: false },
       // Vite+'s, Void's and void-fbtee's setup commands, run again: fails if any changes a file.
       "check:tools": { command: "node scripts/check-tools.mjs", cache: false },
       // In a Claude cloud session: the dev server (vp run dev) on a public https address through
@@ -141,6 +147,8 @@ export default defineConfig({
       e2e("browsers", 3, { setup: "preview" }),
       e2e("dev", 4),
       e2e("deployed", 5, { oneFileAtATime: false }),
+      // Void's AI translating the package's test strings into many languages, on the dev server.
+      e2e("translator", 6, { setup: "dev" }),
     ],
   },
 });

@@ -14,15 +14,16 @@ function points(): Point[] {
     {
       id: "claude",
       title: (
-        <fbt desc="Translating page point title: the dev server translates, with Claude Code">
-          vp dev translates, by Claude Code
+        <fbt desc="Translating page point title: the dev server translates, with Void's AI or Claude Code">
+          vp dev translates, with Void's AI or Claude Code
         </fbt>
       ),
       why: (
-        <fbt desc="Translating page point: the dev server prepares new strings and, once you pause, hands them to Claude Code with void-fbtee's skill">
+        <fbt desc="Translating page point: the dev server prepares new strings and, once you pause, translates them with Void's AI, else Claude Code">
           There's nothing to run. As you save, vp dev adds each new string to every language's
-          catalog, and once you pause, it hands what's new to Claude Code with void-fbtee's skill:
-          the strings, and the markdown pages that changed. The app's AGENTS.md says so too.
+          catalog. Once you pause, it translates what's new, the strings and the markdown pages that
+          changed: with Void's AI, in the app's own Worker, when the app uses it, and with Claude
+          Code and void-fbtee's skill for anything left. The same translator does what people post.
         </fbt>
       ),
       code: [
@@ -31,8 +32,12 @@ function points(): Point[] {
           line: "voidFbtee({ sourceLocale, locales, site: SITE, common }),",
         },
         {
+          file: "queues/translate.ts",
+          line: 'import { translate as translateText } from "void-fbtee/ai";',
+        },
+        {
           file: "AGENTS.md",
-          line: "- Translating is part of the dev server: `vp dev` prepares each new string, translates what's new once you pause, and reports what's left. `vp build` fails on anything left. There are no i18n scripts.",
+          line: "- Translating is part of the dev server: `vp dev` prepares each new string, translates what's new once you pause (with Void's AI when the app uses it, else Claude Code), and reports what's left. `vp build` fails on anything left. There are no i18n scripts.",
         },
       ],
     },
@@ -98,10 +103,10 @@ function stages(): { command: string; what: ReactNode; where: string }[] {
     {
       command: "vp dev",
       what: (
-        <fbt desc="Translating page: what the dev server does about translations, preparing, translating and reporting by itself">
-          As you save, adds new strings to every language, marked new. Once you pause, Claude Code
-          translates them, and the dev server reports what's left. An edited translation shows at
-          once.
+        <fbt desc="Translating page: what the dev server does about translations, preparing, translating with Void's AI or Claude Code, and reporting by itself">
+          As you save, adds new strings to every language, marked new. Once you pause, Void's AI or
+          Claude Code translates them, and the dev server reports what's left. An edited translation
+          shows at once.
         </fbt>
       ),
       where: "vite.config.ts (voidFbtee)",

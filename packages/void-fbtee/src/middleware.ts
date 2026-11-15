@@ -17,6 +17,7 @@
 //   visitor to their language, else the page in the fallback language) and <meta name="void-fbtee">
 //   (the same i18n data, for islands) go into headDefaults.
 // - Zod's validation messages follow the request's language (when the app has Zod 4).
+// - Under `vp dev` only: the dev server's route for translating with Void's AI (ai.ts).
 import { defineMiddleware } from "void";
 import { Temporal } from "temporal-polyfill";
 import config from "virtual:void-fbtee/config";
@@ -35,6 +36,7 @@ import {
 import { acceptedLanguages, negotiate } from "./negotiate";
 import { allTranslations } from "./runtime";
 import { setup as setupZod } from "virtual:void-fbtee/zod";
+import dev from "virtual:void-fbtee/dev";
 import { currentLocale, runIn, siteOrigin } from "./server";
 
 // Zod's own validation messages (a form's errors) in each request's language, when the app has
@@ -97,6 +99,9 @@ function answeringRoute(c: { req: { routeIndex: number } }): string | undefined 
 // carrying a copy of Hono's (Void's dependency; a pnpm app can't import it).
 const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (c, next) => {
   const path = c.req.path;
+  // `vp dev` only: the dev server's own route for translating with Void's AI (ai.ts). Nothing
+  // in a build.
+  if (dev && path === dev.path && c.req.method === "POST") return dev.handle(c.req.raw);
   // "/": to the visitor's own language. The query string as it came; only GET and HEAD.
   if (path === "/" && config.redirectHome && (c.req.method === "GET" || c.req.method === "HEAD")) {
     const best = negotiate(
