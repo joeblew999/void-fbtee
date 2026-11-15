@@ -75,3 +75,12 @@ server's Worker.
   `vp run void-fbtee#test:translator`. Later, the user's call (2026-11-15).
 - The test strings are all English source. An app written in another language (the Thai-source
   fresh app) is never tested: add source strings in another language, with references.
+
+## Decided: what's cached (2026-11-15)
+
+Only answers that passed the checks are kept, and they're kept where the app keeps its text: the
+catalog (vp dev never sends an accepted string again), a translated page with its recorded
+original, a stored post's translation (event_texts). AI Gateway's cache is never used for
+translating (ai.ts: `skipCache`): the loop asks again when an answer is wrong, and a cached wrong
+first answer would come back every time. Temperature 0 and a fixed seed make the same request give
+the same answer, so test runs compare without a cache.

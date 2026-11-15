@@ -43,7 +43,20 @@ async function ask<T>(
       ...(model.jsonMode ? { response_format: { type: "json_schema", json_schema: schema } } : {}),
       // Workers AI's default is 256 tokens, which cuts a page or a batch of strings off mid-JSON.
       max_tokens: 8192,
+      // A translation, not a story: the model's most likely answer, and the same one for the same
+      // request. Workers AI's default is 0.6 for some models and 0.15 for others (each model's
+      // page, "temperature", 0 to 5, checked 2026-11-15); `seed` is its own reproducibility knob.
+      temperature: 0,
+      seed: 1,
     } as never,
+    // Void sends Workers AI through AI Gateway (guide/ai.md, "Cloudflare Gateway Models"), which
+    // can answer a request it has seen from its cache. Never for a translation: the loop sends a
+    // string, checks the answer and asks again with what was wrong, so a cached wrong first answer
+    // would come back every time the string is sent, pinned. What's cached is what passed: the
+    // catalog (vp dev writes an accepted string to it and never sends it again), a page with its
+    // recorded original, a stored post's translation. Temperature 0 and the seed still give the
+    // same request the same answer, so runs compare.
+    { gateway: { skipCache: true } } as never,
   );
   const r = result as { response?: unknown; choices?: { message?: { content?: unknown } }[] };
   const answer = r.response ?? r.choices?.[0]?.message?.content;
