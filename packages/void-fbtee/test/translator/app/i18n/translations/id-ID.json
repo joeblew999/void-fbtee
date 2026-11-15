@@ -426,6 +426,68 @@
         }
       ],
       "types": []
+    },
+    "iQJF/J4mB7QMxMxmCJJLOw==": {
+      "description": "Told to the reader who just booked, worded by their gender",
+      "status": "translated",
+      "tokens": [
+        "__subject__"
+      ],
+      "translations": [
+        {
+          "translation": "Anda sudah terdaftar.",
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "Anda sudah terdaftar.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "Anda sudah terdaftar.",
+          "variations": {
+            "0": 3
+          }
+        }
+      ],
+      "types": [
+        3
+      ]
+    },
+    "Nr+WWEAaNhdmcsZktc6jkQ==": {
+      "description": "Someone booked a number of seats, worded by their gender and the count",
+      "status": "translated",
+      "tokens": [
+        "who",
+        "seats"
+      ],
+      "translations": [
+        {
+          "translation": "{who} memesan {seats} kursi.",
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "{who} memesan {seats} kursi.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "{who} memesan {seats} kursi.",
+          "variations": {
+            "0": 3
+          }
+        }
+      ],
+      "types": [
+        3,
+        28
+      ]
     }
   }
 }

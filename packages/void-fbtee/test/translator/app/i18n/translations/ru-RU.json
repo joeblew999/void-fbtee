@@ -486,6 +486,134 @@
         }
       ],
       "types": []
+    },
+    "iQJF/J4mB7QMxMxmCJJLOw==": {
+      "description": "Told to the reader who just booked, worded by their gender",
+      "status": "translated",
+      "tokens": [
+        "__subject__"
+      ],
+      "translations": [
+        {
+          "translation": "Вы записаны.",
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "Вы записаны.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "Вы записаны.",
+          "variations": {
+            "0": 3
+          }
+        }
+      ],
+      "types": [
+        3
+      ]
+    },
+    "Nr+WWEAaNhdmcsZktc6jkQ==": {
+      "description": "Someone booked a number of seats, worded by their gender and the count",
+      "status": "translated",
+      "tokens": [
+        "who",
+        "seats"
+      ],
+      "translations": [
+        {
+          "translation": "{who} забронировал {seats} место.",
+          "variations": {
+            "0": 1,
+            "1": 4
+          }
+        },
+        {
+          "translation": "{who} забронировал {seats} места.",
+          "variations": {
+            "0": 1,
+            "1": 20
+          }
+        },
+        {
+          "translation": "{who} забронировал {seats} мест.",
+          "variations": {
+            "0": 1,
+            "1": 12
+          }
+        },
+        {
+          "translation": "{who} забронировал {seats} места.",
+          "variations": {
+            "0": 1,
+            "1": 24
+          }
+        },
+        {
+          "translation": "{who} забронировала {seats} место.",
+          "variations": {
+            "0": 2,
+            "1": 4
+          }
+        },
+        {
+          "translation": "{who} забронировала {seats} места.",
+          "variations": {
+            "0": 2,
+            "1": 20
+          }
+        },
+        {
+          "translation": "{who} забронировала {seats} мест.",
+          "variations": {
+            "0": 2,
+            "1": 12
+          }
+        },
+        {
+          "translation": "{who} забронировала {seats} места.",
+          "variations": {
+            "0": 2,
+            "1": 24
+          }
+        },
+        {
+          "translation": "{who} забронировал(а) {seats} место.",
+          "variations": {
+            "0": 3,
+            "1": 4
+          }
+        },
+        {
+          "translation": "{who} забронировал(а) {seats} места.",
+          "variations": {
+            "0": 3,
+            "1": 20
+          }
+        },
+        {
+          "translation": "{who} забронировал(а) {seats} мест.",
+          "variations": {
+            "0": 3,
+            "1": 12
+          }
+        },
+        {
+          "translation": "{who} забронировал(а) {seats} места.",
+          "variations": {
+            "0": 3,
+            "1": 24
+          }
+        }
+      ],
+      "types": [
+        3,
+        28
+      ]
     }
   }
 }

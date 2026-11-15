@@ -60,9 +60,9 @@ holding only the strings with a count. You write each form there in the source l
 one line per gender, `variations` `{"0": 1}` male, `{"0": 2}` female, `{"0": 3}` unknown, in every
 language: fill all three, the same sentence where the language doesn't change its words. With a
 count too, a line for each gender and plural form, each keyed by its own token's index. A sentence
-spoken to the reader can change by the reader's gender, set by `<InLanguage gender>`: add
-`"tokens": ["__viewing_user__"], "types": [3]` to that entry, and the dev server adds its three
-lines. Never change the hash keys.
+spoken to the reader that changes by the reader's gender has `subject={gender}` on its `<fbt>` in
+the code (below): it gets `"tokens": ["__subject__"]` and its three lines the same way. Never add
+tokens by hand, and never change the hash keys.
 
 **Plurals, in the catalog.** A string with a count has one line per plural form the language uses
 (the dev server adds them; fbtee's own prepare-translations doesn't). Each line's `variations`
@@ -91,7 +91,10 @@ Part of a page in another language (a row for a Thai reader on an English page) 
 `<InLanguage locale="th-TH">` from `void-fbtee/react`. Inside it, a component that translates
 calls `const { fbt } = useFbt();` (from `fbtee`) and uses that `fbt`; plain `<fbt>` stays in the
 page's language. `gender` (`"male"`, `"female"` or `"unknown"`) is the reader's, only when the
-person gave it. Use fbtee's other pieces as its README describes: `<fbt:list>` for a list in a sentence (not
+person gave it. A sentence said to the reader that changes with their gender (Arabic's "you're
+booked") says so in the code: `<fbt desc="…" subject={gender}>`, with fbtee's
+`IntlVariations.GENDER_MALE`, `GENDER_FEMALE` or `GENDER_UNKNOWN`. Use fbtee's other pieces as its
+README describes: `<fbt:list>` for a list in a sentence (not
 `String(list(…))`), `<fbt:enum>` for a choice from a fixed set, `<fbt:name>` and
 `<fbt:pronoun>` for a person's gender, `<fbt:same-param>` for a value used twice.
 For choosing another language, use `<LanguagePicker />` from `void-fbtee/react`, not a row of

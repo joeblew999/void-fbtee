@@ -121,3 +121,24 @@ export const twice = (name: string) => (
     ticket by email.
   </fbt>
 );
+
+/** Said to the reader, worded by their gender (`subject`): one line per gender. */
+export const youreBooked = (gender: IntlVariations) => (
+  <fbt desc="Told to the reader who just booked, worded by their gender" subject={gender}>
+    You're booked.
+  </fbt>
+);
+
+/** A person and a count in one sentence: one line per gender and plural form. */
+export const bookedSeats = (who: string, gender: IntlVariations, seats: number) => (
+  <fbt desc="Someone booked a number of seats, worded by their gender and the count">
+    <fbt:param name="who" gender={gender}>
+      {who}
+    </fbt:param>{" "}
+    booked{" "}
+    <fbt:param name="seats" number={seats}>
+      {seats}
+    </fbt:param>{" "}
+    seats.
+  </fbt>
+);

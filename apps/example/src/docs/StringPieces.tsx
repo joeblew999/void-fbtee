@@ -86,10 +86,18 @@ function SameParam({ name }: { name: string }) {
   );
 }
 
-/** Addressed to the reader: inside <InLanguage>, worded by that runtime's reader's gender. */
-function ForTheReader() {
+/**
+ * Addressed to the reader, worded by their gender: fbtee's `subject`, so the code says the sentence
+ * varies by it and the catalog gets a line per gender on its own (the dev server's prepare). Inside
+ * <InLanguage>, in that runtime's language.
+ */
+function ForTheReader({ gender }: { gender: Gender }) {
   const { fbt } = useFbt();
-  return <fbt desc="Strings page: told to the reader who just booked">You're booked.</fbt>;
+  return (
+    <fbt desc="Strings page: told to the reader who just booked" subject={NAME_GENDER[gender]}>
+      You're booked.
+    </fbt>
+  );
 }
 
 function Piece({
@@ -275,11 +283,11 @@ export function StringPieces() {
             For the reader, by their gender
           </fbt>
         }
-        code={"<InLanguage locale={locale} gender={gender}>…</InLanguage>"}
+        code={'<fbt desc="…" subject={gender}>You\'re booked.</fbt>'}
       >
         <p data-gender={gender}>
           <InLanguage locale={locale} gender={gender}>
-            <ForTheReader />
+            <ForTheReader gender={gender} />
           </InLanguage>
         </p>
       </Piece>
@@ -295,7 +303,7 @@ export function StringPieces() {
         {others.map((other) => (
           <p key={other.locale} data-locale={other.locale}>
             <InLanguage locale={other.locale} gender={gender}>
-              <ForTheReader />
+              <ForTheReader gender={gender} />
             </InLanguage>
           </p>
         ))}

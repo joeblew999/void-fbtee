@@ -126,8 +126,10 @@ used.
      says 6.0.0, and fbtee gets an issue with the failing case.
 5. **`<fbt:enum>`:** a choice from a fixed set, translated within its sentence.
 6. **`<fbt:name>`:** a person's name in a sentence, with that person's gender.
-7. **Gender and `<fbt:pronoun>`:** viewer gender for text addressed to the reader, and pronouns,
-   only when the person has given their gender, never guessed.
+7. **Gender and `<fbt:pronoun>`:** text addressed to the reader varies by their gender with
+   `<fbt subject={gender}>` (was a hand-added `__viewing_user__` token, until 2026-11-15: fbtee's
+   prepare and void-fbtee's then give its lines on their own), and pronouns, only when the person
+   has given their gender, never guessed.
 
 8. **`<fbt:same-param>`:** shown on the Strings page (the rule below).
 9. **A catalog for the source language** when it has more plural forms than fbtee's inline two

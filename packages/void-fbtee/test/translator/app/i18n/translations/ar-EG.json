@@ -516,6 +516,176 @@
         }
       ],
       "types": []
+    },
+    "iQJF/J4mB7QMxMxmCJJLOw==": {
+      "description": "Told to the reader who just booked, worded by their gender",
+      "status": "translated",
+      "tokens": [
+        "__subject__"
+      ],
+      "translations": [
+        {
+          "translation": "أنت مسجَّل.",
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "أنتِ مسجَّلة.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "تم تأكيد حجزك.",
+          "variations": {
+            "0": 3
+          }
+        }
+      ],
+      "types": [
+        3
+      ]
+    },
+    "Nr+WWEAaNhdmcsZktc6jkQ==": {
+      "description": "Someone booked a number of seats, worded by their gender and the count",
+      "status": "translated",
+      "tokens": [
+        "who",
+        "seats"
+      ],
+      "translations": [
+        {
+          "translation": "لم يحجز {who} أي مقعد.",
+          "variations": {
+            "0": 1,
+            "1": 16
+          }
+        },
+        {
+          "translation": "حجز {who} مقعدًا واحدًا.",
+          "variations": {
+            "0": 1,
+            "1": 4
+          }
+        },
+        {
+          "translation": "حجز {who} مقعدين.",
+          "variations": {
+            "0": 1,
+            "1": 8
+          }
+        },
+        {
+          "translation": "حجز {who} {seats} مقاعد.",
+          "variations": {
+            "0": 1,
+            "1": 20
+          }
+        },
+        {
+          "translation": "حجز {who} {seats} مقعدًا.",
+          "variations": {
+            "0": 1,
+            "1": 12
+          }
+        },
+        {
+          "translation": "حجز {who} {seats} مقعد.",
+          "variations": {
+            "0": 1,
+            "1": 24
+          }
+        },
+        {
+          "translation": "لم تحجز {who} أي مقعد.",
+          "variations": {
+            "0": 2,
+            "1": 16
+          }
+        },
+        {
+          "translation": "حجزت {who} مقعدًا واحدًا.",
+          "variations": {
+            "0": 2,
+            "1": 4
+          }
+        },
+        {
+          "translation": "حجزت {who} مقعدين.",
+          "variations": {
+            "0": 2,
+            "1": 8
+          }
+        },
+        {
+          "translation": "حجزت {who} {seats} مقاعد.",
+          "variations": {
+            "0": 2,
+            "1": 20
+          }
+        },
+        {
+          "translation": "حجزت {who} {seats} مقعدًا.",
+          "variations": {
+            "0": 2,
+            "1": 12
+          }
+        },
+        {
+          "translation": "حجزت {who} {seats} مقعد.",
+          "variations": {
+            "0": 2,
+            "1": 24
+          }
+        },
+        {
+          "translation": "لم يحجز {who} أي مقعد.",
+          "variations": {
+            "0": 3,
+            "1": 16
+          }
+        },
+        {
+          "translation": "حجز {who} مقعدًا واحدًا.",
+          "variations": {
+            "0": 3,
+            "1": 4
+          }
+        },
+        {
+          "translation": "حجز {who} مقعدين.",
+          "variations": {
+            "0": 3,
+            "1": 8
+          }
+        },
+        {
+          "translation": "حجز {who} {seats} مقاعد.",
+          "variations": {
+            "0": 3,
+            "1": 20
+          }
+        },
+        {
+          "translation": "حجز {who} {seats} مقعدًا.",
+          "variations": {
+            "0": 3,
+            "1": 12
+          }
+        },
+        {
+          "translation": "حجز {who} {seats} مقعد.",
+          "variations": {
+            "0": 3,
+            "1": 24
+          }
+        }
+      ],
+      "types": [
+        3,
+        28
+      ]
     }
   }
 }

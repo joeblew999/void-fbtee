@@ -59,331 +59,331 @@
     {
       "language": "th",
       "name": "Thai",
-      "model": "@cf/thinkingmachines/inkling-2-small",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "measured",
-      "why": "21/21 right, the translator test's pick run (2026-11-15); then deepseek-v4.1-flash-1017 19, gemma-4-26b-a4b-it 19, gemma-sea-lion-v4-27b-it 18, llama-3.3-70b-instruct-fp8-fast 14, gpt-oss-120b 14, qwen3.8-27b 14"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15: one fast model while the long pick runs wait): with the translating skill, 20/21 right in Thai and 20/21 in Arabic, about 1 s a string (the translator test, 2026-11-15); the pick run (TRANSLATOR_PICK=1) chooses each language's own later"
     },
     {
       "language": "vi",
       "name": "Vietnamese",
-      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "changelog 2025-09-24 lists the language"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "id",
       "name": "Indonesian",
-      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "changelog 2025-09-24 lists the language"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "ms",
       "name": "Malay",
-      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "changelog 2025-09-24 lists the language"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "tl",
       "name": "Tagalog",
-      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "changelog 2025-09-24 lists the language"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "fil",
       "name": "Filipino",
-      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "changelog 2025-09-24 lists Tagalog"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "km",
       "name": "Khmer",
-      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "changelog 2025-09-24 lists the language"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "lo",
       "name": "Lao",
-      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "changelog 2025-09-24 lists the language"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "my",
       "name": "Burmese",
-      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "changelog 2025-09-24 lists the language"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "ta",
       "name": "Tamil",
-      "model": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "changelog 2025-09-24 lists the language"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "zh",
       "name": "Chinese",
-      "model": "@cf/qwen/qwen3.8-27b",
-      "source": "llmgateway",
-      "why": "Qwen and GLM for Chinese, Japanese and Korean"
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "ja",
       "name": "Japanese",
-      "model": "@cf/qwen/qwen3.8-27b",
-      "source": "llmgateway",
-      "why": "Qwen and GLM for Chinese, Japanese and Korean"
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "ko",
       "name": "Korean",
-      "model": "@cf/qwen/qwen3.8-27b",
-      "source": "llmgateway",
-      "why": "Qwen and GLM for Chinese, Japanese and Korean"
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "ar",
       "name": "Arabic",
-      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "measured",
-      "why": "chrF 65, 10/10 pass (2026-11-15); llmgateway suggests gpt-oss-120b, untested"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15: one fast model while the long pick runs wait): with the translating skill, 20/21 right in Thai and 20/21 in Arabic, about 1 s a string (the translator test, 2026-11-15); the pick run (TRANSLATOR_PICK=1) chooses each language's own later"
     },
     {
       "language": "he",
       "name": "Hebrew",
-      "model": "@cf/openai/gpt-oss-120b",
-      "source": "llmgateway",
-      "why": "gpt-oss-120b or Llama 3.3 for Arabic, Hebrew, Turkish, Russian, Ukrainian"
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "fa",
       "name": "Persian",
-      "model": "@cf/openai/gpt-oss-120b",
-      "source": "llmgateway",
-      "why": "gpt-oss-120b or Llama 3.3 for right-to-left and Slavic languages"
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "tr",
       "name": "Turkish",
-      "model": "@cf/openai/gpt-oss-120b",
-      "source": "llmgateway",
-      "why": "gpt-oss-120b or Llama 3.3 for Arabic, Hebrew, Turkish, Russian, Ukrainian"
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "ru",
       "name": "Russian",
-      "model": "@cf/openai/gpt-oss-120b",
-      "source": "llmgateway",
-      "why": "gpt-oss-120b or Llama 3.3 for Arabic, Hebrew, Turkish, Russian, Ukrainian"
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "uk",
       "name": "Ukrainian",
-      "model": "@cf/openai/gpt-oss-120b",
-      "source": "llmgateway",
-      "why": "gpt-oss-120b or Llama 3.3 for Arabic, Hebrew, Turkish, Russian, Ukrainian"
+      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "hi",
       "name": "Hindi",
       "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "bn",
       "name": "Bengali",
       "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "ur",
       "name": "Urdu",
       "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "gu",
       "name": "Gujarati",
       "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "mr",
       "name": "Marathi",
       "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "te",
       "name": "Telugu",
       "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "kn",
       "name": "Kannada",
       "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "ml",
       "name": "Malayalam",
       "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "pa",
       "name": "Punjabi",
       "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "ne",
       "name": "Nepali",
       "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "cloudflare",
-      "why": "Gemma 4: 35+ languages (Cloudflare's changelog, 2026-04-04); was GLM 4.7 Flash, dropped 2026-11-15 (its thinking couldn't be switched off); until the translator test's pick run measures it"
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "en",
       "name": "English",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "de",
       "name": "German",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "fr",
       "name": "French",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "es",
       "name": "Spanish",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "it",
       "name": "Italian",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "pt",
       "name": "Portuguese",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "nl",
       "name": "Dutch",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "pl",
       "name": "Polish",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "sv",
       "name": "Swedish",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "da",
       "name": "Danish",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "nb",
       "name": "Norwegian Bokmål",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "no",
       "name": "Norwegian",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "fi",
       "name": "Finnish",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "cs",
       "name": "Czech",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "ro",
       "name": "Romanian",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "hu",
       "name": "Hungarian",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "el",
       "name": "Greek",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     },
     {
       "language": "bg",
       "name": "Bulgarian",
       "model": "@cf/google/gemma-4-26b-a4b-it",
-      "source": "llmgateway",
-      "why": "Gemma 4 for European languages"
+      "source": "cloudflare",
+      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15); 35+ languages out of the box (Cloudflare's changelog, 2026-04-04); not yet measured in this language"
     }
   ]
 }

@@ -3840,7 +3840,7 @@
       "description": "Strings page: told to the reader who just booked",
       "status": "translated",
       "tokens": [
-        "__viewing_user__"
+        "__subject__"
       ],
       "translations": [
         {

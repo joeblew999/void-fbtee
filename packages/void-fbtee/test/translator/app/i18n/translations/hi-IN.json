@@ -450,6 +450,92 @@
         }
       ],
       "types": []
+    },
+    "iQJF/J4mB7QMxMxmCJJLOw==": {
+      "description": "Told to the reader who just booked, worded by their gender",
+      "status": "translated",
+      "tokens": [
+        "__subject__"
+      ],
+      "translations": [
+        {
+          "translation": "आप बुक हो गए हैं।",
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "आप बुक हो गई हैं।",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "आपकी बुकिंग हो गई है।",
+          "variations": {
+            "0": 3
+          }
+        }
+      ],
+      "types": [
+        3
+      ]
+    },
+    "Nr+WWEAaNhdmcsZktc6jkQ==": {
+      "description": "Someone booked a number of seats, worded by their gender and the count",
+      "status": "translated",
+      "tokens": [
+        "who",
+        "seats"
+      ],
+      "translations": [
+        {
+          "translation": "{who} ने {seats} सीट बुक की।",
+          "variations": {
+            "0": 1,
+            "1": 4
+          }
+        },
+        {
+          "translation": "{who} ने {seats} सीटें बुक कीं।",
+          "variations": {
+            "0": 1,
+            "1": 24
+          }
+        },
+        {
+          "translation": "{who} ने {seats} सीट बुक की।",
+          "variations": {
+            "0": 2,
+            "1": 4
+          }
+        },
+        {
+          "translation": "{who} ने {seats} सीटें बुक कीं।",
+          "variations": {
+            "0": 2,
+            "1": 24
+          }
+        },
+        {
+          "translation": "{who} ने {seats} सीट बुक की।",
+          "variations": {
+            "0": 3,
+            "1": 4
+          }
+        },
+        {
+          "translation": "{who} ने {seats} सीटें बुक कीं।",
+          "variations": {
+            "0": 3,
+            "1": 24
+          }
+        }
+      ],
+      "types": [
+        3,
+        28
+      ]
     }
   }
 }

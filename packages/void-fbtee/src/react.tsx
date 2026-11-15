@@ -104,8 +104,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
  * a row for a Thai reader on an English page, a caption in the watcher's language. Inside it,
  * components that translate call fbtee's `useFbt()` and keep its local names, so their <fbt> and
  * fbs are in `locale`: `const { fbt } = useFbt();`. Plain <fbt> elsewhere stays in the page's
- * language, as fbtee's global imports do. `gender` is the reader's, for sentences that address
- * them (`<fbt:pronoun>`, viewer gender), and only when the person gave it.
+ * language, as fbtee's global imports do. `gender` is the reader's, only when the person gave it:
+ * fbtee's runtime gender. A sentence that changes with it says so in its own code, with
+ * `subject={gender}` (the skill, "Writing strings"), so its catalog lines come from the dev server.
  *
  * It takes only the locale: the runtime carries functions, so it can't cross from the server to the
  * browser (fbtee's README: "pass locale and translation data across that boundary"). The server

@@ -442,6 +442,92 @@
         }
       ],
       "types": []
+    },
+    "iQJF/J4mB7QMxMxmCJJLOw==": {
+      "description": "Told to the reader who just booked, worded by their gender",
+      "status": "translated",
+      "tokens": [
+        "__subject__"
+      ],
+      "translations": [
+        {
+          "translation": "Du bist angemeldet.",
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "Du bist angemeldet.",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "Du bist angemeldet.",
+          "variations": {
+            "0": 3
+          }
+        }
+      ],
+      "types": [
+        3
+      ]
+    },
+    "Nr+WWEAaNhdmcsZktc6jkQ==": {
+      "description": "Someone booked a number of seats, worded by their gender and the count",
+      "status": "translated",
+      "tokens": [
+        "who",
+        "seats"
+      ],
+      "translations": [
+        {
+          "translation": "{who} hat {seats} Platz gebucht.",
+          "variations": {
+            "0": 1,
+            "1": 4
+          }
+        },
+        {
+          "translation": "{who} hat {seats} Plätze gebucht.",
+          "variations": {
+            "0": 1,
+            "1": 24
+          }
+        },
+        {
+          "translation": "{who} hat {seats} Platz gebucht.",
+          "variations": {
+            "0": 2,
+            "1": 4
+          }
+        },
+        {
+          "translation": "{who} hat {seats} Plätze gebucht.",
+          "variations": {
+            "0": 2,
+            "1": 24
+          }
+        },
+        {
+          "translation": "{who} hat {seats} Platz gebucht.",
+          "variations": {
+            "0": 3,
+            "1": 4
+          }
+        },
+        {
+          "translation": "{who} hat {seats} Plätze gebucht.",
+          "variations": {
+            "0": 3,
+            "1": 24
+          }
+        }
+      ],
+      "types": [
+        3,
+        28
+      ]
     }
   }
 }

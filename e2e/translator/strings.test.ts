@@ -1,10 +1,10 @@
 // The translator test: Void's AI, on the dev server, translating the test app's strings
 // (packages/void-fbtee/test/translator/: app/src/strings.tsx, fbtee strings in real code) into every
 // language the app has, exactly as `vp dev` does: translateWithVoidAi on the app's own fbtee
-// catalogs. One test per string, so no test waits on more than one string. Each string is reset to
-// "new" on its own (its source text on every line, as fbtee's prepare writes a new one), the rest of
-// the catalog staying translated, so the examples and glossary are the catalog's own, as in a real
-// app. The translation the catalog had is the reference. Each answer:
+// catalogs. One test per string, so no test waits on more than one string. Each string is made new
+// on its own, by vp dev's own prepare (catalogs.ts prepared(): fbtee's prepare-translations and the
+// variant lines), the rest of the catalog staying translated, so the examples and glossary are the
+// catalog's own, as in a real app. The translation the catalog had is the reference. Each answer:
 // - with problems (judge.ts: wrong script, English left, a placeholder or command changed), or one
 //   judged wrong (verdicts.json): wrong; judged right: right;
 // - nobody has judged it: unreviewed, for Claude Code to judge into verdicts.json;
@@ -27,7 +27,7 @@
 import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, describe, expect, inject, test } from "vite-plus/test";
-import { catalogFile, collect } from "../../packages/void-fbtee/src/catalogs";
+import { catalogFile, collect, prepared } from "../../packages/void-fbtee/src/catalogs";
 import { loadProject } from "../../packages/void-fbtee/src/commands";
 import { CANDIDATES, modelFor } from "../../packages/void-fbtee/src/models";
 import { translateWithVoidAi } from "../../packages/void-fbtee/src/translate";
@@ -83,12 +83,23 @@ async function translateOne(to: string, model: string, hash: string): Promise<Re
   const file = catalogFile(p, to);
   const reference = readFileSync(file, "utf8");
   try {
+    // The string new again, the way vp dev makes one: gone from the catalog, then the dev
+    // server's own prepare (fbtee's prepare-translations and void-fbtee's variant lines,
+    // catalogs.ts prepared()) writes it back as fbtee would for a string just written.
     const catalog = JSON.parse(reference) as Catalog;
-    const entry = catalog.translations[hash]!;
-    const ref = entry.translations.map((l) => l.translation);
-    entry.translations = entry.translations.map((l) => ({ ...l, translation: texts[hash]! }));
-    entry.status = "new";
+    const byKey = new Map(
+      catalog.translations[hash]!.translations.map((l) => [key(l.variations), l.translation]),
+    );
+    delete catalog.translations[hash];
     writeFileSync(file, JSON.stringify(catalog, null, 2) + "\n");
+    const fresh = prepared(p).find((x) => x.locale === to)!;
+    writeFileSync(file, fresh.json);
+    const lines = (JSON.parse(fresh.json) as Catalog).translations[hash]!.translations;
+    expect(
+      lines.map((l) => key(l.variations)).sort(),
+      "prepare gives the string the same lines as its reference",
+    ).toEqual([...byKey.keys()].sort());
+    const ref = lines.map((l) => byKey.get(key(l.variations))!);
     // Cached only once an answer to it was judged right (verdicts.json).
     const cache = VERDICTS[to]?.[hash]?.some((v) => v.right) ?? false;
     const log: string[] = [];
@@ -135,6 +146,13 @@ async function translateOne(to: string, model: string, hash: string): Promise<Re
     writeFileSync(file, reference);
   }
 }
+
+/** A line's variations as one comparable key ({"0": 2, "1": 20} → "0:2,1:20"). */
+const key = (v: Record<string, number> | undefined) =>
+  Object.entries(v ?? {})
+    .sort(([a], [b]) => Number(a) - Number(b))
+    .map(([k, x]) => `${k}:${x}`)
+    .join(",");
 
 const count = (rs: Result[], v: Result["verdict"]) => rs.filter((r) => r.verdict === v).length;
 const mean = (rs: Result[], k: "meaning" | "chrF") => {

@@ -3543,14 +3543,32 @@
     "5Jf1Uen6KRT21ot3NTL4ew==": {
       "description": "Strings page: told to the reader who just booked",
       "status": "translated",
-      "tokens": [],
+      "tokens": [
+        "__subject__"
+      ],
       "translations": [
         {
           "translation": "คุณจองแล้ว",
-          "variations": {}
+          "variations": {
+            "0": 1
+          }
+        },
+        {
+          "translation": "คุณจองแล้ว",
+          "variations": {
+            "0": 2
+          }
+        },
+        {
+          "translation": "คุณจองแล้ว",
+          "variations": {
+            "0": 3
+          }
         }
       ],
-      "types": []
+      "types": [
+        3
+      ]
     },
     "l1rZHZvHHLbW/a/yEblXwQ==": {
       "description": "Strings page piece title: a list inside a sentence",
