@@ -40,14 +40,16 @@
       "options": {
         "reasoning_effort": "none"
       },
-      "why": "newer (2026-10-19); reasoning off with reasoning_effort none (Cloudflare's changelog, checked 2026-11-15); paid models only, 20 requests a minute"
+      "perMinute": 20,
+      "why": "newer (2026-10-19); reasoning off with reasoning_effort none (Cloudflare's changelog, checked 2026-11-15); paid models only, 20 requests a minute; requires the Workers Paid plan, so 20 requests a minute on standard billing, per model (Workers AI \"Limits\", paid models, checked 2026-11-15)"
     },
     "@cf/thinkingmachines/inkling-2-small": {
       "jsonMode": false,
       "options": {
         "reasoning_effort": "none"
       },
-      "why": "newer (2026-11-12); reasoning off with reasoning_effort none (Cloudflare's changelog, checked 2026-11-15)"
+      "perMinute": 20,
+      "why": "newer (2026-11-12); reasoning off with reasoning_effort none (Cloudflare's changelog, checked 2026-11-15); requires the Workers Paid plan, so 20 requests a minute on standard billing, per model (Workers AI \"Limits\", paid models, checked 2026-11-15)"
     }
   },
   "default": {

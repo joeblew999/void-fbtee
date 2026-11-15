@@ -20,6 +20,7 @@ import {
 import { sourceOf } from "./locales";
 import { glossaryMisses, keptTerms, problemsWith } from "./judge";
 import { check } from "./check";
+import { LLAMA, modelById, modelFor, type TranslationModel } from "./models";
 
 /** void-fbtee's own folder (dist/ is one level down), where skills/ ships. */
 export const packageDir = () => dirname(dirname(fileURLToPath(import.meta.url)));
@@ -455,23 +456,21 @@ export async function translateEntry(
 }
 
 /**
- * Workers AI's limit for text generation: 300 requests a minute, free or paid plan, for every
- * model that isn't paid-only (Cloudflare, Workers AI "Limits", checked 2026-11-15). Every request
- * to the dev server's translate route goes through this, a little under it, counting the last
- * minute's; past it a request waits for the minute to move on, rather than being refused.
+ * Workers AI's limits are per model, a minute: 300 for text generation, 20 for a model that
+ * requires the Workers Paid plan (models.ts perMinute; Workers AI "Limits", checked 2026-11-15).
+ * Every request to the dev server's translate route takes the next free slot of its model, in
+ * the order asked, kept a little under the limit (90%), rather than being refused.
  */
-const PER_MINUTE = 290;
-const sent: number[] = [];
-async function underLimit(): Promise<void> {
-  for (;;) {
-    const now = Date.now();
-    while (sent.length && now - sent[0]! >= 60_000) sent.shift();
-    if (sent.length < PER_MINUTE) {
-      sent.push(now);
-      return;
-    }
-    await new Promise((r) => setTimeout(r, 60_000 - (now - sent[0]!) + 10));
-  }
+const slots = new Map<string, number[]>();
+async function underLimit(model: TranslationModel): Promise<void> {
+  const limit = Math.max(1, Math.floor(model.perMinute * 0.9));
+  const taken = slots.get(model.id) ?? [];
+  slots.set(model.id, taken);
+  const now = Date.now();
+  while (taken.length && now - taken[0]! >= 60_000) taken.shift();
+  const at = Math.max(now, taken.length >= limit ? taken[taken.length - limit]! + 60_000 : now);
+  taken.push(at);
+  if (at > now) await new Promise((r) => setTimeout(r, at - now));
 }
 
 /**
@@ -480,7 +479,11 @@ async function underLimit(): Promise<void> {
  */
 export function routeCall(url: string, token: string, log: (line: string) => void): TranslateCall {
   return async (body) => {
-    await underLimit();
+    // The model that answers it: the test's, or the language's (as ai.ts devTranslate picks).
+    const { to, model } = body as { to?: unknown; model?: unknown };
+    await underLimit(
+      typeof model === "string" ? modelById(model) : typeof to === "string" ? modelFor(to) : LLAMA,
+    );
     const res = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json", "x-void-fbtee-token": token },

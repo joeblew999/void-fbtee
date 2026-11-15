@@ -117,10 +117,19 @@ dialect in six strings). So it stays; any change to it is measured the same way
    counts, "Catálogo", "String", "Chuỗi" capitalised, Hindi's swapped numbers, Korean's particle,
    "successfully" (Vietnamese), "with this email" (Thai), "joint en pièce jointe", "Sie sind
    gebucht", "coding agent" left in English (Thai, Chinese), 同じく, Arabic's 100-and-up line.
+   All five models without thinking on every string (2026-11-15, report only, models.json
+   untouched). For the 17 strings Gemma gets wrong: Inkling 2 Small right on 15, DeepSeek V4.1
+   Flash on 14, SEA-LION on 9, Llama 3.3 on 6. No model got "Catálogo" right; only Llama "You're
+   booked" in German. Their other answers aren't all judged yet (about 5 to 10 a language for
+   each), so no language's best model is known yet.
+4. Paid-only models (DeepSeek V4.1 Flash, Inkling 2 Small) are 20 requests a minute each
+   (models.json perMinute). Done: the limit is per model (translate.ts routeCall). Open: a retry
+   waits behind every request already queued for its model, so with these models a test can wait
+   past Vitest's 2 minutes (3 timed out, 2026-11-15); a retry should take the next free slot.
    AI Gateway's cache is now keyed by the request and the string's round (ai.ts ask,
    `cacheKey`): every answer is stored the first time it's asked, so a judged answer comes back
    the same until the skill, the examples or the model change.
-4. Done 2026-11-15: everything at once. Each string is made new in memory (no catalog file
+5. Done 2026-11-15: everything at once. Each string is made new in memory (no catalog file
    written per string), every string in every language is sent at once (translate.ts
    translateCatalog), under Workers AI's 300 a minute (routeCall), and each test waits for its own
    answer. All 12 languages with Gemma 4: 41 s, against about 14 minutes one after another. vp dev

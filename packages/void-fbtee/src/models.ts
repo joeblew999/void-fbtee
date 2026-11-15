@@ -11,6 +11,9 @@ export interface TranslationModel {
   jsonMode: boolean;
   /** Sent with every request to it (ai.ts ask): its thinking turned off or to its lowest. */
   options?: Record<string, unknown>;
+  /** Workers AI's requests a minute for it (translate.ts routeCall): 300 for text generation,
+   * unless the model requires the Workers Paid plan (models.json perMinute, 20). */
+  perMinute: number;
 }
 
 export interface Choice {
@@ -22,13 +25,19 @@ export interface Choice {
   why: string;
 }
 
-const MODELS = data.models as Record<string, Omit<TranslationModel, "id"> & { why: string }>;
+const MODELS = data.models as Record<
+  string,
+  Omit<TranslationModel, "id" | "perMinute"> & { perMinute?: number; why: string }
+>;
 
 /** Every model void-fbtee translates with: the translator test's candidates for a language. */
 export const CANDIDATES: TranslationModel[] = Object.entries(MODELS).map(([id, m]) => ({
   id,
   jsonMode: m.jsonMode,
   ...(m.options && { options: m.options }),
+  // Workers AI's limit for text generation, for every model not paid-only (Workers AI "Limits",
+  // checked 2026-11-15).
+  perMinute: m.perMinute ?? 300,
 }));
 /** Every language with its own model. */
 export const CHOICES = data.languages as Choice[];

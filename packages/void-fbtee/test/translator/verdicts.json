@@ -103,6 +103,12 @@
         "right": false,
         "why": "adds \"with this email\" (พร้อมกับอีเมลนี้)",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "สวัสดี {name} ตั๋วของคุณอยู่ในอีเมลนี้",
+        "right": false,
+        "why": "says \"your ticket is in this email\" (อยู่ในอีเมลนี้)",
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "0/yUVSiGyC2JT0/i90uO0A==": [
@@ -247,6 +253,18 @@
         "answer": "AGENTS.md ของแอปจะบอก coding agent ของคุณว่าต้องทำอะไร",
         "right": false,
         "why": "leaves \"coding agent\" in English",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "แอป AGENTS.md บอกโปรแกรมเขียนโค้ดของคุณว่าจะทำอะไร",
+        "right": false,
+        "why": "\"แอป AGENTS.md\" reads as an app called AGENTS.md: the app's needs ของ",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "แอปของเรามีคำแนะนำสำหรับเอเจนต์ของคุณอยู่ใน AGENTS.md",
+        "right": false,
+        "why": "rewrites it: \"our app has instructions for your agent in AGENTS.md\"",
         "by": "Claude Code, 2026-11-15"
       }
     ],
@@ -1091,6 +1109,11 @@
         "right": false,
         "why": "the 100-and-up lines say \"{seats} مقعدًا\"; 100 and up takes the singular \"مقعد\"",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "لم يحجز {who} أي مقعد.\nحجز {who} مقعدًا واحدًا.\nحجز {who} مقعدين.\nحجز {who} {seats} مقاعد.\nحجز {who} {seats} مقعدًا.\nحجز {who} {seats} مقعد.\nلم تحجز {who} أي مقعد.\nحجزت {who} مقعدًا واحدًا.\nحجزت {who} مقعدين.\nحجزت {who} {seats} مقاعد.\nحجزت {who} {seats} مقعدًا.\nحجزت {who} {seats} مقعد.\nلم يحجز {who} أي مقعد.\nحجز {who} مقعدًا واحدًا.\nحجز {who} مقعدين.\nحجز {who} {seats} مقاعد.\nحجز {who} {seats} مقعدًا.\nحجز {who} {seats} مقعد.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ]
   },
@@ -1350,6 +1373,12 @@
         "right": false,
         "why": "capitalises \"Catálogo\" mid-sentence",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Cada Catálogo de idioma está en i18n/translations.",
+        "right": false,
+        "why": "capitalises \"Catálogo\" mid-sentence",
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "hUJ62HRBMHBewxRvZblIMw==": [
@@ -1447,6 +1476,11 @@
         "right": false,
         "why": "the one-seat lines say \"plazas\" (1 plazas), not \"plaza\"",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{who} reservó {seats} plaza.\n{who} reservó {seats} plazas.\n{who} reservó {seats} plaza.\n{who} reservó {seats} plazas.\n{who} reservó {seats} plaza.\n{who} reservó {seats} plazas.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ]
   },
@@ -1470,6 +1504,16 @@
         "answer": "Bonjour {name}, votre billet est joint en pièce jointe.",
         "right": false,
         "why": "says attached twice (\"joint en pièce jointe\")",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Bonjour {name}, votre billet est en pièce jointe.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Bonjour {name}, votre billet est joint.",
+        "right": true,
         "by": "Claude Code, 2026-11-15"
       }
     ],
@@ -1633,6 +1677,11 @@
         "answer": "{who} a réservé {seats} siège.\n{who} a réservé {seats} sièges.\n{who} a réservé {seats} siège.\n{who} a réservé {seats} sièges.\n{who} a réservé {seats} siège.\n{who} a réservé {seats} sièges.",
         "right": true,
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{who} a réservé {seats} place.\n{who} a réservé {seats} places.\n{who} a réservé {seats} place.\n{who} a réservé {seats} places.\n{who} a réservé {seats} place.\n{who} a réservé {seats} places.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ]
   },
@@ -1668,6 +1717,22 @@
         "answer": "{translated} में से {total} स्ट्रिंग का अनुवाद किया गया",
         "right": false,
         "why": "swaps the numbers: \"{total} out of {translated}\"",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{translated} में से {total} स्ट्रिंग अनूदित की गईं",
+        "right": false,
+        "why": "swaps the numbers: \"{total} out of {translated}\"",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{total} में से {translated} स्ट्रिंग का अनुवाद हो चुका है",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{total} में से {translated} स्ट्रिंग का अनुवाद हुआ",
+        "right": true,
         "by": "Claude Code, 2026-11-15"
       }
     ],
@@ -1859,6 +1924,17 @@
         "answer": "{translated} dari {total} String diterjemahkan",
         "right": false,
         "why": "capitalises \"String\" mid-sentence",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{translated} dari {total} String telah diterjemahkan",
+        "right": false,
+        "why": "capitalises \"String\" mid-sentence",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{translated} dari {total} string diterjemahkan",
+        "right": true,
         "by": "Claude Code, 2026-11-15"
       }
     ],
@@ -2180,6 +2256,27 @@
         "right": false,
         "why": "adds \"likewise\" (同じく) before the second name",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name}さんが予約し、{name}さんはメールでチケットを受け取りました。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name} さんは予約しました、および {name} さんはメールでチケットを受け取りました。",
+        "right": false,
+        "why": "joins the clauses with および, which joins nouns, not sentences",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name}さんが予約し、{name}さんにメールでチケットが届きました。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{name}さんが予約し、{name}さんがチケットをメールで受け取りました。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "iQJF/J4mB7QMxMxmCJJLOw==": [
@@ -2315,6 +2412,29 @@
         "answer": "{pages}를 여시겠습니까?",
         "right": false,
         "why": "fixes the particle to 를; a name ending in a consonant needs 을 (을(를))",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "다음 페이지 중 {pages}을(를) 열겠습니까?",
+        "right": false,
+        "why": "adds \"of the following pages\" (다음 페이지 중)",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{pages}를 열까요?",
+        "right": false,
+        "why": "fixes the particle to 를; a name ending in a consonant needs 을 (을(를))",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{pages} 중 어느 것을 열까요?",
+        "right": false,
+        "why": "asks which of {pages} to open (중 어느 것을)",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{pages}을(를) 열까요?",
+        "right": true,
         "by": "Claude Code, 2026-11-15"
       }
     ],
@@ -2590,6 +2710,11 @@
         "right": false,
         "why": "the third line says \"забронировали(а)\", which isn't a Russian form",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Вы забронировали.\nВы забронировали.\nВы забронировали.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "Nr+WWEAaNhdmcsZktc6jkQ==": [
@@ -2603,6 +2728,17 @@
         "answer": "{who} забронировал(а) {seats} места.\n{who} забронировал(а) {seats} места.\n{who} забронировал(а) {seats} мест.\n{who} забронировал(а) {seats} места.\n{who} забронировала {seats} места.\n{who} забронировала {seats} места.\n{who} забронировала {seats} мест.\n{who} забронировала {seats} места.\n{who} забронировал(а) {seats} места.\n{who} забронировал(а) {seats} места.\n{who} забронировал(а) {seats} мест.\n{who} забронировал(а) {seats} места.",
         "right": false,
         "why": "the one-seat lines say \"места\" (1 места), and the male lines \"забронировал(а)\"",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{who} забронировал {seats} место.\n{who} забронировал {seats} места.\n{who} забронировал {seats} мест.\n{who} забронировал {seats} места.\n{who} забронировала {seats} место.\n{who} забронировала {seats} места.\n{who} забронировала {seats} мест.\n{who} забронировала {seats} места.\n{who} забронировал(а) {seats} место.\n{who} забронировал(а) {seats} места.\n{who} забронировал(а) {seats} мест.\n{who} забронировал(а) {seats} места.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{who} забронировал одно место.\n{who} забронировал {seats} места.\n{who} забронировал {seats} мест.\n{who} забронировал {seats} места.\n{who} забронировала одно место.\n{who} забронировала {seats} места.\n{who} забронировала {seats} мест.\n{who} забронировала {seats} места.\n{who} забронировал(а) одно место.\n{who} забронировал(а) {seats} места.\n{who} забронировал(а) {seats} мест.\n{who} забронировал(а) {seats} места.",
+        "right": false,
+        "why": "the one lines say \"одно место\" (one seat), but Russian's one form also covers 21, 31…",
         "by": "Claude Code, 2026-11-15"
       }
     ]
@@ -2645,6 +2781,23 @@
         "answer": "Đã dịch {translated} trên {total} Chuỗi",
         "right": false,
         "why": "capitalises \"Chuỗi\" mid-sentence",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{translated} trên {total} Chuỗi đã được dịch",
+        "right": false,
+        "why": "capitalises \"Chuỗi\" mid-sentence",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "{translated} trong {total} Chuỗi đã dịch",
+        "right": false,
+        "why": "capitalises \"Chuỗi\" mid-sentence",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Đã dịch {translated} trên {total} chuỗi",
+        "right": true,
         "by": "Claude Code, 2026-11-15"
       }
     ],
@@ -2795,6 +2948,16 @@
         "right": false,
         "why": "adds \"successfully\" (thành công)",
         "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Bạn đã đặt chỗ.\nBạn đã đặt chỗ.\nBạn đã đặt chỗ.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "Đã đặt chỗ.\nĐã đặt chỗ.\nĐã đặt chỗ.",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
       }
     ],
     "Nr+WWEAaNhdmcsZktc6jkQ==": [
@@ -2880,6 +3043,26 @@
         "answer": "应用的 AGENTS.md 会告知你的 coding agent 该做什么。",
         "right": false,
         "why": "leaves \"coding agent\" in English",
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "应用的 AGENTS.md 告诉你的编码代理应该做什么。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "应用的 AGENTS.md 告诉你的编码代理如何操作。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "应用的 AGENTS.md 会告诉你的编码智能体该做什么。",
+        "right": true,
+        "by": "Claude Code, 2026-11-15"
+      },
+      {
+        "answer": "应用的 AGENTS.md 会告诉你的编程智能体该做什么。",
+        "right": true,
         "by": "Claude Code, 2026-11-15"
       }
     ],
