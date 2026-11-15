@@ -144,6 +144,46 @@ dialect in six strings). So it stays; any change to it is measured the same way
    answer. All 12 languages with Gemma 4: 41 s, against about 14 minutes one after another. vp dev
    translates the same way: every new string in every language at once.
 
+## Proposal: descriptions and grammar (2026-11-15, to approve)
+
+Gemma's 17 wrong answers (of 276): about 3 are missing context, the rest grammar it slips on.
+
+### Descriptions, first class
+
+The description is in the developer's code, next to the text (`<fbt desc="…">`), and it's the
+only context a translator gets (with the code around the string). Today most say where the text
+shows ("Home feature title: …", "Button: …"), not what's happening; "You're booked." has "Told
+to the reader who just booked", so a model can't tell a seat from a table or a job.
+
+1. The void-fbtee skill (Strings): a description says what's happening and to whom, the sense of
+   a word that has several ("book a seat at an event", "open a page"), and what each placeholder
+   holds ("{pages}: the names of pages"), then where it shows. fbtee has no description for a
+   placeholder, so the string's description names them.
+2. The translating skill: the description is the situation; choose words by it.
+3. The example's 90 descriptions and the test app's rewritten that way.
+4. A description is part of an entry's key (fbtee hashes text and description), so a new
+   description is a new entry: the catalogs' translations are carried over to the new keys by a
+   one-off script (text unchanged), then Void's AI's new answers are judged against them.
+
+### Grammar: checks from Intl and a small data file, sent back to the model
+
+vp dev's checks already send a problem back ("Line 3 must keep {name}") and ask again. Add checks
+for what the run found, in judge.ts problemsWith, so vp dev, the translator test and vp build's
+report use the same ones. What each language needs is data (grammar.json, with its sources and
+when checked), not code:
+
+1. Plural lines: the one line and the other line differ (1 Platz / 2 Plätze); Arabic's many and
+   other differ too (مقعدًا / مقعد). Catches 6 of the 17.
+2. Gender lines: a male or female line has no both-genders form ("забронировал(а)", "/a"). 1.
+3. Capitals: outside German, a word capitalised mid-sentence must be capitalised in the source
+   too (a name). Catches "Catálogo", "String", "Chuỗi", "Chaînes": 3.
+4. Latin words in Thai, Chinese, Japanese, Korean, Arabic, Hindi, Russian lines only where kept
+   (commands, names, placeholders). Catches "coding agent" left in English: 2.
+5. Korean: a placeholder followed by one particle alone (를) needs both forms (을(를)). 1.
+
+Left for Claude Code to fix in the catalog: Hindi's swapped numbers and added words (3 or 4).
+Then one run with Gemma, judged, to measure it.
+
 ## Where it stands (2026-11-15)
 
 Gemma 4 on the full test set (23 strings, every construct), through the real path (prepared(),
