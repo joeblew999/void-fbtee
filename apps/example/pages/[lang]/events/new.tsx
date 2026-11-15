@@ -116,7 +116,7 @@ function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
         id="event-seats"
         name="seats"
         className="sm:max-w-40"
-        label={<fbt desc="Form label: how many seats the event has">Seats</fbt>}
+        label={<fbt common>Seats</fbt>}
         error={
           form.errors.seats && (
             <fbt desc="Form error: seats must be 1 or more">At least 1 seat.</fbt>

@@ -118,15 +118,13 @@ export default function StringsPage() {
     },
     {
       id: "how",
-      title: (
-        <fbt desc="Strings page section title: what translated strings take">What it takes</fbt>
-      ),
+      title: <fbt common>What it takes</fbt>,
     },
   ];
   return (
     <DocsPage
       testId="strings-title"
-      title={<fbt desc="Docs page title: the page about translated strings">Strings</fbt>}
+      title={<fbt common>Strings</fbt>}
       intro={
         <fbt desc="Strings page introduction">
           Every word on this site is marked in the code with fbtee, and each language has a catalog

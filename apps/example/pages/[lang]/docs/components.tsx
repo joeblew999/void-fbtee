@@ -85,7 +85,7 @@ export default function ComponentsPage() {
   const sections = [
     {
       id: "components",
-      title: <fbt desc="Components page section title: the React components">Components</fbt>,
+      title: <fbt common>Components</fbt>,
     },
     {
       id: "picker",
@@ -103,11 +103,7 @@ export default function ComponentsPage() {
   return (
     <DocsPage
       testId="components-title"
-      title={
-        <fbt desc="Docs page title: the page about void-fbtee's React components and hooks">
-          Components
-        </fbt>
-      }
+      title={<fbt common>Components</fbt>}
       intro={
         <fbt desc="Components page introduction">
           Everything void-fbtee gives an app's pages, from void-fbtee/react: its components and

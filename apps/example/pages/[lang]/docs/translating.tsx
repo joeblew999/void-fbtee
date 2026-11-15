@@ -2,6 +2,7 @@
 // Claude Code, into files in the repository (with each catalog's counts, from the loader); what
 // people post by Workers AI, as it's posted. With the lines that do it.
 import { fbt } from "fbtee";
+import type { ReactNode } from "react";
 import { routeUrl } from "void-fbtee/routes";
 import { Formatted, Link, useLocale } from "void-fbtee/react";
 import { DocsPage } from "@/docs/DocsPage";
@@ -76,6 +77,80 @@ function points(): Point[] {
   ];
 }
 
+/**
+ * Each stage of a Vite+ app's work, and what it does about translations: the same commands on a
+ * developer's machine as in CI, so nothing untranslated gets past any of them.
+ */
+function stages(): { command: string; what: ReactNode; where: string }[] {
+  return [
+    {
+      command: "vp check",
+      what: (
+        <fbt desc="Translating page: what vp check does about translations">
+          Lints with fbtee's own rules: text nobody wrapped for translation is an error.
+        </fbt>
+      ),
+      where: "vite.config.ts",
+    },
+    {
+      command: "vp dev",
+      what: (
+        <fbt desc="Translating page: what the dev server does about translations">
+          Says what's untranslated as you work, and shows an edited translation at once.
+        </fbt>
+      ),
+      where: "vite.config.ts (voidFbtee)",
+    },
+    {
+      command: "vp run i18n:prepare",
+      what: (
+        <fbt desc="Translating page: what i18n:prepare does">
+          Adds every new string to each language's catalog, with the forms that language needs,
+          marked new.
+        </fbt>
+      ),
+      where: "package.json",
+    },
+    {
+      command: "vp run i18n:translate",
+      what: (
+        <fbt desc="Translating page: what i18n:translate does">
+          Claude Code translates what's new, strings and markdown pages, by fbtee's own skill.
+        </fbt>
+      ),
+      where: "package.json",
+    },
+    {
+      command: "vp run i18n:check",
+      what: (
+        <fbt desc="Translating page: what i18n:check does">
+          Fails if a string is untranslated or a page's copy is older than its original.
+        </fbt>
+      ),
+      where: "package.json",
+    },
+    {
+      command: "vp build",
+      what: (
+        <fbt desc="Translating page: what the build does about translations">
+          Fails on an untranslated string, so a deploy can't ship one.
+        </fbt>
+      ),
+      where: "vite.config.ts (failOnMissing)",
+    },
+    {
+      command: "CI",
+      what: (
+        <fbt desc="Translating page: what CI does about translations">
+          Runs the same commands on every push: check, i18n:check, build, then deploys and checks
+          the live site.
+        </fbt>
+      ),
+      where: ".github/workflows/ci.yml",
+    },
+  ];
+}
+
 export default function TranslatingPage({ catalogs }: Props) {
   const { locale } = useLocale();
   const number = new Intl.NumberFormat(locale);
@@ -89,6 +164,14 @@ export default function TranslatingPage({ catalogs }: Props) {
       ),
     },
     {
+      id: "vite-plus",
+      title: (
+        <fbt desc="Translating page section title: translation built into Vite+'s commands">
+          Built into Vite+
+        </fbt>
+      ),
+    },
+    {
       id: "how",
       title: (
         <fbt desc="Translating page section title: how the app is translated">How it's done</fbt>
@@ -98,9 +181,7 @@ export default function TranslatingPage({ catalogs }: Props) {
   return (
     <DocsPage
       testId="translating-title"
-      title={
-        <fbt desc="Docs page title: the page about how the app gets translated">Translating</fbt>
-      }
+      title={<fbt common>Translating</fbt>}
       intro={
         <fbt desc="Translating page introduction">
           The app's own text is translated by Claude Code, into files in the repository that you
@@ -146,6 +227,25 @@ export default function TranslatingPage({ catalogs }: Props) {
         </p>
       </Section>
       <Section id={sections[1].id} title={sections[1].title}>
+        <p className="text-muted-foreground">
+          <fbt desc="Translating page: translation is part of each of Vite+'s commands, the same locally and in CI">
+            Translation isn't a separate tool: it's part of each command a Vite+ app already runs,
+            the same on your machine as in CI.
+          </fbt>
+        </p>
+        <dl className="divide-y text-sm" data-testid="stages">
+          {stages().map((s) => (
+            <div key={s.command} className="space-y-1 py-2">
+              <dt className="flex flex-wrap items-baseline justify-between gap-x-4" dir="ltr">
+                <code className="font-mono text-xs">{s.command}</code>
+                <span className="font-mono text-xs text-muted-foreground">{s.where}</span>
+              </dt>
+              <dd>{s.what}</dd>
+            </div>
+          ))}
+        </dl>
+      </Section>
+      <Section id={sections[2].id} title={sections[2].title}>
         <Points points={points()} />
         <SkillLink section="translate-a-void-app-with-void-fbtee" />
       </Section>

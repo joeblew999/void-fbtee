@@ -10,10 +10,7 @@ export const getPrerenderPaths = langParams;
 
 export const head = defineHead(() =>
   pageHead({
-    title: fbs(
-      "Components",
-      "Docs page title: the page about void-fbtee's React components and hooks",
-    ),
+    title: fbs.c("Components"),
     description: fbs(
       "Everything void-fbtee gives an app's pages, from void-fbtee/react: its components and hooks, what each is for, each at work, and the line that uses it.",
       "Components page introduction",

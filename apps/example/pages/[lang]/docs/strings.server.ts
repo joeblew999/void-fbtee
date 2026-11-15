@@ -11,7 +11,7 @@ export const getPrerenderPaths = langParams;
 // The heading and the intro's own strings, so they're translated once.
 export const head = defineHead(() =>
   pageHead({
-    title: fbs("Strings", "Docs page title: the page about translated strings"),
+    title: fbs.c("Strings"),
     description: fbs(
       "Every word on this site is marked in the code with fbtee, and each language has a catalog file with its translations. Here is what that takes, with the lines that do it.",
       "Strings page introduction",

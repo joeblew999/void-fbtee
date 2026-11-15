@@ -4,5 +4,16 @@
   "Docs": "Navigation: the documentation",
   "Post an event": "Heading of the form for posting a new event",
   "Sold out": "Badge: an event has no seats left",
-  "i18n for Void apps": "Home page heading"
+  "i18n for Void apps": "Home page heading",
+  "Seats": "A count of seats at an event: a column heading or a form label",
+  "Time zones": "A heading: named time zones",
+  "Durations": "A heading: lengths of time",
+  "What it takes": "A docs page's section heading: what something takes, with the lines that do it",
+  "Strings": "Docs page title: the page about translated strings",
+  "Right to left": "Docs page title: the page about right-to-left languages",
+  "Markdown pages": "Docs page title: the page about translated markdown pages",
+  "Translating": "Docs page title: the page about how the app gets translated",
+  "Components": "Docs page title: the page about void-fbtee's React components and hooks",
+  "Emails": "Docs page title: the page about the app's translated emails",
+  "PDFs": "Docs page title: the page about translated PDFs"
 }

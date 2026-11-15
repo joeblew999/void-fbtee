@@ -122,19 +122,13 @@ export default function MarkdownPage() {
     },
     {
       id: "how",
-      title: (
-        <fbt desc="Markdown page section title: what translated markdown pages take">
-          What it takes
-        </fbt>
-      ),
+      title: <fbt common>What it takes</fbt>,
     },
   ];
   return (
     <DocsPage
       testId="markdown-title"
-      title={
-        <fbt desc="Docs page title: the page about translated markdown pages">Markdown pages</fbt>
-      }
+      title={<fbt common>Markdown pages</fbt>}
       intro={
         <fbt desc="Markdown page introduction">
           A page written in markdown has a copy in each language, translated whole. Here are this

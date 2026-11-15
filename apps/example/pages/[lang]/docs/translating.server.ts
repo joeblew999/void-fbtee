@@ -34,7 +34,7 @@ export const loader = defineHandler(() => ({
 // The heading and the intro's own strings, so they're translated once.
 export const head = defineHead(() =>
   pageHead({
-    title: fbs("Translating", "Docs page title: the page about how the app gets translated"),
+    title: fbs.c("Translating"),
     description: fbs(
       "The app's own text is translated by Claude Code, into files in the repository that you review. What people post is translated by Workers AI as it's posted. Here is each, with the lines that do it.",
       "Translating page introduction",

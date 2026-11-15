@@ -209,7 +209,7 @@ export default function EmailsPage({ booking, link }: Props) {
   return (
     <DocsPage
       testId="emails-title"
-      title={<fbt desc="Docs page title: the page about the app's translated emails">Emails</fbt>}
+      title={<fbt common>Emails</fbt>}
       intro={
         <fbt desc="Emails page introduction">
           This app emails people in their own language: a booking's confirmation, a reminder the day

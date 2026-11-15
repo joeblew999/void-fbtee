@@ -9,7 +9,7 @@ export function sectionTitle(id: SectionId): ReactNode {
     case "dates":
       return <fbt desc="Intl page section: dates and times">Dates and times</fbt>;
     case "zones":
-      return <fbt desc="Intl page section: named time zones">Time zones</fbt>;
+      return <fbt common>Time zones</fbt>;
     case "ranges":
       return <fbt desc="Intl page section: date ranges">Date ranges</fbt>;
     case "relative":
@@ -25,7 +25,7 @@ export function sectionTitle(id: SectionId): ReactNode {
     case "lists":
       return <fbt desc="Intl page section: lists of items">Lists</fbt>;
     case "durations":
-      return <fbt desc="Intl page section: lengths of time">Durations</fbt>;
+      return <fbt common>Durations</fbt>;
     case "names":
       return <fbt desc="Intl page section: names of languages, regions and currencies">Names</fbt>;
     case "collation":

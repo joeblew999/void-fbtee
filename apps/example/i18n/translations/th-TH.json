@@ -489,18 +489,6 @@
       ],
       "types": []
     },
-    "T/SL1yySYQJS4mBmPyecUQ==": {
-      "description": "Form label: how many seats the event has",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "จำนวนที่นั่ง",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "jhuD83yE9J7dpA0O1SWAYQ==": {
       "description": "Form error: seats must be 1 or more",
       "status": "translated",
@@ -1141,18 +1129,6 @@
       ],
       "types": []
     },
-    "9cM8w6iS33H8Q2+5x793YA==": {
-      "description": "Temporal section: one moment in different time zones",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เขตเวลา",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "W8bv1EfOqqzacAKoqNeimA==": {
       "description": "Temporal section: daylight saving, when clocks go forward or back",
       "status": "translated",
@@ -1172,18 +1148,6 @@
       "translations": [
         {
           "translation": "วันที่ในปฏิทิน",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "TYWTDpqlDJyvlxzxhv56xA==": {
-      "description": "Temporal section: lengths of time between dates",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ระยะเวลา",
           "variations": {}
         }
       ],
@@ -1269,18 +1233,6 @@
       ],
       "types": []
     },
-    "NAVMNt0rU2zRY2HuQWN6Dg==": {
-      "description": "Intl page section: named time zones",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เขตเวลา",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "iAyMA8ajZdv5cK2svUN0Vg==": {
       "description": "Intl page section: date ranges",
       "status": "translated",
@@ -1360,18 +1312,6 @@
       "translations": [
         {
           "translation": "รายการ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "brgbZ/o1V3RDVj1WtYgeaQ==": {
-      "description": "Intl page section: lengths of time",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ระยะเวลา",
           "variations": {}
         }
       ],
@@ -1884,18 +1824,6 @@
       "translations": [
         {
           "translation": "กิจกรรม",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "YPEG6i9RkPBZeQ+eCLEmBg==": {
-      "description": "Events board column: seats still free",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ที่นั่ง",
           "variations": {}
         }
       ],
@@ -2742,18 +2670,6 @@
       ],
       "types": []
     },
-    "ibUKl+8bisEKyM7E7nKmCQ==": {
-      "description": "Markdown page section title: what translated markdown pages take",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "สิ่งที่ต้องทำ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "GwFKLFrF+X3/eRvyHioK2g==": {
       "description": "Markdown page introduction",
       "status": "translated",
@@ -2910,18 +2826,6 @@
       ],
       "types": []
     },
-    "Sb9iDIh00P1ZwNdWleVysw==": {
-      "description": "Right-to-left page section title: what right to left takes",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "สิ่งที่ต้องทำ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "5eJguiKJa4CoBXQ++0dvjw==": {
       "description": "Right-to-left page introduction",
       "status": "translated",
@@ -3073,18 +2977,6 @@
       "translations": [
         {
           "translation": "ประโยคเดียว ทุกจำนวน",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "bGG9eGtKcHRw+2cw0ZMGIw==": {
-      "description": "Strings page section title: what translated strings take",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "สิ่งที่ต้องทำ",
           "variations": {}
         }
       ],
@@ -3946,18 +3838,6 @@
       ],
       "types": []
     },
-    "W7AWZSrFRNq+uOcTbJTdZA==": {
-      "description": "Components page section title: the React components",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "คอมโพเนนต์",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "PYzARl3RwBWydFdjTeOeqQ==": {
       "description": "Components page section title: the language picker, styled two ways",
       "status": "translated",
@@ -4234,18 +4114,6 @@
       ],
       "types": []
     },
-    "hvbGSq+LLppgjmJfvSZrdg==": {
-      "description": "Strings page form: how many seats",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ที่นั่ง",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "iI4KVuDsb4pUDDVioA9rFw==": {
       "description": "Strings page form: how the person takes part in the event",
       "status": "translated",
@@ -4353,6 +4221,149 @@
       "translations": [
         {
           "translation": "{name} จองที่นั่งแล้ว 1 ที่",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zZI6c3ThG+E++mZB6VNlUA==": {
+      "description": "A count of seats at an event: a column heading or a form label",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ที่นั่ง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+BSQtF71BWhuyCYlDZ2PhA==": {
+      "description": "A heading: named time zones",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เขตเวลา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CM4M1hBfp3jZxt9EF9/i1w==": {
+      "description": "A heading: lengths of time",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ระยะเวลา",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vUoLw6hQkrxqyI7M6xVVNA==": {
+      "description": "A docs page's section heading: what something takes, with the lines that do it",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "สิ่งที่ต้องทำ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hlrf6dOB3I8oKkEwm+jp7g==": {
+      "description": "Translating page: what vp check does about translations",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ตรวจด้วยกฎของ fbtee เอง: ข้อความที่ไม่ได้ครอบไว้เพื่อแปลถือเป็นข้อผิดพลาด",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nOK1JdlK2UOv/MvETYysEA==": {
+      "description": "Translating page: what the dev server does about translations",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "บอกว่าอะไรยังไม่ได้แปลระหว่างที่คุณทำงาน และแสดงคำแปลที่แก้ไขทันที",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/zRE+2DoVCiBY6n3ofmSQw==": {
+      "description": "Translating page: what i18n:prepare does",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เพิ่มข้อความใหม่ทุกข้อความลงในแคตตาล็อกของแต่ละภาษา พร้อมรูปแบบที่ภาษานั้นต้องใช้ และทำเครื่องหมายว่าใหม่",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8W0DBmCvpoesZN0arc01Qw==": {
+      "description": "Translating page: what i18n:translate does",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Claude Code แปลสิ่งที่ใหม่ ทั้งข้อความและหน้า Markdown ตามสกิลของ fbtee เอง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pZcOnJfQ40G2gUwhBAApgg==": {
+      "description": "Translating page: what i18n:check does",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ล้มเหลวถ้ามีข้อความที่ยังไม่ได้แปล หรือสำเนาของหน้าเก่ากว่าต้นฉบับ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OdiBbTOSPGsgV7z4VYt7Ew==": {
+      "description": "Translating page: what the build does about translations",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ล้มเหลวเมื่อมีข้อความที่ยังไม่ได้แปล การ deploy จึงไม่มีทางส่งออกไปได้",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nfjc2yJmKXnKeTkY1mv24g==": {
+      "description": "Translating page: what CI does about translations",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "รันคำสั่งเดียวกันทุกครั้งที่ push: check, i18n:check, build แล้ว deploy และตรวจไซต์จริง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "98k5o/AJ4acxS0KZZMV2xg==": {
+      "description": "Translating page section title: translation built into Vite+'s commands",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "อยู่ในตัว Vite+",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KGPb82h362SCCDnY2KPxpQ==": {
+      "description": "Translating page: translation is part of each of Vite+'s commands, the same locally and in CI",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "การแปลไม่ใช่เครื่องมือแยก แต่เป็นส่วนหนึ่งของทุกคำสั่งที่แอป Vite+ รันอยู่แล้ว เหมือนกันทั้งบนเครื่องของคุณและใน CI",
           "variations": {}
         }
       ],

@@ -161,7 +161,7 @@ export function StringPieces() {
           </select>
         </label>
         <label className={field}>
-          <fbt desc="Strings page form: how many seats">Seats</fbt>
+          <fbt common>Seats</fbt>
           <input
             className={input}
             type="number"

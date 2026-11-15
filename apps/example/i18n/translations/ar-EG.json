@@ -637,18 +637,6 @@
       ],
       "types": []
     },
-    "T/SL1yySYQJS4mBmPyecUQ==": {
-      "description": "Form label: how many seats the event has",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "المقاعد",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "jhuD83yE9J7dpA0O1SWAYQ==": {
       "description": "Form error: seats must be 1 or more",
       "status": "translated",
@@ -1315,18 +1303,6 @@
       ],
       "types": []
     },
-    "9cM8w6iS33H8Q2+5x793YA==": {
-      "description": "Temporal section: one moment in different time zones",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "المناطق الزمنية",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "W8bv1EfOqqzacAKoqNeimA==": {
       "description": "Temporal section: daylight saving, when clocks go forward or back",
       "status": "translated",
@@ -1346,18 +1322,6 @@
       "translations": [
         {
           "translation": "تواريخ التقويم",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "TYWTDpqlDJyvlxzxhv56xA==": {
-      "description": "Temporal section: lengths of time between dates",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "المدد",
           "variations": {}
         }
       ],
@@ -1507,18 +1471,6 @@
       ],
       "types": []
     },
-    "NAVMNt0rU2zRY2HuQWN6Dg==": {
-      "description": "Intl page section: named time zones",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "المناطق الزمنية",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "iAyMA8ajZdv5cK2svUN0Vg==": {
       "description": "Intl page section: date ranges",
       "status": "translated",
@@ -1598,18 +1550,6 @@
       "translations": [
         {
           "translation": "القوائم",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "brgbZ/o1V3RDVj1WtYgeaQ==": {
-      "description": "Intl page section: lengths of time",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "المدد الزمنية",
           "variations": {}
         }
       ],
@@ -2180,18 +2120,6 @@
       "translations": [
         {
           "translation": "الفعالية",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "YPEG6i9RkPBZeQ+eCLEmBg==": {
-      "description": "Events board column: seats still free",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "المقاعد",
           "variations": {}
         }
       ],
@@ -3038,18 +2966,6 @@
       ],
       "types": []
     },
-    "ibUKl+8bisEKyM7E7nKmCQ==": {
-      "description": "Markdown page section title: what translated markdown pages take",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ما يتطلبه الأمر",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "GwFKLFrF+X3/eRvyHioK2g==": {
       "description": "Markdown page introduction",
       "status": "translated",
@@ -3206,18 +3122,6 @@
       ],
       "types": []
     },
-    "Sb9iDIh00P1ZwNdWleVysw==": {
-      "description": "Right-to-left page section title: what right to left takes",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ما يتطلبه الأمر",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "5eJguiKJa4CoBXQ++0dvjw==": {
       "description": "Right-to-left page introduction",
       "status": "translated",
@@ -3369,18 +3273,6 @@
       "translations": [
         {
           "translation": "جملة واحدة، لكل عدد",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "bGG9eGtKcHRw+2cw0ZMGIw==": {
-      "description": "Strings page section title: what translated strings take",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ما يتطلبه الأمر",
           "variations": {}
         }
       ],
@@ -4274,18 +4166,6 @@
       ],
       "types": []
     },
-    "W7AWZSrFRNq+uOcTbJTdZA==": {
-      "description": "Components page section title: the React components",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "المكونات",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "PYzARl3RwBWydFdjTeOeqQ==": {
       "description": "Components page section title: the language picker, styled two ways",
       "status": "translated",
@@ -4562,18 +4442,6 @@
       ],
       "types": []
     },
-    "hvbGSq+LLppgjmJfvSZrdg==": {
-      "description": "Strings page form: how many seats",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "المقاعد",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "iI4KVuDsb4pUDDVioA9rFw==": {
       "description": "Strings page form: how the person takes part in the event",
       "status": "translated",
@@ -4707,6 +4575,149 @@
       "translations": [
         {
           "translation": "مقعد واحد محجوز باسم {name}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zZI6c3ThG+E++mZB6VNlUA==": {
+      "description": "A count of seats at an event: a column heading or a form label",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المقاعد",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+BSQtF71BWhuyCYlDZ2PhA==": {
+      "description": "A heading: named time zones",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المناطق الزمنية",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CM4M1hBfp3jZxt9EF9/i1w==": {
+      "description": "A heading: lengths of time",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المدد الزمنية",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vUoLw6hQkrxqyI7M6xVVNA==": {
+      "description": "A docs page's section heading: what something takes, with the lines that do it",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ما يتطلبه الأمر",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hlrf6dOB3I8oKkEwm+jp7g==": {
+      "description": "Translating page: what vp check does about translations",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يفحص الشيفرة بقواعد fbtee نفسها: أي نص لم يُغلَّف للترجمة خطأ.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nOK1JdlK2UOv/MvETYysEA==": {
+      "description": "Translating page: what the dev server does about translations",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يخبرك بما لم يُترجم أثناء عملك، ويعرض الترجمة المعدَّلة فورًا.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/zRE+2DoVCiBY6n3ofmSQw==": {
+      "description": "Translating page: what i18n:prepare does",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يضيف كل نص جديد إلى فهرس كل لغة، بالصيغ التي تحتاجها تلك اللغة، ويعلّمه بأنه جديد.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8W0DBmCvpoesZN0arc01Qw==": {
+      "description": "Translating page: what i18n:translate does",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يترجم Claude Code ما هو جديد، النصوص وصفحات Markdown، وفق مهارة fbtee نفسها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pZcOnJfQ40G2gUwhBAApgg==": {
+      "description": "Translating page: what i18n:check does",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يفشل إذا بقي نص دون ترجمة أو كانت نسخة صفحة أقدم من أصلها.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OdiBbTOSPGsgV7z4VYt7Ew==": {
+      "description": "Translating page: what the build does about translations",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يفشل عند وجود نص غير مترجم، فلا يمكن للنشر أن يُخرجه.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nfjc2yJmKXnKeTkY1mv24g==": {
+      "description": "Translating page: what CI does about translations",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يشغّل الأوامر نفسها مع كل دفع: check وi18n:check وbuild، ثم ينشر ويفحص الموقع الحي.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "98k5o/AJ4acxS0KZZMV2xg==": {
+      "description": "Translating page section title: translation built into Vite+'s commands",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مدمج في Vite+",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KGPb82h362SCCDnY2KPxpQ==": {
+      "description": "Translating page: translation is part of each of Vite+'s commands, the same locally and in CI",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الترجمة ليست أداة منفصلة: إنها جزء من كل أمر يشغّله تطبيق Vite+ أصلًا، كما هو على جهازك وفي CI.",
           "variations": {}
         }
       ],

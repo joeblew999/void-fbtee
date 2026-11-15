@@ -38,7 +38,7 @@ export const loader = defineHandler(async (c) => {
 // The intro's own string as the description, so it's translated once.
 export const head = defineHead(() =>
   pageHead({
-    title: fbs("Emails", "Docs page title: the page about the app's translated emails"),
+    title: fbs.c("Emails"),
     description: fbs(
       "This app emails people in their own language: a booking's confirmation, a reminder the day before, a cancellation, and the private link to delete an event. Here are two of them, made by the app's own code for a sample event, in this page's language, and what it takes for each to arrive the right way round.",
       "Emails page introduction",

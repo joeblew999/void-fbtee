@@ -156,6 +156,25 @@ PDFs too (a ticket, an invoice): `inLocale` writes the page of HTML in its reade
 Cloudflare Browser Run prints it, so Arabic and Thai come out right with only the system's fonts.
 The SKILL's "Translated PDFs" lists what it takes; the example's PDFs docs page shows a ticket.
 
+## Built into Vite+
+
+Translation isn't a separate tool to remember: it's part of each command a Vite+ app already
+runs, the same on a developer's machine as in CI.
+
+| Command                 | What it does about translations                                                                              |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `vp check`              | Lints with fbtee's strict rules: text nobody wrapped for translation is an error.                            |
+| `vp dev`                | Says what's untranslated as you work; an edited catalog shows at once.                                       |
+| `vp run i18n:prepare`   | Adds every new string to each language's catalog, with that language's plural and gender forms, marked new.  |
+| `vp run i18n:translate` | Claude Code translates what's new, strings and markdown pages, by fbtee's own skill.                         |
+| `vp run i18n:check`     | Fails if a string is untranslated, or a markdown page's copy is older than its original.                     |
+| `vp build`              | With `voidFbtee({ failOnMissing: true })`, fails on an untranslated string, so `void deploy` can't ship one. |
+| CI                      | The same commands on every push: `vp check`, `vp run i18n:check`, `vp build`, then the deploy.               |
+
+Words a product uses everywhere (its menu, its own terms) go once in `i18n/common_strings.json`,
+fbtee's common strings, with their description, and are written `<fbt common>Seats</fbt>` or
+`fbs.c("Seats")`: one translation each, the same on every page.
+
 ## Systems
 
 fbtee's compiler is native code, installed already built for your system by your package

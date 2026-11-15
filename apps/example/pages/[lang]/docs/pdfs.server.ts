@@ -12,7 +12,7 @@ export const getPrerenderPaths = langParams;
 // The heading and the intro's own strings, so they're translated once.
 export const head = defineHead(() =>
   pageHead({
-    title: fbs("PDFs", "Docs page title: the page about translated PDFs"),
+    title: fbs.c("PDFs"),
     description: fbs(
       "An app can print any document as a PDF in its reader's language: a ticket, an invoice, a receipt, a report. This app prints each booking's ticket. Here is one, printed for this page's language, and what it takes, with the lines that do it.",
       "PDFs page introduction",

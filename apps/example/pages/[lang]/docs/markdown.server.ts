@@ -11,7 +11,7 @@ export const getPrerenderPaths = langParams;
 // The heading and the intro's own strings, so they're translated once.
 export const head = defineHead(() =>
   pageHead({
-    title: fbs("Markdown pages", "Docs page title: the page about translated markdown pages"),
+    title: fbs.c("Markdown pages"),
     description: fbs(
       "A page written in markdown has a copy in each language, translated whole. Here are this site's, and what it takes, with the lines that do it.",
       "Markdown page introduction",

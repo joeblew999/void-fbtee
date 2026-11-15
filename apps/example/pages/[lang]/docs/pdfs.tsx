@@ -171,7 +171,7 @@ export default function PdfsPage() {
   return (
     <DocsPage
       testId="pdfs-title"
-      title={<fbt desc="Docs page title: the page about translated PDFs">PDFs</fbt>}
+      title={<fbt common>PDFs</fbt>}
       intro={
         <fbt desc="PDFs page introduction">
           An app can print any document as a PDF in its reader's language: a ticket, an invoice, a

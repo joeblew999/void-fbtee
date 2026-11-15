@@ -147,7 +147,7 @@ export default function Events({ events }: Props) {
               <fbt desc="Events board column: the event's title and place">Event</fbt>
             </span>
             <span className="text-end">
-              <fbt desc="Events board column: seats still free">Seats</fbt>
+              <fbt common>Seats</fbt>
             </span>
           </div>
           <ul className="divide-y" data-testid="events-list">

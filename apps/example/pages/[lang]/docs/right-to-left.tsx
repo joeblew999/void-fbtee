@@ -143,17 +143,13 @@ export default function RightToLeftPage() {
     },
     {
       id: "how",
-      title: (
-        <fbt desc="Right-to-left page section title: what right to left takes">What it takes</fbt>
-      ),
+      title: <fbt common>What it takes</fbt>,
     },
   ];
   return (
     <DocsPage
       testId="right-to-left-title"
-      title={
-        <fbt desc="Docs page title: the page about right-to-left languages">Right to left</fbt>
-      }
+      title={<fbt common>Right to left</fbt>}
       intro={
         <fbt desc="Right-to-left page introduction">
           Every language gets its own address, and Arabic reads right to left: the whole site

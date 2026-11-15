@@ -47,7 +47,7 @@ function sidebar(lang: Lang) {
       entries: [
         {
           slug: "strings",
-          title: <fbt desc="Docs page title: the page about translated strings">Strings</fbt>,
+          title: <fbt common>Strings</fbt>,
           href: routeUrl("/[lang]/docs/strings"),
         },
         { slug: "intl", title: "Intl", href: routeUrl("/[lang]/docs/intl") },
@@ -58,48 +58,32 @@ function sidebar(lang: Lang) {
         },
         {
           slug: "markdown",
-          title: (
-            <fbt desc="Docs page title: the page about translated markdown pages">
-              Markdown pages
-            </fbt>
-          ),
+          title: <fbt common>Markdown pages</fbt>,
           href: routeUrl("/[lang]/docs/markdown"),
         },
         {
           slug: "right-to-left",
-          title: (
-            <fbt desc="Docs page title: the page about right-to-left languages">Right to left</fbt>
-          ),
+          title: <fbt common>Right to left</fbt>,
           href: routeUrl("/[lang]/docs/right-to-left"),
         },
         {
           slug: "translating",
-          title: (
-            <fbt desc="Docs page title: the page about how the app gets translated">
-              Translating
-            </fbt>
-          ),
+          title: <fbt common>Translating</fbt>,
           href: routeUrl("/[lang]/docs/translating"),
         },
         {
           slug: "components",
-          title: (
-            <fbt desc="Docs page title: the page about void-fbtee's React components and hooks">
-              Components
-            </fbt>
-          ),
+          title: <fbt common>Components</fbt>,
           href: routeUrl("/[lang]/docs/components"),
         },
         {
           slug: "emails",
-          title: (
-            <fbt desc="Docs page title: the page about the app's translated emails">Emails</fbt>
-          ),
+          title: <fbt common>Emails</fbt>,
           href: routeUrl("/[lang]/docs/emails"),
         },
         {
           slug: "pdfs",
-          title: <fbt desc="Docs page title: the page about translated PDFs">PDFs</fbt>,
+          title: <fbt common>PDFs</fbt>,
           href: routeUrl("/[lang]/docs/pdfs"),
         },
       ],
