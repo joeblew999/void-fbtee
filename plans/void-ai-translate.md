@@ -188,7 +188,7 @@ Then one run with Gemma, judged, to measure it.
 
 - Skills: void-fbtee's says what a description must say; the translating skill, to choose words
   by it.
-- Descriptions: 50 of the example's 349 rewritten (the rest already said what happens), all 23 of
+- Descriptions: 47 of the example's 349 rewritten (the rest already said what happens), all 23 of
   the test app's; their entries and verdicts moved to the new keys (fbtee keys an entry by text
   and description).
 - grammar.json and judge.ts: count lines differ where a noun is counted, no both-genders word on a
