@@ -4489,6 +4489,228 @@
         }
       ],
       "types": []
+    },
+    "T/Fd107+cRPo9L/ZSoliFw==": {
+      "description": "Strings page: which of the site's menu pages to open, its words as an 'or' list",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "هل تفتح {pages}؟",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VYxtalkiJK9DcU+bKG+cMw==": {
+      "description": "Strings page form: a person's name",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الاسم",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rX6yDt+4BBXWnlBa+wsuvg==": {
+      "description": "Strings page form: the person's gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الجنس",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "g9iusEnIlP/npuBo8hkdCg==": {
+      "description": "Strings page form: female gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "أنثى",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zJWvH/rO4PPQLAEu5i3wXg==": {
+      "description": "Strings page form: male gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ذكر",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "X6pqAnx7EYNy9aHxQxbXHA==": {
+      "description": "Strings page form: gender not given",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "غير محدد",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hvbGSq+LLppgjmJfvSZrdg==": {
+      "description": "Strings page form: how many seats",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "المقاعد",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iI4KVuDsb4pUDDVioA9rFw==": {
+      "description": "Strings page form: how the person takes part in the event",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "طريقة المشاركة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qzXcAndckDd3WA5Wi5bzLw==": {
+      "description": "Strings page form: taking part in person",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "حضوريًا",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dLP6SZPNQk0ISYwBGLa15g==": {
+      "description": "Strings page form: taking part online",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "عبر الإنترنت",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UYW8LWG6vIrmBgJd1EBHBA==": {
+      "description": "Strings page form: whether the list joins its items with 'and' or 'or'",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "القائمة",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0fNA/4K1+g90HWefUK7JDA==": {
+      "description": "Strings page form: a list joined with 'and'",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "و",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ggdwr8qpTYlzZd257Vlw2Q==": {
+      "description": "Strings page form: a list joined with 'or'",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "أو",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "N+Aga9flAmbYzufID2wDwQ==": {
+      "description": "Strings page piece title: a count, each language's plural forms",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "العدد",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XHzdG8B22ASNVbpH2NxUVw==": {
+      "description": "Strings page: someone booked a number of seats",
+      "status": "translated",
+      "tokens": [
+        "number"
+      ],
+      "translations": [
+        {
+          "translation": "لا مقاعد محجوزة باسم {name}.",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "مقعدان محجوزان باسم {name}.",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "{number} مقاعد محجوزة باسم {name}.",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "{number} مقعدًا محجوزًا باسم {name}.",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "{number} مقعد محجوز باسم {name}.",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "unOSd4bSf6iUcwRSuh8HbQ==": {
+      "description": "Strings page: someone booked a number of seats",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مقعد واحد محجوز باسم {name}.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

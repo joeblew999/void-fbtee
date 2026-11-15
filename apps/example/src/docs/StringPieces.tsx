@@ -1,26 +1,46 @@
 // The Strings page's "Every piece of fbtee" section: each of fbtee's ways of writing a sentence, at
-// work in the page's language, with the line that does it. A list inside a sentence, a choice from
-// a set, a person's name with their gender, a pronoun, the same value twice, and a sentence for
-// the reader that follows the reader's own gender, shown for three readers through <InLanguage>
-// (fbtee's scoped runtimes), which also shows the same line in the site's other languages.
+// work in the page's language, with the line that does it, all driven by one form, as fbtee's own
+// example does (github.com/nkzw-tech/fbtee, example/src/example/Example.tsx): type a name, pick
+// a gender, a count, how they take part and "and" or "or", and every sentence follows, worded by
+// the language's own rules. The reader's sentence goes through <InLanguage> (fbtee's scoped
+// runtimes), which also shows it in the site's other languages.
 import { fbs, fbt, GenderConst, IntlVariations, useFbt } from "fbtee";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { InLanguage, useLocale, useLocales } from "void-fbtee/react";
 
+type Gender = "female" | "male" | "unknown";
+type Way = "there" | "online";
+
+/** The form's choices, each in fbtee's own constant for the piece that takes it. */
+const NAME_GENDER = {
+  female: IntlVariations.GENDER_FEMALE,
+  male: IntlVariations.GENDER_MALE,
+  unknown: IntlVariations.GENDER_UNKNOWN,
+} as const;
+const PRONOUN = {
+  female: GenderConst.FEMALE_SINGULAR,
+  male: GenderConst.MALE_SINGULAR,
+  unknown: GenderConst.UNKNOWN_SINGULAR,
+} as const;
+
 /** The menu's three words, fbtee's common strings, as the items of a list inside a sentence. */
-function ListInSentence() {
+function ListInSentence({ or }: { or: boolean }) {
   const items = [fbs.c("Home"), fbs.c("Events"), fbs.c("Docs")];
-  return (
+  return or ? (
+    <fbt desc="Strings page: which of the site's menu pages to open, its words as an 'or' list">
+      Open <fbt:list conjunction="or" items={items} name="pages" />?
+    </fbt>
+  ) : (
     <fbt desc="Strings page: the site's menu, its words as a list inside the sentence">
       The menu has <fbt:list items={items} name="pages" />.
     </fbt>
   );
 }
 
-function Enum({ way }: { way: "there" | "online" }) {
+function Enum({ name, way }: { name: string; way: Way }) {
   return (
     <fbt desc="Strings page: how someone takes part in an event, chosen from a fixed set">
-      <fbt:param name="name">{"Somchai"}</fbt:param> takes part{" "}
+      <fbt:param name="name">{name}</fbt:param> takes part{" "}
       <fbt:enum enum-range={{ there: "in person", online: "online" }} value={way} />.
     </fbt>
   );
@@ -37,20 +57,31 @@ function Name({ name, gender }: { name: string; gender: IntlVariations }) {
   );
 }
 
-function Pronoun({ gender }: { gender: GenderConst }) {
+function Seats({ name, count }: { name: string; count: number }) {
+  return (
+    <fbt desc="Strings page: someone booked a number of seats">
+      <fbt:param name="name">{name}</fbt:param> booked{" "}
+      <fbt:plural count={count} many="seats" showCount="ifMany">
+        a seat
+      </fbt:plural>.
+    </fbt>
+  );
+}
+
+function Pronoun({ name, gender }: { name: string; gender: GenderConst }) {
   return (
     <fbt desc="Strings page: someone checked their own ticket, with a pronoun by their gender">
-      <fbt:param name="name">{"Laila"}</fbt:param> checked{" "}
+      <fbt:param name="name">{name}</fbt:param> checked{" "}
       <fbt:pronoun type="possessive" gender={gender} human={true} /> ticket.
     </fbt>
   );
 }
 
-function SameParam() {
+function SameParam({ name }: { name: string }) {
   return (
     <fbt desc="Strings page: the same name twice in one sentence">
-      <fbt:param name="name">{"Laila"}</fbt:param> booked, and <fbt:same-param name="name" /> got
-      the ticket by email.
+      <fbt:param name="name">{name}</fbt:param> booked, and <fbt:same-param name="name" /> got the
+      ticket by email.
     </fbt>
   );
 }
@@ -85,20 +116,99 @@ function Piece({
   );
 }
 
+const field = "flex flex-col gap-1 text-sm";
+const input = "h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm";
+
 export function StringPieces() {
   const { locale } = useLocale();
   const others = useLocales().filter((l) => l.locale !== locale);
+  const [name, setName] = useState("Laila");
+  const [gender, setGender] = useState<Gender>("female");
+  const [count, setCount] = useState(3);
+  const [way, setWay] = useState<Way>("there");
+  const [or, setOr] = useState(false);
+  // What people type is theirs: the name is shown as typed, whatever the page's language.
+  const who = name.trim() || "Laila";
   return (
     <>
+      <form
+        className="grid grid-cols-2 gap-3 rounded-lg border p-4 md:grid-cols-5"
+        data-testid="pieces-form"
+        onSubmit={(event) => event.preventDefault()}
+      >
+        <label className={field}>
+          <fbt desc="Strings page form: a person's name">Name</fbt>
+          <input
+            className={input}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            data-testid="try-name"
+          />
+        </label>
+        <label className={field}>
+          <fbt desc="Strings page form: the person's gender">Gender</fbt>
+          <select
+            className={input}
+            value={gender}
+            onChange={(event) => setGender(event.target.value as Gender)}
+            data-testid="try-gender"
+          >
+            <option value="female">{fbs("Female", "Strings page form: female gender")}</option>
+            <option value="male">{fbs("Male", "Strings page form: male gender")}</option>
+            <option value="unknown">
+              {fbs("Not said", "Strings page form: gender not given")}
+            </option>
+          </select>
+        </label>
+        <label className={field}>
+          <fbt desc="Strings page form: how many seats">Seats</fbt>
+          <input
+            className={input}
+            type="number"
+            min={0}
+            value={count}
+            onChange={(event) => setCount(Math.max(0, Number(event.target.value) || 0))}
+            data-testid="try-count"
+          />
+        </label>
+        <label className={field}>
+          <fbt desc="Strings page form: how the person takes part in the event">Takes part</fbt>
+          <select
+            className={input}
+            value={way}
+            onChange={(event) => setWay(event.target.value as Way)}
+            data-testid="try-way"
+          >
+            <option value="there">
+              {fbs("In person", "Strings page form: taking part in person")}
+            </option>
+            <option value="online">{fbs("Online", "Strings page form: taking part online")}</option>
+          </select>
+        </label>
+        <label className={field}>
+          <fbt desc="Strings page form: whether the list joins its items with 'and' or 'or'">
+            List
+          </fbt>
+          <select
+            className={input}
+            value={or ? "or" : "and"}
+            onChange={(event) => setOr(event.target.value === "or")}
+            data-testid="try-conjunction"
+          >
+            <option value="and">{fbs("and", "Strings page form: a list joined with 'and'")}</option>
+            <option value="or">{fbs("or", "Strings page form: a list joined with 'or'")}</option>
+          </select>
+        </label>
+      </form>
       <Piece
         id="list"
         title={
           <fbt desc="Strings page piece title: a list inside a sentence">A list in a sentence</fbt>
         }
-        code={'<fbt:list items={items} name="pages" />'}
+        code={'<fbt:list conjunction="or" items={items} name="pages" />'}
       >
         <p>
-          <ListInSentence />
+          <ListInSentence or={or} />
         </p>
       </Piece>
       <Piece
@@ -109,10 +219,7 @@ export function StringPieces() {
         code={'<fbt:enum enum-range={{ there: "in person", online: "online" }} value={way} />'}
       >
         <p>
-          <Enum way="there" />
-        </p>
-        <p>
-          <Enum way="online" />
+          <Enum name={who} way={way} />
         </p>
       </Piece>
       <Piece
@@ -122,25 +229,30 @@ export function StringPieces() {
             A name and its gender
           </fbt>
         }
-        code={'<fbt:name name="name" gender={IntlVariations.GENDER_FEMALE}>{name}</fbt:name>'}
+        code={'<fbt:name name="name" gender={gender}>{name}</fbt:name>'}
       >
         <p>
-          <Name name="Laila" gender={IntlVariations.GENDER_FEMALE} />
+          <Name name={who} gender={NAME_GENDER[gender]} />
         </p>
+      </Piece>
+      <Piece
+        id="plural"
+        title={
+          <fbt desc="Strings page piece title: a count, each language's plural forms">A count</fbt>
+        }
+        code={'<fbt:plural count={count} many="seats" showCount="ifMany">a seat</fbt:plural>'}
+      >
         <p>
-          <Name name="Somchai" gender={IntlVariations.GENDER_MALE} />
+          <Seats name={who} count={count} />
         </p>
       </Piece>
       <Piece
         id="pronoun"
         title={<fbt desc="Strings page piece title: a pronoun by gender">A pronoun</fbt>}
-        code={'<fbt:pronoun type="possessive" gender={GenderConst.FEMALE_SINGULAR} human={true} />'}
+        code={'<fbt:pronoun type="possessive" gender={gender} human={true} />'}
       >
         <p>
-          <Pronoun gender={GenderConst.FEMALE_SINGULAR} />
-        </p>
-        <p>
-          <Pronoun gender={GenderConst.UNKNOWN_SINGULAR} />
+          <Pronoun name={who} gender={PRONOUN[gender]} />
         </p>
       </Piece>
       <Piece
@@ -153,7 +265,7 @@ export function StringPieces() {
         code={'<fbt:same-param name="name" />'}
       >
         <p>
-          <SameParam />
+          <SameParam name={who} />
         </p>
       </Piece>
       <Piece
@@ -163,15 +275,13 @@ export function StringPieces() {
             For the reader, by their gender
           </fbt>
         }
-        code={'<InLanguage locale={locale} gender="female">…</InLanguage>'}
+        code={"<InLanguage locale={locale} gender={gender}>…</InLanguage>"}
       >
-        {(["male", "female", "unknown"] as const).map((gender) => (
-          <p key={gender} data-gender={gender}>
-            <InLanguage locale={locale} gender={gender}>
-              <ForTheReader />
-            </InLanguage>
-          </p>
-        ))}
+        <p data-gender={gender}>
+          <InLanguage locale={locale} gender={gender}>
+            <ForTheReader />
+          </InLanguage>
+        </p>
       </Piece>
       <Piece
         id="in-language"
@@ -180,11 +290,11 @@ export function StringPieces() {
             Part of the page in another language
           </fbt>
         }
-        code={"<InLanguage locale={other.locale}>…</InLanguage>"}
+        code={"<InLanguage locale={other.locale} gender={gender}>…</InLanguage>"}
       >
         {others.map((other) => (
           <p key={other.locale} data-locale={other.locale}>
-            <InLanguage locale={other.locale}>
+            <InLanguage locale={other.locale} gender={gender}>
               <ForTheReader />
             </InLanguage>
           </p>

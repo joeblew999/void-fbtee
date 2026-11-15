@@ -4161,6 +4161,202 @@
         }
       ],
       "types": []
+    },
+    "T/Fd107+cRPo9L/ZSoliFw==": {
+      "description": "Strings page: which of the site's menu pages to open, its words as an 'or' list",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เปิด {pages} ไหม",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VYxtalkiJK9DcU+bKG+cMw==": {
+      "description": "Strings page form: a person's name",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ชื่อ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rX6yDt+4BBXWnlBa+wsuvg==": {
+      "description": "Strings page form: the person's gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เพศ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "g9iusEnIlP/npuBo8hkdCg==": {
+      "description": "Strings page form: female gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หญิง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zJWvH/rO4PPQLAEu5i3wXg==": {
+      "description": "Strings page form: male gender",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ชาย",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "X6pqAnx7EYNy9aHxQxbXHA==": {
+      "description": "Strings page form: gender not given",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ไม่ระบุ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hvbGSq+LLppgjmJfvSZrdg==": {
+      "description": "Strings page form: how many seats",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ที่นั่ง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iI4KVuDsb4pUDDVioA9rFw==": {
+      "description": "Strings page form: how the person takes part in the event",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เข้าร่วมแบบ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qzXcAndckDd3WA5Wi5bzLw==": {
+      "description": "Strings page form: taking part in person",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ด้วยตัวเอง",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dLP6SZPNQk0ISYwBGLa15g==": {
+      "description": "Strings page form: taking part online",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ออนไลน์",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UYW8LWG6vIrmBgJd1EBHBA==": {
+      "description": "Strings page form: whether the list joins its items with 'and' or 'or'",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "รายการ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0fNA/4K1+g90HWefUK7JDA==": {
+      "description": "Strings page form: a list joined with 'and'",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "และ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ggdwr8qpTYlzZd257Vlw2Q==": {
+      "description": "Strings page form: a list joined with 'or'",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "หรือ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "N+Aga9flAmbYzufID2wDwQ==": {
+      "description": "Strings page piece title: a count, each language's plural forms",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "จำนวน",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XHzdG8B22ASNVbpH2NxUVw==": {
+      "description": "Strings page: someone booked a number of seats",
+      "status": "translated",
+      "tokens": [
+        "number"
+      ],
+      "translations": [
+        {
+          "translation": "{name} จองที่นั่งแล้ว {number} ที่",
+          "variations": {}
+        }
+      ],
+      "types": [
+        28
+      ]
+    },
+    "unOSd4bSf6iUcwRSuh8HbQ==": {
+      "description": "Strings page: someone booked a number of seats",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{name} จองที่นั่งแล้ว 1 ที่",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }
