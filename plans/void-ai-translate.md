@@ -211,13 +211,15 @@ understands the language catches.
 
 - The review is an option, off unless turned on, in the app's config (voidFbtee's options in
   vite.config.ts): `review: { dev: true, runtime: true }`, one switch for each.
-- Dev time (`review.dev`): Void's AI (Gemma 4) translates; the reviewer reads each answer. Right:
+- Who translates at dev time: Claude Code on the machine when `claude` is there, otherwise
+  Gemma 4 through Void's AI (models.json). At runtime: Gemma 4 (no local Claude on Cloudflare).
+- Dev time (`review.dev`): the translator translates; the reviewer reads each answer. Right:
   kept. Wrong: the reviewer changes the source code, the string's `<fbt>` in the developer's
   file (its description, or its wording where that's what misleads), so vp dev's own catalog
   update makes it a new entry and it's translated again, and reviewed again. At most 3 rounds;
   still wrong after the third, the string is left untranslated, said in the log (vp build
   fails on it, as on anything untranslated). The change is in the developer's git diff.
-- Runtime (`review.runtime`): the same with the data. Void's AI translates in the queue; the
+- Runtime (`review.runtime`): the same with the data. Gemma 4 translates in the queue; the
   reviewer reads each language's answer. Right: stored. Wrong: the reviewer fixes the data the
   translation is made from (what was posted, kept beside the person's own words, which are
   still shown as they wrote them), and that language is translated again, and reviewed again.
