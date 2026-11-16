@@ -202,24 +202,27 @@ Then one run with Gemma, judged, to measure it.
   wrong: "You're booked." in German, Spanish, French, Russian, Vietnamese (the word for booking a
   person); Hindi's swapped numbers; added words; Arabic's 100 and up.
 
-## Next: an AI reviewer that fixes the translation (2026-11-16, agreed)
+## Next: an AI reviewer that fixes the source, then translation runs again (2026-11-16, agreed)
 
 The grammar checks (above) fixed almost nothing: Gemma gives the same answer again after a
 problem, so they turned 2 kept wrong answers into strings left over, and the 259 to 263 was
 mostly the descriptions. What's left wrong is meaning and wording, which only a reviewer that
 understands the language catches.
 
-- The source is never changed: the developer's text and description, and what a person posted,
-  stay as written. Only translations are fixed.
 - The review is an option, off unless turned on, in the app's config (voidFbtee's options in
   vite.config.ts): `review: { dev: true, runtime: true }`, one switch for each.
-- Dev time (the app's strings, `review.dev`): Void's AI (Gemma 4) translates; the reviewer reads
-  each answer and, where it's wrong, writes the right translation into the catalog itself
-  (the code: i18n/translations), marked as the reviewer's. Off: as now (what passes the checks
-  is kept, the rest left for Claude Code).
-- Runtime (what people post, `review.runtime`): Void's AI translates in the queue; the reviewer
-  reads each language's translation and, where it's wrong, stores the right one (the data).
-  Off: as now.
+- Dev time (`review.dev`): Void's AI (Gemma 4) translates; the reviewer reads each answer. Right:
+  kept. Wrong: the reviewer changes the source code, the string's `<fbt>` in the developer's
+  file (its description, or its wording where that's what misleads), so vp dev's own catalog
+  update makes it a new entry and it's translated again, and reviewed again. At most 3 rounds;
+  still wrong after the third, the string is left untranslated, said in the log (vp build
+  fails on it, as on anything untranslated). The change is in the developer's git diff.
+- Runtime (`review.runtime`): the same with the data. Void's AI translates in the queue; the
+  reviewer reads each language's answer. Right: stored. Wrong: the reviewer fixes the data the
+  translation is made from (what was posted, kept beside the person's own words, which are
+  still shown as they wrote them), and that language is translated again, and reviewed again.
+  At most 3 rounds; still wrong, the post is shown in the language it was written in, with its
+  note, as for any post not yet translated.
 - Which reviewer: at dev time, Claude Code on the machine when `claude` is there (the
   developer's own; nothing installed by the package), otherwise Claude through AI Gateway's
   catalog with the same `ai.run` (Void's guide/ai.md: Cloudflare Gateway models,
@@ -231,9 +234,9 @@ understands the language catches.
 - The grammar checks become the reviewer's free first look: an answer that fails them goes to
   the reviewer with their problems, instead of being thrown away. If the reviewer catches the
   same mistakes alone, the checks go.
-- Measured first: the reviewer over the 276 judged answers (verdicts.json): how many of the 13
-  wrong it fixes, and that it leaves the right ones alone. Claude Code (the translator test's
-  judge) still records the verdicts, so the reviewer doesn't mark its own work.
+- Measured first: the reviewer on the 23 test strings in 12 languages: how many of the 13 wrong
+  it gets right within 3 rounds, and that it leaves the right ones alone. Claude Code (the
+  translator test's judge) still records the verdicts, so the reviewer doesn't mark its own work.
 
 ## Where it stands (2026-11-15)
 
