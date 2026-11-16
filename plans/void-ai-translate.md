@@ -204,237 +204,51 @@ Then one run with Gemma, judged, to measure it.
 
 ## Next: translate and review through one queue (2026-11-16, agreed)
 
-The grammar checks (above) fixed almost nothing: Gemma gives the same answer again after a
-problem, so they turned 2 kept wrong answers into strings left over, and the 259 to 263 was
-mostly the descriptions. What's left wrong is meaning and wording, which only a reviewer that
-understands the language catches.
+Gemma gets about 5% wrong (13 of 276), all meaning and wording: rules can't catch them, so a
+reviewer that understands the language does.
 
-### Who does what
+**Who does it**
 
-Three names, used everywhere below:
+|                                    | Translates                    | Reviews                                   |
+| ---------------------------------- | ----------------------------- | ----------------------------------------- |
+| vp dev, Claude Code on the machine | local Claude                  | local Claude                              |
+| vp dev, no Claude Code             | Cloudflare Gemma (Workers AI) | Cloudflare Claude (Haiku 5.5, AI Gateway) |
+| Posts (vp dev, preview, deployed)  | Cloudflare Gemma              | Cloudflare Claude                         |
 
-- **Local Claude**: Claude Code on the developer's machine, the developer's own `claude`
-  (nothing installed by the package), run by vp dev's own process.
-- **Cloudflare Claude**: `anthropic/claude-haiku-5.5` through AI Gateway, called from the
-  queue consumer with Void's `ai.run`.
-- **Cloudflare Gemma**: `@cf/google/gemma-4-26b-a4b-it` on Workers AI, called from the queue
-  consumer with Void's `ai.run`.
+Review is off unless the app's config says `review: { dev: true, runtime: true }`. Cloudflare
+Claude is paid from AI Gateway credits on the Cloudflare account: no key ($0.10 and $0.50 a
+million tokens, about Gemma's price; Cloudflare's catalog, checked 2026-11-16).
 
-|                                       | Translator       | Reviewer          |
-| ------------------------------------- | ---------------- | ----------------- |
-| Dev time, local Claude on the machine | local Claude     | local Claude      |
-| Dev time, no local Claude             | Cloudflare Gemma | Cloudflare Claude |
-| Runtime                               | Cloudflare Gemma | Cloudflare Claude |
+**How**
 
-- Cloudflare Gemma and Cloudflare Claude are both Void's `ai.run` (Void's
-  guide/ai.md: Workers AI models, and Cloudflare Gateway models with Cloudflare-managed
-  credentials). `anthropic/claude-haiku-5.5`: $0.10 and $0.50 a million tokens in and out, about
-  Gemma's price (Cloudflare model catalog, checked 2026-11-16), paid from AI Gateway credits
-  (Unified Billing) loaded once on the Cloudflare account: no Anthropic key, no secret.
-- Which models: data in models.json, the translators as now and the reviewer beside them.
+1. Every translation is one message on the app's translate queue: an app string in one
+   language, or a post in one language, with its round (1 to 3).
+2. The package's queue consumer translates it, checks it (plain code, no AI), and reviews it.
+   It makes every AI call; local Claude it reaches through vp dev.
+3. Right: kept. Wrong: an app string's description in the developer's code is changed, or a
+   post's data the translation is made from (the post itself stays as written); then it goes
+   on the queue again at the next round. After round 3 it's left: an app string untranslated
+   (vp build fails on it), a post shown in its own language.
 
-### Every AI is called by the queue consumer
+vp dev sends a string when it's new or its text or description changed (fbtee keys it by both;
+the old entry is dropped). The reviewer's change is a save like any other, so it's new too.
 
-Nothing calls an AI outside the queue: the consumer calls all three, each by one path.
+**In each mode**: vp dev translates app strings and posts; vp build calls no AI, it fails on
+anything untranslated; preview and deployed translate posts only (their strings are in the
+build).
 
-| AI                | The path, every time                                             |
-| ----------------- | ---------------------------------------------------------------- |
-| Cloudflare Gemma  | queue consumer, Void's `ai.run`, Workers AI                      |
-| Cloudflare Claude | queue consumer, Void's `ai.run`, AI Gateway, Claude Haiku 5.5    |
-| Local Claude      | queue consumer, vp dev's dev-only route, `claude` on the machine |
+**The translator test** runs the developer's own vp dev on a copy of the test app with empty
+catalogs, waits, then reads the catalogs and judges them (verdicts.json, found by language,
+English text and answer). The known-good translations move to test/translator/references/.
 
-Local Claude goes through vp dev only because the consumer runs in the Worker, which can't run a
-program on the machine; the call still starts in the consumer, as the other two do.
+**Order of work**
 
-For each message (what it is, its key, the language, the round), the queue consumer:
-
-1. Calls the translator: for an app string with `claude` on the machine, local Claude through
-   vp dev's route; otherwise Cloudflare Gemma through `ai.run`.
-2. Runs the check: plain code in the consumer, no AI.
-3. Calls the reviewer, with the answer and the check's problems: for an app string with
-   `claude` on the machine, local Claude through vp dev's route; otherwise Cloudflare Claude
-   through `ai.run`.
-4. Right: keeps it. An app string's translation goes into its catalog through vp dev's route; a
-   post's is handed to the app to store.
-5. Wrong, before round 3: an app string's source `<fbt>` is changed through vp dev's route
-   (local Claude makes the change itself; Cloudflare Claude's change vp dev writes), vp dev
-   prepares and answers with the new key, and the consumer puts it on the queue in every
-   language at the next round. A post: Cloudflare Claude's fixed data is handed to the app to
-   store beside the post, and the consumer puts that language back on the queue at the next
-   round.
-6. Wrong at round 3: puts nothing more on the queue, and logs why.
-
-vp dev and the app only put messages on the queue; everything above is the consumer's.
-
-### In each of vp's modes: dev, build, preview (and deployed)
-
-|                                                    | vp dev                                                                                         | vp build                                                                                                      | vp preview                                                                                            | deployed                                |
-| -------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| What it is                                         | the dev server, in Miniflare                                                                   | the production build                                                                                          | the build, run locally                                                                                | on Cloudflare                           |
-| The app's strings                                  | translated: vp dev sends new ones on the queue                                                 | none translated: build-check.ts fails on any left untranslated, and checks every entry with the check's rules | already in the build: none sent                                                                       | already in the build: none sent         |
-| Posts                                              | translated: the app sends them on Void's local queue                                           | none (no requests)                                                                                            | translated: the app sends them on the local queue (the preview runs it: the example's void.config.ts) | translated: Cloudflare's queue          |
-| The translator                                     | strings: local Claude when `claude` is there, else Cloudflare Gemma; posts: Cloudflare Gemma   | none                                                                                                          | Cloudflare Gemma                                                                                      | Cloudflare Gemma                        |
-| The reviewer (`review` on)                         | strings: local Claude when `claude` is there, else Cloudflare Claude; posts: Cloudflare Claude | none                                                                                                          | Cloudflare Claude                                                                                     | Cloudflare Claude                       |
-| vp dev's route (local Claude, changing the source) | there                                                                                          | none                                                                                                          | none                                                                                                  | none                                    |
-| Its tests                                          | test:dev, test:translator                                                                      | (the build in test:preview)                                                                                   | test:preview                                                                                          | the preview suite against the live site |
-
-- Local Claude and changing the source are vp dev only: they need vp dev's process on the
-  developer's machine, and the source; preview and deployed have neither, and their strings
-  were translated before the build.
-- Posts are the same path in vp dev, preview and deployed: the queue, Cloudflare Gemma,
-  the check, Cloudflare Claude. Only the queue differs: Void's local one, or Cloudflare's.
-- vp build calls no AI: it only refuses to build what isn't translated or fails the check.
-
-### The switch
-
-`review: { dev: true, runtime: true }` in voidFbtee's options (the app's vite.config.ts; the
-package's plugin.ts VoidFbteeOptions), one for each, off unless set. Off: as now (translate,
-check, keep what passes).
-
-### What's new at dev time: vp dev knows by itself
-
-vp dev runs fbtee's collect and prepare (catalogs.ts prepared(), from plugin.ts: as it starts,
-and on every save of a source file, once saves settle), and fbtee keys every string by its text
-and its description (checked 2026-11-16, changing "Save"'s description in a copy):
-
-| The developer                                   | The catalogs                                       |
-| ----------------------------------------------- | -------------------------------------------------- |
-| changes other code, or moves a string unchanged | nothing: the entry and its translations stay       |
-| adds a string                                   | a new entry in every catalog, marked new           |
-| changes a string's text or description          | the old entry dropped, a new one added, marked new |
-| removes a string                                | its entry dropped from every catalog               |
-| adds a language to the config                   | that language's catalog, every string marked new   |
-
-- Only entries marked new go on the queue, one message per language; a translated entry is
-  never sent again unless its text or description changes.
-- The reviewer's change to the source is a save like the developer's, so it goes through the
-  same prepare: the old entry is dropped from every catalog (every language's translation of
-  it, the right ones too) and a new one is added, marked new. The consumer, not vp dev's save,
-  sends it on (counting the rounds, next).
-- Counting the rounds: in the queue message, the same at dev time and at runtime (no file).
-  Each message carries its round, 1 when vp dev or the app first sends it. When the reviewer
-  finds it wrong and it's below 3, the consumer has the fix made, then sends the next messages
-  itself with the round one higher:
-  - dev time: the consumer asks vp dev (the dev-only route) to make the reviewer's change to the
-    source and prepare at once; vp dev answers with the new entry's key, and the consumer sends
-    it in every language at the next round. vp dev's own sending on a save skips a key already
-    sent, so it isn't sent again at round 1. A message for the old key still waiting finds its
-    entry gone and is dropped.
-  - runtime: the fixed data is stored beside the post, and the consumer sends that language
-    again at the next round.
-  - At round 3, still wrong: not sent again.
-
-### One path: the translate queue (parity)
-
-- Every translation is one message on the app's translate queue: one catalog entry in one
-  language at dev time (its plural and gender lines together), one post in one language at
-  runtime (its title and description together). 23 strings in 12 languages: 276 messages.
-- A message holds: what it is (an app string, or a post), its key (the catalog entry's key, or
-  the post's id), the language, and the round (1 to 3).
-- The consumer does the same for each: translate, check (judge.ts, grammar.json: a free first
-  look, its problems handed to the reviewer), review, at most 3 rounds.
-- Void delivers messages to the same consumer in Miniflare under vp dev as on Cloudflare
-  (Void's guide/queues.md, "Local development", checked 2026-11-16). A queue is a file in the
-  app's queues/ folder: the app's `queues/translate.ts` hands it to the package (void-fbtee init
-  writes it; the example's is that file), its consumer options literal there, as Void reads
-  them. The queue's batches and retries do the pacing, replacing translate.ts's per-minute
-  counter.
-- What only the developer's machine can do, run local Claude and edit source files, the consumer
-  asks of vp dev's own process through a dev-only route.
-
-### The check: part of every message
-
-The consumer checks every answer, app string or post, review on or off: judge.ts, no AI, no
-cost, as vp dev already does for app strings (translate.ts problemsWith). Today posts aren't
-checked at all (ai.ts translate()): that's closed here.
-
-- In: the source (its lines, with each plural and gender form, for an app string; the title and
-  description for a post), the answer, the source language and the language translated into.
-- Out: a list of problems, each in words ("Line 2 must keep the placeholder {name}").
-- Two kinds:
-  - Must pass, or the answer would break the page: the same lines as the source, each
-    placeholder kept, no placeholder added, written in the language's script, no English
-    sentence left in it. The reviewer can't overrule these.
-  - Hints, from grammar.json: count lines that should differ, a both-genders word on a man's or
-    a woman's line, a capital mid-sentence, English words left in another script, Korean
-    particles, Thai punctuation, a form for more than one number keeping {number}. With review
-    on, the reviewer has the last word on these (it may find one isn't a mistake here).
-- Review on: the answer and its problems both go to the reviewer, which says right or wrong
-  knowing what the check found. A must-pass problem is always wrong.
-- Review off: any problem and the answer isn't kept, as today: an app string is left for Claude
-  Code, a post is shown in the language it was written in.
-- For a post, the checks that need the source language's own text (a counted noun, capitals
-  against the source) use the language it was written in; grammar.json says which languages
-  each one knows (countedNoun has English only; a post written in another language skips it).
-- vp build keeps checking every catalog entry, without the AI, as the last gate (check.ts).
-
-### When the reviewer finds it wrong
-
-- Dev time: the source code is changed, that string's `<fbt>` in the developer's file (its
-  description, or its wording where that misleads), through vp dev's dev-only route: local
-  Claude makes the change itself; Cloudflare Claude says what to change and vp dev writes it
-  (the consumer, in the Worker, can't write files). It's in the developer's git diff. vp dev
-  prepares at once (catalogs.ts prepared(): the old entry dropped from every catalog, the new
-  one added) and answers with the new key; the consumer sends it in every language at the next
-  round.
-- Runtime: Cloudflare Claude fixes the data the translation is made from, stored by the app
-  beside the person's post, which is still shown as they wrote it; the consumer sends only that
-  language again, at the next round.
-- At most 3 rounds. Still wrong: at dev time the string is left untranslated, said in the log,
-  and vp build fails on it, as on anything untranslated; at runtime the post is shown in the
-  language it was written in, with its note, as for any post not yet translated.
-
-### The translator test: only what a developer gets
-
-With the queue, the test runs what a developer runs, with no code of its own in the path:
-a copy of the test app (packages/void-fbtee/test/translator/app, with its own
-`queues/translate.ts`), its catalogs without the strings to measure, and the app's own vp dev.
-vp dev's prepare marks them new and sends them on the queue; the consumer translates, checks and
-reviews; the catalogs fill. The test waits for that, reads the catalogs and judges them.
-
-- Goes: making strings new in memory (freshEntries), calling translateCatalog and routeCall
-  directly, the test-only request settings (the cache round, the model, rules off, one locale),
-  the per-minute counter (the queue paces), and the pick run across models.
-- Stays, the test's own and outside the path: the judging, verdicts.json and scores.json.
-  The real code writes what it always writes; the test only reads it afterwards:
-  - the copy's catalogs: each language's answer, or the entry still new (left after 3 rounds);
-  - the copy's source, against the test app's: every change the reviewer made (its git diff);
-  - vp dev's log: each round, what the reviewer said, and why a string was left.
-- The references are the answer key: a known-good translation of each of the 23 test strings,
-  one file per language, written and checked by Claude Code (2026-11-15). They're what each
-  answer is scored against (chrF), what its lines are checked against (one per plural and gender
-  form), and what the judge reads beside it. Today they're the test app's own catalogs
-  (packages/void-fbtee/test/translator/app/i18n/translations/th-TH.json and the rest). They move
-  to their own folder, packages/void-fbtee/test/translator/references/th-TH.json and the rest,
-  because the app's catalogs now start empty and are filled by vp dev: the AI's work in the
-  catalogs, the answer key apart, never written over.
-- A verdict is found by language, English text and answer, not by the entry's key: the
-  reviewer's change to a description gives the entry a new key every run, the English text
-  doesn't change (verdicts.json moved to that once).
-- Each string's result: right, wrong or unjudged (by verdicts.json), how many rounds it took,
-  what the reviewer changed, and its scores against the reference (chrF, and the meaning check
-  through the dev server, a measurement after the path, not in it).
-- Waiting for vp dev: it says when nothing is left to translate (in its log and on a dev-only
-  status route a developer can use too), and the test waits on that.
-- Answers stay put between runs the way they do for a developer: a translated entry is kept in
-  the catalog and never sent again. To measure again, the test copy starts without them. AI
-  Gateway's cache keyed by the test's round goes with the rest.
-- Comparing models, if it's ever wanted again: the test app's config says which (data), not code.
-
-### Order of work
-
-1. The queue path: the package's consumer, `queues/translate.ts` in the example and from
-   void-fbtee init, vp dev putting the app's new strings on it; the translator test as above,
-   its own code in the path removed.
-2. The review loop with local Claude (needs nothing more), measured by the
-   translator test on the 23 strings in 12 languages: how many of the 13 wrong are right
-   within 3 rounds, and that the right ones stay right. The judge, Claude Code in the session running the test (not the reviewer), records
-   the verdicts, so the reviewer doesn't mark its own work.
-3. Cloudflare Gemma translating and Cloudflare Claude reviewing, once AI Gateway credits are loaded: the same
-   measurement.
-4. The runtime review in the queue, for posts.
-5. The two skills and the example's Strings and Translating pages, to match.
-6. The grammar checks stay as the free first look, or go if the reviewer catches the same alone.
+1. The queue path, with the translator test running through it.
+2. The review with local Claude; measure how many of the 13 it fixes.
+3. Cloudflare Gemma and Cloudflare Claude, once AI Gateway credits are loaded; measure again.
+4. Review of posts.
+5. Skills and the example's docs to match.
+6. The grammar checks kept or dropped, by what the measurements show.
 
 ## Where it stands (2026-11-15)
 
