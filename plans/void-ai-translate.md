@@ -369,6 +369,27 @@ reviews; the catalogs fill. The test waits for that, reads the catalogs and judg
   Gateway's cache keyed by the test's round goes with the rest.
 - Comparing models, if it's ever wanted again: the test app's config says which (data), not code.
 
+### Files named by what they do (part of this change)
+
+Each translation is translator (AI), check (plain code), reviewer (AI); the files say which:
+
+| Now              | Becomes              | What it holds                                                                                                                                          |
+| ---------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| src/judge.ts     | src/check.ts         | the check: plain code, no AI (problemsWith and the rest)                                                                                               |
+| src/grammar.json | src/check-rules.json | the check's rules for each language                                                                                                                    |
+| src/check.ts     | src/build-check.ts   | what vp build checks before it builds (catalogs complete, pages, the check's rules over every entry)                                                   |
+| src/ai.ts        | src/translator.ts    | the translator: Cloudflare Gemma through ai.run, the dev server's route to it                                                                          |
+| (new)            | src/reviewer.ts      | the reviewer: Cloudflare Claude through ai.run, and asking vp dev for local Claude                                                                     |
+| (new)            | src/queue.ts         | the translate queue's consumer: translate, check, review, the rounds                                                                                   |
+| src/translate.ts | src/dev-translate.ts | vp dev's side: sending new strings on the queue, running local Claude (it already finds it: hasClaude, runClaude), changing the source, markdown pages |
+
+- The package's export `void-fbtee/ai` becomes `void-fbtee/translator`: the example's
+  queues/translate.ts and its Translating page import it, and plugin.ts's dev route.
+- The meaning score (ai.ts meaningScores) is the translator test's measurement: it moves to the
+  test, not the package.
+- Every import, test, skill and doc that names them changes in the same change, nothing left
+  under the old names.
+
 ### Order of work
 
 1. The queue path: the package's consumer, `queues/translate.ts` in the example and from
