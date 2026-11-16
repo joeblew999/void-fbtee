@@ -202,35 +202,38 @@ Then one run with Gemma, judged, to measure it.
   wrong: "You're booked." in German, Spanish, French, Russian, Vietnamese (the word for booking a
   person); Hindi's swapped numbers; added words; Arabic's 100 and up.
 
-## Next: a reviewer that fixes the input, then asks again (2026-11-16, agreed)
+## Next: an AI reviewer that fixes the translation (2026-11-16, agreed)
 
 The grammar checks (above) fixed almost nothing: Gemma gives the same answer again after a
 problem, so they turned 2 kept wrong answers into strings left over, and the 259 to 263 was
 mostly the descriptions. What's left wrong is meaning and wording, which only a reviewer that
 understands the language catches.
 
-1. Void's AI (Gemma 4) translates, as now.
-2. A reviewer reads the answer with the translating skill. Right: kept. Wrong: the reviewer
-   changes the input, not the answer, and Void's AI is asked again, until the reviewer says
-   it's right (at most a few rounds, then the string is left, said in the log):
-   - at dev time, the code: the string's description (what's happening, what each placeholder
-     holds), so it's right for every language and every later run (a new description is a new
-     entry, translated again);
-   - at runtime, the data: the context sent with what someone posted (the post itself is
-     theirs and isn't changed).
-3. Which reviewer:
-   - at dev time, Claude Code on the machine when it's there (`claude`, as the developer's own
-     session; nothing installed by the package);
-   - otherwise, and always at runtime, Claude through AI Gateway's catalog with the same
-     `ai.run` (Void's guide/ai.md: Cloudflare Gateway models, Cloudflare-managed credentials):
-     `anthropic/claude-haiku-5.5`, $0.10 and $0.50 a million tokens in and out, about Gemma's
-     price (Cloudflare model catalog, checked 2026-11-16). Paid from AI Gateway credits
-     (Unified Billing), loaded once on the Cloudflare account: no Anthropic key, no secret.
-   - The reviewer is data (models.json), like the translators.
-4. The grammar checks stay only as a free first look before the reviewer is paid for, their
-   problems handed to it; if the reviewer finds the same, they go.
-5. Measured first: the reviewer over the 276 judged answers: how many of the 13 wrong it
-   catches, whether its new descriptions make Gemma right, and that it passes the right ones.
+- The source is never changed: the developer's text and description, and what a person posted,
+  stay as written. Only translations are fixed.
+- The review is an option, off unless turned on, in the app's config (voidFbtee's options in
+  vite.config.ts): `review: { dev: true, runtime: true }`, one switch for each.
+- Dev time (the app's strings, `review.dev`): Void's AI (Gemma 4) translates; the reviewer reads
+  each answer and, where it's wrong, writes the right translation into the catalog itself
+  (the code: i18n/translations), marked as the reviewer's. Off: as now (what passes the checks
+  is kept, the rest left for Claude Code).
+- Runtime (what people post, `review.runtime`): Void's AI translates in the queue; the reviewer
+  reads each language's translation and, where it's wrong, stores the right one (the data).
+  Off: as now.
+- Which reviewer: at dev time, Claude Code on the machine when `claude` is there (the
+  developer's own; nothing installed by the package), otherwise Claude through AI Gateway's
+  catalog with the same `ai.run` (Void's guide/ai.md: Cloudflare Gateway models,
+  Cloudflare-managed credentials); at runtime, always the latter:
+  `anthropic/claude-haiku-5.5`, $0.10 and $0.50 a million tokens in and out, about Gemma's
+  price (Cloudflare model catalog, checked 2026-11-16). Paid from AI Gateway credits (Unified
+  Billing), loaded once on the Cloudflare account: no Anthropic key, no secret. Which model is
+  data (models.json), like the translators.
+- The grammar checks become the reviewer's free first look: an answer that fails them goes to
+  the reviewer with their problems, instead of being thrown away. If the reviewer catches the
+  same mistakes alone, the checks go.
+- Measured first: the reviewer over the 276 judged answers (verdicts.json): how many of the 13
+  wrong it fixes, and that it leaves the right ones alone. Claude Code (the translator test's
+  judge) still records the verdicts, so the reviewer doesn't mark its own work.
 
 ## Where it stands (2026-11-15)
 
