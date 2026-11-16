@@ -223,10 +223,11 @@ understands the language catches.
   still shown as they wrote them), and that language is translated again, and reviewed again.
   At most 3 rounds; still wrong, the post is shown in the language it was written in, with its
   note, as for any post not yet translated.
-- Which reviewer: at dev time, Claude Code on the machine when `claude` is there (the
-  developer's own; nothing installed by the package), otherwise Claude through AI Gateway's
-  catalog with the same `ai.run` (Void's guide/ai.md: Cloudflare Gateway models,
-  Cloudflare-managed credentials); at runtime, always the latter:
+- Which reviewer: at dev time, by default Claude Code on the machine when `claude` is there (the
+  developer's own; nothing installed by the package), otherwise Gemma 4 through Void's AI, the
+  same as translates (needs nothing more; a model reviewing its own kind of answer catches less,
+  measured with the rest); at runtime, Claude through AI Gateway's catalog with the same
+  `ai.run` (Void's guide/ai.md: Cloudflare Gateway models, Cloudflare-managed credentials):
   `anthropic/claude-haiku-5.5`, $0.10 and $0.50 a million tokens in and out, about Gemma's
   price (Cloudflare model catalog, checked 2026-11-16). Paid from AI Gateway credits (Unified
   Billing), loaded once on the Cloudflare account: no Anthropic key, no secret. Which model is
