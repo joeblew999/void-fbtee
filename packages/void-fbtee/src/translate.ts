@@ -1,6 +1,6 @@
 // Translating, as `vp dev` does it (plugin.ts): the work goes to a coding agent, `claude -p` with
-// void-fbtee's skill, allowed to read and edit files and nothing else, or the Claude Code session
-// the dev server runs in, given the prompt. The skill does the translating; this file only says
+// void-fbtee's skill, allowed to read and edit files and nothing else, when `claude` is installed
+// and signed in. The skill does the translating; this file only says
 // what's missing, records each translated page's original, and checks the result.
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -135,10 +135,19 @@ export function runner(root: string): string {
   return packageManager(root);
 }
 
-/** Running inside a Claude Code session (it sets CLAUDECODE=1 for the commands it runs). */
-export const insideClaudeCode = () => process.env.CLAUDECODE === "1";
-
-export const hasClaude = () => spawnSync("claude", ["--version"], { stdio: "ignore" }).status === 0;
+/**
+ * Claude Code (`claude`) is installed and signed in, so `claude -p` can run. A Claude cloud
+ * session has `claude` but doesn't pass its sign-in to the commands it runs ("loggedIn": false).
+ */
+export function hasClaude(): boolean {
+  const run = spawnSync("claude", ["auth", "status"], { encoding: "utf8" });
+  if (run.status !== 0) return false;
+  try {
+    return JSON.parse(run.stdout).loggedIn === true;
+  } catch {
+    return false;
+  }
+}
 
 /** The tools the agent gets: read and edit files, nothing that runs commands. */
 export const AGENT_TOOLS = ["Read", "Edit", "Write", "Glob", "Grep"];
@@ -201,10 +210,10 @@ function showEvent(root: string, line: string) {
 }
 
 /**
- * Translate what's new: Claude Code translates (a `claude -p` here, or the Claude Code session the
- * dev server runs in, given the prompt), then the pages it wrote are stamped and everything is
- * checked. The dev server runs it straight after each save's prepare. Resolves with what's left: the
- * check's problems, or the prompt handed to the session.
+ * Translate what's new: Claude Code translates (`claude -p`, when it's signed in here), then the
+ * pages it wrote are stamped and everything is checked. The dev server runs it straight after each
+ * save's prepare (after Void's AI, when there's no Claude Code). Resolves with what's left: the
+ * check's problems, and the prompt shown for a coding agent when there's no Claude Code.
  */
 export async function translateApp(
   p: Project,
@@ -215,16 +224,12 @@ export async function translateApp(
   const task = translateTask(p);
   if (!task) {
     // Nothing for an agent to do.
-  } else if (insideClaudeCode() || !hasClaude()) {
-    // Inside Claude Code already (it sets CLAUDECODE=1 in its shell): that agent does the work.
-    // A second `claude -p` started there has no sign-in of its own in a Claude cloud session, and
-    // on a laptop it would be a second agent without the first one's context.
-    // The same prompt as last time: the session is still on it, so don't show it again.
+  } else if (!hasClaude()) {
+    // No signed-in Claude Code: show the prompt for whatever coding agent the developer uses.
+    // The same prompt as last time: don't show it again.
     if (task.prompt !== handedOut) {
       log(
-        insideClaudeCode()
-          ? "You're running in Claude Code, so translate in this session: follow this prompt. The dev server records each page marked done and reports what's left.\n"
-          : "Claude Code (claude) isn't installed here. Give this prompt to your coding agent; the dev server records each page marked done and reports what's left.\n",
+        "No signed-in Claude Code (claude) here. Give this prompt to your coding agent; the dev server records each page marked done and reports what's left.\n",
       );
       log(task.prompt);
     }

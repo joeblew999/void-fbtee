@@ -10,9 +10,9 @@ an app up is the one void-fbtee command: `vp exec void-fbtee init`. After that:
 
 - `vp dev` prepares: as it starts and on each save, every new string goes into every catalog,
   marked new. Straight after, it translates what's new (which translator, the package
-  decides). When the dev server runs in a Claude Code session, the work is a prompt in its log
-  for that session ("void-fbtee: … entries with "status": "new""). When you see it, translate
-  here, by this skill. It records each markdown page you mark done and reports what's
+  decides: a signed-in `claude -p` with this skill, else Void's AI). With neither, the work is a
+  prompt in its log ("void-fbtee: … entries with "status": "new""); a coding agent given it
+  translates by this skill. It records each markdown page you mark done and reports what's
   left, until "all translated, nothing to fix".
 - `vp build` (and so `void deploy` and CI) fails on anything left: untranslated strings and
   pages, setup problems, a removed language's leftovers. Its message lists them.

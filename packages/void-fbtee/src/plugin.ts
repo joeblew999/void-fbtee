@@ -27,14 +27,7 @@ import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, matchesGlob, relative, sep } from "node:path";
 import { prepare } from "./commands";
-import {
-  hasClaude,
-  insideClaudeCode,
-  markedDone,
-  stamp,
-  translateApp,
-  translateWithVoidAi,
-} from "./translate";
+import { hasClaude, markedDone, stamp, translateApp, translateWithVoidAi } from "./translate";
 import { check } from "./check";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
@@ -178,7 +171,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   // One translation at a time; a save during one asks for another after it.
   let translating: Promise<void> | undefined;
   let translateAgain = false;
-  // The prompt last handed to the Claude Code session, so the next save doesn't show it again.
+  // The prompt last shown for a coding agent, so the next save doesn't show it again.
   let handedOut: string | undefined;
   const log = (text: string) =>
     text.split("\n").forEach((l) => devServer?.config.logger.info(`void-fbtee: ${l}`));
@@ -228,12 +221,10 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         return;
       }
       if (!wanted || !agentAllowed()) return report(check(project()));
-      // Local Claude when it's there (the dev server in a Claude Code session, or a `claude` on
-      // the machine): it translates everything new, and Void's AI isn't asked. Otherwise Void's
+      // Local Claude when it's there (a `claude` on the machine, signed in): it translates everything new, and Void's AI isn't asked. Otherwise Void's
       // AI, through the dev server's own route, when the app has it; then Claude Code's prompt
       // for anything left (what didn't pass the checks).
-      const inSession = insideClaudeCode();
-      const localClaude = inSession || hasClaude();
+      const localClaude = hasClaude();
       const base = devServer?.resolvedUrls?.local[0];
       const url = !localClaude && base && new URL(DEV_TRANSLATE_PATH, base).href;
       // Who translates, said before they start.
@@ -241,13 +232,11 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       if (count(open))
         log(
           `translating ${count(open)} new strings (${byLanguage(open)}) with ${
-            inSession
-              ? "Claude Code, in this session"
-              : localClaude
-                ? "Claude Code (claude -p on this machine)"
-                : url
-                  ? "Void's AI"
-                  : "nobody here: no Claude Code, no Void's AI; the prompt below is for your coding agent"
+            localClaude
+              ? "Claude Code (claude -p on this machine)"
+              : url
+                ? "Void's AI"
+                : "nobody here: no Claude Code, no Void's AI; the prompt below is for your coding agent"
           }`,
         );
       if (localClaude)

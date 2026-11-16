@@ -4371,13 +4371,13 @@
       ],
       "types": []
     },
-    "DeuAZebvWVH6t0W0YLUd2Q==": {
+    "OJgh0mzVJrcrN8I6GVCZBw==": {
       "description": "Home feature fact: the dev server translates new strings as you save, with Claude Code or Void's AI",
       "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "vp dev แปลสิ่งที่ใหม่ทันทีที่คุณบันทึก ด้วย Claude Code เมื่อมีอยู่ หากไม่มีจะใช้ Void's AI",
+          "translation": "vp dev แปลสิ่งที่ใหม่ขณะที่คุณบันทึก: ด้วย Claude Code เมื่อมีการลงชื่อเข้าใช้ มิฉะนั้นจะใช้ Void's AI",
           "variations": {}
         }
       ],
