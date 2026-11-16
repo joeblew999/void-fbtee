@@ -259,10 +259,18 @@ and its description (checked 2026-11-16, changing "Save"'s description in a copy
   through the same prepare: the old entry is dropped from every catalog (every language's
   translation of it, the right ones too) and a new one is added, marked new, and queued in
   every language. Nothing else is needed to send it round again.
-- Counting the rounds: the new entry has a new key, so vp dev keeps a record of the keys the
-  reviewer made, each with its round (node_modules/.void-fbtee/review-rounds.json, beside the
-  dev token). A new entry the record doesn't have is the developer's own: round 1. One the
-  record has is that round; after round 3 it isn't queued again.
+- Counting the rounds: in the queue message, the same at dev time and at runtime (no file).
+  Each message carries its round, 1 when vp dev or the app first sends it. When the reviewer
+  finds it wrong and it's below 3, the consumer has the fix made, then sends the next messages
+  itself with the round one higher:
+  - dev time: the consumer asks vp dev (the dev-only route) to make the reviewer's change to the
+    source and prepare at once; vp dev answers with the new entry's key, and the consumer sends
+    it in every language at the next round. vp dev's own sending on a save skips a key already
+    sent, so it isn't sent again at round 1. A message for the old key still waiting finds its
+    entry gone and is dropped.
+  - runtime: the fixed data is stored beside the post, and the consumer sends that language
+    again at the next round.
+  - At round 3, still wrong: not sent again.
 
 ### One path: the translate queue (parity)
 
