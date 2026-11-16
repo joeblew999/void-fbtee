@@ -306,10 +306,30 @@ and its description (checked 2026-11-16, changing "Save"'s description in a copy
   and vp build fails on it, as on anything untranslated; at runtime the post is shown in the
   language it was written in, with its note, as for any post not yet translated.
 
+### The translator test: only what a developer gets
+
+With the queue, the test runs what a developer runs, with no code of its own in the path:
+a copy of the test app (packages/void-fbtee/test/translator/app, with its own
+`queues/translate.ts`), its catalogs without the strings to measure, and the app's own vp dev.
+vp dev's prepare marks them new and sends them on the queue; the consumer translates, checks and
+reviews; the catalogs fill. The test waits for that, reads the catalogs and judges them.
+
+- Goes: making strings new in memory (freshEntries), calling translateCatalog and routeCall
+  directly, the test-only request settings (the cache round, the model, rules off, one locale),
+  the per-minute counter (the queue paces), and the pick run across models.
+- Stays, the test's own and outside the path: the judging, verdicts.json and scores.json.
+- Waiting for vp dev: it says when nothing is left to translate (in its log and on a dev-only
+  status route a developer can use too), and the test waits on that.
+- Answers stay put between runs the way they do for a developer: a translated entry is kept in
+  the catalog and never sent again. To measure again, the test copy starts without them. AI
+  Gateway's cache keyed by the test's round goes with the rest.
+- Comparing models, if it's ever wanted again: the test app's config says which (data), not code.
+
 ### Order of work
 
 1. The queue path: the package's consumer, `queues/translate.ts` in the example and from
-   void-fbtee init, vp dev putting the app's new strings on it; the translator test through it.
+   void-fbtee init, vp dev putting the app's new strings on it; the translator test as above,
+   its own code in the path removed.
 2. The review loop with local Claude (needs nothing more), measured by the
    translator test on the 23 strings in 12 languages: how many of the 13 wrong are right
    within 3 rounds, and that the right ones stay right. The judge, Claude Code in the session running the test (not the reviewer), records
