@@ -211,14 +211,22 @@ understands the language catches.
 
 ### Who does what
 
-|                                      | Translator          | Reviewer                            |
-| ------------------------------------ | ------------------- | ----------------------------------- |
-| Dev time, Claude Code on the machine | Claude Code         | Claude Code                         |
-| Dev time, no Claude Code             | Gemma 4 (Void's AI) | Claude Haiku 5.5 through AI Gateway |
-| Runtime                              | Gemma 4 (Void's AI) | Claude Haiku 5.5 through AI Gateway |
+Three names, used everywhere below:
 
-- Claude Code is the developer's own `claude` (nothing installed by the package), run by vp
-  dev's own process. Gemma 4 and Claude through AI Gateway are both Void's `ai.run` (Void's
+- **Local Claude**: Claude Code on the developer's machine, the developer's own `claude`
+  (nothing installed by the package), run by vp dev's own process.
+- **Cloudflare Claude**: `anthropic/claude-haiku-5.5` through AI Gateway, called from the
+  queue consumer with Void's `ai.run`.
+- **Cloudflare Gemma**: `@cf/google/gemma-4-26b-a4b-it` on Workers AI, called from the queue
+  consumer with Void's `ai.run`.
+
+|                                       | Translator       | Reviewer          |
+| ------------------------------------- | ---------------- | ----------------- |
+| Dev time, local Claude on the machine | local Claude     | local Claude      |
+| Dev time, no local Claude             | Cloudflare Gemma | Cloudflare Claude |
+| Runtime                               | Cloudflare Gemma | Cloudflare Claude |
+
+- Cloudflare Gemma and Cloudflare Claude are both Void's `ai.run` (Void's
   guide/ai.md: Workers AI models, and Cloudflare Gateway models with Cloudflare-managed
   credentials). `anthropic/claude-haiku-5.5`: $0.10 and $0.50 a million tokens in and out, about
   Gemma's price (Cloudflare model catalog, checked 2026-11-16), paid from AI Gateway credits
@@ -244,7 +252,7 @@ check, keep what passes).
   writes it; the example's is that file), its consumer options literal there, as Void reads
   them. The queue's batches and retries do the pacing, replacing translate.ts's per-minute
   counter.
-- What only the developer's machine can do, run Claude Code and edit source files, the consumer
+- What only the developer's machine can do, run local Claude and edit source files, the consumer
   asks of vp dev's own process through a dev-only route.
 
 ### When the reviewer finds it wrong
@@ -264,11 +272,11 @@ check, keep what passes).
 
 1. The queue path: the package's consumer, `queues/translate.ts` in the example and from
    void-fbtee init, vp dev putting the app's new strings on it; the translator test through it.
-2. The review loop with Claude Code on the machine (needs nothing more), measured by the
+2. The review loop with local Claude (needs nothing more), measured by the
    translator test on the 23 strings in 12 languages: how many of the 13 wrong are right
-   within 3 rounds, and that the right ones stay right. Claude Code, the test's judge, records
+   within 3 rounds, and that the right ones stay right. The judge, Claude Code in the session running the test (not the reviewer), records
    the verdicts, so the reviewer doesn't mark its own work.
-3. Claude Haiku 5.5 through AI Gateway as the reviewer, once credits are loaded: the same
+3. Cloudflare Gemma translating and Cloudflare Claude reviewing, once AI Gateway credits are loaded: the same
    measurement.
 4. The runtime review in the queue, for posts.
 5. The two skills and the example's Strings and Translating pages, to match.
