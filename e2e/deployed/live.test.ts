@@ -31,7 +31,7 @@ describe.skipIf(!site)("the live site (run with `vp run test:deployed`)", () => 
     for (const lang of [SOURCE, ...TRANSLATED]) expect(xml).toContain(`/${lang}</loc>`);
   });
 
-  // What only Cloudflare can show (plans/their-own-language.md): the edge never shares "/"'s answer.
+  // What only Cloudflare can show: the edge never shares "/"'s answer.
   test('"/" sends each visitor to their language, and the answer is never shared', async () => {
     for (const [accept, to] of [
       ["th", "/th-TH"],

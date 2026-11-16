@@ -48,7 +48,7 @@ const postBooking = (event: string, fields: Record<string, string>) =>
     }),
   });
 
-// "/" sends each visitor to their own language, by fbtee's rule (plans/their-own-language.md):
+// "/" sends each visitor to their own language, by fbtee's rule:
 // half the requests as a browser opening a page sends them, half with no Sec-Fetch-Dest (a link
 // preview, a crawler), which the redirect treats the same.
 const home = (accept: string | undefined, headers: Record<string, string> = {}) =>

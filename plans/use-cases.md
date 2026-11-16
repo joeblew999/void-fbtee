@@ -29,7 +29,7 @@ adding an entry. That's what lets them grow past the first two issues.
   text (`db/schema/events.ts`). Add an end, a streamed flag and a venue address for directions.
 - **A person is only a booking.** It has a language and zone (`db/schema/bookings.ts`), but not
   where they're coming from or how they take part. Add `taking_part` (there, online) to bookings,
-  written with `<fbt:enum>` (`plans/fbtee-fully.md`), and an optional "coming from" for travel.
+  written with `<fbt:enum>`, and an optional "coming from" for travel.
   `plans/video-conferencing.md` uses this field and the "streamed" flag above, so they're made here
   and only here.
 - **Booking needs JavaScript** (`plans/void-form-without-javascript.md`): that's Void's issue, and

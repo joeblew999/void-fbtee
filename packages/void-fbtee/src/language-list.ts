@@ -1,4 +1,4 @@
-// The language picker's list (LanguagePicker in react.tsx, plans/language-picker.md): names,
+// The language picker's list (LanguagePicker in react.tsx): names,
 // order, search and the visitor's own languages. Apart from React and the app's modules, so it's
 // tested on its own.
 import { negotiateLocale } from "./negotiate";

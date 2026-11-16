@@ -1,4 +1,4 @@
-// void-fbtee's language picker in the example's header (plans/language-picker.md), in real
+// void-fbtee's language picker in the example's header, in real
 // Chromium and WebKit: on a code page, an island page and a markdown page, in English and Arabic,
 // with JavaScript and without.
 import { describe, expect, test } from "vite-plus/test";

@@ -34,7 +34,7 @@ on 2026-11-14.
 **People and time**
 
 1. **`Reader`:** a person's `{ locale, timeZone }`, and their gender only if they gave it (fbtee's
-   gender, adopted in `plans/fbtee-fully.md`, step 7). `inLocale`, `momentFor`, `translate`, the email
+   gender, already used). `inLocale`, `momentFor`, `translate`, the email
    and the calendar entry all take it. The package doesn't store it; storing is the app's.
 2. **`momentFor(instant, reader)`:** the instant on their clock, their day ("tomorrow" counted in
    _their_ day, not the event's, which is a bug today), their calendar and digits, in their
@@ -71,11 +71,9 @@ on 2026-11-14.
 **Showing it**
 
 8. **Text in its own language inside another:** the event's Arabic title on a Thai page or in a Thai
-   email. On a page that's `<InLanguage>` from `plans/fbtee-fully.md`, step 3 (fbtee's scoped
-   runtimes), not a second component here. In an email's HTML, the same marking (`<bdi lang dir>`)
+   email. On a page that's `<InLanguage>` (fbtee's scoped runtimes, already in the package), not a second component here. In an email's HTML, the same marking (`<bdi lang dir>`)
    comes with item 10, `sendInLocale`.
-9. **The visitor's own language:** this has its own plan, `plans/their-own-language.md`, done
-   first. Its `negotiate()` is a primitive of the package too.
+9. **The visitor's own language:** built. Its `negotiate()` is a primitive of the package too.
 10. **An email in its reader's language:** the email's `<html lang dir>`, the body's direction, and
     writing it inside `inLocale`. Each of the four emails in `src/events/emails.ts` repeats that
     setup. The package gives `sendInLocale(reader, email)` around Void's `sendEmail`. The look stays
@@ -83,8 +81,7 @@ on 2026-11-14.
 
 ## fbtee
 
-Using fbtee fully is its own plan, done first: `plans/fbtee-fully.md`. The primitives here are built
-on what it adopts (scoped runtimes, `<fbt:enum>`, `<fbt:name>`, gender), not beside it.
+fbtee is used fully already. The primitives here are built on what that adopted (scoped runtimes, `<fbt:enum>`, `<fbt:name>`, gender), not beside it.
 
 ## Not void-fbtee's
 

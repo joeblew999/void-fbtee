@@ -1,5 +1,5 @@
 // "/" in real browsers: each opens the site's own address and lands in its own language, as the
-// browser sets Accept-Language from its locale (plans/their-own-language.md).
+// browser sets Accept-Language from its locale.
 import { describe, expect, test } from "vite-plus/test";
 import { browser, collectErrors, VOID_DEFER_MESSAGE } from "../helpers";
 

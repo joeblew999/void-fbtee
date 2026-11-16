@@ -5,12 +5,11 @@ installs a release only once it's 24 hours old (it held back react-email 6.11.12
 2026-11-13), and 1.9.1 was published 2026-11-14 03:27 UTC. Its place in the order: `plans/README.md`.
 Moved here from `plans/quiet-harbor-atlas.md`, "Still open".
 
-## Why after the language plan
+## What checks it
 
 Void 1.9.0 came out on 2026-11-14 at 00:11 UTC and 1.9.1 at 03:27 (`npm view void time`), and the
-repo is on 1.8.0. The language plan (`plans/their-own-language.md`) relies on Void's routing,
-middleware and pages, all checked on 1.8.0, and it adds tests for each of them. So it's built first,
-and this upgrade runs those tests on 1.9.1: that's the check, not a wait.
+repo is on 1.8.0. The language redirect on `"/"` (built 2026-11-14) relies on Void's routing,
+middleware and pages, all checked on 1.8.0, with tests for each of them. This upgrade runs those tests on 1.9.1: that's the check, not a wait.
 
 ## What it changes
 
@@ -33,8 +32,7 @@ and this upgrade runs those tests on 1.9.1: that's the check, not a wait.
 5. **The plans:** the Void facts the other plans quote from 1.8.0's docs (`islands.md`'s "static
    only" layouts, `head.md`'s script, `revalidation.md`'s `Vary` rule, `rewrites.md`) are checked
    again in 1.9.1, and corrected where they changed.
-6. **What the language plan relies on in Void's behaviour** (`plans/their-own-language.md`, "What
-   was checked"): the middleware seeing `"/"`, and Void leaving the middleware's own `Cache-Control: no-store` on
+6. **What the language redirect relies on in Void's behaviour** (checked on 1.8.0, 2026-11-14): the middleware seeing `"/"`, and Void leaving the middleware's own `Cache-Control: no-store` on
    its 302. Its preview and
    live tests cover both; a change in 1.9.1 shows up there, and is fixed in this plan.
 

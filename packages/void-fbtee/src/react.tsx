@@ -296,8 +296,8 @@ export interface LanguagePickerProps {
 }
 
 /**
- * Choosing another language: one control, the same size for 3 languages or 300
- * (plans/language-picker.md). Closed, it shows the page's language, named in itself. Open: the
+ * Choosing another language: one control, the same size for 3 languages or 300.
+ * Closed, it shows the page's language, named in itself. Open: the
  * visitor's own languages first (navigator.languages, matched by fbtee's rule, as "/" matches
  * them), then every language, each named in itself and in the page's language, in the page
  * language's order, with a search box. Each is a plain link to this page in that language:

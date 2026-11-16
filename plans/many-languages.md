@@ -7,7 +7,7 @@ has been measured yet: this plan is to measure first, then fix what doesn't hold
 ## Already fixed
 
 - `<InLanguage>` in the browser loaded every language's catalog before showing one line
-  (`packages/void-fbtee/src/react.tsx`, `allTranslations(catalogs)`, built in fbtee-fully). It now
+  (`packages/void-fbtee/src/react.tsx`, `allTranslations(catalogs)`. It now
   loads its own language's, its fallbacks' and the source's (`translationsFor()` in
   `src/runtime.ts`), with a unit test (2026-11-14).
 

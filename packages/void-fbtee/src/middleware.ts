@@ -7,7 +7,7 @@
 // - The locale comes from the first URL segment (/th-TH/...): one URL per language, as Google
 //   wants, and never a redirect from one language's page to another's. Only "/" follows the
 //   visitor: a 302 to their own language, by fbtee's rule (negotiate.ts), or the fallback
-//   language (plans/their-own-language.md), marked no-store, so it's never shared.
+//   language, marked no-store, so it's never shared.
 // - fbtee's per-request state is held by fbtee itself in AsyncLocalStorage (runWithFbtee), so
 //   text rendered after the shell streams in the right language too. It gets every catalog, so
 //   fbtee falls back per message (de-AT -> de -> source text) as its README describes.

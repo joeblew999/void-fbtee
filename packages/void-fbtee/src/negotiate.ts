@@ -8,7 +8,7 @@
 // getLocaleHierarchy keeps every tag it has seen in a module-level Map, never cleared; on a server
 // those tags come from every visitor's header, so this copy keeps nothing. A unit test checks the
 // answers equal setupLocaleContext(...).getLocale(); when fbtee exports negotiateLocale
-// (plans/their-own-language.md, issue 1), this copy goes and fbtee's is called.
+// (plans/fbtee-issues.md, issue 1), this copy goes and fbtee's is called.
 
 /** The most entries of an Accept-Language header read: a real browser sends a handful. */
 const MOST = 20;
