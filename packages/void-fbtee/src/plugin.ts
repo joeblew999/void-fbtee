@@ -46,6 +46,7 @@ import {
   catalogFile,
   catalogLocales,
   collect,
+  missing,
   runtimeCatalog,
   runtimeTexts,
   type Project,
@@ -181,12 +182,34 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   let handedOut: string | undefined;
   const log = (text: string) =>
     text.split("\n").forEach((l) => devServer?.config.logger.info(`void-fbtee: ${l}`));
-  const report = (problems: string[]) =>
+  // What Claude Code was given to translate, by language (each string's text): when it's done,
+  // the log says so, so it's clear which translations are Claude's.
+  const withClaude = new Map<string, Set<string>>();
+  const openNow = () => new Map(missing(project()).map((m) => [m.locale, new Set(m.app)] as const));
+  const byLanguage = (by: Map<string, Set<string>>) =>
+    [...by]
+      .filter(([, s]) => s.size)
+      .map(([locale, s]) => `${locale} ${s.size}`)
+      .join(", ");
+  const count = (by: Map<string, Set<string>>) => [...by.values()].reduce((n, s) => n + s.size, 0);
+  const report = (problems: string[]) => {
+    if (count(withClaude)) {
+      const open = openNow();
+      const done = new Map(
+        [...withClaude].map(
+          ([locale, texts]) =>
+            [locale, new Set([...texts].filter((t) => !open.get(locale)?.has(t)))] as const,
+        ),
+      );
+      if (count(done)) log(`Claude Code translated ${count(done)} strings (${byLanguage(done)})`);
+      for (const [locale, texts] of done) for (const t of texts) withClaude.get(locale)?.delete(t);
+    }
     log(
       problems.length
         ? `${problems.length} to fix:\n${problems.join("\n")}`
         : "all translated, nothing to fix",
     );
+  };
   // Tests (Vitest's server, CI) don't start an agent: they report.
   const agentAllowed = () => !underVitest && !process.env.CI;
   // After a save, straight after its prepare: translate what's new (a source file or original page saved), or
@@ -209,9 +232,30 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       // the machine): it translates everything new, and Void's AI isn't asked. Otherwise Void's
       // AI, through the dev server's own route, when the app has it; then Claude Code's prompt
       // for anything left (what didn't pass the checks).
-      const localClaude = insideClaudeCode() || hasClaude();
+      const inSession = insideClaudeCode();
+      const localClaude = inSession || hasClaude();
       const base = devServer?.resolvedUrls?.local[0];
       const url = !localClaude && base && new URL(DEV_TRANSLATE_PATH, base).href;
+      // Who translates, said before they start.
+      const open = openNow();
+      if (count(open))
+        log(
+          `translating ${count(open)} new strings (${byLanguage(open)}) with ${
+            inSession
+              ? "Claude Code, in this session"
+              : localClaude
+                ? "Claude Code (claude -p on this machine)"
+                : url
+                  ? "Void's AI"
+                  : "nobody here: no Claude Code, no Void's AI; the prompt below is for your coding agent"
+          }`,
+        );
+      if (localClaude)
+        for (const [locale, texts] of open)
+          for (const t of texts) {
+            if (!withClaude.has(locale)) withClaude.set(locale, new Set());
+            withClaude.get(locale)!.add(t);
+          }
       translating = (
         url ? translateWithVoidAi(project(), url, devToken, log) : Promise.resolve(false)
       )
