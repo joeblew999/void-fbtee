@@ -88,6 +88,9 @@ export default defineConfig({
     // Cloudflare Browser Run (headless Chrome), which prints the PDFs (src/pdf.ts). It has no local
     // stand-in either, so it's remote in dev and the preview too, through the same sign-in.
     browser: { binding: "BROWSER", remote: true },
+    // Workers Logs: the live Worker's console output, errors and queue runs, kept on Cloudflare
+    // (Wrangler's `observability` field, which Void passes through).
+    observability: { enabled: true },
   },
   worker: {
     // 2026-03-24 or later for Browser Run's quickAction (src/pdf.ts). What it changed since

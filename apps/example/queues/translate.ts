@@ -29,7 +29,13 @@ export default defineQueue<Message>(async (batch) => {
     try {
       const done: Record<string, Text> = {};
       for (const locale of event.missing)
-        done[locale] = await translate(event, event.locale, locale);
+        // Only the text: the event's other fields (its id, the languages it lacks) aren't to be
+        // translated, and sent along they come back as more of the answer.
+        done[locale] = await translate(
+          { title: event.title, description: event.description },
+          event.locale,
+          locale,
+        );
       await storeTranslations(event.id, done);
       message.ack();
     } catch (error) {

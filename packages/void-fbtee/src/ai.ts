@@ -111,7 +111,10 @@ export async function translate<K extends string>(
       { from, to },
       "Reply with JSON only: an object with the same keys.",
     ),
-    JSON.stringify(fields),
+    // The language to write in, said again with the text: given only in the system prompt, Gemma
+    // 4 sometimes answers with the text unchanged (a Thai post left in English, AI Gateway's logs,
+    // 2026-11-16), as the strings' request already says it.
+    `Translate from ${named(from)} into ${named(to)}:\n${JSON.stringify(fields)}`,
     {
       type: "object",
       properties: Object.fromEntries(keys.map((k) => [k, { type: "string" }])),
@@ -295,7 +298,7 @@ export async function translatePage(
       { from, to },
       "Don't add a translatedFrom line. Reply with JSON only: the whole page as one string.",
     ),
-    text,
+    `Translate from ${named(from)} into ${named(to)}:\n${text}`,
     { type: "object", properties: { page: { type: "string" } }, required: ["page"] },
     modelFor(to),
   );
