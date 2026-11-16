@@ -233,6 +233,39 @@ Three names, used everywhere below:
   (Unified Billing) loaded once on the Cloudflare account: no Anthropic key, no secret.
 - Which models: data in models.json, the translators as now and the reviewer beside them.
 
+### Every AI is called by the queue consumer
+
+Nothing calls an AI outside the queue: the consumer calls all three, each by one path.
+
+| AI                | The path, every time                                             |
+| ----------------- | ---------------------------------------------------------------- |
+| Cloudflare Gemma  | queue consumer, Void's `ai.run`, Workers AI                      |
+| Cloudflare Claude | queue consumer, Void's `ai.run`, AI Gateway, Claude Haiku 5.5    |
+| Local Claude      | queue consumer, vp dev's dev-only route, `claude` on the machine |
+
+Local Claude goes through vp dev only because the consumer runs in the Worker, which can't run a
+program on the machine; the call still starts in the consumer, as the other two do.
+
+For each message (what it is, its key, the language, the round), the queue consumer:
+
+1. Calls the translator: for an app string with `claude` on the machine, local Claude through
+   vp dev's route; otherwise Cloudflare Gemma through `ai.run`.
+2. Runs the check: plain code in the consumer, no AI.
+3. Calls the reviewer, with the answer and the check's problems: for an app string with
+   `claude` on the machine, local Claude through vp dev's route; otherwise Cloudflare Claude
+   through `ai.run`.
+4. Right: keeps it. An app string's translation goes into its catalog through vp dev's route; a
+   post's is handed to the app to store.
+5. Wrong, before round 3: an app string's source `<fbt>` is changed through vp dev's route
+   (local Claude makes the change itself; Cloudflare Claude's change vp dev writes), vp dev
+   prepares and answers with the new key, and the consumer puts it on the queue in every
+   language at the next round. A post: Cloudflare Claude's fixed data is handed to the app to
+   store beside the post, and the consumer puts that language back on the queue at the next
+   round.
+6. Wrong at round 3: puts nothing more on the queue, and logs why.
+
+vp dev and the app only put messages on the queue; everything above is the consumer's.
+
 ### The switch
 
 `review: { dev: true, runtime: true }` in voidFbtee's options (the app's vite.config.ts; the
