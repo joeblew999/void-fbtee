@@ -322,8 +322,14 @@ reviews; the catalogs fill. The test waits for that, reads the catalogs and judg
   - the copy's catalogs: each language's answer, or the entry still new (left after 3 rounds);
   - the copy's source, against the test app's: every change the reviewer made (its git diff);
   - vp dev's log: each round, what the reviewer said, and why a string was left.
-- The references move out of the app (test/translator/references/<language>.json), so the copy
-  starts without translations and the references stay as they are.
+- The references are the answer key: a known-good translation of each of the 23 test strings,
+  one file per language, written and checked by Claude Code (2026-11-15). They're what each
+  answer is scored against (chrF), what its lines are checked against (one per plural and gender
+  form), and what the judge reads beside it. Today they're the test app's own catalogs
+  (packages/void-fbtee/test/translator/app/i18n/translations/th-TH.json and the rest). They move
+  to their own folder, packages/void-fbtee/test/translator/references/th-TH.json and the rest,
+  because the app's catalogs now start empty and are filled by vp dev: the AI's work in the
+  catalogs, the answer key apart, never written over.
 - A verdict is found by language, English text and answer, not by the entry's key: the
   reviewer's change to a description gives the entry a new key every run, the English text
   doesn't change (verdicts.json moved to that once).
