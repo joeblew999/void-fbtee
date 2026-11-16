@@ -318,6 +318,18 @@ reviews; the catalogs fill. The test waits for that, reads the catalogs and judg
   directly, the test-only request settings (the cache round, the model, rules off, one locale),
   the per-minute counter (the queue paces), and the pick run across models.
 - Stays, the test's own and outside the path: the judging, verdicts.json and scores.json.
+  The real code writes what it always writes; the test only reads it afterwards:
+  - the copy's catalogs: each language's answer, or the entry still new (left after 3 rounds);
+  - the copy's source, against the test app's: every change the reviewer made (its git diff);
+  - vp dev's log: each round, what the reviewer said, and why a string was left.
+- The references move out of the app (test/translator/references/<language>.json), so the copy
+  starts without translations and the references stay as they are.
+- A verdict is found by language, English text and answer, not by the entry's key: the
+  reviewer's change to a description gives the entry a new key every run, the English text
+  doesn't change (verdicts.json moved to that once).
+- Each string's result: right, wrong or unjudged (by verdicts.json), how many rounds it took,
+  what the reviewer changed, and its scores against the reference (chrF, and the meaning check
+  through the dev server, a measurement after the path, not in it).
 - Waiting for vp dev: it says when nothing is left to translate (in its log and on a dev-only
   status route a developer can use too), and the test waits on that.
 - Answers stay put between runs the way they do for a developer: a translated entry is kept in
