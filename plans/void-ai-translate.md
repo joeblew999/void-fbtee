@@ -225,6 +225,16 @@ understands the language catches.
   still shown as they wrote them), and that language is translated again, and reviewed again.
   At most 3 rounds; still wrong, the post is shown in the language it was written in, with its
   note, as for any post not yet translated.
+- One path for both, through a Void queue (parity): every string to translate, the app's own at
+  dev time and what people post at runtime, is a message on the app's translate queue, and its
+  consumer runs translate, check, review, at most 3 rounds. Void delivers queue messages to the
+  same consumer in Miniflare under vp dev as on Cloudflare (Void's guide/queues.md, "Local
+  development", checked 2026-11-16). A queue is a file in the app's queues/ folder, so the app
+  has one that hands it to the package (`queues/translate.ts`; void-fbtee init writes it), the
+  consumer options literal in that file as Void reads them. The queue's own retries and batch
+  size replace translate.ts's per-minute counter. What only the developer's machine can do,
+  run local Claude Code and edit the source files, stays in vp dev's own process: the consumer
+  asks it through a dev-only route, the way the translate route is called today in reverse.
 - Which reviewer: Claude. At dev time, Claude Code on the machine when `claude` is there (the
   developer's own; nothing installed by the package), otherwise Claude through AI Gateway's
   catalog; at runtime, always Claude through AI Gateway. Through the gateway it's the same
