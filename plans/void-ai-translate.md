@@ -255,10 +255,10 @@ and its description (checked 2026-11-16, changing "Save"'s description in a copy
 
 - Only entries marked new go on the queue, one message per language; a translated entry is
   never sent again unless its text or description changes.
-- The reviewer's change to the source is a save like the developer's, so it comes back
-  through the same prepare: the old entry is dropped from every catalog (every language's
-  translation of it, the right ones too) and a new one is added, marked new, and queued in
-  every language. Nothing else is needed to send it round again.
+- The reviewer's change to the source is a save like the developer's, so it goes through the
+  same prepare: the old entry is dropped from every catalog (every language's translation of
+  it, the right ones too) and a new one is added, marked new. The consumer, not vp dev's save,
+  sends it on (counting the rounds, next).
 - Counting the rounds: in the queue message, the same at dev time and at runtime (no file).
   Each message carries its round, 1 when vp dev or the app first sends it. When the reviewer
   finds it wrong and it's below 3, the consumer has the fix made, then sends the next messages
@@ -277,6 +277,8 @@ and its description (checked 2026-11-16, changing "Save"'s description in a copy
 - Every translation is one message on the app's translate queue: one catalog entry in one
   language at dev time (its plural and gender lines together), one post in one language at
   runtime (its title and description together). 23 strings in 12 languages: 276 messages.
+- A message holds: what it is (an app string, or a post), its key (the catalog entry's key, or
+  the post's id), the language, and the round (1 to 3).
 - The consumer does the same for each: translate, check (judge.ts, grammar.json: a free first
   look, its problems handed to the reviewer), review, at most 3 rounds.
 - Void delivers messages to the same consumer in Miniflare under vp dev as on Cloudflare
@@ -290,13 +292,16 @@ and its description (checked 2026-11-16, changing "Save"'s description in a copy
 
 ### When the reviewer finds it wrong
 
-- Dev time: the reviewer changes the source code, that string's `<fbt>` in the developer's file
-  (its description, or its wording where that misleads); the change is in the developer's git
-  diff. vp dev's own prepare (catalogs.ts prepared(), fbtee's prepare-translations) drops the
-  old entry from every catalog and adds the new one, in every language (checked 2026-11-16), and
-  vp dev puts a message on the queue for each language.
-- Runtime: the reviewer fixes the data the translation is made from, kept beside the person's
-  post, which is still shown as they wrote it; only that language goes on the queue again.
+- Dev time: the source code is changed, that string's `<fbt>` in the developer's file (its
+  description, or its wording where that misleads), through vp dev's dev-only route: local
+  Claude makes the change itself; Cloudflare Claude says what to change and vp dev writes it
+  (the consumer, in the Worker, can't write files). It's in the developer's git diff. vp dev
+  prepares at once (catalogs.ts prepared(): the old entry dropped from every catalog, the new
+  one added) and answers with the new key; the consumer sends it in every language at the next
+  round.
+- Runtime: Cloudflare Claude fixes the data the translation is made from, stored by the app
+  beside the person's post, which is still shown as they wrote it; the consumer sends only that
+  language again, at the next round.
 - At most 3 rounds. Still wrong: at dev time the string is left untranslated, said in the log,
   and vp build fails on it, as on anything untranslated; at runtime the post is shown in the
   language it was written in, with its note, as for any post not yet translated.
