@@ -1,9 +1,7 @@
-# plans/void-1.9.md: Void 1.8.0 to 1.9.1, before building more on 1.8.0
+# plans/void-1.9.md: Void 1.8.0 to 1.9.1, when a release gives us something we need
 
-Status: proposed 2026-11-14, waiting for the user's OK. Can't start before 2026-11-15 03:27 UTC: pnpm
-installs a release only once it's 24 hours old (it held back react-email 6.11.12 the same way on
-2026-11-13), and 1.9.1 was published 2026-11-14 03:27 UTC. Its place in the order: `plans/README.md`.
-Moved here from `plans/quiet-harbor-atlas.md`, "Still open".
+Status: left on 2026-11-16, the user's call: it buys little now. Done when a Void release gives us
+something we need; its place: `plans/README.md`, "Waiting on others". Moved here from `plans/quiet-harbor-atlas.md`, "Still open".
 
 ## What checks it
 

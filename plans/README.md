@@ -3,14 +3,15 @@
 Each plan is done, checked and committed before the next one starts. A plan's own file says
 what it changes; this list is the only place that says when.
 
-1. `void-1.9.md`: Void 1.8.0 to 1.9.1. pnpm installs a release only once it's 24 hours old, so not
-   before 2026-11-15 03:27 UTC (1.9.1 was published 2026-11-14 03:27 UTC).
-2. `primitives.md`: void-fbtee's missing primitives, moved out of the example into the package.
-3. `use-cases.md`: one event, many people, as data, built on the primitives.
-4. `video-conferencing.md`: `void-moq`, built on all of the above.
+1. `primitives.md`: void-fbtee's missing primitives, moved out of the example into the package.
+2. `use-cases.md`: one event, many people, as data, built on the primitives.
+3. `video-conferencing.md`: `void-moq`, built on all of the above.
 
 Waiting on others, not in the order:
 
+- `void-1.9.md`: Void 1.8.0 to 1.9.1. Left on 2026-11-16, the user's call: it buys little now (at
+  most #810's fix, which lets the example drop its key cookie). Done when a Void release gives us
+  something we need.
 - `fbtee-issues.md`: two issues for fbtee (locale matching on a server, and two things in Arabic),
   drafted, filed only with the user's OK.
 - `void-form-without-javascript.md`: waits on Void (an issue drafted for voidzero-dev/void, filed
