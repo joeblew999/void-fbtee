@@ -15,7 +15,7 @@
 // Which model translates into which language, and why: models.ts.
 import { ai } from "void/ai";
 import skill from "../skills/void-fbtee-translate/SKILL.md?raw";
-import { LLAMA, modelById, modelFor, type TranslationModel } from "./models";
+import { LLAMA, modelFor, type TranslationModel } from "./models";
 import { MARKS } from "./plurals";
 
 /**
@@ -39,7 +39,6 @@ async function ask<T>(
   user: string,
   schema: object,
   model: TranslationModel = LLAMA,
-  cache?: string,
 ): Promise<T> {
   const input = {
     messages: [
@@ -62,38 +61,15 @@ async function ask<T>(
     // Its thinking off or at its lowest (models.json): a translation needs none.
     ...model.options,
   };
-  // The gateway's cache key: the request itself (its model and everything sent), and the
-  // translator test's round for the string (`cache`), so one round's answer comes back every run
-  // and a new round is asked fresh.
-  const key = cache
-    ? `void-fbtee ${cache} ${[
-        ...new Uint8Array(
-          await crypto.subtle.digest(
-            "SHA-256",
-            new TextEncoder().encode(JSON.stringify([model.id, input])),
-          ),
-        ),
-      ]
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("")}`
-    : undefined;
   const result = await ai.run(
     model.id as never,
     input as never,
     // Through the account's AI Gateway ("default", Cloudflare's own, made on a first request), so
-    // every request is in the gateway's logs. Its cache is off for vp dev: a string is asked for
-    // once, and its accepted answer is kept in the catalog. The translator test keeps it on, keyed
-    // by the request and the string's round (`cacheKey`, Cloudflare's GatewayOptions): an answer
-    // is stored the first time it's asked, so once judged right it comes back the same; a string
-    // judged wrong gets a new round, and so a fresh answer. The binding's third argument, which
-    // Void passes on (AI Gateway docs, "Workers Bindings"; Void's runtime/ai.mjs
-    // makeDirectBackend); proven both ways by e2e/translator/cache.test.ts and the gateway's logs
-    // (2026-11-15).
+    // every request is in the gateway's logs; its cache off: a string is asked for once, and its
+    // accepted answer is kept in the catalog. The binding's third argument, which Void passes on
+    // (AI Gateway docs, "Workers Bindings"; Void's runtime/ai.mjs makeDirectBackend).
     {
-      gateway: {
-        id: "default",
-        ...(key ? { cacheKey: key, cacheTtl: 30 * 86400 } : { skipCache: true }),
-      },
+      gateway: { id: "default", skipCache: true },
       // One replica per model, so the system prompt, the same for every string, is prefix-cached
       // across requests (Workers AI's "Prompt caching" page: x-session-affinity, through the
       // binding's extraHeaders, checked 2026-11-15).
@@ -182,18 +158,15 @@ export function rulesFor(kind: Kind, fbtee?: string): string {
   ].join("\n\n");
 }
 
-/** What every request says, whatever the kind: what it is, the rules (unless the translator test
- * turns them off to measure them), and how to reply. */
+/** What every request says, whatever the kind: what it is, the rules, and how to reply. */
 function instructions(
   kind: Kind,
   what: string,
-  { from, to, rules = true, fbtee }: { from: string; to: string; rules?: boolean; fbtee?: string },
+  { from, to, fbtee }: { from: string; to: string; fbtee?: string },
   reply: string,
 ): string {
   const into = from === to ? `in ${named(to)} itself` : `from ${named(from)} into ${named(to)}`;
-  return [`You translate ${what}, ${into}.`, ...(rules ? [rulesFor(kind, fbtee)] : []), reply].join(
-    "\n\n",
-  );
+  return [`You translate ${what}, ${into}.`, rulesFor(kind, fbtee), reply].join("\n\n");
 }
 
 /** One catalog entry to translate: its description and its source lines, each maybe a form. */
@@ -226,24 +199,16 @@ export async function translateStrings(
     examples = [],
     glossary = [],
     feedback,
-    model,
-    cache,
-    rules,
     fbtee,
   }: {
     from: string;
     to: string;
-    /** The translator test turns the rules off to measure them. */
-    rules?: boolean;
     /** fbtee's own rules, from the app's installed fbtee (translate.ts fbteeRules). */
     fbtee?: string;
     examples?: Example[];
     glossary?: { source: string; translation: string }[];
     /** The last answer and what was wrong with it, when it's asked again. */
     feedback?: { answer: string[]; problems: string[] };
-    model?: string;
-    /** AI Gateway's cache on, with this round in its key (the translator test; ask). */
-    cache?: string;
   },
 ): Promise<string[][]> {
   const items = entries.map((e, i) => ({
@@ -263,7 +228,7 @@ export async function translateStrings(
     instructions(
       "fbt",
       "the text of a web app's user interface",
-      { from, to, rules, fbtee },
+      { from, to, fbtee },
       "Each entry comes with its description, its code (the source around it, to show where the " +
         "text appears), its keep_exactly words and its lines, each marked with its form. Reply " +
         "with JSON only.",
@@ -295,8 +260,7 @@ export async function translateStrings(
       },
       required: ["entries"],
     },
-    model ? modelById(model) : modelFor(to),
-    cache,
+    modelFor(to),
   );
   // A model without JSON Mode may give a line as an object ({ "form": "other", "target": "…" }):
   // its translation, not its first field (SEA-LION's Thai once read "other", 2026-11-15).
@@ -322,13 +286,13 @@ export async function translateStrings(
  */
 export async function translatePage(
   text: string,
-  { from, to, rules }: { from: string; to: string; rules?: boolean },
+  { from, to }: { from: string; to: string },
 ): Promise<string> {
   const out = await ask<{ page: string }>(
     instructions(
       "page",
       "markdown pages of a website",
-      { from, to, rules },
+      { from, to },
       "Don't add a translatedFrom line. Reply with JSON only: the whole page as one string.",
     ),
     text,
@@ -348,87 +312,10 @@ export type DevRequest =
       examples?: Example[];
       glossary?: { source: string; translation: string }[];
       feedback?: { answer: string[]; problems: string[] };
-      cache?: string;
       /** fbtee's own rules, from the app's installed fbtee (translate.ts fbteeRules). */
       fbtee?: string;
-      /** The translator test only (e2e/translator/): another model to try; the rules off. */
-      model?: string;
-      rules?: boolean;
     }
-  | { kind: "page"; from: string; to: string; text: string; rules?: boolean }
-  /** The meaning score (judge.ts): each pair is a source and its translation. */
-  | { kind: "meaning"; pairs: [string, string][] }
-  /** The cache test only (e2e/translator/cache.test.ts). */
-  | { kind: "cache-probe"; cache: "on" | "off" };
-
-/** Workers AI's multilingual embeddings model: Cloudflare, "100+ languages" (changelog 2025-03-17). */
-export const MEANING_MODEL = "@cf/baai/bge-m3";
-
-/**
- * How close each translation's meaning is to its source's, 0 to 1: the cosine of their
- * embeddings from one multilingual model, which puts a sentence and its translation near each
- * other. A signal for the judge (judge.ts), not a verdict: it misses a single wrong word in a long
- * sentence, and catches a translation that says something else.
- */
-export async function meaningScores(pairs: [string, string][]): Promise<number[]> {
-  if (!pairs.length) return [];
-  // Through AI Gateway like every request, its cache off, as for translating (ask).
-  const result = (await ai.run(
-    MEANING_MODEL as never,
-    { text: pairs.flat() } as never,
-    { gateway: { id: "default", skipCache: true } } as never,
-  )) as { data?: number[][] };
-  const v = result.data ?? [];
-  const cos = (a: number[], b: number[]) => {
-    let dot = 0,
-      na = 0,
-      nb = 0;
-    for (let i = 0; i < a.length; i++) {
-      dot += a[i]! * b[i]!;
-      na += a[i]! * a[i]!;
-      nb += b[i]! * b[i]!;
-    }
-    return na && nb ? dot / Math.sqrt(na * nb) : 0;
-  };
-  return pairs.map((_, i) => cos(v[2 * i] ?? [], v[2 * i + 1] ?? []));
-}
-
-/**
- * One request that comes out differently each time the model answers it (a high temperature, no
- * seed), through AI Gateway's default gateway with its cache on (`cacheTtl`, seconds) or off
- * (`skipCache`). Cloudflare: the `id` is what sends a binding request through AI Gateway; "default"
- * is created on the first authenticated request (AI Gateway, "Workers Bindings", 2026-11-05). Two
- * answers word for word the same came from the cache. For the cache test, not for translating.
- */
-async function cacheProbe(
-  cache: "on" | "off",
-): Promise<{ answer: string; headers: Record<string, string> }> {
-  // The raw response (Void's direct backend returns it with `returnRawResponse`), for AI Gateway's
-  // own headers: cf-aig-cache-status says HIT or MISS, cf-aig-log-id that the gateway saw it.
-  const res = (await ai.run(
-    LLAMA.id as never,
-    {
-      messages: [{ role: "user", content: "Write one short sentence about the sea." }],
-      max_tokens: 64,
-      temperature: 1.5,
-    } as never,
-    {
-      gateway:
-        cache === "on" ? { id: "default", cacheTtl: 300 } : { id: "default", skipCache: true },
-      returnRawResponse: true,
-    } as never,
-  )) as unknown as Response;
-  const headers = Object.fromEntries(
-    [...res.headers].filter(([k]) => k.startsWith("cf-aig") || k === "content-type"),
-  );
-  const r = (await res.json()) as {
-    response?: unknown;
-    result?: { response?: unknown };
-    choices?: { message?: { content?: unknown } }[];
-  };
-  const answer = r.response ?? r.result?.response ?? r.choices?.[0]?.message?.content;
-  return { answer: typeof answer === "string" ? answer : JSON.stringify(answer ?? ""), headers };
-}
+  | { kind: "page"; from: string; to: string; text: string };
 
 /**
  * The dev server's route, `POST /__void-fbtee/translate`: only under `vp dev` (the plugin's
@@ -444,11 +331,7 @@ export async function devTranslate(request: Request, token: string): Promise<Res
     const result =
       body.kind === "strings"
         ? { lines: await translateStrings(body.entries, body) }
-        : body.kind === "page"
-          ? { page: await translatePage(body.text, body) }
-          : body.kind === "meaning"
-            ? { scores: await meaningScores(body.pairs) }
-            : await cacheProbe(body.cache);
+        : { page: await translatePage(body.text, body) };
     return Response.json(result);
   } catch (error) {
     // 503: no Void's AI here (Void's own message, "ai: Not available…"); 502: it answered

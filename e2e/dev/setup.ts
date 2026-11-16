@@ -37,8 +37,7 @@ async function startDev(): Promise<ChildProcess> {
 
 export default async function setup(project: TestProject) {
   const named = project.vitest.config.project;
-  // The translator tests (e2e/translator/) run on the dev server too.
-  if (!named.includes("dev") && !named.includes("translator")) {
+  if (!named.includes("dev")) {
     project.provide("devSkip" as never, "run it with `vp run test:dev`" as never);
     return;
   }

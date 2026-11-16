@@ -9,11 +9,10 @@ The app's own Vite+ commands do the work; there are no i18n scripts or other com
 an app up is the one void-fbtee command: `vp exec void-fbtee init`. After that:
 
 - `vp dev` prepares: as it starts and on each save, every new string goes into every catalog,
-  marked new. Once the saves pause, it translates what's new: with Void's AI first, when the app
-  uses `void/ai` (in the app's own Worker, every answer checked as the build checks it), then
-  with Claude Code for anything left: a `claude -p` on the developer's machine, or, when the dev
-  server runs in a Claude Code session, the prompt in its log for that session ("void-fbtee: … entries with "status": "new""). When you see it,
-  translate here, by this skill. It records each markdown page you mark done and reports what's
+  marked new. Straight after, it translates what's new (which translator, the package
+  decides). When the dev server runs in a Claude Code session, the work is a prompt in its log
+  for that session ("void-fbtee: … entries with "status": "new""). When you see it, translate
+  here, by this skill. It records each markdown page you mark done and reports what's
   left, until "all translated, nothing to fix".
 - `vp build` (and so `void deploy` and CI) fails on anything left: untranslated strings and
   pages, setup problems, a removed language's leftovers. Its message lists them.

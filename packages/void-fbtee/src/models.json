@@ -1,5 +1,5 @@
 {
-  "$comment": "models: each Workers AI model void-fbtee translates with, with its own settings: jsonMode (the model is on Workers AI's JSON Mode page) and options, sent with every request (its thinking turned off or to its lowest: a translation needs none, and thinking made four of the six too slow for the translator test, 2026-11-15); they're the candidates the translator test picks a language's model from. languages: the model that translates into each language, one entry per language (BCP 47 language subtag), read by models.ts for vp dev, the app's own translate() and the translator test alike. source: cloudflare (Cloudflare's own docs name the language for the model), llmgateway (https://llmgateway.io/models/translation, a third party's recommendation, until the translator test measures it), measured (the translator test, test/translator/scores.json); why says what. Checked 2026-11-15: every model is in Cloudflare's catalog and not on its November 2026 deprecation list (changelog 2026-11-05). Not used: IndicTrans2 (from English only, takes no description or examples), m2m100 (sentences alone; chrF 29.6 against Llama 3.3's 53.0 on the example's events, 2026-11-13). Any language not listed: default.",
+  "$comment": "models: each Workers AI model void-fbtee translates with, with its own settings: jsonMode (the model is on Workers AI's JSON Mode page) and options, sent with every request (its thinking turned off or to its lowest: a translation needs none, and thinking made four of the six too slow, measured 2026-11-15). languages: the model that translates into each language, one entry per language (BCP 47 language subtag), read by models.ts for vp dev and the app's own translate(). source: cloudflare (Cloudflare's own docs name the language for the model), llmgateway (https://llmgateway.io/models/translation, a third party's recommendation), measured (measured 2026-11-15 against Claude Code's verdicts, in git history before 2026-11-16); why says what. Checked 2026-11-15: every model is in Cloudflare's catalog and not on its November 2026 deprecation list (changelog 2026-11-05). Not used: IndicTrans2 (from English only, takes no description or examples), m2m100 (sentences alone; chrF 29.6 against Llama 3.3's 53.0 on the example's events, 2026-11-13). Any language not listed: default.",
   "models": {
     "@cf/aisingapore/gemma-sea-lion-v4-27b-it": {
       "jsonMode": false,
@@ -63,7 +63,7 @@
       "name": "Thai",
       "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "measured",
-      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15: one fast model while the long pick runs wait): with the translating skill, 20/21 right in Thai and 20/21 in Arabic, about 1 s a string (the translator test, 2026-11-15); the pick run (TRANSLATOR_PICK=1) chooses each language's own later"
+      "why": "Gemma 4 for every language (the user's call, 2026-11-15): with the translating skill, 263 of 276 right across 12 languages, about 1 s a string (measured 2026-11-15 against Claude Code's verdicts, in git history before 2026-11-16)"
     },
     {
       "language": "vi",
@@ -154,7 +154,7 @@
       "name": "Arabic",
       "model": "@cf/google/gemma-4-26b-a4b-it",
       "source": "measured",
-      "why": "Gemma 4 for every language for now (the user's call, 2026-11-15: one fast model while the long pick runs wait): with the translating skill, 20/21 right in Thai and 20/21 in Arabic, about 1 s a string (the translator test, 2026-11-15); the pick run (TRANSLATOR_PICK=1) chooses each language's own later"
+      "why": "Gemma 4 for every language (the user's call, 2026-11-15): with the translating skill, 263 of 276 right across 12 languages, about 1 s a string (measured 2026-11-15 against Claude Code's verdicts, in git history before 2026-11-16)"
     },
     {
       "language": "he",

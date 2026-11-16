@@ -1,14 +1,9 @@
-// Whether a translation is right: one judge for every translation void-fbtee makes or tests.
-// `vp dev` asks it before writing a string to the catalog (translate.ts translateEntry: anything it
-// finds goes back to Void's AI as what to fix), and the translator test asks it about every answer
-// (e2e/translator/). It answers in two kinds of words:
-// - problems (problemsWith): what breaks an app, so an answer with any is never kept: lines missing,
-//   JSON in a line, text left in the source language, the wrong script, a placeholder, command,
-//   file name or path changed;
-// - signals, for the test to rank answers and choose what a person reads: the meaning score
-//   (ai.ts meaningScore: Workers AI's multilingual embeddings), the score against a reference
-//   (test/translator/score.ts), and a verdict once someone has read the answer
-//   (test/translator/verdicts.ts).
+// Whether a translation is right, by rules, no AI. `vp dev` asks it before writing a string to the
+// catalog (translate.ts translateEntry: anything it finds goes back to Void's AI as what to fix),
+// and vp build of every catalog entry (check.ts). Its problems (problemsWith) are what breaks an
+// app, so an answer with any is never kept: lines missing, JSON in a line, text left in the source
+// language, the wrong script, a placeholder, command, file name or path changed, and what a
+// language's grammar asks (grammar.json).
 
 import grammar from "./grammar.json" with { type: "json" };
 import { CATEGORY_CODE } from "./plurals";

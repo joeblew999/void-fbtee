@@ -92,7 +92,7 @@ vp run tailscale:logout   # takes it off again; remove the machine at
 
 On a Mac, just open http://localhost:5173.
 
-Translations: `vp dev` prepares and translates as you work (once you pause), and `vp build`
+Translations: `vp dev` prepares and translates as you save, and `vp build`
 fails on anything left. There are no i18n scripts.
 
 Production (Void's own commands):

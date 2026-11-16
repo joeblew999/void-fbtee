@@ -32,8 +32,8 @@ test("kept terms: commands, file names and paths, without a sentence's full stop
   ]);
 });
 
-// The grammar checks (grammar.json), each on an answer Gemma 4 gave in the translator test
-// (verdicts.json, 2026-11-15), and on the right one.
+// The grammar checks (grammar.json), each on an answer Gemma 4 gave (2026-11-15), and on the
+// right one.
 const forms = (text: string, codes: number[][]) =>
   codes.map((c) => ({
     translation: text,

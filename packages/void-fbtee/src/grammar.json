@@ -1,5 +1,5 @@
 {
-  "$comment": "What each language's grammar asks of a translation, checked by judge.ts grammarProblems: in vp dev (a problem goes back to Void's AI), the translator test, and vp build (the checks that need only the translation). Languages by BCP 47 subtag. Found by the translator test's run in 12 languages (e2e/translator/, verdicts.json), 2026-11-15.",
+  "$comment": "What each language's grammar asks of a translation, checked by judge.ts grammarProblems: in vp dev (a problem goes back to Void's AI) and vp build (the checks that need only the translation). Languages by BCP 47 subtag. Found in Gemma 4's answers in 12 languages, judged by Claude Code, 2026-11-15 (in git history before 2026-11-16).",
   "pluralLinesDiffer": {
     "why": "Pairs of plural forms whose lines must differ when a noun is counted: in the source language, a placeholder followed by a plural noun (countedNoun: \"{seats} seats\", not \"{number}+\"; fbtee keeps only the plural English), because the noun changes between them (Unicode CLDR plural rules; each language's grammar). Gemma 4 gave the same line to both: 1 Plätze, 1 plazas, 1 places, 1 सीटें, Russian's other line мест. Not Arabic's many and other: a feminine noun (ليلة) looks the same in both without its vowel marks.",
     "languages": {
@@ -80,7 +80,7 @@
     }
   },
   "punctuation": {
-    "why": "Marks a language doesn't write, and misspellings a rule can see. Thai: no full stop at the end and no comma after Thai words or a name (a comma between code words, html, head, stays); a tone mark or vowel mark written twice is misspelt. Found in the translator test's Thai verdicts, 2026-11-15.",
+    "why": "Marks a language doesn't write, and misspellings a rule can see. Thai: no full stop at the end and no comma after Thai words or a name (a comma between code words, html, head, stays); a tone mark or vowel mark written twice is misspelt. Found in Gemma 4's Thai answers, judged by Claude Code, 2026-11-15.",
     "languages": {
       "th": [
         [

@@ -3751,18 +3751,6 @@
       ],
       "types": []
     },
-    "+eGjH8PHTlpgxZsnNcfIrA==": {
-      "description": "Home feature fact: the dev server translates new strings with Void's AI or Claude Code once you pause",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يترجم vp dev ما هو جديد باستخدام الذكاء الاصطناعي من Void أو Claude Code، بمجرد توقفك.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "zv6OgqGuv2aGlwiMTYo5GA==": {
       "description": "Translating page point title: the dev server translates, with Void's AI or Claude Code",
       "status": "translated",
@@ -3770,30 +3758,6 @@
       "translations": [
         {
           "translation": "يترجم vp dev، باستخدام الذكاء الاصطناعي من Void أو Claude Code",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "11+A/r80oBTKWFIt6+Kyww==": {
-      "description": "Translating page point: the dev server prepares new strings and, once you pause, translates them with Void's AI, else Claude Code",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "لا يوجد شيء للتشغيل. عند الحفظ، يضيف vp dev كل سلسلة جديدة إلى فهرس كل لغة. بمجرد توقفك، يترجم ما هو جديد، النصوص وصفحات Markdown التي تغيرت: باستخدام الذكاء الاصطناعي من Void، في الـ Worker الخاص بالتطبيق، عندما يستخدم التطبيق ذلك، وباستخدام Claude Code ومهارة void-fbtee لأي شيء متبقٍ. نفس المترجم يقوم بما ينشره الناس.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "aa7Dj+dRbjgFFxCuexgioA==": {
-      "description": "Translating page: what the dev server does about translations, preparing, translating with Void's AI or Claude Code, and reporting by itself",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "عند الحفظ، يضيف إلى كل لغة النصوص الجديدة، معلمة جديدة. بمجرد توقفك، يترجمها الذكاء الاصطناعي من Void أو Claude Code، ويبلّغ الخادم التطويري ما تبقى. تظهر الترجمة المعدلة على الفور.",
           "variations": {}
         }
       ],
@@ -4700,6 +4664,42 @@
       "translations": [
         {
           "translation": "يُكتب النص في المكوّن داخل عنصر fbt، مع وصف يخبر المترجم بما يحدث، وبما يحمله كل عنصر نائب، وأين يظهر النص: وهو كل ما يعرفه المترجم عن السياق. ويجمع vp dev كل واحد منها، أثناء الحفظ، في كتالوج كل لغة، i18n/translations، وهو ملف في مستودع التطبيق.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dnMq1/t6A/8A1Z4uIcO8ug==": {
+      "description": "Home feature fact: the dev server translates new strings as you save, with Claude Code or Void's AI",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "vp dev translates what's new as you save, with Claude Code or Void's AI.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4PHUCeucntmxGJxyjUv6rQ==": {
+      "description": "Translating page point: as you save, the dev server prepares new strings and translates them, with Claude Code when it's on the machine, else with Void's AI; what people post is translated by Void's AI",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "There's nothing to run. As you save, vp dev adds each new string to every language's catalog and translates what's new, the strings and the markdown pages that changed: with Claude Code and void-fbtee's skill when it's on your machine, else with Void's AI, in the app's own Worker, when the app uses it. What people post is translated by Void's AI.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "b1TeFLhl8Yagqok2H9oF5Q==": {
+      "description": "Translating page: what the dev server does about translations as you save, preparing, translating with Claude Code or Void's AI, and reporting by itself",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "As you save, adds new strings to every language, marked new, and Claude Code or Void's AI translates them; the dev server reports what's left. An edited translation shows at once.",
           "variations": {}
         }
       ],

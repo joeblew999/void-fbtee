@@ -1,7 +1,6 @@
 // Which Workers AI model translates into which language. The data is models.json: each model with
 // its own settings, and one entry per language naming its model and where the choice comes from.
-// vp dev, the app's own translate() and the translator test all read it here. Change a language's
-// model there.
+// vp dev and the app's own translate() read it here. Change a language's model there.
 import data from "./models.json" with { type: "json" };
 
 export interface TranslationModel {
@@ -30,7 +29,7 @@ const MODELS = data.models as Record<
   Omit<TranslationModel, "id" | "perMinute"> & { perMinute?: number; why: string }
 >;
 
-/** Every model void-fbtee translates with: the translator test's candidates for a language. */
+/** Every model void-fbtee can translate with (models.json models). */
 export const CANDIDATES: TranslationModel[] = Object.entries(MODELS).map(([id, m]) => ({
   id,
   jsonMode: m.jsonMode,

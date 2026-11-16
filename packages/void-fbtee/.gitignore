@@ -1,3 +1,2 @@
-# Copies made by the tests: test/unit/fixture, and the translator test's app.
+# Copies made by the tests: test/unit/fixture.
 test/unit/.tmp-*/
-test/translator/.tmp-*/

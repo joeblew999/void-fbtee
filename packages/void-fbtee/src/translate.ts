@@ -20,7 +20,7 @@ import {
 import { sourceOf } from "./locales";
 import { glossaryMisses, keptTerms, problemsWith } from "./judge";
 import { check } from "./check";
-import { LLAMA, modelById, modelFor, type TranslationModel } from "./models";
+import { LLAMA, modelFor, type TranslationModel } from "./models";
 
 /** void-fbtee's own folder (dist/ is one level down), where skills/ ships. */
 export const packageDir = () => dirname(dirname(fileURLToPath(import.meta.url)));
@@ -203,7 +203,7 @@ function showEvent(root: string, line: string) {
 /**
  * Translate what's new: Claude Code translates (a `claude -p` here, or the Claude Code session the
  * dev server runs in, given the prompt), then the pages it wrote are stamped and everything is
- * checked. The dev server runs it once you pause after a save. Resolves with what's left: the
+ * checked. The dev server runs it straight after each save's prepare. Resolves with what's left: the
  * check's problems, or the prompt handed to the session.
  */
 export async function translateApp(
@@ -395,8 +395,8 @@ export type TranslateCall = (body: unknown) => Promise<Record<string, unknown> |
 /**
  * One string through Void's AI, as `vp dev` translates it: sent, checked (problemsWith), and asked
  * again with what was wrong, up to twice (judge.ts: problemsWith, glossaryMisses). Every problem must
- * be gone; a glossary word not used is asked about too, and accepted on the last answer. The test
- * strings go through the same (e2e/translator/). Undefined when Void's AI isn't there.
+ * be gone; a glossary word not used is asked about too, and accepted on the last answer.
+ * Undefined when Void's AI isn't there.
  */
 export async function translateEntry(
   call: TranslateCall,
@@ -411,13 +411,8 @@ export async function translateEntry(
     };
     examples?: unknown[];
     glossary?: { source: string; translation: string }[];
-    /** Another model than the language's own (models.ts), for trying one (e2e/translator/). */
-    model?: string;
-    /** The translator test turns the rules off to measure them; fbtee's own rules (fbteeRules). */
-    rules?: boolean;
+    /** fbtee's own rules (fbteeRules). */
     fbtee?: string;
-    /** AI Gateway's cache on, with this round in its key: the translator test (ai.ts ask). */
-    cache?: string;
   },
 ): Promise<{ lines: string[]; problems: string[]; attempts: number } | undefined> {
   const source = o.entry.lines.map((l) => ({ translation: l.text, variations: l.variations }));
@@ -433,9 +428,6 @@ export async function translateEntry(
       entries: [o.entry],
       examples: o.examples ?? [],
       glossary,
-      model: o.model,
-      cache: o.cache,
-      rules: o.rules,
       fbtee: o.fbtee,
       feedback: feedback.length ? { answer: out, problems: feedback } : undefined,
     });
@@ -479,11 +471,9 @@ async function underLimit(model: TranslationModel): Promise<void> {
  */
 export function routeCall(url: string, token: string, log: (line: string) => void): TranslateCall {
   return async (body) => {
-    // The model that answers it: the test's, or the language's (as ai.ts devTranslate picks).
-    const { to, model } = body as { to?: unknown; model?: unknown };
-    await underLimit(
-      typeof model === "string" ? modelById(model) : typeof to === "string" ? modelFor(to) : LLAMA,
-    );
+    // The model that answers it: the language's (as ai.ts devTranslate picks).
+    const { to } = body as { to?: unknown };
+    await underLimit(typeof to === "string" ? modelFor(to) : LLAMA);
     const res = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json", "x-void-fbtee-token": token },
@@ -504,14 +494,6 @@ export function routeCall(url: string, token: string, log: (line: string) => voi
   };
 }
 
-/** The translator test's: Workers AI's cache, another model, one language, the rules off. */
-export interface CatalogRun {
-  cache?: string;
-  model?: string;
-  locale?: string;
-  rules?: boolean;
-}
-
 /**
  * Every new entry of one language's catalog through Void's AI, all at once: each is its own
  * request (translateEntry), so they run side by side, under Workers AI's limit (routeCall). An
@@ -526,7 +508,6 @@ export async function translateCatalog(
   locale: string,
   catalog: { translations: Record<string, CatalogEntry> },
   log: (line: string) => void,
-  test: CatalogRun = {},
 ): Promise<{ done: number; open: number } | undefined> {
   const { texts, builtinHashes } = collect(p);
   const fbtee = fbteeRules(p.root);
@@ -554,7 +535,6 @@ export async function translateCatalog(
         examples: examplesFor(finished, [toSend]),
         glossary: glossaryFor(finished, [toSend], Object.keys(p.common ?? {})),
         fbtee,
-        ...test,
       });
       if (!answer) return;
       const out = answer.lines;
@@ -586,26 +566,31 @@ export async function translateWithVoidAi(
   url: string,
   token: string,
   log: (line: string) => void,
-  test: CatalogRun = {},
 ): Promise<boolean> {
   const call = routeCall(url, token, log);
   const from = p.config.sourceLocale;
   const rel = (f: string) => relative(p.root, f).split(sep).join("/");
 
-  const catalogs = missing(p)
-    .filter((m) => !test.locale || m.locale === test.locale)
-    .map(async (m) => {
-      const file = catalogFile(p, m.locale);
-      if (!existsSync(file)) return true;
-      const catalog = JSON.parse(readFileSync(file, "utf8")) as {
-        translations: Record<string, CatalogEntry>;
-      };
-      const ran = await translateCatalog(p, call, m.locale, catalog, log, test);
-      // What passed is written even when another answer found Void's AI gone.
-      writeFileSync(file, JSON.stringify(catalog, null, 2) + "\n");
-      if (ran?.open) log(`${rel(file)}: ${ran.done} of ${ran.open} translated with Void's AI`);
-      return !!ran;
-    });
+  const catalogs = missing(p).map(async (m) => {
+    const file = catalogFile(p, m.locale);
+    if (!existsSync(file)) return true;
+    const catalog = JSON.parse(readFileSync(file, "utf8")) as {
+      translations: Record<string, CatalogEntry>;
+    };
+    const ran = await translateCatalog(p, call, m.locale, catalog, log);
+    // Saves don't wait for translating: a prepare may have changed the file meanwhile (a string
+    // dropped, a new one added). So what passed goes into the file as it is now, each only where
+    // its entry is still there and still new. What passed is written even when another answer
+    // found Void's AI gone.
+    const now = JSON.parse(readFileSync(file, "utf8")) as typeof catalog;
+    for (const [hash, entry] of Object.entries(catalog.translations)) {
+      const there = now.translations[hash];
+      if (entry.status === "translated" && there?.status === "new") now.translations[hash] = entry;
+    }
+    writeFileSync(file, JSON.stringify(now, null, 2) + "\n");
+    if (ran?.open) log(`${rel(file)}: ${ran.done} of ${ran.open} translated with Void's AI`);
+    return !!ran;
+  });
 
   const source = sourceOf(p.config);
   const pages = markdownPages(p)
@@ -617,7 +602,6 @@ export async function translateWithVoidAi(
         from,
         to: page.locale,
         text: original,
-        rules: test.rules,
       });
       if (!answer) return false;
       const copy = typeof answer.page === "string" ? answer.page : "";

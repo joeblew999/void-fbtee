@@ -14,9 +14,9 @@
 //   source (plus fbtee's built-in strings), as `virtual:void-fbtee/catalogs`. Nothing generated
 //   goes in git. catalogs.ts.
 // - `vp dev` does the translation work: on start and on each save it prepares the catalogs (a new
-//   string is in each, marked new); once you pause it translates what's new, with Void's AI when
-//   the app has it (its own Worker, through a route only `vp dev` has: ai.ts) and Claude Code for
-//   anything left (translate.ts); it records each page the agent marks done, and it reports
+//   string is in each, marked new), then at once translates what's new: with Claude Code when it's
+//   there, otherwise with Void's AI when the app has it (its own Worker, through a route only
+//   `vp dev` has: ai.ts) and Claude Code's prompt for anything left (translate.ts); it records each page the agent marks done, and it reports
 //   everything `check` finds.
 // - `vp build` fails on anything `check` finds, so `void deploy` (which builds) can't ship gaps.
 // - Browser: every app module that uses <fbt> or fbs first imports `void-fbtee/client`, which
@@ -27,7 +27,14 @@ import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, matchesGlob, relative, sep } from "node:path";
 import { prepare } from "./commands";
-import { markedDone, stamp, translateApp, translateWithVoidAi } from "./translate";
+import {
+  hasClaude,
+  insideClaudeCode,
+  markedDone,
+  stamp,
+  translateApp,
+  translateWithVoidAi,
+} from "./translate";
 import { check } from "./check";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
@@ -45,10 +52,10 @@ import {
 } from "./catalogs";
 import { checkSite } from "./site";
 
-/** How long the dev server waits after the last save before preparing (milliseconds). */
+/** How long the dev server waits after the last save before preparing (milliseconds): saves
+ * that come together, as an editor's "save all" does, prepare once. Translating follows the
+ * prepare at once: the developer doesn't pause for it. */
 const PREPARE_DELAY = 300;
-/** How long after the last save the dev server waits before translating: a pause. */
-const TRANSLATE_DELAY = 5_000;
 
 /** voidFbtee({ fallbackLocale }), canonical and one of the app's, or the source language. */
 function checkFallback(fallback: string | undefined, config: LocaleConfig): string {
@@ -170,7 +177,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   // One translation at a time; a save during one asks for another after it.
   let translating: Promise<void> | undefined;
   let translateAgain = false;
-  // The prompt last handed to the Claude Code session, so a pause doesn't show it again.
+  // The prompt last handed to the Claude Code session, so the next save doesn't show it again.
   let handedOut: string | undefined;
   const log = (text: string) =>
     text.split("\n").forEach((l) => devServer?.config.logger.info(`void-fbtee: ${l}`));
@@ -182,7 +189,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
     );
   // Tests (Vitest's server, CI) don't start an agent: they report.
   const agentAllowed = () => !underVitest && !process.env.CI;
-  // After a save, once you pause: translate what's new (a source file or original page saved), or
+  // After a save, straight after its prepare: translate what's new (a source file or original page saved), or
   // only report (a catalog or translated page saved, which is the translating itself).
   let translateWanted = false;
   const translateSoon = (translate = true) => {
@@ -198,10 +205,13 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         return;
       }
       if (!wanted || !agentAllowed()) return report(check(project()));
-      // Void's AI first, through the dev server's own route, when the app has it; then Claude
-      // Code for anything left (none, or what didn't pass the checks).
+      // Local Claude when it's there (the dev server in a Claude Code session, or a `claude` on
+      // the machine): it translates everything new, and Void's AI isn't asked. Otherwise Void's
+      // AI, through the dev server's own route, when the app has it; then Claude Code's prompt
+      // for anything left (what didn't pass the checks).
+      const localClaude = insideClaudeCode() || hasClaude();
       const base = devServer?.resolvedUrls?.local[0];
-      const url = base && new URL(DEV_TRANSLATE_PATH, base).href;
+      const url = !localClaude && base && new URL(DEV_TRANSLATE_PATH, base).href;
       translating = (
         url ? translateWithVoidAi(project(), url, devToken, log) : Promise.resolve(false)
       )
@@ -222,7 +232,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
             translateSoon();
           }
         });
-    }, TRANSLATE_DELAY);
+    }, 0);
   };
   // Whether the app uses @void/md, as void-md tells its own adapters (by plugin name): no peer
   // dependency on it, which an app without markdown pages would have to install anyway.
@@ -331,15 +341,18 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         prepareTimer = setTimeout(() => {
           try {
             const written = prepare(project());
-            if (written.length) log(`prepared ${written.join(", ")}: translating once you pause`);
+            if (written.length) log(`prepared ${written.join(", ")}: translating`);
           } catch (error) {
             devServer?.config.logger.warn(`void-fbtee: couldn't prepare: ${String(error)}`);
           }
+          // Then at once: translate what's new.
+          translateSoon(true);
         }, PREPARE_DELAY);
+        return;
       } else if (!/\.mdx?$/.test(file) || !rel.startsWith("pages/")) return;
-      // Then, once you pause: translate what's new, or report what's left.
+      // A markdown page saved: translate what's new (an original page), or report what's left.
       const original = `pages/${sourceOf(config).segment}/`;
-      translateSoon(source || rel.startsWith(original));
+      translateSoon(rel.startsWith(original));
     },
     configEnvironment(name, env) {
       // The virtual modules must reach void-fbtee's own files, so it is never pre-bundled.

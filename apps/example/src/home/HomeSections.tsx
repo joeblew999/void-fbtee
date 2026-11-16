@@ -188,9 +188,9 @@ function features(): Feature[] {
       facts: [
         <fbt
           key="1"
-          desc="Home feature fact: the dev server translates new strings with Void's AI or Claude Code once you pause"
+          desc="Home feature fact: the dev server translates new strings as you save, with Claude Code or Void's AI"
         >
-          vp dev translates what's new with Void's AI or Claude Code, once you pause.
+          vp dev translates what's new as you save, with Claude Code or Void's AI.
         </fbt>,
         <fbt key="2" desc="Home feature fact: translations are files in the app's repository">
           Translations are files in your repo, ready to review.
