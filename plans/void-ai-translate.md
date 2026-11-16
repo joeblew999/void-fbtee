@@ -290,6 +290,32 @@ and its description (checked 2026-11-16, changing "Save"'s description in a copy
 - What only the developer's machine can do, run local Claude and edit source files, the consumer
   asks of vp dev's own process through a dev-only route.
 
+### The check: part of every message
+
+The consumer checks every answer, app string or post, review on or off: judge.ts, no AI, no
+cost, as vp dev already does for app strings (translate.ts problemsWith). Today posts aren't
+checked at all (ai.ts translate()): that's closed here.
+
+- In: the source (its lines, with each plural and gender form, for an app string; the title and
+  description for a post), the answer, the source language and the language translated into.
+- Out: a list of problems, each in words ("Line 2 must keep the placeholder {name}").
+- Two kinds:
+  - Must pass, or the answer would break the page: the same lines as the source, each
+    placeholder kept, no placeholder added, written in the language's script, no English
+    sentence left in it. The reviewer can't overrule these.
+  - Hints, from grammar.json: count lines that should differ, a both-genders word on a man's or
+    a woman's line, a capital mid-sentence, English words left in another script, Korean
+    particles, Thai punctuation, a form for more than one number keeping {number}. With review
+    on, the reviewer has the last word on these (it may find one isn't a mistake here).
+- Review on: the answer and its problems both go to the reviewer, which says right or wrong
+  knowing what the check found. A must-pass problem is always wrong.
+- Review off: any problem and the answer isn't kept, as today: an app string is left for Claude
+  Code, a post is shown in the language it was written in.
+- For a post, the checks that need the source language's own text (a counted noun, capitals
+  against the source) use the language it was written in; grammar.json says which languages
+  each one knows (countedNoun has English only; a post written in another language skips it).
+- vp build keeps checking every catalog entry, without the AI, as the last gate (check.ts).
+
 ### When the reviewer finds it wrong
 
 - Dev time: the source code is changed, that string's `<fbt>` in the developer's file (its
