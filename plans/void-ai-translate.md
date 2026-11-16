@@ -202,53 +202,77 @@ Then one run with Gemma, judged, to measure it.
   wrong: "You're booked." in German, Spanish, French, Russian, Vietnamese (the word for booking a
   person); Hindi's swapped numbers; added words; Arabic's 100 and up.
 
-## Next: an AI reviewer that fixes the source, then translation runs again (2026-11-16, agreed)
+## Next: translate and review through one queue (2026-11-16, agreed)
 
 The grammar checks (above) fixed almost nothing: Gemma gives the same answer again after a
 problem, so they turned 2 kept wrong answers into strings left over, and the 259 to 263 was
 mostly the descriptions. What's left wrong is meaning and wording, which only a reviewer that
 understands the language catches.
 
-- The review is an option, off unless turned on, in the app's config (voidFbtee's options in
-  vite.config.ts): `review: { dev: true, runtime: true }`, one switch for each.
-- Who translates at dev time: Claude Code on the machine when `claude` is there, otherwise
-  Gemma 4 through Void's AI (models.json). At runtime: Gemma 4 (no local Claude on Cloudflare).
-- Dev time (`review.dev`): the translator translates; the reviewer reads each answer. Right:
-  kept. Wrong: the reviewer changes the source code, the string's `<fbt>` in the developer's
-  file (its description, or its wording where that's what misleads), so vp dev's own catalog
-  update makes it a new entry and it's translated again, and reviewed again. At most 3 rounds;
-  still wrong after the third, the string is left untranslated, said in the log (vp build
-  fails on it, as on anything untranslated). The change is in the developer's git diff.
-- Runtime (`review.runtime`): the same with the data. Gemma 4 translates in the queue; the
-  reviewer reads each language's answer. Right: stored. Wrong: the reviewer fixes the data the
-  translation is made from (what was posted, kept beside the person's own words, which are
-  still shown as they wrote them), and that language is translated again, and reviewed again.
-  At most 3 rounds; still wrong, the post is shown in the language it was written in, with its
-  note, as for any post not yet translated.
-- One path for both, through a Void queue (parity): every string to translate, the app's own at
-  dev time and what people post at runtime, is a message on the app's translate queue, and its
-  consumer runs translate, check, review, at most 3 rounds. Void delivers queue messages to the
-  same consumer in Miniflare under vp dev as on Cloudflare (Void's guide/queues.md, "Local
-  development", checked 2026-11-16). A queue is a file in the app's queues/ folder, so the app
-  has one that hands it to the package (`queues/translate.ts`; void-fbtee init writes it), the
-  consumer options literal in that file as Void reads them. The queue's own retries and batch
-  size replace translate.ts's per-minute counter. What only the developer's machine can do,
-  run local Claude Code and edit the source files, stays in vp dev's own process: the consumer
-  asks it through a dev-only route, the way the translate route is called today in reverse.
-- Which reviewer: Claude. At dev time, Claude Code on the machine when `claude` is there (the
-  developer's own; nothing installed by the package), otherwise Claude through AI Gateway's
-  catalog; at runtime, always Claude through AI Gateway. Through the gateway it's the same
-  `ai.run` (Void's guide/ai.md: Cloudflare Gateway models, Cloudflare-managed credentials):
-  `anthropic/claude-haiku-5.5`, $0.10 and $0.50 a million tokens in and out, about Gemma's
-  price (Cloudflare model catalog, checked 2026-11-16). Paid from AI Gateway credits (Unified
-  Billing), loaded once on the Cloudflare account: no Anthropic key, no secret. Which model is
-  data (models.json), like the translators.
-- The grammar checks become the reviewer's free first look: an answer that fails them goes to
-  the reviewer with their problems, instead of being thrown away. If the reviewer catches the
-  same mistakes alone, the checks go.
-- Measured first: the reviewer on the 23 test strings in 12 languages: how many of the 13 wrong
-  it gets right within 3 rounds, and that it leaves the right ones alone. Claude Code (the
-  translator test's judge) still records the verdicts, so the reviewer doesn't mark its own work.
+### Who does what
+
+|                                      | Translator          | Reviewer                            |
+| ------------------------------------ | ------------------- | ----------------------------------- |
+| Dev time, Claude Code on the machine | Claude Code         | Claude Code                         |
+| Dev time, no Claude Code             | Gemma 4 (Void's AI) | Claude Haiku 5.5 through AI Gateway |
+| Runtime                              | Gemma 4 (Void's AI) | Claude Haiku 5.5 through AI Gateway |
+
+- Claude Code is the developer's own `claude` (nothing installed by the package), run by vp
+  dev's own process. Gemma 4 and Claude through AI Gateway are both Void's `ai.run` (Void's
+  guide/ai.md: Workers AI models, and Cloudflare Gateway models with Cloudflare-managed
+  credentials). `anthropic/claude-haiku-5.5`: $0.10 and $0.50 a million tokens in and out, about
+  Gemma's price (Cloudflare model catalog, checked 2026-11-16), paid from AI Gateway credits
+  (Unified Billing) loaded once on the Cloudflare account: no Anthropic key, no secret.
+- Which models: data in models.json, the translators as now and the reviewer beside them.
+
+### The switch
+
+`review: { dev: true, runtime: true }` in voidFbtee's options (the app's vite.config.ts; the
+package's plugin.ts VoidFbteeOptions), one for each, off unless set. Off: as now (translate,
+check, keep what passes).
+
+### One path: the translate queue (parity)
+
+- Every translation is one message on the app's translate queue: one catalog entry in one
+  language at dev time (its plural and gender lines together), one post in one language at
+  runtime (its title and description together). 23 strings in 12 languages: 276 messages.
+- The consumer does the same for each: translate, check (judge.ts, grammar.json: a free first
+  look, its problems handed to the reviewer), review, at most 3 rounds.
+- Void delivers messages to the same consumer in Miniflare under vp dev as on Cloudflare
+  (Void's guide/queues.md, "Local development", checked 2026-11-16). A queue is a file in the
+  app's queues/ folder: the app's `queues/translate.ts` hands it to the package (void-fbtee init
+  writes it; the example's is that file), its consumer options literal there, as Void reads
+  them. The queue's batches and retries do the pacing, replacing translate.ts's per-minute
+  counter.
+- What only the developer's machine can do, run Claude Code and edit source files, the consumer
+  asks of vp dev's own process through a dev-only route.
+
+### When the reviewer finds it wrong
+
+- Dev time: the reviewer changes the source code, that string's `<fbt>` in the developer's file
+  (its description, or its wording where that misleads); the change is in the developer's git
+  diff. vp dev's own prepare (catalogs.ts prepared(), fbtee's prepare-translations) drops the
+  old entry from every catalog and adds the new one, in every language (checked 2026-11-16), and
+  vp dev puts a message on the queue for each language.
+- Runtime: the reviewer fixes the data the translation is made from, kept beside the person's
+  post, which is still shown as they wrote it; only that language goes on the queue again.
+- At most 3 rounds. Still wrong: at dev time the string is left untranslated, said in the log,
+  and vp build fails on it, as on anything untranslated; at runtime the post is shown in the
+  language it was written in, with its note, as for any post not yet translated.
+
+### Order of work
+
+1. The queue path: the package's consumer, `queues/translate.ts` in the example and from
+   void-fbtee init, vp dev putting the app's new strings on it; the translator test through it.
+2. The review loop with Claude Code on the machine (needs nothing more), measured by the
+   translator test on the 23 strings in 12 languages: how many of the 13 wrong are right
+   within 3 rounds, and that the right ones stay right. Claude Code, the test's judge, records
+   the verdicts, so the reviewer doesn't mark its own work.
+3. Claude Haiku 5.5 through AI Gateway as the reviewer, once credits are loaded: the same
+   measurement.
+4. The runtime review in the queue, for posts.
+5. The two skills and the example's Strings and Translating pages, to match.
+6. The grammar checks stay as the free first look, or go if the reviewer catches the same alone.
 
 ## Where it stands (2026-11-15)
 
