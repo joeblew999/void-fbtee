@@ -266,6 +266,25 @@ For each message (what it is, its key, the language, the round), the queue consu
 
 vp dev and the app only put messages on the queue; everything above is the consumer's.
 
+### In each of vp's modes: dev, build, preview (and deployed)
+
+|                                                    | vp dev                                                                                         | vp build                                                                                                      | vp preview                                                                                            | deployed                                |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| What it is                                         | the dev server, in Miniflare                                                                   | the production build                                                                                          | the build, run locally                                                                                | on Cloudflare                           |
+| The app's strings                                  | translated: vp dev sends new ones on the queue                                                 | none translated: build-check.ts fails on any left untranslated, and checks every entry with the check's rules | already in the build: none sent                                                                       | already in the build: none sent         |
+| Posts                                              | translated: the app sends them on Void's local queue                                           | none (no requests)                                                                                            | translated: the app sends them on the local queue (the preview runs it: the example's void.config.ts) | translated: Cloudflare's queue          |
+| The translator                                     | strings: local Claude when `claude` is there, else Cloudflare Gemma; posts: Cloudflare Gemma   | none                                                                                                          | Cloudflare Gemma                                                                                      | Cloudflare Gemma                        |
+| The reviewer (`review` on)                         | strings: local Claude when `claude` is there, else Cloudflare Claude; posts: Cloudflare Claude | none                                                                                                          | Cloudflare Claude                                                                                     | Cloudflare Claude                       |
+| vp dev's route (local Claude, changing the source) | there                                                                                          | none                                                                                                          | none                                                                                                  | none                                    |
+| Its tests                                          | test:dev, test:translator                                                                      | (the build in test:preview)                                                                                   | test:preview                                                                                          | the preview suite against the live site |
+
+- Local Claude and changing the source are vp dev only: they need vp dev's process on the
+  developer's machine, and the source; preview and deployed have neither, and their strings
+  were translated before the build.
+- Posts are the same path in vp dev, preview and deployed: the queue, Cloudflare Gemma,
+  the check, Cloudflare Claude. Only the queue differs: Void's local one, or Cloudflare's.
+- vp build calls no AI: it only refuses to build what isn't translated or fails the check.
+
 ### The switch
 
 `review: { dev: true, runtime: true }` in voidFbtee's options (the app's vite.config.ts; the
