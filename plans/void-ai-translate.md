@@ -239,6 +239,31 @@ Three names, used everywhere below:
 package's plugin.ts VoidFbteeOptions), one for each, off unless set. Off: as now (translate,
 check, keep what passes).
 
+### What's new at dev time: vp dev knows by itself
+
+vp dev runs fbtee's collect and prepare (catalogs.ts prepared(), from plugin.ts: as it starts,
+and on every save of a source file, once saves settle), and fbtee keys every string by its text
+and its description (checked 2026-11-16, changing "Save"'s description in a copy):
+
+| The developer                                   | The catalogs                                       |
+| ----------------------------------------------- | -------------------------------------------------- |
+| changes other code, or moves a string unchanged | nothing: the entry and its translations stay       |
+| adds a string                                   | a new entry in every catalog, marked new           |
+| changes a string's text or description          | the old entry dropped, a new one added, marked new |
+| removes a string                                | its entry dropped from every catalog               |
+| adds a language to the config                   | that language's catalog, every string marked new   |
+
+- Only entries marked new go on the queue, one message per language; a translated entry is
+  never sent again unless its text or description changes.
+- The reviewer's change to the source is a save like the developer's, so it comes back
+  through the same prepare: the old entry is dropped from every catalog (every language's
+  translation of it, the right ones too) and a new one is added, marked new, and queued in
+  every language. Nothing else is needed to send it round again.
+- Counting the rounds: the new entry has a new key, so vp dev keeps a record of the keys the
+  reviewer made, each with its round (node_modules/.void-fbtee/review-rounds.json, beside the
+  dev token). A new entry the record doesn't have is the developer's own: round 1. One the
+  record has is that round; after round 3 it isn't queued again.
+
 ### One path: the translate queue (parity)
 
 - Every translation is one message on the app's translate queue: one catalog entry in one
