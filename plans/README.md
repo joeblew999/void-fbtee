@@ -3,9 +3,11 @@
 Each plan is done, checked and committed before the next one starts. A plan's own file says
 what it changes; this list is the only place that says when.
 
-1. `primitives.md`: void-fbtee's missing primitives, moved out of the example into the package.
-2. `use-cases.md`: one event, many people, as data, built on the primitives.
-3. `video-conferencing.md`: `void-moq`, built on all of the above.
+1. `translation-rework.md`: one translator (Gemini 3.5 Flash on Cloudflare) for dev and runtime,
+   checked the same way in dev and build, reviewed by Claude at dev time.
+2. `primitives.md`: void-fbtee's missing primitives, moved out of the example into the package.
+3. `use-cases.md`: one event, many people, as data, built on the primitives.
+4. `video-conferencing.md`: `void-moq`, built on all of the above.
 
 Waiting on others, not in the order:
 
