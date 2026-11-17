@@ -17,7 +17,8 @@ type Message = { eventId: string };
 
 // A failure waits before it's tried again, and is tried 5 times (Void's guide/queues.md: by default
 // 3 times, at once). Cloudflare then drops the message (Void's queues have no dead-letter queue);
-// the daily job queues any upcoming event still missing a language again (crons/reminders.ts).
+// the daily job queues any event still missing a language again (crons/reminders.ts
+// reconcileTranslations).
 export const maxRetries = 5;
 export const retryDelay = 300;
 

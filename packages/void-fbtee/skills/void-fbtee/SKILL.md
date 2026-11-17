@@ -286,8 +286,9 @@ no key); for the preview, mark the binding remote in `void.config.ts`:
 Each language is stored as soon as it's translated, so a retry only pays for the ones still missing;
 when the account isn't paying (credits used up, a spend limit reached: `paymentProblem()` from
 `void-fbtee/ai`), the message waits an hour. Cloudflare drops a message after its last retry (Void's
-queues have no dead-letter queue), so the daily job (`crons/reminders.ts`) queues any upcoming
-event still missing a language again. Posts go to Google's Gemini (not Zero Data Retention).
+queues have no dead-letter queue), so the daily job (`crons/reminders.ts`) keeps posts to the app's
+languages both ways: it queues every event missing a language (or with an `unknown` translation),
+and deletes translations into a language the app no longer has. Posts go to Google's Gemini (not Zero Data Retention).
 
 ## Markdown pages
 

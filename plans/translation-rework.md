@@ -281,8 +281,8 @@ Moving from Workers AI to Gemini on credits changed more than the model. Fixed:
   them again. Each is now stored as it's done. It retried 3 times at once (Void's default) and then
   Cloudflare dropped the message for good (no dead-letter queue), so a post made while the credits
   were out was never translated: now 5 retries 5 minutes apart, an hour apart when the account isn't
-  paying, and the daily job (`crons/reminders.ts requeueUntranslated`) queues every upcoming event
-  still missing a language. In the daily job, not its own: the free plan allows 5 Cron Triggers.
+  paying, and the daily job (`crons/reminders.ts reconcileTranslations`) queues every event still missing
+  a language (upcoming only at first; every event since plans/translation-provenance.md). In the daily job, not its own: the free plan allows 5 Cron Triggers.
   Proven in dev: an Arabic text deleted, the job run through `/__void/scheduled`, the queue stored a
   new one by Gemini.
 - **Docs:** the package README's `vp dev` row still said Claude Code goes first; it now says Void's

@@ -44,6 +44,10 @@ database. Nobody edits live data by hand.
   where its id, title and description are still exactly what the sample-events migration wrote.
   Every other row keeps the default, `unknown`. Proven on the live data before it ran: the same
   conditions, run as a read-only SELECT on the live D1, matched exactly the 8 seeded rows.
+- The daily job (`crons/reminders.ts reconcileTranslations`) keeps the posts' translations to the
+  app's languages, both ways, in every database: it deletes translations into a language the app no
+  longer has, and queues every event (past ones too) missing one of its languages or with an
+  `unknown` one. Counted in one query (D1 takes at most 100 bound parameters, so no id lists).
 - The app replaces its own `unknown` rows: `untranslated()` counts one as missing, the daily job
   (`crons/reminders.ts`) queues its event, and `storeTranslations()` overwrites a row only when it
   says `unknown`. That's the same code in every database.
@@ -76,8 +80,6 @@ AI's translation (`awaitsReview`).
   logged whole, kept until the gateway's 10,000,000-log cap). The rows' `gateway_log_id`s name
   exactly which logs: delete those too when the post is deleted (AI Gateway's logs API, or the
   gateway's logging turned off for posts).
-- A language taken out of the app leaves its rows in `event_texts`: `check()` reports a removed
-  language's catalog files, not its database rows.
 - Markdown pages aren't reviewed at all: `reviewTask` and `awaitsReview` cover catalog entries only.
   An `unknown` or an AI-made page needs the same review.
 
