@@ -1,9 +1,10 @@
-// Whether a translation is right, by rules, no AI. `vp dev` asks it before writing a string to the
-// catalog (translate.ts translateEntry: anything it finds goes back to Void's AI as what to fix),
-// and vp build of every catalog entry (check.ts). Its problems (problemsWith) are what breaks an
-// app, so an answer with any is never kept: lines missing, JSON in a line, text left in the source
-// language, the wrong script, a placeholder, command, file name or path changed, and what a
-// language's grammar asks (grammar.json).
+// Whether a translation is right, by rules, no AI. One checker for every translation, whoever wrote
+// it: `vp dev` asks it of each answer before writing it to the catalog (translate.ts: anything it
+// finds goes back to Void's AI as what to fix), and `vp build` asks it of every finished catalog
+// entry (check.ts), against the entry's source lines. Its problems (problemsWith) are what breaks
+// an app: lines missing or one too many for the language's plural forms, JSON in a line, text left
+// in the source language, the wrong script, a placeholder, command, file name or path changed, and
+// what a language's grammar asks (grammar.json).
 
 import grammar from "./grammar.json" with { type: "json" };
 import { CATEGORY_CODE } from "./plurals";
@@ -20,17 +21,27 @@ const placeholders = (text: string) => new Set(text.match(/\{[^{}]+\}/g) ?? []);
 const WORDED = new Set([16, 4, 8]);
 
 /**
- * What a translation keeps exactly as the source writes it: commands (`vp dev`), file names
- * (`AGENTS.md`), paths (`i18n/translations`) and lower-case names with a hyphen (`void-fbtee`).
+ * What a translation keeps exactly as the source writes it: commands (`vp dev`), file names, dotted
+ * ones whole (`AGENTS.md`, `void.config.ts`: both models once cut it to `config.ts`, 2026-11-17), paths (`i18n/translations`) and lower-case names with a hyphen (`void-fbtee`).
  */
 export function keptTerms(text: string): string[] {
   return (
     text.match(
-      /\bvp [a-z]+\b|[\w-]+\.(?:md|mdx|ts|tsx|js|json|ya?ml)\b|\b[\w.-]+(?:\/[\w.-]+)+|\b[a-z0-9]+(?:-[a-z0-9]+)+\b/g,
+      /\bvp [a-z]+\b|[\w-]+(?:\.[\w-]+)*\.(?:md|mdx|ts|tsx|js|json|ya?ml)\b|\b[\w.-]+(?:\/[\w.-]+)+|\b[\w.-]+\/(?=[\s,.;:)]|$)|\b[a-z0-9]+(?:-[a-z0-9]+)+\b/g,
     ) ?? []
-  ).map((t) => t.replace(/[.-]+$/, "")); // a sentence's own full stop isn't part of a path
+  )
+    .map((t) => t.replace(/[.-]+$/, "")) // a sentence's own full stop isn't part of a path
+    .filter((t) => !t.includes("-") || t.includes("/") || t.includes(".") || isName(t));
 }
 
+/**
+ * A lower-case name with a hyphen kept as written: the packages void-fbtee's apps are built with
+ * (grammar.json keptTerms.names). Any other hyphenated phrase is an English compound
+ * ("right-to-left", "written-out", "supported-value"), translated like any words: vp build flagged
+ * all three as names to keep when it began checking every entry (2026-11-17).
+ */
+const HYPHEN_NAMES = new Set(grammar.keptTerms.names);
+const isName = (t: string) => HYPHEN_NAMES.has(t);
 /**
  * The script a language is written in, by CLDR's likely subtags (Intl.Locale.maximize: "th" →
  * Thai), as Unicode script names for a regular expression. Japanese and Korean mix in Han.
@@ -76,9 +87,13 @@ export function inScript(line: string, locale: string): boolean {
   const scripts = scriptOf(locale);
   if (!scripts) return true;
   const own = new RegExp(scripts.map((s) => `\\p{Script=${s}}`).join("|"), "u");
+  const words = line.replace(/\{[^{}]+\}/g, " ");
+  // Nothing to write in a script: placeholders and marks alone ("{number}+", list joiners), or
+  // only names ("Worker", "PDFs"): a name is written as it is.
+  if (!/\p{L}/u.test(words) || /^[\s\p{P}\p{S}]*(?:\p{Lu}[\p{L}']*[\s\p{P}\p{S}]*)+$/u.test(words))
+    return true;
   return own.test(line) && !/\b[a-z']+(?:\s+[a-z']+){3}\b/.test(line);
 }
-
 /**
  * What's wrong with a translated entry into `to`, in words Void's AI is told when it's asked
  * again. Empty: nothing breaks an app.
@@ -105,7 +120,13 @@ export function problemsWith(
     // `form": "zero", "target": "…"`, 2026-11-15).
     if (/"\s*:\s*"|\b(?:form|source|target|lines|id)"\s*:/.test(line))
       problems.push(`Line ${i + 1} has JSON in it: give only the translated sentence.`);
-    else if (line.trim() === src.trim() && words(line) >= 3)
+    // Only a line with words of its own: "{previous items}; {following items}" is the same in
+    // every language.
+    else if (
+      line.trim() === src.trim() &&
+      words(line) >= 3 &&
+      /\p{L}/u.test(line.replace(/\{[^{}]+\}/g, ""))
+    )
       problems.push(`Line ${i + 1} is still the source text: translate it.`);
     else if (to && line.trim() && !inScript(line, to))
       problems.push(
@@ -209,6 +230,10 @@ export function grammarProblems(
       lang
     ] ?? [])
       if (new RegExp(pattern!, "u").test(line)) problems.push(`Line ${i + 1} ${what}.`);
+    for (const [pattern, what] of (grammar.register.languages as Record<string, string[][]>)[
+      lang
+    ] ?? [])
+      if (new RegExp(pattern!, "u").test(line)) problems.push(`Line ${i + 1} ${what}.`);
     const particles = (grammar.particles.languages as Record<string, string[][]>)[lang] ?? [];
     for (const pair of particles)
       for (const one of pair) {
@@ -243,7 +268,12 @@ export function wordingProblems(source: SourceLine[], lines: string[], to: strin
     ]);
     // Capitalised in the source: names (Claude Code, Void's AI, Gmail).
     const named = new Set((src.match(LATIN_WORD) ?? []).filter((w) => /^\p{Lu}/u.test(w)));
-    const plain = line.replace(/\{[^{}]+\}/g, " ").replace(/`[^`]*`/g, " ");
+    // A term's English name in brackets after the language's own word is a gloss, not text left
+    // untranslated ("ربط (binding)": the app's catalogs write it so).
+    const plain = line
+      .replace(/\{[^{}]+\}/g, " ")
+      .replace(/`[^`]*`/g, " ")
+      .replace(/\([^()]*\)/g, " ");
     const latinScript =
       !scriptOf(to) || /Cyrl|Grek/.test(new Intl.Locale(to).maximize().script ?? "");
     if (latinScript && !grammar.capitals.notChecked.includes(lang)) {

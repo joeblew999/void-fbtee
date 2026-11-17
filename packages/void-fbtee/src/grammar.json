@@ -46,7 +46,7 @@
     }
   },
   "noEnglishWords": {
-    "why": "Languages in another script, where English words left in Latin letters are untranslated text (only names, commands, file names and placeholders stay). Gemma 4 left \"coding agent\" in Thai and Chinese.",
+    "why": "Languages in another script, where English words left in Latin letters are untranslated text (only names, commands, file names and placeholders stay). Gemma 4 left \"coding agent\" in Thai and Chinese. fbt (the element's name) and lint (the tool) are kept: both Gemma 4 and Gemini 3.5 Flash were flagged for them, rightly keeping them (Claude's review, 2026-11-17). The developer words developers in these languages write in Latin letters (polyfill, markdown, middleware, localhost, the html/head/body elements, git diff, island), and void-fbtee's own commands and functions (init, translate, fbs), are kept too: the app's catalogs write them so, and vp build checking every entry flagged them (2026-11-17).",
     "languages": [
       "th",
       "zh",
@@ -66,7 +66,31 @@
       "ta",
       "te"
     ],
-    "kept": ["fbtee", "lang", "dir", "hreflang"]
+    "kept": [
+      "fbtee",
+      "lang",
+      "dir",
+      "hreflang",
+      "fbt",
+      "lint",
+      "polyfill",
+      "markdown",
+      "middleware",
+      "localhost",
+      "html",
+      "head",
+      "body",
+      "fbs",
+      "id",
+      "repo",
+      "git",
+      "diff",
+      "init",
+      "translate",
+      "island",
+      "frontmatter",
+      "temporal"
+    ]
   },
   "particles": {
     "why": "A particle right after a placeholder: the word it stands for may end in a consonant or a vowel, so both forms are written, as the app does (을(를)). Gemma 4 wrote {pages}를.",
@@ -97,5 +121,27 @@
         ]
       ]
     }
+  },
+  "register": {
+    "why": "Words of a spoken variety where the app writes the standard one: Arabic is written in Modern Standard Arabic (فصحى) for every ar-* locale, never Egyptian or other colloquial. Gemini 3.5 Flash once answered in Egyptian colloquial (بيفشل… لسه مش مترجمة) among standard answers (Claude's review, 2026-11-17).",
+    "languages": {
+      "ar": [
+        [
+          "(?<!\\p{L})(?:مش|لسه|كمان|عشان|دلوقتي|إزاي|ازاي|بتاع|بتاعة|علشان)(?!\\p{L})",
+          "is in colloquial Arabic: write it in Modern Standard Arabic (فصحى), as the rest of the app is"
+        ]
+      ]
+    }
+  },
+  "keptTerms": {
+    "why": "The lower-case names with a hyphen kept exactly as written: packages void-fbtee's apps are built with. Any other hyphenated phrase is an English compound and is translated (right-to-left, written-out, supported-value), which vp build flagged as names when it began checking every entry (2026-11-17).",
+    "names": [
+      "void-fbtee",
+      "temporal-polyfill",
+      "vite-plus",
+      "void-moq",
+      "react-email",
+      "shadcn-ui"
+    ]
   }
 }

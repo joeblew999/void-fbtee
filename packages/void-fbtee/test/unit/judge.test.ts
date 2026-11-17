@@ -126,3 +126,40 @@ test("Russian's one form is also 21, so its line keeps {number}", () => {
     ).join(),
   ).toMatch(/keep the placeholder \{seats\}/);
 });
+
+// Claude's review of Gemini's and Gemma's answers, and vp build checking every entry
+// (plans/translation-rework.md, 2026-11-17).
+test("kept terms: a dotted file name whole, a package name, not an English compound", () => {
+  expect(keptTerms("Browser Run is a binding in void.config.ts.")).toEqual(["void.config.ts"]);
+  expect(keptTerms("Add void-fbtee, then read it right-to-left.")).toEqual(["void-fbtee"]);
+  expect(keptTerms("Each language has its copy under pages/ and the language.")).toEqual([
+    "pages/",
+  ]);
+  const src = "Browser Run is a binding in void.config.ts.";
+  expect(problemsWith(line(src), ["Browser Run ربط في config.ts."], "ar-EG").join(" ")).toMatch(
+    /must keep "void.config.ts"/,
+  );
+});
+
+test("a line needs no script of its own when it's only placeholders, marks or names", () => {
+  expect(inScript("{number}+", "ar-EG")).toBe(true);
+  expect(inScript("{previous items}; {following items}", "th-TH")).toBe(true);
+  expect(inScript("Worker", "th-TH")).toBe(true);
+  expect(inScript("PDFs", "th-TH")).toBe(true);
+  expect(problemsWith(line("{number}+"), ["{number}+"], "ar-EG")).toEqual([]);
+});
+
+test("Arabic is Modern Standard Arabic: colloquial Egyptian is a problem", () => {
+  const src = "vp build fails on any string still untranslated.";
+  expect(
+    problemsWith(line(src), ["بيفشل vp build مع أي نص لسه مش مترجم."], "ar-EG").join(" "),
+  ).toMatch(/colloquial Arabic/);
+  expect(problemsWith(line(src), ["يفشل vp build إذا بقي أي نص غير مترجم."], "ar-EG")).toEqual([]);
+});
+
+test("an English term in brackets after the word is a gloss, not text left in English", () => {
+  const src = "Browser Run is a binding in void.config.ts.";
+  expect(
+    problemsWith(line(src), ["Browser Run ربط (binding) في void.config.ts."], "ar-EG"),
+  ).toEqual([]);
+});

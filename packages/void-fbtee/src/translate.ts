@@ -20,7 +20,7 @@ import {
 import { sourceOf } from "./locales";
 import { glossaryMisses, keptTerms, problemsWith } from "./judge";
 import { check } from "./check";
-import { LLAMA, modelFor, type TranslationModel } from "./models";
+import { BATCH, costOf, GEMINI, type Usage } from "./models";
 
 /** void-fbtee's own folder (dist/ is one level down), where skills/ ships. */
 export const packageDir = () => dirname(dirname(fileURLToPath(import.meta.url)));
@@ -246,7 +246,9 @@ export async function translateApp(
         existsSync(page.file) ? readFileSync(page.file, "utf8") : undefined,
       ]),
     );
+    const wasNew = newEntries(p);
     const code = await runClaude(root, task.prompt);
+    markTranslatedBy(p, wasNew, "claude");
     if (code !== 0) log(`\nclaude exited with ${code}`);
     // Pages the agent wrote, and unrecorded ones it checked. An untouched stale page stays stale.
     const unrecorded = new Set(
@@ -262,16 +264,62 @@ export async function translateApp(
   return { problems: check(p) };
 }
 
+/** Each language's entries still marked new, by hash. */
+function newEntries(p: Project): Map<string, Set<string>> {
+  const out = new Map<string, Set<string>>();
+  for (const m of missing(p)) {
+    const file = catalogFile(p, m.locale);
+    if (!existsSync(file)) continue;
+    const catalog = JSON.parse(readFileSync(file, "utf8")) as {
+      translations: Record<string, CatalogEntry>;
+    };
+    out.set(
+      m.locale,
+      new Set(
+        Object.entries(catalog.translations)
+          .filter(([, e]) => e.status === "new")
+          .map(([h]) => h),
+      ),
+    );
+  }
+  return out;
+}
+
+/**
+ * Record who wrote the entries that were new and are now translated (step 4 of
+ * plans/translation-rework.md): an agent edits the files itself, so it's done after it finishes.
+ */
+function markTranslatedBy(p: Project, wasNew: Map<string, Set<string>>, by: string): void {
+  for (const [locale, hashes] of wasNew) {
+    const file = catalogFile(p, locale);
+    if (!existsSync(file) || !hashes.size) continue;
+    const text = readFileSync(file, "utf8");
+    const catalog = JSON.parse(text) as { translations: Record<string, CatalogEntry> };
+    for (const h of hashes) {
+      const e = catalog.translations[h];
+      if (!e || e.status === "new" || e.translatedBy) continue;
+      e.translatedBy = by;
+      e.translatedAt = today();
+    }
+    const out = JSON.stringify(catalog, null, 2) + "\n";
+    if (out !== text) writeFileSync(file, out);
+  }
+}
+
 interface CatalogLine {
   translation: string;
   variations: Record<string, number>;
 }
 interface CatalogEntry {
   description?: string;
-  /** Not in fbtee's file: the source text, added here for examplesFor. */
+  /** Not in fbtee's file: the source text, added here for glossaryFor. */
   source?: string;
   status?: string;
   translations?: CatalogLine[];
+  /** Who wrote the translation: a model's id, or "claude" (plans/translation-rework.md, step 4). */
+  translatedBy?: string;
+  /** The day it was written, YYYY-MM-DD. */
+  translatedAt?: string;
 }
 
 /**
@@ -316,54 +364,7 @@ export function sourceContext(p: Project, hash: string): string | undefined {
   }
 }
 
-// One entry per request (translateCatalog): sent three at a time, Llama 3.3 mixed their lines
-// up and most failed the checks; each alone, the same entries passed (2026-11-15).
-/** How many of the catalog's own translations go with each request, as examples. */
-const EXAMPLES = 12;
-
 const wordsOf = (t: string) => new Set(t.toLowerCase().match(/[a-z0-9']+/g) ?? []);
-/** The names in a text: capitalised words and runs of them ("Void's AI", "Claude Code"). */
-const namesOf = (t: string) =>
-  new Set(t.match(/\b[A-Z][\w']*(?: [A-Z][\w']*)*/g)?.filter((n) => n.length > 1) ?? []);
-
-/**
- * The catalog's own finished translations closest to these entries (most words in common with
- * their source and description), as examples of the app's words and style for Void's AI.
- */
-export function examplesFor(
-  done: CatalogEntry[],
-  entries: { description: string; lines: { text: string }[] }[],
-  n = EXAMPLES,
-): { description: string; source: string; translation: string }[] {
-  const want = wordsOf(
-    entries.map((e) => e.description + " " + e.lines.map((l) => l.text).join(" ")).join(" "),
-  );
-  // A name the entry uses counts five times a word: the examples then show how the app already
-  // writes it, so it's written the same way everywhere.
-  const names = namesOf(entries.map((e) => e.lines.map((l) => l.text).join(" ")).join(" "));
-  const pool = done.filter(
-    (e) => e.status === "translated" && e.translations?.length === 1 && e.source,
-  );
-  // A word counts by how rare it is in the catalog (its inverse document frequency): "string"
-  // picks the entries that show how the app says "string"; "the" and "to" pick nothing.
-  const seen = new Map<string, number>();
-  for (const e of pool) for (const w of wordsOf(e.source!)) seen.set(w, (seen.get(w) ?? 0) + 1);
-  const weight = (w: string) => Math.log((pool.length + 1) / ((seen.get(w) ?? 0) + 1));
-  return pool
-    .map((e) => {
-      const has = wordsOf(e.source!);
-      const shared = [...namesOf(e.source!)].filter((x) => names.has(x)).length;
-      const words = [...has].filter((w) => want.has(w)).reduce((a, w) => a + weight(w), 0);
-      return { e, score: words + 5 * shared };
-    })
-    .sort((a, b) => b.score - a.score)
-    .slice(0, n)
-    .map(({ e }) => ({
-      description: e.description ?? "",
-      source: e.source!,
-      translation: e.translations![0]!.translation,
-    }));
-}
 
 /**
  * The app's own words for the terms an entry uses: its one-word entries ("Strings", "Language")
@@ -394,14 +395,39 @@ export function glossaryFor(
     .map((e) => ({ source: e.source!, translation: e.translations![0]!.translation }));
 }
 
-/** One request to the dev server's translate route (ai.ts devTranslate); undefined: no Void's AI. */
+/**
+ * One request to the dev server's translate route (ai.ts devTranslate): its answer, with the
+ * tokens it used (`usage`). Undefined: no Void's AI. Empty lines: an answer that couldn't be used.
+ */
 export type TranslateCall = (body: unknown) => Promise<Record<string, unknown> | undefined>;
 
+/** What the requests of a run cost, in US$, from the tokens each answer reports. */
+export const spentOn = (answers: (Record<string, unknown> | undefined)[]) =>
+  answers.reduce((a, r) => a + ((r?.usage as Usage[]) ?? []).reduce((b, u) => b + costOf(u), 0), 0);
+
 /**
- * One string through Void's AI, as `vp dev` translates it: sent, checked (problemsWith), and asked
- * again with what was wrong, up to twice (judge.ts: problemsWith, glossaryMisses). Every problem must
- * be gone; a glossary word not used is asked about too, and accepted on the last answer.
- * Undefined when Void's AI isn't there.
+ * Each line with its source line's own leading and trailing spaces, whatever the model added (a
+ * Thai answer once began " {name} จอง…", 2026-11-15).
+ */
+const spaced = (source: { translation: string }[], lines: string[]) =>
+  lines.map((l, i) => {
+    const src = source[i]?.translation ?? "";
+    return src.match(/^\s*/)![0] + l.trim() + src.match(/\s*$/)![0];
+  });
+
+/** Run `work` on every item, `n` at a time, in order. */
+async function inTurn<T, R>(items: T[], n: number, work: (item: T) => Promise<R>): Promise<R[]> {
+  const out: R[] = [];
+  for (let i = 0; i < items.length; i += n)
+    out.push(...(await Promise.all(items.slice(i, i + n).map(work))));
+  return out;
+}
+
+/**
+ * One string through Void's AI on its own, for one the batches didn't get right: sent, checked
+ * (problemsWith), and asked again with what was wrong, up to twice (judge.ts: problemsWith,
+ * glossaryMisses). Every problem must be gone; a glossary word not used is asked about too, and
+ * accepted on the last answer. Undefined when Void's AI isn't there.
  */
 export async function translateEntry(
   call: TranslateCall,
@@ -414,10 +440,11 @@ export async function translateEntry(
       keep?: string[];
       context?: string;
     };
-    examples?: unknown[];
     glossary?: { source: string; translation: string }[];
     /** fbtee's own rules (fbteeRules). */
     fbtee?: string;
+    /** Told each answer, to count what it cost. */
+    onAnswer?: (answer: Record<string, unknown>) => void;
   },
 ): Promise<{ lines: string[]; problems: string[]; attempts: number } | undefined> {
   const source = o.entry.lines.map((l) => ({ translation: l.text, variations: l.variations }));
@@ -431,19 +458,14 @@ export async function translateEntry(
       from: o.from,
       to: o.to,
       entries: [o.entry],
-      examples: o.examples ?? [],
       glossary,
       fbtee: o.fbtee,
       feedback: feedback.length ? { answer: out, problems: feedback } : undefined,
     });
     attempts++;
     if (!answer) return;
-    // Each line with its source line's own leading and trailing spaces, whatever the model added
-    // (SEA-LION's Thai once began " {name} จอง…", 2026-11-15).
-    out = (((answer.lines ?? []) as string[][])[0] ?? []).map((l, i) => {
-      const src = source[i]?.translation ?? "";
-      return src.match(/^\s*/)![0] + l.trim() + src.match(/\s*$/)![0];
-    });
+    o.onAnswer?.(answer);
+    out = spaced(source, ((answer.lines ?? []) as string[][])[0] ?? []);
     const hard = problemsWith(source, out, o.to, o.from);
     const soft = glossaryMisses(glossary, out);
     feedback = [...hard, ...soft];
@@ -453,32 +475,11 @@ export async function translateEntry(
 }
 
 /**
- * Workers AI's limits are per model, a minute: 300 for text generation, 20 for a model that
- * requires the Workers Paid plan (models.ts perMinute; Workers AI "Limits", checked 2026-11-15).
- * Every request to the dev server's translate route takes the next free slot of its model, in
- * the order asked, kept a little under the limit (90%), rather than being refused.
- */
-const slots = new Map<string, number[]>();
-async function underLimit(model: TranslationModel): Promise<void> {
-  const limit = Math.max(1, Math.floor(model.perMinute * 0.9));
-  const taken = slots.get(model.id) ?? [];
-  slots.set(model.id, taken);
-  const now = Date.now();
-  while (taken.length && now - taken[0]! >= 60_000) taken.shift();
-  const at = Math.max(now, taken.length >= limit ? taken[taken.length - limit]! + 60_000 : now);
-  taken.push(at);
-  if (at > now) await new Promise((r) => setTimeout(r, at - now));
-}
-
-/**
- * Requests to the dev server's translate route (ai.ts devTranslate), each under Workers AI's
- * per-minute limit. Undefined: Void's AI isn't there (503); an empty answer: one unusable (502).
+ * Requests to the dev server's translate route (ai.ts devTranslate). Undefined: Void's AI isn't
+ * there (503); empty lines: an answer that couldn't be used (502), with what it still cost.
  */
 export function routeCall(url: string, token: string, log: (line: string) => void): TranslateCall {
   return async (body) => {
-    // The model that answers it: the language's (as ai.ts devTranslate picks).
-    const { to } = body as { to?: unknown };
-    await underLimit(typeof to === "string" ? modelFor(to) : LLAMA);
     const res = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json", "x-void-fbtee-token": token },
@@ -490,22 +491,28 @@ export function routeCall(url: string, token: string, log: (line: string) => voi
       return undefined;
     }
     if (res.status === 502) {
-      const { error } = (await res.json().catch(() => ({}))) as { error?: string };
-      log(`Void's AI gave an unusable answer (${error ?? "no answer"}); left for Claude Code`);
-      return {};
+      const { error, usage } = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        usage?: Usage[];
+      };
+      log(`Void's AI gave an unusable answer (${error ?? "no answer"}); asked again`);
+      return { usage };
     }
     if (!res.ok) throw new Error(`the dev server's translate route answered ${res.status}`);
     return (await res.json()) as Record<string, unknown>;
   };
 }
 
+/** Today, as a catalog records it: YYYY-MM-DD. */
+const today = () => new Date().toISOString().slice(0, 10);
+
 /**
- * Every new entry of one language's catalog through Void's AI, all at once: each is its own
- * request (translateEntry), so they run side by side, under Workers AI's limit (routeCall). An
- * answer that passes the checks is written into the catalog object (its lines, "translated"); the
- * file is the caller's. The examples and glossary are the catalog's finished entries as it was
- * when the run began: entries asked at the same time can't be each other's examples. Undefined
- * when Void's AI isn't there.
+ * Every new entry of one language's catalog through Void's AI, wuchale's way (models.ts BATCH):
+ * up to 50 entries a request, 4 requests at once; the entries that fail the checks go again in a
+ * second round of batches; any still failing then go one at a time with what was wrong
+ * (translateEntry). An answer that passes the checks is written into the catalog object (its
+ * lines, "translated", who and when); the file is the caller's. The glossary is the catalog's
+ * finished entries as it was when the run began. Undefined when Void's AI isn't there.
  */
 export async function translateCatalog(
   p: Project,
@@ -513,49 +520,86 @@ export async function translateCatalog(
   locale: string,
   catalog: { translations: Record<string, CatalogEntry> },
   log: (line: string) => void,
-): Promise<{ done: number; open: number } | undefined> {
+): Promise<{ done: number; open: number; usd: number } | undefined> {
   const { texts, builtinHashes } = collect(p);
   const fbtee = fbteeRules(p.root);
-  // The app's own translations, each with its source text, as examples (not written back).
-  // Not fbtee's built-in strings: list joiners ("{list of items} and {last item}"), no use as
-  // an example, and English where an app hasn't translated them yet.
+  const from = p.config.sourceLocale;
+  const common = Object.keys(p.common ?? {});
+  // The app's own translations, each with its source text, for the glossary (not written back).
+  // Not fbtee's built-in strings: list joiners, and English where an app hasn't translated them.
   const finished = Object.entries(catalog.translations)
     .filter(([hash]) => !builtinHashes.has(hash))
     .map(([hash, e]) => ({ ...e, source: texts[hash] }));
-  const open = Object.entries(catalog.translations).filter(
+  const answers: (Record<string, unknown> | undefined)[] = [];
+  const toSend = (hash: string, entry: CatalogEntry) => ({
+    description: entry.description ?? "",
+    lines: entry.translations!.map((l) => ({ text: l.translation, variations: l.variations })),
+    keep: [...new Set(entry.translations!.flatMap((l) => keptTerms(l.translation)))],
+    context: sourceContext(p, hash),
+  });
+  const keep = (entry: CatalogEntry, lines: string[]) => {
+    entry.translations = entry.translations!.map((l, k) => ({ ...l, translation: lines[k]! }));
+    entry.status = "translated";
+    entry.translatedBy = GEMINI.id;
+    entry.translatedAt = today();
+  };
+  let open = Object.entries(catalog.translations).filter(
     ([, e]) => e.status === "new" && e.translations?.length,
   );
-  const results = await Promise.all(
-    open.map(async ([hash, entry]) => {
-      const toSend = {
-        description: entry.description ?? "",
-        lines: entry.translations!.map((l) => ({ text: l.translation, variations: l.variations })),
-        keep: [...new Set(entry.translations!.flatMap((l) => keptTerms(l.translation)))],
-        context: sourceContext(p, hash),
-      };
-      const answer = await translateEntry(call, {
-        from: p.config.sourceLocale,
+  const total = open.length;
+  let gone = false;
+  for (let round = 1; round <= 2 && open.length && !gone; round++) {
+    const batches: (typeof open)[] = [];
+    for (let i = 0; i < open.length; i += BATCH.size) batches.push(open.slice(i, i + BATCH.size));
+    const failed: typeof open = [];
+    await inTurn(batches, BATCH.parallel, async (batch) => {
+      const sends = batch.map(([hash, entry]) => toSend(hash, entry));
+      const answer = await call({
+        kind: "strings",
+        from,
         to: locale,
-        entry: toSend,
-        examples: examplesFor(finished, [toSend]),
-        glossary: glossaryFor(finished, [toSend], Object.keys(p.common ?? {})),
+        entries: sends,
+        glossary: glossaryFor(finished, sends, common),
         fbtee,
       });
-      if (!answer) return;
-      const out = answer.lines;
-      const problems = problemsWith(entry.translations!, out, locale, p.config.sourceLocale);
-      // Not kept: say what was wrong with its last answer, so the reason is in the log.
-      if (problems.length) {
-        log(`${texts[hash]} → ${JSON.stringify(out)}: ${problems.join(" ")}`);
-        return false;
+      answers.push(answer);
+      if (!answer) {
+        gone = true;
+        return;
       }
-      entry.translations = entry.translations!.map((l, k) => ({ ...l, translation: out[k]! }));
-      entry.status = "translated";
-      return true;
-    }),
-  );
+      const lines = (answer.lines ?? []) as string[][];
+      batch.forEach(([hash, entry], i) => {
+        const out = spaced(entry.translations!, lines[i] ?? []);
+        if (problemsWith(entry.translations!, out, locale, from).length) failed.push([hash, entry]);
+        else keep(entry, out);
+      });
+    });
+    open = failed;
+  }
+  if (gone) return;
+  // Still failing after two rounds: each on its own, told what was wrong.
+  const results = await inTurn(open, BATCH.parallel, async ([hash, entry]) => {
+    const send = toSend(hash, entry);
+    const answer = await translateEntry(call, {
+      from,
+      to: locale,
+      entry: send,
+      glossary: glossaryFor(finished, [send], common),
+      fbtee,
+      onAnswer: (a) => answers.push(a),
+    });
+    if (!answer) return;
+    // Not kept: say what was wrong with its last answer, so the reason is in the log.
+    if (answer.problems.length) {
+      log(`${texts[hash]} → ${JSON.stringify(answer.lines)}: ${answer.problems.join(" ")}`);
+      return false;
+    }
+    keep(entry, answer.lines);
+    return true;
+  });
   if (results.includes(undefined)) return;
-  return { done: results.filter(Boolean).length, open: open.length };
+  const usd = spentOn(answers);
+  return { done: total - results.filter((r) => r === false).length, open: total, usd };
 }
 
 /**
@@ -593,7 +637,10 @@ export async function translateWithVoidAi(
       if (entry.status === "translated" && there?.status === "new") now.translations[hash] = entry;
     }
     writeFileSync(file, JSON.stringify(now, null, 2) + "\n");
-    if (ran?.open) log(`${rel(file)}: ${ran.done} of ${ran.open} translated with Void's AI`);
+    if (ran?.open)
+      log(
+        `${rel(file)}: ${ran.done} of ${ran.open} translated with ${GEMINI.id}, US$${ran.usd.toFixed(4)}`,
+      );
     return !!ran;
   });
 
@@ -609,6 +656,7 @@ export async function translateWithVoidAi(
         text: original,
       });
       if (!answer) return false;
+      log(`${rel(page.file)}: asked ${GEMINI.id}, US$${spentOn([answer]).toFixed(4)}`);
       const copy = typeof answer.page === "string" ? answer.page : "";
       if (!copy.trim()) return true;
       const same = (a: string[], b: string[]) => a.join("\n") === b.join("\n");

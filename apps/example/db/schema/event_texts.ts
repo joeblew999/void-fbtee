@@ -1,6 +1,5 @@
 // An event's title and description in another language: the sample events' stored translations
-// (db/migrations), and a new event's, from Workers AI on Cloudflare or Claude locally
-// (src/events/translations.ts).
+// (db/migrations), and a new event's, from Void's AI (src/events/translations.ts).
 // Made by `void gen model event_texts …`; then: a UUID id, the link to its event, and one row per
 // event and language. The event row keeps the original, in the language it was written in.
 import { sql } from "void/db";
@@ -19,6 +18,11 @@ export const event_texts = sqliteTable(
     locale: text("locale").notNull(),
     title: text("title").notNull(),
     description: text("description").notNull(),
+    // Who translated it (the model's id, models.ts) and when, YYYY-MM-DD: so a translation can be
+    // traced to what made it (plans/translation-rework.md, step 4). Empty for the sample events'
+    // own translations, which came with the migration that added them.
+    translatedBy: text("translated_by"),
+    translatedAt: text("translated_at"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`(datetime('now'))`),

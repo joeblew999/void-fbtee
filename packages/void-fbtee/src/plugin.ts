@@ -14,10 +14,10 @@
 //   source (plus fbtee's built-in strings), as `virtual:void-fbtee/catalogs`. Nothing generated
 //   goes in git. catalogs.ts.
 // - `vp dev` does the translation work: on start and on each save it prepares the catalogs (a new
-//   string is in each, marked new), then at once translates what's new: with Claude Code when it's
-//   there, otherwise with Void's AI when the app has it (its own Worker, through a route only
-//   `vp dev` has: ai.ts) and Claude Code's prompt for anything left (translate.ts); it records each page the agent marks done, and it reports
-//   everything `check` finds.
+//   string is in each, marked new), then at once translates what's new: with Void's AI when the
+//   app has it (its own Worker, through a route only `vp dev` has: ai.ts), then Claude Code for
+//   anything left (`claude -p` when it's signed in, else its prompt: translate.ts); it records
+//   each page the agent marks done, and it reports everything `check` finds.
 // - `vp build` fails on anything `check` finds, so `void deploy` (which builds) can't ship gaps.
 // - Browser: every app module that uses <fbt> or fbs first imports `void-fbtee/client`, which
 //   installs the page's catalog (top-level await). Islands hydrate without the layout's
@@ -221,30 +221,22 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         return;
       }
       if (!wanted || !agentAllowed()) return report(check(project()));
-      // Local Claude when it's there (a `claude` on the machine, signed in): it translates everything new, and Void's AI isn't asked. Otherwise Void's
-      // AI, through the dev server's own route, when the app has it; then Claude Code's prompt
-      // for anything left (what didn't pass the checks).
-      const localClaude = hasClaude();
+      // Void's AI first, the one translator (models.ts: Gemini 3.5 Flash, as at runtime), through
+      // the dev server's own route, when the app has it. Then Claude Code for anything left (what
+      // didn't pass the checks, or everything when Void's AI isn't there): `claude -p` when it's
+      // signed in here, otherwise its prompt, for whatever coding agent the developer uses.
       const base = devServer?.resolvedUrls?.local[0];
-      const url = !localClaude && base && new URL(DEV_TRANSLATE_PATH, base).href;
+      const url = base && new URL(DEV_TRANSLATE_PATH, base).href;
       // Who translates, said before they start.
       const open = openNow();
       if (count(open))
         log(
           `translating ${count(open)} new strings (${byLanguage(open)}) with ${
-            localClaude
-              ? "Claude Code (claude -p on this machine)"
-              : url
-                ? "Void's AI"
-                : "nobody here: no Claude Code, no Void's AI; the prompt below is for your coding agent"
+            url
+              ? "Void's AI, then Claude Code for anything left"
+              : "nobody here: no Void's AI; Claude Code, or the prompt below for your coding agent"
           }`,
         );
-      if (localClaude)
-        for (const [locale, texts] of open)
-          for (const t of texts) {
-            if (!withClaude.has(locale)) withClaude.set(locale, new Set());
-            withClaude.get(locale)!.add(t);
-          }
       translating = (
         url ? translateWithVoidAi(project(), url, devToken, log) : Promise.resolve(false)
       )
@@ -252,7 +244,16 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           log(`Void's AI couldn't translate: ${String(error)}`);
           return false;
         })
-        .then(() => translateApp(project(), root, log, handedOut))
+        .then(() => {
+          // What Claude Code is given: whatever Void's AI left.
+          if (hasClaude())
+            for (const [locale, texts] of openNow())
+              for (const t of texts) {
+                if (!withClaude.has(locale)) withClaude.set(locale, new Set());
+                withClaude.get(locale)!.add(t);
+              }
+          return translateApp(project(), root, log, handedOut);
+        })
         .then((result) => {
           handedOut = result.prompt;
           report(result.problems);

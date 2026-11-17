@@ -16,9 +16,22 @@ export function copyFixture(): string {
 }
 
 /**
+ * A made-up translation the build accepts: the source with a word in the catalog's language, and in
+ * a language with its own script, no English words left in (only the placeholders).
+ */
+function madeUp(file: string, text: string): string {
+  const word = ({ ar: "(مترجم)", th: "(แปลแล้ว)" } as Record<string, string>)[file.slice(0, 2)];
+  if (!word) return `${text} (übersetzt)`;
+  const kept = text
+    .split(/(\{[^{}]+\})/)
+    .map((part, i) => (i % 2 ? part : part.replace(/[A-Za-z']+/g, "")));
+  return `${kept.join("").trim()} ${word}`;
+}
+
+/**
  * Make a copy pass check(), so `vite build` runs (void-fbtee fails a build on anything check
- * finds): the setup init writes, every catalog entry marked translated (its text left as is: these
- * tests are about the build, not the words), and every markdown page copied and recorded. For
+ * finds): the setup init writes, every catalog entry marked translated (with a made-up translation:
+ * these tests are about the build, not the words), and every markdown page copied and recorded. For
  * the app the test's own voidFbtee(options) builds.
  */
 export function makeBuildable(root: string, options: VoidFbteeOptions): void {
@@ -39,8 +52,17 @@ export function makeBuildable(root: string, options: VoidFbteeOptions): void {
   for (const file of readdirSync(join(root, p.translations))) {
     const path = join(root, p.translations, file);
     const catalog = JSON.parse(readFileSync(path, "utf8"));
-    for (const entry of Object.values(catalog.translations) as { status: string }[])
+    // Each line made a translation the build accepts (madeUp): not the source text left as it is (vp build
+    // checks every entry as vp dev checks an answer, plans/translation-rework.md step 5).
+    for (const entry of Object.values(catalog.translations) as {
+      status: string;
+      translations: { translation: string }[];
+    }[]) {
+      // A translation the test wrote itself stays as it is.
+      if (entry.status === "translated") continue;
       entry.status = "translated";
+      for (const l of entry.translations) l.translation = madeUp(file, l.translation);
+    }
     writeFileSync(path, JSON.stringify(catalog, null, 2));
   }
   for (const page of markdownPages(p)) {

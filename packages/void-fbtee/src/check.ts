@@ -3,8 +3,15 @@
 import { createHash } from "node:crypto";
 import { existsSync, globSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
-import { catalogFile, catalogLocales, collect, missing, type Project } from "./catalogs";
-import { grammarProblems } from "./judge";
+import {
+  catalogFile,
+  catalogLocales,
+  collect,
+  freshCatalog,
+  missing,
+  type Project,
+} from "./catalogs";
+import { problemsWith } from "./judge";
 import { firstFile, hasI18nMiddleware, HOME_PAGES, LAYOUTS, VOID_CONFIGS } from "./app-files";
 import { sourceOf, translatedOf } from "./locales";
 
@@ -245,27 +252,31 @@ export function check(p: Project): string[] {
       problems.push(`strings: ${r.locale}: ${r.builtin} of fbtee's built-in strings untranslated`);
   }
 
-  // The grammar of what's translated: what each language asks of its lines (judge.ts
-  // grammarProblems, grammar.json), the same as vp dev checks each answer.
+  // Every finished translation, by the same checker vp dev asks of each answer (judge.ts
+  // problemsWith), against its source lines as a new catalog would have them (catalogs.ts
+  // freshCatalog): one line for each plural form and gender the language needs, nothing in the
+  // source language left in, the language's script, every placeholder and kept term, its grammar.
+  // Whoever wrote it: an AI, an agent or a person (plans/translation-rework.md, step 5).
   const { texts } = collect(p);
   for (const locale of translatedOf(p.config).map((l) => l.locale)) {
     const file = catalogFile(p, locale);
     if (!existsSync(file)) continue;
+    type Line = { translation: string; variations: Record<string, number> };
     const catalog = JSON.parse(readFileSync(file, "utf8")) as {
-      translations: Record<
-        string,
-        {
-          status?: string;
-          translations?: { translation: string; variations: Record<string, number> }[];
-        }
-      >;
+      translations: Record<string, { status?: string; translations?: Line[] }>;
     };
+    const source = (
+      JSON.parse(freshCatalog(p, locale)) as {
+        translations: Record<string, { translations: Line[] }>;
+      }
+    ).translations;
     for (const [hash, entry] of Object.entries(catalog.translations)) {
-      if (entry.status === "new" || !entry.translations?.length) continue;
-      for (const what of grammarProblems(
-        entry.translations,
+      if (entry.status === "new" || !entry.translations?.length || !source[hash]) continue;
+      for (const what of problemsWith(
+        source[hash].translations,
         entry.translations.map((l) => l.translation),
         locale,
+        p.config.sourceLocale,
       ))
         problems.push(`strings: ${locale}: ${JSON.stringify(texts[hash] ?? hash)}: ${what}`);
     }

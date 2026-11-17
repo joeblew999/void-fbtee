@@ -1,10 +1,9 @@
-// Translating with Void's AI (`ai` from `void/ai`: Workers AI), in the app's Worker. One
-// translator for everything: what people post, at runtime (an app's queue calls translate()), and
-// the app's own strings and pages while `vp dev` runs (the dev server's route calls
-// translateStrings() and translatePage(): plugin.ts, devTranslate below). Each is told how to
-// translate by the translating skill (skills/void-fbtee-translate/SKILL.md, bundled into the code:
-// TRANSLATING), the text a coding agent reads too: instructions() below, the one place a request
-// is worded.
+// Translating with Void's AI (`ai` from `void/ai`), in the app's Worker. One translator for
+// everything: what people post, at runtime (an app's queue calls translate()), and the app's own
+// strings and pages while `vp dev` runs (the dev server's route calls translateStrings() and
+// translatePage(): plugin.ts, devTranslate below). Each is told how to translate by the translating
+// skill (skills/void-fbtee-translate/SKILL.md, bundled into the code: TRANSLATING), the text a
+// coding agent reads too: instructions() below, the one place a request is worded.
 //
 // Void's AI is there wherever Void runs the app's code: dev, the preview and Cloudflare, in a
 // route, a queue or a job (found 2026-11-13, plans/quiet-harbor-atlas.md, 7b). Void only connects
@@ -12,21 +11,13 @@
 // files, not its packages), so importing this module from void-fbtee changes nothing for an app
 // without AI: ai.run then throws "Not available", and the dev server translates another way.
 //
-// Which model translates into which language, and why: models.ts.
+// The model, and why: models.ts.
 import { ai } from "void/ai";
 import skill from "../skills/void-fbtee-translate/SKILL.md?raw";
-import {
-  GEMINI,
-  LLAMA,
-  modelById,
-  modelFor,
-  thirdParty,
-  type TranslationModel,
-  type Usage,
-} from "./models";
+import { GEMINI, type Usage } from "./models";
+import { MARKS } from "./plurals";
 
 export { GEMINI, type Usage };
-import { MARKS } from "./plurals";
 
 /**
  * How to translate: the translating skill (skills/void-fbtee-translate/SKILL.md), the same text a
@@ -39,92 +30,6 @@ export const TRANSLATING = skill.replace(/^---\n[\s\S]*?\n---\n+/, "").trim();
 const named = (locale: string) =>
   new Intl.DisplayNames("en", { type: "language" }).of(locale) ?? locale;
 
-/**
- * Ask a model for JSON of a given shape. With JSON Mode, Workers AI holds the answer to the schema;
- * a model without it (models.ts) is given the schema in the prompt, and the JSON is read from its
- * answer's text. Workers AI answers in its own shape ({ response }) or OpenAI's ({ choices }).
- */
-async function ask<T>(
-  system: string,
-  user: string,
-  schema: object,
-  model: TranslationModel = LLAMA,
-  onUsage?: (usage: Usage) => void,
-): Promise<T> {
-  // Gemini in its own request shape, as wuchale sends it (src/ai/gemini.ts): the instructions as
-  // systemInstruction, thinking off (thinkingBudget 0), JSON asked for by mime type. Cloudflare's
-  // catalog shows Gemini taking this shape through the binding (its model page's examples, checked
-  // 2026-11-17). In the Chat Completions shape its thinking stayed on and spent all 8192 tokens
-  // with no answer (finish_reason "length", twice, 2026-11-17).
-  if (model.id.startsWith("google/gemini"))
-    return askGemini<T>(
-      // The shape to answer in, as the other models without JSON Mode are told: asked only for
-      // "JSON", Gemini made up its own (no lines found in its answers, 2026-11-17).
-      `${system}\n\nReply with one JSON object and nothing else, matching this JSON Schema: ${JSON.stringify(schema)}`,
-      user,
-      model,
-      onUsage,
-    );
-  const input = {
-    messages: [
-      {
-        role: "system",
-        content: model.jsonMode
-          ? system
-          : `${system}\n\nReply with one JSON object and nothing else, no code fence, matching this JSON Schema: ${JSON.stringify(schema)}`,
-      },
-      { role: "user", content: user },
-    ],
-    ...(model.jsonMode ? { response_format: { type: "json_schema", json_schema: schema } } : {}),
-    // Workers AI's default is 256 tokens, which cuts a page or a batch of strings off mid-JSON.
-    max_tokens: 8192,
-    // A translation, not a story: the model's most likely answer, and the same one for the same
-    // request. Workers AI's default is 0.6 for some models and 0.15 for others (each model's
-    // page, "temperature", 0 to 5, checked 2026-11-15); `seed` is its own reproducibility knob.
-    temperature: 0,
-    // A third-party model gets only what Chat Completions has: AI Gateway rejects fields a model
-    // doesn't take (developers.cloudflare.com/ai-gateway/usage/worker-binding-methods/).
-    ...(thirdParty(model) ? {} : { seed: 1 }),
-    // Its thinking off or at its lowest (models.json): a translation needs none.
-    ...model.options,
-  };
-  const result = await ai.run(
-    model.id as never,
-    input as never,
-    // Through the account's AI Gateway ("default", Cloudflare's own, made on a first request), so
-    // every request is in the gateway's logs; its cache off: a string is asked for once, and its
-    // accepted answer is kept in the catalog. The binding's third argument, which Void passes on
-    // (AI Gateway docs, "Workers Bindings"; Void's runtime/ai.mjs makeDirectBackend).
-    {
-      gateway: { id: "default", skipCache: true },
-      // One replica per model, so the system prompt, the same for every string, is prefix-cached
-      // across requests (Workers AI's "Prompt caching" page: x-session-affinity, through the
-      // binding's extraHeaders, checked 2026-11-15). Workers AI's own models only.
-      ...(thirdParty(model)
-        ? {}
-        : { extraHeaders: { "x-session-affinity": `void-fbtee-${model.id}` } }),
-    } as never,
-  );
-  const r = result as {
-    response?: unknown;
-    choices?: { message?: { content?: unknown }; finish_reason?: string }[];
-    usage?: Usage;
-  };
-  if (onUsage && r.usage) onUsage(r.usage);
-  const answer = r.response ?? r.choices?.[0]?.message?.content;
-  // No answer: a thinking model that spent max_tokens thinking (GLM 4.7 Flash's 8192 tokens, all
-  // reasoning, content null, in the gateway's logs, 2026-11-15) or one cut off mid-answer.
-  if (answer === null || answer === undefined || r.choices?.[0]?.finish_reason === "length")
-    throw new Error(
-      `${model.id} gave no complete answer (${r.choices?.[0]?.finish_reason ?? "no content"})`,
-    );
-  if (typeof answer !== "string") return answer as T;
-  // Without JSON Mode, the object may come with words or a fence around it.
-  const start = answer.indexOf("{");
-  const end = answer.lastIndexOf("}");
-  return JSON.parse(start >= 0 && end > start ? answer.slice(start, end + 1) : answer) as T;
-}
-
 /** Gemini's own answer shape (generateContent). */
 interface GeminiAnswer {
   candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[];
@@ -135,24 +40,43 @@ interface GeminiAnswer {
   };
 }
 
-async function askGemini<T>(
+/**
+ * Ask Gemini for JSON of a given shape, in its own request shape, as wuchale sends it
+ * (src/ai/gemini.ts): the instructions as systemInstruction, thinking off (thinkingBudget 0), JSON
+ * asked for by mime type, and the schema in the instructions (asked only for "JSON", Gemini made up
+ * its own shape, 2026-11-17). Cloudflare's catalog shows Gemini taking this shape through the
+ * binding (its model page's examples, checked 2026-11-17). In the Chat Completions shape its
+ * thinking stayed on and spent all 8192 tokens with no answer (2026-11-17).
+ */
+async function ask<T>(
   system: string,
   user: string,
-  model: TranslationModel,
+  schema: object,
   onUsage?: (usage: Usage) => void,
 ): Promise<T> {
   const result = (await ai.run(
-    model.id as never,
+    GEMINI.id as never,
     {
-      systemInstruction: { parts: [{ text: system }] },
+      systemInstruction: {
+        parts: [
+          {
+            text: `${system}\n\nReply with one JSON object and nothing else, matching this JSON Schema: ${JSON.stringify(schema)}`,
+          },
+        ],
+      },
       contents: [{ role: "user", parts: [{ text: user }] }],
       generationConfig: {
+        // A translation, not a story: the model's most likely answer.
         temperature: 0,
         maxOutputTokens: 8192,
         responseMimeType: "application/json",
         thinkingConfig: { thinkingBudget: 0 },
       },
     } as never,
+    // Through the account's AI Gateway ("default", Cloudflare's own, made on a first request),
+    // which a third-party model needs, and which logs every request; its cache off: a string is
+    // asked for once, and its accepted answer is kept in the catalog (AI Gateway docs, "Workers
+    // Bindings"; Void's runtime/ai.mjs makeDirectBackend passes this argument on).
     { gateway: { id: "default", skipCache: true } } as never,
   )) as GeminiAnswer;
   const m = result.usageMetadata;
@@ -166,7 +90,7 @@ async function askGemini<T>(
   const text = candidate?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
   if (!text || (candidate?.finishReason && candidate.finishReason !== "STOP"))
     throw new Error(
-      `${model.id} gave no complete answer (${candidate?.finishReason ?? "no content"})`,
+      `${GEMINI.id} gave no complete answer (${candidate?.finishReason ?? "no content"})`,
     );
   const start = text.indexOf("{");
   const end = text.lastIndexOf("}");
@@ -174,9 +98,8 @@ async function askGemini<T>(
     return JSON.parse(start >= 0 && end > start ? text.slice(start, end + 1) : text) as T;
   } catch (error) {
     // Say what came back, so a shape we don't read yet can be seen and fixed.
-    const parts = candidate?.content?.parts?.length ?? 0;
     throw new Error(
-      `${model.id}'s answer isn't one JSON object (${parts} parts, ${m?.thoughtsTokenCount ?? 0} thinking tokens): ${String(error)}; it begins ${JSON.stringify(text.slice(0, 200))} and ends ${JSON.stringify(text.slice(-200))}`,
+      `${GEMINI.id}'s answer isn't one JSON object: ${String(error)}; it begins ${JSON.stringify(text.slice(0, 200))} and ends ${JSON.stringify(text.slice(-200))}`,
     );
   }
 }
@@ -198,16 +121,15 @@ export async function translate<K extends string>(
       { from, to },
       "Reply with JSON only: an object with the same keys.",
     ),
-    // The language to write in, said again with the text: given only in the system prompt, Gemma
-    // 4 sometimes answers with the text unchanged (a Thai post left in English, AI Gateway's logs,
-    // 2026-11-16), as the strings' request already says it.
+    // The language to write in, said again with the text, as the strings' request says it: given
+    // only in the system prompt, a model has answered with the text unchanged (a Thai post left in
+    // English, AI Gateway's logs, 2026-11-16).
     `Translate from ${named(from)} into ${named(to)}:\n${JSON.stringify(fields)}`,
     {
       type: "object",
       properties: Object.fromEntries(keys.map((k) => [k, { type: "string" }])),
       required: keys,
     },
-    modelFor(to),
   );
   return Object.fromEntries(keys.map((k) => [k, String(out[k] ?? "")])) as Record<K, string>;
 }
@@ -269,13 +191,6 @@ export interface StringEntry {
   context?: string;
 }
 
-/** A string the app already has in the target language, to match its words and style. */
-export interface Example {
-  description: string;
-  source: string;
-  translation: string;
-}
-
 /**
  * Translate an app's strings (fbtee catalog entries), by the rules void-fbtee's skill gives:
  * read the description, keep every {placeholder} exactly, one line per plural form, each in the
@@ -286,24 +201,20 @@ export async function translateStrings(
   {
     from,
     to,
-    examples = [],
     glossary = [],
     feedback,
     fbtee,
-    model,
     onUsage,
   }: {
     from: string;
     to: string;
-    /** The model to ask, instead of the language's own (models.ts): for measuring. */
-    model?: TranslationModel;
     /** Told each request's tokens. */
     onUsage?: (usage: Usage) => void;
     /** fbtee's own rules, from the app's installed fbtee (translate.ts fbteeRules). */
     fbtee?: string;
-    examples?: Example[];
+    /** The app's own words for terms these entries use (translate.ts glossaryFor). */
     glossary?: { source: string; translation: string }[];
-    /** The last answer and what was wrong with it, when it's asked again. */
+    /** For one entry asked again: its last answer and what was wrong with it. */
     feedback?: { answer: string[]; problems: string[] };
   },
 ): Promise<string[][]> {
@@ -332,9 +243,6 @@ export async function translateStrings(
     (glossary.length
       ? `The app's own words for these terms: always use them, never another word:\n${JSON.stringify(glossary)}\n\n`
       : "") +
-      (examples.length
-        ? `The app's own translations from ${named(from)} into ${named(to)}, for its words and style:\n${JSON.stringify(examples)}\n\n`
-        : "") +
       `Translate from ${named(from)} into ${named(to)}:\n${JSON.stringify(items)}` +
       (feedback
         ? `\n\nYour last answer was ${JSON.stringify(feedback.answer)}. Change only what these points name; add nothing else:\n- ${feedback.problems.join("\n- ")}`
@@ -356,24 +264,13 @@ export async function translateStrings(
       },
       required: ["entries"],
     },
-    model ?? modelFor(to),
     onUsage,
   );
-  // A model without JSON Mode may give a line as an object ({ "form": "other", "target": "…" }):
-  // its translation, not its first field (SEA-LION's Thai once read "other", 2026-11-15).
-  const lineOf = (o: Record<string, unknown>) => {
-    for (const k of ["translation", "target", "text", "line", "output"])
-      if (typeof o[k] === "string") return o[k];
-    const strings = Object.values(o).filter((v): v is string => typeof v === "string");
-    return strings.sort((a, b) => b.length - a.length)[0] ?? "";
-  };
-  const text = (l: unknown): string =>
-    typeof l === "string"
-      ? l
-      : l && typeof l === "object"
-        ? lineOf(l as Record<string, unknown>)
-        : "";
-  return entries.map((_, i) => (out.entries?.find((e) => e.id === i)?.lines ?? []).map(text));
+  return entries.map((_, i) =>
+    (out.entries?.find((e) => e.id === i)?.lines ?? []).map((l) =>
+      typeof l === "string" ? l : "",
+    ),
+  );
 }
 
 /**
@@ -383,7 +280,7 @@ export async function translateStrings(
  */
 export async function translatePage(
   text: string,
-  { from, to }: { from: string; to: string },
+  { from, to, onUsage }: { from: string; to: string; onUsage?: (usage: Usage) => void },
 ): Promise<string> {
   const out = await ask<{ page: string }>(
     instructions(
@@ -394,7 +291,7 @@ export async function translatePage(
     ),
     `Translate from ${named(from)} into ${named(to)}:\n${text}`,
     { type: "object", properties: { page: { type: "string" } }, required: ["page"] },
-    modelFor(to),
+    onUsage,
   );
   return String(out.page ?? "");
 }
@@ -406,13 +303,10 @@ export type DevRequest =
       from: string;
       to: string;
       entries: StringEntry[];
-      examples?: Example[];
       glossary?: { source: string; translation: string }[];
       feedback?: { answer: string[]; problems: string[] };
       /** fbtee's own rules, from the app's installed fbtee (translate.ts fbteeRules). */
       fbtee?: string;
-      /** A model's id to ask instead of the language's own: for measuring (GEMINI or models.json). */
-      model?: string;
     }
   | { kind: "page"; from: string; to: string; text: string };
 
@@ -426,33 +320,23 @@ export async function devTranslate(request: Request, token: string): Promise<Res
   if (request.headers.get("x-void-fbtee-token") !== token)
     return new Response("not found", { status: 404 });
   const body = (await request.json()) as DevRequest;
+  // Every request's tokens go back with its answer, a failed one's too: what it cost, for whoever
+  // is counting (translate.ts, scripts/translations-measure.ts).
+  const usage: Usage[] = [];
+  const onUsage = (u: Usage) => usage.push(u);
   try {
-    if (body.kind === "page") return Response.json({ page: await translatePage(body.text, body) });
-    const model = body.model
-      ? body.model === GEMINI.id
-        ? GEMINI
-        : modelById(body.model)
-      : modelFor(body.to);
-    const usage: Usage[] = [];
-    try {
-      const lines = await translateStrings(body.entries, {
-        ...body,
-        model,
-        onUsage: (u) => usage.push(u),
-      });
-      return Response.json({ lines, model: model.id, usage });
-    } catch (error) {
-      // What a failed request still cost, for whoever is counting (scripts/translations-measure.ts).
-      const unavailable = /not available/i.test(String(error));
-      return Response.json(
-        { error: String(error), model: model.id, usage },
-        { status: unavailable ? 503 : 502 },
-      );
-    }
+    const result =
+      body.kind === "page"
+        ? { page: await translatePage(body.text, { ...body, onUsage }) }
+        : { lines: await translateStrings(body.entries, { ...body, onUsage }) };
+    return Response.json({ ...result, model: GEMINI.id, usage });
   } catch (error) {
     // 503: no Void's AI here (Void's own message, "ai: Not available…"); 502: it answered
     // something unusable, for this request only.
     const unavailable = /not available/i.test(String(error));
-    return Response.json({ error: String(error) }, { status: unavailable ? 503 : 502 });
+    return Response.json(
+      { error: String(error), model: GEMINI.id, usage },
+      { status: unavailable ? 503 : 502 },
+    );
   }
 }

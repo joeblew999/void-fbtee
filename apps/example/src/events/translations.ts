@@ -1,9 +1,10 @@
-// Translations of what people post, made by Workers AI in the translate queue (queues/translate.ts).
+// Translations of what people post, made by Void's AI in the translate queue (queues/translate.ts).
 // Each is stored beside the original (event_texts), then the event's pages leave Void's page cache
 // in every language, and its open pages are told to load their data again (live). Until then, a
 // page in a language it isn't in yet isn't cached at all (awaitsTranslation).
 import { event_texts, events } from "@schema";
 import { and, db, eq, inArray } from "void/db";
+import { GEMINI } from "void-fbtee/ai";
 import type { AppLocale } from "void-fbtee/locales";
 import { appLocales, pickText, revalidate, textLocales } from "void-fbtee/server";
 import { eventTopic, live } from "./live";
@@ -95,6 +96,8 @@ export async function storeTranslations(eventId: string, translations: Record<st
         locale,
         title: text.title.trim(),
         description: text.description.trim(),
+        translatedBy: GEMINI.id,
+        translatedAt: new Date().toISOString().slice(0, 10),
       })
       .onConflictDoNothing();
   await revalidate({ paths: eventPages(eventId) });

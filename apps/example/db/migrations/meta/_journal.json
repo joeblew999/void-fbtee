@@ -57,6 +57,13 @@
       "when": 1794633727229,
       "tag": "20261114052207_mighty_screwball",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1794907371111,
+      "tag": "20261117092251_silly_star_brand",
+      "breakpoints": true
     }
   ]
 }

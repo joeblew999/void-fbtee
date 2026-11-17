@@ -12,7 +12,8 @@ reads it as a skill. What to edit and which commands to run is in the void-fbtee
 ## The app's strings
 
 Each string is a catalog entry: its source lines, a description, the code around it, and the
-app's own translations as examples.
+app's own words for the terms it uses (its glossary). Strings come many at a time: translate each
+on its own, by its own description.
 
 - The description says what's happening, to whom, what each placeholder holds and where the text
   shows. Choose the words by it: "book a seat at an event" is not reserving a table or hiring a
@@ -33,8 +34,8 @@ app's own translations as examples.
   the way developers in the language say it, not left in English and not a sales agent.
 - Capital letters only where the language puts them: a word in the middle of a sentence is
   lowercase even when the app uses it as a heading elsewhere ("Catalog", "Strings").
-- Use the app's own translations as examples: the same word for the same thing, and the same
-  style. Where the app gives its own word for a term, always use it.
+- Where the app gives its own word for a term (its glossary, or its other translations when you
+  can read them), always use it: the same word for the same thing everywhere, and the same style.
 - Give exactly one translated line for each source line, in order.
 
 ## Counts: one line per plural form
@@ -103,7 +104,8 @@ Translate the whole page, keeping its structure: the same headings in the same o
 
 - Thai: no full stop at the end of a sentence, and no comma after a name; spaces between phrases
   where Thai puts them. Loanwords in Thai letters are fine (แอป, แค็ตตาล็อก).
-- Arabic: Modern Standard Arabic, not a dialect. Arabic punctuation (، ؟). No direction marks
+- Arabic: Modern Standard Arabic, not a dialect, for every Arabic locale, ar-EG (Egypt) included:
+  never Egyptian or other spoken Arabic (no مش, لسه, كمان, عشان, no بيـ before a verb). Arabic punctuation (، ؟). No direction marks
   (U+200E, U+200F): the page sets right to left itself. A number followed by a noun takes the
   noun's form for that number: zero says none (لم يتبقَّ أي مقعد, not "0 seats"); two, the dual,
   without the number (مقعدان as a subject, مقعدين as an object); 3 to 10, plural (مقاعد); 11 to 99,
