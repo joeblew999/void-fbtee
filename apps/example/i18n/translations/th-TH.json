@@ -2140,11 +2140,13 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "เขียนหน้าครั้งเดียวใต้ pages/ และภาษาต้นทาง แล้วแต่ละภาษามีสำเนาของตัวเองที่ path เดียวกันในโฟลเดอร์ของภาษานั้น แปลทั้งหน้า ทั้งหัวข้อ เนื้อความ และชื่อกับคำอธิบายใน frontmatter",
+          "translation": "หน้าจะถูกเขียนขึ้นเพียงครั้งเดียวภายใต้ pages/ และภาษาต้นทาง และแต่ละภาษาจะมีสำเนาของตัวเองในเส้นทางเดียวกันภายใต้โฟลเดอร์ของภาษานั้นๆ ซึ่งได้รับการแปลทั้งหมด ทั้งหัวข้อ ข้อความ รวมถึงชื่อเรื่องและคำอธิบายใน frontmatter",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
     },
     "XTxmV9cNQS5qJAbGReTbbQ==": {
       "description": "Markdown page point title: a copy whose original changed",
@@ -2536,11 +2538,13 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "คำแปลเป็นไฟล์ใน repository แค็ตตาล็อกหนึ่งไฟล์ต่อภาษา และสำเนาของหน้า Markdown แต่ละหน้า จึงตรวจด้วย git diff และ commit เหมือนโค้ด ไม่มีอะไรถูกแปลขณะที่ผู้เข้าชมรอ",
+          "translation": "คำแปลต่างๆ จะอยู่ในรูปแบบไฟล์ในที่เก็บข้อมูล (repository) โดยมีหนึ่งแค็ตตาล็อกต่อหนึ่งภาษาและสำเนาของแต่ละหน้า Markdown ดังนั้นจึงสามารถตรวจสอบความเปลี่ยนแปลงได้ด้วย git diff และคอมมิตได้เหมือนกับโค้ดทั่วไป จะไม่มีการแปลภาษาใดๆ ในระหว่างที่ผู้เยี่ยมชมกำลังรอโหลดหน้าเว็บ",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
     },
     "QWTleZIgt+OQTekLHF+MJw==": {
       "description": "Translating page point title: what people post is translated as it's posted",
@@ -2549,18 +2553,6 @@
       "translations": [
         {
           "translation": "สิ่งที่ผู้คนโพสต์ ทันทีที่โพสต์",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "PiM5wxtePrk1NeOis7gFQA==": {
-      "description": "Translating page point: a posted event goes to a queue whose consumer translates it with Workers AI",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "อีเวนต์ที่มีคนโพสต์ไม่ได้อยู่ใน repository จึงแปลทันทีที่โพสต์ โพสต์จะเข้าคิว และตัวรับของคิวขอให้ Workers AI แปลเป็นภาษาอื่น ๆ ของแอป หลังจากผู้โพสต์ได้รับคำตอบแล้ว",
           "variations": {}
         }
       ],
@@ -2585,18 +2577,6 @@
       "translations": [
         {
           "translation": "ทำอย่างไร",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "go4hg/3m6IV9tBrvRVt+lg==": {
-      "description": "Translating page introduction",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ข้อความของแอปเองแปลโดย Claude Code เป็นไฟล์ใน repository ที่คุณตรวจ สิ่งที่ผู้คนโพสต์แปลโดย Workers AI ทันทีที่โพสต์ นี่คือทั้งสองอย่าง พร้อมบรรทัดโค้ดที่ทำงานนั้น",
           "variations": {}
         }
       ],
@@ -2860,11 +2840,13 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Browser Run เป็น binding ใน void.config.ts ทำงานบน Cloudflare ตอนพัฒนาด้วย ผ่านการลงชื่อเข้า Cloudflare ของ Void ต้องใช้ compatibility date ตั้งแต่ 2026-03-24 แพ็กเกจฟรีของ Cloudflare ให้เวลาเบราว์เซอร์ 10 นาทีต่อวัน ประมาณสองพันใบ",
+          "translation": "Browser Run เป็นการเชื่อมโยงใน void.config.ts ซึ่งทำงานบน Cloudflare ในขั้นตอนการพัฒนาด้วยเช่นกัน ผ่านการลงชื่อเข้าใช้ Cloudflare ของ Void โดยจำเป็นต้องใช้วันที่เข้ากันได้เป็น 2026-03-24 หรือใหม่กว่า แผนบริการฟรีของ Cloudflare ให้เวลาใช้งานเบราว์เซอร์ 10 นาทีต่อวัน หรือคิดเป็นตั๋วประมาณสองพันใบ",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
     },
     "yCF3/6M+1/izLuN7RZCVKA==": {
       "description": "PDFs page section title: the sample PDF, printed for this page's language",
@@ -3663,41 +3645,19 @@
       ],
       "types": []
     },
-    "9PlusVxA/lrWcJwlu5EpsA==": {
-      "description": "Translating page: what the build does about translations",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ล้มเหลวหากยังมีสิ่งใดเหลือ: ข้อความหรือหน้าที่ยังไม่ได้แปล หน้าที่เก่ากว่าต้นฉบับ หรือปัญหาการตั้งค่า การ deploy จึงส่งสิ่งเหล่านี้ออกไปไม่ได้",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "X9n7ejivG8fJSwBpv0Mw0w==": {
       "description": "Translating page: what CI does about translations",
       "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "รันคำสั่งเดียวกันทุกครั้งที่ push: check, build จากนั้น deploy และตรวจสอบเว็บไซต์จริง",
+          "translation": "รันคำสั่งเดียวกันในทุกการพุช: ตรวจสอบ บิลด์ จากนั้นปรับใช้และตรวจสอบไซต์จริง",
           "variations": {}
         }
       ],
-      "types": []
-    },
-    "zv6OgqGuv2aGlwiMTYo5GA==": {
-      "description": "Translating page point title: the dev server translates, with Void's AI or Claude Code",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "vp dev แปลด้วย Void's AI หรือ Claude Code",
-          "variations": {}
-        }
-      ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
     },
     "sMtlR6Z8zMzZ6LalfCQsVQ==": {
       "description": "When an event starts, on the reader's own clock; {time} is that time, already formatted",
@@ -4125,54 +4085,6 @@
       ],
       "types": []
     },
-    "6OwibbMT4w5UBc/wNCOcbg==": {
-      "description": "Temporal page: how many rows the polyfill on the Worker got the same as Cloudflare's own Temporal; {same} is how many are the same, {total} how many rows there are",
-      "status": "translated",
-      "tokens": [
-        "total"
-      ],
-      "translations": [
-        {
-          "translation": "polyfill บน Worker: เหมือนกัน {same} จาก {total}",
-          "variations": {}
-        }
-      ],
-      "types": [
-        28
-      ]
-    },
-    "ux1ckl4KnGcx6j3DWxAqiQ==": {
-      "description": "Temporal page: how many rows the browser's own Temporal got the same as the Worker; {same} is how many are the same, {total} how many rows there are",
-      "status": "translated",
-      "tokens": [
-        "total"
-      ],
-      "translations": [
-        {
-          "translation": "Temporal ของเบราว์เซอร์คุณเอง: เหมือนกัน {same} จาก {total}",
-          "variations": {}
-        }
-      ],
-      "types": [
-        28
-      ]
-    },
-    "OUq58lQUIlL8t9SsKPK/0g==": {
-      "description": "Temporal page: how many rows the polyfill in the browser got the same as the Worker; {same} is how many are the same, {total} how many rows there are",
-      "status": "translated",
-      "tokens": [
-        "total"
-      ],
-      "translations": [
-        {
-          "translation": "polyfill ในเบราว์เซอร์ของคุณ: เหมือนกัน {same} จาก {total}",
-          "variations": {}
-        }
-      ],
-      "types": [
-        28
-      ]
-    },
     "JA5wLKwdZbt5CZs55OQ7SQ==": {
       "description": "Translating page: how many of a catalog's strings are translated; {translated} is how many are translated, {strings} how many strings there are",
       "status": "translated",
@@ -4180,18 +4092,6 @@
       "translations": [
         {
           "translation": "แปลแล้ว {translated} จาก {strings} ข้อความ",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Pl/C+9vrq4vM+QiVa2sFuw==": {
-      "description": "Translating page: the events people post are translated by Workers AI; {link} is a link to the events whose text is 'see them'",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "อีเวนต์แปลโดย Workers AI: {link}",
           "variations": {}
         }
       ],
@@ -4347,30 +4247,6 @@
       ],
       "types": []
     },
-    "4PHUCeucntmxGJxyjUv6rQ==": {
-      "description": "Translating page point: as you save, the dev server prepares new strings and translates them, with Claude Code when it's on the machine, else with Void's AI; what people post is translated by Void's AI",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ไม่ต้องสั่งรันอะไร ขณะที่คุณบันทึก vp dev จะเพิ่มข้อความใหม่แต่ละข้อความลงในแค็ตตาล็อกของทุกภาษาและแปลสิ่งที่ใหม่ ทั้งข้อความและหน้า markdown ที่เปลี่ยนไป ด้วย Claude Code และสกิลของ void-fbtee เมื่อมีอยู่ในเครื่องของคุณ หากไม่มีจะใช้ Void's AI ใน Worker ของแอปเองเมื่อแอปใช้งาน ส่วนสิ่งที่ผู้คนโพสต์จะแปลโดย Void's AI",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "b1TeFLhl8Yagqok2H9oF5Q==": {
-      "description": "Translating page: what the dev server does about translations as you save, preparing, translating with Claude Code or Void's AI, and reporting by itself",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ขณะที่คุณบันทึก จะเพิ่มข้อความใหม่ลงในทุกภาษาโดยทำเครื่องหมายว่าใหม่ และ Claude Code หรือ Void's AI จะแปลข้อความเหล่านั้น เซิร์ฟเวอร์สำหรับพัฒนาจะรายงานสิ่งที่เหลืออยู่ คำแปลที่แก้ไขแล้วจะแสดงผลทันที",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "OJgh0mzVJrcrN8I6GVCZBw==": {
       "description": "Home feature fact: the dev server translates new strings as you save, with Claude Code or Void's AI",
       "status": "translated",
@@ -4382,6 +4258,158 @@
         }
       ],
       "types": []
+    },
+    "bLL81XvSzDEiVUWSMLWyew==": {
+      "description": "Translating page point title: the dev server translates, with Void's AI, then Claude Code for what's left",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "vp dev แปลภาษาด้วย Void's AI จากนั้นใช้ Claude Code สำหรับส่วนที่เหลือ",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "RDmZOKQne5lXFwwEOtPf1w==": {
+      "description": "Translating page point: as you save, the dev server prepares new strings and has Void's AI translate them, many at a time; every answer is checked, and what still fails goes to Claude Code; each translation records who wrote it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ไม่มีอะไรต้องรัน ขณะที่คุณบันทึก vp dev จะเพิ่มข้อความใหม่แต่ละข้อความลงในแค็ตตาล็อกของทุกภาษา และแปลสิ่งใหม่ ทั้งข้อความและหน้า Markdown ที่เปลี่ยนแปลง ด้วย Void's AI ใน Worker ของแอปเอง: Gemini 3.5 Flash ครั้งละหลายข้อความ ทุกคำตอบจะได้รับการตรวจสอบ และส่วนที่ยังล้มเหลวจะถูกส่งไปยัง Claude Code ด้วยทักษะของ void-fbtee การแปลแต่ละครั้งจะบันทึกว่าใครเป็นผู้เขียนและเขียนเมื่อใด",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "52BVoeSoml1sJh7/JrUk6Q==": {
+      "description": "Translating page point: a posted event goes to a queue whose consumer translates it with Void's AI, the same model as the app's own text",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "กิจกรรมที่มีผู้โพสต์จะไม่ได้อยู่ในคลังข้อมูล ดังนั้นจึงได้รับการแปลทันทีที่โพสต์กิจกรรม โดยโพสต์ดังกล่าวจะถูกส่งไปยังคิว และผู้บริโภคคิวจะขอให้ Void's AI ซึ่งเป็นโมเดลเดียวกับข้อความของแอป แปลเป็นภาษาอื่นๆ ของแอป หลังจากที่ผู้โพสต์ได้รับคำตอบแล้ว",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "0lZ+v47QSOzy6IAWK4T/Dg==": {
+      "description": "Translating page: what the dev server does about translations as you save: preparing, translating with Void's AI then Claude Code, and reporting by itself",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "เมื่อคุณบันทึก ระบบจะเพิ่มข้อความใหม่ไปยังทุกภาษาโดยทำเครื่องหมายว่าใหม่ จากนั้น Void's AI จะแปลข้อความเหล่านั้น และ Claude Code จะแปลส่วนที่เหลือ โดยเซิร์ฟเวอร์สำหรับพัฒนาจะรายงานสิ่งที่เหลืออยู่ และคำแปลที่แก้ไขแล้วจะแสดงขึ้นทันที",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "zkhofd94vWDMBbyNeGl6wg==": {
+      "description": "Translating page: what the build does about translations",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "จะล้มเหลวหากมีสิ่งใดตกค้างหรือผิดพลาด: ข้อความหรือหน้าที่ยังไม่ได้แปล การแปลที่ไม่ผ่านการตรวจสอบของ vp dev หน้าที่เก่ากว่าต้นฉบับ หรือปัญหาการตั้งค่า เพื่อไม่ให้การติดตั้งใช้งานนำสิ่งเหล่านี้ขึ้นระบบจริง",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "5AtDKB1g3YMwQWILBRxDjw==": {
+      "description": "Translating page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ข้อความของแอปเองและสิ่งที่ผู้คนโพสต์จะได้รับการแปลโดย AI ตัวเดียวกันคือ Gemini 3.5 Flash ผ่าน Void's AI โดยข้อความจะถูกแปลลงในไฟล์ในที่เก็บข้อมูลเพื่อให้คุณตรวจสอบ ส่วนโพสต์จะได้รับการแปลทันทีที่โพสต์ Claude Code จะแปลส่วนที่เหลืออยู่ และนี่คือแต่ละส่วนพร้อมกับบรรทัดที่ดำเนินการ",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "A3T96LuiZD94KEB/GfigmA==": {
+      "description": "Translating page: the events people post are translated by Void's AI; {link} is a link to the events whose text is 'see them'",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "กิจกรรมต่าง ๆ ได้รับการแปลโดย Void's AI: {link}",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "zCHE057k0dimoTU2sp85fA==": {
+      "description": "Temporal page: how many rows the polyfill on the Worker got the same as Cloudflare's own Temporal; {same} is how many are the same, {total} how many rows there are; the count each form is for is {total}",
+      "status": "translated",
+      "tokens": [
+        "total"
+      ],
+      "translations": [
+        {
+          "translation": "Polyfill บน Worker: เหมือนกัน {same} จากทั้งหมด {total} รายการ",
+          "variations": {}
+        }
+      ],
+      "types": [
+        28
+      ],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "GQtWWYwqRPGzQ9zLWD/4Ww==": {
+      "description": "Temporal page: how many rows the browser's own Temporal got the same as the Worker; {same} is how many are the same, {total} how many rows there are; the count each form is for is {total}",
+      "status": "translated",
+      "tokens": [
+        "total"
+      ],
+      "translations": [
+        {
+          "translation": "Temporal ของเบราว์เซอร์คุณเอง: เหมือนกัน {same} จากทั้งหมด {total} รายการ",
+          "variations": {}
+        }
+      ],
+      "types": [
+        28
+      ],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "pw4gLfbMmGtxs6YNyvuTxA==": {
+      "description": "Temporal page: how many rows the polyfill in the browser got the same as the Worker; {same} is how many are the same, {total} how many rows there are; the count each form is for is {total}",
+      "status": "translated",
+      "tokens": [
+        "total"
+      ],
+      "translations": [
+        {
+          "translation": "Polyfill ในเบราว์เซอร์ของคุณ: เหมือนกัน {same} จากทั้งหมด {total} รายการ",
+          "variations": {}
+        }
+      ],
+      "types": [
+        28
+      ],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
     }
   }
 }

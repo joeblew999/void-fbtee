@@ -1,49 +1,27 @@
 {
-  "$comment": "plans/translation-rework.md step 2: each translator on the same sample, checked by judge.ts problemsWith(); `current` is the catalog's translation at the time, for Claude's review. Made by `vp run translations:measure`.",
-  "date": "2026-11-17T09:09:53.079Z",
+  "$comment": "plans/translation-rework.md: the translator on a sample, through translate.ts translateCatalog, checked by judge.ts problemsWith(); `current` is the catalog's translation at the time, for Claude's review. Made by `vp run translations:measure`.",
+  "date": "2026-11-17T09:39:49.371Z",
+  "model": "google/gemini-3.5-flash",
   "summary": [
     {
       "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
       "entries": 25,
-      "passed": 21
-    },
-    {
-      "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
-      "entries": 25,
-      "passed": 24
+      "passed": 25,
+      "seconds": 58,
+      "usd": 0.0253845
     },
     {
       "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
       "entries": 25,
-      "passed": 23
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "entries": 25,
-      "passed": 24
+      "passed": 25,
+      "seconds": 7,
+      "usd": 0.025003499999999998
     }
   ],
-  "tokens": {
-    "@cf/google/gemma-4-26b-a4b-it": {
-      "input": 316125,
-      "output": 4935,
-      "requests": 92
-    },
-    "google/gemini-3.5-flash": {
-      "input": 16808,
-      "output": 3190,
-      "requests": 4
-    }
-  },
-  "geminiUsd": 0.053922,
+  "usd": 0.050388,
   "results": [
     {
       "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
       "hash": "6OwibbMT4w5UBc/wNCOcbg==",
       "description": "Temporal page: how many rows the polyfill on the Worker got the same as Cloudflare's own Temporal; {same} is how many are the same, {total} how many rows there are",
       "source": [
@@ -55,34 +33,25 @@
         "The polyfill on the Worker: {same} of {total} the same."
       ],
       "current": [
-        "الـ polyfill على الـ Worker: {same} من {total} متطابقة.",
-        "The polyfill on the Worker: {same} of {total} the same.",
-        "The polyfill on the Worker: {same} of {total} the same.",
-        "The polyfill on the Worker: {same} of {total} the same.",
-        "The polyfill on the Worker: {same} of {total} the same.",
-        "The polyfill on the Worker: {same} of {total} the same."
+        "ملف التعويض على الـ Worker: لم يتطابق أي صف من إجمالي {total}.",
+        "ملف التعويض على الـ Worker: تطابق صف واحد ({same}) من إجمالي {total}.",
+        "ملف التعويض على الـ Worker: تطابق صفان ({same}) من إجمالي {total}.",
+        "ملف التعويض على الـ Worker: تطابقت {same} صفوف من إجمالي {total}.",
+        "ملف التعويض على الـ Worker: تطابق {same} صفًا من إجمالي {total}.",
+        "ملف التعويض على الـ Worker: تطابق {same} صف من إجمالي {total}."
       ],
       "answer": [
-        "الـ polyfill على الـ Worker: لم يتطابق أي من {total} صفوف.",
-        "الـ polyfill على الـ Worker: تطابق {same} من أصل {total} صفوف.",
-        "الـ polyfill على الـ Worker: تطابق الصفان من أصل {total} صفوف.",
-        "الـ polyfill على الـ Worker: تطابق {same} من أصل {total} صفوف.",
-        "الـ polyfill على الـ Worker: تطابق {same} من أصل {total} صفوف.",
-        "الـ polyfill على الـ Worker: تطابق {same} من أصل {total} صفوف."
+        "الـ polyfill على الـ Worker: يتطابق صف صفر من إجمالي {total}.",
+        "الـ polyfill على الـ Worker: يتطابق صف واحد من إجمالي {total}.",
+        "الـ polyfill على الـ Worker: يتطابق صفان من إجمالي {total}.",
+        "الـ polyfill على الـ Worker: تتطابق {same} من إجمالي {total}.",
+        "الـ polyfill على الـ Worker: يتطابق {same} من إجمالي {total}.",
+        "الـ polyfill على الـ Worker: يتطابق {same} من إجمالي {total}."
       ],
-      "problems": [
-        "Line 1 leaves \"polyfill\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters.",
-        "Line 2 leaves \"polyfill\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters.",
-        "Line 3 leaves \"polyfill\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters.",
-        "Line 4 leaves \"polyfill\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters.",
-        "Line 5 leaves \"polyfill\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters.",
-        "Line 6 leaves \"polyfill\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters."
-      ],
-      "attempts": 3
+      "problems": []
     },
     {
       "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
       "hash": "75g1ge6mloe7/wwoynaTZA==",
       "description": "Intl page: text from data that arrives after the page: the nights left in a stay; {number} is the count",
       "source": [
@@ -100,461 +69,16 @@
         "لاحقًا: تبقّت {number} ليلة"
       ],
       "answer": [
-        "لاحقًا: لم تبقَ أي ليلة",
-        "لاحقًا: ليلتان",
-        "لاحقًا: {number} ليالٍ",
-        "لاحقًا: {number} ليلة",
-        "لاحقًا: {number} ليلة"
-      ],
-      "problems": [],
-      "attempts": 2
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "BmMTtbikAdQBfJNSHlsnDg==",
-      "description": "Intl page: how many rows the browser formatted exactly as the Worker did; {same} is how many are the same, {total} how many rows there are",
-      "source": [
-        "{same} of {total} rows are the same in your browser.",
-        "{same} of {total} rows are the same in your browser.",
-        "{same} of {total} rows are the same in your browser.",
-        "{same} of {total} rows are the same in your browser.",
-        "{same} of {total} rows are the same in your browser.",
-        "{same} of {total} rows are the same in your browser."
-      ],
-      "current": [
-        "{same} من {total} صف متطابقة في متصفحك.",
-        "{same} من صف واحد متطابق في متصفحك.",
-        "{same} من صفّين متطابقة في متصفحك.",
-        "{same} من {total} صفوف متطابقة في متصفحك.",
-        "{same} من {total} صفًا متطابقة في متصفحك.",
-        "{same} من {total} صف متطابقة في متصفحك."
-      ],
-      "answer": [
-        "لم يتطابق أي من {same} من أصل {total} صف في متصفحك.",
-        "{same} من أصل {total} صف متطابق في متصفحك.",
-        "{same} من أصل {total} صف متطابقان في متصفحك.",
-        "{same} من أصل {total} صفوف متطابقة في متصفحك.",
-        "{same} من أصل {total} صفًا متطابقًا في متصفحك.",
-        "{same} من أصل {total} صف متطابق في متصفحك."
-      ],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "FmYCSyKNMYHFcurKzrIYBw==",
-      "description": "Strings page: someone booked a seat at an event, worded by their gender; {name} is their name",
-      "source": ["{name} booked a seat.", "{name} booked a seat.", "{name} booked a seat."],
-      "current": ["حجز {name} مقعدًا.", "حجزت {name} مقعدًا.", "تم حجز مقعد باسم {name}."],
-      "answer": ["حجز {name} مقعدًا.", "حجزت {name} مقعدًا.", "تم الحجز باسم {name}."],
-      "problems": [],
-      "attempts": 3
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "OUq58lQUIlL8t9SsKPK/0g==",
-      "description": "Temporal page: how many rows the polyfill in the browser got the same as the Worker; {same} is how many are the same, {total} how many rows there are",
-      "source": [
-        "The polyfill in your browser: {same} of {total} the same.",
-        "The polyfill in your browser: {same} of {total} the same.",
-        "The polyfill in your browser: {same} of {total} the same.",
-        "The polyfill in your browser: {same} of {total} the same.",
-        "The polyfill in your browser: {same} of {total} the same.",
-        "The polyfill in your browser: {same} of {total} the same."
-      ],
-      "current": [
-        "الـ polyfill في متصفحك: {same} من {total} متطابقة.",
-        "The polyfill in your browser: {same} of {total} the same.",
-        "The polyfill in your browser: {same} of {total} the same.",
-        "The polyfill in your browser: {same} of {total} the same.",
-        "The polyfill in your browser: {same} of {total} the same.",
-        "The polyfill in your browser: {same} of {total} the same."
-      ],
-      "answer": [
-        "لم يتطابق الـ polyfill في متصفحك في أي صف من أصل {total}.",
-        "الـ polyfill في متصفحك: {same} من أصل {total} متطابقان.",
-        "الـ polyfill في متصفحك: {same} من أصل {total} متطابقان.",
-        "الـ polyfill في متصفحك: {same} من أصل {total} متطابقة.",
-        "الـ polyfill في متصفحك: {same} من أصل {total} متطابقة.",
-        "الـ polyfill في متصفحك: {same} من أصل {total} متطابقة."
-      ],
-      "problems": [
-        "Line 1 leaves \"polyfill\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters.",
-        "Line 2 leaves \"polyfill\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters.",
-        "Line 3 leaves \"polyfill\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters.",
-        "Line 4 leaves \"polyfill\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters.",
-        "Line 5 leaves \"polyfill\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters.",
-        "Line 6 leaves \"polyfill\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters."
-      ],
-      "attempts": 3
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "QpU/a6qlWEEQiQ9R4/DwkQ==",
-      "description": "How many nights of a stay the reader has booked; {number} is the count",
-      "source": [
-        "You booked {number} nights",
-        "You booked {number} nights",
-        "You booked {number} nights",
-        "You booked {number} nights",
-        "You booked {number} nights"
-      ],
-      "current": [
-        "لم تحجز أي ليلة",
-        "حجزت ليلتين",
-        "حجزت {number} ليالٍ",
-        "حجزت {number} ليلة",
-        "حجزت {number} ليلة"
-      ],
-      "answer": [
-        "لم تحجز أي ليلة",
-        "حجزت ليلتين",
-        "حجزت {number} ليالٍ",
-        "حجزت {number} ليلة",
-        "حجزت {number} ليلة"
-      ],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "YTVupDM8i+JxeTsyzilxQQ==",
-      "description": "Strings page: someone booked seats at an event; {name} is their name, {number} how many seats",
-      "source": [
-        "{name} booked {number} seats.",
-        "{name} booked {number} seats.",
-        "{name} booked {number} seats.",
-        "{name} booked {number} seats.",
-        "{name} booked {number} seats."
-      ],
-      "current": [
-        "لا مقاعد محجوزة باسم {name}.",
-        "مقعدان محجوزان باسم {name}.",
-        "{number} مقاعد محجوزة باسم {name}.",
-        "{number} مقعدًا محجوزًا باسم {name}.",
-        "{number} مقعد محجوز باسم {name}."
-      ],
-      "answer": [
-        "لم يحجز {name} أي مقعد.",
-        "حجز {name} مقعدين.",
-        "حجز {name} {number} مقاعد.",
-        "حجز {name} {number} مقعدًا.",
-        "حجز {name} {number} مقعد."
-      ],
-      "problems": [],
-      "attempts": 3
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "pyuIHcl9IjiwEfzc6+OZQw==",
-      "description": "How many seats at an event are still free to book; {number} is the count",
-      "source": [
-        "{number} seats left",
-        "{number} seats left",
-        "{number} seats left",
-        "{number} seats left",
-        "{number} seats left"
-      ],
-      "current": [
-        "لم يتبقَّ أي مقعد",
-        "تبقّى مقعدان",
-        "تبقّت {number} مقاعد",
-        "تبقّى {number} مقعدًا",
-        "تبقّى {number} مقعد"
-      ],
-      "answer": [
-        "لم يتبقَّ أي مقعد",
-        "مقعدان متبقيان",
-        "بقي {number} مقاعد",
-        "بقي {number} مقعدًا",
-        "بقي {number} مقعد"
-      ],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "+AuH23AakSMD2/1McKhd4w==",
-      "description": "Strings page point title: plurals",
-      "source": ["Plurals, each language's own"],
-      "current": ["الجمع، لكل لغة قواعدها"],
-      "answer": ["صيغ الجمع، حسب قواعد كل لغة"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "+BSQtF71BWhuyCYlDZ2PhA==",
-      "description": "A heading: named time zones",
-      "source": ["Time zones"],
-      "current": ["المناطق الزمنية"],
-      "answer": ["المناطق الزمنية"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "+TOlgrXkyPMWSXZKyRlS+w==",
-      "description": "Intl page section: relative time, like 'yesterday'",
-      "source": ["Relative time"],
-      "current": ["الوقت النسبي"],
-      "answer": ["الوقت النسبي"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "/R89OA5GUYekRxWiCvTRSA==",
-      "description": "Cancellation email: the event the reader had a seat at is cancelled by its organiser; {event} is its title, {time} when it would have started, already formatted",
-      "source": [
-        "{event}, on {time}, has been cancelled by its organiser. Your seat is gone with it."
-      ],
-      "current": ["ألغى المنظم {event} التي كانت ستقام {time}، وأُلغي مقعدك معها."],
-      "answer": ["تم إلغاء {event}، في {time}، من قِبل منظمها. وقد ضاع مقعدك معها."],
-      "problems": [],
-      "attempts": 3
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "/WNY/KEU6PiQ/6Qz1I2xpg==",
-      "description": "Strings page point: the build fails on any untranslated string, and the lint rules catch text not marked",
-      "source": [
-        "vp build fails on any string still untranslated in any language, and fbtee's lint rules (vp check) report text written in a component without fbt."
-      ],
-      "current": [
-        "يفشل vp build إذا بقي أي نص غير مترجم في أي لغة، وتُبلغ قواعد lint في fbtee (vp check) عن النص المكتوب في مكوّن دون fbt."
-      ],
-      "answer": [
-        "يفشل vp build إذا بقي أي نص غير مترجم في أي لغة، وتُبلغ قواعد التدقيق الخاصة بـ fbtee (vp check) عن النص المكتوب في المكوّن بدون عنصر fbt."
-      ],
-      "problems": [
-        "Line 1 leaves \"fbt\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters."
-      ],
-      "attempts": 3
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "/aRZulxMqHQep4BC9smXmg==",
-      "description": "Events page description, for search results",
-      "source": ["Events posted in any language, each on its own city's clock and on yours."],
-      "current": ["فعاليات منشورة بأي لغة، كل منها على توقيت مدينتها وعلى توقيتك."],
-      "answer": ["فعاليات منشورة بأي لغة، كل واحدة على توقيت مدينتها وعلى توقيت ساعتك."],
-      "problems": [],
-      "attempts": 3
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "/s93hh9vqUCZEcDcAH6YJA==",
-      "description": "Home feature title: numbers and other formats",
-      "source": ["Numbers and the rest, by Intl"],
-      "current": ["الأرقام وكل ما عداها، بواسطة Intl"],
-      "answer": ["الأرقام وما عدا ذلك، بواسطة Intl"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "/tj0XCj9mTqyMKaRkIh2KA==",
-      "description": "Strings page: someone looked over their own ticket for an event, with a pronoun by their gender; {name} is their name",
-      "source": ["{name} checked their ticket."],
-      "current": ["تمّت مراجعة {name} لتذكرتهم."],
-      "answer": ["راجع {name} تذكرته."],
-      "problems": [],
-      "attempts": 3
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "0+6Iq11NYcCJ+uDy7/PqnA==",
-      "description": "Home feature fact: the middleware sets the page's language and direction",
-      "source": ["The middleware sets the page's lang and dir from the URL."],
-      "current": ["يضبط الـ middleware قيمتي lang وdir للصفحة من الرابط."],
-      "answer": ["يضع وسيط void-fbtee lang وdir على الصفحة من العنوان."],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "0KCj8z+wYa63EFv4pp9wmA==",
-      "description": "Intl page section: numbers",
-      "source": ["Numbers"],
-      "current": ["الأرقام"],
-      "answer": ["الأرقام"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "0Nrc8Co3U/Yd5XokcA/uNg==",
-      "description": "Strings page: someone booked seats at an event; {name} is their name, {number} how many seats",
-      "source": ["{name} booked a seat."],
-      "current": ["مقعد واحد محجوز باسم {name}."],
-      "answer": ["حجز {name} مقعدًا."],
-      "problems": [],
-      "attempts": 3
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "0QlWMWPWKIJVwMzYcHG7vw==",
-      "description": "Docs page title: the page about how the app gets translated",
-      "source": ["Translating"],
-      "current": ["الترجمة"],
-      "answer": ["الترجمة"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "0f0XPtcyZdzVqSt5xH6qvw==",
-      "description": "Components page: useTimeZone gives the reader's own time zone, once the browser knows it",
-      "source": ["The reader's own time zone, once the browser knows it; none on the server."],
-      "current": ["المنطقة الزمنية للقارئ نفسه، حين يعرفها المتصفح؛ لا شيء على الخادم."],
-      "answer": [
-        "المنطقة الزمنية الخاصة بالقارئ، بمجرد أن يعرفها المتصفح؛ ولا توجد منطقة زمنية على الخادم."
-      ],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "0fNA/4K1+g90HWefUK7JDA==",
-      "description": "Strings page form: a list joined with 'and'",
-      "source": ["and"],
-      "current": ["و"],
-      "answer": ["و"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "0n9xvB/2BBBZQNC97OSkWA==",
-      "description": "Booking email: before the link to the event's page",
-      "source": ["The event's page:"],
-      "current": ["صفحة الفعالية:"],
-      "answer": ["صفحة الفعالية:"],
-      "problems": [],
-      "attempts": 3
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "1MRfK1NgI+jnW+SPgLHuJw==",
-      "description": "Home feature fact: the same calls run on the server and in the browser",
-      "source": [
-        "The same calls on the Worker and in the browser; the Intl page shows where engines differ."
-      ],
-      "current": [
-        "الاستدعاءات نفسها على Worker وفي المتصفح، وتعرض صفحة التنسيقات مواضع اختلاف المحركات."
-      ],
-      "answer": [
-        "نفس الاستدعاءات على الـ Worker وفي المتصفح؛ وتُظهر صفحة Intl مواضع اختلاف المحركات."
-      ],
-      "problems": [],
-      "attempts": 3
-    },
-    {
-      "locale": "ar-EG",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "1ZgRTsLW3UVFnhciyWetNA==",
-      "description": "PDFs page point: the browser binding in void.config.ts, run on Cloudflare in development too, a compatibility date from 2026-03-24, and the free plan's limits",
-      "source": [
-        "Browser Run is a binding in void.config.ts, run on Cloudflare in development too, through Void's Cloudflare sign-in. It needs a compatibility date of 2026-03-24 or later. Cloudflare's free plan gives 10 minutes of browser time a day: about two thousand tickets."
-      ],
-      "current": [
-        "Browser Run ربط (binding) في void.config.ts، يعمل على Cloudflare في التطوير أيضًا، عبر تسجيل دخول Void إلى Cloudflare. ويتطلب تاريخ توافق 2026-03-24 أو بعده. وتمنح خطة Cloudflare المجانية 10 دقائق من وقت المتصفح يوميًا: نحو ألفي تذكرة."
-      ],
-      "answer": [
-        "Browser Run هو ربط في void.config.ts، ويُشغَّل على Cloudflare في مرحلة التطوير أيضًا، من خلال sign-in الخاص بـ Void على Cloudflare. يتطلب تاريخ توافق 2026-03-24 أو ما بعده. تمنح الخطة المجانية من Cloudflare 10 دقائق من وقت المتصفح يوميًا: أي حوالي ألفي تذكرة."
-      ],
-      "problems": [
-        "Line 1 leaves \"void\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters."
-      ],
-      "attempts": 3
-    },
-    {
-      "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
-      "hash": "6OwibbMT4w5UBc/wNCOcbg==",
-      "description": "Temporal page: how many rows the polyfill on the Worker got the same as Cloudflare's own Temporal; {same} is how many are the same, {total} how many rows there are",
-      "source": [
-        "The polyfill on the Worker: {same} of {total} the same.",
-        "The polyfill on the Worker: {same} of {total} the same.",
-        "The polyfill on the Worker: {same} of {total} the same.",
-        "The polyfill on the Worker: {same} of {total} the same.",
-        "The polyfill on the Worker: {same} of {total} the same.",
-        "The polyfill on the Worker: {same} of {total} the same."
-      ],
-      "current": [
-        "الـ polyfill على الـ Worker: {same} من {total} متطابقة.",
-        "The polyfill on the Worker: {same} of {total} the same.",
-        "The polyfill on the Worker: {same} of {total} the same.",
-        "The polyfill on the Worker: {same} of {total} the same.",
-        "The polyfill on the Worker: {same} of {total} the same.",
-        "The polyfill on the Worker: {same} of {total} the same."
-      ],
-      "answer": [
-        "البوليفيل على الـ Worker: لم يتطابق أي صف من {total}.",
-        "البوليفيل على الـ Worker: تطابق صف واحد من {total}.",
-        "البوليفيل على الـ Worker: تطابق صفان من {total}.",
-        "البوليفيل على الـ Worker: تطابق {same} صفوف من {total}.",
-        "البوليفيل على الـ Worker: تطابق {same} صفًا من {total}.",
-        "البوليفيل على الـ Worker: تطابق {same} صف من {total}."
-      ],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
-      "hash": "75g1ge6mloe7/wwoynaTZA==",
-      "description": "Intl page: text from data that arrives after the page: the nights left in a stay; {number} is the count",
-      "source": [
-        "Deferred: {number} nights left",
-        "Deferred: {number} nights left",
-        "Deferred: {number} nights left",
-        "Deferred: {number} nights left",
-        "Deferred: {number} nights left"
-      ],
-      "current": [
-        "لاحقًا: لم تتبقَّ أي ليلة",
-        "لاحقًا: تبقّت ليلتان",
-        "لاحقًا: تبقّت {number} ليالٍ",
-        "لاحقًا: تبقّت {number} ليلة",
-        "لاحقًا: تبقّت {number} ليلة"
-      ],
-      "answer": [
-        "مؤجل: لم يتبقَّ أي ليلة",
+        "مؤجل: لم يتبقَّ أي ليالٍ",
         "مؤجل: تبقت ليلتان",
         "مؤجل: تبقت {number} ليالٍ",
-        "مؤجل: تبقت {number} ليلة",
-        "مؤجل: تبقت {number} ليلة"
+        "مؤجل: تبقى {number} ليلةً",
+        "مؤجل: تبقى {number} ليلة"
       ],
-      "problems": [],
-      "attempts": 1
+      "problems": []
     },
     {
       "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
       "hash": "BmMTtbikAdQBfJNSHlsnDg==",
       "description": "Intl page: how many rows the browser formatted exactly as the Worker did; {same} is how many are the same, {total} how many rows there are",
       "source": [
@@ -574,30 +98,26 @@
         "{same} من {total} صف متطابقة في متصفحك."
       ],
       "answer": [
-        "لم يتطابق أي صف من {total} في متصفحك.",
-        "تطابق صف واحد من {total} في متصفحك.",
-        "تطابق صفان من {total} في متصفحك.",
-        "تطابق {same} صفوف من {total} في متصفحك.",
-        "تطابق {same} صفًا من {total} في متصفحك.",
-        "تطابق {same} صف من {total} في متصفحك."
+        "يتطابق صف صفر من إجمالي {total} صفوف في متصفحك.",
+        "يتطابق صف واحد من إجمالي {total} صفوف في متصفحك.",
+        "يتطابق صفان من إجمالي {total} صفوف في متصفحك.",
+        "تتطابق {same} من إجمالي {total} صفوف في متصفحك.",
+        "يتطابق {same} من إجمالي {total} صفوف في متصفحك.",
+        "يتطابق {same} من إجمالي {total} صفوف في متصفحك."
       ],
-      "problems": [],
-      "attempts": 1
+      "problems": []
     },
     {
       "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
       "hash": "FmYCSyKNMYHFcurKzrIYBw==",
       "description": "Strings page: someone booked a seat at an event, worded by their gender; {name} is their name",
       "source": ["{name} booked a seat.", "{name} booked a seat.", "{name} booked a seat."],
       "current": ["حجز {name} مقعدًا.", "حجزت {name} مقعدًا.", "تم حجز مقعد باسم {name}."],
       "answer": ["حجز {name} مقعدًا.", "حجزت {name} مقعدًا.", "حجز {name} مقعدًا."],
-      "problems": [],
-      "attempts": 1
+      "problems": []
     },
     {
       "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
       "hash": "OUq58lQUIlL8t9SsKPK/0g==",
       "description": "Temporal page: how many rows the polyfill in the browser got the same as the Worker; {same} is how many are the same, {total} how many rows there are",
       "source": [
@@ -609,27 +129,25 @@
         "The polyfill in your browser: {same} of {total} the same."
       ],
       "current": [
-        "الـ polyfill في متصفحك: {same} من {total} متطابقة.",
-        "The polyfill in your browser: {same} of {total} the same.",
-        "The polyfill in your browser: {same} of {total} the same.",
-        "The polyfill in your browser: {same} of {total} the same.",
-        "The polyfill in your browser: {same} of {total} the same.",
-        "The polyfill in your browser: {same} of {total} the same."
+        "البوليفيل في متصفحك: {same} من {total} متطابقة.",
+        "البوليفيل في متصفحك: {same} من {total} متطابقة.",
+        "البوليفيل في متصفحك: {same} من {total} متطابقتين.",
+        "البوليفيل في متصفحك: {same} من {total} متطابقة.",
+        "البوليفيل في متصفحك: {same} من {total} متطابقة.",
+        "البوليفيل في متصفحك: {same} من {total} متطابقة."
       ],
       "answer": [
-        "البوليفيل في متصفحك: لم يتطابق أي صف من {total}.",
-        "البوليفيل في متصفحك: تطابق صف واحد من {total}.",
-        "البوليفيل في متصفحك: تطابق صفان من {total}.",
-        "البوليفيل في متصفحك: تطابق {same} صفوف من {total}.",
-        "البوليفيل في متصفحك: تطابق {same} صفًا من {total}.",
-        "البوليفيل في متصفحك: تطابق {same} صف من {total}."
+        "الـ polyfill في متصفحك: يتطابق صف صفر من إجمالي {total}.",
+        "الـ polyfill في متصفحك: يتطابق صف واحد من إجمالي {total}.",
+        "الـ polyfill في متصفحك: يتطابق صفان من إجمالي {total}.",
+        "الـ polyfill في متصفحك: تتطابق {same} من إجمالي {total}.",
+        "الـ polyfill في متصفحك: يتطابق {same} من إجمالي {total}.",
+        "الـ polyfill في متصفحك: يتطابق {same} من إجمالي {total}."
       ],
-      "problems": [],
-      "attempts": 1
+      "problems": []
     },
     {
       "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
       "hash": "QpU/a6qlWEEQiQ9R4/DwkQ==",
       "description": "How many nights of a stay the reader has booked; {number} is the count",
       "source": [
@@ -647,18 +165,16 @@
         "حجزت {number} ليلة"
       ],
       "answer": [
-        "لم تحجز أي ليلة",
-        "لقد حجزت ليلتين",
-        "لقد حجزت {number} ليالٍ",
-        "لقد حجزت {number} ليلة",
-        "لقد حجزت {number} ليلة"
+        "لم تحجز أي ليالٍ",
+        "حجزت ليلتين",
+        "حجزت {number} ليالٍ",
+        "حجزت {number} ليلةً",
+        "حجزت {number} ليلة"
       ],
-      "problems": [],
-      "attempts": 1
+      "problems": []
     },
     {
       "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
       "hash": "YTVupDM8i+JxeTsyzilxQQ==",
       "description": "Strings page: someone booked seats at an event; {name} is their name, {number} how many seats",
       "source": [
@@ -676,18 +192,16 @@
         "{number} مقعد محجوز باسم {name}."
       ],
       "answer": [
-        "لم يحجز {name} أي مقعد.",
+        "لم يحجز {name} أي مقاعد.",
         "حجز {name} مقعدين.",
         "حجز {name} {number} مقاعد.",
         "حجز {name} {number} مقعدًا.",
         "حجز {name} {number} مقعد."
       ],
-      "problems": [],
-      "attempts": 1
+      "problems": []
     },
     {
       "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
       "hash": "pyuIHcl9IjiwEfzc6+OZQw==",
       "description": "How many seats at an event are still free to book; {number} is the count",
       "source": [
@@ -711,185 +225,50 @@
         "تبقَّى {number} مقعدًا",
         "تبقَّى {number} مقعد"
       ],
-      "problems": [],
-      "attempts": 1
+      "problems": []
     },
     {
       "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
       "hash": "+AuH23AakSMD2/1McKhd4w==",
       "description": "Strings page point title: plurals",
       "source": ["Plurals, each language's own"],
       "current": ["الجمع، لكل لغة قواعدها"],
       "answer": ["صيغ الجمع، الخاصة بكل لغة"],
-      "problems": [],
-      "attempts": 1
+      "problems": []
     },
     {
       "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
       "hash": "+BSQtF71BWhuyCYlDZ2PhA==",
       "description": "A heading: named time zones",
       "source": ["Time zones"],
       "current": ["المناطق الزمنية"],
       "answer": ["المناطق الزمنية"],
-      "problems": [],
-      "attempts": 1
+      "problems": []
     },
     {
       "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
       "hash": "+TOlgrXkyPMWSXZKyRlS+w==",
       "description": "Intl page section: relative time, like 'yesterday'",
       "source": ["Relative time"],
       "current": ["الوقت النسبي"],
       "answer": ["الوقت النسبي"],
-      "problems": [],
-      "attempts": 1
+      "problems": []
     },
     {
       "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
       "hash": "/R89OA5GUYekRxWiCvTRSA==",
       "description": "Cancellation email: the event the reader had a seat at is cancelled by its organiser; {event} is its title, {time} when it would have started, already formatted",
       "source": [
         "{event}, on {time}, has been cancelled by its organiser. Your seat is gone with it."
       ],
       "current": ["ألغى المنظم {event} التي كانت ستقام {time}، وأُلغي مقعدك معها."],
-      "answer": ["تم إلغاء {event}، المقرر في {time}، من قِبل المنظم. وبذلك تم إلغاء حجز مقعدك."],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
-      "hash": "/aRZulxMqHQep4BC9smXmg==",
-      "description": "Events page description, for search results",
-      "source": ["Events posted in any language, each on its own city's clock and on yours."],
-      "current": ["فعاليات منشورة بأي لغة، كل منها على توقيت مدينتها وعلى توقيتك."],
-      "answer": ["فعاليات منشورة بأي لغة، كل منها حسب توقيت مدينتها وتوقيتك أنت."],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
-      "hash": "/s93hh9vqUCZEcDcAH6YJA==",
-      "description": "Home feature title: numbers and other formats",
-      "source": ["Numbers and the rest, by Intl"],
-      "current": ["الأرقام وكل ما عداها، بواسطة Intl"],
-      "answer": ["الأرقام وباقي التنسيقات، بواسطة Intl"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
-      "hash": "/tj0XCj9mTqyMKaRkIh2KA==",
-      "description": "Strings page: someone looked over their own ticket for an event, with a pronoun by their gender; {name} is their name",
-      "source": ["{name} checked their ticket."],
-      "current": ["تمّت مراجعة {name} لتذكرتهم."],
-      "answer": ["راجع {name} تذكرته."],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
-      "hash": "0+6Iq11NYcCJ+uDy7/PqnA==",
-      "description": "Home feature fact: the middleware sets the page's language and direction",
-      "source": ["The middleware sets the page's lang and dir from the URL."],
-      "current": ["يضبط الـ middleware قيمتي lang وdir للصفحة من الرابط."],
-      "answer": ["تحدد البرمجية الوسيطة لغة الصفحة واتجاهها من رابط URL."],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
-      "hash": "0KCj8z+wYa63EFv4pp9wmA==",
-      "description": "Intl page section: numbers",
-      "source": ["Numbers"],
-      "current": ["الأرقام"],
-      "answer": ["الأرقام"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
-      "hash": "0Nrc8Co3U/Yd5XokcA/uNg==",
-      "description": "Strings page: someone booked seats at an event; {name} is their name, {number} how many seats",
-      "source": ["{name} booked a seat."],
-      "current": ["مقعد واحد محجوز باسم {name}."],
-      "answer": ["حجز {name} مقعدًا."],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
-      "hash": "0QlWMWPWKIJVwMzYcHG7vw==",
-      "description": "Docs page title: the page about how the app gets translated",
-      "source": ["Translating"],
-      "current": ["الترجمة"],
-      "answer": ["الترجمة"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
-      "hash": "0f0XPtcyZdzVqSt5xH6qvw==",
-      "description": "Components page: useTimeZone gives the reader's own time zone, once the browser knows it",
-      "source": ["The reader's own time zone, once the browser knows it; none on the server."],
-      "current": ["المنطقة الزمنية للقارئ نفسه، حين يعرفها المتصفح؛ لا شيء على الخادم."],
-      "answer": ["المنطقة الزمنية الخاصة بالقارئ بمجرد معرفة المتصفح بها؛ ولا توجد على الخادم."],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
-      "hash": "0fNA/4K1+g90HWefUK7JDA==",
-      "description": "Strings page form: a list joined with 'and'",
-      "source": ["and"],
-      "current": ["و"],
-      "answer": ["و"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
-      "hash": "0n9xvB/2BBBZQNC97OSkWA==",
-      "description": "Booking email: before the link to the event's page",
-      "source": ["The event's page:"],
-      "current": ["صفحة الفعالية:"],
-      "answer": ["صفحة الفعالية:"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
-      "hash": "1MRfK1NgI+jnW+SPgLHuJw==",
-      "description": "Home feature fact: the same calls run on the server and in the browser",
-      "source": [
-        "The same calls on the Worker and in the browser; the Intl page shows where engines differ."
-      ],
-      "current": [
-        "الاستدعاءات نفسها على Worker وفي المتصفح، وتعرض صفحة التنسيقات مواضع اختلاف المحركات."
-      ],
       "answer": [
-        "تشتغل نفس الاستدعاءات على الـ Worker وفي المتصفح؛ وتوضح صفحة Intl مواضع الاختلاف بين المحركات."
+        "تم إلغاء {event}، المقرر إقامتها في {time}، بواسطة منظمها. وذهب مقعدك مع هذا الإلغاء."
       ],
-      "problems": [],
-      "attempts": 1
+      "problems": []
     },
     {
       "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
       "hash": "/WNY/KEU6PiQ/6Qz1I2xpg==",
       "description": "Strings page point: the build fails on any untranslated string, and the lint rules catch text not marked",
       "source": [
@@ -899,630 +278,190 @@
         "يفشل vp build إذا بقي أي نص غير مترجم في أي لغة، وتُبلغ قواعد lint في fbtee (vp check) عن النص المكتوب في مكوّن دون fbt."
       ],
       "answer": [
-        "بيفشل vp build مع أي سلسلة نصوص لسه مش مترجمة بأي لغة، وقواعد فحص الكود (vp check) الخاصة بـ fbtee بتبلّغ عن أي نص مكتوب في مكون من غير fbt."
+        "يفشل vp build عند وجود أي نص غير مترجم في أي لغة، وتبلغ قواعد فحص التنسيق لـ fbtee (عبر vp check) عن أي نص مكتوب في مكون بدون fbt."
       ],
-      "problems": [
-        "Line 1 leaves \"fbt\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters."
-      ],
-      "attempts": 2
+      "problems": []
     },
     {
       "locale": "ar-EG",
-      "model": "google/gemini-3.5-flash",
-      "hash": "1ZgRTsLW3UVFnhciyWetNA==",
-      "description": "PDFs page point: the browser binding in void.config.ts, run on Cloudflare in development too, a compatibility date from 2026-03-24, and the free plan's limits",
-      "source": [
-        "Browser Run is a binding in void.config.ts, run on Cloudflare in development too, through Void's Cloudflare sign-in. It needs a compatibility date of 2026-03-24 or later. Cloudflare's free plan gives 10 minutes of browser time a day: about two thousand tickets."
-      ],
-      "current": [
-        "Browser Run ربط (binding) في void.config.ts، يعمل على Cloudflare في التطوير أيضًا، عبر تسجيل دخول Void إلى Cloudflare. ويتطلب تاريخ توافق 2026-03-24 أو بعده. وتمنح خطة Cloudflare المجانية 10 دقائق من وقت المتصفح يوميًا: نحو ألفي تذكرة."
-      ],
-      "answer": [
-        "ميزة Browser Run عبارة عن ربط في config.ts، وبيشتغل على Cloudflare في بيئة التطوير كمان، من خلال تسجيل الدخول لـ Cloudflare (sign-in) الخاص بـ Void. وبيحتاج تاريخ توافق 2026-03-24 أو أحدث. خطة Cloudflare المجانية بتديك 10 دقائق من وقت المتصفح في اليوم: يعني حوالي ألفين تذكرة."
-      ],
-      "problems": [],
-      "attempts": 2
-    },
-    {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "FmYCSyKNMYHFcurKzrIYBw==",
-      "description": "Strings page: someone booked a seat at an event, worded by their gender; {name} is their name",
-      "source": ["{name} booked a seat.", "{name} booked a seat.", "{name} booked a seat."],
-      "current": ["{name} จองที่นั่งแล้ว", "{name} จองที่นั่งแล้ว", "{name} จองที่นั่งแล้ว"],
-      "answer": ["{name} จองที่นั่งแล้ว", "{name} จองที่นั่งแล้ว", "{name} จองที่นั่งแล้ว"],
-      "problems": [],
-      "attempts": 3
-    },
-    {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "qxa4l1H7kCC3JQD+LJ7viA==",
-      "description": "Strings page: said to the reader right after they book a seat at an event, and it means: you have a seat now. Short, like the English",
-      "source": ["You're booked.", "You're booked.", "You're booked."],
-      "current": ["คุณจองแล้ว", "คุณจองแล้ว", "คุณจองแล้ว"],
-      "answer": ["จองเรียบร้อยแล้ว", "จองเรียบร้อยแล้ว", "จองเรียบร้อยแล้ว"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "+AuH23AakSMD2/1McKhd4w==",
-      "description": "Strings page point title: plurals",
-      "source": ["Plurals, each language's own"],
-      "current": ["รูปพหูพจน์ ตามแต่ละภาษา"],
-      "answer": ["รูปพหูพจน์ตามกฎของแต่ละภาษา"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "+BSQtF71BWhuyCYlDZ2PhA==",
-      "description": "A heading: named time zones",
-      "source": ["Time zones"],
-      "current": ["เขตเวลา"],
-      "answer": ["เขตเวลา"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "+TOlgrXkyPMWSXZKyRlS+w==",
-      "description": "Intl page section: relative time, like 'yesterday'",
-      "source": ["Relative time"],
-      "current": ["เวลาสัมพัทธ์"],
-      "answer": ["เวลาสัมพัทธ์"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "/R89OA5GUYekRxWiCvTRSA==",
-      "description": "Cancellation email: the event the reader had a seat at is cancelled by its organiser; {event} is its title, {time} when it would have started, already formatted",
-      "source": [
-        "{event}, on {time}, has been cancelled by its organiser. Your seat is gone with it."
-      ],
-      "current": ["{event} ซึ่งจะจัดขึ้น{time} ถูกผู้จัดยกเลิกแล้ว ที่นั่งของคุณจึงถูกยกเลิกไปด้วย"],
-      "answer": ["{event} เมื่อ {time} ถูกยกเลิกโดยผู้จัดกิจกรรม ที่นั่งของคุณจึงถูกยกเลิกไปด้วย"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "/WNY/KEU6PiQ/6Qz1I2xpg==",
-      "description": "Strings page point: the build fails on any untranslated string, and the lint rules catch text not marked",
-      "source": [
-        "vp build fails on any string still untranslated in any language, and fbtee's lint rules (vp check) report text written in a component without fbt."
-      ],
-      "current": [
-        "vp build จะล้มเหลวหากมีข้อความใดยังไม่ได้แปลในภาษาใดก็ตาม และกฎ lint ของ fbtee (vp check) จะแจ้งข้อความที่เขียนในคอมโพเนนต์โดยไม่มี fbt"
-      ],
-      "answer": [
-        "vp build จะล้มเหลวหากยังมีข้อความใดที่ยังไม่ได้แปลในภาษาใดก็ตาม และกฎการตรวจสอบของ fbtee (vp check) จะรายงานข้อความที่เขียนในคอมโพเนนต์โดยไม่มีอิลิเมนต์ fbt"
-      ],
-      "problems": [
-        "Line 1 leaves \"fbt\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters."
-      ],
-      "attempts": 3
-    },
-    {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
       "hash": "/aRZulxMqHQep4BC9smXmg==",
       "description": "Events page description, for search results",
       "source": ["Events posted in any language, each on its own city's clock and on yours."],
-      "current": ["กิจกรรมที่โพสต์ในภาษาใดก็ได้ แต่ละรายการแสดงตามเวลาในเมืองของกิจกรรมและตามเวลาของคุณ"],
-      "answer": [
-        "กิจกรรมที่โพสต์ในภาษาใดก็ได้ โดยแต่ละกิจกรรมจะแสดงตามนาฬิกาในเมืองของตนเองและตามนาฬิกาของคุณ"
-      ],
-      "problems": [],
-      "attempts": 2
+      "current": ["فعاليات منشورة بأي لغة، كل منها على توقيت مدينتها وعلى توقيتك."],
+      "answer": ["الفعاليات المنشورة بأي لغة، كل واحدة على ساعة مدينتها وعلى ساعتك."],
+      "problems": []
     },
     {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "locale": "ar-EG",
       "hash": "/s93hh9vqUCZEcDcAH6YJA==",
       "description": "Home feature title: numbers and other formats",
       "source": ["Numbers and the rest, by Intl"],
-      "current": ["ตัวเลขและอื่นๆ ด้วย Intl"],
-      "answer": ["ตัวเลขและอื่น ๆ โดย Intl"],
-      "problems": [],
-      "attempts": 1
+      "current": ["الأرقام وكل ما عداها، بواسطة Intl"],
+      "answer": ["الأرقام وباقي التنسيقات، بواسطة Intl"],
+      "problems": []
     },
     {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "locale": "ar-EG",
       "hash": "/tj0XCj9mTqyMKaRkIh2KA==",
       "description": "Strings page: someone looked over their own ticket for an event, with a pronoun by their gender; {name} is their name",
       "source": ["{name} checked their ticket."],
-      "current": ["{name} ตรวจตั๋วของตนแล้ว"],
-      "answer": ["{name} ตรวจสอบตั๋วของเขา"],
-      "problems": [],
-      "attempts": 3
+      "current": ["تمّت مراجعة {name} لتذكرتهم."],
+      "answer": ["راجع {name} تذكرته."],
+      "problems": []
     },
     {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "locale": "ar-EG",
       "hash": "0+6Iq11NYcCJ+uDy7/PqnA==",
       "description": "Home feature fact: the middleware sets the page's language and direction",
       "source": ["The middleware sets the page's lang and dir from the URL."],
-      "current": ["มิดเดิลแวร์ตั้งค่า lang และ dir ของหน้าจาก URL"],
-      "answer": ["มิดเดิลแวร์ตั้งค่า lang และ dir ของหน้าจาก URL"],
-      "problems": [],
-      "attempts": 2
+      "current": ["يضبط الـ middleware قيمتي lang وdir للصفحة من الرابط."],
+      "answer": ["تُحدد الـ middleware لغة الصفحة واتجاهها من رابط URL."],
+      "problems": []
     },
     {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "locale": "ar-EG",
       "hash": "0KCj8z+wYa63EFv4pp9wmA==",
       "description": "Intl page section: numbers",
       "source": ["Numbers"],
-      "current": ["ตัวเลข"],
-      "answer": ["ตัวเลข"],
-      "problems": [],
-      "attempts": 1
+      "current": ["الأرقام"],
+      "answer": ["الأرقام"],
+      "problems": []
     },
     {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "locale": "ar-EG",
       "hash": "0Nrc8Co3U/Yd5XokcA/uNg==",
       "description": "Strings page: someone booked seats at an event; {name} is their name, {number} how many seats",
       "source": ["{name} booked a seat."],
-      "current": ["{name} จองที่นั่งแล้ว 1 ที่"],
-      "answer": ["{name} จองที่นั่งแล้ว"],
-      "problems": [],
-      "attempts": 3
+      "current": ["مقعد واحد محجوز باسم {name}."],
+      "answer": ["حجز {name} مقعدًا."],
+      "problems": []
     },
     {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "locale": "ar-EG",
       "hash": "0QlWMWPWKIJVwMzYcHG7vw==",
       "description": "Docs page title: the page about how the app gets translated",
       "source": ["Translating"],
-      "current": ["การแปล"],
-      "answer": ["การแปล"],
-      "problems": [],
-      "attempts": 1
+      "current": ["الترجمة"],
+      "answer": ["الترجمة"],
+      "problems": []
     },
     {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "locale": "ar-EG",
       "hash": "0f0XPtcyZdzVqSt5xH6qvw==",
       "description": "Components page: useTimeZone gives the reader's own time zone, once the browser knows it",
       "source": ["The reader's own time zone, once the browser knows it; none on the server."],
-      "current": ["เขตเวลาของผู้อ่านเอง เมื่อเบราว์เซอร์รู้แล้ว บนเซิร์ฟเวอร์ไม่มี"],
-      "answer": ["เขตเวลาของผู้อ่านเอง เมื่อเบราว์เซอร์ทราบแล้ว แต่บนเซิร์ฟเวอร์จะไม่มีข้อมูล"],
-      "problems": [],
-      "attempts": 1
+      "current": ["المنطقة الزمنية للقارئ نفسه، حين يعرفها المتصفح؛ لا شيء على الخادم."],
+      "answer": [
+        "المنطقة الزمنية الخاصة بالقارئ، بمجرد ما يعرفها المتصفح؛ ولا توجد أي منطقة زمنية على الخادم."
+      ],
+      "problems": []
     },
     {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "locale": "ar-EG",
       "hash": "0fNA/4K1+g90HWefUK7JDA==",
       "description": "Strings page form: a list joined with 'and'",
       "source": ["and"],
-      "current": ["และ"],
-      "answer": ["และ"],
-      "problems": [],
-      "attempts": 1
+      "current": ["و"],
+      "answer": ["و"],
+      "problems": []
     },
     {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "locale": "ar-EG",
+      "hash": "0lZ+v47QSOzy6IAWK4T/Dg==",
+      "description": "Translating page: what the dev server does about translations as you save: preparing, translating with Void's AI then Claude Code, and reporting by itself",
+      "source": [
+        "As you save, adds new strings to every language, marked new; Void's AI translates them, Claude Code what it leaves, and the dev server reports what's left. An edited translation shows at once."
+      ],
+      "current": [
+        "بمجرد الحفظ، يضيف نصوصًا جديدة إلى كل لغة، ويضع عليها علامة \"جديد\"؛ ويترجمها Void's AI، ثم يترجم Claude Code ما يتبقى، ويبلغ خادم التطوير عما تبقى. تظهر الترجمة المُعدلة على الفور."
+      ],
+      "answer": [
+        "أثناء الحفظ، يضيف خادم التطوير نصوصًا جديدة لكل لغة، ويصنفها كجديدة؛ ويترجمها ذكاء Void الاصطناعي، ثم يترجم Claude Code ما يتبقى، ويبلغ خادم التطوير عما تبقى. وتظهر الترجمة المعدلة على الفور."
+      ],
+      "problems": []
+    },
+    {
+      "locale": "ar-EG",
       "hash": "0n9xvB/2BBBZQNC97OSkWA==",
       "description": "Booking email: before the link to the event's page",
       "source": ["The event's page:"],
-      "current": ["หน้าของกิจกรรม:"],
-      "answer": ["หน้ากิจกรรม:"],
-      "problems": [],
-      "attempts": 1
+      "current": ["صفحة الفعالية:"],
+      "answer": ["صفحة الفعالية:"],
+      "problems": []
     },
     {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
+      "locale": "ar-EG",
       "hash": "1MRfK1NgI+jnW+SPgLHuJw==",
       "description": "Home feature fact: the same calls run on the server and in the browser",
       "source": [
         "The same calls on the Worker and in the browser; the Intl page shows where engines differ."
       ],
-      "current": ["เรียกใช้แบบเดียวกันทั้งบน Worker และในเบราว์เซอร์ หน้ารูปแบบแสดงจุดที่แต่ละเอนจินต่างกัน"],
-      "answer": ["การเรียกใช้แบบเดียวกันทั้งบน Worker และในเบราว์เซอร์ ส่วนหน้า Intl จะแสดงจุดที่เอนจินต่างกัน"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "1ZgRTsLW3UVFnhciyWetNA==",
-      "description": "PDFs page point: the browser binding in void.config.ts, run on Cloudflare in development too, a compatibility date from 2026-03-24, and the free plan's limits",
-      "source": [
-        "Browser Run is a binding in void.config.ts, run on Cloudflare in development too, through Void's Cloudflare sign-in. It needs a compatibility date of 2026-03-24 or later. Cloudflare's free plan gives 10 minutes of browser time a day: about two thousand tickets."
-      ],
       "current": [
-        "Browser Run เป็น binding ใน void.config.ts ทำงานบน Cloudflare ตอนพัฒนาด้วย ผ่านการลงชื่อเข้า Cloudflare ของ Void ต้องใช้ compatibility date ตั้งแต่ 2026-03-24 แพ็กเกจฟรีของ Cloudflare ให้เวลาเบราว์เซอร์ 10 นาทีต่อวัน ประมาณสองพันใบ"
+        "الاستدعاءات نفسها على Worker وفي المتصفح، وتعرض صفحة التنسيقات مواضع اختلاف المحركات."
       ],
       "answer": [
-        "Browser Run เป็น binding ใน void.config.ts ซึ่งรันบน Cloudflare ในระหว่างการพัฒนาด้วยเช่นกัน ผ่านการ sign-in ของ Cloudflare ใน Void โดยต้องใช้ compatibility date ตั้งแต่วันที่ 2026-03-24 เป็นต้นไป แผนฟรีของ Cloudflare ให้เวลาใช้งานเบราว์เซอร์ 10 นาทีต่อวัน หรือประมาณสองพันตั๋ว"
+        "تشتغل نفس الاستدعاءات على الـ Worker وفي المتصفح؛ وتوضح صفحة Intl الأماكن اللي بتختلف فيها المحركات."
       ],
-      "problems": [
-        "Line 1 leaves \"binding void compatibility date\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters."
-      ],
-      "attempts": 3
+      "problems": []
     },
     {
       "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "1iRhgvB2HIGstP0vJWcmRA==",
-      "description": "Strings page: how someone attends an event, in person at the venue or online over the internet, chosen from a fixed set; {name} is the person's name",
-      "source": ["{name} takes part in person."],
-      "current": ["{name} เข้าร่วมด้วยตัวเอง"],
-      "answer": ["{name} เข้าร่วมด้วยตนเอง"],
-      "problems": [],
-      "attempts": 3
-    },
-    {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "1ldXio0BzOF9+7o9Jna/rg==",
-      "description": "Strings page piece title: a sentence for the reader, by the reader's gender",
-      "source": ["For the reader, by their gender"],
-      "current": ["สำหรับผู้อ่าน ตามเพศของผู้อ่าน"],
-      "answer": ["สำหรับผู้อ่าน ตามเพศของเขา"],
-      "problems": [],
-      "attempts": 2
-    },
-    {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "1mDHR8oSgYcns8pzU3E7oA==",
-      "description": "Home page link to the setup page of the docs",
-      "source": ["Read the full setup"],
-      "current": ["อ่านวิธีตั้งค่าทั้งหมด"],
-      "answer": ["อ่านวิธีการตั้งค่าทั้งหมด"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "22R3BWXFqX8yXBs1Gxh41w==",
-      "description": "Home feature fact about daylight saving time",
-      "source": ["Daylight saving worked out for the date itself, not for today."],
-      "current": ["คำนวณเวลาออมแสงตามวันที่นั้นเอง ไม่ใช่ตามวันนี้"],
-      "answer": ["การปรับเวลาออมแสงคำนวณตามวันที่นั้นๆ ไม่ใช่ตามวันปัจจุบัน"],
-      "problems": [],
-      "attempts": 3
-    },
-    {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "2F0uBrci189YangXw6qYvg==",
-      "description": "Strings page: each of fbtee's ways of writing a sentence, shown in this page's language",
-      "source": [
-        "Each of fbtee's ways of writing a sentence, in this page's language, with the line that does it. Arabic changes its words by who is meant; Thai and English mostly don't."
-      ],
-      "current": [
-        "แต่ละวิธีของ fbtee ในการเขียนประโยค ในภาษาของหน้านี้ พร้อมบรรทัดที่ทำหน้าที่นั้น ภาษาอาหรับเปลี่ยนคำตามบุคคลที่กล่าวถึง ส่วนภาษาไทยและภาษาอังกฤษส่วนใหญ่ไม่เปลี่ยน"
-      ],
-      "answer": [
-        "วิธีการเขียนประโยคแต่ละแบบของ fbtee ในภาษาของหน้านี้ พร้อมบรรทัดโค้ดที่ทำงานนั้น ภาษาอาหรับจะเปลี่ยนคำตามบุคคลที่กล่าวถึง ส่วนภาษาไทยและภาษาอังกฤษส่วนใหญ่จะไม่เปลี่ยน"
-      ],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "@cf/google/gemma-4-26b-a4b-it",
-      "hash": "2M3NvtZ7LdvWa8A+L9rDgA==",
-      "description": "PDFs page point: the ticket goes with the booking's confirmation email, in the same language",
-      "source": [
-        "The ticket goes with the booking's confirmation, in the same language. If it still can't be printed on the last try, the email goes without it, and the ticket is printed when it's downloaded."
-      ],
-      "current": [
-        "ตั๋วส่งไปพร้อมอีเมลยืนยันการจอง ในภาษาเดียวกัน ถ้ายังพิมพ์ไม่ได้ในครั้งสุดท้าย อีเมลจะส่งไปโดยไม่มีตั๋ว และตั๋วจะพิมพ์ตอนดาวน์โหลด"
-      ],
-      "answer": [
-        "ตั๋วจะมาพร้อมกับการยืนยันการจองในภาษาเดียวกัน หากยังพิมพ์ไม่ได้ในการลองครั้งสุดท้าย อีเมลจะถูกส่งไปโดยไม่มีตั๋ว และตั๋วจะถูกพิมพ์เมื่อมีการดาวน์โหลด"
-      ],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
       "hash": "FmYCSyKNMYHFcurKzrIYBw==",
       "description": "Strings page: someone booked a seat at an event, worded by their gender; {name} is their name",
       "source": ["{name} booked a seat.", "{name} booked a seat.", "{name} booked a seat."],
       "current": ["{name} จองที่นั่งแล้ว", "{name} จองที่นั่งแล้ว", "{name} จองที่นั่งแล้ว"],
-      "answer": ["{name} จองที่นั่งแล้ว", "{name} จองที่นั่งแล้ว", "{name} จองที่นั่งแล้ว"],
-      "problems": [],
-      "attempts": 1
+      "answer": ["{name} ได้จองที่นั่งแล้ว", "{name} ได้จองที่นั่งแล้ว", "{name} ได้จองที่นั่งแล้ว"],
+      "problems": []
     },
     {
       "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
       "hash": "qxa4l1H7kCC3JQD+LJ7viA==",
       "description": "Strings page: said to the reader right after they book a seat at an event, and it means: you have a seat now. Short, like the English",
       "source": ["You're booked.", "You're booked.", "You're booked."],
       "current": ["คุณจองแล้ว", "คุณจองแล้ว", "คุณจองแล้ว"],
       "answer": ["คุณจองที่นั่งแล้ว", "คุณจองที่นั่งแล้ว", "คุณจองที่นั่งแล้ว"],
-      "problems": [],
-      "attempts": 1
+      "problems": []
     },
     {
       "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
       "hash": "+AuH23AakSMD2/1McKhd4w==",
       "description": "Strings page point title: plurals",
       "source": ["Plurals, each language's own"],
       "current": ["รูปพหูพจน์ ตามแต่ละภาษา"],
-      "answer": ["พหูพจน์ตามแต่ละภาษา"],
-      "problems": [],
-      "attempts": 1
+      "answer": ["พหูพจน์ตามหลักของแต่ละภาษา"],
+      "problems": []
     },
     {
       "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
       "hash": "+BSQtF71BWhuyCYlDZ2PhA==",
       "description": "A heading: named time zones",
       "source": ["Time zones"],
       "current": ["เขตเวลา"],
       "answer": ["เขตเวลา"],
-      "problems": [],
-      "attempts": 1
+      "problems": []
     },
     {
       "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
       "hash": "+TOlgrXkyPMWSXZKyRlS+w==",
       "description": "Intl page section: relative time, like 'yesterday'",
       "source": ["Relative time"],
       "current": ["เวลาสัมพัทธ์"],
-      "answer": ["เวลาสัมพัทธ์"],
-      "problems": [],
-      "attempts": 1
+      "answer": ["เวลาเปรียบเทียบ"],
+      "problems": []
     },
     {
       "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
       "hash": "/R89OA5GUYekRxWiCvTRSA==",
       "description": "Cancellation email: the event the reader had a seat at is cancelled by its organiser; {event} is its title, {time} when it would have started, already formatted",
       "source": [
         "{event}, on {time}, has been cancelled by its organiser. Your seat is gone with it."
       ],
       "current": ["{event} ซึ่งจะจัดขึ้น{time} ถูกผู้จัดยกเลิกแล้ว ที่นั่งของคุณจึงถูกยกเลิกไปด้วย"],
-      "answer": ["งาน {event} ในวันที่ {time} ถูกยกเลิกโดยผู้จัดงานแล้ว และที่นั่งของคุณก็ถูกยกเลิกไปด้วย"],
-      "problems": [],
-      "attempts": 1
+      "answer": ["กิจกรรม {event} ในวันที่ {time} ถูกยกเลิกโดยผู้จัดงาน และที่นั่งของคุณก็ถูกยกเลิกไปด้วย"],
+      "problems": []
     },
     {
       "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "/aRZulxMqHQep4BC9smXmg==",
-      "description": "Events page description, for search results",
-      "source": ["Events posted in any language, each on its own city's clock and on yours."],
-      "current": ["กิจกรรมที่โพสต์ในภาษาใดก็ได้ แต่ละรายการแสดงตามเวลาในเมืองของกิจกรรมและตามเวลาของคุณ"],
-      "answer": ["งานกิจกรรมที่โพสต์ในภาษาใดก็ได้ โดยแต่ละงานจะแสดงตามเวลาของเมืองนั้นๆ และเวลาของคุณ"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "/s93hh9vqUCZEcDcAH6YJA==",
-      "description": "Home feature title: numbers and other formats",
-      "source": ["Numbers and the rest, by Intl"],
-      "current": ["ตัวเลขและอื่นๆ ด้วย Intl"],
-      "answer": ["ตัวเลขและรูปแบบอื่นๆ โดย Intl"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "/tj0XCj9mTqyMKaRkIh2KA==",
-      "description": "Strings page: someone looked over their own ticket for an event, with a pronoun by their gender; {name} is their name",
-      "source": ["{name} checked their ticket."],
-      "current": ["{name} ตรวจตั๋วของตนแล้ว"],
-      "answer": ["{name} ตรวจสอบตั๋วของตนเองแล้ว"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "0+6Iq11NYcCJ+uDy7/PqnA==",
-      "description": "Home feature fact: the middleware sets the page's language and direction",
-      "source": ["The middleware sets the page's lang and dir from the URL."],
-      "current": ["มิดเดิลแวร์ตั้งค่า lang และ dir ของหน้าจาก URL"],
-      "answer": ["มิดเดิลแวร์จะตั้งค่าภาษาและทิศทางของหน้าจาก URL"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "0KCj8z+wYa63EFv4pp9wmA==",
-      "description": "Intl page section: numbers",
-      "source": ["Numbers"],
-      "current": ["ตัวเลข"],
-      "answer": ["ตัวเลข"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "0Nrc8Co3U/Yd5XokcA/uNg==",
-      "description": "Strings page: someone booked seats at an event; {name} is their name, {number} how many seats",
-      "source": ["{name} booked a seat."],
-      "current": ["{name} จองที่นั่งแล้ว 1 ที่"],
-      "answer": ["{name} จองที่นั่งแล้ว"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "0QlWMWPWKIJVwMzYcHG7vw==",
-      "description": "Docs page title: the page about how the app gets translated",
-      "source": ["Translating"],
-      "current": ["การแปล"],
-      "answer": ["การแปลภาษา"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "0f0XPtcyZdzVqSt5xH6qvw==",
-      "description": "Components page: useTimeZone gives the reader's own time zone, once the browser knows it",
-      "source": ["The reader's own time zone, once the browser knows it; none on the server."],
-      "current": ["เขตเวลาของผู้อ่านเอง เมื่อเบราว์เซอร์รู้แล้ว บนเซิร์ฟเวอร์ไม่มี"],
-      "answer": ["เขตเวลาของผู้ใช้เองเมื่อเบราว์เซอร์รับรู้แล้ว และจะไม่มีบนเซิร์ฟเวอร์"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "0fNA/4K1+g90HWefUK7JDA==",
-      "description": "Strings page form: a list joined with 'and'",
-      "source": ["and"],
-      "current": ["และ"],
-      "answer": ["และ"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "0n9xvB/2BBBZQNC97OSkWA==",
-      "description": "Booking email: before the link to the event's page",
-      "source": ["The event's page:"],
-      "current": ["หน้าของกิจกรรม:"],
-      "answer": ["หน้าของงานกิจกรรม:"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "1MRfK1NgI+jnW+SPgLHuJw==",
-      "description": "Home feature fact: the same calls run on the server and in the browser",
-      "source": [
-        "The same calls on the Worker and in the browser; the Intl page shows where engines differ."
-      ],
-      "current": ["เรียกใช้แบบเดียวกันทั้งบน Worker และในเบราว์เซอร์ หน้ารูปแบบแสดงจุดที่แต่ละเอนจินต่างกัน"],
-      "answer": [
-        "การเรียกใช้งานแบบเดียวกันทั้งบน Worker และในเบราว์เซอร์ โดยหน้า Intl จะแสดงจุดที่เครื่องมือประมวลผลทำงานต่างกัน"
-      ],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "1ZgRTsLW3UVFnhciyWetNA==",
-      "description": "PDFs page point: the browser binding in void.config.ts, run on Cloudflare in development too, a compatibility date from 2026-03-24, and the free plan's limits",
-      "source": [
-        "Browser Run is a binding in void.config.ts, run on Cloudflare in development too, through Void's Cloudflare sign-in. It needs a compatibility date of 2026-03-24 or later. Cloudflare's free plan gives 10 minutes of browser time a day: about two thousand tickets."
-      ],
-      "current": [
-        "Browser Run เป็น binding ใน void.config.ts ทำงานบน Cloudflare ตอนพัฒนาด้วย ผ่านการลงชื่อเข้า Cloudflare ของ Void ต้องใช้ compatibility date ตั้งแต่ 2026-03-24 แพ็กเกจฟรีของ Cloudflare ให้เวลาเบราว์เซอร์ 10 นาทีต่อวัน ประมาณสองพันใบ"
-      ],
-      "answer": [
-        "Browser Run เป็นการเชื่อมโยงใน config.ts ซึ่งทำงานบน Cloudflare ในขั้นตอนการพัฒนาด้วยเช่นกันผ่านการ sign-in เข้าสู่ Cloudflare ของ Void โดยจำเป็นต้องใช้วันที่เข้ากันได้เป็น 2026-03-24 หรือใหม่กว่า แผนบริการฟรีของ Cloudflare ให้เวลาใช้งานเบราว์เซอร์ 10 นาทีต่อวัน ซึ่งพิมพ์ตั๋วได้ประมาณสองพันใบ"
-      ],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "1iRhgvB2HIGstP0vJWcmRA==",
-      "description": "Strings page: how someone attends an event, in person at the venue or online over the internet, chosen from a fixed set; {name} is the person's name",
-      "source": ["{name} takes part in person."],
-      "current": ["{name} เข้าร่วมด้วยตัวเอง"],
-      "answer": ["{name} เข้าร่วมงานด้วยตนเอง"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "1ldXio0BzOF9+7o9Jna/rg==",
-      "description": "Strings page piece title: a sentence for the reader, by the reader's gender",
-      "source": ["For the reader, by their gender"],
-      "current": ["สำหรับผู้อ่าน ตามเพศของผู้อ่าน"],
-      "answer": ["สำหรับผู้ใช้ ตามเพศของผู้ใช้"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "1mDHR8oSgYcns8pzU3E7oA==",
-      "description": "Home page link to the setup page of the docs",
-      "source": ["Read the full setup"],
-      "current": ["อ่านวิธีตั้งค่าทั้งหมด"],
-      "answer": ["อ่านขั้นตอนการตั้งค่าทั้งหมด"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "22R3BWXFqX8yXBs1Gxh41w==",
-      "description": "Home feature fact about daylight saving time",
-      "source": ["Daylight saving worked out for the date itself, not for today."],
-      "current": ["คำนวณเวลาออมแสงตามวันที่นั้นเอง ไม่ใช่ตามวันนี้"],
-      "answer": ["เวลาออมแสงจะคำนวณตามวันที่จัดงานจริง ไม่ใช่ตามวันปัจจุบัน"],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "2F0uBrci189YangXw6qYvg==",
-      "description": "Strings page: each of fbtee's ways of writing a sentence, shown in this page's language",
-      "source": [
-        "Each of fbtee's ways of writing a sentence, in this page's language, with the line that does it. Arabic changes its words by who is meant; Thai and English mostly don't."
-      ],
-      "current": [
-        "แต่ละวิธีของ fbtee ในการเขียนประโยค ในภาษาของหน้านี้ พร้อมบรรทัดที่ทำหน้าที่นั้น ภาษาอาหรับเปลี่ยนคำตามบุคคลที่กล่าวถึง ส่วนภาษาไทยและภาษาอังกฤษส่วนใหญ่ไม่เปลี่ยน"
-      ],
-      "answer": [
-        "วิธีการเขียนประโยคแต่ละแบบของ fbtee ที่แสดงในภาษาของหน้านี้พร้อมกับบรรทัดโค้ดที่ใช้ ภาษาอาหรับจะเปลี่ยนคำตามผู้ที่ถูกกล่าวถึง ส่วนภาษาไทยและภาษาอังกฤษส่วนใหญ่จะไม่มีการเปลี่ยนคำ"
-      ],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
-      "hash": "2M3NvtZ7LdvWa8A+L9rDgA==",
-      "description": "PDFs page point: the ticket goes with the booking's confirmation email, in the same language",
-      "source": [
-        "The ticket goes with the booking's confirmation, in the same language. If it still can't be printed on the last try, the email goes without it, and the ticket is printed when it's downloaded."
-      ],
-      "current": [
-        "ตั๋วส่งไปพร้อมอีเมลยืนยันการจอง ในภาษาเดียวกัน ถ้ายังพิมพ์ไม่ได้ในครั้งสุดท้าย อีเมลจะส่งไปโดยไม่มีตั๋ว และตั๋วจะพิมพ์ตอนดาวน์โหลด"
-      ],
-      "answer": [
-        "ตั๋วจะถูกส่งไปพร้อมกับอีเมลยืนยันการจองในภาษาเดียวกัน หากยังไม่สามารถพิมพ์ตั๋วได้ในการพยายามครั้งสุดท้าย อีเมลจะถูกส่งไปโดยไม่มีตั๋ว และตั๋วจะถูกพิมพ์เมื่อมีการดาวน์โหลด"
-      ],
-      "problems": [],
-      "attempts": 1
-    },
-    {
-      "locale": "th-TH",
-      "model": "google/gemini-3.5-flash",
       "hash": "/WNY/KEU6PiQ/6Qz1I2xpg==",
       "description": "Strings page point: the build fails on any untranslated string, and the lint rules catch text not marked",
       "source": [
@@ -1532,12 +471,195 @@
         "vp build จะล้มเหลวหากมีข้อความใดยังไม่ได้แปลในภาษาใดก็ตาม และกฎ lint ของ fbtee (vp check) จะแจ้งข้อความที่เขียนในคอมโพเนนต์โดยไม่มี fbt"
       ],
       "answer": [
-        "vp build จะล้มเหลวหากมีข้อความใดที่ยังไม่ได้แปลในภาษาใดก็ตาม และกฎ lint ของ fbtee (vp check) จะรายงานข้อความที่เขียนในคอมโพเนนต์โดยไม่มี fbt"
+        "vp build จะล้มเหลวหากมีข้อความใดที่ยังไม่ได้แปลในภาษาใดก็ตาม และกฎการตรวจสอบโค้ด (vp check) จะรายงานข้อความที่เขียนในคอมโพเนนต์โดยไม่ได้ใช้ fbt"
       ],
-      "problems": [
-        "Line 1 leaves \"lint fbt\" in English: translate it; only names, commands, file names and placeholders stay in Latin letters."
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "/aRZulxMqHQep4BC9smXmg==",
+      "description": "Events page description, for search results",
+      "source": ["Events posted in any language, each on its own city's clock and on yours."],
+      "current": ["กิจกรรมที่โพสต์ในภาษาใดก็ได้ แต่ละรายการแสดงตามเวลาในเมืองของกิจกรรมและตามเวลาของคุณ"],
+      "answer": [
+        "กิจกรรมที่กำลังจะเกิดขึ้นซึ่งโพสต์ในภาษาใดก็ได้ โดยแต่ละกิจกรรมจะแสดงตามเวลาบนนาฬิกาของเมืองที่จัดงานและนาฬิกาของคุณ"
       ],
-      "attempts": 2
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "/s93hh9vqUCZEcDcAH6YJA==",
+      "description": "Home feature title: numbers and other formats",
+      "source": ["Numbers and the rest, by Intl"],
+      "current": ["ตัวเลขและอื่นๆ ด้วย Intl"],
+      "answer": ["ตัวเลขและรูปแบบอื่น ๆ โดย Intl"],
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "/tj0XCj9mTqyMKaRkIh2KA==",
+      "description": "Strings page: someone looked over their own ticket for an event, with a pronoun by their gender; {name} is their name",
+      "source": ["{name} checked their ticket."],
+      "current": ["{name} ตรวจตั๋วของตนแล้ว"],
+      "answer": ["{name} ตรวจสอบตั๋วของตัวเองแล้ว"],
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "0+6Iq11NYcCJ+uDy7/PqnA==",
+      "description": "Home feature fact: the middleware sets the page's language and direction",
+      "source": ["The middleware sets the page's lang and dir from the URL."],
+      "current": ["มิดเดิลแวร์ตั้งค่า lang และ dir ของหน้าจาก URL"],
+      "answer": ["มิดเดิลแวร์จะตั้งค่าภาษาและทิศทางของหน้าจาก URL"],
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "0KCj8z+wYa63EFv4pp9wmA==",
+      "description": "Intl page section: numbers",
+      "source": ["Numbers"],
+      "current": ["ตัวเลข"],
+      "answer": ["ตัวเลข"],
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "0Nrc8Co3U/Yd5XokcA/uNg==",
+      "description": "Strings page: someone booked seats at an event; {name} is their name, {number} how many seats",
+      "source": ["{name} booked a seat."],
+      "current": ["{name} จองที่นั่งแล้ว 1 ที่"],
+      "answer": ["{name} ได้จองที่นั่งแล้ว"],
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "0QlWMWPWKIJVwMzYcHG7vw==",
+      "description": "Docs page title: the page about how the app gets translated",
+      "source": ["Translating"],
+      "current": ["การแปล"],
+      "answer": ["การแปลภาษา"],
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "0f0XPtcyZdzVqSt5xH6qvw==",
+      "description": "Components page: useTimeZone gives the reader's own time zone, once the browser knows it",
+      "source": ["The reader's own time zone, once the browser knows it; none on the server."],
+      "current": ["เขตเวลาของผู้อ่านเอง เมื่อเบราว์เซอร์รู้แล้ว บนเซิร์ฟเวอร์ไม่มี"],
+      "answer": ["เขตเวลาของผู้อ่านเองเมื่อเบราว์เซอร์รับรู้แล้ว และจะไม่มีค่านี้บนเซิร์ฟเวอร์"],
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "0fNA/4K1+g90HWefUK7JDA==",
+      "description": "Strings page form: a list joined with 'and'",
+      "source": ["and"],
+      "current": ["และ"],
+      "answer": ["และ"],
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "0lZ+v47QSOzy6IAWK4T/Dg==",
+      "description": "Translating page: what the dev server does about translations as you save: preparing, translating with Void's AI then Claude Code, and reporting by itself",
+      "source": [
+        "As you save, adds new strings to every language, marked new; Void's AI translates them, Claude Code what it leaves, and the dev server reports what's left. An edited translation shows at once."
+      ],
+      "current": [
+        "เมื่อคุณบันทึก ระบบจะเพิ่มข้อความใหม่ไปยังทุกภาษาโดยทำเครื่องหมายว่าใหม่ จากนั้น Void's AI จะแปลข้อความเหล่านั้น และ Claude Code จะแปลส่วนที่เหลือ โดยเซิร์ฟเวอร์สำหรับพัฒนาจะรายงานสิ่งที่เหลืออยู่ และคำแปลที่แก้ไขแล้วจะแสดงขึ้นทันที"
+      ],
+      "answer": [
+        "เมื่อคุณบันทึกไฟล์ ระบบจะเพิ่มข้อความใหม่ไปยังทุกภาษาโดยทำเครื่องหมายว่าเป็นข้อความใหม่ จากนั้น AI ของ Void จะแปลข้อความเหล่านั้น และ Claude Code จะแปลส่วนที่เหลือ โดยเซิร์ฟเวอร์สำหรับพัฒนาจะรายงานข้อความที่ยังค้างอยู่ และคำแปลที่แก้ไขแล้วจะแสดงผลทันที"
+      ],
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "0n9xvB/2BBBZQNC97OSkWA==",
+      "description": "Booking email: before the link to the event's page",
+      "source": ["The event's page:"],
+      "current": ["หน้าของกิจกรรม:"],
+      "answer": ["หน้าของกิจกรรม:"],
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "1MRfK1NgI+jnW+SPgLHuJw==",
+      "description": "Home feature fact: the same calls run on the server and in the browser",
+      "source": [
+        "The same calls on the Worker and in the browser; the Intl page shows where engines differ."
+      ],
+      "current": ["เรียกใช้แบบเดียวกันทั้งบน Worker และในเบราว์เซอร์ หน้ารูปแบบแสดงจุดที่แต่ละเอนจินต่างกัน"],
+      "answer": [
+        "เรียกใช้งานแบบเดียวกันทั้งบน Worker และในเบราว์เซอร์ โดยหน้า Intl จะแสดงจุดที่แต่ละเอนจินทำงานต่างกัน"
+      ],
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "1ZgRTsLW3UVFnhciyWetNA==",
+      "description": "PDFs page point: the browser binding in void.config.ts, run on Cloudflare in development too, a compatibility date from 2026-03-24, and the free plan's limits",
+      "source": [
+        "Browser Run is a binding in void.config.ts, run on Cloudflare in development too, through Void's Cloudflare sign-in. It needs a compatibility date of 2026-03-24 or later. Cloudflare's free plan gives 10 minutes of browser time a day: about two thousand tickets."
+      ],
+      "current": [
+        "Browser Run เป็นการเชื่อมโยงใน void.config.ts ซึ่งทำงานบน Cloudflare ในขั้นตอนการพัฒนาด้วยเช่นกัน ผ่านการลงชื่อเข้าใช้ Cloudflare ของ Void โดยจำเป็นต้องใช้วันที่เข้ากันได้เป็น 2026-03-24 หรือใหม่กว่า แผนบริการฟรีของ Cloudflare ให้เวลาใช้งานเบราว์เซอร์ 10 นาทีต่อวัน หรือคิดเป็นตั๋วประมาณสองพันใบ"
+      ],
+      "answer": [
+        "Browser Run เป็นการเชื่อมโยงใน void.config.ts ซึ่งทำงานบน Cloudflare ในขั้นตอนการพัฒนาด้วยเช่นกัน ผ่านการลงชื่อเข้าใช้ Cloudflare ของ Void โดยจำเป็นต้องใช้วันที่เข้ากันได้ (compatibility date) เป็นวันที่ 2026-03-24 หรือใหม่กว่า แผนบริการฟรีของ Cloudflare ให้เวลาใช้งานเบราว์เซอร์ 10 นาทีต่อวัน ซึ่งเทียบเท่ากับตั๋วประมาณสองพันใบ"
+      ],
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "1iRhgvB2HIGstP0vJWcmRA==",
+      "description": "Strings page: how someone attends an event, in person at the venue or online over the internet, chosen from a fixed set; {name} is the person's name",
+      "source": ["{name} takes part in person."],
+      "current": ["{name} เข้าร่วมด้วยตัวเอง"],
+      "answer": ["{name} เข้าร่วมงานด้วยตัวเอง"],
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "1ldXio0BzOF9+7o9Jna/rg==",
+      "description": "Strings page piece title: a sentence for the reader, by the reader's gender",
+      "source": ["For the reader, by their gender"],
+      "current": ["สำหรับผู้อ่าน ตามเพศของผู้อ่าน"],
+      "answer": ["สำหรับผู้อ่าน โดยแบ่งตามเพศของพวกเขา"],
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "1mDHR8oSgYcns8pzU3E7oA==",
+      "description": "Home page link to the setup page of the docs",
+      "source": ["Read the full setup"],
+      "current": ["อ่านวิธีตั้งค่าทั้งหมด"],
+      "answer": ["อ่านขั้นตอนการตั้งค่าทั้งหมด"],
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "22R3BWXFqX8yXBs1Gxh41w==",
+      "description": "Home feature fact about daylight saving time",
+      "source": ["Daylight saving worked out for the date itself, not for today."],
+      "current": ["คำนวณเวลาออมแสงตามวันที่นั้นเอง ไม่ใช่ตามวันนี้"],
+      "answer": ["เวลาออมแสง (Daylight saving) จะคำนวณตามวันที่จัดกิจกรรมจริง ไม่ใช่ตามวันปัจจุบัน"],
+      "problems": []
+    },
+    {
+      "locale": "th-TH",
+      "hash": "2F0uBrci189YangXw6qYvg==",
+      "description": "Strings page: each of fbtee's ways of writing a sentence, shown in this page's language",
+      "source": [
+        "Each of fbtee's ways of writing a sentence, in this page's language, with the line that does it. Arabic changes its words by who is meant; Thai and English mostly don't."
+      ],
+      "current": [
+        "แต่ละวิธีของ fbtee ในการเขียนประโยค ในภาษาของหน้านี้ พร้อมบรรทัดที่ทำหน้าที่นั้น ภาษาอาหรับเปลี่ยนคำตามบุคคลที่กล่าวถึง ส่วนภาษาไทยและภาษาอังกฤษส่วนใหญ่ไม่เปลี่ยน"
+      ],
+      "answer": [
+        "วิธีการเขียนประโยคแต่ละแบบของ fbtee ในภาษาของหน้านี้ พร้อมกับบรรทัดโค้ดที่ใช้ทำงาน ภาษาอาหรับจะเปลี่ยนรูปคำตามบุคคลที่หมายถึง ส่วนภาษาไทยและภาษาอังกฤษส่วนใหญ่จะไม่มีการเปลี่ยนรูป"
+      ],
+      "problems": []
     }
   ]
 }

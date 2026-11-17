@@ -134,7 +134,7 @@
     }
   },
   "keptTerms": {
-    "why": "The lower-case names with a hyphen kept exactly as written: packages void-fbtee's apps are built with. Any other hyphenated phrase is an English compound and is translated (right-to-left, written-out, supported-value), which vp build flagged as names when it began checking every entry (2026-11-17).",
+    "why": "The lower-case names with a hyphen kept exactly as written: packages void-fbtee's apps are built with. Any other hyphenated phrase is an English compound and is translated (right-to-left, written-out, supported-value), which vp build flagged as names when it began checking every entry (2026-11-17). Product names in the source (products) are kept as written too: Gemini wrote Void's AI as ذكاء Void الاصطناعي and AI ของ Void (Claude's review, 2026-11-17).",
     "names": [
       "void-fbtee",
       "temporal-polyfill",
@@ -142,6 +142,7 @@
       "void-moq",
       "react-email",
       "shadcn-ui"
-    ]
+    ],
+    "products": ["Void's AI", "Claude Code", "Gemini 3.5 Flash"]
   }
 }

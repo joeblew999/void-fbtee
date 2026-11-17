@@ -75,7 +75,7 @@ export default defineConfig({
   },
   // The Worker's name on Cloudflare: void-fbtee-example.<subdomain>.workers.dev.
   // The account too, as Void's config reference shows.
-  // Workers AI (void/ai, which translates what people post: queues/translate.ts) has no local
+  // Void's AI (void/ai, which translates what people post: queues/translate.ts) has no local
   // stand-in, so local runs send it to Cloudflare through Void's sign-in. Void marks it remote by
   // itself only in dev (Void 1.8.0); `vp preview` runs the build's config, where it was plain, and
   // failed with "Binding AI needs to be run remotely". Set here, it's in the build too (Void

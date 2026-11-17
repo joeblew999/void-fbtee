@@ -163,3 +163,15 @@ test("an English term in brackets after the word is a gloss, not text left in En
     problemsWith(line(src), ["Browser Run ربط (binding) في void.config.ts."], "ar-EG"),
   ).toEqual([]);
 });
+
+test("product names are kept as written", () => {
+  const src = "vp dev translates with Void's AI, then Claude Code.";
+  expect(keptTerms(src)).toEqual(["vp dev", "Void's AI", "Claude Code"]);
+  expect(
+    problemsWith(
+      line(src),
+      ["يترجم vp dev باستخدام ذكاء Void الاصطناعي، ثم Claude Code."],
+      "ar-EG",
+    ).join(" "),
+  ).toMatch(/must keep "Void's AI"/);
+});

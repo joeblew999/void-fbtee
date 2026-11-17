@@ -1,6 +1,7 @@
-// The Translating page, a reference: how this app gets translated. Its own text and pages by
-// Claude Code, into files in the repository (with each catalog's counts, from the loader); what
-// people post by Workers AI, as it's posted. With the lines that do it.
+// The Translating page, a reference: how this app gets translated. Its own text and pages, and what
+// people post, by the same AI (Void's AI: Gemini 3.5 Flash), the first into files in the
+// repository (with each catalog's counts, from the loader), the second as it's posted; Claude Code
+// for what it leaves. With the lines that do it.
 import { fbt } from "fbtee";
 import type { ReactNode } from "react";
 import { routeUrl } from "void-fbtee/routes";
@@ -14,16 +15,17 @@ function points(): Point[] {
     {
       id: "claude",
       title: (
-        <fbt desc="Translating page point title: the dev server translates, with Void's AI or Claude Code">
-          vp dev translates, with Void's AI or Claude Code
+        <fbt desc="Translating page point title: the dev server translates, with Void's AI, then Claude Code for what's left">
+          vp dev translates, with Void's AI, then Claude Code
         </fbt>
       ),
       why: (
-        <fbt desc="Translating page point: as you save, the dev server prepares new strings and translates them, with Claude Code when it's on the machine, else with Void's AI; what people post is translated by Void's AI">
+        <fbt desc="Translating page point: as you save, the dev server prepares new strings and has Void's AI translate them, many at a time; every answer is checked, and what still fails goes to Claude Code; each translation records who wrote it">
           There's nothing to run. As you save, vp dev adds each new string to every language's
-          catalog and translates what's new, the strings and the markdown pages that changed: with
-          Claude Code and void-fbtee's skill when it's on your machine, else with Void's AI, in the
-          app's own Worker, when the app uses it. What people post is translated by Void's AI.
+          catalog and translates what's new, the strings and the markdown pages that changed, with
+          Void's AI in the app's own Worker: Gemini 3.5 Flash, many strings at a time. Every answer
+          is checked, and what still fails goes to Claude Code with void-fbtee's skill. Each
+          translation records who wrote it and when.
         </fbt>
       ),
       code: [
@@ -65,10 +67,10 @@ function points(): Point[] {
         </fbt>
       ),
       why: (
-        <fbt desc="Translating page point: a posted event goes to a queue whose consumer translates it with Workers AI">
+        <fbt desc="Translating page point: a posted event goes to a queue whose consumer translates it with Void's AI, the same model as the app's own text">
           An event someone posts isn't in the repository, so it's translated as it's posted: the
-          post goes to a queue, and its consumer asks Workers AI for each of the app's other
-          languages, after the poster has their answer.
+          post goes to a queue, and its consumer asks Void's AI, the same model as the app's own
+          text, for each of the app's other languages, after the poster has their answer.
         </fbt>
       ),
       code: [
@@ -78,7 +80,7 @@ function points(): Point[] {
         },
         {
           file: "queues/translate.ts",
-          line: 'const MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";',
+          line: 'translateText(text, { from, to, about: "listings for events" });',
         },
       ],
     },
@@ -103,9 +105,10 @@ function stages(): { command: string; what: ReactNode; where: string }[] {
     {
       command: "vp dev",
       what: (
-        <fbt desc="Translating page: what the dev server does about translations as you save, preparing, translating with Claude Code or Void's AI, and reporting by itself">
-          As you save, adds new strings to every language, marked new, and Claude Code or Void's AI
-          translates them; the dev server reports what's left. An edited translation shows at once.
+        <fbt desc="Translating page: what the dev server does about translations as you save: preparing, translating with Void's AI then Claude Code, and reporting by itself">
+          As you save, adds new strings to every language, marked new; Void's AI translates them,
+          Claude Code what it leaves, and the dev server reports what's left. An edited translation
+          shows at once.
         </fbt>
       ),
       where: "vite.config.ts (voidFbtee)",
@@ -114,8 +117,9 @@ function stages(): { command: string; what: ReactNode; where: string }[] {
       command: "vp build",
       what: (
         <fbt desc="Translating page: what the build does about translations">
-          Fails on anything left: an untranslated string or page, a page older than its original, a
-          setup problem. So a deploy can't ship one.
+          Fails on anything left or wrong: an untranslated string or page, a translation that fails
+          the checks vp dev runs, a page older than its original, a setup problem. So a deploy can't
+          ship one.
         </fbt>
       ),
       where: "vite.config.ts (voidFbtee)",
@@ -174,9 +178,9 @@ export default function TranslatingPage({ catalogs }: Props) {
       title={<fbt common>Translating</fbt>}
       intro={
         <fbt desc="Translating page introduction">
-          The app's own text is translated by Claude Code, into files in the repository that you
-          review. What people post is translated by Workers AI as it's posted. Here is each, with
-          the lines that do it.
+          The app's own text and what people post are translated by the same AI, Gemini 3.5 Flash
+          through Void's AI: the text into files in the repository that you review, posts as they're
+          posted. Claude Code translates what it leaves. Here is each, with the lines that do it.
         </fbt>
       }
       sections={sections}
@@ -206,8 +210,8 @@ export default function TranslatingPage({ catalogs }: Props) {
           </tbody>
         </table>
         <p className="text-muted-foreground">
-          <fbt desc="Translating page: the events people post are translated by Workers AI; {link} is a link to the events whose text is 'see them'">
-            The events are translated by Workers AI:{" "}
+          <fbt desc="Translating page: the events people post are translated by Void's AI; {link} is a link to the events whose text is 'see them'">
+            The events are translated by Void's AI:{" "}
             <fbt:param name="link">
               <Link href={routeUrl("/[lang]/events")} className="underline">
                 <fbt desc="Translating page: link text to the list of events">see them</fbt>

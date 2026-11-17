@@ -51,9 +51,9 @@ Every day:
 
 ```sh
 vp run login             # once: Void's Cloudflare sign-in, which dev and the preview need for
-                         # Workers AI and Browser Run (Void has no local stand-in for them)
+                         # Void's AI and Browser Run (Void has no local stand-in for them)
 vp run dev               # develop: the package rebuilds on save; the example runs with Void's
-                         # local D1, KV, R2, queues, live updates, email inbox, Workers AI and
+                         # local D1, KV, R2, queues, live updates, email inbox, Void's AI and
                          # Browser Run (the PDF tickets).
                          # It prints its email inbox's address when it starts
 vp check                 # format, lint, types
@@ -71,7 +71,7 @@ vp run deploy            # deploy the example to production (Cloudflare), with n
 vp run test:production   # the preview suite against the live site, less what posts or books
 vp run deploy:preview    # this branch as a Worker Preview beside production (needs cf's login)
 vp run test:deployed     # a quick check of what the last deploy put live: sitemap, a Thai
-                         # not-found page, one event posted, translated by Workers AI and
+                         # not-found page, one event posted, translated by Void's AI and
                          # deleted (CI runs it after each deploy)
 vp run test:browsers     # every page in every language in Chromium, WebKit and WebKit as today's
                          # iPhones have it (no built-in Temporal): no errors, fits a phone; and
@@ -133,7 +133,7 @@ Each test runs on the stage Void gives what it checks, and checks through what V
 there (Void's docs in `apps/example/node_modules/void/docs/` and its own `TESTING.md`). Nothing is faked: the tests use the real runtime, Void's own hooks and
 Cloudflare's local stand-ins.
 
-| Stage (task)                      | Where it runs                                        | Email                                                                          | Workers AI                | Queues and the cron                                                                                              | Page cache                         |
+| Stage (task)                      | Where it runs                                        | Email                                                                          | Void's AI                 | Queues and the cron                                                                                              | Page cache                         |
 | --------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
 | `test:unit`                       | Node                                                 | Void's harness (`void/email/testing`) checks each email's wording and language | none                      | none                                                                                                             | none                               |
 | `test:dev` (`e2e/dev/`)           | the dev server: yours if running, else it starts one | Void's dev inbox, read back with its token                                     | real, through the sign-in | Void's triggers: `POST /__void/queue` (each message's ack checked), `POST /__void/scheduled` (the reminder cron) | none in dev                        |
@@ -145,8 +145,10 @@ Cloudflare's local stand-ins.
 - **Dev and the preview, one at a time:** they share the local database (Void's
   `guide/database/d1.md`), which the preview run resets and refuses to touch while dev is up.
   `test:dev` uses your dev server's database as it is and deletes everything it posts.
-- **Workers AI in dev and the preview:** both send it to Cloudflare through Void's sign-in
-  (`vp run login`). Void marks the AI binding remote by itself only in dev, so
+- **Void's AI in dev and the preview:** both send it to Cloudflare through Void's sign-in
+  (`vp run login`). It translates with Gemini 3.5 Flash through AI Gateway, paid from the
+  account's AI Gateway credits (Unified Billing, no key); `vp run translations:measure` runs it on
+  a sample and prints the cost. Void marks the AI binding remote by itself only in dev, so
   `apps/example/void.config.ts` sets `ai: { binding: "AI", remote: true }` in `cloudflare`; without
   it the preview fails with "Binding AI needs to be run remotely".
 - **Browser Run (the PDF tickets) in dev and the preview:** the same, through the same sign-in:

@@ -2618,18 +2618,6 @@
       ],
       "types": []
     },
-    "PiM5wxtePrk1NeOis7gFQA==": {
-      "description": "Translating page point: a posted event goes to a queue whose consumer translates it with Workers AI",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "الفعالية التي ينشرها أحد ليست في المستودع، فتُترجم عند نشرها: يذهب المنشور إلى طابور، ويطلب مستهلكه من Workers AI كل لغة أخرى في التطبيق، بعد أن يتلقى الناشر جوابه.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "XxIseC//t+ZDp/MXfOKBvw==": {
       "description": "Translating page section title: this app's catalogs, one per language",
       "status": "translated",
@@ -2649,18 +2637,6 @@
       "translations": [
         {
           "translation": "كيف يتم ذلك",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "go4hg/3m6IV9tBrvRVt+lg==": {
-      "description": "Translating page introduction",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يترجم Claude Code نص التطبيق نفسه، إلى ملفات في المستودع تراجعها أنت. وما ينشره الناس يترجمه Workers AI عند نشره. هذا كلٌّ منهما، مع الأسطر التي تقوم به.",
           "variations": {}
         }
       ],
@@ -3727,41 +3703,19 @@
       ],
       "types": []
     },
-    "9PlusVxA/lrWcJwlu5EpsA==": {
-      "description": "Translating page: what the build does about translations",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يفشل إذا بقي أي شيء: نص أو صفحة غير مترجمة، أو صفحة أقدم من أصلها، أو مشكلة في الإعداد. لذا لا يمكن للنشر أن يحمل أيًا منها.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "X9n7ejivG8fJSwBpv0Mw0w==": {
       "description": "Translating page: what CI does about translations",
       "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "يشغّل الأوامر نفسها مع كل push: ‏check، ثم build، ثم ينشر ويتحقق من الموقع الحي.",
+          "translation": "يُشغِّل الأوامر نفسها عند كل دفع: الفحص، والبناء، ثم ينشر الموقع الحي ويفحصه.",
           "variations": {}
         }
       ],
-      "types": []
-    },
-    "zv6OgqGuv2aGlwiMTYo5GA==": {
-      "description": "Translating page point title: the dev server translates, with Void's AI or Claude Code",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يترجم vp dev، باستخدام الذكاء الاصطناعي من Void أو Claude Code",
-          "variations": {}
-        }
-      ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
     },
     "sMtlR6Z8zMzZ6LalfCQsVQ==": {
       "description": "When an event starts, on the reader's own clock; {time} is that time, already formatted",
@@ -4351,150 +4305,6 @@
       ],
       "types": []
     },
-    "6OwibbMT4w5UBc/wNCOcbg==": {
-      "description": "Temporal page: how many rows the polyfill on the Worker got the same as Cloudflare's own Temporal; {same} is how many are the same, {total} how many rows there are",
-      "status": "translated",
-      "tokens": [
-        "total"
-      ],
-      "translations": [
-        {
-          "translation": "الـ polyfill على الـ Worker: {same} من {total} متطابقة.",
-          "variations": {
-            "0": 16
-          }
-        },
-        {
-          "translation": "The polyfill on the Worker: {same} of {total} the same.",
-          "variations": {
-            "0": 4
-          }
-        },
-        {
-          "translation": "The polyfill on the Worker: {same} of {total} the same.",
-          "variations": {
-            "0": 8
-          }
-        },
-        {
-          "translation": "The polyfill on the Worker: {same} of {total} the same.",
-          "variations": {
-            "0": 20
-          }
-        },
-        {
-          "translation": "The polyfill on the Worker: {same} of {total} the same.",
-          "variations": {
-            "0": 12
-          }
-        },
-        {
-          "translation": "The polyfill on the Worker: {same} of {total} the same.",
-          "variations": {
-            "0": 24
-          }
-        }
-      ],
-      "types": [
-        28
-      ]
-    },
-    "ux1ckl4KnGcx6j3DWxAqiQ==": {
-      "description": "Temporal page: how many rows the browser's own Temporal got the same as the Worker; {same} is how many are the same, {total} how many rows there are",
-      "status": "translated",
-      "tokens": [
-        "total"
-      ],
-      "translations": [
-        {
-          "translation": "Temporal الخاص بمتصفحك: {same} من {total} متطابقة.",
-          "variations": {
-            "0": 16
-          }
-        },
-        {
-          "translation": "Your browser's own Temporal: {same} of {total} the same.",
-          "variations": {
-            "0": 4
-          }
-        },
-        {
-          "translation": "Your browser's own Temporal: {same} of {total} the same.",
-          "variations": {
-            "0": 8
-          }
-        },
-        {
-          "translation": "Your browser's own Temporal: {same} of {total} the same.",
-          "variations": {
-            "0": 20
-          }
-        },
-        {
-          "translation": "Your browser's own Temporal: {same} of {total} the same.",
-          "variations": {
-            "0": 12
-          }
-        },
-        {
-          "translation": "Your browser's own Temporal: {same} of {total} the same.",
-          "variations": {
-            "0": 24
-          }
-        }
-      ],
-      "types": [
-        28
-      ]
-    },
-    "OUq58lQUIlL8t9SsKPK/0g==": {
-      "description": "Temporal page: how many rows the polyfill in the browser got the same as the Worker; {same} is how many are the same, {total} how many rows there are",
-      "status": "translated",
-      "tokens": [
-        "total"
-      ],
-      "translations": [
-        {
-          "translation": "الـ polyfill في متصفحك: {same} من {total} متطابقة.",
-          "variations": {
-            "0": 16
-          }
-        },
-        {
-          "translation": "The polyfill in your browser: {same} of {total} the same.",
-          "variations": {
-            "0": 4
-          }
-        },
-        {
-          "translation": "The polyfill in your browser: {same} of {total} the same.",
-          "variations": {
-            "0": 8
-          }
-        },
-        {
-          "translation": "The polyfill in your browser: {same} of {total} the same.",
-          "variations": {
-            "0": 20
-          }
-        },
-        {
-          "translation": "The polyfill in your browser: {same} of {total} the same.",
-          "variations": {
-            "0": 12
-          }
-        },
-        {
-          "translation": "The polyfill in your browser: {same} of {total} the same.",
-          "variations": {
-            "0": 24
-          }
-        }
-      ],
-      "types": [
-        28
-      ]
-    },
     "JA5wLKwdZbt5CZs55OQ7SQ==": {
       "description": "Translating page: how many of a catalog's strings are translated; {translated} is how many are translated, {strings} how many strings there are",
       "status": "translated",
@@ -4502,18 +4312,6 @@
       "translations": [
         {
           "translation": "تُرجم {translated} من {strings} نصًا",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Pl/C+9vrq4vM+QiVa2sFuw==": {
-      "description": "Translating page: the events people post are translated by Workers AI; {link} is a link to the events whose text is 'see them'",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يترجم Workers AI الفعاليات: {link}.",
           "variations": {}
         }
       ],
@@ -4669,30 +4467,6 @@
       ],
       "types": []
     },
-    "4PHUCeucntmxGJxyjUv6rQ==": {
-      "description": "Translating page point: as you save, the dev server prepares new strings and translates them, with Claude Code when it's on the machine, else with Void's AI; what people post is translated by Void's AI",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "لا شيء لتشغيله. أثناء الحفظ، يضيف vp dev كل نص جديد إلى كتالوج كل لغة ويترجم ما هو جديد، النصوص وصفحات markdown التي تغيّرت: باستخدام Claude Code ومهارة void-fbtee عندما يكون على جهازك، وإلا باستخدام Void's AI، في Worker التطبيق نفسه، عندما يستخدمه التطبيق. أما ما ينشره الناس فيترجمه Void's AI.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "b1TeFLhl8Yagqok2H9oF5Q==": {
-      "description": "Translating page: what the dev server does about translations as you save, preparing, translating with Claude Code or Void's AI, and reporting by itself",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "أثناء الحفظ، يضيف النصوص الجديدة إلى كل لغة، مع وسمها بأنها جديدة، ويترجمها Claude Code أو Void's AI؛ ويبلّغ خادم التطوير بما تبقّى. وتظهر الترجمة المعدّلة فورًا.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "OJgh0mzVJrcrN8I6GVCZBw==": {
       "description": "Home feature fact: the dev server translates new strings as you save, with Claude Code or Void's AI",
       "status": "translated",
@@ -4704,6 +4478,254 @@
         }
       ],
       "types": []
+    },
+    "bLL81XvSzDEiVUWSMLWyew==": {
+      "description": "Translating page point title: the dev server translates, with Void's AI, then Claude Code for what's left",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يترجم vp dev، باستخدام Void's AI، ثم Claude Code",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "RDmZOKQne5lXFwwEOtPf1w==": {
+      "description": "Translating page point: as you save, the dev server prepares new strings and has Void's AI translate them, many at a time; every answer is checked, and what still fails goes to Claude Code; each translation records who wrote it",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "لا يوجد شيء لتشغيله. بمجرد الحفظ، يضيف vp dev كل نص جديد إلى كتالوج كل لغة ويترجم الجديد، النصوص وصفحات Markdown التي تغيرت، باستخدام Void's AI في الـ Worker الخاص بالتطبيق: Gemini 3.5 Flash، العديد من النصوص في المرة الواحدة. يتم فحص كل إجابة، وما يستمر في الفشل يذهب إلى Claude Code بمهارة void-fbtee. وتسجل كل ترجمة من كتبها ومتى.",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "52BVoeSoml1sJh7/JrUk6Q==": {
+      "description": "Translating page point: a posted event goes to a queue whose consumer translates it with Void's AI, the same model as the app's own text",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الفعالية التي ينشرها شخص ما لا تكون موجودة في المستودع، لذلك تُترجم بمجرد نشرها: يذهب منشور الفعالية إلى طابور انتظار، ويطلب مستهلك الطابور من Void's AI، وهو نفس النموذج المستخدم لنصوص التطبيق نفسه، الترجمة إلى كل لغة من لغات التطبيق الأخرى، بعد أن يحصل الناشر على إجابته.",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "0lZ+v47QSOzy6IAWK4T/Dg==": {
+      "description": "Translating page: what the dev server does about translations as you save: preparing, translating with Void's AI then Claude Code, and reporting by itself",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "بمجرد الحفظ، يضيف نصوصًا جديدة إلى كل لغة، ويضع عليها علامة \"جديد\"؛ ويترجمها Void's AI، ثم يترجم Claude Code ما يتبقى، ويبلغ خادم التطوير عما تبقى. تظهر الترجمة المُعدلة على الفور.",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "zkhofd94vWDMBbyNeGl6wg==": {
+      "description": "Translating page: what the build does about translations",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "يفشل عند وجود أي شيء ناقص أو خاطئ: نص أو صفحة غير مترجمة، أو ترجمة تفشل في الفحوصات التي يجريها vp dev، أو صفحة أقدم من نسختها الأصلية، أو مشكلة في الإعداد. وبذلك لا يمكن لأي عملية نشر شحن أي منها.",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "5AtDKB1g3YMwQWILBRxDjw==": {
+      "description": "Translating page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تتم ترجمة نصوص التطبيق نفسه وما ينشره الأشخاص بواسطة الذكاء الاصطناعي ذاته، Gemini 3.5 Flash من خلال Void's AI: النصوص إلى ملفات في المستودع الذي تراجعه، والمنشورات فور نشرها. ويترجم Claude Code ما يتركه. إليك كل منها، مع السطور التي تفعل ذلك.",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "A3T96LuiZD94KEB/GfigmA==": {
+      "description": "Translating page: the events people post are translated by Void's AI; {link} is a link to the events whose text is 'see them'",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "تُترجم الفعاليات بواسطة Void's AI: {link}.",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "zCHE057k0dimoTU2sp85fA==": {
+      "description": "Temporal page: how many rows the polyfill on the Worker got the same as Cloudflare's own Temporal; {same} is how many are the same, {total} how many rows there are; the count each form is for is {total}",
+      "status": "translated",
+      "tokens": [
+        "total"
+      ],
+      "translations": [
+        {
+          "translation": "الـ polyfill على الـ Worker: لم يتطابق أي صف من أصل {total}.",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "الـ polyfill على الـ Worker: تطابق {same} من أصل صف واحد.",
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "الـ polyfill على الـ Worker: تطابق {same} من أصل صفين.",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "الـ polyfill على الـ Worker: تطابق {same} من أصل {total} صفوف.",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "الـ polyfill على الـ Worker: تطابق {same} من أصل {total} صفًا.",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "الـ polyfill على الـ Worker: تطابق {same} من أصل {total} صف.",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ],
+      "translatedBy": "claude",
+      "translatedAt": "2026-11-17"
+    },
+    "GQtWWYwqRPGzQ9zLWD/4Ww==": {
+      "description": "Temporal page: how many rows the browser's own Temporal got the same as the Worker; {same} is how many are the same, {total} how many rows there are; the count each form is for is {total}",
+      "status": "translated",
+      "tokens": [
+        "total"
+      ],
+      "translations": [
+        {
+          "translation": "ميزة Temporal الخاصة بمتصفحك: لم يتطابق أي صف من أصل {total}.",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "ميزة Temporal الخاصة بمتصفحك: تطابق {same} من أصل صف واحد.",
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "ميزة Temporal الخاصة بمتصفحك: تطابق {same} من أصل صفين.",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "ميزة Temporal الخاصة بمتصفحك: تطابق {same} من أصل {total} صفوف.",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "ميزة Temporal الخاصة بمتصفحك: تطابق {same} من أصل {total} صفًا.",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "ميزة Temporal الخاصة بمتصفحك: تطابق {same} من أصل {total} صف.",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ],
+      "translatedBy": "google/gemini-3.5-flash",
+      "translatedAt": "2026-11-17"
+    },
+    "pw4gLfbMmGtxs6YNyvuTxA==": {
+      "description": "Temporal page: how many rows the polyfill in the browser got the same as the Worker; {same} is how many are the same, {total} how many rows there are; the count each form is for is {total}",
+      "status": "translated",
+      "tokens": [
+        "total"
+      ],
+      "translations": [
+        {
+          "translation": "الـ polyfill في متصفحك: لم يتطابق أي صف من أصل {total}.",
+          "variations": {
+            "0": 16
+          }
+        },
+        {
+          "translation": "الـ polyfill في متصفحك: تطابق {same} من أصل صف واحد.",
+          "variations": {
+            "0": 4
+          }
+        },
+        {
+          "translation": "الـ polyfill في متصفحك: تطابق {same} من أصل صفين.",
+          "variations": {
+            "0": 8
+          }
+        },
+        {
+          "translation": "الـ polyfill في متصفحك: تطابق {same} من أصل {total} صفوف.",
+          "variations": {
+            "0": 20
+          }
+        },
+        {
+          "translation": "الـ polyfill في متصفحك: تطابق {same} من أصل {total} صفًا.",
+          "variations": {
+            "0": 12
+          }
+        },
+        {
+          "translation": "الـ polyfill في متصفحك: تطابق {same} من أصل {total} صف.",
+          "variations": {
+            "0": 24
+          }
+        }
+      ],
+      "types": [
+        28
+      ],
+      "translatedBy": "claude",
+      "translatedAt": "2026-11-17"
     }
   }
 }

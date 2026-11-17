@@ -1,7 +1,7 @@
 // Vitest global setup for the dev-server suite (the `dev` project in the root vite.config.ts): the
 // stage where Void gives an app its dev hooks (voidzero-dev/void TESTING.md: a dev-mode suite beside
 // the full preview one). Its email inbox, its queue and cron triggers (`/__void/queue`,
-// `/__void/scheduled`), and Workers AI through the Cloudflare sign-in (guide/ai.md), all on the dev
+// `/__void/scheduled`), and Void's AI through the Cloudflare sign-in (guide/ai.md), all on the dev
 // server (`vp run dev`).
 //
 // The developer's own dev server if it's running (port 5173, apps/example/vite.config.ts), as is,

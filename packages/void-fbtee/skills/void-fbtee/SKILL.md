@@ -9,13 +9,15 @@ The app's own Vite+ commands do the work; there are no i18n scripts or other com
 an app up is the one void-fbtee command: `vp exec void-fbtee init`. After that:
 
 - `vp dev` prepares: as it starts and on each save, every new string goes into every catalog,
-  marked new. Straight after, it translates what's new (which translator, the package
-  decides: a signed-in `claude -p` with this skill, else Void's AI). With neither, the work is a
-  prompt in its log ("void-fbtee: … entries with "status": "new""); a coding agent given it
-  translates by this skill. It records each markdown page you mark done and reports what's
-  left, until "all translated, nothing to fix".
-- `vp build` (and so `void deploy` and CI) fails on anything left: untranslated strings and
-  pages, setup problems, a removed language's leftovers. Its message lists them.
+  marked new. Straight after, it translates what's new with Void's AI (Gemini 3.5 Flash, many
+  strings a request, each answer checked), then Claude Code for what that leaves: a signed-in
+  `claude -p` with this skill, else a prompt in its log ("void-fbtee: … entries with "status":
+  "new""); a coding agent given it translates by this skill. Each entry records who translated
+  it (`translatedBy`, `translatedAt`). It records each markdown page you mark done and reports
+  what's left, until "all translated, nothing to fix".
+- `vp build` (and so `void deploy` and CI) fails on anything left or wrong: untranslated strings
+  and pages, a translation that fails the checks `vp dev` runs on each answer, setup problems, a
+  removed language's leftovers. Its message lists them.
 - `vp check` runs fbtee's lint rules (text no one wrapped for translation).
 
 Translate only this way, never by other means, so the app's own tooling is what's used.
@@ -29,7 +31,8 @@ Translate only this way, never by other means, so the app's own tooling is what'
 2. Translate every entry with `"status": "new"` by fbtee's own skill,
    `node_modules/fbtee/skills/fbtee-translate/SKILL.md`, steps 3 to 5, and void-fbtee's
    translating skill, `node_modules/void-fbtee/skills/void-fbtee-translate/SKILL.md`: how to
-   translate, the same rules Void's AI is sent. Then mark the entry done.
+   translate, the same rules Void's AI is sent. Then mark the entry done: `"status":
+   "translated"`, with `"translatedBy": "claude"` and `"translatedAt"` the day (YYYY-MM-DD).
 3. What's specific to editing a void-fbtee app's catalogs is below.
 
 **Page titles and descriptions.** A page's `head()` (Void's `defineHead`, in its `.server.ts`)
@@ -272,11 +275,13 @@ another language than the page's, in the page's own words (`<fbt>`, with the lan
 with the original one click away.
 
 To translate it as it's posted, the example (github.com/joeblew999/void-fbtee, `apps/example`)
-sends each post to a queue whose consumer asks Workers AI, and stores every translation through
+sends each post to a queue whose consumer asks Void's AI (void-fbtee's `translate()`, the same
+model as the app's own text), and stores every translation, with who made it, through
 one function, which also clears the pages and tells open ones. A page showing a post in a language
 it isn't translated into yet sends `x-revalidate: 0`, so Void's page cache never keeps it in the
-wrong language. Workers AI runs on Cloudflare in dev and the preview too, through Void's Cloudflare
-sign-in (`void cloudflare login`); for the preview, mark the binding remote in `void.config.ts`:
+wrong language. Void's AI runs on Cloudflare in dev and the preview too, through Void's Cloudflare
+sign-in (`void cloudflare login`), paid from the account's AI Gateway credits (Unified Billing,
+no key); for the preview, mark the binding remote in `void.config.ts`:
 `cloudflare: { ai: { binding: "AI", remote: true } }` (Void marks it so by itself only in dev).
 
 ## Markdown pages

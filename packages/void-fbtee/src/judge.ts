@@ -21,7 +21,8 @@ const placeholders = (text: string) => new Set(text.match(/\{[^{}]+\}/g) ?? []);
 const WORDED = new Set([16, 4, 8]);
 
 /**
- * What a translation keeps exactly as the source writes it: commands (`vp dev`), file names, dotted
+ * What a translation keeps exactly as the source writes it: product names (grammar.json
+ * keptTerms.products: Void's AI, Claude Code), commands (`vp dev`), file names, dotted
  * ones whole (`AGENTS.md`, `void.config.ts`: both models once cut it to `config.ts`, 2026-11-17), paths (`i18n/translations`) and lower-case names with a hyphen (`void-fbtee`).
  */
 export function keptTerms(text: string): string[] {
@@ -31,7 +32,8 @@ export function keptTerms(text: string): string[] {
     ) ?? []
   )
     .map((t) => t.replace(/[.-]+$/, "")) // a sentence's own full stop isn't part of a path
-    .filter((t) => !t.includes("-") || t.includes("/") || t.includes(".") || isName(t));
+    .filter((t) => !t.includes("-") || t.includes("/") || t.includes(".") || isName(t))
+    .concat(grammar.keptTerms.products.filter((name) => text.includes(name)));
 }
 
 /**

@@ -29,7 +29,7 @@ afterAll(async () => {
   for (const event of posted) await deleteEvent(event);
 });
 
-/** Waits for the open page's title to be in Thai script: Workers AI's translation, any wording. */
+/** Waits for the open page's title to be in Thai script: Void's AI's translation, any wording. */
 const thaiTitle = (p: import("playwright").Page) =>
   p.waitForFunction(() => /[฀-๿]/.test(document.querySelector("h1")?.textContent ?? ""));
 
@@ -57,7 +57,7 @@ test.skipIf(!!skip)(
 );
 
 test.skipIf(!!skip)(
-  "a new post is translated by Workers AI, live; booking it in Thai emails a Thai confirmation with that title and its PDF ticket",
+  "a new post is translated by Void's AI, live; booking it in Thai emails a Thai confirmation with that title and its PDF ticket",
   async () => {
     const p = await page();
     const event = await postEvent(p, {
@@ -66,7 +66,7 @@ test.skipIf(!!skip)(
     });
     posted.push(event);
     // The Thai page, open while the queue translates: its title turns Thai when the translation
-    // lands (the page's live stream), whatever Workers AI wrote.
+    // lands (the page's live stream), whatever Void's AI wrote.
     const thai = await page();
     await thai.goto(`/th-TH${event.path}`);
     await started(thai);

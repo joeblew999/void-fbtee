@@ -1,5 +1,5 @@
 // The quick check of a deployed site, after each deploy (`vp run test:deployed`, scripts/deployed.ts):
-// the sitemap, a not-found page in Thai, and one event posted, translated by Workers AI and deleted
+// the sitemap, a not-found page in Thai, and one event posted, translated by Void's AI and deleted
 // with its private link. It emails no one (it posts without an address and books nothing).
 //
 // Void's own rule is that live tests are opt-in (voidzero-dev/void TESTING.md): they write data and
@@ -54,7 +54,7 @@ describe.skipIf(!site)("the live site (run with `vp run test:deployed`)", () => 
     expect(await r.text()).toContain('lang="th-TH"');
   });
 
-  test("an event is posted, translated by Workers AI, and deleted with its private link", async () => {
+  test("an event is posted, translated by Void's AI, and deleted with its private link", async () => {
     const p = await page();
     posted = await postEvent(p, {
       title: "Live check: pottery class",

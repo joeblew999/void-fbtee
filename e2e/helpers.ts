@@ -15,7 +15,7 @@ export const url = (mode: "prod") => inject(mode as never) as string;
 
 /**
  * Whether the suite runs against the live site (`vp run test:production`): tests that post or book
- * skip themselves there, since that would call Workers AI and send real email (Void's TESTING.md:
+ * skip themselves there, since that would call Void's AI and send real email (Void's TESTING.md:
  * live tests are opt-in and leave nothing behind).
  */
 export const onLiveSite = () => inject("live" as never) as boolean;

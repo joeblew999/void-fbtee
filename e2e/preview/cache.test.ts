@@ -2,7 +2,7 @@
 // pages they change, in every language (revalidate() from void-fbtee/server), so the next visitor
 // gets the change, not the cached page. A page showing an event in a language it isn't translated
 // into yet isn't cached at all (awaitsTranslation, src/events/translations.ts), so the cache never
-// holds it in the wrong language; once Workers AI's translation is in (the translate queue, which
+// holds it in the wrong language; once Void's AI's translation is in (the translate queue, which
 // the preview runs: void.config.ts), it is. Read through Void's own cache header, `x-isr-cache`
 // (@void/isr): HIT from the cache, MISS when built afresh and stored, none when built afresh and
 // not stored (@void/isr's runtime.mjs returns an uncacheable render as it is). Only the production
@@ -56,7 +56,7 @@ test.skipIf(onLiveSite())(
     const p = await page();
     const event = await postEvent(p, { title, local: "2027-01-20T18:00", seats: 5 });
 
-    // Translating: the Thai page isn't cached until Workers AI's Thai is in, then it is. Done first,
+    // Translating: the Thai page isn't cached until Void's AI's Thai is in, then it is. Done first,
     // as the translation landing clears the event's pages and the list again.
     const thai = `/th-TH${event.path}`;
     await untilTranslated(thai);

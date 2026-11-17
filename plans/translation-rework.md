@@ -220,6 +220,35 @@ Claude's review of the answers (what the checks didn't catch), each now a fix to
 5. **Workers AI's allowance ran out mid-run** ("AI is temporarily unavailable because its usage
    limit was reached"): today's translator isn't dependable in dev either.
 
+## Steps 3 to 5 and 8, done (2026-11-17)
+
+- Gemini 3.5 Flash is the one translator (`models.ts`), batched as wuchale does (50 a request, 4 at
+  once), for `vp dev` and for posts. `models.json`, the rate limiter, the per-string examples and
+  the Chat Completions path are gone; the glossary stays.
+- Entries record `translatedBy`/`translatedAt`; `event_texts` has `translated_by`/`translated_at`
+  (migration `20261117092251_silly_star_brand.sql`).
+- `vp build` runs `problemsWith()` on every finished entry against its source lines. Its first run
+  on the example's catalogs found 118 problems; 80 were the checker's own false alarms, each fixed
+  as a rule (lines of only placeholders or names, developer words, glosses in brackets, only known
+  hyphenated names); the other 38 were real (English left in, the Arabic Temporal counts) and were
+  translated again by `vp dev`. Now: "all translated, nothing to fix".
+- `vp run translations:measure` through the new code: 25 of 25 in each of ar-EG and th-TH passed
+  the checks, US$0.050 for the 50 (ar-EG 58 s, th-TH 7 s).
+- Credits: US$10.00 → US$9.44 for the whole of today, including a run on a stale build (below).
+
+Claude's review of today's Gemini answers, and what came of each:
+
+1. Product names translated ("ذكاء Void الاصطناعي", "AI ของ Void" for Void's AI): now kept terms
+   (`grammar.json` keptTerms.products), and the entries translated again.
+2. The Temporal counts were ambiguous: which number the plural forms are for. Gemma and Gemini
+   each guessed differently. Fixed at the source: their descriptions now say the forms are for
+   {total}; translated again.
+3. "polyfill" written as "ملف التعويض" ("compensation file"), then "ملف الـ polyfill" ("the polyfill
+   file"): corrected by hand to "الـ polyfill", marked `translatedBy: "claude"`.
+4. Still open, not caught by any rule: in the sample, "لم تحجز أي ليالٍ" (after أي, the singular:
+   أي ليلة) and "يتطابق صف صفر" ("row zero matches") for a count of zero; "مؤجل" where the catalog
+   says "لاحقًا" for "Deferred". To go in the translating skill's Arabic counts and the glossary.
+
 ## Done when
 
 - `vp build` fails on every problem `vp dev` checks for, including a wrong number of plural forms.
@@ -249,5 +278,10 @@ Claude's review of the answers (what the checks didn't catch), each now a fix to
   login` in one works from a cloud session (device code). `.claude/hooks/cloud-session.sh` now
   also installs `secret-tool`, which Cloudflare's `cf` needs to keep the sign-in in the keyring.
   To do: make the login task work the same in a cloud session.
+- `vp run dev` can start on a stale build of the package: it runs `vp pack --watch` and the app's
+  `vp dev` side by side, and the app may load `dist/` before the rebuild lands. The first dev run
+  after this change translated 22 strings with the code from before it, one string a request
+  (37 requests, US$0.15, AI Gateway's logs 09:35 UTC). To fix: the app's dev waits for the
+  package's first build.
 - The Cloudflare connector's Workers AI call returned 401 ("Reconnect to sign in again"): it may
   lack the Workers AI permission. Only matters if a session is to call Workers AI through it.
