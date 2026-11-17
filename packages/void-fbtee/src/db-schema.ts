@@ -29,8 +29,17 @@ export const UNKNOWN = "unknown";
 /** What `translated_by` holds while a translation is only asked for (content.ts translateSoon). */
 export const QUEUED = "queued";
 
+// The app's schema calls translationsOf() as it loads, and loading it can come in the middle of
+// loading this module: void/db, imported here for `sql`, imports the app's schema, which imports
+// this (Void's plugin wires void/db to the app's schema). So translationsOf() uses nothing of this
+// module's but function declarations, which JavaScript has ready before any of the module runs,
+// and literal values: a `const` here could still be unset then (seen in a production build,
+// 2026-11-17: "translationsTableName is not a function").
+
 /** The translations table's name for a table of content: `<table>_translations`. */
-export const translationsTableName = (table: string) => `${table}_translations`;
+export function translationsTableName(table: string): string {
+  return `${table}_translations`;
+}
 
 /**
  * The table of translations for one of the app's tables of content. Deleting a row deletes its
@@ -59,7 +68,7 @@ export function translationsOf<
       fields: text("fields", { mode: "json" }).$type<Record<string, string>>().notNull(),
       // Who made it, never empty: a model's id, "claude", a person, or "unknown" for code that
       // didn't say (an older deploy after a rollback); "unknown" is translated again.
-      translatedBy: text("translated_by").notNull().default(UNKNOWN),
+      translatedBy: text("translated_by").notNull().default("unknown"),
       translatedAt: text("translated_at"),
       // The AI Gateway log of the request that made it (its model, tokens, cost).
       gatewayLogId: text("gateway_log_id"),
