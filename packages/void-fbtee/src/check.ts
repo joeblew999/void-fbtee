@@ -1,7 +1,7 @@
 // What `vp build` and `vp dev` check (the plugin runs check()), as plain functions. Each problem is one
 // line a person can act on.
 import { createHash } from "node:crypto";
-import { existsSync, globSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, globSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import {
   catalogFile,
@@ -324,4 +324,44 @@ export function check(p: Project): string[] {
     }
   }
   return problems;
+}
+
+/**
+ * Every finished translation that fails the checks (the same ones `check()` reports, judge.ts
+ * problemsWith), back to new, with its source lines as a new catalog has them, so `vp dev`
+ * translates it again; one line each, saying what was wrong. A catalog written before the checks
+ * were stricter (an app upgrading from 0.6.0) would otherwise fail the build with nothing to
+ * translate it. Whoever wrote it: what was there is in git.
+ */
+export function reopenFailing(p: Project): string[] {
+  const reopened: string[] = [];
+  const { texts } = collect(p);
+  for (const locale of translatedOf(p.config).map((l) => l.locale)) {
+    const file = catalogFile(p, locale);
+    if (!existsSync(file)) continue;
+    type Line = { translation: string; variations: Record<string, number> };
+    type Entry = { status?: string; translations?: Line[]; [k: string]: unknown };
+    const catalog = JSON.parse(readFileSync(file, "utf8")) as {
+      translations: Record<string, Entry>;
+    };
+    const source = (JSON.parse(freshCatalog(p, locale)) as { translations: Record<string, Entry> })
+      .translations;
+    let changed = false;
+    for (const [hash, entry] of Object.entries(catalog.translations)) {
+      const fresh = source[hash];
+      if (entry.status === "new" || !entry.translations?.length || !fresh?.translations) continue;
+      const wrong = problemsWith(
+        fresh.translations,
+        entry.translations.map((l) => l.translation),
+        locale,
+        p.config.sourceLocale,
+      );
+      if (!wrong.length) continue;
+      catalog.translations[hash] = { ...fresh, status: "new" };
+      changed = true;
+      reopened.push(`${locale}: ${JSON.stringify(texts[hash] ?? hash)}: ${wrong.join(" ")}`);
+    }
+    if (changed) writeFileSync(file, JSON.stringify(catalog, null, 2) + "\n");
+  }
+  return reopened;
 }

@@ -16,7 +16,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vite-plus/test";
 import { copyFixture } from "./copy-fixture";
 import type { Project } from "../../src/catalogs";
-import { check, markdownPages, missingHead } from "../../src/check";
+import { check, markdownPages, missingHead, reopenFailing } from "../../src/check";
 import { loadProject, prepare } from "../../src/commands";
 import { init } from "../../src/init";
 import { awaitsReview, markedDone, stamp, translateTask } from "../../src/translate";
@@ -244,4 +244,22 @@ test("a translation waits for review when an AI wrote it and no one has reviewed
   expect(awaitsReview({ status: "translated", translatedBy: "claude" })).toBe(false);
   expect(awaitsReview({ status: "translated" })).toBe(false);
   expect(awaitsReview({ ...ai, status: "new" })).toBe(false);
+});
+
+test("a finished translation the checks fail goes back to new, with its source line; one that passes stays", () => {
+  prepare(p);
+  const file = join(root, "i18n/translations/de-DE.json");
+  const hello = "SSJ6IVWoQjvWr8iQwHsMTA==";
+  expect(reopenFailing(p)).toEqual([]);
+  const catalog = JSON.parse(readFileSync(file, "utf8"));
+  catalog.translations[hello].translations[0].translation = "Hallo {name}";
+  writeFileSync(file, JSON.stringify(catalog, null, 2));
+  const reopened = reopenFailing(p);
+  expect(reopened).toHaveLength(1);
+  expect(reopened[0]).toMatch(/^de-DE: "Hello": .*\{name\}/);
+  const after = JSON.parse(readFileSync(file, "utf8")).translations[hello];
+  expect(after.status).toBe("new");
+  expect(after.translations[0].translation).toBe("Hello");
+  expect(after.description).toBe("Greeting in the test fixture");
+  expect(reopenFailing(p)).toEqual([]);
 });

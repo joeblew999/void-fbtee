@@ -369,3 +369,9 @@ missing; where it can't safely edit a file it prints the line to add). The piece
   wrapped for translation (`vp lint` lists it); names that stay as they are (the app's,
   products') go in that rule's `ignoredWords`.
 - A void-fbtee section in `AGENTS.md`. No scripts: an older init's `i18n:*` scripts are removed.
+
+From 0.7.0, `vp build` runs every check on every finished translation, not only on new ones, so a
+catalog from an older version can fail it. `vp dev` sends each finished translation the checks fail
+back to be translated, and logs it with what was wrong (`reopenFailing`, check.ts); what was there
+is in git. Void's AI translates with Gemini 3.5 Flash on AI Gateway credits (no model to choose:
+`models.json` and its options are gone).

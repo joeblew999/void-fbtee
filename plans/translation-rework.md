@@ -290,6 +290,19 @@ Moving from Workers AI to Gemini on credits changed more than the model. Fixed:
   `zdr: false` on the gateway; AI Gateway also logs every request, `collect_logs: true`).
 - `plans/video-conferencing.md` still said posts are translated with Llama.
 
+Then, also fixed:
+
+- **Upgrading apps:** `vp build` now checks every finished translation, so a catalog from 0.6.0 can
+  fail it (this repo's did, 118 times), and nothing translated those again: `vp dev` only translates
+  new entries. Now `vp dev` sends each finished translation that fails back to new
+  (`check.ts reopenFailing`), logged with what was wrong. Version 0.7.0 (options removed), the
+  package README's install line (it still said v0.5.0) and an upgrade note in the SKILL.
+- **The live check after each deploy** posts an event and waits for its Thai title: with the credits
+  used up it timed out with nothing saying why; it now says where to look.
+
+Open: event translations already on the live site were made by the old models and have no
+`translated_by` (null): a review of posts in production (the next plan) can't tell them apart.
+
 Open: a spend limit on the `default` gateway (AI Gateway "Spend limits": US$2 a day on
 `google/gemini-3.5-flash`, so a runaway loop can't empty the credits; dev and the live site share
 it). The Cloudflare connector in the cloud session can read the gateway but not change it (it lacks

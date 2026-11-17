@@ -36,7 +36,7 @@ import {
   translateWithVoidAi,
   unreviewed,
 } from "./translate";
-import { check } from "./check";
+import { check, reopenFailing } from "./check";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
 import type { FallbackLocales } from "fbtee";
@@ -242,6 +242,13 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       // signed in here, otherwise its prompt, for whatever coding agent the developer uses.
       const base = devServer?.resolvedUrls?.local[0];
       const url = base && new URL(DEV_TRANSLATE_PATH, base).href;
+      // A finished translation the checks now fail (a catalog from before they were stricter) is
+      // translated again, not left for the build to fail on (check.ts reopenFailing).
+      const reopened = reopenFailing(project());
+      if (reopened.length)
+        log(
+          `${reopened.length} finished translations fail the checks, so they're translated again:\n${reopened.join("\n")}`,
+        );
       // Who translates, said before they start.
       const open = openNow();
       if (count(open))

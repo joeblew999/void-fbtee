@@ -67,7 +67,15 @@ describe.skipIf(!site)("the live site (run with `vp run test:deployed`)", () => 
     const thai = await page();
     await thai.goto(`/th-TH/events/${posted.id}`);
     await started(thai);
-    await thai.waitForFunction(() => /[฀-๿]/.test(document.querySelector("h1")?.textContent ?? ""));
+    // No Thai title: the queue's consumer failed. "translation waits an hour" in the Worker's logs
+    // means the account's AI Gateway credits are used up or a spend limit reached (queues/translate.ts).
+    await thai
+      .waitForFunction(() => /[฀-๿]/.test(document.querySelector("h1")?.textContent ?? ""))
+      .catch((error: unknown) => {
+        throw new Error(
+          `the post wasn't translated into Thai: see the Worker's Workers Logs on Cloudflare; "translation waits an hour" there means AI Gateway credits are used up or a spend limit reached. ${String(error)}`,
+        );
+      });
 
     await deleteInPage(p);
     expect((await fetch(`${site}/${SOURCE}/events/${posted.id}`)).status).toBe(404);
