@@ -80,6 +80,17 @@ Checked 2026-11-17 in Cloudflare's docs:
 - **Claude also translates, as the fallback only:** what still fails the checks after the retries,
   or everything when Void's AI isn't reachable (no credits, offline). Its entries are marked as its
   own.
+- **Where Claude runs, and how.**
+  - On a Mac with `claude` signed in: the dev server starts `claude -p` itself, in the
+    background, after each translation (`translate.ts` `hasClaude()`, `runClaude()`).
+  - In a Claude cloud session: `claude` is there but not signed in for the commands it runs
+    (`claude auth status` gives `"loggedIn": false`, checked 2026-11-17, as `hasClaude()`'s comment
+    says), so the dev server can't start it. It prints the review prompt instead, and the session's
+    own Claude does the review with the same files and commands, as any developer's coding agent
+    would. So in the cloud a review happens when the session runs it, not by itself.
+  - Either way the verdicts land in the same review log, in the same shape.
+  - Void's AI (Gemini) in a cloud session needs Void's Cloudflare sign-in there, kept in the
+    session's keyring (`.claude/hooks/cloud-session.sh`). Checked in step 1.
 - **A rejection is a fix to make.** Each verdict goes in a review log in the repo. A mechanical one
   (English left in, a form missing, a placeholder broken) becomes a rule in `judge.ts`; one about
   meaning or tone becomes a change to the translating skill. Both go in this plan's "Found" list
@@ -89,12 +100,15 @@ Checked 2026-11-17 in Cloudflare's docs:
 
 1. **Check the facts it rests on.**
    - Does the account have Unified Billing credits? (Cloudflare API, through the connector.)
+   - Can this cloud session reach Void's AI: `vp` set up (`.claude/hooks/cloud-session.sh` runs
+     at session start, so a repo added mid-session hasn't had it) and Void signed in to Cloudflare?
    - Does fbtee's `prepareTranslationsBatchSync` keep an extra field in a catalog entry? Decides
      where step 4's record lives.
    - What do the five Arabic counts without a "one" line show for a count of 1? A unit test that
      renders them.
 2. **Measure before changing.** A script under `scripts/` runs Gemma 4 (today) and Gemini 3.5 Flash
-   over the example's catalogs with the same checks, and Claude reviews both. Prints, per language
+   over the example's catalogs with the same checks, and Claude reviews both (in a cloud session, the
+   session's Claude, from the printed prompt). Prints, per language
    and model: right, wrong, time, cost. Kept for the record, in this plan.
 3. **The translator.** In `ai.ts`: `translate(body, instruction)` on `google/gemini-3.5-flash`,
    wuchale's defaults (50 a request, 4 at once, thinking off, temperature 0, 30 retries of only what
