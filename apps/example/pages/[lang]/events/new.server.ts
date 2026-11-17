@@ -6,7 +6,7 @@ import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
 import { db } from "void/db";
-import { queues } from "void/queues";
+import { translateSoon } from "void-fbtee/content";
 import { hashDeleteKey, keyCookie, newDeleteKey, privateLink } from "@/events/delete-key";
 import { routeUrl } from "void-fbtee/routes";
 import { langParams, revalidate } from "void-fbtee/server";
@@ -62,8 +62,9 @@ export const action = defineHandler.withValidator({
       // Where it was posted (dev, a Worker Preview, live), not the site's canonical address.
       link: privateLink(new URL(c.req.url).origin + page, key),
     });
-  // Its translations into the app's other languages, after this answers (queues/translate.ts).
-  await queues.translate.send({ eventId: created.id });
+  // Its translations into the app's other languages, at once (void-fbtee's queue): without this,
+  // the first page read in another language would queue it, and the hourly job would find it.
+  await translateSoon("events", created.id);
   // The list in every language, and the sitemap, which lists the new event.
   await revalidate({ paths: eventPages() });
   // To the new event's page, with the key in a short-lived cookie, which the page turns into the

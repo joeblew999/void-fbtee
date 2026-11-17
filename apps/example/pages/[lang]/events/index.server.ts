@@ -6,8 +6,7 @@ import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
 import { asc, count, db, eq, gte } from "void/db";
-import { pickText } from "void-fbtee/server";
-import { awaitsTranslation, textsFor } from "../../../src/events/translations";
+import { textFor, textsFor } from "../../../src/events/translations";
 
 export type Props = InferProps<typeof loader>;
 
@@ -15,7 +14,8 @@ export type Props = InferProps<typeof loader>;
 // changes with time as well as with posts. Void serves the kept copy while it renders a new one,
 // so no visitor waits. Posting clears it at once (new.server.ts); seats left here can be up to a
 // minute behind (each event's own page has them live). While an event in it isn't translated into
-// the page's language yet, the list isn't cached at all (awaitsTranslation).
+// the page's language yet, the list isn't cached, and the translation is queued (textFor, and
+// void-fbtee's middleware).
 export const revalidate = 60;
 
 export const loader = defineHandler(async (c) => {
@@ -33,16 +33,13 @@ export const loader = defineHandler(async (c) => {
     .where(gte(events.starts_at_utc, new Date().toISOString()))
     .orderBy(asc(events.starts_at_utc));
   // Their stored translations for this page (the page's language and its fallbacks), and for each
-  // the best (pickText from void-fbtee/server).
+  // the best (textFor).
   const ids = rows.map((r) => r.event.id);
   const texts = await textsFor(ids, locale);
-  const mine = (id: string) => texts.filter((t) => t.event_id === id);
-  if (rows.some(({ event }) => awaitsTranslation(event.locale, mine(event.id), locale)))
-    c.header("x-revalidate", "0");
   return {
     events: rows.map(({ event, taken }) => ({
       ...event,
-      text: pickText(mine(event.id), locale) ?? null,
+      text: textFor(event, texts, locale),
       left: Math.max(0, event.seats - (taken ?? 0)),
     })),
   };

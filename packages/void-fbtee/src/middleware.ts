@@ -38,6 +38,7 @@ import { allTranslations } from "./runtime";
 import { setup as setupZod } from "virtual:void-fbtee/zod";
 import dev from "virtual:void-fbtee/dev";
 import { currentLocale, runIn, siteOrigin } from "./server";
+import { withPending } from "./content-pending";
 
 // Zod's own validation messages (a form's errors) in each request's language, when the app has
 // Zod 4 (plugin.ts, zodMessages).
@@ -197,7 +198,28 @@ const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (
   const answering = found || own ? undefined : answeringRoute(c);
   const madeUp = answering !== undefined && /^\/:[^/]+/.test(answering);
   // The request's language for fbtee, and for routeUrl from void-fbtee/routes (server.ts).
-  const response = await runIn(current, translations, () => (madeUp ? c.notFound() : next()));
+  const run = withPending(() =>
+    runIn(current, translations, () => (madeUp ? c.notFound() : next())),
+  );
+  const response = await run.result;
+  // A page that showed a row of content not yet in the reader's language (content.ts textOf):
+  // kept out of Void's page cache, so the cache never holds it in the wrong language, and the
+  // translation queued, after the response (plans/translated-content.md).
+  const pending = run.pending();
+  if (pending.length) {
+    c.header("x-revalidate", "0");
+    const queue = import("./content").then(({ translateSoon }) =>
+      Promise.all(pending.map((p) => translateSoon(p.table, p.id))),
+    );
+    try {
+      c.executionCtx.waitUntil(
+        queue.catch((e) => console.warn("void-fbtee: queuing failed:", String(e))),
+      );
+    } catch {
+      // No execution context (a test): queue it anyway.
+      await queue.catch(() => {});
+    }
+  }
   // A copy of the site at another address (a Worker Preview, the dev server): kept out of search
   // results, so it never competes with the site itself. Only when the app names its site.
   if (config.site && new URL(c.req.url).origin !== config.site) c.header("X-Robots-Tag", "noindex");

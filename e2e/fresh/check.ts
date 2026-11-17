@@ -285,7 +285,10 @@ async function thaiSource(target: string, dir: string, app: App, installed: stri
   for (const [locale, texts] of Object.entries(FROM_THAI)) {
     const file = join(dir, `i18n/translations/${locale}.json`);
     const catalog = JSON.parse(readFileSync(file, "utf8")) as {
-      translations: Record<string, { status?: string; translations: Translation[] }>;
+      translations: Record<
+        string,
+        { status?: string; translations: Translation[]; translatedBy?: string }
+      >;
     };
     for (const entry of Object.values(catalog.translations)) {
       const wanted = texts[entry.translations[0]?.translation ?? ""];
@@ -299,6 +302,8 @@ async function thaiSource(target: string, dir: string, app: App, installed: stri
           line.translation = form;
         }
       entry.status = "translated";
+      // As the agent marks what it translated (void-fbtee's skill): the build asks who.
+      entry.translatedBy = "claude";
     }
     writeFileSync(file, JSON.stringify(catalog, null, 2) + "\n");
   }
@@ -307,15 +312,19 @@ async function thaiSource(target: string, dir: string, app: App, installed: stri
   for (const locale of Object.keys(FROM_THAI)) {
     const file = join(dir, `i18n/translations/${locale}.json`);
     const catalog = JSON.parse(readFileSync(file, "utf8")) as {
-      translations: Record<string, { status?: string }>;
+      translations: Record<string, { status?: string; translatedBy?: string }>;
     };
     for (const entry of Object.values(catalog.translations))
-      if (entry.status === "new") entry.status = "translated";
+      if (entry.status === "new") {
+        entry.status = "translated";
+        entry.translatedBy = "claude";
+      }
     writeFileSync(file, JSON.stringify(catalog, null, 2) + "\n");
   }
   run(...exec(app.pm, "vp", "build"), dir);
   run(...exec(app.pm, "tsc", "--noEmit"), dir);
   check(true, `${target}: builds (translations checked) and typechecks`);
+  await translatedContent(target, dir, app);
 
   const homeFor = (base: string, accept?: string) =>
     fetch(`${base}/`, {
@@ -767,4 +776,58 @@ function checkMacLockfile(target: string, dir: string) {
   );
   const build = failing(...exec("npm", "vp", "build"), dir);
   check(!build, `${target}: and it builds ${build.split("\n").slice(-5).join(" ")}`);
+}
+
+/**
+ * What people write, translated by the package (plans/translated-content.md), as a developer adds
+ * it to a new app: a table of their own, one line in voidFbtee({ content }), then `vp dev` writes
+ * the app's files at Void's places (the queue, the job, the translations table), `vp build` fails
+ * until the table has its migration, `void db generate` makes it, and the build passes.
+ */
+async function translatedContent(target: string, dir: string, app: App) {
+  mkdirSync(join(dir, "db/schema"), { recursive: true });
+  writeFileSync(
+    join(dir, "db/schema/notes.ts"),
+    [
+      'import { sqliteTable, text } from "void/schema-d1";',
+      "",
+      'export const notes = sqliteTable("notes", {',
+      '  id: text("id").primaryKey(),',
+      '  locale: text("locale").notNull(),',
+      '  body: text("body").notNull(),',
+      "});",
+      "",
+    ].join("\n"),
+  );
+  writeFileSync(join(dir, "db/schema.ts"), 'export * from "./schema/notes";\n');
+  const config = join(dir, "vite.config.ts");
+  writeFileSync(
+    config,
+    readFileSync(config, "utf8").replace(
+      "voidFbtee({",
+      'voidFbtee({ content: { notes: ["body"] },',
+    ),
+  );
+  await withDev(app, dir, async (_base, page) => void (await page(`/${app.written}`)));
+  for (const file of [
+    "queues/translate.ts",
+    "crons/translations.ts",
+    "db/schema/notes_translations.ts",
+  ])
+    check(
+      existsSync(join(dir, file)),
+      `${target}: vp dev wrote ${file} for voidFbtee({ content })`,
+    );
+  check(
+    readFileSync(join(dir, "db/schema.ts"), "utf8").includes("./schema/notes_translations"),
+    `${target}: vp dev re-exported the translations table from db/schema.ts`,
+  );
+  check(
+    /notes_translations has no migration/.test(failing(...exec(app.pm, "vp", "build"), dir)),
+    `${target}: vp build fails until the translations table has its migration`,
+  );
+  run(...exec(app.pm, "vp", "exec", "void", "db", "generate"), dir);
+  run(...exec(app.pm, "vp", "build"), dir);
+  run(...exec(app.pm, "tsc", "--noEmit"), dir);
+  check(true, `${target}: with its migration, builds and typechecks`);
 }

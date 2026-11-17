@@ -259,37 +259,58 @@ recipient's language.
 ## What people post
 
 Text people write (an event's title, a review, a message) isn't in the catalogs: it's stored, in
-the language its writer wrote it in. Keep that language with it (a `locale` column), and any
-translations one row per language beside it: a table such as `event_texts` with the item's id,
-`locale` and the translated fields, unique on the id and `locale`. Pick what to show with
-`textLocales(locale)` and `pickText(rows, locale)` from `void-fbtee/server`: the page's language,
-then its fallbacks (`voidFbtee({ fallbackLocales })`), else none, and then the original.
+the language its writer wrote it in. void-fbtee translates it into the app's other languages,
+from one line in `vite.config.ts`, naming the table and the fields:
+
+```ts
+voidFbtee({ …, content: { events: { fields: ["title", "description"], about: "listings for events" } } })
+```
+
+(or `content: { events: ["title", "description"] }`). The table needs a text `id` and a `locale`
+column, the language each row was written in. Then `vp dev` writes the app's few files for it, at
+Void's own places, where they're missing (never over yours):
+
+- `db/schema/<table>_translations.ts`: `translationsOf(<table>)` from `void-fbtee/db/schema`,
+  re-exported from `db/schema.ts`. One shape for every table: the row's id, the language, the
+  fields as JSON, who made it (`translatedBy`, the AI Gateway log). Deleting a row deletes its
+  translations (the foreign key cascades). Then run `vp exec void db generate` in a terminal, for
+  its migration: without a terminal it may write nothing and still say it's done, so `vp build`
+  checks the migration is there.
+- `queues/translate.ts`: void-fbtee's consumer (`void-fbtee/queues/translate`), with `void/ai`
+  and `void/db` imported and the retries written there, since Void reads all of them from the
+  app's own files. To refresh pages or tell open ones when a translation lands, export
+  `translationQueue({ onTranslated })` instead of the default.
+- `crons/translations.ts`: the hourly job (`void-fbtee/crons/translations`), keeping every row in
+  the app's languages both ways: translations into a language the app no longer has are deleted,
+  and anything missing (or `unknown`) is queued.
+
+`vp build` fails, saying what to do, while one is missing or the table has no migration.
+
+To show it, from `void-fbtee/content`: `translationsFor(table, ids, locale)` gets the stored
+translations a page in `locale` can show, and `textOf(table, row, translations, locale)` gives the
+row's fields in the best of them, else the original. A page that showed a row not yet in its
+language isn't kept in Void's page cache, and the translation is queued then (void-fbtee's
+middleware): a new post is translated the first time it's read in another language. To queue one
+at once, as it's posted, call `translateSoon(table, id)`.
 
 Mark the element showing it with its own language, whichever that is, by spreading
-`langAttrs(locale)` from `void-fbtee/react` on it (`<h1 {...langAttrs(text?.locale ?? event.locale)}>`):
-`lang` for screen readers and search engines, and `dir`, so Arabic posted on an English page reads
-right to left. Inside a translated sentence, put it in a `<bdi {...langAttrs(locale)}>` in the
+`langAttrs(locale)` from `void-fbtee/react` on it (`<h1 {...langAttrs(text.locale)}>`): `lang` for
+screen readers and search engines, and `dir`, so Arabic posted on an English page reads right to
+left. Inside a translated sentence, put it in a `<bdi {...langAttrs(locale)}>` in the
 `<fbt:param>`, so its direction doesn't reorder the sentence around it. Say when it's shown in
 another language than the page's, in the page's own words (`<fbt>`, with the language's name from
 `Intl.DisplayNames` in `<Formatted>`): "Written in Arabic", or "Translated by machine from Arabic"
 with the original one click away.
 
-To translate it as it's posted, the example (github.com/joeblew999/void-fbtee, `apps/example`)
-sends each post to a queue whose consumer asks Void's AI (void-fbtee's `translate()`, the same
-model as the app's own text), and stores every translation, with who made it, through
-one function, which also clears the pages and tells open ones. A page showing a post in a language
-it isn't translated into yet sends `x-revalidate: 0`, so Void's page cache never keeps it in the
-wrong language. Void's AI runs on Cloudflare in dev and the preview too, through Void's Cloudflare
-sign-in (`void cloudflare login`), paid from the account's AI Gateway credits (Unified Billing,
-no key); for the preview, mark the binding remote in `void.config.ts`:
-`cloudflare: { ai: { binding: "AI", remote: true } }` (Void marks it so by itself only in dev).
-Each language is stored as soon as it's translated, so a retry only pays for the ones still missing;
-when the account isn't paying (credits used up, a spend limit reached: `paymentProblem()` from
-`void-fbtee/ai`), the message waits an hour. Cloudflare drops a message after its last retry (Void's
-queues have no dead-letter queue), so the daily job (`crons/reminders.ts`) keeps posts to the app's
-languages both ways: it queues every event missing a language (or with an `unknown` translation),
-and deletes translations into a language the app no longer has. Posts go to Google's Gemini (not Zero Data Retention), and aren't kept in AI
-Gateway's logs (`collectLog: false`): their log has the model, tokens and cost, not the text.
+Void's AI translates it (Gemini 3.5 Flash, the same model as the app's own text) on Cloudflare in
+dev and the preview too, through Void's Cloudflare sign-in (`void cloudflare login`), paid from the
+account's AI Gateway credits (Unified Billing, no key); for the preview, mark the binding remote in
+`void.config.ts`: `cloudflare: { ai: { binding: "AI", remote: true } }`. Each language is stored as
+soon as it's translated, so a retry pays only for what's still missing; while the account isn't
+paying (credits used up, a spend limit reached) a message waits an hour. Posts go to Google's
+Gemini (not Zero Data Retention), and aren't kept in AI Gateway's logs (`collectLog: false`): their
+log has the model, tokens and cost, not the text. The example (github.com/joeblew999/void-fbtee,
+`apps/example`) shows all of it.
 
 ## Markdown pages
 

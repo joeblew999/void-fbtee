@@ -1,5 +1,5 @@
 // One event, by its id, with its seats left (the loader), and booking a seat (the action).
-import { bookings, bookSchema, event_texts, events } from "@schema";
+import { bookings, bookSchema, events } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { count, db, eq, sql } from "void/db";
 import { queues } from "void/queues";
@@ -10,23 +10,19 @@ import { Temporal } from "temporal-polyfill";
 import { jsonLd, pageHead } from "void-fbtee/head";
 import type { AppLocale } from "void-fbtee/locales";
 import { routeUrl } from "void-fbtee/routes";
-import { pickText, revalidate as clearCache, siteOrigin } from "void-fbtee/server";
+import { revalidate as clearCache, siteOrigin } from "void-fbtee/server";
 import { deleteKeyMatches } from "../../../src/events/delete-key";
 import { ticketKey } from "../../../src/events/tickets";
 import { eventTopic, live } from "../../../src/events/live";
-import {
-  awaitsTranslation,
-  eventPages,
-  textsFor,
-  titleFor,
-} from "../../../src/events/translations";
+import { eventPages, textFor, textsFor, titleFor } from "../../../src/events/translations";
 
 export type Props = InferProps<typeof loader>;
 
 // Void's page cache keeps each event's page until the next deploy (a year, the longest it
 // allows): only a booking changes it, and booking clears it at once, in every language (the
 // action). Open pages get the new seats-left count live as well (src/events/live.ts). A page in a
-// language the event isn't translated into yet isn't cached (awaitsTranslation, the loader).
+// language the event isn't translated into yet isn't cached, and its translation is queued
+// (void-fbtee's middleware, from textFor in the loader).
 export const revalidate = 31_536_000;
 
 // The page's URL parameter: /<lang>/events/<id>. Whether it's an event is the database's answer:
@@ -41,7 +37,7 @@ const booked = (id: string) =>
     .then(([row]) => row.n);
 
 // The event, its title and description in the page's language where a translation is stored (else
-// its fallbacks', else as its organiser wrote it: pickText from void-fbtee/server), seats left,
+// its fallbacks', else as its organiser wrote it: textFor), seats left,
 // and whether it can be deleted (a posted event, not a sample). Never its delete key's hash: the
 // page and its data are public, and cached.
 export const loader = defineHandler.withValidator({ params })(async (c, { params: { id } }) => {
@@ -49,9 +45,7 @@ export const loader = defineHandler.withValidator({ params })(async (c, { params
   const [row] = await db.select().from(events).where(eq(events.id, id));
   if (!row) return c.notFound();
   const { delete_key_hash, ...event } = row;
-  const texts = await textsFor([id], locale);
-  const text = pickText(texts, locale) ?? null;
-  if (awaitsTranslation(event.locale, texts, locale)) c.header("x-revalidate", "0");
+  const text = textFor(event, await textsFor([id], locale), locale);
   return { event, text, left: event.seats - (await booked(id)), deletable: !!delete_key_hash };
 });
 
@@ -130,7 +124,6 @@ const remove = defineHandler.withValidator({ params, body: z.object({ key: z.str
     );
     await db.batch([
       db.delete(bookings).where(eq(bookings.event_id, id)),
-      db.delete(event_texts).where(eq(event_texts.event_id, id)),
       db.delete(events).where(eq(events.id, id)),
     ]);
     // Their PDF tickets too: each has its booker's name on it.

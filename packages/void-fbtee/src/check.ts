@@ -12,6 +12,7 @@ import {
   type Project,
 } from "./catalogs";
 import { problemsWith } from "./judge";
+import { contentProblems } from "./content-files";
 import { firstFile, hasI18nMiddleware, HOME_PAGES, LAYOUTS, VOID_CONFIGS } from "./app-files";
 import { sourceOf, translatedOf } from "./locales";
 
@@ -245,6 +246,10 @@ export function check(p: Project): string[] {
         `setup: ${own} is the app's own "/" page, but void-fbtee sends "/" to each visitor's language: set voidFbtee({ redirectHome: false }) to keep it`,
       );
   }
+
+  // What people write, translated by the package: the app's files and the table's migration
+  // (content-files.ts).
+  problems.push(...contentProblems(p));
 
   // Untranslated strings, by fbtee's own rule (same count as the plugin's report).
   for (const r of missing(p)) {

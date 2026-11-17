@@ -1,11 +1,12 @@
-// Translations of what people post, made by Void's AI in the translate queue (queues/translate.ts).
-// Each is stored beside the original (event_texts), then the event's pages leave Void's page cache
-// in every language, and its open pages are told to load their data again (live). Until then, a
-// page in a language it isn't in yet isn't cached at all (awaitsTranslation).
-import { event_texts, events } from "@schema";
-import { and, db, eq, inArray, ne, sql } from "void/db";
+// The events' text in a reader's language, and what the app does when a translation lands. The
+// translating itself is the package's (plans/translated-content.md): voidFbtee({ content }) names
+// the events' title and description, queues/translate.ts translates them, crons/translations.ts
+// keeps them in the app's languages, and a page that shows an event not yet in its language isn't
+// cached and queues it (void-fbtee's middleware). What's here is the app's own: which pages show
+// an event, and telling open ones.
 import type { AppLocale } from "void-fbtee/locales";
-import { appLocales, pickText, revalidate, textLocales } from "void-fbtee/server";
+import { textOf, translationsFor, type Translation } from "void-fbtee/content";
+import { revalidate } from "void-fbtee/server";
 import { eventTopic, live } from "./live";
 
 export type Text = { title: string; description: string };
@@ -22,105 +23,46 @@ export const eventPages = (id?: string): Parameters<typeof revalidate>[0]["paths
 
 /**
  * The stored translations of these events: those a page in `locale` can show (it and its
- * fallbacks, textLocales from void-fbtee/server), or all of them without `locale`.
+ * fallbacks), or all of them without `locale` (void-fbtee/content translationsFor).
  */
-export async function textsFor(ids: string[], locale?: AppLocale) {
-  if (!ids.length) return [];
-  const ofThese = inArray(event_texts.event_id, ids);
-  return await db
-    .select()
-    .from(event_texts)
-    .where(locale ? and(ofThese, inArray(event_texts.locale, textLocales(locale))) : ofThese);
-}
+export const textsFor = (ids: string[], locale?: AppLocale) =>
+  translationsFor("events", ids, locale);
 
 /**
- * The event's title for someone reading in `locale`, and the language it's in: the best stored
- * translation (pickText), else the original. `texts` may hold other events' too.
+ * The event's title and description for a reader in `locale`, and the language they're in: the best
+ * stored translation, or null to show the original as its organiser wrote it. A page that gets null
+ * for an event in another language waits for its translation: void-fbtee's middleware keeps it out
+ * of the page cache and queues it.
  */
+export function textFor(
+  event: { id: string; locale: string },
+  texts: readonly Translation[],
+  locale: string,
+): (Text & { locale: string }) | null {
+  const text = textOf("events", event, texts, locale);
+  if (!text.translated) return null;
+  return {
+    locale: text.locale,
+    title: text.fields.title ?? "",
+    description: text.fields.description ?? "",
+  };
+}
+
+/** The event's title for a reader in `locale`, and the language it's in. */
 export function titleFor(
   event: { id: string; title: string; locale: string },
-  texts: readonly { event_id: string; title: string; locale: string }[],
+  texts: readonly Translation[],
   locale: string,
 ): { title: string; locale: string } {
-  const text = pickText(
-    texts.filter((t) => t.event_id === event.id),
-    locale,
-  );
+  const text = textFor(event, texts, locale);
   return { title: text?.title ?? event.title, locale: text?.locale ?? event.locale };
 }
 
 /**
- * Whether a page in `locale` shows an event still waiting for its translation into that language:
- * it was written in another one, and none of the stored texts is in `locale`. Such a page isn't
- * kept in Void's page cache (`x-revalidate: 0`, guide/edge/revalidation.md, "Per-response TTL
- * override"), so the cache never holds an event in the wrong language: the first visit after the
- * translation is stored caches the finished page. Clearing the cache when it lands
- * (storeTranslations) then only has older copies to clear, and nothing waits on it.
+ * A translation landed (queues/translate.ts): the event's pages leave Void's page cache in every
+ * language, and its open pages are told to load their data again.
  */
-export const awaitsTranslation = (
-  written: string,
-  texts: readonly { locale: string }[],
-  locale: string,
-) => written !== locale && !texts.some((t) => t.locale === locale);
-
-/**
- * An event's original, and the app's languages it has no translation in yet. A translation nobody
- * can say the origin of ("unknown": from before that was recorded, or stored by code that didn't
- * say) counts as missing: it's translated again, and replaced (storeTranslations).
- */
-export async function untranslated(eventId: string) {
-  const list = await db.select().from(events).where(eq(events.id, eventId));
-  const texts = await db
-    .select({ event_id: event_texts.event_id, locale: event_texts.locale })
-    .from(event_texts)
-    .where(and(eq(event_texts.event_id, eventId), ne(event_texts.translatedBy, UNKNOWN)));
-  return list
-    .map((e) => ({
-      id: e.id,
-      locale: e.locale,
-      title: e.title,
-      description: e.description,
-      missing: appLocales().filter(
-        (l) => l !== e.locale && !texts.some((t) => t.event_id === e.id && t.locale === l),
-      ),
-    }))
-    .filter((e) => e.missing.length);
-}
-
-/** What `translated_by` holds when nothing says who made a translation (db/schema/event_texts.ts). */
-export const UNKNOWN = "unknown";
-
-/** Who made a translation: the model's id, and its AI Gateway log (the request, answer and cost). */
-export type Made = { by: string; gatewayLogId?: string };
-
-/**
- * Stores an event's text in `locale`, with who made it, then its pages refresh. A stored
- * translation is kept, unless nobody can say who made it ("unknown"): that one is replaced.
- */
-export async function storeTranslations(
-  eventId: string,
-  translations: Record<string, Text>,
-  made: Made,
-) {
-  const locales = Object.keys(translations);
-  if (!locales.length) return;
-  for (const [locale, text] of Object.entries(translations)) {
-    const row = {
-      title: text.title.trim(),
-      description: text.description.trim(),
-      translatedBy: made.by,
-      translatedAt: new Date().toISOString().slice(0, 10),
-      gatewayLogId: made.gatewayLogId ?? null,
-    };
-    await db
-      .insert(event_texts)
-      .values({ event_id: eventId, locale, ...row })
-      .onConflictDoUpdate({
-        target: [event_texts.event_id, event_texts.locale],
-        set: { ...row, updatedAt: sql`(datetime('now'))` },
-        setWhere: eq(event_texts.translatedBy, UNKNOWN),
-      });
-  }
-  await revalidate({ paths: eventPages(eventId) });
-  await live.publish(eventTopic(eventId), {}, { type: "translated" });
+export async function onTranslated(_table: string, id: string) {
+  await revalidate({ paths: eventPages(id) });
+  await live.publish(eventTopic(id), {}, { type: "translated" });
 }

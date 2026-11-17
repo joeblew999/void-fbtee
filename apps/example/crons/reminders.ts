@@ -4,24 +4,21 @@
 // written with inLocale() (src/events/emails.ts). The window is the 24 hours after the run's own
 // scheduledTime, so daily runs cover every start once and no event is reminded twice. A booker
 // who ticked the box when booking gets their PDF ticket attached again. The same run deletes the
-// PDF tickets of events that started a week before, and keeps the posts' translations to the app's
-// languages: deletes those in a language it no longer has, and queues every event missing one
-// (reconcileTranslations).
+// PDF tickets of events that started a week before. (Keeping posts in the app's languages is
+// crons/translations.ts.)
 //
 // Cloudflare runs it on its Cron Trigger; in dev, Void's trigger runs it on demand
 // (`POST /__void/scheduled`, guide/jobs.md), as e2e/dev/jobs.test.ts does.
-import { bookings, event_texts, events } from "@schema";
+import { bookings, events } from "@schema";
 import { defineScheduled } from "void";
-import { and, db, eq, gte, inArray, lt, notInArray, sql } from "void/db";
-import { queues } from "void/queues";
-import { appLocales } from "void-fbtee/server";
+import { and, db, eq, gte, inArray, lt } from "void/db";
 import { Temporal } from "temporal-polyfill";
 import type { AppLocale } from "void-fbtee/locales";
 import { sendReminderEmail } from "@/events/emails";
 import { KEEP_TICKETS_MS, ticketKey, ticketPdf } from "@/events/tickets";
 import { storage } from "void/storage";
 import { originOr } from "@/site";
-import { textsFor, titleFor, UNKNOWN } from "@/events/translations";
+import { textsFor, titleFor } from "@/events/translations";
 
 // 06:00 UTC every day: early morning in Bangkok, late evening before in the Americas.
 export const cron = "0 6 * * *";
@@ -53,53 +50,9 @@ async function deleteOldTickets(from: number) {
     await storage.delete(done.slice(i, i + 1000).map((b) => ticketKey(b.id)));
 }
 
-/**
- * The posts' translations kept to the app's languages, both ways (plans/translation-provenance.md):
- *
- * - A translation into a language the app no longer has is deleted: its pages are gone with the
- *   language, and it would never be read again.
- * - Every event missing one of the app's languages, or with one nobody can say the origin of
- *   ("unknown"), goes back on the translate queue (queues/translate.ts), which translates only
- *   what's missing. Posting queues it once; when that fails for good (after the queue's retries
- *   Cloudflare drops the message: Void's queues have no dead-letter queue, guide/queues.md), as it
- *   does while the account's AI Gateway credits are used up, or when the app gains a language,
- *   this picks it up. Every event, past ones too: their pages are still there to be read. Only
- *   events posted over an hour before, so a fresh post's own message isn't doubled.
- *
- * Counted in the database, one query for all events (D1 takes at most 100 bound parameters a
- * query, so not a list of ids). Here, not a job of its own: Cloudflare's free plan allows 5 Cron
- * Triggers an account.
- */
-async function reconcileTranslations(from: number) {
-  const locales = appLocales();
-  await db.delete(event_texts).where(notInArray(event_texts.locale, locales));
-  const list = sql.join(
-    locales.map((l) => sql`${l}`),
-    sql`, `,
-  );
-  const missing = await db
-    .select({ id: events.id })
-    .from(events)
-    .where(
-      and(
-        // created_at is SQLite's datetime('now'): "YYYY-MM-DD HH:MM:SS", UTC.
-        lt(events.createdAt, sql`datetime(${Math.floor(from / 1000) - 3600}, 'unixepoch')`),
-        // Its translations someone can name, in the app's languages other than its own, fewer
-        // than those languages.
-        sql`(SELECT count(*) FROM ${event_texts} WHERE ${event_texts.event_id} = ${events.id}
-          AND ${event_texts.translatedBy} <> ${UNKNOWN}
-          AND ${event_texts.locale} <> ${events.locale}
-          AND ${event_texts.locale} IN (${list}))
-          < ${locales.length} - (CASE WHEN ${events.locale} IN (${list}) THEN 1 ELSE 0 END)`,
-      ),
-    );
-  for (const e of missing) await queues.translate.send({ eventId: e.id });
-}
-
 export default defineScheduled(async (controller, env) => {
   const from = controller.scheduledTime;
   await deleteOldTickets(from);
-  await reconcileTranslations(from);
   const soon = await db
     .select()
     .from(events)

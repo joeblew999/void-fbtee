@@ -40,8 +40,9 @@ Found on the way:
 ## The design (decided 2026-11-17)
 
 The app uses the package's exports at Void's own places, as it already does for the middleware
-(`middleware/99.i18n.ts` is `export { default } from "void-fbtee/middleware"`). No generated
-files: each app file is a few lines a developer can read, `void-fbtee init` writes it, and
+(`middleware/99.i18n.ts` is `export { default } from "void-fbtee/middleware"`). Each app file
+is a few lines a developer can read; `vp dev` writes the ones missing (never over the app's own),
+since it reads voidFbtee()'s options on every start and `init` runs before an app has content; and
 `vp build` fails, saying what to do, when one is missing. The package's exports mirror Void's
 folders, so it's plain which file each is for.
 
@@ -65,5 +66,23 @@ The example's `event_texts` moves into `events_translations` by a migration that
 (fields as JSON, provenance kept) before dropping it. The example's own copies of the logic are
 deleted, and `test:fresh` proves a new `void init` app gets all of it from the package.
 
-Still to settle when building: whether `vp dev` also runs `void db generate` when the table is
-missing, or the build tells the developer to.
+## Built (2026-11-17)
+
+- `vp dev` doesn't run `void db generate`: it asks questions (a new table, or a renamed one?), and
+  without a terminal it writes nothing and still says "Migration generation complete" (it did so
+  twice here). `vp build` checks drizzle's own snapshot for the table instead, and says to run it
+  in a terminal.
+- Proven in dev on the example: a page read in a language the event lacked showed the original,
+  wasn't cached (`x-revalidate: 0`), queued it, and the next read was Thai and cached; the hourly
+  job deleted a French row and replaced an `unknown` Thai one (one queue job); deleting an event
+  deleted its translations through the foreign key. `test:dev` 8/8, `test:preview` 44/44 (its
+  cache checks included), the live rows' move checked on a copy (10 rows, 8 `claude`, 2
+  `unknown`, the old table gone).
+- `test:fresh`'s Thai-source app adds a table and the one line, and checks `vp dev` writes the
+  files, `vp build` fails until the migration, and passes after `void db generate`.
+
+## Found (follow-ups)
+
+- Gemini left an English word in a Thai post ("ว่ายน้ำชมพระอาทิตย์ขึ้นที่ Harbour", for "Harbour
+  sunrise swim"). What people post isn't run through the checks the app's own text is
+  (judge.ts): it should be, before it's stored, with one retry told what was wrong.

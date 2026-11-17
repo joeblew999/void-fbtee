@@ -30,6 +30,7 @@ import { prepare } from "./commands";
 import {
   hasClaude,
   agentProvenance,
+  appName,
   markedDone,
   reviewApp,
   stamp,
@@ -38,6 +39,7 @@ import {
   unreviewed,
 } from "./translate";
 import { check, reopenFailing } from "./check";
+import { writeContentFiles } from "./content-files";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
 import type { FallbackLocales } from "fbtee";
@@ -67,6 +69,20 @@ function checkFallback(fallback: string | undefined, config: LocaleConfig): stri
   if (!config.locales.some((l) => l.locale === locale))
     throw new Error(`void-fbtee: fallbackLocale "${fallback}" is not in locales.`);
   return locale;
+}
+
+/** voidFbtee({ content }), each table with its fields and what it holds (content.ts ContentTable). */
+export function contentOf(
+  options: Pick<VoidFbteeOptions, "content">,
+): Record<string, { fields: string[]; about: string }> {
+  return Object.fromEntries(
+    Object.entries(options.content ?? {}).map(([table, v]) => [
+      table,
+      Array.isArray(v)
+        ? { fields: v, about: table }
+        : { fields: v.fields, about: v.about ?? table },
+    ]),
+  );
 }
 
 export interface VoidFbteeOptions {
@@ -109,6 +125,15 @@ export interface VoidFbteeOptions {
    * (or `fbt.c("Save")`) without repeating it. See fbtee's README, "Common Strings".
    */
   common?: Record<string, string>;
+  /**
+   * What people write in the app's tables, to translate into its languages
+   * (plans/translated-content.md): each table, with its fields, and optionally what it holds,
+   * for the model ("listings for events"). E.g. { events: ["title", "description"] } or
+   * { events: { fields: ["title", "description"], about: "listings for events" } }. Each table
+   * has a text `id` and a `locale` column; its translations are in `<table>_translations`
+   * (translationsOf from void-fbtee/db/schema).
+   */
+  content?: Record<string, string[] | { fields: string[]; about?: string }>;
 }
 
 /** What the plugin exposes on its `api`, read from the config without running the plugin (loadProject, for tests). */
@@ -311,6 +336,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
     src,
     common: options.common,
     redirectHome: options.redirectHome ?? true,
+    content: contentOf(options),
   });
 
   const api: VoidFbteeApi = { options, project };
@@ -355,6 +381,18 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         if (written.length) log(`prepared ${written.join(", ")}`);
       } catch (error) {
         server.config.logger.warn(`void-fbtee: couldn't prepare: ${String(error)}`);
+      }
+      // voidFbtee({ content }): the app's few files for it, at Void's places, where they're
+      // missing (content-files.ts); never over the app's own. Void rescans queues and jobs as files
+      // change.
+      try {
+        const written = writeContentFiles(project());
+        if (written.length)
+          log(
+            `wrote ${written.join(", ")} for voidFbtee({ content }); a new table needs its migration: vp exec void db generate`,
+          );
+      } catch (error) {
+        server.config.logger.warn(`void-fbtee: couldn't write the content files: ${String(error)}`);
       }
       // The route's token, where the measurement of translators reads it (scripts/translator.ts),
       // as Void keeps its own dev trigger token in a file (.void/dev-trigger-token).
@@ -480,7 +518,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       async handler(id) {
         if (id === SERVER_TEMPORAL_ID) return SERVER_TEMPORAL;
         if (id === "\0" + CONFIG_ID)
-          return `export default ${JSON.stringify({ ...config, fallbackLocale, redirectHome: options.redirectHome ?? true, fallbackLocales: options.fallbackLocales, site: options.site })};`;
+          return `export default ${JSON.stringify({ ...config, fallbackLocale, redirectHome: options.redirectHome ?? true, fallbackLocales: options.fallbackLocales, site: options.site, content: contentOf(options), app: appName(root) })};`;
         if (id === "\0" + CATALOGS_ID) {
           // The translated languages, and the source's own when it needs one (catalogs.ts).
           const entries = catalogLocales(project()).map(

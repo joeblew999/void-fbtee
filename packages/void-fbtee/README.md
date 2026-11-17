@@ -168,6 +168,12 @@ runs, the same on a developer's machine as in CI. There are no i18n scripts.
 | `vp build` | Fails on anything left: an untranslated string or page, a page older than its original, a setup problem. So `void deploy`, and CI, can't ship one.                                                                                                                                                                                                                                                                         |
 | `vp check` | Lints with fbtee's strict rules: text nobody wrapped for translation is an error.                                                                                                                                                                                                                                                                                                                                          |
 
+**What people post.** Name the table and its fields, `voidFbtee({ content: { events: ["title",
+"description"] } })`, and void-fbtee translates every row into the app's languages: `vp dev` writes
+the few files Void needs at its own places (`queues/translate.ts`, `crons/translations.ts`,
+`db/schema/events_translations.ts`), and `vp build` fails while one is missing or the table has no
+migration. The SKILL's "What people post" has the rest.
+
 **What translating costs, and where the text goes.** Void's AI translates with Google's Gemini 3.5
 Flash through Cloudflare's AI Gateway, paid from the Cloudflare account's AI Gateway credits
 (Unified Billing): about US$0.001 a string per language (the example: 361 strings, about US$0.36

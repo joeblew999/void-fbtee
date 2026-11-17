@@ -31,11 +31,11 @@ function points(): Point[] {
       code: [
         {
           file: "vite.config.ts",
-          line: "voidFbtee({ sourceLocale, locales, site: SITE, common }),",
+          line: "voidFbtee({",
         },
         {
           file: "queues/translate.ts",
-          line: 'import { translate as translateText } from "void-fbtee/ai";',
+          line: 'import { translationQueue } from "void-fbtee/queues/translate";',
         },
         {
           file: "AGENTS.md",
@@ -75,12 +75,20 @@ function points(): Point[] {
       ),
       code: [
         {
+          file: "vite.config.ts",
+          line: 'content: { events: { fields: ["title", "description"], about: "listings for events" } },',
+        },
+        {
           file: "pages/[lang]/events/new.server.ts",
-          line: "await queues.translate.send({ eventId: created.id });",
+          line: 'await translateSoon("events", created.id);',
         },
         {
           file: "queues/translate.ts",
-          line: 'translateText(text, { from, to, about: "listings for events" });',
+          line: "export default translationQueue({ onTranslated });",
+        },
+        {
+          file: "crons/translations.ts",
+          line: 'export { default } from "void-fbtee/crons/translations";',
         },
       ],
     },

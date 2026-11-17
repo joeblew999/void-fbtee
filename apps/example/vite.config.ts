@@ -50,7 +50,16 @@ export default defineConfig({
     // site: the deployed address, so the dev server and Worker Previews name it in canonical,
     // hreflang, og:url and the sitemap. common: labels used on several pages, each described once
     // (fbtee's common strings), written <fbt common>Events</fbt>.
-    voidFbtee({ sourceLocale, locales, site: SITE, common }),
+    voidFbtee({
+      sourceLocale,
+      locales,
+      site: SITE,
+      common,
+      // What people post, translated into the app's languages by the package
+      // (plans/translated-content.md): db/schema/events_translations.ts, queues/translate.ts and
+      // crons/translations.ts, each a few lines at Void's own place.
+      content: { events: { fields: ["title", "description"], about: "listings for events" } },
+    }),
     voidPlugin(),
     voidReact({ react: { compiler: true } }),
     voidMarkdown(),
