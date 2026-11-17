@@ -37,24 +37,33 @@ Found on the way:
   can't load fails silently, so the package's check must see that the table has a migration.
 - **Each job is a Cloudflare Cron Trigger**: the free plan allows 5 per account.
 
-## The design
+## The design (decided 2026-11-17)
 
-The developer writes one thing, in the `voidFbtee()` options they already have:
-`content: { events: ["title", "description"] }`. From it:
+The app uses the package's exports at Void's own places, as it already does for the middleware
+(`middleware/99.i18n.ts` is `export { default } from "void-fbtee/middleware"`). No generated
+files: each app file is a few lines a developer can read, `void-fbtee init` writes it, and
+`vp build` fails, saying what to do, when one is missing. The package's exports mirror Void's
+folders, so it's plain which file each is for.
 
-- `vp dev` writes the app's thin files, marked "made by void-fbtee, don't edit": the table's
-  re-export, the queue (its options, `void/ai`, the package's consumer) and one job, each a few
-  lines. The logic stays in the package.
-- `vp build` fails, saying what to do, when one is missing or changed, or when the table has no
-  migration (the silent drizzle-kit failure above).
-- The translations table references the content table with `ON DELETE CASCADE`, so deleting a post
-  deletes its translations, with no code to remember.
-- The job runs hourly and keeps every row in the app's languages, both ways (what
-  `reconcileTranslations` does in the example today). An optional call queues a new post at once.
-- One helper gives a row's text in the reader's language (`pickText` today).
-- The example's own copies are deleted; it gets post translation from the package like any app,
-  and `test:fresh` proves a new `void init` app does too.
+| The app's file (Void's layout)     | What's in it                                                                                                                                                                                                                                                                                                                       |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vite.config.ts`                   | `voidFbtee({ content: { events: ["title", "description"] } })`: which tables people write in, and which fields to translate. The one declaration.                                                                                                                                                                                  |
+| `db/schema/events_translations.ts` | `export const events_translations = translationsOf(events)` from `void-fbtee/db/schema` (a module that imports only `void/schema-d1`). One table shape for every app: the source row's id (`ON DELETE CASCADE`), the language, the fields as JSON, who made it, when, the gateway log.                                             |
+| `queues/translate.ts`              | `import "void/ai"`, `maxRetries`/`retryDelay` as literals, `export default translationQueue({ onTranslated })` from `void-fbtee/queues/translate`. `onTranslated` is the app's: which pages to refresh, which live topic to tell.                                                                                                  |
+| `crons/translations.ts`            | its schedule, `export { default } from "void-fbtee/crons/translations"`: the hourly backstop, both ways (deletes a removed language's rows, queues what's missing or `unknown`).                                                                                                                                                   |
+| `middleware/99.i18n.ts`            | unchanged. The package's middleware also: when a page read a row through the package's helper and the reader's language was missing, marks the response not to be cached (`x-revalidate: 0`) and queues the translation (`waitUntil`). A new post is translated the first time it's read in another language; no page code for it. |
 
-Still to settle when building: one job for all the package's work, to spend one Cron Trigger; and
-whether `vp dev` also runs `void db generate` when the table changes, or the build tells the
-developer to.
+Reading: `translationsOf`'s helper in `void-fbtee/server` gives rows' text in the request's language
+(`pickText`), and records what's missing for the middleware. A post's own code may call
+`translateSoon("events", id)` to queue it at once; leaving it out costs only a delay.
+
+Conventions for a content table: a text `id` primary key and a `locale` column (the language it
+was written in). `vp build` checks them, and that the translations table has a migration (the
+silent drizzle-kit failure above), from drizzle's own snapshot in `db/migrations/meta/`.
+
+The example's `event_texts` moves into `events_translations` by a migration that copies its rows
+(fields as JSON, provenance kept) before dropping it. The example's own copies of the logic are
+deleted, and `test:fresh` proves a new `void init` app gets all of it from the package.
+
+Still to settle when building: whether `vp dev` also runs `void db generate` when the table is
+missing, or the build tells the developer to.
