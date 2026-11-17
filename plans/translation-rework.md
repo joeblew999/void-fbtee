@@ -304,10 +304,9 @@ Then, also fixed:
 Open: event translations already on the live site were made by the old models and have no
 `translated_by` (null): a review of posts in production (the next plan) can't tell them apart.
 
-Open: a spend limit on the `default` gateway (AI Gateway "Spend limits": US$2 a day on
-`google/gemini-3.5-flash`, so a runaway loop can't empty the credits; dev and the live site share
-it). The Cloudflare connector in the cloud session can read the gateway but not change it (it lacks
-the permission).
+Done 2026-11-17: a spend limit on the `default` gateway, `gemini-daily`: US$2 a sliding 24 hours on
+`google/gemini-3.5-flash` (AI Gateway "Spend limits"), set through the Cloudflare connector; dev and the
+live site share it. Its other settings (authentication, Unified Billing, logs) were kept.
 
 ## Done when
 
