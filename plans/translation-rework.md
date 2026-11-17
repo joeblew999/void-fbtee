@@ -267,6 +267,34 @@ Claude's review of today's Gemini answers, and what came of each:
   which the package's dev server can't read; it needs a route in the example, like the translate
   route. Left for later, with the review of posts in production out of scope (no Claude there).
 
+## What paying for the model changed (2026-11-17)
+
+Moving from Workers AI to Gemini on credits changed more than the model. Fixed:
+
+- **Credits used up or a limit reached** (AI Gateway: 402, codes 2052/2021; 429, a spend limit or
+  code 2018; Cloudflare's "Troubleshooting" page, checked 2026-11-17): `models.ts paymentProblem()`
+  tells these from a bad answer. `vp dev` says once what to do and stops asking (the dev route
+  answers 402/429; translate.ts `routeCall`), instead of asking again entry by entry. Unit-tested on
+  Cloudflare's own messages; not yet seen live (it needs the credits run out).
+- **The post queue paid twice:** it stored every language at the end, so a retry translated all of
+  them again. Each is now stored as it's done. It retried 3 times at once (Void's default) and then
+  Cloudflare dropped the message for good (no dead-letter queue), so a post made while the credits
+  were out was never translated: now 5 retries 5 minutes apart, an hour apart when the account isn't
+  paying, and the daily job (`crons/reminders.ts requeueUntranslated`) queues every upcoming event
+  still missing a language. In the daily job, not its own: the free plan allows 5 Cron Triggers.
+  Proven in dev: an Arabic text deleted, the job run through `/__void/scheduled`, the queue stored a
+  new one by Gemini.
+- **Docs:** the package README's `vp dev` row still said Claude Code goes first; it now says Void's
+  AI does, and Claude reviews. It, the SKILL and the root README now say what translating costs
+  (about US$0.001 a string per language) and that the text goes to Google (not Zero Data Retention,
+  `zdr: false` on the gateway; AI Gateway also logs every request, `collect_logs: true`).
+- `plans/video-conferencing.md` still said posts are translated with Llama.
+
+Open: a spend limit on the `default` gateway (AI Gateway "Spend limits": US$2 a day on
+`google/gemini-3.5-flash`, so a runaway loop can't empty the credits; dev and the live site share
+it). The Cloudflare connector in the cloud session can read the gateway but not change it (it lacks
+the permission).
+
 ## Done when
 
 - `vp build` fails on every problem `vp dev` checks for, including a wrong number of plural forms.

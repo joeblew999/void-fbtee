@@ -20,7 +20,7 @@ import {
 import { sourceOf } from "./locales";
 import { glossaryMisses, keptTerms, problemsWith } from "./judge";
 import { check } from "./check";
-import { BATCH, costOf, GEMINI, type Usage } from "./models";
+import { BATCH, costOf, GEMINI, paymentAdvice, type Usage } from "./models";
 
 /** void-fbtee's own folder (dist/ is one level down), where skills/ ships. */
 export const packageDir = () => dirname(dirname(fileURLToPath(import.meta.url)));
@@ -569,9 +569,11 @@ export async function translateEntry(
 
 /**
  * Requests to the dev server's translate route (ai.ts devTranslate). Undefined: Void's AI isn't
- * there (503); empty lines: an answer that couldn't be used (502), with what it still cost.
+ * there (503), or not paid for now (402, 429: credits used up, a spend limit reached); empty lines:
+ * an answer that couldn't be used (502), with what it still cost.
  */
 export function routeCall(url: string, token: string, log: (line: string) => void): TranslateCall {
+  let paymentSaid = false;
   return async (body) => {
     const res = await fetch(url, {
       method: "POST",
@@ -581,6 +583,14 @@ export function routeCall(url: string, token: string, log: (line: string) => voi
     if (res.status === 503) {
       const { error } = (await res.json().catch(() => ({}))) as { error?: string };
       log(`Void's AI isn't available here (${error ?? "no answer"}), so Claude Code translates`);
+      return undefined;
+    }
+    if (res.status === 402 || res.status === 429) {
+      // Not paid for now: asking again (entry by entry) would only fail again. The rest is left
+      // new, for Claude Code, or the next save once credits are back.
+      if (!paymentSaid)
+        log(`Void's AI stopped: ${paymentAdvice[res.status === 402 ? "credits" : "limit"]}`);
+      paymentSaid = true;
       return undefined;
     }
     if (res.status === 502) {

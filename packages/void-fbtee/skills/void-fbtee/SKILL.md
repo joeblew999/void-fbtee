@@ -283,6 +283,11 @@ wrong language. Void's AI runs on Cloudflare in dev and the preview too, through
 sign-in (`void cloudflare login`), paid from the account's AI Gateway credits (Unified Billing,
 no key); for the preview, mark the binding remote in `void.config.ts`:
 `cloudflare: { ai: { binding: "AI", remote: true } }` (Void marks it so by itself only in dev).
+Each language is stored as soon as it's translated, so a retry only pays for the ones still missing;
+when the account isn't paying (credits used up, a spend limit reached: `paymentProblem()` from
+`void-fbtee/ai`), the message waits an hour. Cloudflare drops a message after its last retry (Void's
+queues have no dead-letter queue), so the daily job (`crons/reminders.ts`) queues any upcoming
+event still missing a language again. Posts go to Google's Gemini (not Zero Data Retention).
 
 ## Markdown pages
 

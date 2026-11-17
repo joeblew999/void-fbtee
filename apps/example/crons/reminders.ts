@@ -4,13 +4,16 @@
 // written with inLocale() (src/events/emails.ts). The window is the 24 hours after the run's own
 // scheduledTime, so daily runs cover every start once and no event is reminded twice. A booker
 // who ticked the box when booking gets their PDF ticket attached again. The same run deletes the
-// PDF tickets of events that started a week before.
+// PDF tickets of events that started a week before, and queues again each upcoming event still
+// missing one of the app's languages (requeueUntranslated).
 //
 // Cloudflare runs it on its Cron Trigger; in dev, Void's trigger runs it on demand
 // (`POST /__void/scheduled`, guide/jobs.md), as e2e/dev/jobs.test.ts does.
-import { bookings, events } from "@schema";
+import { bookings, event_texts, events } from "@schema";
 import { defineScheduled } from "void";
-import { and, db, eq, gte, inArray, lt } from "void/db";
+import { and, db, eq, gte, inArray, lt, sql } from "void/db";
+import { queues } from "void/queues";
+import { appLocales } from "void-fbtee/server";
 import { Temporal } from "temporal-polyfill";
 import type { AppLocale } from "void-fbtee/locales";
 import { sendReminderEmail } from "@/events/emails";
@@ -49,9 +52,48 @@ async function deleteOldTickets(from: number) {
     await storage.delete(done.slice(i, i + 1000).map((b) => ticketKey(b.id)));
 }
 
+/**
+ * Each upcoming event still missing one of the app's languages, back on the translate queue
+ * (queues/translate.ts). Posting queues it once; when that fails for good (after the queue's retries
+ * Cloudflare drops the message, and Void's queues have no dead-letter queue: Void's
+ * guide/queues.md), as it does while the account's AI Gateway credits are used up, this picks it
+ * up again. Only events posted over an hour before, so a fresh post's own message isn't doubled,
+ * and only those still to come: a past event's page isn't worth paying for. Here, not a job of its
+ * own: Cloudflare's free plan allows 5 Cron Triggers an account.
+ */
+async function requeueUntranslated(from: number) {
+  const upcoming = await db
+    .select({ id: events.id, locale: events.locale })
+    .from(events)
+    .where(
+      and(
+        gte(events.starts_at_utc, utc(from)),
+        // created_at is SQLite's datetime('now'): "YYYY-MM-DD HH:MM:SS", UTC.
+        lt(events.createdAt, sql`datetime(${Math.floor(from / 1000) - 3600}, 'unixepoch')`),
+      ),
+    );
+  if (!upcoming.length) return;
+  const texts = await db
+    .select({ event_id: event_texts.event_id, locale: event_texts.locale })
+    .from(event_texts)
+    .where(
+      inArray(
+        event_texts.event_id,
+        upcoming.map((e) => e.id),
+      ),
+    );
+  const locales = appLocales();
+  for (const e of upcoming) {
+    const has = (l: string) =>
+      l === e.locale || texts.some((t) => t.event_id === e.id && t.locale === l);
+    if (!locales.every(has)) await queues.translate.send({ eventId: e.id });
+  }
+}
+
 export default defineScheduled(async (controller, env) => {
   const from = controller.scheduledTime;
   await deleteOldTickets(from);
+  await requeueUntranslated(from);
   const soon = await db
     .select()
     .from(events)

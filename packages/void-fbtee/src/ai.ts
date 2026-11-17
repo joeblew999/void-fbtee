@@ -14,10 +14,10 @@
 // The model, and why: models.ts.
 import { ai } from "void/ai";
 import skill from "../skills/void-fbtee-translate/SKILL.md?raw";
-import { GEMINI, type Usage } from "./models";
+import { GEMINI, paymentProblem, paymentAdvice, type Usage } from "./models";
 import { MARKS } from "./plurals";
 
-export { GEMINI, type Usage };
+export { GEMINI, paymentProblem, paymentAdvice, type Usage };
 
 /**
  * How to translate: the translating skill (skills/void-fbtee-translate/SKILL.md), the same text a
@@ -314,7 +314,8 @@ export type DevRequest =
  * The dev server's route, `POST /__void-fbtee/translate`: only under `vp dev` (the plugin's
  * virtual:void-fbtee/dev is empty in a build), and only for the dev server itself (the token it
  * made as it started). 503 when Void's AI isn't there (the app doesn't use it, or no Cloudflare
- * sign-in), so the dev server translates another way; 502 when one answer was unusable.
+ * sign-in), so the dev server translates another way; 402 when the account's AI Gateway credits are
+ * used up, 429 when a spend limit is reached; 502 when one answer was unusable.
  */
 export async function devTranslate(request: Request, token: string): Promise<Response> {
   if (request.headers.get("x-void-fbtee-token") !== token)
@@ -331,12 +332,12 @@ export async function devTranslate(request: Request, token: string): Promise<Res
         : { lines: await translateStrings(body.entries, { ...body, onUsage }) };
     return Response.json({ ...result, model: GEMINI.id, usage });
   } catch (error) {
-    // 503: no Void's AI here (Void's own message, "ai: Not available…"); 502: it answered
-    // something unusable, for this request only.
+    // 503: no Void's AI here (Void's own message, "ai: Not available…"); 402 and 429: the
+    // account isn't paying for it now (models.ts paymentProblem); 502: it answered something
+    // unusable, for this request only.
     const unavailable = /not available/i.test(String(error));
-    return Response.json(
-      { error: String(error), model: GEMINI.id, usage },
-      { status: unavailable ? 503 : 502 },
-    );
+    const payment = paymentProblem(error);
+    const status = unavailable ? 503 : payment === "credits" ? 402 : payment ? 429 : 502;
+    return Response.json({ error: String(error), model: GEMINI.id, usage }, { status });
   }
 }

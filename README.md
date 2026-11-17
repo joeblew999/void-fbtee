@@ -150,7 +150,9 @@ Cloudflare's local stand-ins.
 - **Void's AI in dev and the preview:** both send it to Cloudflare through Void's sign-in
   (`vp run login`). It translates with Gemini 3.5 Flash through AI Gateway, paid from the
   account's AI Gateway credits (Unified Billing, no key); `vp run translations:measure` runs it on
-  a sample and prints the cost. Void marks the AI binding remote by itself only in dev, so
+  a sample and prints the cost (about US$0.001 a string per language). When the credits run out, dev
+  says so and stops; the post queue waits an hour and the daily job (`crons/reminders.ts`) re-queues what's still
+  missing. Void marks the AI binding remote by itself only in dev, so
   `apps/example/void.config.ts` sets `ai: { binding: "AI", remote: true }` in `cloudflare`; without
   it the preview fails with "Binding AI needs to be run remotely".
 - **Browser Run (the PDF tickets) in dev and the preview:** the same, through the same sign-in:

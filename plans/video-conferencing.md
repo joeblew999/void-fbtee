@@ -50,8 +50,9 @@ Sources, read 2026-11-14:
   - Workers AI supports two Deepgram STT models: @cf/deepgram/nova-3 and
     @cf/deepgram/flux, streamed over a WebSocket.
   - Nova-3 is listed as Cloudflare-hosted, Batch, Partner, Real-time.
-- **Translation:** the same Workers AI model the app already translates posts with
-  (`queues/translate.ts`, `@cf/meta/llama-3.3-70b-instruct-fp8-fast`).
+- **Translation:** the same model the app already translates posts with (`queues/translate.ts`:
+  Gemini 3.5 Flash through AI Gateway, `packages/void-fbtee/src/models.ts`), unless live speech
+  needs a faster one.
 
 ## The first thing to prove
 
