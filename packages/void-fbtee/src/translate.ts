@@ -18,7 +18,7 @@ import {
   type MarkdownPage,
 } from "./check";
 import { sourceOf } from "./locales";
-import { glossaryMisses, keptTerms, problemsWith } from "./judge";
+import { glossaryMisses, keptTerms, problemsWith, sourceLanguageOf } from "./judge";
 import { check } from "./check";
 import { BATCH, costOf, GEMINI, paymentAdvice, type Usage } from "./models";
 
@@ -740,7 +740,15 @@ export async function translateCatalog(
       const lines = (answer.lines ?? []) as string[][];
       batch.forEach(([hash, entry], i) => {
         const out = spaced(entry.translations!, lines[i] ?? []);
-        if (problemsWith(entry.translations!, out, locale, from).length) failed.push([hash, entry]);
+        if (
+          problemsWith(
+            entry.translations!,
+            out,
+            locale,
+            sourceLanguageOf(hash, builtinHashes, from),
+          ).length
+        )
+          failed.push([hash, entry]);
         else keep(entry, out, answer);
       });
     });
@@ -751,7 +759,7 @@ export async function translateCatalog(
   const results = await inTurn(open, BATCH.parallel, async ([hash, entry]) => {
     const send = toSend(hash, entry);
     const answer = await translateEntry(call, {
-      from,
+      from: sourceLanguageOf(hash, builtinHashes, from),
       to: locale,
       entry: send,
       glossary: glossaryFor(finished, [send], common),

@@ -11,7 +11,7 @@ import {
   missing,
   type Project,
 } from "./catalogs";
-import { problemsWith } from "./judge";
+import { problemsWith, sourceLanguageOf } from "./judge";
 import { contentProblems } from "./content-files";
 import { firstFile, hasI18nMiddleware, HOME_PAGES, LAYOUTS, VOID_CONFIGS } from "./app-files";
 import { sourceOf, translatedOf } from "./locales";
@@ -265,7 +265,7 @@ export function check(p: Project): string[] {
   // freshCatalog): one line for each plural form and gender the language needs, nothing in the
   // source language left in, the language's script, every placeholder and kept term, its grammar.
   // Whoever wrote it: an AI, an agent or a person (plans/translation-rework.md, step 5).
-  const { texts } = collect(p);
+  const { texts, builtinHashes } = collect(p);
   for (const locale of translatedOf(p.config).map((l) => l.locale)) {
     const file = catalogFile(p, locale);
     if (!existsSync(file)) continue;
@@ -293,7 +293,7 @@ export function check(p: Project): string[] {
         source[hash].translations,
         entry.translations.map((l) => l.translation),
         locale,
-        p.config.sourceLocale,
+        sourceLanguageOf(hash, builtinHashes, p.config.sourceLocale),
       ))
         problems.push(`strings: ${locale}: ${JSON.stringify(texts[hash] ?? hash)}: ${what}`);
     }
@@ -356,7 +356,7 @@ export function check(p: Project): string[] {
  */
 export function reopenFailing(p: Project): string[] {
   const reopened: string[] = [];
-  const { texts } = collect(p);
+  const { texts, builtinHashes } = collect(p);
   for (const locale of translatedOf(p.config).map((l) => l.locale)) {
     const file = catalogFile(p, locale);
     if (!existsSync(file)) continue;
@@ -375,7 +375,7 @@ export function reopenFailing(p: Project): string[] {
         fresh.translations,
         entry.translations.map((l) => l.translation),
         locale,
-        p.config.sourceLocale,
+        sourceLanguageOf(hash, builtinHashes, p.config.sourceLocale),
       );
       if (!wrong.length) continue;
       catalog.translations[hash] = { ...fresh, status: "new" };

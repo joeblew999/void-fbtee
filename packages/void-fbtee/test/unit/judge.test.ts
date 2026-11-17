@@ -175,3 +175,13 @@ test("product names are kept as written", () => {
     ).join(" "),
   ).toMatch(/must keep "Void's AI"/);
 });
+
+test("a line the same as its source is fine into the same language (fbtee's English built-ins, en-US)", () => {
+  const src = [{ translation: "{list of items}, and {last item}", variations: {} }];
+  const words = [{ translation: "Something went wrong here", variations: {} }];
+  expect(problemsWith(words, ["Something went wrong here"], "en-US", "en")).toEqual([]);
+  expect(problemsWith(words, ["Something went wrong here"], "ar-EG", "en")).toContain(
+    "Line 1 is still the source text: translate it.",
+  );
+  expect(problemsWith(src, ["{list of items}, and {last item}"], "en-GB", "en-US")).toEqual([]);
+});

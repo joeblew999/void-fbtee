@@ -74,6 +74,10 @@ const FROM_THAI: Record<string, Record<string, string | Record<number, string>>>
     "เหลือ 1 ที่นั่ง": "1 seat left",
     ไม่มีอะไรอยู่ที่นี่: "There's nothing here",
     หน้าแรก: "Home",
+    เกิดข้อผิดพลาด: "Something went wrong",
+    "ตอนนี้สร้างหน้านี้ไม่ได้ ลองอีกครั้ง หรือเริ่มจากหน้าแรก":
+      "This page couldn't be made just now. Try again, or start from the home page.",
+    ลองอีกครั้ง: "Try again",
   },
   "ar-EG": {
     งานของชุมชน: "فعاليات المجتمع",
@@ -87,6 +91,10 @@ const FROM_THAI: Record<string, Record<string, string | Record<number, string>>>
     "เหลือ 1 ที่นั่ง": "تبقّى مقعد واحد",
     ไม่มีอะไรอยู่ที่นี่: "لا يوجد شيء هنا",
     หน้าแรก: "الرئيسية",
+    เกิดข้อผิดพลาด: "حدث خطأ",
+    "ตอนนี้สร้างหน้านี้ไม่ได้ ลองอีกครั้ง หรือเริ่มจากหน้าแรก":
+      "تعذّر إنشاء هذه الصفحة الآن. حاول مرة أخرى، أو ابدأ من الصفحة الرئيسية.",
+    ลองอีกครั้ง: "حاول مرة أخرى",
   },
 };
 const targets = process.argv[2] ? [process.argv[2]] : Object.keys(APPS);
@@ -254,14 +262,25 @@ async function thaiSource(target: string, dir: string, app: App, installed: stri
     `${target}: init says its own pages' English text is to be written in ${source}`,
   );
   moveStarterHome(target, dir, said);
-  // As the developer does: init's not-found page in Thai (the error page keeps its English,
-  // translated as any string is; only what's shown below is checked).
+  // As the developer does: init's not-found and error pages in Thai, the app's language, as its
+  // to-do asks (an English string in a Thai app would be "still the source" in English).
   const notFound = join(dir, "pages/_not-found.tsx");
   writeFileSync(
     notFound,
     readFileSync(notFound, "utf8")
       .replaceAll("There's nothing here", "ไม่มีอะไรอยู่ที่นี่")
       .replace(">Home</fbt>", ">หน้าแรก</fbt>"),
+  );
+  const error = join(dir, "pages/_error.tsx");
+  writeFileSync(
+    error,
+    readFileSync(error, "utf8")
+      .replaceAll("Something went wrong", "เกิดข้อผิดพลาด")
+      .replace(
+        "This page couldn't be made just now. Try again, or start from the home page.",
+        "ตอนนี้สร้างหน้านี้ไม่ได้ ลองอีกครั้ง หรือเริ่มจากหน้าแรก",
+      )
+      .replace(">Try again</fbt>", ">ลองอีกครั้ง</fbt>"),
   );
   run(...install(app.pm), dir);
   checkOwnDependencies(target, dir, installed);

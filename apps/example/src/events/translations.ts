@@ -38,8 +38,9 @@ export function textFor(
   event: { id: string; locale: string },
   texts: readonly Translation[],
   locale: string,
+  { note = true }: { note?: boolean } = {},
 ): (Text & { locale: string }) | null {
-  const text = textOf("events", event, texts, locale);
+  const text = textOf("events", event, texts, locale, { note });
   if (!text.translated) return null;
   return {
     locale: text.locale,
@@ -48,13 +49,16 @@ export function textFor(
   };
 }
 
-/** The event's title for a reader in `locale`, and the language it's in. */
+/**
+ * The event's title for a reader in `locale`, and the language it's in: for an email, a ticket or
+ * an action, so it asks for nothing (a page's loader uses textFor).
+ */
 export function titleFor(
   event: { id: string; title: string; locale: string },
   texts: readonly Translation[],
   locale: string,
 ): { title: string; locale: string } {
-  const text = textFor(event, texts, locale);
+  const text = textFor(event, texts, locale, { note: false });
   return { title: text?.title ?? event.title, locale: text?.locale ?? event.locale };
 }
 

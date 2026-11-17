@@ -7,7 +7,7 @@
 //   export const events_translations = translationsOf(events);
 //
 // One shape for every app, so the package's runtime (void-fbtee/queues/translate,
-// void-fbtee/crons/translations, the read helpers in void-fbtee/server) reaches it by name: the
+// void-fbtee/crons/translations, the read helpers in void-fbtee/content) reaches it by name: the
 // source row's id, the language, the translated fields as JSON (which fields: voidFbtee({ content })),
 // and who made it (plans/translation-provenance.md).
 //
@@ -25,6 +25,9 @@ import { sql } from "void/db";
 
 /** What `translated_by` holds when nothing says who made a translation. */
 export const UNKNOWN = "unknown";
+
+/** What `translated_by` holds while a translation is only asked for (content.ts translateSoon). */
+export const QUEUED = "queued";
 
 /** The translations table's name for a table of content: `<table>_translations`. */
 export const translationsTableName = (table: string) => `${table}_translations`;

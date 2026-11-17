@@ -1,17 +1,22 @@
 // Translations of what people write in the app's tables (plans/translated-content.md): which rows
-// lack which of the app's languages, storing a translation with who made it, queuing one, keeping
-// every table in the app's languages both ways, and reading a row in the reader's language.
+// lack which of the app's languages, storing a translation with who made it, asking for one (once
+// an hour at most), keeping every table in the app's languages both ways, and reading a row in the
+// reader's language.
 //
 // Which tables, and which of their fields: voidFbtee({ content }), handed over in
 // virtual:void-fbtee/config. Each table's translations are in `<table>_translations`, the one shape
 // translationsOf() makes (void-fbtee/db/schema). A table of content has a text `id` and a `locale`
 // column, the language the row was written in (`vp build` checks both).
+//
+// Asking for a translation is recorded in that table, a "queued" row for the language, and asked
+// again only when that's more than an hour old: a page read many times while it waits, posting,
+// and the daily job all ask through it, so a row is paid for once, not once per view.
 import config from "virtual:void-fbtee/config";
 import { db, sql } from "void/db";
 import { queues } from "void/queues";
-import { translationsTableName, UNKNOWN } from "./db-schema";
+import { QUEUED, translationsTableName, UNKNOWN } from "./db-schema";
 import { notePending } from "./content-pending";
-import { pickText, textLocales as textLocalesOf } from "./server";
+import { textLocales } from "./server";
 import type { RuntimeConfig } from "./runtime";
 
 /** A table's fields to translate, and what it holds, for the model (voidFbtee({ content })). */
@@ -40,6 +45,15 @@ const list = (values: string[]) =>
     values.map((v) => sql`${v}`),
     sql`, `,
   );
+/** Translations someone can name: not "unknown" (being replaced), not "queued" (asked for). */
+const named = () => sql`${ident("translated_by")} NOT IN (${UNKNOWN}, ${QUEUED})`;
+// D1 takes at most 100 bound parameters a query (Cloudflare's D1 limits).
+const CHUNK = 90;
+const chunks = <T>(items: T[]) =>
+  Array.from({ length: Math.ceil(items.length / CHUNK) }, (_, i) =>
+    items.slice(i * CHUNK, (i + 1) * CHUNK),
+  );
+const changes = (result: unknown) => (result as { meta?: { changes?: number } }).meta?.changes ?? 0;
 
 /** One row of content: its id, the language it was written in, and its fields. */
 export interface Source {
@@ -49,9 +63,9 @@ export interface Source {
 }
 
 /**
- * A row, and the app's languages it has no translation in. One nobody can say the origin of
- * ("unknown") counts as missing: it's translated again, and replaced (storeTranslation).
- * Undefined when the row is gone.
+ * A row, and the app's languages it has no translation in that someone can name ("unknown" and
+ * "queued" ones are missing: translated, and replaced, by storeTranslation). Undefined when the
+ * row is gone.
  */
 export async function untranslated(
   table: string,
@@ -69,19 +83,14 @@ export async function untranslated(
   const have = (
     (await db.all(
       sql`SELECT ${ident("locale")} FROM ${ident(translationsTableName(table))}
-        WHERE ${ident("source_id")} = ${id} AND ${ident("translated_by")} <> ${UNKNOWN}`,
+        WHERE ${ident("source_id")} = ${id} AND ${named()}`,
     )) as { locale: string }[]
   ).map((r) => r.locale);
   return {
     source: {
       id: row.id!,
       locale: row.locale!,
-      fields: Object.fromEntries(
-        fields.map((f) => {
-          const value = (row as Record<string, unknown>)[f];
-          return [f, typeof value === "string" ? value : ""];
-        }),
-      ),
+      fields: Object.fromEntries(fields.map((f) => [f, row[f] ?? ""])),
     },
     missing: appLocales().filter((l) => l !== row.locale && !have.includes(l)),
   };
@@ -95,7 +104,8 @@ export interface Made {
 
 /**
  * Stores a row's translation into `locale`, with who made it. A stored translation is kept, unless
- * nobody can say who made it ("unknown"): that one is replaced. Resolves true when it was stored.
+ * nobody can say who made it ("unknown") or it was only asked for ("queued"): that one is replaced.
+ * Resolves true when it was stored.
  */
 export async function storeTranslation(
   table: string,
@@ -119,30 +129,50 @@ export async function storeTranslation(
         ${ident("translated_at")} = excluded.${ident("translated_at")},
         ${ident("gateway_log_id")} = excluded.${ident("gateway_log_id")},
         ${ident("updated_at")} = datetime('now')
-      WHERE ${ident(t)}.${ident("translated_by")} = ${UNKNOWN}`,
+      WHERE ${ident(t)}.${ident("translated_by")} IN (${UNKNOWN}, ${QUEUED})`,
   );
-  return ((result as { meta?: { changes?: number } }).meta?.changes ?? 1) > 0;
+  return changes(result) > 0;
 }
 
 /** The queue every translation goes through: the app's `queues/translate.ts`. */
 export type TranslateMessage = { table: string; id: string };
 
 /**
- * Queues a row's translation into the app's languages it lacks, at once. Optional: a row read in
- * a language it lacks is queued then (the middleware), and the hourly job finds any left.
+ * Asks for a row's translation into the app's languages it lacks: marks each "queued" (or, for an
+ * "unknown" one, as asked) and sends one message, unless every one was asked for in the last hour
+ * (then nothing: it's on its way, or the daily job asks again). Resolves whether it was sent.
+ * Optional as a post is made: a row read in a language it lacks is asked for then (the
+ * middleware), and the daily job finds any left.
  */
-export async function translateSoon(table: string, id: string): Promise<void> {
-  tableOf(table);
+export async function translateSoon(table: string, id: string): Promise<boolean> {
+  const found = await untranslated(table, id);
+  if (!found?.missing.length) return false;
+  const t = ident(translationsTableName(table));
+  let asked = 0;
+  for (const locale of found.missing)
+    // New: a "queued" row. There already (queued, or an "unknown" translation): asked again only
+    // when its last asking is over an hour old. A translation someone can name isn't missing.
+    asked += changes(
+      await db.run(
+        sql`INSERT INTO ${t} (${ident("id")}, ${ident("source_id")}, ${ident("locale")}, ${ident("fields")}, ${ident("translated_by")})
+          VALUES (${crypto.randomUUID()}, ${id}, ${locale}, ${"{}"}, ${QUEUED})
+          ON CONFLICT (${ident("source_id")}, ${ident("locale")}) DO UPDATE SET ${ident("updated_at")} = datetime('now')
+          WHERE ${t}.${ident("translated_by")} IN (${QUEUED}, ${UNKNOWN})
+            AND ${t}.${ident("updated_at")} < datetime('now', '-1 hour')`,
+      ),
+    );
+  if (!asked) return false;
   await (
     queues as unknown as Record<string, { send(m: TranslateMessage): Promise<void> }>
   ).translate!.send({ table, id });
+  return true;
 }
 
 /**
  * Every table of content kept to the app's languages, both ways: translations into a language the
  * app no longer has are deleted, and every row missing one of its languages, or with an "unknown"
- * one, is queued. Counted in the database, one query a table (D1 takes at most 100 bound
- * parameters a query, so not a list of ids). The hourly job's work (void-fbtee/crons/translations).
+ * one, is asked for (translateSoon: not one asked for in the last hour). Counted in the database,
+ * one query a table. The daily job's work (void-fbtee/crons/translations).
  */
 export async function reconcile(): Promise<{ deleted: number; queued: number }> {
   const locales = appLocales();
@@ -150,20 +180,18 @@ export async function reconcile(): Promise<{ deleted: number; queued: number }> 
   let queued = 0;
   for (const table of contentTables().keys()) {
     const t = ident(translationsTableName(table));
-    const gone = await db.run(
-      sql`DELETE FROM ${t} WHERE ${ident("locale")} NOT IN (${list(locales)})`,
+    deleted += changes(
+      await db.run(sql`DELETE FROM ${t} WHERE ${ident("locale")} NOT IN (${list(locales)})`),
     );
-    deleted += (gone as { meta?: { changes?: number } }).meta?.changes ?? 0;
     const rows = (await db.all(
       sql`SELECT s.${ident("id")} AS id FROM ${ident(table)} s
         WHERE (SELECT count(*) FROM ${t} x WHERE x.${ident("source_id")} = s.${ident("id")}
-          AND x.${ident("translated_by")} <> ${UNKNOWN}
+          AND x.${ident("translated_by")} NOT IN (${UNKNOWN}, ${QUEUED})
           AND x.${ident("locale")} <> s.${ident("locale")}
           AND x.${ident("locale")} IN (${list(locales)}))
         < ${locales.length} - (CASE WHEN s.${ident("locale")} IN (${list(locales)}) THEN 1 ELSE 0 END)`,
     )) as { id: string }[];
-    for (const { id } of rows) await translateSoon(table, id);
-    queued += rows.length;
+    for (const { id } of rows) if (await translateSoon(table, id)) queued++;
   }
   return { deleted, queued };
 }
@@ -177,7 +205,8 @@ export interface Translation {
 
 /**
  * The stored translations of these rows: those a page in `locale` can show (it and its fallbacks),
- * or all of them without `locale`. "unknown" ones are left out: they're being replaced.
+ * or all of them without `locale`. Only ones someone can name: "unknown" ones are being replaced,
+ * "queued" ones are only asked for. Any number of ids (asked for 90 at a time, under D1's limit).
  */
 export async function translationsFor(
   table: string,
@@ -185,40 +214,39 @@ export async function translationsFor(
   locale?: string,
 ): Promise<Translation[]> {
   tableOf(table);
-  if (!ids.length) return [];
   const t = ident(translationsTableName(table));
-  const rows = (await db.all(
-    sql`SELECT ${ident("source_id")} AS source_id, ${ident("locale")} AS locale, ${ident("fields")} AS fields
-      FROM ${t} WHERE ${ident("source_id")} IN (${list(ids)}) AND ${ident("translated_by")} <> ${UNKNOWN}`,
-  )) as { source_id: string; locale: string; fields: string }[];
-  const wanted = locale ? new Set(textLocalesOf(locale)) : undefined;
-  return rows
-    .filter((r) => !wanted || wanted.has(r.locale))
-    .map((r) => ({ source_id: r.source_id, locale: r.locale, fields: JSON.parse(r.fields) }));
+  const wanted = locale ? new Set(textLocales(locale)) : undefined;
+  const out: Translation[] = [];
+  for (const some of chunks([...new Set(ids)])) {
+    const rows = (await db.all(
+      sql`SELECT ${ident("source_id")} AS source_id, ${ident("locale")} AS locale, ${ident("fields")} AS fields
+        FROM ${t} WHERE ${ident("source_id")} IN (${list(some)}) AND ${named()}`,
+    )) as { source_id: string; locale: string; fields: string }[];
+    for (const r of rows)
+      if (!wanted || wanted.has(r.locale))
+        out.push({ source_id: r.source_id, locale: r.locale, fields: JSON.parse(r.fields) });
+  }
+  return out;
 }
 
 /**
- * A row's fields for a reader in `locale`, and the language they're in: the best stored translation
- * (pickText), else the original. When it's the original and the reader's language is one the app
- * has, the request notes it (content-pending.ts): the middleware keeps the page out of Void's page
- * cache and queues the translation. `translations` may hold other rows' too.
+ * A row's fields for a reader in `locale`, and the language they're in: the first of the reader's
+ * language and its fallbacks (textLocales) the row is in, as written or translated; else the
+ * original. When the reader's own language is one the app has and the row isn't in it yet, the
+ * request notes it (content-pending.ts): the middleware keeps the page out of Void's page cache and
+ * asks for the translation. Call it from a page's loader; with `{ note: false }` (an email, an
+ * action) it notes nothing. `translations` may hold other rows' too.
  */
 export function textOf(
   table: string,
   row: { id: string; locale: string },
   translations: readonly Translation[],
   locale: string,
+  { note = true }: { note?: boolean } = {},
 ): { fields: Record<string, string>; locale: string; translated: boolean } {
   const { fields } = tableOf(table);
-  const found = pickText(
-    translations.filter((t) => t.source_id === row.id),
-    locale,
-  );
-  // Not in the reader's own language (none, or only a fallback's): the page waits for it.
-  if ((found?.locale ?? row.locale) !== locale && appLocales().includes(locale))
-    notePending(table, row.id);
-  if (found) return { fields: found.fields, locale: found.locale, translated: true };
-  return {
+  const mine = translations.filter((t) => t.source_id === row.id);
+  const original = () => ({
     fields: Object.fromEntries(
       fields.map((f) => {
         const value = (row as Record<string, unknown>)[f];
@@ -227,5 +255,19 @@ export function textOf(
     ),
     locale: row.locale,
     translated: false,
-  };
+  });
+  // Not yet in the reader's own language: the page waits for it.
+  if (
+    note &&
+    row.locale !== locale &&
+    appLocales().includes(locale) &&
+    !mine.some((t) => t.locale === locale)
+  )
+    notePending(table, row.id);
+  for (const l of textLocales(locale)) {
+    if (l === row.locale) return original();
+    const found = mine.find((t) => t.locale === l);
+    if (found) return { fields: found.fields, locale: found.locale, translated: true };
+  }
+  return original();
 }

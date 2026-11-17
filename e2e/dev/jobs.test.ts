@@ -122,10 +122,10 @@ test.skipIf(!!skip)(
     await started(thai);
     await thai.waitForFunction(() => /[฀-๿]/.test(document.querySelector("h1")?.textContent ?? ""));
     const title = await thai.locator("h1").textContent();
-    expect(await runQueue("translate", { eventId: event.id })).toBe("ack");
+    expect(await runQueue("translate", { table: "events", id: event.id })).toBe("ack");
     await thai.reload();
     await started(thai);
     expect(await thai.locator("h1").textContent()).toBe(title);
-    expect(await runQueue("translate", { eventId: crypto.randomUUID() })).toBe("ack");
+    expect(await runQueue("translate", { table: "events", id: crypto.randomUUID() })).toBe("ack");
   },
 );

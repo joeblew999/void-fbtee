@@ -100,6 +100,17 @@ export function inScript(line: string, locale: string): boolean {
  * What's wrong with a translated entry into `to`, in words Void's AI is told when it's asked
  * again. Empty: nothing breaks an app.
  */
+/** Whether two locales are the same language (en-US and en-GB are: "en"). */
+const sameLanguage = (a?: string, b?: string) =>
+  !!a && !!b && a.split("-")[0]!.toLowerCase() === b.split("-")[0]!.toLowerCase();
+
+/** The language an entry's source text is in: fbtee's built-in strings are English. */
+export const sourceLanguageOf = (
+  hash: string,
+  builtin: ReadonlySet<string>,
+  sourceLocale: string,
+) => (builtin.has(hash) ? "en" : sourceLocale);
+
 export function problemsWith(
   source: SourceLine[],
   lines: string[],
@@ -123,8 +134,10 @@ export function problemsWith(
     if (/"\s*:\s*"|\b(?:form|source|target|lines|id)"\s*:/.test(line))
       problems.push(`Line ${i + 1} has JSON in it: give only the translated sentence.`);
     // Only a line with words of its own: "{previous items}; {following items}" is the same in
-    // every language.
+    // every language. And only into another language: fbtee's built-in strings are English, so
+    // their en-US lines in a Thai app are rightly the same (callers pass "en" as their `from`).
     else if (
+      !sameLanguage(to, from) &&
       line.trim() === src.trim() &&
       words(line) >= 3 &&
       /\p{L}/u.test(line.replace(/\{[^{}]+\}/g, ""))
