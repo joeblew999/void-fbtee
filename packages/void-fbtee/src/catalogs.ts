@@ -186,6 +186,19 @@ export function prepared(p: Project): { locale: string; json: string; existed: b
   });
 }
 
+/**
+ * A language's catalog as it would be made from nothing: every string new, with its source lines,
+ * one per plural form and gender (addVariants). What a translator is given (and the measuring of
+ * translators: scripts/translations-measure.ts).
+ */
+export function freshCatalog(p: Project, locale: string): string {
+  const { phrases } = collect(p);
+  const [json] = prepareTranslationsBatchSync(JSON.stringify({ phrases }), [{ locale }]);
+  return addVariants(json!, pluralSlots(phrases), locale, {
+    genders: locale !== p.config.sourceLocale,
+  });
+}
+
 export interface LocaleMissing {
   locale: string;
   /** The app's own untranslated strings, as source text. */

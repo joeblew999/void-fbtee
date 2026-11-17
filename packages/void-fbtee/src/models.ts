@@ -63,3 +63,28 @@ export function modelFor(locale: string): TranslationModel {
 /** The choice for a language, or undefined when it takes the default. */
 export const choiceFor = (locale: string): Choice | undefined =>
   byLanguage.get(new Intl.Locale(locale).language);
+
+/**
+ * Gemini 3.5 Flash, Google's model, through Cloudflare's AI Gateway: wuchale's default
+ * (wuchalejs/wuchale src/ai/gemini.ts, read 2026-11-17). A third-party model on Cloudflare's
+ * catalog (developers.cloudflare.com/ai/models/google/gemini-3.5-flash/, checked 2026-11-17), paid
+ * from the account's AI Gateway credits (Unified Billing): no key of ours. Being measured against
+ * the Workers AI models (plans/translation-rework.md, step 2); not used unless a request names it.
+ */
+export const GEMINI: TranslationModel & { price: { input: number; output: number } } = {
+  id: "google/gemini-3.5-flash",
+  jsonMode: false,
+  perMinute: 300,
+  // US$ per million tokens, Cloudflare's catalog page (checked 2026-11-17).
+  price: { input: 1.5, output: 9 },
+};
+
+/** A model that isn't Workers AI's own (`@cf/…`): sent through the gateway to its provider. */
+export const thirdParty = (model: TranslationModel) => !model.id.startsWith("@cf/");
+
+/** The tokens one request used, as the answer reports them (OpenAI's `usage`). */
+export interface Usage {
+  prompt_tokens?: number;
+  completion_tokens?: number;
+  total_tokens?: number;
+}

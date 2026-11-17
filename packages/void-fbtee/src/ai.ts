@@ -15,7 +15,17 @@
 // Which model translates into which language, and why: models.ts.
 import { ai } from "void/ai";
 import skill from "../skills/void-fbtee-translate/SKILL.md?raw";
-import { LLAMA, modelFor, type TranslationModel } from "./models";
+import {
+  GEMINI,
+  LLAMA,
+  modelById,
+  modelFor,
+  thirdParty,
+  type TranslationModel,
+  type Usage,
+} from "./models";
+
+export { GEMINI, type Usage };
 import { MARKS } from "./plurals";
 
 /**
@@ -39,6 +49,7 @@ async function ask<T>(
   user: string,
   schema: object,
   model: TranslationModel = LLAMA,
+  onUsage?: (usage: Usage) => void,
 ): Promise<T> {
   const input = {
     messages: [
@@ -57,7 +68,9 @@ async function ask<T>(
     // request. Workers AI's default is 0.6 for some models and 0.15 for others (each model's
     // page, "temperature", 0 to 5, checked 2026-11-15); `seed` is its own reproducibility knob.
     temperature: 0,
-    seed: 1,
+    // A third-party model gets only what Chat Completions has: AI Gateway rejects fields a model
+    // doesn't take (developers.cloudflare.com/ai-gateway/usage/worker-binding-methods/).
+    ...(thirdParty(model) ? {} : { seed: 1 }),
     // Its thinking off or at its lowest (models.json): a translation needs none.
     ...model.options,
   };
@@ -72,14 +85,18 @@ async function ask<T>(
       gateway: { id: "default", skipCache: true },
       // One replica per model, so the system prompt, the same for every string, is prefix-cached
       // across requests (Workers AI's "Prompt caching" page: x-session-affinity, through the
-      // binding's extraHeaders, checked 2026-11-15).
-      extraHeaders: { "x-session-affinity": `void-fbtee-${model.id}` },
+      // binding's extraHeaders, checked 2026-11-15). Workers AI's own models only.
+      ...(thirdParty(model)
+        ? {}
+        : { extraHeaders: { "x-session-affinity": `void-fbtee-${model.id}` } }),
     } as never,
   );
   const r = result as {
     response?: unknown;
     choices?: { message?: { content?: unknown }; finish_reason?: string }[];
+    usage?: Usage;
   };
+  if (onUsage && r.usage) onUsage(r.usage);
   const answer = r.response ?? r.choices?.[0]?.message?.content;
   // No answer: a thinking model that spent max_tokens thinking (GLM 4.7 Flash's 8192 tokens, all
   // reasoning, content null, in the gateway's logs, 2026-11-15) or one cut off mid-answer.
@@ -203,9 +220,15 @@ export async function translateStrings(
     glossary = [],
     feedback,
     fbtee,
+    model,
+    onUsage,
   }: {
     from: string;
     to: string;
+    /** The model to ask, instead of the language's own (models.ts): for measuring. */
+    model?: TranslationModel;
+    /** Told each request's tokens. */
+    onUsage?: (usage: Usage) => void;
     /** fbtee's own rules, from the app's installed fbtee (translate.ts fbteeRules). */
     fbtee?: string;
     examples?: Example[];
@@ -263,7 +286,8 @@ export async function translateStrings(
       },
       required: ["entries"],
     },
-    modelFor(to),
+    model ?? modelFor(to),
+    onUsage,
   );
   // A model without JSON Mode may give a line as an object ({ "form": "other", "target": "…" }):
   // its translation, not its first field (SEA-LION's Thai once read "other", 2026-11-15).
@@ -317,6 +341,8 @@ export type DevRequest =
       feedback?: { answer: string[]; problems: string[] };
       /** fbtee's own rules, from the app's installed fbtee (translate.ts fbteeRules). */
       fbtee?: string;
+      /** A model's id to ask instead of the language's own: for measuring (GEMINI or models.json). */
+      model?: string;
     }
   | { kind: "page"; from: string; to: string; text: string };
 
@@ -331,11 +357,19 @@ export async function devTranslate(request: Request, token: string): Promise<Res
     return new Response("not found", { status: 404 });
   const body = (await request.json()) as DevRequest;
   try {
-    const result =
-      body.kind === "strings"
-        ? { lines: await translateStrings(body.entries, body) }
-        : { page: await translatePage(body.text, body) };
-    return Response.json(result);
+    if (body.kind === "page") return Response.json({ page: await translatePage(body.text, body) });
+    const model = body.model
+      ? body.model === GEMINI.id
+        ? GEMINI
+        : modelById(body.model)
+      : modelFor(body.to);
+    const usage: Usage[] = [];
+    const lines = await translateStrings(body.entries, {
+      ...body,
+      model,
+      onUsage: (u) => usage.push(u),
+    });
+    return Response.json({ lines, model: model.id, usage });
   } catch (error) {
     // 503: no Void's AI here (Void's own message, "ai: Not available…"); 502: it answered
     // something unusable, for this request only.

@@ -106,7 +106,9 @@ Checked 2026-11-17 in Cloudflare's docs:
      where step 4's record lives.
    - What do the five Arabic counts without a "one" line show for a count of 1? A unit test that
      renders them.
-2. **Measure before changing.** A script under `scripts/` runs Gemma 4 (today) and Gemini 3.5 Flash
+2. **Measure before changing.** `vp run translations:measure` (`scripts/translations-measure.ts`,
+   made 2026-11-17, checked here as far as a cloud session can: it builds the sample and stops at
+   the missing dev server) runs Gemma 4 (today) and Gemini 3.5 Flash
    over the example's catalogs with the same checks, and Claude reviews both (in a cloud session, the
    session's Claude, from the printed prompt). Prints, per language
    and model: right, wrong, time, cost. Kept for the record, in this plan.
@@ -198,5 +200,10 @@ Checked 2026-11-17 in Cloudflare's docs:
 
 - `apps/example/void.lock.json` was behind `void.config.ts` after `397a1d4` (Workers Logs on):
   `vp install` added `observability` and `browser` to it. Committed on its own.
+- In a cloud session `vp run dev` doesn't start at all, not only its AI: the remote bindings (AI,
+  Browser Run) need Cloudflare's sign-in, and without it the Cloudflare Vite plugin stops the
+  server ("In a non-interactive environment, it's necessary to set a CLOUDFLARE_API_TOKEN",
+  2026-11-17). The tailscale task's note says a cloud session runs the dev server: true only once
+  Void is signed in there. To settle when step 6 (reviews) is built.
 - The Cloudflare connector's Workers AI call returned 401 ("Reconnect to sign in again"): it may
   lack the Workers AI permission. Only matters if a session is to call Workers AI through it.

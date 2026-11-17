@@ -70,6 +70,10 @@ export default defineConfig({
       // Mac, open http://localhost:5173 instead.
       "tailscale:login": { command: "vpx scripts/tailscale.ts login", cache: false },
       "tailscale:logout": { command: "vpx scripts/tailscale.ts logout", cache: false },
+      // Each translator on a sample of the example's strings, Gemini capped at US$0.50 a run
+      // (scripts/translations-measure.ts, plans/translation-rework.md step 2). Needs `vp run dev`
+      // running, signed in to Cloudflare.
+      "translations:measure": { command: "vpx scripts/translations-measure.ts", cache: false },
       // The example's tasks (apps/example/vite.config.ts), runnable from the root.
       login: { command: "vp run example#login", cache: false },
       status: { command: "vp run example#status", cache: false },
