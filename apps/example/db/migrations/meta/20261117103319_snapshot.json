@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "02e0f5b2-37dc-4e25-8a6f-338ca7b11087",
+  "id": "69086cb1-0347-4d05-b692-a2570f06e769",
   "prevId": "5b532500-b584-4250-9aee-b13733380463",
   "tables": {
     "events": {
@@ -240,11 +240,19 @@
           "name": "translated_by",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'unknown'"
         },
         "translated_at": {
           "name": "translated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "gateway_log_id": {
+          "name": "gateway_log_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,

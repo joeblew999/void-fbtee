@@ -200,6 +200,9 @@ function isLanguage(name: string): boolean {
   }
 }
 
+/** A page's frontmatter, without its fences; empty when it has none. */
+const frontmatterOf = (text: string) => frontmatter(text)?.yaml ?? "";
+
 /** Problems, one line each. Empty when everything is in order. */
 export function check(p: Project): string[] {
   const problems: string[] = [];
@@ -263,7 +266,10 @@ export function check(p: Project): string[] {
     if (!existsSync(file)) continue;
     type Line = { translation: string; variations: Record<string, number> };
     const catalog = JSON.parse(readFileSync(file, "utf8")) as {
-      translations: Record<string, { status?: string; translations?: Line[] }>;
+      translations: Record<
+        string,
+        { status?: string; translations?: Line[]; translatedBy?: string }
+      >;
     };
     const source = (
       JSON.parse(freshCatalog(p, locale)) as {
@@ -272,6 +278,12 @@ export function check(p: Project): string[] {
     ).translations;
     for (const [hash, entry] of Object.entries(catalog.translations)) {
       if (entry.status === "new" || !entry.translations?.length || !source[hash]) continue;
+      // Who translated it, always (plans/translation-provenance.md): a model's id, "claude", a
+      // person, or "unknown" when nothing says.
+      if (!entry.translatedBy?.trim())
+        problems.push(
+          `strings: ${locale}: ${JSON.stringify(texts[hash] ?? hash)}: doesn't say who translated it (translatedBy)`,
+        );
       for (const what of problemsWith(
         source[hash].translations,
         entry.translations.map((l) => l.translation),
@@ -314,6 +326,10 @@ export function check(p: Project): string[] {
     }
     if (page.state !== "missing") {
       untitledIn(page.locale, page.file);
+      if (!/^translatedBy:\s*\S/m.test(frontmatterOf(readFileSync(page.file, "utf8"))))
+        problems.push(
+          `pages: ${page.locale}: ${rel(page.file)}: doesn't say who translated it (translatedBy in its frontmatter)`,
+        );
       for (const key of missingHead(
         readFileSync(page.original, "utf8"),
         readFileSync(page.file, "utf8"),

@@ -57,10 +57,16 @@ export function makeBuildable(root: string, options: VoidFbteeOptions): void {
     for (const entry of Object.values(catalog.translations) as {
       status: string;
       translations: { translation: string }[];
+      translatedBy?: string;
     }[]) {
-      // A translation the test wrote itself stays as it is.
-      if (entry.status === "translated") continue;
+      // Who translated it, as the build asks (check.ts): a translation the test wrote itself
+      // stays as it is, and says who only if it didn't.
+      if (entry.status === "translated") {
+        entry.translatedBy ??= "claude";
+        continue;
+      }
       entry.status = "translated";
+      entry.translatedBy = "claude";
       for (const l of entry.translations) l.translation = madeUp(file, l.translation);
     }
     writeFileSync(path, JSON.stringify(catalog, null, 2));
@@ -68,7 +74,7 @@ export function makeBuildable(root: string, options: VoidFbteeOptions): void {
   for (const page of markdownPages(p)) {
     mkdirSync(dirname(page.file), { recursive: true });
     writeFileSync(page.file, readFileSync(page.original, "utf8"));
-    stamp(p, page.file);
+    stamp(p, page.file, { by: "claude" });
   }
   const left = check(p);
   if (left.length) throw new Error(`fixture still has problems:\n${left.join("\n")}`);

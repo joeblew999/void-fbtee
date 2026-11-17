@@ -102,7 +102,7 @@ export default async function setup(project: TestProject) {
   // A fresh local database with every migration, the sample events' one included.
   run(["exec", "void", "db", "reset", "--yes"], EXAMPLE);
   // The example's build, and before it void-fbtee's (Vite+'s transitive run: -t).
-  run(["run", "-t", "example#build"], root);
+  run(["run", "-t", "void-fbtee-example#build"], root);
   const port = await freePort();
   const prod = `http://127.0.0.1:${port}`;
   const servers = [await start(["preview"], port, `${prod}/${SOURCE}`)];

@@ -19,7 +19,13 @@ import type { Project } from "../../src/catalogs";
 import { check, markdownPages, missingHead, reopenFailing } from "../../src/check";
 import { loadProject, prepare } from "../../src/commands";
 import { init } from "../../src/init";
-import { awaitsReview, markedDone, stamp, translateTask } from "../../src/translate";
+import {
+  agentProvenance,
+  awaitsReview,
+  markedDone,
+  stamp,
+  translateTask,
+} from "../../src/translate";
 
 let root: string;
 let p: Project;
@@ -150,7 +156,7 @@ test("check reports a copy that loses or changes what it must keep", () => {
     "pages/de-DE/blog/rich.md",
     RICH.replace("A tip", "Ein Tipp").replace("Text.", "Text auf Deutsch."),
   );
-  stamp(p, join(root, "pages/de-DE/blog/rich.md"));
+  stamp(p, join(root, "pages/de-DE/blog/rich.md"), { by: "claude" });
   expect(check(p).filter((l) => l.includes("de-DE/blog/rich.md"))).toEqual([]);
 });
 
@@ -262,4 +268,42 @@ test("a finished translation the checks fail goes back to new, with its source l
   expect(after.translations[0].translation).toBe("Hello");
   expect(after.description).toBe("Greeting in the test fixture");
   expect(reopenFailing(p)).toEqual([]);
+});
+
+test("stamp records who translated a page, when, and the request's gateway log", () => {
+  write("pages/en-US/blog/hello.md", POST);
+  write("pages/de-DE/blog/hello.md", POST.replace("Hello", "Hallo"));
+  const file = join(root, "pages/de-DE/blog/hello.md");
+  stamp(p, file, { by: "google/gemini-3.5-flash", at: "2026-11-17", gatewayLogId: "01abc" });
+  const text = readFileSync(file, "utf8");
+  expect(text).toMatch(/^translatedBy: "google\/gemini-3.5-flash"$/m);
+  expect(text).toMatch(/^translatedAt: "2026-11-17"$/m);
+  expect(text).toMatch(/^gatewayLogId: "01abc"$/m);
+  // Stamped again by someone else: replaced, not added twice.
+  stamp(p, file, { by: "claude", at: "2026-11-18" });
+  const again = readFileSync(file, "utf8");
+  expect(again.match(/^translatedBy:/gm)).toHaveLength(1);
+  expect(again).toMatch(/^translatedBy: "claude"$/m);
+  // Without a gateway log now: the old one isn't left saying a request made it.
+  expect(again).not.toMatch(/^gatewayLogId:/m);
+});
+
+test("a finished entry that doesn't say who translated it fails the check", () => {
+  prepare(p);
+  const file = join(root, "i18n/translations/de-DE.json");
+  const catalog = JSON.parse(readFileSync(file, "utf8"));
+  delete catalog.translations["SSJ6IVWoQjvWr8iQwHsMTA=="].translatedBy;
+  writeFileSync(file, JSON.stringify(catalog, null, 2));
+  expect(check(p)).toContain(
+    'strings: de-DE: "Hello": doesn\'t say who translated it (translatedBy)',
+  );
+});
+
+test("a page an agent marked done says who it is, or unknown if it still names a model", () => {
+  const page = (by: string) => `---\ntitle: Hallo\n${by}translatedFrom: done\n---\n\nText.\n`;
+  expect(agentProvenance(page('translatedBy: "claude"\n'))).toEqual({ by: "claude" });
+  expect(agentProvenance(page('translatedBy: "google/gemini-3.5-flash"\n'))).toEqual({
+    by: "unknown",
+  });
+  expect(agentProvenance(page(""))).toEqual({ by: "unknown" });
 });

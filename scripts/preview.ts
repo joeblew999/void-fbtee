@@ -22,7 +22,9 @@ const run = (cmd: string, args: string[], cwd?: string, env?: NodeJS.ProcessEnv)
   if (r.status !== 0) process.exit(r.status ?? 1);
 };
 
-run("vp", ["run", "-t", "example#build"], undefined, { CLOUDFLARE_PREVIEW_BUILD: "true" });
+run("vp", ["run", "-t", "void-fbtee-example#build"], undefined, {
+  CLOUDFLARE_PREVIEW_BUILD: "true",
+});
 
 const file = join(app, ".cloudflare/output/v0/workers/default/worker.config.json");
 const worker = JSON.parse(readFileSync(file, "utf8")) as {

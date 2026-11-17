@@ -15,6 +15,7 @@ title: جولة
 description: انشر فعالية، احجز مقعدًا، وشاهد كل موعد بتوقيت مكان الفعالية وبتوقيتك.
 updated: "2026-11-14"
 translatedFrom: "379ae94ae71a"
+translatedBy: "unknown"
 ---
 
 # فعاليات تعرف كم الساعة عندك

@@ -3,8 +3,7 @@
 // in every language, and its open pages are told to load their data again (live). Until then, a
 // page in a language it isn't in yet isn't cached at all (awaitsTranslation).
 import { event_texts, events } from "@schema";
-import { and, db, eq, inArray } from "void/db";
-import { GEMINI } from "void-fbtee/ai";
+import { and, db, eq, inArray, ne, sql } from "void/db";
 import type { AppLocale } from "void-fbtee/locales";
 import { appLocales, pickText, revalidate, textLocales } from "void-fbtee/server";
 import { eventTopic, live } from "./live";
@@ -64,13 +63,17 @@ export const awaitsTranslation = (
   locale: string,
 ) => written !== locale && !texts.some((t) => t.locale === locale);
 
-/** An event's original, and the app's languages it has no translation in yet. */
+/**
+ * An event's original, and the app's languages it has no translation in yet. A translation nobody
+ * can say the origin of ("unknown": from before that was recorded, or stored by code that didn't
+ * say) counts as missing: it's translated again, and replaced (storeTranslations).
+ */
 export async function untranslated(eventId: string) {
   const list = await db.select().from(events).where(eq(events.id, eventId));
   const texts = await db
     .select({ event_id: event_texts.event_id, locale: event_texts.locale })
     .from(event_texts)
-    .where(eq(event_texts.event_id, eventId));
+    .where(and(eq(event_texts.event_id, eventId), ne(event_texts.translatedBy, UNKNOWN)));
   return list
     .map((e) => ({
       id: e.id,
@@ -84,22 +87,40 @@ export async function untranslated(eventId: string) {
     .filter((e) => e.missing.length);
 }
 
-/** Stores an event's text in `locale` (once: a stored translation is kept), then its pages refresh. */
-export async function storeTranslations(eventId: string, translations: Record<string, Text>) {
+/** What `translated_by` holds when nothing says who made a translation (db/schema/event_texts.ts). */
+export const UNKNOWN = "unknown";
+
+/** Who made a translation: the model's id, and its AI Gateway log (the request, answer and cost). */
+export type Made = { by: string; gatewayLogId?: string };
+
+/**
+ * Stores an event's text in `locale`, with who made it, then its pages refresh. A stored
+ * translation is kept, unless nobody can say who made it ("unknown"): that one is replaced.
+ */
+export async function storeTranslations(
+  eventId: string,
+  translations: Record<string, Text>,
+  made: Made,
+) {
   const locales = Object.keys(translations);
   if (!locales.length) return;
-  for (const [locale, text] of Object.entries(translations))
+  for (const [locale, text] of Object.entries(translations)) {
+    const row = {
+      title: text.title.trim(),
+      description: text.description.trim(),
+      translatedBy: made.by,
+      translatedAt: new Date().toISOString().slice(0, 10),
+      gatewayLogId: made.gatewayLogId ?? null,
+    };
     await db
       .insert(event_texts)
-      .values({
-        event_id: eventId,
-        locale,
-        title: text.title.trim(),
-        description: text.description.trim(),
-        translatedBy: GEMINI.id,
-        translatedAt: new Date().toISOString().slice(0, 10),
-      })
-      .onConflictDoNothing();
+      .values({ event_id: eventId, locale, ...row })
+      .onConflictDoUpdate({
+        target: [event_texts.event_id, event_texts.locale],
+        set: { ...row, updatedAt: sql`(datetime('now'))` },
+        setWhere: eq(event_texts.translatedBy, UNKNOWN),
+      });
+  }
   await revalidate({ paths: eventPages(eventId) });
   await live.publish(eventTopic(eventId), {}, { type: "translated" });
 }

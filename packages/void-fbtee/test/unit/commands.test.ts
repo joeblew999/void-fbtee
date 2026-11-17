@@ -105,6 +105,14 @@ describe("check", () => {
       "pages/de-DE/post.md",
       `---\ntitle: Hallo\n${TRANSLATED_FROM}: ${markdownHash(original)}\n---\n\n# Hallo\n`,
     );
+    // Who translated it, always (plans/translation-provenance.md).
+    expect(pageProblems()).toEqual([
+      "pages: de-DE: pages/de-DE/post.md: doesn't say who translated it (translatedBy in its frontmatter)",
+    ]);
+    write(
+      "pages/de-DE/post.md",
+      `---\ntitle: Hallo\n${TRANSLATED_FROM}: ${markdownHash(original)}\ntranslatedBy: "claude"\n---\n\n# Hallo\n`,
+    );
     expect(pageProblems()).toEqual([]);
 
     // The formatter adds a blank line after the frontmatter's opening `---`: not a change.

@@ -303,14 +303,21 @@ Pages under `pages/<source locale>/` have a copy per locale at the same path und
   one inside a list item, a table or a sentence breaks the HTML around it (the list falls apart).
 - **translatedFrom:** each translated page records the original it came from in its frontmatter.
   Don't write its value yourself: when a page is done (translated, or checked and right), set
-  `translatedFrom: done`, and the dev server replaces it with the original's version. For a page
+  `translatedFrom: done`, and the dev server replaces it with the original's version. Say who
+  translated it, as entries do: `translatedBy: "claude"` and `translatedAt:` the day; `vp build`
+  fails on a page that doesn't say. For a page
   reported out of date, compare it with the original and change only what changed.
 
 ## Reviewing
 
 `vp dev` has Void's AI translate, then asks Claude Code to review what the AI wrote: a signed-in
 `claude -p`, else a prompt in its log ("Review this Void app's machine translations"). An entry to
-review has `"translatedBy"` an AI's id (not `"claude"`) and no `"review"`.
+review has `"translatedBy"` an AI's id or `"unknown"` (not `"claude"`) and no `"review"`.
+
+Every translation says who made it (`translatedBy`), and `vp build` fails on one that doesn't: a
+model's id (with `gatewayLogId`, the AI Gateway log of the request, its exact request, answer and
+cost, when Void's AI made it), `"claude"`, or `"unknown"` for one from before this was recorded.
+An `"unknown"` one is reviewed like an AI's. Never write `"unknown"` for one you translate.
 
 1. Read each such entry as a reader of the language would: its description and source lines, and
    the code around the string if you need it. Judge it by the translating skill: the meaning

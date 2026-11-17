@@ -8,7 +8,9 @@ import { dirname } from "node:path";
 import { stripVTControlCharacters } from "node:util";
 import { PRODUCTION_URL } from "./production-url";
 
-const task = process.argv.includes("--atomic") ? "example#deploy:atomic" : "example#deploy";
+const task = process.argv.includes("--atomic")
+  ? "void-fbtee-example#deploy:atomic"
+  : "void-fbtee-example#deploy";
 const child = spawn("vp", ["run", task], {
   stdio: ["inherit", "pipe", "inherit"],
 });

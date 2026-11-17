@@ -89,7 +89,7 @@ export const markedDone = (text: string) =>
  * Record in a translated page which version of the original it was translated from:
  * `translatedFrom: "<hash>"` in its frontmatter (made if there's none, after a leading <script>).
  */
-export function stamp(p: Project, file: string): void {
+export function stamp(p: Project, file: string, by?: Provenance): void {
   const source = sourceOf(p.config);
   const pagesDir = join(p.root, "pages");
   const [segment, ...rest] = relative(pagesDir, file).split(sep);
@@ -110,7 +110,55 @@ export function stamp(p: Project, file: string): void {
       out = `${script}---\n${line}\n---\n\n${text.slice(script.length)}`;
     }
   }
+  // Who translated it, when, and the gateway log of the request (plans/translation-provenance.md):
+  // given by whoever just wrote it. An agent that marked the page done writes its own.
+  if (by) {
+    out = frontmatterLine(out, "translatedBy", by.by);
+    out = frontmatterLine(out, "translatedAt", by.at ?? today());
+    // Only a request's own log: one left from an earlier translation would say a request made this.
+    if (by.gatewayLogId) out = frontmatterLine(out, "gatewayLogId", by.gatewayLogId);
+    else out = out.replace(/^gatewayLogId:.*\n/m, "");
+  }
   writeFileSync(file, out);
+}
+
+/**
+ * Who made a page an agent marked done (`translatedFrom: done`): what it says, unless that's still
+ * a model's id (an id with a "/", models.ts) — then the agent changed a page a model made and
+ * didn't say who it is, so nobody can say: "unknown", and it's reviewed. An agent's page has no
+ * gateway log either way.
+ */
+export function agentProvenance(text: string): Provenance {
+  const said = /^translatedBy:\s*"?([^"\n]*)"?\s*$/m
+    .exec(frontmatter(text)?.yaml ?? "")?.[1]
+    ?.trim();
+  return { by: said && !said.includes("/") ? said : "unknown" };
+}
+
+/** Who translated something: a model's id, "claude", a person; when; the request's gateway log. */
+export interface Provenance {
+  by: string;
+  at?: string;
+  gatewayLogId?: string;
+}
+
+/** `key: "value"` in a page's frontmatter (which stamp() has made sure is there): set or added. */
+function frontmatterLine(text: string, key: string, value: string): string {
+  const line = `${key}: ${JSON.stringify(value)}`;
+  const existing = new RegExp(`^${key}:.*$`, "m");
+  const fm = frontmatter(text)!;
+  const head = text.slice(0, fm.close);
+  if (existing.test(head)) return head.replace(existing, line) + text.slice(fm.close);
+  return head + `${line}\n` + text.slice(fm.close);
+}
+
+/** The app's name, its package.json's, for the gateway's logs. */
+export function appName(root: string): string | undefined {
+  try {
+    return (JSON.parse(readFileSync(join(root, "package.json"), "utf8")) as { name?: string }).name;
+  } catch {
+    return undefined;
+  }
 }
 
 /** pnpm or npm, for messages: what the app is installed with. */
@@ -256,8 +304,10 @@ export async function translateApp(
     );
     for (const [file, text] of before) {
       if (!existsSync(file)) continue;
-      if (readFileSync(file, "utf8") === text && !(code === 0 && unrecorded.has(file))) continue;
-      stamp(p, file);
+      const changed = readFileSync(file, "utf8") !== text;
+      if (!changed && !(code === 0 && unrecorded.has(file))) continue;
+      // Claude wrote it only if it changed it: a page it only checked keeps who wrote it.
+      stamp(p, file, changed ? { by: "claude" } : undefined);
       log(`stamped ${relative(root, file)}`);
     }
   }
@@ -393,10 +443,13 @@ interface CatalogEntry {
   source?: string;
   status?: string;
   translations?: CatalogLine[];
-  /** Who wrote the translation: a model's id, or "claude" (plans/translation-rework.md, step 4). */
+  /** Who wrote the translation: a model's id, "claude", a person, or "unknown" when nothing said
+   * (plans/translation-provenance.md). Every finished entry has one (check.ts). */
   translatedBy?: string;
   /** The day it was written, YYYY-MM-DD. */
   translatedAt?: string;
+  /** The AI Gateway log of the request that wrote it: its exact request, answer and cost. */
+  gatewayLogId?: string;
   /** Claude's review of a translation an AI wrote (reviewTask). Cleared when it's translated again. */
   review?: Review;
 }
@@ -492,7 +545,7 @@ export function glossaryFor(
  * One request to the dev server's translate route (ai.ts devTranslate): its answer, with the
  * tokens it used (`usage`). Undefined: no Void's AI. Empty lines: an answer that couldn't be used.
  */
-export type TranslateCall = (body: unknown) => Promise<Record<string, unknown> | undefined>;
+export type TranslateCall = (body: object) => Promise<Record<string, unknown> | undefined>;
 
 /** What the requests of a run cost, in US$, from the tokens each answer reports. */
 export const spentOn = (answers: (Record<string, unknown> | undefined)[]) =>
@@ -539,12 +592,16 @@ export async function translateEntry(
     /** Told each answer, to count what it cost. */
     onAnswer?: (answer: Record<string, unknown>) => void;
   },
-): Promise<{ lines: string[]; problems: string[]; attempts: number } | undefined> {
+): Promise<
+  | { lines: string[]; problems: string[]; attempts: number; last: Record<string, unknown> }
+  | undefined
+> {
   const source = o.entry.lines.map((l) => ({ translation: l.text, variations: l.variations }));
   const glossary = o.glossary ?? [];
   let feedback: string[] = [];
   let out: string[] = [];
   let attempts = 0;
+  let last: Record<string, unknown> = {};
   for (; attempts < 3;) {
     const answer = await call({
       kind: "strings",
@@ -558,13 +615,14 @@ export async function translateEntry(
     attempts++;
     if (!answer) return;
     o.onAnswer?.(answer);
+    last = answer;
     out = spaced(source, ((answer.lines ?? []) as string[][])[0] ?? []);
     const hard = problemsWith(source, out, o.to, o.from);
     const soft = glossaryMisses(glossary, out);
     feedback = [...hard, ...soft];
     if (!hard.length && (!soft.length || attempts === 3)) break;
   }
-  return { lines: out, problems: problemsWith(source, out, o.to, o.from), attempts };
+  return { lines: out, problems: problemsWith(source, out, o.to, o.from), attempts, last };
 }
 
 /**
@@ -572,13 +630,18 @@ export async function translateEntry(
  * there (503), or not paid for now (402, 429: credits used up, a spend limit reached); empty lines:
  * an answer that couldn't be used (502), with what it still cost.
  */
-export function routeCall(url: string, token: string, log: (line: string) => void): TranslateCall {
+export function routeCall(
+  url: string,
+  token: string,
+  log: (line: string) => void,
+  app?: string,
+): TranslateCall {
   let paymentSaid = false;
   return async (body) => {
     const res = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json", "x-void-fbtee-token": token },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ ...body, app }),
     });
     if (res.status === 503) {
       const { error } = (await res.json().catch(() => ({}))) as { error?: string };
@@ -640,11 +703,14 @@ export async function translateCatalog(
     keep: [...new Set(entry.translations!.flatMap((l) => keptTerms(l.translation)))],
     context: sourceContext(p, hash),
   });
-  const keep = (entry: CatalogEntry, lines: string[]) => {
+  const keep = (entry: CatalogEntry, lines: string[], answer: Record<string, unknown>) => {
     entry.translations = entry.translations!.map((l, k) => ({ ...l, translation: lines[k]! }));
     entry.status = "translated";
     entry.translatedBy = GEMINI.id;
     entry.translatedAt = today();
+    const logId = ((answer.logs ?? []) as string[]).at(-1);
+    if (logId) entry.gatewayLogId = logId;
+    else delete entry.gatewayLogId;
     delete entry.review;
   };
   let open = Object.entries(catalog.translations).filter(
@@ -675,7 +741,7 @@ export async function translateCatalog(
       batch.forEach(([hash, entry], i) => {
         const out = spaced(entry.translations!, lines[i] ?? []);
         if (problemsWith(entry.translations!, out, locale, from).length) failed.push([hash, entry]);
-        else keep(entry, out);
+        else keep(entry, out, answer);
       });
     });
     open = failed;
@@ -698,7 +764,7 @@ export async function translateCatalog(
       log(`${texts[hash]} → ${JSON.stringify(answer.lines)}: ${answer.problems.join(" ")}`);
       return false;
     }
-    keep(entry, answer.lines);
+    keep(entry, answer.lines, answer.last);
     return true;
   });
   if (results.includes(undefined)) return;
@@ -720,7 +786,7 @@ export async function translateWithVoidAi(
   token: string,
   log: (line: string) => void,
 ): Promise<boolean> {
-  const call = routeCall(url, token, log);
+  const call = routeCall(url, token, log, appName(p.root));
   const from = p.config.sourceLocale;
   const rel = (f: string) => relative(p.root, f).split(sep).join("/");
 
@@ -770,7 +836,8 @@ export async function translateWithVoidAi(
       }
       mkdirSync(dirname(page.file), { recursive: true });
       writeFileSync(page.file, copy.endsWith("\n") ? copy : copy + "\n");
-      stamp(p, page.file);
+      const logs = (answer.logs ?? []) as string[];
+      stamp(p, page.file, { by: GEMINI.id, gatewayLogId: logs.at(-1) });
       log(`${rel(page.file)}: translated with Void's AI from ${source.segment}/${page.path}`);
       return true;
     });

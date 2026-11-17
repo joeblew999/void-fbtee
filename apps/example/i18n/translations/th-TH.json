@@ -15,7 +15,8 @@
       ],
       "types": [
         28
-      ]
+      ],
+      "translatedBy": "unknown"
     },
     "ZIF1WhVQwt7WZJvFTEbMWw==": {
       "description": "Label with meaning 'less than number'",
@@ -31,7 +32,8 @@
       ],
       "types": [
         28
-      ]
+      ],
+      "translatedBy": "unknown"
     },
     "Oc/9PrbjfyLHS60BXceD1A==": {
       "description": "A list of items of various types, for example: \"San Francisco; London; Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",
@@ -43,7 +45,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "AXXbKEUZuc0ji1IClRrOOw==": {
       "description": "A list of items of various types separated by bullets, for example: \"San Francisco \\u2022 London \\u2022 Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",
@@ -55,7 +58,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "89ACgPMtnwlLDSeqhLBx2Q==": {
       "description": "A list of items of various types separated by commas, for example: \"San Francisco, London, Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",
@@ -67,7 +71,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "5hL7VXOBVnetm46YAjpX0g==": {
       "description": "A list of items of various types with a serial comma, for example: \"item1, item2, and item3\"",
@@ -79,7 +84,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "icNetEL/crQv/PS6yhySVQ==": {
       "description": "A list of items of various types, for example: \"item1, item2, item3 and item4\"",
@@ -91,7 +97,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "8kLAQ3ffiiFnQ/bWPqXfuQ==": {
       "description": "A list of items of various types with a serial comma, for example: \"item1, item2, or item3\"",
@@ -103,7 +110,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "8eSaAzrWtAqn9ktNKfkaEg==": {
       "description": "A list of items of various types, for example: \"item1, item2, item3 or item4\"",
@@ -115,7 +123,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "+IBI7kr/mMKdzp+3stDvkw==": {
       "description": "A list of items of various types, for example: \"San Francisco; London; Tokyo\". {previous items} itself contains one or more items.",
@@ -127,7 +136,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "55IeE8c0qqtjTU0lo7q9AA==": {
       "description": "A list of items of various types separated by bullets, for example: \"San Francisco \\u2022 London \\u2022 Tokyo\". {previous items} contains one or more items.",
@@ -139,7 +149,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "6PRJS0QalZfvaN8CkKCUCw==": {
       "description": "A list of items of various types, for example: \"item1, item2, item3, item4\"",
@@ -151,7 +162,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "bICo0CAkktQ7e4c4PRH+mA==": {
       "description": "Navigation: the home page",
@@ -163,7 +175,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "W7Yb3H5AslnfMK0Pjn0PJA==": {
       "description": "Navigation: the documentation",
@@ -175,7 +188,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "jFQA2JEUnikrWL/p4Txfag==": {
       "description": "Page fact: the page's language",
@@ -187,7 +201,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "CkCU4bauyg+jVEHoa2Fk9A==": {
       "description": "Page fact: left-to-right or right-to-left",
@@ -199,7 +214,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "J1Y2wDzg2yV7wkG38nZwzA==": {
       "description": "Page fact: the language's calendar",
@@ -211,7 +227,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "xRd4pHgDdS7AC2KFL8Hn+Q==": {
       "description": "Page fact: the language's digits",
@@ -223,7 +240,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "oQw0ZzJP066VQTZfxnXdIg==": {
       "description": "Page fact: 12- or 24-hour clock",
@@ -235,7 +253,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "6KalcWskNHrHPq/AqqMSZw==": {
       "description": "Page fact: the visitor's time zone, from their browser",
@@ -247,7 +266,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "GT3+qur89p160RfLJ/9CmQ==": {
       "description": "Home page heading",
@@ -259,7 +279,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "5w2wB/LokLMrSJDX7ET7xQ==": {
       "description": "Docs index heading",
@@ -271,7 +292,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "BWGB7cju3+tlpcpaeCdWSw==": {
       "description": "Home card text: what the docs show",
@@ -283,7 +305,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "YhBzwGXrssZ0QtoNnlUq+A==": {
       "description": "Home card text: what the events app shows",
@@ -295,7 +318,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "88bXloxtPp7U7Ddof/il7g==": {
       "description": "Heading of the form for posting a new event",
@@ -307,7 +331,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "mZ8hYu9qPvbwglMhY1pg6Q==": {
       "description": "Form label: the event's title",
@@ -319,7 +344,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "ezNp5IBUD7GsPJV5F848Gw==": {
       "description": "Form error: the title is missing",
@@ -331,7 +357,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "nTTFEVGn7nrf4dlWq2uxhA==": {
       "description": "Form label: what the event is about",
@@ -343,7 +370,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "yEkGnkX/XlLgee4iOvmiHw==": {
       "description": "Form error: the description is missing",
@@ -355,7 +383,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "a7jnMImYOSMl7XdQpP7X+g==": {
       "description": "Form label: when the event starts, on the clock where it happens",
@@ -367,7 +396,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "N+4hyhcPzHyhQ4Rx/nkZpA==": {
       "description": "Form error: no start time",
@@ -379,7 +409,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "BqEWnqF/4jf7cITy9pZWeQ==": {
       "description": "Form label: the time zone where the event happens",
@@ -391,7 +422,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "jhuD83yE9J7dpA0O1SWAYQ==": {
       "description": "Form error: seats must be 1 or more",
@@ -403,7 +435,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "ls+ihApHfjE1F0bHA1Kn7w==": {
       "description": "Button: post the new event",
@@ -415,7 +448,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "DoSLC5Ng7v/JBh0E5Muy/g==": {
       "description": "Heading of the events page",
@@ -427,7 +461,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "pqpH8iaZyoOLqrE2GYYamA==": {
       "description": "Booking form label: the booker's name",
@@ -439,7 +474,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Dw+hp8/GQPXdJK2IisVSTA==": {
       "description": "Booking form error: no name",
@@ -451,7 +487,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "uSI6kPEEk8gVXZZ3f8DCqg==": {
       "description": "Booking form label: the booker's email address",
@@ -463,7 +500,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "9z7bciuQIIFa5+4PwbgSBA==": {
       "description": "Booking form error: not an email address",
@@ -475,7 +513,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "7lGrFc+0C2V2I0I/KTxryQ==": {
       "description": "Booking error: the last seat went just before",
@@ -487,7 +526,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "3F6C/X8jjdqy0NUriWUeJQ==": {
       "description": "Heading of the booking box on an event's page",
@@ -499,7 +539,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "daTaaxWObSJle3RqqEYtlQ==": {
       "description": "Home page button: open the events app, the live demo",
@@ -511,7 +552,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "bJNB5x27sSngKuHm5czO2A==": {
       "description": "Docs sidebar group: reference pages",
@@ -523,7 +565,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "P+G8vsrZGIeowZaO58AmZw==": {
       "description": "Docs sidebar group: the events app that demonstrates void-fbtee",
@@ -535,7 +578,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "YVHOtZ0ZvktNU/M91HDijQ==": {
       "description": "Docs: heading over the list of this page's sections",
@@ -547,7 +591,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "gbekjQeH7R7EhnLqCjXXBQ==": {
       "description": "Docs: the menu of documentation pages on a phone",
@@ -559,7 +604,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "r4IKuw5azKxSmaT1to8Vxg==": {
       "description": "Home page section heading: how to install void-fbtee",
@@ -571,7 +617,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "1mDHR8oSgYcns8pzU3E7oA==": {
       "description": "Home page link to the setup page of the docs",
@@ -583,7 +630,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "uPAZSuG30yJgomrJUHscxw==": {
       "description": "Home feature title: translated strings",
@@ -595,7 +643,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Mi7KvJU4yazxSF0yc2+aDg==": {
       "description": "Home feature fact about translated strings",
@@ -607,7 +656,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "qnFB+IIDm4Gl3YRnqnwJeg==": {
       "description": "Home feature fact about plurals",
@@ -619,7 +669,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "sjKkcyIzeAcfN6dmuNNMBw==": {
       "description": "Home feature title: dates and times",
@@ -631,7 +682,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Z18dFUo92yTODxTOj74iZg==": {
       "description": "Home feature fact about times and time zones",
@@ -643,7 +695,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "22R3BWXFqX8yXBs1Gxh41w==": {
       "description": "Home feature fact about daylight saving time",
@@ -655,7 +708,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "3psdWa+GK46B490i3KleuQ==": {
       "description": "Home feature fact: Temporal runs natively on Cloudflare",
@@ -667,7 +721,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "/s93hh9vqUCZEcDcAH6YJA==": {
       "description": "Home feature title: numbers and other formats",
@@ -679,7 +734,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "SBDZza5p69hRnrnpACDRTQ==": {
       "description": "Home feature fact about the Intl formats",
@@ -691,7 +747,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "rGA2sEdvXM8TzENm3eRJLQ==": {
       "description": "Home feature fact: no locale data in the app's bundle",
@@ -703,7 +760,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "qoffyYuCF9Wq02kyuS/PGA==": {
       "description": "Home feature title: translated markdown pages",
@@ -715,7 +773,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "SjxKJHxSSe+ArVBVsUjLmg==": {
       "description": "Home feature fact about where translated markdown pages are",
@@ -727,7 +786,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "nKuYg7h0hnsbJw8ektkJ2w==": {
       "description": "Home feature fact about out-of-date translated pages",
@@ -739,7 +799,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "xHMRN0XLJs7RmbCydFWFGA==": {
       "description": "Home feature fact about dates and numbers inside markdown pages",
@@ -751,7 +812,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "UNGENmBfbH2jubY2hOm1UQ==": {
       "description": "Home feature title: machine translation",
@@ -763,7 +825,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "cLHgEo25WrhEIYVsOQg+Hw==": {
       "description": "Home feature fact: translations are files in the app's repository",
@@ -775,7 +838,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "6uTUKKFe9hZt2kh1Xrj86A==": {
       "description": "Home feature title: right-to-left languages",
@@ -787,7 +851,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "0+6Iq11NYcCJ+uDy7/PqnA==": {
       "description": "Home feature fact: the middleware sets the page's language and direction",
@@ -799,7 +864,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "eGIqKsERRp8K5kgis80MWQ==": {
       "description": "Home feature fact about one address per language for search engines",
@@ -811,7 +877,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "kVhM+CK26wd8XAPPfI2OGg==": {
       "description": "Home feature fact: this site mirrors in Arabic",
@@ -823,7 +890,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "fykgbnzGpf5GpLV7UBKJzw==": {
       "description": "Home page section heading over the list of features",
@@ -835,7 +903,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Q+0QGT6iYNlMZlBgDqRzqA==": {
       "description": "Home page: link from a feature to the docs page about it",
@@ -847,7 +916,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "BZZazFJe6vI4eA2kaQFieQ==": {
       "description": "Button: open void-fbtee's code on GitHub",
@@ -859,7 +929,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "b9Kyosa3J9PZxDexO55V2w==": {
       "description": "Button: start with the setup page of the docs",
@@ -871,7 +942,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "A6TDmycq7yBlxeKyYOytYA==": {
       "description": "Footer column heading: links about the void-fbtee project",
@@ -883,7 +955,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "ErUa3WEq8TmzE91xxjgvPQ==": {
       "description": "Footer link: the project's releases on GitHub",
@@ -895,7 +968,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "lA4Xg52VghMOLVP1ogXVWA==": {
       "description": "Footer column heading: the tools this example is built with",
@@ -907,7 +981,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "KzkjAkRRUHUc+Khepmx5Xg==": {
       "description": "Caption of a window showing commands typed in a terminal",
@@ -919,7 +994,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "hhR1x6vVuOTbvaY+I1JJHg==": {
       "description": "Home page: what to do before running the install commands shown beside it; packageJson and workspace are file names",
@@ -931,7 +1007,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "7Rm9wekHe7oI7S1XZgTOIA==": {
       "description": "Temporal section: exact moments in time, in UTC",
@@ -943,7 +1020,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "W8bv1EfOqqzacAKoqNeimA==": {
       "description": "Temporal section: daylight saving, when clocks go forward or back",
@@ -955,7 +1033,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "iNKxEYi3z2/VaGrx97bbTw==": {
       "description": "Temporal section: dates, months, weeks and comparing",
@@ -967,7 +1046,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "2xLRymCBC6CIAHj3ozPOjw==": {
       "description": "The visitor's browser has no Temporal of its own",
@@ -979,7 +1059,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "9ScYgwZCVdYOiiihIPP1+w==": {
       "description": "Temporal table column: the result with the browser's own Temporal",
@@ -991,7 +1072,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "GXfZHVblXwd5gpWPHpDAow==": {
       "description": "Temporal table column: the result with the polyfill, in the browser",
@@ -1003,7 +1085,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "HdWPrfsdTRgAEswLDzP6jw==": {
       "description": "Intl page section: dates and times",
@@ -1015,7 +1098,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "iAyMA8ajZdv5cK2svUN0Vg==": {
       "description": "Intl page section: date ranges",
@@ -1027,7 +1111,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "+TOlgrXkyPMWSXZKyRlS+w==": {
       "description": "Intl page section: relative time, like 'yesterday'",
@@ -1039,7 +1124,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "0KCj8z+wYa63EFv4pp9wmA==": {
       "description": "Intl page section: numbers",
@@ -1051,7 +1137,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "X/se3Q0ZI1heP8tXSPjNPg==": {
       "description": "Intl page section: money",
@@ -1063,7 +1150,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "3Q1wjlBRENu/8nmQrTUgvA==": {
       "description": "Intl page section: units of measure",
@@ -1075,7 +1163,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "MWxlHWYq0z1cm9kcERdSKQ==": {
       "description": "Intl page section: plural rules",
@@ -1087,7 +1176,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "VHVT7JXkqkp+6qIpnPs9kw==": {
       "description": "Intl page section: lists of items",
@@ -1099,7 +1189,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Fc6FHwPPPhlwRVfromiO2w==": {
       "description": "Intl page section: names of languages, regions and currencies",
@@ -1111,7 +1202,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "jghKjiykM8i3o5EMnx+Msw==": {
       "description": "Intl page section: sorting text",
@@ -1123,7 +1215,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "E4i3y6o3djN0v+lysBFF8w==": {
       "description": "Intl page section: splitting text into characters, words and sentences",
@@ -1135,7 +1228,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "eOZtLRhZGqOon7h+CJOGGw==": {
       "description": "Intl page section: facts about this page's language",
@@ -1147,7 +1241,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "nT3fkcmM8muxDK7KF6ai0A==": {
       "description": "Intl page section: everything this Intl supports",
@@ -1159,7 +1254,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "VAr4ThQ83quLMmdpLL3Tig==": {
       "description": "Intl page section: translated strings with fbtee",
@@ -1171,7 +1267,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "1MRfK1NgI+jnW+SPgLHuJw==": {
       "description": "Home feature fact: the same calls run on the server and in the browser",
@@ -1183,7 +1280,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "LvCtq/SyGAUwL/CVauN+3A==": {
       "description": "Home card text: what the Intl page shows",
@@ -1195,7 +1293,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "vPMkXbm9YaPzpmLXKomnWg==": {
       "description": "Intl page introduction",
@@ -1207,7 +1306,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "AkpZ1lW8bkl83HoztVPFlA==": {
       "description": "Intl page: what a highlighted row means",
@@ -1219,7 +1319,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "bI9+IfmZSx+xtqq32csdGQ==": {
       "description": "Intl table column: the result on the Cloudflare Worker",
@@ -1231,7 +1332,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "tlFl+QX0jrzG2InxhL2YYg==": {
       "description": "Intl table column: the result in the visitor's browser",
@@ -1243,7 +1345,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "uhvT565/vxdeCui5rwFKwg==": {
       "description": "Intl card heading: facts about this page's language",
@@ -1255,7 +1358,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "o+M4dP3r8NzgvqEoGp7ZZA==": {
       "description": "Heading of the box showing an event exactly as it's saved in the database",
@@ -1267,7 +1371,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "q7oxLKwGpElWrMadA+doDQ==": {
       "description": "Under 'Stored as': what the box shows and why it never changes",
@@ -1279,7 +1384,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "D2yEBA4I7UmiEXupRwmiOw==": {
       "description": "Temporal page introduction",
@@ -1291,7 +1397,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "mTDc+BXpwQqqK+pea+yfZw==": {
       "description": "Temporal page: which Temporal runs where",
@@ -1303,7 +1410,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "RkWXhR3tYA1Vv/Zrw5M2Og==": {
       "description": "Temporal table column: the result on the Cloudflare Worker, with Cloudflare's own Temporal (what the app runs)",
@@ -1315,7 +1423,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "MuzALXpJPjg9z2HTAWBe3w==": {
       "description": "Temporal table column: the result with the polyfill, on the Worker",
@@ -1327,7 +1436,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "gZfypIjul0vN+hl5z0+ocw==": {
       "description": "Home page description, for search results",
@@ -1339,7 +1449,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "8HurGTye1LRfqN9IRDn7fA==": {
       "description": "Docs index description, for search results",
@@ -1351,7 +1462,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "dKSYWmpq+J+1CQmajCFyNw==": {
       "description": "Docs: when this page was last changed; date is a date, written out",
@@ -1363,7 +1475,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Ue5dcvdFRm8wi6R55yKkZA==": {
       "description": "Navigation: the list of events people post and book",
@@ -1375,7 +1488,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "/aRZulxMqHQep4BC9smXmg==": {
       "description": "Events page description, for search results",
@@ -1387,7 +1501,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "DvAw+ULA31GrsaHftMjhDQ==": {
       "description": "Post-an-event page description, for search results",
@@ -1399,7 +1514,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "P8ckWcezTuBnZX1Y7/eVSw==": {
       "description": "Label of the row showing where you are on the site",
@@ -1411,7 +1527,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "jRRRckE2inw09CelDkWvtw==": {
       "description": "Form label: where the event happens (optional)",
@@ -1423,7 +1540,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "vHJBmpHIErvq712eD4hPAw==": {
       "description": "The site's description, as an installed app shows it",
@@ -1435,7 +1553,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "PMYmAgJ1lx3RBah3SAGqOw==": {
       "description": "Under the events page's heading",
@@ -1447,7 +1566,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "qXDx5IlYXYzsitfaNeZNgQ==": {
       "description": "Events board column: the day an event is on",
@@ -1459,7 +1579,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "5YTGfb3YfCkFqgphMhpS8g==": {
       "description": "Events board column: start time on the clock where the event happens",
@@ -1471,7 +1592,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "8rcT7bwafGlb2/Y0JBQfJA==": {
       "description": "Events board column: start time on the reader's clock",
@@ -1483,7 +1605,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Pc8KX2rDNaUH2dgjLrXxlA==": {
       "description": "Events board column: the event's title and place",
@@ -1495,7 +1618,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "b2+r/LXjvCZFlBg8Zm0AoA==": {
       "description": "Events page when nothing is coming up",
@@ -1507,7 +1631,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "RdhcAQAg2obBssPy8rffDg==": {
       "description": "Events page when nothing is coming up: what posting does",
@@ -1519,7 +1644,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "UiCufRUv7HhJXBhYIpJXHg==": {
       "description": "Under the heading of the form for posting an event: what happens to it",
@@ -1531,7 +1657,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "nAQYIQzY8EiT5tKaG469QQ==": {
       "description": "Heading of the page shown when the site failed to make a page",
@@ -1543,7 +1670,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "rvPBoQpzwcdc63MWsK3Hug==": {
       "description": "Under the error heading: what to do",
@@ -1555,7 +1683,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "8hIsQrMl9I5uIOQAcXb5dA==": {
       "description": "Button: load the page again after an error",
@@ -1567,7 +1696,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "CYxuGRRXh/qn3LllDScV5w==": {
       "description": "Heading of the page shown for an address with nothing at it",
@@ -1579,7 +1709,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "c9R3zUFlNV5JPXPawfkWhQ==": {
       "description": "Under the not-found heading: what happened and where to go",
@@ -1591,7 +1722,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "uqAg3PARSaWYjmk791nVVg==": {
       "description": "Booking email: greeting, with the name the booker gave",
@@ -1603,7 +1735,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "0n9xvB/2BBBZQNC97OSkWA==": {
       "description": "Booking email: before the link to the event's page",
@@ -1615,7 +1748,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "j3i6opoGHc7x96tN8JBCmw==": {
       "description": "For whoever posted an event: keep this private link to delete it later",
@@ -1627,7 +1761,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "hKnW2a7iR5vyx0Tsfl749Q==": {
       "description": "Label of the private link to delete an event",
@@ -1639,7 +1774,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "dEkKZirV2EjNp4skRxL/yw==": {
       "description": "Button: really delete the event, after asking",
@@ -1651,7 +1787,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "g6U/RpkoDMWf58dh/rkKKQ==": {
       "description": "Button: delete the event you posted",
@@ -1663,7 +1800,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Wbr1JqNPhJcizxGi3o0frg==": {
       "description": "Error: the private link's key doesn't match this event",
@@ -1675,7 +1813,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "9wpj4yOHo3acWWy3pyTP/g==": {
       "description": "Button under the booking form's name and email: books the seat",
@@ -1687,7 +1826,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "IgVwgp5Y9MBQ9Y3NcsNPCg==": {
       "description": "Shown on an event's open page once its organiser has deleted it",
@@ -1699,7 +1839,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "eSI/JIGvdXBhyFy7sNuuvQ==": {
       "description": "Link from a cancelled event to the list of events",
@@ -1711,7 +1852,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "suCemt5DI4xzGtu5Atmhzw==": {
       "description": "Form label: an email address to send the poster their private link to (optional)",
@@ -1723,7 +1865,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "XhwAdRwSxWK0O0G1wMs54g==": {
       "description": "Under the private link email field: what the link is for, and that the address isn't kept",
@@ -1735,7 +1878,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "akdPP4Vwe0hB43GP/y6g0w==": {
       "description": "Form error: the email address isn't one",
@@ -1747,7 +1891,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "M3pc8E4cZ9kvHeB4GhuKGw==": {
       "description": "Private link email: why to keep the link, and to keep it private",
@@ -1759,7 +1904,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "lr8L2wbKOt1b5Ro+bcY3ug==": {
       "description": "Cancellation email: greeting, with the name the booker gave",
@@ -1771,7 +1917,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "qvACgHb8I2u1PdwubuKCtQ==": {
       "description": "Cancellation email: before the link to the events list",
@@ -1783,7 +1930,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "z47tcjPbrJQirrBdPfj5Dw==": {
       "description": "Reminder email: greeting, with the name the booker gave",
@@ -1795,7 +1943,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "ww1rNR/RLXZcmijwRDG+Ug==": {
       "description": "Reminder email: before the link to the event's page",
@@ -1807,7 +1956,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "GVbiJcLUe1A8lpRge3QmCA==": {
       "description": "Home feature title: emails in each recipient's language",
@@ -1818,7 +1968,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "ss4LuZVei4N8hhIIB0S6bA==": {
       "description": "Home feature fact: an email is in its recipient's language, not in the language of whoever caused it",
@@ -1829,7 +1980,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "3sZg3WlaLSRBo7kLn7d7mA==": {
       "description": "Home feature fact: Arabic emails read right to left in Gmail",
@@ -1840,7 +1992,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "I7GpuvCileib7mw8B2Owug==": {
       "description": "Home feature fact: in development, Void's inbox catches the emails, so tests can read them",
@@ -1851,7 +2004,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "3/+8ub8oqHil6VMBPJd1JA==": {
       "description": "Docs page title: the page about the app's translated emails",
@@ -1862,7 +2016,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "jJjvqoh018tEoo4gkf8QVw==": {
       "description": "Emails page: shows the plain-text version sent with an email",
@@ -1873,7 +2028,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "xNW9wwR0nMAWXutG4Tcc3g==": {
       "description": "Emails page point title: the email is in the recipient's language",
@@ -1884,7 +2040,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "NbUYQUVMcLiFwzEP1fUvYw==": {
       "description": "Emails page point: void-fbtee's inLocale writes the email in the language saved with the booking",
@@ -1895,7 +2052,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "vd3MEl3yHHdMTTC1zRRUSQ==": {
       "description": "Emails page point title: the language and direction go on the email's content",
@@ -1906,7 +2064,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "5Z2K5VtQbounK5TVY55rXA==": {
       "description": "Emails page point: Gmail drops the html element, so lang and dir also go on the content's box",
@@ -1917,7 +2076,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "DoUYz5xll+gSdsN5kpJLKg==": {
       "description": "Emails page point title: the email builder's defaults",
@@ -1928,7 +2088,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "HyUNijYiBwsSCh/xnXfEsQ==": {
       "description": "Emails page point: React Email's Body says English, left to right, unless given the email's language",
@@ -1939,7 +2100,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "EazpjYSpTaLuVFyeId9LHw==": {
       "description": "Emails page point title: text in another language than the email",
@@ -1950,7 +2112,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "gN7YzfeUiKAbHR65yA9xTw==": {
       "description": "Emails page point: an event's title in another language is marked with its own, as on the site's pages",
@@ -1961,7 +2124,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Pj0kzgV8bxfNDJYtC19a7w==": {
       "description": "Emails page point title: a web address written out in the email",
@@ -1972,7 +2136,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "jos9Wtq2cr9giw/SN9rEpw==": {
       "description": "Emails page point: a web address in a right-to-left email is marked left to right",
@@ -1983,7 +2148,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "JUvRRLGQ1bjAm0Vcv2HZbQ==": {
       "description": "Emails page point title: images sent inside the email",
@@ -1994,7 +2160,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "2usNtx/WYBQMiwnPJvyB6g==": {
       "description": "Emails page point: the logo is sent inside the email, so it shows in every mail app and in the dev inbox",
@@ -2005,7 +2172,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "s96U1PJw3Ypy+kEOLoP6MA==": {
       "description": "Emails page introduction",
@@ -2016,7 +2184,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "dRNSEr8XFaAgyTWvKq4xcA==": {
       "description": "Emails page section title: the sample emails",
@@ -2027,7 +2196,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "uH6q6coDpyh9WdmyxCsdiA==": {
       "description": "Emails page section title: what a translated email needs",
@@ -2038,7 +2208,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "lR8tRrPsoJ/f8whuFbAH6w==": {
       "description": "Emails page: the sample booking confirmation email",
@@ -2049,7 +2220,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "OGbYARASr2WAjEzET6808Q==": {
       "description": "Emails page: the sample email with the private link to delete an event",
@@ -2060,7 +2232,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "naBQ1NAndzvYk3foo0e+cQ==": {
       "description": "Docs page title: the page about translated strings",
@@ -2072,7 +2245,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "DLrjEdgnZFPrQlj71F2utQ==": {
       "description": "Docs page title: the page about translated markdown pages",
@@ -2084,7 +2258,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "gdsprPgijAf7i4aJGXejjw==": {
       "description": "Docs page title: the page about right-to-left languages",
@@ -2096,7 +2271,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "0QlWMWPWKIJVwMzYcHG7vw==": {
       "description": "Docs page title: the page about how the app gets translated",
@@ -2108,7 +2284,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "HOTWNW9NlJ0aGkzX/S81BA==": {
       "description": "Docs: link text naming void-fbtee's skill, its full reference",
@@ -2120,7 +2297,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "BgLeWvb0E7iENcPahhyFuA==": {
       "description": "Markdown page point title: a copy of each page per language",
@@ -2132,7 +2310,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "O3DiNYJ/EbuRA2TcUBPJWg==": {
       "description": "Markdown page point: each page has a copy per language at the same path under the language's folder",
@@ -2163,7 +2342,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "A/OTAM3Acd6zaLfNmnG5vg==": {
       "description": "Markdown page point title: dates and numbers in a markdown page",
@@ -2175,7 +2355,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "At+2Ds66rkPDf5rscfzYxQ==": {
       "description": "Markdown page point: dates and numbers in a page are islands that format them with Intl, on a line of their own",
@@ -2187,7 +2368,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "saYYe6KCZqUj4Al5djzeXA==": {
       "description": "Markdown page point title: links between the site's pages",
@@ -2199,7 +2381,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "nygdBbCeR3M7Ob031HEajA==": {
       "description": "Markdown page point: links to the site's own pages are written relative, so each copy's links stay in its language",
@@ -2211,7 +2394,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "y4ekpWh/5+v5FMHnqcZJkg==": {
       "description": "Markdown page section title: this site's markdown pages and their copies",
@@ -2223,7 +2407,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "GwFKLFrF+X3/eRvyHioK2g==": {
       "description": "Markdown page introduction",
@@ -2235,7 +2420,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "po1WqShm0vPjOiIR2/p/EQ==": {
       "description": "Markdown page: this language has no copy of the page yet",
@@ -2247,7 +2433,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "HV4C+XujTZTfmto+jqJyVQ==": {
       "description": "Markdown page: this copy is the original that the others are translated from",
@@ -2259,7 +2446,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "yxgk/xDn2tD935gnxHRpJQ==": {
       "description": "Right-to-left page point title: the page's language and direction",
@@ -2271,7 +2459,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "xbd/XezLTFLZ3OmT/6Su7A==": {
       "description": "Right-to-left page point: void-fbtee's middleware sets the page's lang and dir from the URL, and links to the page in every language",
@@ -2283,7 +2472,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "xOBwwonnIhiDrGIUg0j7zg==": {
       "description": "Right-to-left page point title: start and end instead of left and right",
@@ -2295,7 +2485,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "4J2rCL6dOn3VgGdYwsGgsg==": {
       "description": "Right-to-left page point: spacing and alignment are written as start and end, so the same markup mirrors; arrows that point a way are flipped",
@@ -2307,7 +2498,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "FaEcKJ3NOItY1qVr44S07w==": {
       "description": "Right-to-left page point title: text in another language than the page",
@@ -2319,7 +2511,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "gUA03CORtHDX4RCnfKsnHg==": {
       "description": "Right-to-left page point: text in another language than the page is marked with its own language and direction, so it reads the right way round",
@@ -2331,7 +2524,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "bnf1ZzRC/D5t9ZN80bYTdQ==": {
       "description": "Right-to-left page point title: what is always left to right",
@@ -2343,7 +2537,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "WpoglIk2emqLAPZEd80YqQ==": {
       "description": "Right-to-left page point: code, commands and web addresses read left to right in every language, so they are marked so",
@@ -2355,7 +2550,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "FAj4TF5TvQACeWRW4Q5X+A==": {
       "description": "Right-to-left page section title: this page's address in every language",
@@ -2367,7 +2563,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "oDAhyDDL0CQIaSgd4vf1jg==": {
       "description": "Right-to-left page section title: the same markup shown both ways round",
@@ -2379,7 +2576,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "5eJguiKJa4CoBXQ++0dvjw==": {
       "description": "Right-to-left page introduction",
@@ -2391,7 +2589,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "S0/BcPiqQtKyQmZVKVZXWw==": {
       "description": "Right-to-left page: the two boxes have the same markup, only the direction differs",
@@ -2403,7 +2602,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "NLQXainHsxby1xQrwZXS6g==": {
       "description": "Strings page point title: text is marked in the code",
@@ -2415,7 +2615,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "dJBLP1ojMmgmJXaGGrvtzQ==": {
       "description": "Strings page point title: plain strings for attributes",
@@ -2427,7 +2628,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "X2x6D5RNHlg4+MM0RLe1HQ==": {
       "description": "Strings page point: fbs gives a plain string, for attributes, titles and emails",
@@ -2439,7 +2641,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "+AuH23AakSMD2/1McKhd4w==": {
       "description": "Strings page point title: plurals",
@@ -2451,7 +2654,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "VVvSSum9GnPIeJhJSuC8CA==": {
       "description": "Strings page point title: words used on many pages",
@@ -2463,7 +2667,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Der7UKrjBbMrI58bHq/Bpw==": {
       "description": "Strings page point: a word used on many pages is given once to voidFbtee and translated once",
@@ -2475,7 +2680,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "hCYToQBG97vWabsRO8x/Rw==": {
       "description": "Strings page point title: finding what's untranslated",
@@ -2487,7 +2693,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "hC/uuazRUITa0nHQfPmwyg==": {
       "description": "Strings page section title: one sentence with a count, shown for several counts",
@@ -2499,7 +2706,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "omyx0QbtSL68JpfA+DIVoQ==": {
       "description": "Strings page introduction",
@@ -2511,7 +2719,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "EqG9EN7jYqigN14Xh2JBwA==": {
       "description": "Strings page: the table shows one plural sentence for several counts, in this page's language",
@@ -2523,7 +2732,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "CsY7QsE69lQzED6yPnTlEQ==": {
       "description": "Translating page point title: translations are files to review",
@@ -2535,7 +2745,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Z5HLziNAw3FE2qyVKj2yfw==": {
       "description": "Translating page point: translations are files in the repository, reviewed and committed like code",
@@ -2571,7 +2782,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "XxIseC//t+ZDp/MXfOKBvw==": {
       "description": "Translating page section title: this app's catalogs, one per language",
@@ -2583,7 +2795,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "X0UGyc2IqB5dmQPhCrvl7A==": {
       "description": "Translating page section title: how the app is translated",
@@ -2595,7 +2808,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "kWZkiGUUPLl04F06tVbaXg==": {
       "description": "Translating page: link text to the list of events",
@@ -2607,7 +2821,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "tcesMjuZRBKKvSEpKDUFQA==": {
       "description": "Home feature title: PDFs in each reader's language",
@@ -2619,7 +2834,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Hzbp3eFVRQ1uV3KOJUZ/+A==": {
       "description": "Home feature fact: any document can be printed as a PDF in its reader's language",
@@ -2631,7 +2847,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "ER29Lgj+z/RySWnYjsgCOg==": {
       "description": "Home feature fact: Arabic and Thai come out right in the PDFs, with only the system's fonts",
@@ -2643,7 +2860,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "fvMbZt5AijBxYoTAuKp2dw==": {
       "description": "Home feature fact: the PDFs are printed by Cloudflare Browser Run, in a queue, and kept",
@@ -2655,7 +2873,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "t05E1QEqKHf3SEmbHgZnFA==": {
       "description": "Docs page title: the page about translated PDFs",
@@ -2667,7 +2886,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Kt42M8d1TsS1Bo28kUlMxA==": {
       "description": "Link text after booking: opens the booking's PDF ticket",
@@ -2679,7 +2899,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "EeZVySGgiRANJGtNpVHlmg==": {
       "description": "Emails page point title: the booking's PDF ticket attached to its email",
@@ -2691,7 +2912,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "b+AXgd2hqP6enW2uqmfkGA==": {
       "description": "Emails page point: the booking's confirmation carries its PDF ticket, in the same language; the PDFs page shows how",
@@ -2703,7 +2925,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "G4wHFwtEoZ4s/JjyvUTHOA==": {
       "description": "PDFs page point title: the PDF is printed by a real browser",
@@ -2715,7 +2938,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "jR/zqH8XPjGrsIONxPENwA==": {
       "description": "PDFs page point: a browser lays out every script right, so the PDF is a page of HTML printed by Cloudflare Browser Run",
@@ -2727,7 +2951,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "phUD4eXIvUWURLJFOKsUsw==": {
       "description": "PDFs page point title: only the fonts already on the machine",
@@ -2739,7 +2964,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "RZVplTzV9b9hYKJPI5fwJA==": {
       "description": "PDFs page point: the page names the system font, as the site does, and Cloudflare's Chrome has fonts for every language, so no font files are shipped",
@@ -2751,7 +2977,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "JoYon6A5ta7YgCMJiboGgw==": {
       "description": "PDFs page point title: the PDF is in its reader's language",
@@ -2763,7 +2990,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "CD2yL+ezDGKMrUG6YdL7QA==": {
       "description": "PDFs page point: the PDF is made in the language saved with the booking, with void-fbtee's inLocale, its language and direction on the page, and text in another language marked",
@@ -2775,7 +3003,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "FCeb/7Cw/YYb5NKdqoteTw==": {
       "description": "PDFs page point title: the PDF is made after the page answers",
@@ -2787,7 +3016,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "61ejh+VpKPuhht2UfxwsbQ==": {
       "description": "PDFs page point title: each PDF is printed once and kept",
@@ -2799,7 +3029,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "olc9dfcmP+APdeBoxOXb9g==": {
       "description": "PDFs page point: each PDF is kept in R2 under the booking's random id, which is its private address",
@@ -2811,7 +3042,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "2bDX0Q5iuYkFXy0DlAYb/w==": {
       "description": "PDFs page point title: the PDF is attached to the booking's email",
@@ -2823,7 +3055,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "2M3NvtZ7LdvWa8A+L9rDgA==": {
       "description": "PDFs page point: the ticket goes with the booking's confirmation email, in the same language",
@@ -2835,7 +3068,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "POI7A+ALrOLDJ3JcVUylGw==": {
       "description": "PDFs page point title: what to set up",
@@ -2847,7 +3081,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "1ZgRTsLW3UVFnhciyWetNA==": {
       "description": "PDFs page point: the browser binding in void.config.ts, run on Cloudflare in development too, a compatibility date from 2026-03-24, and the free plan's limits",
@@ -2878,7 +3113,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "n4q/zB8B3Eo5khGR4UqI9w==": {
       "description": "PDFs page section title: what a translated PDF needs",
@@ -2890,7 +3126,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "mOjypCzUtIxYfveU0dOjYA==": {
       "description": "PDFs page introduction",
@@ -2902,7 +3139,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "oAs11JY3P3tux420T+l3FQ==": {
       "description": "PDFs page: the sample is the app's own ticket, for a sample booking, printed by Browser Run in this page's language",
@@ -2914,7 +3152,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "I+w03GZW5OS8fNXYCy3plQ==": {
       "description": "PDFs page: link that opens the sample PDF on its own",
@@ -2926,7 +3165,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "OuoRoEp0HO+vlN/hD72vJQ==": {
       "description": "PDF ticket: label of the name the booker gave",
@@ -2938,7 +3178,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "HAQ1EvLSj1obFRk2+rqrnA==": {
       "description": "PDF ticket: label of when the event starts, on its own clock",
@@ -2950,7 +3191,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "qVki9NW0D0cT5ZXsGVuC8w==": {
       "description": "PDF ticket: what to do with the ticket",
@@ -2962,7 +3204,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "4x11xUJVRHK5CXAMPNzwIg==": {
       "description": "Booking form checkbox: also attach the PDF ticket to the reminder email sent the day before",
@@ -2974,7 +3217,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "2coqkqhqyAioPcUDPMSXQg==": {
       "description": "PDFs page point: printing takes up to a second and can fail, so booking sends a message to a queue, whose consumer prints each ticket on its own and retries if it has to",
@@ -2986,7 +3230,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "IkgRC3pkBXP8x+yBVpf9OQ==": {
       "description": "Email: the booking's PDF ticket is attached to it",
@@ -2998,7 +3243,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "PYVHoz+qVApwKyp2Hp+hUA==": {
       "description": "PDFs page: description of the picture of the sample PDF ticket",
@@ -3010,7 +3256,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "l1rZHZvHHLbW/a/yEblXwQ==": {
       "description": "Strings page piece title: a list inside a sentence",
@@ -3022,7 +3269,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Ze+y8mH7PTW766I4LwERmw==": {
       "description": "Strings page piece title: a choice from a fixed set",
@@ -3034,7 +3282,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "XWFC+7e2Mtu7iSiMeI/Lcg==": {
       "description": "Strings page piece title: a person's name, with their gender",
@@ -3046,7 +3295,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "SXOyBny8orkEOBw42AvK5w==": {
       "description": "Strings page piece title: a pronoun by gender",
@@ -3058,7 +3308,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "2sEBdi/HqR9d28AdOPbLVg==": {
       "description": "Strings page piece title: the same value twice in a sentence",
@@ -3070,7 +3321,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "1ldXio0BzOF9+7o9Jna/rg==": {
       "description": "Strings page piece title: a sentence for the reader, by the reader's gender",
@@ -3082,7 +3334,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "l2im0sieXAQmyaHWJT4u9Q==": {
       "description": "Strings page piece title: part of the page in another language",
@@ -3094,7 +3347,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "gA5w9YnyCStts6aLzi/eUQ==": {
       "description": "Strings page section title: each of fbtee's ways of writing a sentence",
@@ -3106,7 +3360,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "2F0uBrci189YangXw6qYvg==": {
       "description": "Strings page: each of fbtee's ways of writing a sentence, shown in this page's language",
@@ -3118,7 +3373,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "2PraAVUpYGeGFRtoUfZbqQ==": {
       "description": "Home page introduction; languages is a list of language names",
@@ -3130,7 +3386,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "i8Y9tJaaoDwfPdXN87wmBg==": {
       "description": "The language picker in the site header, for screen readers",
@@ -3142,7 +3399,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "OhMSDFYDAfBzn5ysA8vliQ==": {
       "description": "Placeholder of the language picker's search box",
@@ -3154,7 +3412,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "fljYgj2M/SdGQgJLRFAiYQ==": {
       "description": "Above the visitor's own languages in the language picker",
@@ -3166,7 +3425,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "lOX+vW31NF1aiAgkzf7bJQ==": {
       "description": "Docs page title: the page about void-fbtee's React components and hooks",
@@ -3178,7 +3438,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "PYzARl3RwBWydFdjTeOeqQ==": {
       "description": "Components page section title: the language picker, styled two ways",
@@ -3190,7 +3451,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "vQ6KX/ePBpVy8HY9HFoHWA==": {
       "description": "Components page section title: the React hooks",
@@ -3202,7 +3464,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "V6GubWL2aJQK5q1PpyHE2Q==": {
       "description": "Components page introduction",
@@ -3214,7 +3477,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "hFhXolQSiGFM6pGXfcp8EQ==": {
       "description": "Components page: I18nProvider goes once in the root layout and makes every page's strings work",
@@ -3226,7 +3490,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "RvkuITj0lNvKl2/Ms/xraA==": {
       "description": "Components page: Link keeps the page's language in the address it links to",
@@ -3238,7 +3503,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "8UR9f3QwkT3C4WObfh/2Bw==": {
       "description": "Components page: Formatted holds text the server formatted, so the browser keeps it",
@@ -3250,7 +3516,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "SnB18Zhpb+7066DFudP1og==": {
       "description": "Components page: InLanguage shows part of a page in another language",
@@ -3262,7 +3529,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "7oLWCb7iWYp7m4LHDk3dLw==": {
       "description": "Components page: the language picker is one control for any number of languages, with no look of its own",
@@ -3274,7 +3542,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "g+//TZljTm9Wnro1JapvJw==": {
       "description": "Components page: the same picker, styled two ways, to show its look is the app's",
@@ -3286,7 +3555,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "3VJcFjVUPSXajPC5MR4m/w==": {
       "description": "Components page: useLocale gives the page's language, direction and address",
@@ -3298,7 +3568,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "UM5NMaHty7YzYBBdkj8FaQ==": {
       "description": "Components page: useLocales gives every language the app has, from its settings",
@@ -3310,7 +3581,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "wkfN0LcW4VDHAskNcNnK3w==": {
       "description": "Components page: useHydrated is false on the server and while hydrating, then true",
@@ -3322,7 +3594,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "t3YP7NofNOC98rdulUeQ2g==": {
       "description": "Components page: useNow gives the current moment, the server's at first, then the browser's clock",
@@ -3334,7 +3607,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "0f0XPtcyZdzVqSt5xH6qvw==": {
       "description": "Components page: useTimeZone gives the reader's own time zone, once the browser knows it",
@@ -3346,7 +3620,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "tr1Hd5cZV0bL+5EmRadBAA==": {
       "description": "Components page: useForm is Void's form with the page's language in its address",
@@ -3358,7 +3633,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "OI+j+2UTcOhXRflX/tc3jA==": {
       "description": "Components page: langAttrs marks text in another language with its lang and direction",
@@ -3370,7 +3646,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "eV1s9krFs/WU5TQk0xqOmw==": {
       "description": "Docs: the void-fbtee pieces a page uses, each linking to where the Components page explains it",
@@ -3382,7 +3659,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "VYxtalkiJK9DcU+bKG+cMw==": {
       "description": "Strings page form: a person's name",
@@ -3394,7 +3672,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "rX6yDt+4BBXWnlBa+wsuvg==": {
       "description": "Strings page form: the person's gender",
@@ -3406,7 +3685,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "g9iusEnIlP/npuBo8hkdCg==": {
       "description": "Strings page form: female gender",
@@ -3418,7 +3698,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "zJWvH/rO4PPQLAEu5i3wXg==": {
       "description": "Strings page form: male gender",
@@ -3430,7 +3711,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "X6pqAnx7EYNy9aHxQxbXHA==": {
       "description": "Strings page form: gender not given",
@@ -3442,7 +3724,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "iI4KVuDsb4pUDDVioA9rFw==": {
       "description": "Strings page form: how the person takes part in the event",
@@ -3454,7 +3737,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "qzXcAndckDd3WA5Wi5bzLw==": {
       "description": "Strings page form: taking part in person",
@@ -3466,7 +3750,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "dLP6SZPNQk0ISYwBGLa15g==": {
       "description": "Strings page form: taking part online",
@@ -3478,7 +3763,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "UYW8LWG6vIrmBgJd1EBHBA==": {
       "description": "Strings page form: whether the list joins its items with 'and' or 'or'",
@@ -3490,7 +3776,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "0fNA/4K1+g90HWefUK7JDA==": {
       "description": "Strings page form: a list joined with 'and'",
@@ -3502,7 +3789,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "ggdwr8qpTYlzZd257Vlw2Q==": {
       "description": "Strings page form: a list joined with 'or'",
@@ -3514,7 +3802,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "N+Aga9flAmbYzufID2wDwQ==": {
       "description": "Strings page piece title: a count, each language's plural forms",
@@ -3526,7 +3815,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "zZI6c3ThG+E++mZB6VNlUA==": {
       "description": "A count of seats at an event: a column heading or a form label",
@@ -3537,7 +3827,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "+BSQtF71BWhuyCYlDZ2PhA==": {
       "description": "A heading: named time zones",
@@ -3548,7 +3839,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "CM4M1hBfp3jZxt9EF9/i1w==": {
       "description": "A heading: lengths of time",
@@ -3559,7 +3851,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "vUoLw6hQkrxqyI7M6xVVNA==": {
       "description": "A docs page's section heading: what something takes, with the lines that do it",
@@ -3570,7 +3863,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "hlrf6dOB3I8oKkEwm+jp7g==": {
       "description": "Translating page: what vp check does about translations",
@@ -3581,7 +3875,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "98k5o/AJ4acxS0KZZMV2xg==": {
       "description": "Translating page section title: translation built into Vite+'s commands",
@@ -3592,7 +3887,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "KGPb82h362SCCDnY2KPxpQ==": {
       "description": "Translating page: translation is part of each of Vite+'s commands, the same locally and in CI",
@@ -3603,7 +3899,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "655gsLEO0SW1CifODjXhpw==": {
       "description": "Home feature fact: the build fails on anything untranslated",
@@ -3615,7 +3912,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "OyxyHsMTb19siPl9d13hGg==": {
       "description": "Markdown page point: each copy records which version of the original it was translated from, and check reports it when the original changes",
@@ -3627,7 +3925,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "C6STfhplFeU7B0Ur/lFlNg==": {
       "description": "Strings page point: a count has one translation per plural form the language uses",
@@ -3639,7 +3938,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "/WNY/KEU6PiQ/6Qz1I2xpg==": {
       "description": "Strings page point: the build fails on any untranslated string, and the lint rules catch text not marked",
@@ -3651,7 +3951,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "FJ/lBvh3mGS3BKL16lV73A==": {
       "description": "Translating page: what void-fbtee init does, once, to set an app up",
@@ -3663,7 +3964,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "X9n7ejivG8fJSwBpv0Mw0w==": {
       "description": "Translating page: what CI does about translations",
@@ -3694,7 +3996,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "pyuIHcl9IjiwEfzc6+OZQw==": {
       "description": "How many seats at an event are still free to book; {number} is the count",
@@ -3710,7 +4013,8 @@
       ],
       "types": [
         28
-      ]
+      ],
+      "translatedBy": "unknown"
     },
     "2tgDvNA6Od319736N286sA==": {
       "description": "How many seats at an event are still free to book; {number} is the count",
@@ -3722,7 +4026,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Wo/Tv3txNj2D7xq3Z3LYrQ==": {
       "description": "Badge on an event: every seat is booked, none left to book",
@@ -3734,7 +4039,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "MCmwkI2tzOKSvQGdkgHelg==": {
       "description": "Docs: the last line of a page, pointing to void-fbtee's skill, its full reference; {link} is a link whose text is void-fbtee's skill",
@@ -3746,7 +4052,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "vYtTVMmhUpzQJxmTFPDFMw==": {
       "description": "Strings page: a question asking the reader which page to open; {pages} is the names of the site's menu pages, joined as an 'or' list",
@@ -3758,7 +4065,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "GHvNxmBkCOuhJpHk/CVdRA==": {
       "description": "Strings page: what the site's menu holds; {pages} is the names of its pages, joined as an 'and' list",
@@ -3770,7 +4078,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "1iRhgvB2HIGstP0vJWcmRA==": {
       "description": "Strings page: how someone attends an event, in person at the venue or online over the internet, chosen from a fixed set; {name} is the person's name",
@@ -3782,7 +4091,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "KowaTACm5EqwMvl1AlV36w==": {
       "description": "Strings page: how someone attends an event, in person at the venue or online over the internet, chosen from a fixed set; {name} is the person's name",
@@ -3794,7 +4104,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "FmYCSyKNMYHFcurKzrIYBw==": {
       "description": "Strings page: someone booked a seat at an event, worded by their gender; {name} is their name",
@@ -3824,7 +4135,8 @@
       ],
       "types": [
         3
-      ]
+      ],
+      "translatedBy": "unknown"
     },
     "YTVupDM8i+JxeTsyzilxQQ==": {
       "description": "Strings page: someone booked seats at an event; {name} is their name, {number} how many seats",
@@ -3840,7 +4152,8 @@
       ],
       "types": [
         28
-      ]
+      ],
+      "translatedBy": "unknown"
     },
     "0Nrc8Co3U/Yd5XokcA/uNg==": {
       "description": "Strings page: someone booked seats at an event; {name} is their name, {number} how many seats",
@@ -3852,7 +4165,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "pNo/5gVeY95SnIOyU/Vp/A==": {
       "description": "Strings page: someone looked over their own ticket for an event, with a pronoun by their gender; {name} is their name",
@@ -3864,7 +4178,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "A1bfZTZ9qaUxo/jmE7FUhw==": {
       "description": "Strings page: someone looked over their own ticket for an event, with a pronoun by their gender; {name} is their name",
@@ -3876,7 +4191,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "/tj0XCj9mTqyMKaRkIh2KA==": {
       "description": "Strings page: someone looked over their own ticket for an event, with a pronoun by their gender; {name} is their name",
@@ -3888,7 +4204,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Bl+oIHfy3dAmRUMkw47GvQ==": {
       "description": "Strings page: the same person named twice: they booked a seat at an event, and they got its ticket by email; {name} is their name",
@@ -3900,7 +4217,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "sjX/HQUWa3qC/vdBK95EIw==": {
       "description": "Intl page: a number of nights of a stay, as in a hotel booking; {number} is the count",
@@ -3916,7 +4234,8 @@
       ],
       "types": [
         28
-      ]
+      ],
+      "translatedBy": "unknown"
     },
     "J2T2wrYrFmoE4uH2cCzEbg==": {
       "description": "Intl page: a number of nights of a stay, as in a hotel booking; {number} is the count",
@@ -3928,7 +4247,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "RNYKT0m1B0N/sALi05CtXA==": {
       "description": "Intl page: what something costs; {price} is an amount of money, already formatted with its currency",
@@ -3940,7 +4260,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "75g1ge6mloe7/wwoynaTZA==": {
       "description": "Intl page: text from data that arrives after the page: the nights left in a stay; {number} is the count",
@@ -3956,7 +4277,8 @@
       ],
       "types": [
         28
-      ]
+      ],
+      "translatedBy": "unknown"
     },
     "K4uzZ/fJ05y+kNoHKIHV1g==": {
       "description": "Intl page: text from data that arrives after the page: the nights left in a stay; {number} is the count",
@@ -3968,7 +4290,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "QpU/a6qlWEEQiQ9R4/DwkQ==": {
       "description": "How many nights of a stay the reader has booked; {number} is the count",
@@ -3984,7 +4307,8 @@
       ],
       "types": [
         28
-      ]
+      ],
+      "translatedBy": "unknown"
     },
     "DepO5trxUyoC/tjAuGTdLw==": {
       "description": "How many nights of a stay the reader has booked; {number} is the count",
@@ -3996,7 +4320,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "f2fUGBQtV93QslUDtyxDPA==": {
       "description": "Shown right after booking a seat: the PDF ticket is on its way by email, or can be downloaded now; {link} is a link whose text is 'download it now'",
@@ -4008,7 +4333,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "2P+wymX8zVP2aPh5A3uH7Q==": {
       "description": "Where an event happens; {venue} is the place, as its organiser wrote it",
@@ -4020,7 +4346,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "CIqN9/BBTtCIe2vF7NfBYQ==": {
       "description": "Note under an event: its text was machine-translated from the language its poster wrote it in; {language} is that language's name",
@@ -4032,7 +4359,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Y7yNVVxNprAIPIMr8b8QEg==": {
       "description": "Note under an event shown as its poster wrote it, in another language; {language} is that language's name",
@@ -4044,7 +4372,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "YVf2mAV+Lu3LjjTd2p3gPg==": {
       "description": "Intl page: supported values the Worker has and the browser doesn't; {values} is a list of them",
@@ -4056,7 +4385,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "kLdz73lBQ4AKylL2ddEi+A==": {
       "description": "Intl page: supported values the browser has and the Worker doesn't; {values} is a list of them",
@@ -4068,7 +4398,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "BmMTtbikAdQBfJNSHlsnDg==": {
       "description": "Intl page: how many rows the browser formatted exactly as the Worker did; {same} is how many are the same, {total} how many rows there are",
@@ -4084,7 +4415,8 @@
       ],
       "types": [
         28
-      ]
+      ],
+      "translatedBy": "unknown"
     },
     "gG2Z8UvMHFqo0ZJ8WVUAYg==": {
       "description": "Intl page: which moment the times below show, and in which time zone; {instant} is that moment, already formatted, {zone} a time zone's name",
@@ -4096,7 +4428,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "mxossMzgQYIUJvwrIjKzoQ==": {
       "description": "The same moment in the visitor's own time zone; {time} is that time, already formatted",
@@ -4108,7 +4441,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "JA5wLKwdZbt5CZs55OQ7SQ==": {
       "description": "Translating page: how many of a catalog's strings are translated; {translated} is how many are translated, {strings} how many strings there are",
@@ -4120,7 +4454,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "daZwA7a3sR4W2t05xan4fw==": {
       "description": "Booking email: the reader has a seat at an event; {event} is the event's title, {time} when it starts on the clock where it happens, already formatted",
@@ -4132,7 +4467,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "w6QyRVIytetbTQkmcN1nzg==": {
       "description": "Booking email subject: the reader has booked a seat at an event; {event} is the event's title",
@@ -4144,7 +4480,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "LxAH3+PgiKQ07a3YgavAAQ==": {
       "description": "Private link email: the reader has just posted an event; {event} is its title",
@@ -4156,7 +4493,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "Az/vNr2zZCLfSrbRNtq/6g==": {
       "description": "Private link email subject: the private link to delete the event the reader posted; {event} is its title",
@@ -4168,7 +4506,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "/R89OA5GUYekRxWiCvTRSA==": {
       "description": "Cancellation email: the event the reader had a seat at is cancelled by its organiser; {event} is its title, {time} when it would have started, already formatted",
@@ -4180,7 +4519,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "hbIy42QceIJ1mbs3FWf7WQ==": {
       "description": "Cancellation email subject: the event the reader had a seat at is cancelled; {event} is its title",
@@ -4192,7 +4532,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "UsFwsrTwe/3AzqvJm6d67A==": {
       "description": "Reminder email: the event the reader has a seat at starts within a day; {event} is its title, {time} when it starts, already formatted",
@@ -4204,7 +4545,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "qC42lQTtoDRiJUHpV1PmbQ==": {
       "description": "Reminder email subject: the event the reader has a seat at starts within a day; {event} is its title",
@@ -4216,7 +4558,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "qxa4l1H7kCC3JQD+LJ7viA==": {
       "description": "Strings page: said to the reader right after they book a seat at an event, and it means: you have a seat now. Short, like the English",
@@ -4246,7 +4589,8 @@
       ],
       "types": [
         3
-      ]
+      ],
+      "translatedBy": "unknown"
     },
     "pYQquciq1BA6IzmnxI/yIw==": {
       "description": "Shown to the reader right after they book a seat at an event, and it means: you have a seat now, and we'll see you at the event. Short, like the English",
@@ -4258,7 +4602,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "9kCCBAQFabdShyYb4xm7WQ==": {
       "description": "Strings page point: text in components is written in fbt elements, each with a description for the translator",
@@ -4270,7 +4615,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "OJgh0mzVJrcrN8I6GVCZBw==": {
       "description": "Home feature fact: the dev server translates new strings as you save, with Claude Code or Void's AI",
@@ -4282,7 +4628,8 @@
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "unknown"
     },
     "bLL81XvSzDEiVUWSMLWyew==": {
       "description": "Translating page point title: the dev server translates, with Void's AI, then Claude Code for what's left",

@@ -45,7 +45,9 @@ lists what it needs: Workers Scripts, and the products Void makes (here D1, KV, 
    ```
 
 A branch's Worker Preview (`<branch>-void-fbtee-example.gedw99.workers.dev`) is made from your
-machine: `vp run deploy:preview`.
+machine: `vp run deploy:preview`. It uses the live database (`scripts/preview.ts`) and doesn't
+migrate it, so a branch that adds a database column is deployed (`vp run deploy` migrates) before
+it's previewed; until then its code would write to a column the live database doesn't have.
 
 Every day:
 

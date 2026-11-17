@@ -17,7 +17,7 @@ import { loadProject } from "../packages/void-fbtee/src/commands";
 import { problemsWith } from "../packages/void-fbtee/src/judge";
 import { GEMINI } from "../packages/void-fbtee/src/models";
 import { DEV_TRANSLATE_PATH } from "../packages/void-fbtee/src/plugin";
-import { routeCall, translateCatalog } from "../packages/void-fbtee/src/translate";
+import { appName, routeCall, translateCatalog } from "../packages/void-fbtee/src/translate";
 
 const probe = process.argv.includes("--probe");
 const LOCALES = probe ? ["th-TH"] : ["ar-EG", "th-TH"];
@@ -35,7 +35,7 @@ try {
     "No dev server token: start `vp run dev` first, then run this in another terminal.",
   );
 }
-const route = routeCall(url, token, (line) => console.log(`  ${line}`));
+const route = routeCall(url, token, (line) => console.log(`  ${line}`), appName(app));
 const call: typeof route = (body) =>
   route(body).catch(() => {
     throw new Error(`No dev server at ${url}: start \`vp run dev\` first.`);

@@ -226,7 +226,8 @@ Claude's review of the answers (what the checks didn't catch), each now a fix to
   once), for `vp dev` and for posts. `models.json`, the rate limiter, the per-string examples and
   the Chat Completions path are gone; the glossary stays.
 - Entries record `translatedBy`/`translatedAt`; `event_texts` has `translated_by`/`translated_at`
-  (migration `20261117092251_silly_star_brand.sql`).
+  (migration `20261117103319_dark_roulette.sql`, which plans/translation-provenance.md made
+  required, with `gateway_log_id`).
 - `vp build` runs `problemsWith()` on every finished entry against its source lines. Its first run
   on the example's catalogs found 118 problems; 80 were the checker's own false alarms, each fixed
   as a rule (lines of only placeholders or names, developer words, glosses in brackets, only known

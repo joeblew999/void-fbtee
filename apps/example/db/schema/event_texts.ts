@@ -18,11 +18,16 @@ export const event_texts = sqliteTable(
     locale: text("locale").notNull(),
     title: text("title").notNull(),
     description: text("description").notNull(),
-    // Who translated it (the model's id, models.ts) and when, YYYY-MM-DD: so a translation can be
-    // traced to what made it (plans/translation-rework.md, step 4). Empty for the sample events'
-    // own translations, which came with the migration that added them.
-    translatedBy: text("translated_by"),
+    // Who translated it, never empty (plans/translation-provenance.md): the model's id (models.ts),
+    // "claude" (the sample events' own, from their migration), or "unknown" when nothing says (rows
+    // from before this was recorded, or written by code that doesn't say: an older deploy after a
+    // rollback). The app translates an "unknown" one again (src/events/translations.ts).
+    translatedBy: text("translated_by").notNull().default("unknown"),
+    // When, YYYY-MM-DD.
     translatedAt: text("translated_at"),
+    // The AI Gateway log of the request that made it: the exact request, answer and cost, in the
+    // account's gateway logs. Empty when no AI made it.
+    gatewayLogId: text("gateway_log_id"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`(datetime('now'))`),

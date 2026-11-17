@@ -23,6 +23,10 @@ test("a limit reached", () => {
     ),
   ).toBe("limit");
   expect(paymentProblem("429 Too Many Requests: spend limit reached")).toBe("limit");
+  // What Void's runtime throws for any 429 (runtime/ai.mjs limitFromResponse).
+  expect(paymentProblem("AI is temporarily unavailable because its usage limit was reached.")).toBe(
+    "limit",
+  );
 });
 
 test("anything else is a bad answer, not payment", () => {

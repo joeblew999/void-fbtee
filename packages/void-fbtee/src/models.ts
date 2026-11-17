@@ -48,7 +48,9 @@ export const costOf = (u: Usage, model: TranslationModel = GEMINI) =>
 export function paymentProblem(error: unknown): "credits" | "limit" | undefined {
   const text = String(error);
   if (/insufficient[^.]*balance|\b(2052|2021)\b|\b402\b/i.test(text)) return "credits";
-  if (/spend limit|rate limit|\b2018\b|\b429\b/i.test(text)) return "limit";
+  // Void's runtime turns any 429 into its own error before the answer reaches us
+  // (runtime/ai.mjs limitFromResponse: "…because its usage limit was reached").
+  if (/spend limit|rate limit|usage limit|\b2018\b|\b429\b/i.test(text)) return "limit";
   return undefined;
 }
 

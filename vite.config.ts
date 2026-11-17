@@ -49,7 +49,7 @@ export default defineConfig({
       // README's "Testing".
       // Unit: the package's (packages/void-fbtee/test/unit/) and the example's (beside its code).
       "test:unit": {
-        command: "vp test run --project unit && vp run example#test",
+        command: "vp test run --project unit && vp run void-fbtee-example#test",
         cache: false,
       },
       // The production build in the local preview: the full browser contract (e2e/preview/).
@@ -86,10 +86,10 @@ export default defineConfig({
       // (scripts/translations-reviews.ts, plans/translation-rework.md step 7).
       "translations:reviews": { command: "vpx scripts/translations-reviews.ts", cache: false },
       // The example's tasks (apps/example/vite.config.ts), runnable from the root.
-      login: { command: "vp run example#login", cache: false },
-      status: { command: "vp run example#status", cache: false },
-      logs: { command: "vp run example#logs", cache: false },
-      rollback: { command: "vp run example#rollback", cache: false },
+      login: { command: "vp run void-fbtee-example#login", cache: false },
+      status: { command: "vp run void-fbtee-example#status", cache: false },
+      logs: { command: "vp run void-fbtee-example#logs", cache: false },
+      rollback: { command: "vp run void-fbtee-example#rollback", cache: false },
       // The example's deploy, saving the URL Void reports for test:production (scripts/deploy.ts).
       deploy: { command: "vpx scripts/deploy.ts", cache: false },
       "deploy:atomic": { command: "vpx scripts/deploy.ts --atomic", cache: false },
@@ -132,7 +132,7 @@ export default defineConfig({
   // (packages/void-fbtee/vite.config.ts); `preview` and `browsers` on the production build in the
   // local preview (e2e/preview/setup.ts); `dev` on the dev server (e2e/dev/setup.ts); `deployed` on
   // the live site (e2e/deployed/setup.ts). The browser tests drive Playwright's library from Vitest,
-  // as Void's do. The example's own unit tests run from inside it (`vp run example#test`): Void
+  // as Void's do. The example's own unit tests run from inside it (`vp run void-fbtee-example#test`): Void
   // finds an app from where it runs. A plain `vp test run` selects every project; `dev` and
   // `deployed` then skip themselves and say which task runs them.
   test: {

@@ -29,6 +29,7 @@ import { dirname, join, matchesGlob, relative, sep } from "node:path";
 import { prepare } from "./commands";
 import {
   hasClaude,
+  agentProvenance,
   markedDone,
   reviewApp,
   stamp,
@@ -378,8 +379,9 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       // That write is another save, which then finds the page recorded.
       if (/\.mdx?$/.test(file) && event !== "delete" && existsSync(file)) {
         try {
-          if (markedDone(readFileSync(file, "utf8"))) {
-            stamp(project(), file);
+          const text = readFileSync(file, "utf8");
+          if (markedDone(text)) {
+            stamp(project(), file, agentProvenance(text));
             log(`recorded ${rel}`);
             return;
           }

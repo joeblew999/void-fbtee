@@ -244,5 +244,5 @@ Each step is shipped and proven before the next, each with its docs example in t
 ## Verification
 
 Every step: `vp check`, the package tests (`vp test run --project void-fbtee`), the example's unit
-tests (`vp run example#test`), and the fresh-app test for that step, which must fail before the step
+tests (`vp run void-fbtee-example#test`), and the fresh-app test for that step, which must fail before the step
 and pass after it. After a push: CI's `vp run test:deployed`.

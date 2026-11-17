@@ -10,8 +10,8 @@ import tailwindcss from "@tailwindcss/vite";
 import { SITE } from "./src/site";
 
 export default defineConfig({
-  // `vp run <task>` here (or `vp run example#<task>` from anywhere). `build` is Void's script in
-  // package.json; `vp run -t example#build` builds void-fbtee first.
+  // `vp run <task>` here (or `vp run void-fbtee-example#<task>` from anywhere). `build` is Void's script in
+  // package.json; `vp run -t void-fbtee-example#build` builds void-fbtee first.
   run: {
     tasks: {
       // Sign in to Cloudflare if needed, and point this project at your account (Void's own
@@ -56,7 +56,7 @@ export default defineConfig({
     voidMarkdown(),
     tailwindcss(),
   ],
-  // `vp test` (or `vp run example#test` from anywhere): the example's own unit tests, beside its
+  // `vp test` (or `vp run void-fbtee-example#test` from anywhere): the example's own unit tests, beside its
   // code in src/. They run in Node.js with no Worker (Void's docs/guide/testing.md); the browser
   // tests are e2e/ at the repo's root. Vitest leaves CSS out unless told: the emails read
   // pages/style.css as text for their look (src/events/email-theme.ts), so that file is let in.
