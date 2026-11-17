@@ -162,6 +162,22 @@ Checked 2026-11-17 in Cloudflare's docs:
     session reviews them. The Mac's agent and this session coordinate through comments on the
     work's PR.
 
+## Spending, while it's being proven
+
+- US$10 of AI Gateway credits loaded 2026-11-17 (balance 1000 cents, checked through the
+  Cloudflare connector, `GET …/ai-gateway/billing/credit-balance`). No auto top-up.
+- The gateway's totals before this work (dashboard, 2026-11-17): 11.66k requests, 6.58M tokens,
+  US$1.62, all Workers AI, mostly `vp dev`'s one-string-per-request translating. The same tokens
+  at Gemini 3.5 Flash's prices would be roughly US$15–35: Gemini only pays with batching.
+- Until the whole thing is proven, every run that calls Gemini is small and capped:
+  - step 2 measures a sample, 25 entries in each of `ar-EG` and `th-TH` (plurals, genders and plain
+    strings included), not whole catalogs;
+  - the measuring task adds up each answer's tokens (the response's `usage`) at the catalog's
+    prices and stops at US$0.50 a run, printing what it spent;
+  - the credit balance is read before and after each run and written in this plan.
+- Whole catalogs, or dev with Gemini switched on for everything, only after the user has seen the
+  sample's numbers and said so.
+
 ## Done when
 
 - `vp build` fails on every problem `vp dev` checks for, including a wrong number of plural forms.
