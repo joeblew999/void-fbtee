@@ -208,8 +208,8 @@ const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (
   const pending = run.pending();
   if (pending.length) {
     c.header("x-revalidate", "0");
-    const queue = import("./content").then(({ translateSoon }) =>
-      Promise.all(pending.map((p) => translateSoon(p.table, p.id))),
+    const queue = import("virtual:void-fbtee/content-ask").then(({ translateSoon: ask }) =>
+      ask ? Promise.all(pending.map((p) => ask(p.table, p.id))) : [],
     );
     try {
       c.executionCtx.waitUntil(

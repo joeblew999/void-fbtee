@@ -189,6 +189,7 @@ for (const target of targets) {
     `${target}: void init made a ${app.pm} app`,
   );
   strict(dir, app.pm);
+  pinCloudflarePlugin(dir, app.pm);
 
   const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
   if (app.source === "git") {
@@ -854,4 +855,34 @@ async function translatedContent(target: string, dir: string, app: App) {
   run(...exec(app.pm, "vp", "build"), dir);
   run(...exec(app.pm, "tsc", "--noEmit"), dir);
   check(true, `${target}: with its migration, builds and typechecks`);
+}
+
+/**
+ * Void 1.8.0 asks for "@cloudflare/vite-plugin": "^2.0.0-beta.v.15", a range that also takes
+ * 2.0.0-rc.0 (2026-11-17), which writes its build to .cloudflare/output/v1 while Void 1.8.0 reads
+ * v0: every new Void 1.8.0 app's `vp build` fails ("no root config found"), void-fbtee or not
+ * (README "Reported to Void"). So the fresh apps use the version this repo's lockfile has, the way
+ * each package manager pins one: pnpm's overrides in pnpm-workspace.yaml, npm's in package.json.
+ */
+function pinCloudflarePlugin(dir: string, pm: Pm) {
+  const version = /^\s+'@cloudflare\/vite-plugin@([^'(]+)':$/m.exec(
+    readFileSync(join(root, "pnpm-lock.yaml"), "utf8"),
+  )?.[1];
+  if (!version) throw new Error("no @cloudflare/vite-plugin in pnpm-lock.yaml");
+  if (pm === "pnpm") {
+    const file = join(dir, "pnpm-workspace.yaml");
+    const text = existsSync(file) ? readFileSync(file, "utf8") : "";
+    const line = `  "@cloudflare/vite-plugin": ${version}`;
+    writeFileSync(
+      file,
+      /^overrides:$/m.test(text)
+        ? text.replace(/^overrides:$/m, `overrides:\n${line}`)
+        : `${text.replace(/\n*$/, "\n")}overrides:\n${line}\n`,
+    );
+  } else {
+    const pkgFile = join(dir, "package.json");
+    const pkg = JSON.parse(readFileSync(pkgFile, "utf8"));
+    pkg.overrides = { ...pkg.overrides, "@cloudflare/vite-plugin": version };
+    writeFileSync(pkgFile, JSON.stringify(pkg, null, 2) + "\n");
+  }
 }

@@ -158,6 +158,10 @@ const MD_PAGES_ID = "virtual:void-fbtee/md-pages";
 const ZOD_ID = "virtual:void-fbtee/zod";
 /** `vp dev` only: the dev server's route for translating with Void's AI (ai.ts devTranslate). */
 const DEV_ID = "virtual:void-fbtee/dev";
+// What the middleware asks for a row a page read in a language it lacks with: the package's
+// translateSoon when the app has voidFbtee({ content }), else nothing, so an app without content
+// doesn't bundle void/db and void/queues (content.ts).
+const CONTENT_ASK_ID = "virtual:void-fbtee/content-ask";
 export const DEV_TRANSLATE_PATH = "/__void-fbtee/translate";
 /**
  * The app's pages in every language: each page under pages/[lang]/ whose only parameter is the
@@ -490,6 +494,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           id === MD_PAGES_ID ||
           id === ZOD_ID ||
           id === DEV_ID ||
+          id === CONTENT_ASK_ID ||
           id === PAGES_ID ||
           id.startsWith(CATALOG_PREFIX)
         )
@@ -537,6 +542,10 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           const core = await this.resolve("zod/v4/core", join(root, "package.json"));
           return zodMessages(root, Boolean(core && !core.external), config);
         }
+        if (id === "\0" + CONTENT_ASK_ID)
+          return Object.keys(contentOf(options)).length
+            ? `export { translateSoon } from "void-fbtee/content";`
+            : "export const translateSoon = undefined;";
         // The route exists only under `vp dev`, on the server, and answers only the dev server.
         if (id === "\0" + DEV_ID)
           return command === "serve" && !isClient(this.environment)

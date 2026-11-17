@@ -217,6 +217,12 @@ Then `vp check`, `vp run test:unit`, `vp run test:dev`, `vp run test:preview` an
 Problems in Void that this repo works around. After upgrading Void, check whether each is fixed,
 and if so remove what depends on it.
 
+- Not yet reported (2026-11-17, Void 1.8.0): Void asks for `"@cloudflare/vite-plugin":
+  "^2.0.0-beta.v.15"`, which also takes `2.0.0-rc.0`, and that writes its build to
+  `.cloudflare/output/v1` where Void 1.8.0 reads `v0`, so a new Void app's `vp build` fails ("no
+  root config found"). This repo's lockfile has `2.0.0-beta.v.17`; `test:fresh` pins its apps to it
+  (`pinCloudflarePlugin` in `e2e/fresh/check.ts`).
+
 - [voidzero-dev/void#802](https://github.com/voidzero-dev/void/issues/802) (2026-11-12, Void
   1.8.0): `@void/md` in right-to-left and translated pages. Heading anchors and the copy button
   are placed with physical `left`/`right`; the copy button's label is fixed in English
