@@ -81,7 +81,28 @@ deleted, and `test:fresh` proves a new `void init` app gets all of it from the p
 - `test:fresh`'s Thai-source app adds a table and the one line, and checks `vp dev` writes the
   files, `vp build` fails until the migration, and passes after `void db generate`.
 
+## Fixed after an independent review (2026-11-17)
+
+- **Paying once a row, not once a view.** Asking for a translation records a "queued" row per
+  language (`translated_by = "queued"`) and asks again only when it's over an hour old (one atomic
+  upsert); page reads, posting and the job all ask through it. Proven in dev: three reads of a
+  waiting page, one translation.
+- `textOf`: the original wins over a fallback's translation (no page left uncached for ever), and it
+  notes only when the reader's own language is missing; `titleFor` (emails, actions) notes nothing.
+- `translationsFor` takes any number of ids, 90 a query (D1's 100-parameter limit).
+- An app without content no longer bundles the content runtime (130 kB): the middleware asks
+  through `virtual:void-fbtee/content-ask`, a stub without content.
+- fbtee's built-in strings are English: an en-US line the same as its source is right
+  (`judge.ts sameLanguage`, `sourceLanguageOf`), in the check, dev and `reopenFailing`.
+- A production bundle ran the app's schema before `db-schema.ts`'s consts were set (`void/db`
+  imports the app's schema, which imports it): `translationsTableName` is a function declaration
+  and `translationsOf` uses literals (comment in the file). `test:preview` caught it.
+
 ## Found (follow-ups)
+
+- **Void 1.8.0 can't build a new app today** (not void-fbtee's): its range for
+  `@cloudflare/vite-plugin` takes `2.0.0-rc.0`, whose output Void can't read. README "Reported to
+  Void" has it, not yet filed (filing needs the user's OK); `test:fresh` pins its apps meanwhile.
 
 - Gemini left an English word in a Thai post ("ว่ายน้ำชมพระอาทิตย์ขึ้นที่ Harbour", for "Harbour
   sunrise swim"). What people post isn't run through the checks the app's own text is
