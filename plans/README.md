@@ -5,11 +5,13 @@ what it changes; this list is the only place that says when.
 
 1. `translation-provenance.md`: every translation says who made it (database, catalogs, pages,
    AI Gateway's logs), enforced, with the past filled in from evidence.
-2. `translation-rework.md`: one translator (Gemini 3.5 Flash on Cloudflare) for dev and runtime,
+2. `translated-content.md`: translating what people post comes from the package; the app only
+   says what to translate.
+3. `translation-rework.md`: one translator (Gemini 3.5 Flash on Cloudflare) for dev and runtime,
    checked the same way in dev and build, reviewed by Claude at dev time.
-3. `primitives.md`: void-fbtee's missing primitives, moved out of the example into the package.
-4. `use-cases.md`: one event, many people, as data, built on the primitives.
-5. `video-conferencing.md`: `void-moq`, built on all of the above.
+4. `primitives.md`: void-fbtee's missing primitives, moved out of the example into the package.
+5. `use-cases.md`: one event, many people, as data, built on the primitives.
+6. `video-conferencing.md`: `void-moq`, built on all of the above.
 
 Waiting on others, not in the order:
 
