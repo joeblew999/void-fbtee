@@ -95,6 +95,11 @@ const FROM_THAI: Record<string, Record<string, string | Record<number, string>>>
     "ตอนนี้สร้างหน้านี้ไม่ได้ ลองอีกครั้ง หรือเริ่มจากหน้าแรก":
       "تعذّر إنشاء هذه الصفحة الآن. حاول مرة أخرى، أو ابدأ من الصفحة الرئيسية.",
     ลองอีกครั้ง: "حاول مرة أخرى",
+    // fbtee's built-in list joiners, English in every app, as the example's ar-EG catalog has them.
+    "{list of items}, and {last item}": "{list of items} و{last item}",
+    "{list of items} and {last item}": "{list of items} و{last item}",
+    "{list of items}, or {last item}": "{list of items} أو {last item}",
+    "{list of items} or {last item}": "{list of items} أو {last item}",
   },
 };
 const targets = process.argv[2] ? [process.argv[2]] : Object.keys(APPS);
