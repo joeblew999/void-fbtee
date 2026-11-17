@@ -71,6 +71,13 @@ AI's translation (`awaitsReview`).
 - Claude's review of the 697 `unknown` entries: `vp dev` asks for it (`reviewApp`); in a cloud
   session without a signed-in `claude`, Claude reviews them in the session by the SKILL's
   "Reviewing".
+- Deleting a post (`pages/[lang]/events/[id].server.ts`, `remove`) deletes its translations,
+  bookings and tickets in one batch, but its text stays in AI Gateway's logs (every request is
+  logged whole, kept until the gateway's 10,000,000-log cap). The rows' `gateway_log_id`s name
+  exactly which logs: delete those too when the post is deleted (AI Gateway's logs API, or the
+  gateway's logging turned off for posts).
+- A language taken out of the app leaves its rows in `event_texts`: `check()` reports a removed
+  language's catalog files, not its database rows.
 - Markdown pages aren't reviewed at all: `reviewTask` and `awaitsReview` cover catalog entries only.
   An `unknown` or an AI-made page needs the same review.
 
