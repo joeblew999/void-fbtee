@@ -88,6 +88,12 @@ async function ask<T>(
         id: "default",
         skipCache: true,
         metadata: { app: app ?? "unnamed", build: import.meta.env.DEV ? "dev" : "build", kind },
+        // What people post isn't kept in the gateway's logs: they can delete their post, and a
+        // Worker can't delete a log (its binding only reads and annotates them; AI Gateway's
+        // "Worker Binding Methods"). Unified Billing still logs the request's billing details
+        // (model, tokens, cost) without the text (AI Gateway's "Logging", checked 2026-11-17),
+        // so it keeps its log id. The app's own strings and pages are logged whole, to review.
+        collectLog: kind !== "post",
       },
       returnRawResponse: true,
     } as never,

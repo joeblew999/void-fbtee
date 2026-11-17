@@ -288,7 +288,7 @@ Moving from Workers AI to Gemini on credits changed more than the model. Fixed:
 - **Docs:** the package README's `vp dev` row still said Claude Code goes first; it now says Void's
   AI does, and Claude reviews. It, the SKILL and the root README now say what translating costs
   (about US$0.001 a string per language) and that the text goes to Google (not Zero Data Retention,
-  `zdr: false` on the gateway; AI Gateway also logs every request, `collect_logs: true`).
+  `zdr: false` on the gateway; AI Gateway logs every request, `collect_logs: true`, except posts' text since plans/translation-provenance.md).
 - `plans/video-conferencing.md` still said posts are translated with Llama.
 
 Then, also fixed:

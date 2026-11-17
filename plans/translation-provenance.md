@@ -34,6 +34,17 @@ Nothing is stored without saying who made it. It's enforced, not hoped for:
   became (`gateway_log_id` in the database; `gatewayLogId` in entries and pages), so the exact
   request, answer and cost can be opened again.
 
+## What people post isn't kept in the gateway's logs
+
+Until 2026-11-17 the gateway (`collect_logs: true`, as Cloudflare makes `default`) stored every
+request whole, a post's text included, and kept it after the post was deleted. A Worker can't delete
+a log: its binding only reads and annotates them (AI Gateway's "Worker Binding Methods"); the REST
+API can, with an API token the Worker would have to keep. So posts are sent with `collectLog: false`
+(ai.ts `ask`): Unified Billing still logs the request's model, tokens, cost and tags, without the
+text, so its log id still says what made the translation (checked: a post's log has no request or
+response to fetch). Deleting a post deletes its translations; nothing of its text is left to delete.
+The app's own strings and pages are logged whole: they're the developer's, and the review uses them.
+
 ## There are several databases
 
 Each developer's local database, the live D1, and a Worker Preview's (which uses the live D1
@@ -75,11 +86,6 @@ AI's translation (`awaitsReview`).
 - Claude's review of the 697 `unknown` entries: `vp dev` asks for it (`reviewApp`); in a cloud
   session without a signed-in `claude`, Claude reviews them in the session by the SKILL's
   "Reviewing".
-- Deleting a post (`pages/[lang]/events/[id].server.ts`, `remove`) deletes its translations,
-  bookings and tickets in one batch, but its text stays in AI Gateway's logs (every request is
-  logged whole, kept until the gateway's 10,000,000-log cap). The rows' `gateway_log_id`s name
-  exactly which logs: delete those too when the post is deleted (AI Gateway's logs API, or the
-  gateway's logging turned off for posts).
 - Markdown pages aren't reviewed at all: `reviewTask` and `awaitsReview` cover catalog entries only.
   An `unknown` or an AI-made page needs the same review.
 

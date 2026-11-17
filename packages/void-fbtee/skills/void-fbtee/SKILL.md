@@ -288,7 +288,8 @@ when the account isn't paying (credits used up, a spend limit reached: `paymentP
 `void-fbtee/ai`), the message waits an hour. Cloudflare drops a message after its last retry (Void's
 queues have no dead-letter queue), so the daily job (`crons/reminders.ts`) keeps posts to the app's
 languages both ways: it queues every event missing a language (or with an `unknown` translation),
-and deletes translations into a language the app no longer has. Posts go to Google's Gemini (not Zero Data Retention).
+and deletes translations into a language the app no longer has. Posts go to Google's Gemini (not Zero Data Retention), and aren't kept in AI
+Gateway's logs (`collectLog: false`): their log has the model, tokens and cost, not the text.
 
 ## Markdown pages
 
