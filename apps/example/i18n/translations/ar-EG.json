@@ -3715,7 +3715,12 @@
       ],
       "types": [],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "sMtlR6Z8zMzZ6LalfCQsVQ==": {
       "description": "When an event starts, on the reader's own clock; {time} is that time, already formatted",
@@ -4491,7 +4496,12 @@
       ],
       "types": [],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "RDmZOKQne5lXFwwEOtPf1w==": {
       "description": "Translating page point: as you save, the dev server prepares new strings and has Void's AI translate them, many at a time; every answer is checked, and what still fails goes to Claude Code; each translation records who wrote it",
@@ -4505,7 +4515,12 @@
       ],
       "types": [],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "52BVoeSoml1sJh7/JrUk6Q==": {
       "description": "Translating page point: a posted event goes to a queue whose consumer translates it with Void's AI, the same model as the app's own text",
@@ -4519,7 +4534,12 @@
       ],
       "types": [],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "0lZ+v47QSOzy6IAWK4T/Dg==": {
       "description": "Translating page: what the dev server does about translations as you save: preparing, translating with Void's AI then Claude Code, and reporting by itself",
@@ -4533,7 +4553,12 @@
       ],
       "types": [],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "zkhofd94vWDMBbyNeGl6wg==": {
       "description": "Translating page: what the build does about translations",
@@ -4541,13 +4566,23 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "يفشل عند وجود أي شيء ناقص أو خاطئ: نص أو صفحة غير مترجمة، أو ترجمة تفشل في الفحوصات التي يجريها vp dev، أو صفحة أقدم من نسختها الأصلية، أو مشكلة في الإعداد. وبذلك لا يمكن لأي عملية نشر شحن أي منها.",
+          "translation": "يفشل عند وجود أي شيء ناقص أو خاطئ: نص أو صفحة غير مترجمة، أو ترجمة تفشل في الفحوصات التي يجريها vp dev، أو صفحة أقدم من نسختها الأصلية، أو مشكلة في الإعداد. وبذلك لا يصل أي منها إلى النشر.",
           "variations": {}
         }
       ],
       "types": [],
-      "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedBy": "claude",
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "wrong",
+        "of": "google/gemini-3.5-flash",
+        "note": "\"So a deploy can't ship one\" was rendered literally as shipping cargo (شحن): no deploy can carry one.",
+        "was": [
+          "يفشل عند وجود أي شيء ناقص أو خاطئ: نص أو صفحة غير مترجمة، أو ترجمة تفشل في الفحوصات التي يجريها vp dev، أو صفحة أقدم من نسختها الأصلية، أو مشكلة في الإعداد. وبذلك لا يمكن لأي عملية نشر شحن أي منها."
+        ]
+      }
     },
     "5AtDKB1g3YMwQWILBRxDjw==": {
       "description": "Translating page introduction",
@@ -4561,7 +4596,12 @@
       ],
       "types": [],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "A3T96LuiZD94KEB/GfigmA==": {
       "description": "Translating page: the events people post are translated by Void's AI; {link} is a link to the events whose text is 'see them'",
@@ -4575,7 +4615,12 @@
       ],
       "types": [],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "zCHE057k0dimoTU2sp85fA==": {
       "description": "Temporal page: how many rows the polyfill on the Worker got the same as Cloudflare's own Temporal; {same} is how many are the same, {total} how many rows there are; the count each form is for is {total}",
@@ -4675,7 +4720,12 @@
         28
       ],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "pw4gLfbMmGtxs6YNyvuTxA==": {
       "description": "Temporal page: how many rows the polyfill in the browser got the same as the Worker; {same} is how many are the same, {total} how many rows there are; the count each form is for is {total}",

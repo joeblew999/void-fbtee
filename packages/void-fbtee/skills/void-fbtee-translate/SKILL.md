@@ -109,7 +109,9 @@ Translate the whole page, keeping its structure: the same headings in the same o
   (U+200E, U+200F): the page sets right to left itself. A number followed by a noun takes the
   noun's form for that number: zero says none (لم يتبقَّ أي مقعد, not "0 seats"); two, the dual,
   without the number (مقعدان as a subject, مقعدين as an object); 3 to 10, plural (مقاعد); 11 to 99,
-  singular, accusative (مقعدًا); 100 and up, singular (مقعد).
+  singular, accusative (مقعدًا); 100 and up, singular (مقعد). After أي ("any", "none of") the
+  noun is singular: لم تحجز أي ليلة, never أي ليالٍ. A zero count says that none did (لم يتطابق
+  أي صف), never "row zero" (صف صفر).
 - Right-to-left languages in general: natural text, no direction marks.
 - Korean: after a placeholder, give both forms of the particle, as the app does: 을(를), 이(가),
   은(는), since the word it stands for may end in a consonant or a vowel.

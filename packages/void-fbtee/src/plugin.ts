@@ -27,7 +27,15 @@ import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, matchesGlob, relative, sep } from "node:path";
 import { prepare } from "./commands";
-import { hasClaude, markedDone, stamp, translateApp, translateWithVoidAi } from "./translate";
+import {
+  hasClaude,
+  markedDone,
+  reviewApp,
+  stamp,
+  translateApp,
+  translateWithVoidAi,
+  unreviewed,
+} from "./translate";
 import { check } from "./check";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
@@ -173,6 +181,8 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   let translateAgain = false;
   // The prompt last shown for a coding agent, so the next save doesn't show it again.
   let handedOut: string | undefined;
+  // The review prompt last shown, likewise.
+  let reviewHandedOut: string | undefined;
   const log = (text: string) =>
     text.split("\n").forEach((l) => devServer?.config.logger.info(`void-fbtee: ${l}`));
   // What Claude Code was given to translate, by language (each string's text): when it's done,
@@ -202,6 +212,11 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         ? `${problems.length} to fix:\n${problems.join("\n")}`
         : "all translated, nothing to fix",
     );
+    const waiting = [...unreviewed(project())].filter(([, n]) => n);
+    if (waiting.length)
+      log(
+        `not yet reviewed by Claude: ${waiting.map(([locale, n]) => `${locale} ${n}`).join(", ")}`,
+      );
   };
   // Tests (Vitest's server, CI) don't start an agent: they report.
   const agentAllowed = () => !underVitest && !process.env.CI;
@@ -254,9 +269,14 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
               }
           return translateApp(project(), root, log, handedOut);
         })
-        .then((result) => {
+        .then(async (result) => {
           handedOut = result.prompt;
-          report(result.problems);
+          // Then Claude reviews what the AI wrote (step 6 of plans/translation-rework.md), once
+          // nothing is left to translate: a review of half a catalog would be done twice.
+          if (result.prompt) return report(result.problems);
+          const reviewed = await reviewApp(project(), root, log, reviewHandedOut);
+          reviewHandedOut = reviewed.prompt;
+          report(reviewed.problems);
         })
         .catch((error) => log(`couldn't translate: ${String(error)}`))
         .finally(() => {
@@ -305,6 +325,12 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
     buildStart() {
       if (command !== "build") return;
       const problems = check(project());
+      // Not a failure (CI has no Claude), but said: what no one has looked at yet.
+      const waiting = [...unreviewed(project())].filter(([, n]) => n);
+      if (waiting.length)
+        this.info(
+          `void-fbtee: machine translations not yet reviewed: ${waiting.map(([locale, n]) => `${locale} ${n}`).join(", ")}`,
+        );
       if (problems.length)
         this.error(
           `void-fbtee: ${problems.length} to fix before this can build (vp dev translates them):\n${problems.join("\n")}`,

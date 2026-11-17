@@ -301,6 +301,25 @@ Pages under `pages/<source locale>/` have a copy per locale at the same path und
   `translatedFrom: done`, and the dev server replaces it with the original's version. For a page
   reported out of date, compare it with the original and change only what changed.
 
+## Reviewing
+
+`vp dev` has Void's AI translate, then asks Claude Code to review what the AI wrote: a signed-in
+`claude -p`, else a prompt in its log ("Review this Void app's machine translations"). An entry to
+review has `"translatedBy"` an AI's id (not `"claude"`) and no `"review"`.
+
+1. Read each such entry as a reader of the language would: its description and source lines, and
+   the code around the string if you need it. Judge it by the translating skill: the meaning
+   kept, the language's own words and grammar (each plural form for its count, each gender
+   line), the app's words for its terms, product names, commands and file names kept.
+2. Right: add `"review": { "by": "claude", "at": "<YYYY-MM-DD>", "verdict": "ok" }`.
+3. Wrong: correct the lines, set `"translatedBy": "claude"` and `"translatedAt"` to today, and add
+   `"review": { "by": "claude", "at": "<YYYY-MM-DD>", "verdict": "wrong", "of": "<the AI's id it
+   had>", "note": "<what was wrong, in a sentence>", "was": [<its lines as they were>] }`.
+4. When something is wrong in a way a rule could catch (a term changed, a word left in English, a
+   form that's always wrong), say so in your last line: it belongs in void-fbtee's checks
+   (`judge.ts`, `grammar.json`), and when it's the meaning or the words, in the translating skill.
+   Then `vp dev` checks your corrections like any translation.
+
 ## Finish
 
 Don't run anything: the dev server checks as you save and reports what's left in its log, and

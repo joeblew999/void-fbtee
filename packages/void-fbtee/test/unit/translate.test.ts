@@ -19,7 +19,7 @@ import type { Project } from "../../src/catalogs";
 import { check, markdownPages, missingHead } from "../../src/check";
 import { loadProject, prepare } from "../../src/commands";
 import { init } from "../../src/init";
-import { markedDone, stamp, translateTask } from "../../src/translate";
+import { awaitsReview, markedDone, stamp, translateTask } from "../../src/translate";
 
 let root: string;
 let p: Project;
@@ -233,4 +233,15 @@ test("check: the title and description after a page's <script> block", () => {
   expect(
     missingHead(original, `${script}---\r\ntitle: ทัวร์\r\ndescription: โพสต์\r\n---\r\n`),
   ).toEqual([]);
+});
+
+test("a translation waits for review when an AI wrote it and no one has reviewed it", () => {
+  const ai = { status: "translated", translatedBy: "google/gemini-3.5-flash" };
+  expect(awaitsReview(ai)).toBe(true);
+  expect(
+    awaitsReview({ ...ai, review: { by: "claude", at: "2026-11-17", verdict: "ok" as const } }),
+  ).toBe(false);
+  expect(awaitsReview({ status: "translated", translatedBy: "claude" })).toBe(false);
+  expect(awaitsReview({ status: "translated" })).toBe(false);
+  expect(awaitsReview({ ...ai, status: "new" })).toBe(false);
 });

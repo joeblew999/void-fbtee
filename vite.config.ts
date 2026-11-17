@@ -29,8 +29,16 @@ export default defineConfig({
   // `vp run <task>` from anywhere in the repo.
   run: {
     tasks: {
-      // The package rebuilding on save, and the example's dev server, together.
-      dev: { command: "vp run -r --parallel dev", cache: false },
+      // The package rebuilding on save, and the example's dev server, together. The package is
+      // built once first: otherwise the example can load its old dist/ before the watch's first
+      // rebuild lands, and translate with code from before the change (it did, 2026-11-17:
+      // plans/translation-rework.md, "Found").
+      // (Not dependsOn: under `vp run -r --parallel` it ran the build again, alongside, and the
+      // example found dist/ empty.)
+      dev: {
+        command: ["vp run void-fbtee#build", "vp run -r --parallel dev"],
+        cache: false,
+      },
       // Chromium for the browser tests (once per machine).
       "install:browser": {
         command: "playwright install --with-deps chromium webkit",
@@ -74,6 +82,9 @@ export default defineConfig({
       // (scripts/translations-measure.ts, plans/translation-rework.md step 2). Needs `vp run dev`
       // running, signed in to Cloudflare.
       "translations:measure": { command: "vpx scripts/translations-measure.ts", cache: false },
+      // How the machine translations fared in Claude's reviews, by language and translator
+      // (scripts/translations-reviews.ts, plans/translation-rework.md step 7).
+      "translations:reviews": { command: "vpx scripts/translations-reviews.ts", cache: false },
       // The example's tasks (apps/example/vite.config.ts), runnable from the root.
       login: { command: "vp run example#login", cache: false },
       status: { command: "vp run example#status", cache: false },

@@ -264,6 +264,83 @@ export async function translateApp(
   return { problems: check(p) };
 }
 
+/** Each language's catalog, read. */
+function catalogsOf(
+  p: Project,
+): { locale: string; file: string; catalog: { translations: Record<string, CatalogEntry> } }[] {
+  return missing(p)
+    .map((m) => ({ locale: m.locale, file: catalogFile(p, m.locale) }))
+    .filter(({ file }) => existsSync(file))
+    .map((c) => ({ ...c, catalog: JSON.parse(readFileSync(c.file, "utf8")) }));
+}
+
+/** Whether an entry waits for review: translated by an AI (not by Claude or a person), not yet reviewed. */
+export const awaitsReview = (e: CatalogEntry) =>
+  e.status !== "new" && !!e.translatedBy && e.translatedBy !== "claude" && !e.review;
+
+/** How many translations wait for review, by language. */
+export function unreviewed(p: Project): Map<string, number> {
+  return new Map(
+    catalogsOf(p).map(({ locale, catalog }) => [
+      locale,
+      Object.values(catalog.translations).filter(awaitsReview).length,
+    ]),
+  );
+}
+
+/**
+ * What's left to review, as a prompt for a coding agent: each catalog with translations an AI
+ * wrote and no one has reviewed. The void-fbtee skill's "Reviewing" says how (and what to write
+ * in each entry). Undefined when there's nothing.
+ */
+export function reviewTask(p: Project): string | undefined {
+  const rel = (f: string) => relative(p.root, f).split(sep).join("/");
+  const lines = [...unreviewed(p)]
+    .filter(([, n]) => n)
+    .map(([locale, n]) => `- ${rel(catalogFile(p, locale))} (${locale}): ${n} entries to review`);
+  if (!lines.length) return;
+  return [
+    `Review this Void app's machine translations. First read ${skillPath(p.root)} (the void-fbtee skill), its "Reviewing" section, and follow it; how a translation should be is in ${translatingSkillPath(p.root)}.`,
+    "",
+    "Catalogs:",
+    ...lines,
+    "",
+    'Review the entries with a translatedBy that isn\'t "claude" and no review. Edit only these files.',
+    "Finish with one line per file: how many were right, how many you corrected, and what was wrong.",
+  ].join("\n");
+}
+
+/**
+ * Claude's review of what an AI translated, as `vp dev` runs it after translating: `claude -p` when
+ * it's signed in here, else the prompt for the developer's coding agent (shown once). Then the
+ * checks, on the reviewer's corrections too.
+ */
+export async function reviewApp(
+  p: Project,
+  root: string,
+  log: (line: string) => void = console.log,
+  handedOut?: string,
+): Promise<{ problems: string[]; prompt?: string }> {
+  const prompt = reviewTask(p);
+  if (!prompt) return { problems: check(p) };
+  if (!hasClaude()) {
+    if (prompt !== handedOut) {
+      log(
+        "No signed-in Claude Code (claude) here. Give this review prompt to your coding agent:\n",
+      );
+      log(prompt);
+    }
+    return { problems: check(p), prompt };
+  }
+  log(
+    `\n$ claude -p <review prompt> --permission-mode acceptEdits --allowedTools ${AGENT_TOOLS.join(",")}\n`,
+  );
+  log(prompt.replace(/^/gm, "  > "));
+  const code = await runClaude(root, prompt);
+  if (code !== 0) log(`\nclaude exited with ${code}`);
+  return { problems: check(p) };
+}
+
 /** Each language's entries still marked new, by hash. */
 function newEntries(p: Project): Map<string, Set<string>> {
   const out = new Map<string, Set<string>>();
@@ -320,6 +397,22 @@ interface CatalogEntry {
   translatedBy?: string;
   /** The day it was written, YYYY-MM-DD. */
   translatedAt?: string;
+  /** Claude's review of a translation an AI wrote (reviewTask). Cleared when it's translated again. */
+  review?: Review;
+}
+
+/**
+ * A reviewer's verdict on one entry, kept in the entry (plans/translation-rework.md, step 6):
+ * "ok", or "wrong" with what was wrong (`note`), the translator it judged (`of`) and its lines
+ * (`was`), the reviewer's correction being the entry's lines now.
+ */
+export interface Review {
+  by: string;
+  at: string;
+  verdict: "ok" | "wrong";
+  of?: string;
+  note?: string;
+  was?: string[];
 }
 
 /**
@@ -542,6 +635,7 @@ export async function translateCatalog(
     entry.status = "translated";
     entry.translatedBy = GEMINI.id;
     entry.translatedAt = today();
+    delete entry.review;
   };
   let open = Object.entries(catalog.translations).filter(
     ([, e]) => e.status === "new" && e.translations?.length,

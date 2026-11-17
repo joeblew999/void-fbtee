@@ -2146,7 +2146,12 @@
       ],
       "types": [],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "XTxmV9cNQS5qJAbGReTbbQ==": {
       "description": "Markdown page point title: a copy whose original changed",
@@ -2538,13 +2543,23 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "คำแปลต่างๆ จะอยู่ในรูปแบบไฟล์ในที่เก็บข้อมูล (repository) โดยมีหนึ่งแค็ตตาล็อกต่อหนึ่งภาษาและสำเนาของแต่ละหน้า Markdown ดังนั้นจึงสามารถตรวจสอบความเปลี่ยนแปลงได้ด้วย git diff และคอมมิตได้เหมือนกับโค้ดทั่วไป จะไม่มีการแปลภาษาใดๆ ในระหว่างที่ผู้เยี่ยมชมกำลังรอโหลดหน้าเว็บ",
+          "translation": "คำแปลต่างๆ จะอยู่ในรูปแบบไฟล์ในที่เก็บข้อมูล (repository) โดยมีหนึ่งแค็ตตาล็อกต่อหนึ่งภาษาและสำเนาของแต่ละหน้า Markdown ดังนั้นจึงตรวจสอบได้ด้วย git diff และคอมมิตได้เหมือนโค้ด ไม่มีการแปลใดๆ ในระหว่างที่ผู้เยี่ยมชมรอ",
           "variations": {}
         }
       ],
       "types": [],
-      "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedBy": "claude",
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "wrong",
+        "of": "google/gemini-3.5-flash",
+        "note": "Added what the source doesn't say: \"like ordinary code\" (ทั่วไป) and \"waiting for the page to load\".",
+        "was": [
+          "คำแปลต่างๆ จะอยู่ในรูปแบบไฟล์ในที่เก็บข้อมูล (repository) โดยมีหนึ่งแค็ตตาล็อกต่อหนึ่งภาษาและสำเนาของแต่ละหน้า Markdown ดังนั้นจึงสามารถตรวจสอบความเปลี่ยนแปลงได้ด้วย git diff และคอมมิตได้เหมือนกับโค้ดทั่วไป จะไม่มีการแปลภาษาใดๆ ในระหว่างที่ผู้เยี่ยมชมกำลังรอโหลดหน้าเว็บ"
+        ]
+      }
     },
     "QWTleZIgt+OQTekLHF+MJw==": {
       "description": "Translating page point title: what people post is translated as it's posted",
@@ -2846,7 +2861,12 @@
       ],
       "types": [],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "yCF3/6M+1/izLuN7RZCVKA==": {
       "description": "PDFs page section title: the sample PDF, printed for this page's language",
@@ -3657,7 +3677,12 @@
       ],
       "types": [],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "sMtlR6Z8zMzZ6LalfCQsVQ==": {
       "description": "When an event starts, on the reader's own clock; {time} is that time, already formatted",
@@ -4271,7 +4296,12 @@
       ],
       "types": [],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "RDmZOKQne5lXFwwEOtPf1w==": {
       "description": "Translating page point: as you save, the dev server prepares new strings and has Void's AI translate them, many at a time; every answer is checked, and what still fails goes to Claude Code; each translation records who wrote it",
@@ -4285,7 +4315,12 @@
       ],
       "types": [],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "52BVoeSoml1sJh7/JrUk6Q==": {
       "description": "Translating page point: a posted event goes to a queue whose consumer translates it with Void's AI, the same model as the app's own text",
@@ -4293,13 +4328,23 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "กิจกรรมที่มีผู้โพสต์จะไม่ได้อยู่ในคลังข้อมูล ดังนั้นจึงได้รับการแปลทันทีที่โพสต์กิจกรรม โดยโพสต์ดังกล่าวจะถูกส่งไปยังคิว และผู้บริโภคคิวจะขอให้ Void's AI ซึ่งเป็นโมเดลเดียวกับข้อความของแอป แปลเป็นภาษาอื่นๆ ของแอป หลังจากที่ผู้โพสต์ได้รับคำตอบแล้ว",
+          "translation": "กิจกรรมที่มีผู้โพสต์ไม่ได้อยู่ในที่เก็บข้อมูล (repository) จึงแปลทันทีที่โพสต์ โดยโพสต์จะเข้าคิว และตัวรับของคิวจะขอให้ Void's AI ซึ่งเป็นโมเดลเดียวกับข้อความของแอป แปลเป็นภาษาอื่นๆ ของแอป หลังจากที่ผู้โพสต์ได้รับคำตอบแล้ว",
           "variations": {}
         }
       ],
       "types": [],
-      "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedBy": "claude",
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "wrong",
+        "of": "google/gemini-3.5-flash",
+        "note": "Words that differ from the app's own: คลังข้อมูล for the repository (the app says ที่เก็บข้อมูล) and ผู้บริโภคคิว, a shopper, for the queue's consumer (the app says ตัวรับของคิว).",
+        "was": [
+          "กิจกรรมที่มีผู้โพสต์จะไม่ได้อยู่ในคลังข้อมูล ดังนั้นจึงได้รับการแปลทันทีที่โพสต์กิจกรรม โดยโพสต์ดังกล่าวจะถูกส่งไปยังคิว และผู้บริโภคคิวจะขอให้ Void's AI ซึ่งเป็นโมเดลเดียวกับข้อความของแอป แปลเป็นภาษาอื่นๆ ของแอป หลังจากที่ผู้โพสต์ได้รับคำตอบแล้ว"
+        ]
+      }
     },
     "0lZ+v47QSOzy6IAWK4T/Dg==": {
       "description": "Translating page: what the dev server does about translations as you save: preparing, translating with Void's AI then Claude Code, and reporting by itself",
@@ -4313,7 +4358,12 @@
       ],
       "types": [],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "zkhofd94vWDMBbyNeGl6wg==": {
       "description": "Translating page: what the build does about translations",
@@ -4327,7 +4377,12 @@
       ],
       "types": [],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "5AtDKB1g3YMwQWILBRxDjw==": {
       "description": "Translating page introduction",
@@ -4341,7 +4396,12 @@
       ],
       "types": [],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "A3T96LuiZD94KEB/GfigmA==": {
       "description": "Translating page: the events people post are translated by Void's AI; {link} is a link to the events whose text is 'see them'",
@@ -4355,7 +4415,12 @@
       ],
       "types": [],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "zCHE057k0dimoTU2sp85fA==": {
       "description": "Temporal page: how many rows the polyfill on the Worker got the same as Cloudflare's own Temporal; {same} is how many are the same, {total} how many rows there are; the count each form is for is {total}",
@@ -4373,7 +4438,12 @@
         28
       ],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "GQtWWYwqRPGzQ9zLWD/4Ww==": {
       "description": "Temporal page: how many rows the browser's own Temporal got the same as the Worker; {same} is how many are the same, {total} how many rows there are; the count each form is for is {total}",
@@ -4391,7 +4461,12 @@
         28
       ],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     },
     "pw4gLfbMmGtxs6YNyvuTxA==": {
       "description": "Temporal page: how many rows the polyfill in the browser got the same as the Worker; {same} is how many are the same, {total} how many rows there are; the count each form is for is {total}",
@@ -4409,7 +4484,12 @@
         28
       ],
       "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17"
+      "translatedAt": "2026-11-17",
+      "review": {
+        "by": "claude",
+        "at": "2026-11-17",
+        "verdict": "ok"
+      }
     }
   }
 }

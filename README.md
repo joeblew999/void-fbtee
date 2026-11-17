@@ -52,6 +52,8 @@ Every day:
 ```sh
 vp run login             # once: Void's Cloudflare sign-in, which dev and the preview need for
                          # Void's AI and Browser Run (Void has no local stand-in for them)
+                         # In a Claude cloud session too: in a terminal, it prints a link and a
+                         # code to confirm on any device (Cloudflare's device sign-in)
 vp run dev               # develop: the package rebuilds on save; the example runs with Void's
                          # local D1, KV, R2, queues, live updates, email inbox, Void's AI and
                          # Browser Run (the PDF tickets).

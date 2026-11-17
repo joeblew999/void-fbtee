@@ -249,6 +249,24 @@ Claude's review of today's Gemini answers, and what came of each:
    أي ليلة) and "يتطابق صف صفر" ("row zero matches") for a count of zero; "مؤجل" where the catalog
    says "لاحقًا" for "Deferred". To go in the translating skill's Arabic counts and the glossary.
 
+## Steps 6 and 7, done (2026-11-17)
+
+- After translating, `vp dev` asks Claude Code to review what an AI wrote (`translate.ts`
+  reviewApp): `claude -p` where it's signed in, else the prompt in its log. The void-fbtee skill's
+  "Reviewing" says how: the verdict goes in the entry (`review`: ok, or wrong with `of`, `note`
+  and `was`, the correction being the entry's lines), and a translation done again loses its old
+  review. `vp dev` and `vp build` say how many wait.
+- `vp run translations:reviews`: per language and translator, reviewed, right, waiting, and what
+  was wrong.
+- First review, by this cloud session's Claude from the printed prompt: Gemini 3.5 Flash right on
+  8 of 9 in ar-EG (89%) and 12 of 14 in th-TH (86%). Wrong: a literal "ship" (شحن); two Thai
+  additions the source doesn't have; two Thai words that differ from the app's own (the
+  repository, the queue's consumer). None is a rule; the last is the glossary's limit (it only
+  takes one-word entries), noted for later.
+- Not done: reviewing event translations in the local database. They're the example's own table,
+  which the package's dev server can't read; it needs a route in the example, like the translate
+  route. Left for later, with the review of posts in production out of scope (no Claude there).
+
 ## Done when
 
 - `vp build` fails on every problem `vp dev` checks for, including a wrong number of plural forms.
@@ -277,8 +295,11 @@ Claude's review of today's Gemini answers, and what came of each:
 - `vp run login` (`void connect --platform cloudflare`) fails with no terminal; `void cloudflare
   login` in one works from a cloud session (device code). `.claude/hooks/cloud-session.sh` now
   also installs `secret-tool`, which Cloudflare's `cf` needs to keep the sign-in in the keyring.
-  To do: make the login task work the same in a cloud session.
-- `vp run dev` can start on a stale build of the package: it runs `vp pack --watch` and the app's
+  Settled: `vp run login` works in a cloud session when it runs in a terminal (checked
+  2026-11-17: "Connected to Cloudflare"); the README says so. Claude runs it in one.
+- Fixed: `vp run dev` builds the package first (`vite.config.ts` dev: `vp run void-fbtee#build`,
+  then the rest; `dependsOn` ran the build a second time alongside, under `--parallel`).
+  Was: `vp run dev` could start on a stale build of the package: it runs `vp pack --watch` and the app's
   `vp dev` side by side, and the app may load `dist/` before the rebuild lands. The first dev run
   after this change translated 22 strings with the code from before it, one string a request
   (37 requests, US$0.15, AI Gateway's logs 09:35 UTC). To fix: the app's dev waits for the
