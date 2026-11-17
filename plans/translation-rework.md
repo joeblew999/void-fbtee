@@ -180,6 +180,46 @@ Checked 2026-11-17 in Cloudflare's docs:
 - Whole catalogs, or dev with Gemini switched on for everything, only after the user has seen the
   sample's numbers and said so.
 
+## Step 2's results (2026-11-17, run in a Claude cloud session)
+
+Void signed in to Cloudflare here with `void cloudflare login` (a device-code login: works from a
+cloud session when run in a terminal; `vp run login` failed only because it had none). Then
+`vp run dev` and `vp run translations:measure`: 25 strings each in `ar-EG` and `th-TH`, counts and
+genders first. Raw answers: `plans/translation-rework-measure.json`.
+
+|                          | Gemma 4 (today)                                    | Gemini 3.5 Flash |
+| ------------------------ | -------------------------------------------------- | ---------------- |
+| ar-EG, passed the checks | 21 of 25                                           | 24 of 25         |
+| th-TH, passed the checks | 23 of 25                                           | 24 of 25         |
+| Requests for 50 strings  | 92                                                 | 4                |
+| Tokens in / out          | 316,125 / 4,935                                    | 16,808 / 3,190   |
+| Cost                     | Workers AI allowance (ran out twice: "UsageLimit") | US$0.054         |
+
+- Gemini answers in about 8 s for 25 strings; Gemma took 80–97 s.
+- Gemini put right the three Arabic Temporal counts that are English in the catalog, every form.
+- Credits: US$10.00 → US$9.67 over the whole day's trying, including two 25-string requests
+  that failed before Gemini's own request shape and thinking off were in place, and two probes.
+  About US$0.001 a string a language once working.
+- Getting there: in the Chat Completions shape Gemini thought until it ran out of tokens; in its
+  own shape with `thinkingBudget: 0` it doesn't (68 tokens out for one string). Asked only for
+  "JSON" it made up its own shape; given the schema it answers in ours.
+
+Claude's review of the answers (what the checks didn't catch), each now a fix to make:
+
+1. **A file name cut short, by both models in both languages:** `void.config.ts` came back as
+   `config.ts`. `judge.ts` `keptTerms()` takes `[\w-]+\.ts`, so only `config.ts` is kept and the
+   change passes. Fix: dotted file names whole.
+2. **Arabic switched register:** one of Gemini's Arabic answers is Egyptian colloquial ("بيفشل…
+   لسه مش مترجمة") among Modern Standard Arabic. Fix: the translating skill says Modern Standard
+   Arabic for every `ar-*`, and `grammar.json` flags colloquial markers (بيـ, لسه, مش, كمان).
+3. **Words drift without the app's own:** Gemini wrote งานกิจกรรม where the app says กิจกรรม,
+   ผู้ใช้ ("user") for the reader, البرمجية الوسيطة for "middleware". The glossary (the app's
+   one-word entries and common strings) is cheap in a batch: keep it, drop only the per-entry
+   examples.
+4. **False alarms:** "fbt" and "lint" flagged as English left in. Fix: kept terms.
+5. **Workers AI's allowance ran out mid-run** ("AI is temporarily unavailable because its usage
+   limit was reached"): today's translator isn't dependable in dev either.
+
 ## Done when
 
 - `vp build` fails on every problem `vp dev` checks for, including a wrong number of plural forms.
@@ -205,5 +245,9 @@ Checked 2026-11-17 in Cloudflare's docs:
   server ("In a non-interactive environment, it's necessary to set a CLOUDFLARE_API_TOKEN",
   2026-11-17). The tailscale task's note says a cloud session runs the dev server: true only once
   Void is signed in there. To settle when step 6 (reviews) is built.
+- `vp run login` (`void connect --platform cloudflare`) fails with no terminal; `void cloudflare
+  login` in one works from a cloud session (device code). `.claude/hooks/cloud-session.sh` now
+  also installs `secret-tool`, which Cloudflare's `cf` needs to keep the sign-in in the keyring.
+  To do: make the login task work the same in a cloud session.
 - The Cloudflare connector's Workers AI call returned 401 ("Reconnect to sign in again"): it may
   lack the Workers AI permission. Only matters if a session is to call Workers AI through it.

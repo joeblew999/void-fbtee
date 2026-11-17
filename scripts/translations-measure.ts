@@ -27,8 +27,11 @@ import {
   translateEntry,
 } from "../packages/void-fbtee/src/translate";
 
-const LOCALES = ["ar-EG", "th-TH"];
-const SAMPLE = 25;
+const LOCALES = process.argv.includes("--probe") ? ["th-TH"] : ["ar-EG", "th-TH"];
+/** `--probe`: one string, to prove a model answers before a whole sample is paid for. */
+const SAMPLE = process.argv.includes("--probe") ? 1 : 25;
+/** `--gemini-only`: skip today's translator (its Workers AI allowance may be used up). */
+const GEMINI_ONLY = process.argv.includes("--gemini-only") || process.argv.includes("--probe");
 /** The most this run may spend on Gemini, in US$ (plans/translation-rework.md, "Spending"). */
 const CAP_USD = 0.5;
 
@@ -67,7 +70,6 @@ async function call(input: unknown): Promise<(Answer & Record<string, unknown>) 
     console.log(`  ${res.status}: ${answer.error ?? "no answer"}`);
     if (res.status === 503)
       throw new Error("Void's AI isn't available: is Void signed in (`vp run login`)?");
-    return {};
   }
   const t = tokens.get(answer.model!) ?? { input: 0, output: 0, requests: 0 };
   for (const u of answer.usage ?? []) {
@@ -75,13 +77,14 @@ async function call(input: unknown): Promise<(Answer & Record<string, unknown>) 
     t.output += u.completion_tokens ?? 0;
   }
   t.requests++;
-  tokens.set(answer.model!, t);
+  if (answer.model) tokens.set(answer.model, t);
   if (answer.model === GEMINI.id)
     spent =
       (tokens.get(GEMINI.id)!.input * GEMINI.price.input +
         tokens.get(GEMINI.id)!.output * GEMINI.price.output) /
       1e6;
-  return answer;
+  // A failed request still costs what it used; its answer is empty.
+  return res.ok ? answer : {};
 }
 
 const { texts, builtinHashes } = collect(p);
@@ -147,21 +150,23 @@ for (const locale of LOCALES) {
 
   // Today's translator.
   const today = modelFor(locale).id;
-  console.log(`\n${locale}: ${entries.length} entries with ${today}, one at a time`);
-  const started = Date.now();
-  for (const e of entries) {
-    const entry = payload(e);
-    const answer = await translateEntry(call, {
-      from,
-      to: locale,
-      entry,
-      examples: examplesFor(finished, [entry]),
-      glossary: glossaryFor(finished, [entry], Object.keys(p.common ?? {})),
-      fbtee,
-    });
-    record(today, e, answer?.lines ?? [], { attempts: answer?.attempts });
+  if (!GEMINI_ONLY) {
+    console.log(`\n${locale}: ${entries.length} entries with ${today}, one at a time`);
+    const started = Date.now();
+    for (const e of entries) {
+      const entry = payload(e);
+      const answer = await translateEntry(call, {
+        from,
+        to: locale,
+        entry,
+        examples: examplesFor(finished, [entry]),
+        glossary: glossaryFor(finished, [entry], Object.keys(p.common ?? {})),
+        fbtee,
+      });
+      record(today, e, answer?.lines ?? [], { attempts: answer?.attempts });
+    }
+    console.log(`  ${((Date.now() - started) / 1000).toFixed(0)} s`);
   }
-  console.log(`  ${((Date.now() - started) / 1000).toFixed(0)} s`);
 
   // Gemini, wuchale's way.
   console.log(`${locale}: the same ${entries.length} with ${GEMINI.id}, all in one request`);

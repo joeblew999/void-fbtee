@@ -51,6 +51,20 @@ async function ask<T>(
   model: TranslationModel = LLAMA,
   onUsage?: (usage: Usage) => void,
 ): Promise<T> {
+  // Gemini in its own request shape, as wuchale sends it (src/ai/gemini.ts): the instructions as
+  // systemInstruction, thinking off (thinkingBudget 0), JSON asked for by mime type. Cloudflare's
+  // catalog shows Gemini taking this shape through the binding (its model page's examples, checked
+  // 2026-11-17). In the Chat Completions shape its thinking stayed on and spent all 8192 tokens
+  // with no answer (finish_reason "length", twice, 2026-11-17).
+  if (model.id.startsWith("google/gemini"))
+    return askGemini<T>(
+      // The shape to answer in, as the other models without JSON Mode are told: asked only for
+      // "JSON", Gemini made up its own (no lines found in its answers, 2026-11-17).
+      `${system}\n\nReply with one JSON object and nothing else, matching this JSON Schema: ${JSON.stringify(schema)}`,
+      user,
+      model,
+      onUsage,
+    );
   const input = {
     messages: [
       {
@@ -109,6 +123,62 @@ async function ask<T>(
   const start = answer.indexOf("{");
   const end = answer.lastIndexOf("}");
   return JSON.parse(start >= 0 && end > start ? answer.slice(start, end + 1) : answer) as T;
+}
+
+/** Gemini's own answer shape (generateContent). */
+interface GeminiAnswer {
+  candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[];
+  usageMetadata?: {
+    promptTokenCount?: number;
+    candidatesTokenCount?: number;
+    thoughtsTokenCount?: number;
+  };
+}
+
+async function askGemini<T>(
+  system: string,
+  user: string,
+  model: TranslationModel,
+  onUsage?: (usage: Usage) => void,
+): Promise<T> {
+  const result = (await ai.run(
+    model.id as never,
+    {
+      systemInstruction: { parts: [{ text: system }] },
+      contents: [{ role: "user", parts: [{ text: user }] }],
+      generationConfig: {
+        temperature: 0,
+        maxOutputTokens: 8192,
+        responseMimeType: "application/json",
+        thinkingConfig: { thinkingBudget: 0 },
+      },
+    } as never,
+    { gateway: { id: "default", skipCache: true } } as never,
+  )) as GeminiAnswer;
+  const m = result.usageMetadata;
+  // Thinking is paid as output: counted with it, so the cost is right even if it isn't off.
+  if (onUsage && m)
+    onUsage({
+      prompt_tokens: m.promptTokenCount ?? 0,
+      completion_tokens: (m.candidatesTokenCount ?? 0) + (m.thoughtsTokenCount ?? 0),
+    });
+  const candidate = result.candidates?.[0];
+  const text = candidate?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
+  if (!text || (candidate?.finishReason && candidate.finishReason !== "STOP"))
+    throw new Error(
+      `${model.id} gave no complete answer (${candidate?.finishReason ?? "no content"})`,
+    );
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  try {
+    return JSON.parse(start >= 0 && end > start ? text.slice(start, end + 1) : text) as T;
+  } catch (error) {
+    // Say what came back, so a shape we don't read yet can be seen and fixed.
+    const parts = candidate?.content?.parts?.length ?? 0;
+    throw new Error(
+      `${model.id}'s answer isn't one JSON object (${parts} parts, ${m?.thoughtsTokenCount ?? 0} thinking tokens): ${String(error)}; it begins ${JSON.stringify(text.slice(0, 200))} and ends ${JSON.stringify(text.slice(-200))}`,
+    );
+  }
 }
 
 /**
@@ -364,12 +434,21 @@ export async function devTranslate(request: Request, token: string): Promise<Res
         : modelById(body.model)
       : modelFor(body.to);
     const usage: Usage[] = [];
-    const lines = await translateStrings(body.entries, {
-      ...body,
-      model,
-      onUsage: (u) => usage.push(u),
-    });
-    return Response.json({ lines, model: model.id, usage });
+    try {
+      const lines = await translateStrings(body.entries, {
+        ...body,
+        model,
+        onUsage: (u) => usage.push(u),
+      });
+      return Response.json({ lines, model: model.id, usage });
+    } catch (error) {
+      // What a failed request still cost, for whoever is counting (scripts/translations-measure.ts).
+      const unavailable = /not available/i.test(String(error));
+      return Response.json(
+        { error: String(error), model: model.id, usage },
+        { status: unavailable ? 503 : 502 },
+      );
+    }
   } catch (error) {
     // 503: no Void's AI here (Void's own message, "ai: Not available…"); 502: it answered
     // something unusable, for this request only.

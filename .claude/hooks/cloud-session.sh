@@ -2,7 +2,8 @@
 # Claude cloud sessions only (a Mac or a developer's machine is left alone). It gives the session
 # what a developer's machine already has, so Claude runs the same commands they do:
 #   - Vite+'s global `vp` (https://viteplus.dev/guide/global-cli), managing the Node in .node-version;
-#   - a system keyring, where `void` keeps the Cloudflare sign-in (a cloud session has none).
+#   - a system keyring (and secret-tool, to reach it), where `void` keeps the Cloudflare sign-in
+#     (a cloud session has none).
 # Run by .claude/settings.json: with `start` when a session starts (installs, once per machine),
 # and before each prompt to restart the keyring if it has stopped (this environment stops
 # background programs between turns). Before a prompt it only does that, which is instant.
@@ -24,10 +25,13 @@ if [ ! -x "$vpbin/vp" ]; then
 fi
 "$vpbin/vp" env on > /dev/null 2>&1
 
-if ! command -v gnome-keyring-daemon > /dev/null; then
-  $sudo apt-get install -y -q gnome-keyring > "$dir/apt.log" 2>&1 ||
-    { $sudo apt-get update -q > /dev/null 2>&1 && $sudo apt-get install -y -q gnome-keyring >> "$dir/apt.log" 2>&1; } ||
-    echo "cloud-session: installing gnome-keyring failed ($dir/apt.log)"
+# gnome-keyring keeps the secrets; secret-tool (libsecret-tools) is how Cloudflare's cf, which
+# `void cloudflare login` runs, reaches it ("secret-tool is required for OS keyring storage on
+# Linux", Void 1.8.0's sign-in, 2026-11-17).
+if ! command -v gnome-keyring-daemon > /dev/null || ! command -v secret-tool > /dev/null; then
+  $sudo apt-get install -y -q gnome-keyring libsecret-tools > "$dir/apt.log" 2>&1 ||
+    { $sudo apt-get update -q > /dev/null 2>&1 && $sudo apt-get install -y -q gnome-keyring libsecret-tools >> "$dir/apt.log" 2>&1; } ||
+    echo "cloud-session: installing gnome-keyring and secret-tool failed ($dir/apt.log)"
 fi
 fi
 
