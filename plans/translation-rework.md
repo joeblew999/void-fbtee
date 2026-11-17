@@ -138,6 +138,30 @@ Checked 2026-11-17 in Cloudflare's docs:
    `skills/void-fbtee-translate/SKILL.md`), the comments in `plugin.ts`, `translate.ts`, `ai.ts` and
    `queues/translate.ts`. Nothing left that describes the old way.
 
+## Step 1's results (2026-11-17, in a Claude cloud session)
+
+- **Credits: none yet.** AI Gateway's credit balance is 0, a card is on file, no top-up has ever
+  been made (`GET /accounts/{id}/ai-gateway/billing/credit-balance`, through the Cloudflare
+  connector). Gemini can't run until credits are loaded.
+- **fbtee keeps extra fields.** `prepareTranslationsBatchSync` kept a made-up field on an entry and
+  on a line of `th-TH.json` unchanged. So step 4's record goes in the catalog entry itself, not a
+  side file (`addVariants` to be covered by step 4's tests).
+- **Arabic for a count of 1 is right.** A `<fbt:plural>` makes two entries: the counted one (no
+  "one" line, as `pluralCategories()` intends) and its own entry for exactly 1, which is translated:
+  "1 seat left" → "تبقّى مقعد واحد", "You booked 1 night" → "حجزت ليلة واحدة". Nothing to fix.
+- **This cloud session can't run the translator.** Void isn't signed in to Cloudflare here
+  (`void cloudflare status`: "Not signed in"), and `vp run login` (`void connect --platform
+  cloudflare`) needs an interactive terminal or a `CLOUDFLARE_API_TOKEN`, which we don't put in
+  Claude. The Cloudflare connector refuses third-party models by design ("This server only runs
+  Workers AI models") and answered a Workers AI call with 401. So:
+  - Anything that calls a model runs where Void is signed in: `vp dev` on the Mac, or on
+    Cloudflare itself (a Worker Preview, `test:deployed`).
+  - A cloud session does the code, the checks (no AI in them), the reviews of what a Mac run wrote
+    to the catalogs and the review log, and the data fixes.
+  - Step 2's measurement is a `vp run` task the Mac runs; its results are committed, and the
+    session reviews them. The Mac's agent and this session coordinate through comments on the
+    work's PR.
+
 ## Done when
 
 - `vp build` fails on every problem `vp dev` checks for, including a wrong number of plural forms.
@@ -156,4 +180,7 @@ Checked 2026-11-17 in Cloudflare's docs:
 
 ## Found (follow-ups)
 
-- (filled in as the work goes)
+- `apps/example/void.lock.json` was behind `void.config.ts` after `397a1d4` (Workers Logs on):
+  `vp install` added `observability` and `browser` to it. Committed on its own.
+- The Cloudflare connector's Workers AI call returned 401 ("Reconnect to sign in again"): it may
+  lack the Workers AI permission. Only matters if a session is to call Workers AI through it.
