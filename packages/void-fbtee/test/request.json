@@ -1,0 +1,240 @@
+{
+  "about": "What each entry of entries.json should become, written by hand on 2026-11-18 from plans/translation-simple.md (\"The request\"): one Gemini request per entry, keyed by the entry's key, sent as each is to google/gemini-4-hydrogen. Each line is named by its plural form or gender (MARKS in src/plurals.ts), a count and a gender together by both, in fbtee's token order; an entry with no variation has one plain line. answers.json holds Gemini's answer to each.",
+  "requests": {
+    "label": {
+      "systemInstruction": {
+        "parts": [
+          {
+            "text": "You translate a web app's interface text from en-US into ar-EG. You get a description of where the text appears and its lines: one text, or one for each plural form or gender, named for it. Reply with its lines translated, under the same names."
+          }
+        ]
+      },
+      "contents": [
+        {
+          "role": "user",
+          "parts": [
+            {
+              "text": "{\"description\":\"Button on an event's page that books a seat\",\"lines\":\"Book a seat\"}"
+            }
+          ]
+        }
+      ],
+      "generationConfig": {
+        "thinkingConfig": { "thinkingLevel": "low" },
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "object",
+          "properties": { "lines": { "type": "string" } },
+          "required": ["lines"]
+        }
+      }
+    },
+    "time": {
+      "systemInstruction": {
+        "parts": [
+          {
+            "text": "You translate a web app's interface text from en-US into ar-EG. You get a description of where the text appears and its lines: one text, or one for each plural form or gender, named for it. Reply with its lines translated, under the same names."
+          }
+        ]
+      },
+      "contents": [
+        {
+          "role": "user",
+          "parts": [
+            {
+              "text": "{\"description\":\"When an event starts, on the reader's own clock; {time} is that time, already formatted\",\"lines\":\"Your time: {time}\"}"
+            }
+          ]
+        }
+      ],
+      "generationConfig": {
+        "thinkingConfig": { "thinkingLevel": "low" },
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "object",
+          "properties": { "lines": { "type": "string" } },
+          "required": ["lines"]
+        }
+      }
+    },
+    "seats": {
+      "systemInstruction": {
+        "parts": [
+          {
+            "text": "You translate a web app's interface text from en-US into ar-EG. You get a description of where the text appears and its lines: one text, or one for each plural form or gender, named for it. Reply with its lines translated, under the same names."
+          }
+        ]
+      },
+      "contents": [
+        {
+          "role": "user",
+          "parts": [
+            {
+              "text": "{\"description\":\"How many seats at an event are still free to book; {number} is the count\",\"lines\":{\"zero\":\"{number} seats left\",\"one\":\"{number} seats left\",\"two\":\"{number} seats left\",\"few\":\"{number} seats left\",\"many\":\"{number} seats left\",\"other\":\"{number} seats left\"}}"
+            }
+          ]
+        }
+      ],
+      "generationConfig": {
+        "thinkingConfig": { "thinkingLevel": "low" },
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "object",
+          "properties": {
+            "lines": {
+              "type": "object",
+              "properties": {
+                "zero": { "type": "string" },
+                "one": { "type": "string" },
+                "two": { "type": "string" },
+                "few": { "type": "string" },
+                "many": { "type": "string" },
+                "other": { "type": "string" }
+              },
+              "required": ["zero", "one", "two", "few", "many", "other"]
+            }
+          },
+          "required": ["lines"]
+        }
+      }
+    },
+    "booked": {
+      "systemInstruction": {
+        "parts": [
+          {
+            "text": "You translate a web app's interface text from en-US into ar-EG. You get a description of where the text appears and its lines: one text, or one for each plural form or gender, named for it. Reply with its lines translated, under the same names."
+          }
+        ]
+      },
+      "contents": [
+        {
+          "role": "user",
+          "parts": [
+            {
+              "text": "{\"description\":\"Someone booked a seat at an event, worded by their gender; {name} is their name\",\"lines\":{\"male\":\"{name} booked a seat\",\"female\":\"{name} booked a seat\",\"unknown\":\"{name} booked a seat\"}}"
+            }
+          ]
+        }
+      ],
+      "generationConfig": {
+        "thinkingConfig": { "thinkingLevel": "low" },
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "object",
+          "properties": {
+            "lines": {
+              "type": "object",
+              "properties": {
+                "male": { "type": "string" },
+                "female": { "type": "string" },
+                "unknown": { "type": "string" }
+              },
+              "required": ["male", "female", "unknown"]
+            }
+          },
+          "required": ["lines"]
+        }
+      }
+    },
+    "booked-seats": {
+      "systemInstruction": {
+        "parts": [
+          {
+            "text": "You translate a web app's interface text from en-US into ar-EG. You get a description of where the text appears and its lines: one text, or one for each plural form or gender, named for it. Reply with its lines translated, under the same names."
+          }
+        ]
+      },
+      "contents": [
+        {
+          "role": "user",
+          "parts": [
+            {
+              "text": "{\"description\":\"Someone booked seats at an event, worded by their gender; {name} is their name and {number} how many seats\",\"lines\":{\"zero, male\":\"{name} booked {number} seats\",\"zero, female\":\"{name} booked {number} seats\",\"zero, unknown\":\"{name} booked {number} seats\",\"one, male\":\"{name} booked {number} seats\",\"one, female\":\"{name} booked {number} seats\",\"one, unknown\":\"{name} booked {number} seats\",\"two, male\":\"{name} booked {number} seats\",\"two, female\":\"{name} booked {number} seats\",\"two, unknown\":\"{name} booked {number} seats\",\"few, male\":\"{name} booked {number} seats\",\"few, female\":\"{name} booked {number} seats\",\"few, unknown\":\"{name} booked {number} seats\",\"many, male\":\"{name} booked {number} seats\",\"many, female\":\"{name} booked {number} seats\",\"many, unknown\":\"{name} booked {number} seats\",\"other, male\":\"{name} booked {number} seats\",\"other, female\":\"{name} booked {number} seats\",\"other, unknown\":\"{name} booked {number} seats\"}}"
+            }
+          ]
+        }
+      ],
+      "generationConfig": {
+        "thinkingConfig": { "thinkingLevel": "low" },
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "object",
+          "properties": {
+            "lines": {
+              "type": "object",
+              "properties": {
+                "zero, male": { "type": "string" },
+                "zero, female": { "type": "string" },
+                "zero, unknown": { "type": "string" },
+                "one, male": { "type": "string" },
+                "one, female": { "type": "string" },
+                "one, unknown": { "type": "string" },
+                "two, male": { "type": "string" },
+                "two, female": { "type": "string" },
+                "two, unknown": { "type": "string" },
+                "few, male": { "type": "string" },
+                "few, female": { "type": "string" },
+                "few, unknown": { "type": "string" },
+                "many, male": { "type": "string" },
+                "many, female": { "type": "string" },
+                "many, unknown": { "type": "string" },
+                "other, male": { "type": "string" },
+                "other, female": { "type": "string" },
+                "other, unknown": { "type": "string" }
+              },
+              "required": [
+                "zero, male",
+                "zero, female",
+                "zero, unknown",
+                "one, male",
+                "one, female",
+                "one, unknown",
+                "two, male",
+                "two, female",
+                "two, unknown",
+                "few, male",
+                "few, female",
+                "few, unknown",
+                "many, male",
+                "many, female",
+                "many, unknown",
+                "other, male",
+                "other, female",
+                "other, unknown"
+              ]
+            }
+          },
+          "required": ["lines"]
+        }
+      }
+    },
+    "Oc/9PrbjfyLHS60BXceD1A==": {
+      "systemInstruction": {
+        "parts": [
+          {
+            "text": "You translate a web app's interface text from en-US into ar-EG. You get a description of where the text appears and its lines: one text, or one for each plural form or gender, named for it. Reply with its lines translated, under the same names."
+          }
+        ]
+      },
+      "contents": [
+        {
+          "role": "user",
+          "parts": [
+            {
+              "text": "{\"description\":\"A list of items of various types, for example: \\\"San Francisco; London; Tokyo\\\". {previous items} and {following items} are themselves lists that contain one or more items.\",\"lines\":\"{previous items}; {following items}\"}"
+            }
+          ]
+        }
+      ],
+      "generationConfig": {
+        "thinkingConfig": { "thinkingLevel": "low" },
+        "responseMimeType": "application/json",
+        "responseJsonSchema": {
+          "type": "object",
+          "properties": { "lines": { "type": "string" } },
+          "required": ["lines"]
+        }
+      }
+    }
+  }
+}

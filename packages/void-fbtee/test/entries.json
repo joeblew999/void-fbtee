@@ -1,0 +1,78 @@
+{
+  "about": "Test data for the package's translation code, written by hand on 2026-11-18 (plans/translation-simple.md, step 1): six new entries of an ar-EG catalog in fbtee's format, with their English still in place, as fbtee prepares them. Made up for the tests, not taken from the example app; the list joiner is fbtee's own (node_modules/fbtee/Strings.json). request.json is what each should become; answers.json is Gemini's real answer to it.",
+  "locale": "ar-EG",
+  "translations": {
+    "label": {
+      "description": "Button on an event's page that books a seat",
+      "status": "new",
+      "tokens": [],
+      "translations": [{ "translation": "Book a seat", "variations": {} }],
+      "types": []
+    },
+    "time": {
+      "description": "When an event starts, on the reader's own clock; {time} is that time, already formatted",
+      "status": "new",
+      "tokens": [],
+      "translations": [{ "translation": "Your time: {time}", "variations": {} }],
+      "types": []
+    },
+    "seats": {
+      "description": "How many seats at an event are still free to book; {number} is the count",
+      "status": "new",
+      "tokens": ["number"],
+      "translations": [
+        { "translation": "{number} seats left", "variations": { "0": 16 } },
+        { "translation": "{number} seats left", "variations": { "0": 4 } },
+        { "translation": "{number} seats left", "variations": { "0": 8 } },
+        { "translation": "{number} seats left", "variations": { "0": 20 } },
+        { "translation": "{number} seats left", "variations": { "0": 12 } },
+        { "translation": "{number} seats left", "variations": { "0": 24 } }
+      ],
+      "types": [28]
+    },
+    "booked": {
+      "description": "Someone booked a seat at an event, worded by their gender; {name} is their name",
+      "status": "new",
+      "tokens": ["name"],
+      "translations": [
+        { "translation": "{name} booked a seat", "variations": { "0": 1 } },
+        { "translation": "{name} booked a seat", "variations": { "0": 2 } },
+        { "translation": "{name} booked a seat", "variations": { "0": 3 } }
+      ],
+      "types": [3]
+    },
+    "booked-seats": {
+      "description": "Someone booked seats at an event, worded by their gender; {name} is their name and {number} how many seats",
+      "status": "new",
+      "tokens": ["number", "name"],
+      "translations": [
+        { "translation": "{name} booked {number} seats", "variations": { "0": 16, "1": 1 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 16, "1": 2 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 16, "1": 3 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 4, "1": 1 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 4, "1": 2 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 4, "1": 3 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 8, "1": 1 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 8, "1": 2 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 8, "1": 3 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 20, "1": 1 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 20, "1": 2 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 20, "1": 3 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 12, "1": 1 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 12, "1": 2 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 12, "1": 3 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 24, "1": 1 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 24, "1": 2 } },
+        { "translation": "{name} booked {number} seats", "variations": { "0": 24, "1": 3 } }
+      ],
+      "types": [28, 3]
+    },
+    "Oc/9PrbjfyLHS60BXceD1A==": {
+      "description": "A list of items of various types, for example: \"San Francisco; London; Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",
+      "status": "new",
+      "tokens": [],
+      "translations": [{ "translation": "{previous items}; {following items}", "variations": {} }],
+      "types": []
+    }
+  }
+}

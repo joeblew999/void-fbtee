@@ -9,7 +9,7 @@ Today every request to Gemini carries ~1,400 tokens of rules (built for Gemma 4,
 answers are matched back by position, and every finished translation is judged by the same rules
 when `vp dev` starts and at `vp build`. One that fails is set back to "new" and translated
 again. Requests sent by hand on 2026-11-18 showed Gemini needs none of the rules. So: one model,
-one plain request with the locale codes, answers matched by key, and a check of only what can break
+one plain request with the locale codes, answers matched by name, and a check of only what can break
 the app. The rules, their checks and the tests built on them go.
 
 This covers everything the package translates: the app's strings, its Markdown pages, and posts
@@ -35,16 +35,17 @@ people write at runtime (the example's events).
 - One string per request, 4 requests at once. Batching goes (`BATCH` in `models.ts`, 50 a
   request, set for Gemini 3.5 Flash): Hydrogen's thinking grew with the strings sent (one: 57–88
   tokens; two: 520–690), so it saves little; one per request needs no batching code, and a bad
-  answer loses one string. About $0.001 a string, well under a dollar a language.
+  answer loses one string. Measured in step 1: US$0.0013 for a plain label to US$0.010 for 18
+  lines (a count and a gender), mostly thinking; a few hundred strings for a language is US$1–2.
 - Only the text is sent. The code around each string (`sourceContext`), the words to keep
   (`keptTerms`) and the glossary (`glossaryFor`, `glossaryMisses`) go: every request sent without
   them on 2026-11-18 came back right.
 
-| What        | Sent as                                                                                                                                                                                                                                                                      | Example                                                                                    |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| App strings | each new catalog entry under its fbtee key: its description and its lines, each line named by its form (`one`, `few`, `female`, `few, female`) via `MARKS` in `plurals.ts`; the English from fbtee's collected strings (`freshCatalog`, `catalogs.ts`), not the catalog line | `{"pyuIHcl…": {"description": "…", "lines": {"one": "{number} seat left", "other": "…"}}}` |
-| Posts       | each field under its name                                                                                                                                                                                                                                                    | `{"title": "…", "description": "…"}`                                                       |
-| Pages       | the whole Markdown page, answered as Markdown, not JSON; told to keep code blocks (their comments too), links, components and frontmatter keys                                                                                                                               | `pages/en-US/docs/tour.md`                                                                 |
+| What        | Sent as                                                                                                                                                                                                                                                                                                                                          | Example                                                                      |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| App strings | one new catalog entry, on its own (so no key): its description and its lines, one plain line or each named by its form (`one`, `few`, `female`, `few, female`) via `MARKS` in `plurals.ts`; the English from fbtee's collected strings (`freshCatalog`, `catalogs.ts`), not the catalog line. Exactly as `packages/void-fbtee/test/request.json` | `{"description": "…", "lines": {"one": "{number} seat left", "other": "…"}}` |
+| Posts       | each field under its name                                                                                                                                                                                                                                                                                                                        | `{"title": "…", "description": "…"}`                                         |
+| Pages       | the whole Markdown page, answered as Markdown, not JSON; told to keep code blocks (their comments too), links, components and frontmatter keys                                                                                                                                                                                                   | `pages/en-US/docs/tour.md`                                                   |
 
 One plain function builds the request and reads the answer, used by the dev route for strings and
 by the post queue. It replaces `translateStrings` and `translate` in `ai.ts`, and
@@ -53,10 +54,12 @@ above in place of the rules.
 
 ## The answer back
 
-1. Each key onto the entry with that key; each line onto the line with that name. Never by
-   position. A key not sent is ignored; a key missing leaves the entry `"new"`.
+1. Each line onto the entry's line with that name (a post: each field onto the field of that
+   name). Never by position. A name not sent is ignored; one missing leaves the entry `"new"`.
 2. The English line's leading and trailing spaces put back (`spaced`, `translate.ts`).
-3. Checked: no line empty, every `{placeholder}` there and none extra, every line there. If not,
+3. Checked: no line empty, every `{placeholder}` there and none extra, every line there. A form
+   for one number alone may say its number in words and drop `{number}`, as today's check allows
+   (`forOneNumber`, `judge.ts`): step 1's Arabic "two" came back "باقي مكانين", rightly. If not,
    asked once more on its own with the reason; still wrong, left `"new"` for Claude Code (a post:
    left for the queue's next retry).
 4. Strings: written as now (`translateWithVoidAi`): the file read again, only entries still
@@ -84,19 +87,20 @@ string per request makes it exact. (`tokens` is taken: fbtee uses it.)
 
 - `GEMINI`: `id: "google/gemini-4-hydrogen"` and its price, `{ input: 1.5, output: 7.5 }` US$ per
   million tokens, with its source (Google's Gemini pricing page) and the date checked.
-- `Usage` with the thinking tokens as well as in and out, and `costOf` counting thinking as output.
+- `Usage` with the thinking tokens as well as in and out (today's `ask` in `ai.ts` already adds
+  Gemini's `thoughtsTokenCount` to the output, so the cost was right; `Usage` keeps them apart so
+  `usage` can show them), and `costOf` counting thinking as output.
 - `paymentProblem` and `paymentAdvice`, unchanged: they tell "credits used up" (402) and "spend
   limit reached" (429) apart, so the post queue waits an hour instead of failing.
 
 Going from it: the header about Gemini 3.5 Flash, wuchale and the Gemma measurement, the old id and
 price ("from Cloudflare's catalog page"), and `BATCH`.
 
-Step 1 checks the token counts first (below), so the US$ is what's paid.
-
 ## What `vp dev` and `vp build` check (`check.ts`)
 
 - Stays: anything untranslated fails the build; every translation says who made it
-  (`translatedBy`); every line there, none empty, every placeholder kept.
+  (`translatedBy`); every line there, none empty, every placeholder kept (a form for one number
+  alone may drop `{number}`).
 - Goes: judging finished translations by the rules (the script, "still the source text", kept
   words, `grammar.json`, wording; `problemsWith` in `judge.ts`).
 - Goes: `reopenFailing` (`check.ts`, called by `plugin.ts` when `vp dev` translates), which sets
@@ -106,11 +110,11 @@ Step 1 checks the token counts first (below), so the US$ is what's paid.
 ## Order of the work
 
 1. **The test data, by hand, before any code,** so the code is tested against something it didn't
-   make: `test/entries.json` and `test/request.json` written from this plan's shapes, then one
-   request (`cf ai run google/gemini-4-hydrogen --body @test/request.json`, one sign-in you
-   approve), into `th-TH`. The answer, untouched, becomes `test/answers.json`. Its token counts are compared with the request's AI Gateway log, to see
-   whether the `usage` Cloudflare returns includes Hydrogen's thinking (billed as output). If it
-   doesn't, `costOf` (`models.ts`) adds the thinking, so `vp dev`'s "US$…" line is what's paid.
+   make: `test/entries.json` and `test/request.json` written from this plan's shapes, then each
+   request sent (`cf ai run google/gemini-4-hydrogen --body <it>`), into `ar-EG` (all six plural
+   forms and the genders; Thai has one form). The answers, untouched, are `test/answers.json`.
+   Done 2026-11-18: all six right in shape, US$0.025 together; the token counts include the
+   thinking as `thoughtsTokenCount`.
 2. The code.
 3. The tests and docs.
 4. `vp check`, `test:unit`, `test:dev`, `test:preview`. Commit; push only when you say.
@@ -250,7 +254,8 @@ New:
   - `entries.json`: six entries as a catalog holds them, `"status": "new"`: a label, a `{time}`
     sentence, a plural, a gender line, count and gender, a list joiner.
   - `request.json`: the request those six should become, exactly.
-  - `answers.json`: Hydrogen's real answer to it, with model, date and gateway log id.
+  - `answers.json`: Hydrogen's real answers to it, as they came, with model, date and each
+    answer's `responseId` (`cf ai run` doesn't show AI Gateway's log id).
 - `test/unit/translate-entries.test.ts`: our function on that data, both ways: `entries.json`
   gives exactly `request.json`; `answers.json` is written back onto the right keys and lines,
   with `usage` from its token counts.
@@ -291,8 +296,8 @@ Other models or a model option; simplifying the post queue, cron and markers; th
 | dessert post, th-TH → en-US                | Hydrogen  | right                        | 263 / 58 / 136             | $0.0018 |
 | "Your time: {time}" by key                 | Hydrogen  | right, under its key         | 321 / 53 / 88              | $0.0015 |
 
-Hydrogen is $1.50 / $7.50 per million tokens; a few hundred strings for a language is about a
-dollar.
+Hydrogen is $1.50 / $7.50 per million tokens; a few hundred strings for a language is US$1–2
+(step 1's six strings: US$0.025).
 
 Sources (checked 2026-11-18): Google's
 [Gemini 3.5 notes](https://ai.google.dev/gemini-api/docs/generate-content/whats-new-gemini-3.5),
