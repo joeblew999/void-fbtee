@@ -173,8 +173,49 @@ the pages' way:
   there would mean reading and hashing every post every hour.
 - A translation with no hash (all made before this) counts as current: nothing already translated
   is translated again.
-- The example can't show it (events can be posted and deleted, not edited); a test in
-  `e2e/dev/jobs.test.ts` edits a post's row and checks the queue translates it again.
+- The example shows it: its events can be changed (next section).
+
+## Changing an event (the example)
+
+The example can post and delete an event, not change one. It gets that, so an edited post goes
+through the translation system for real.
+
+- **Who:** only the poster, with the same private link that deletes it (`#key=…`,
+  `src/events/delete-key.ts`; its SHA-256 in `events.delete_key_hash`). The event page shows
+  "Change" beside "Delete" to whoever has the key. A wrong or missing key is a 403. The sample
+  events have no key, so nobody can change them. The file and column keep their names (renaming
+  the column would mean a data migration); their comments say the key changes and deletes.
+- **Where:** `pages/[lang]/events/[id]/edit.tsx` and `.server.ts`: the posting form
+  (`new.tsx`), filled in with the event as it is. The key goes in the request body from the
+  page's `#`, as deleting sends it.
+- **What can change:** title, description, venue, start (time and zone), seats (never below the
+  seats booked). Not its language: it stays the one it was written in.
+- **On saving, in order:** the row updated (`updatedAt`); `translateSoon("events", id)`, which
+  finds the translations' hash no longer matches and translates again; its pages cleared from
+  Void's cache in every language (`eventPages(id)`); pages open on it told it changed
+  (`src/events/live.ts`), and they reload; its bookings' stored PDF tickets deleted, since they
+  show the title, time and venue, so the next download prints the new one; the bookers emailed
+  (below).
+- **Who's emailed:** everyone booked, when the title, time or venue changed: what's on their
+  ticket and what gets them there. Not for the description or seats alone. The poster only if
+  they booked.
+- **The email** (`changeEmail` in `src/events/emails.ts`, sent by a new `queues/change.ts`, one
+  message per booking, as `queues/cancel.ts` does): in the language they booked in, saying what
+  changed (the old time and the new, on their clock and the event's; the new venue; the new
+  title), with the link to the event and its ticket. The title as they read it: the queue waits
+  until the translation into their language matches the post's hash, retrying a minute apart; on
+  the last try it sends with the title as written, marked with its language, as the page shows it.
+- **Reminders:** `crons/reminders.ts` reads the start as it is now, so a changed event is reminded
+  at its new time. One moved to within the next day may miss the daily reminder; the change email
+  covers it.
+- **Tests,** in `e2e/dev/events.test.ts`:
+  - The poster changes the title and the time of a booked event. A booker in Arabic gets the
+    change email in Arabic with the new Arabic title. The translations are made again, with the
+    new hash. An open page shows the change. The stored ticket is gone, and the next download has
+    the new time.
+  - A description-only change emails nobody, and is still translated again.
+  - Another event's key, or none, gets a 403 and changes nothing.
+  - `changeEmail` in each language joins the other emails' tests (`src/events/emails.test.ts`).
 
 A deleted post: the example deletes events already (the poster's private link, `remove` in
 `pages/[lang]/events/[id].server.ts`), and its translations go with it, by the database
@@ -216,8 +257,9 @@ Old, in `packages/void-fbtee/test/unit/`:
 | `fixture/`                                          | kept; its entry falsely labelled `"claude"` fixed |
 | `e2e/fresh/check.ts`, `e2e/preview/strings.test.ts` | the skill files a new app gets                    |
 
-`e2e/dev/jobs.test.ts` gains the edited-post test; `e2e/dev/events.test.ts` gains the
-deleted-before-translated test, and its delete test the check on translation rows (above). Everything else runs unchanged, including the post test already in
+`e2e/dev/events.test.ts` gains the changed-event tests, the deleted-before-translated test, and
+its delete test the check on translation rows (above). Everything else runs unchanged, including
+the post test already in
 `e2e/dev/events.test.ts`, which waits for real Gemini to translate a new post: it now goes through
 the new function.
 
