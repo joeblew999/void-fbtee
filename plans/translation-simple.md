@@ -191,8 +191,9 @@ Old, in `packages/void-fbtee/test/unit/`:
 | `fixture/`                                          | kept; its entry falsely labelled `"claude"` fixed |
 | `e2e/fresh/check.ts`, `e2e/preview/strings.test.ts` | the skill files a new app gets                    |
 
-Everything else runs unchanged, including `e2e/dev/events.test.ts`, which already creates a post
-in dev and waits for real Gemini to translate it: it now goes through the new function.
+`e2e/dev/jobs.test.ts` gains the edited-post test (above). Everything else runs unchanged,
+including `e2e/dev/events.test.ts`, which already creates a post in dev and waits for real Gemini
+to translate it: it now goes through the new function.
 
 ## Not in this change
 
