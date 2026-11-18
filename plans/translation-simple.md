@@ -153,6 +153,21 @@ Step 1 checks the token counts first (below), so the US$ is what's paid.
 It picks which post translation a page shows (`textLocales`, `server.ts`) and which catalogs a page
 preloads. The example has no fallbacks, so nothing there changes; a unit test covers it.
 
+An edited post keeps its old translation for good: its translation doesn't record which version of
+the post it was made from, and `untranslated` (`content.ts`) only asks whether one exists. Pages
+already record it (`translatedFrom`); strings needn't (fbtee's key changes with the English). Fixed
+the pages' way:
+
+- Each post translation stores a hash of the post's fields as they were (`translated_from`, a new
+  column beside `usage`: one migration for both).
+- `untranslated` counts a translation whose hash differs from the post's as missing, and
+  `storeTranslation` replaces it. An app that edits a post calls `translateSoon`, as on create;
+  the nightly cron (`reconcile`) catches any it didn't.
+- A translation with no hash (all made before this) counts as current: nothing already translated
+  is translated again.
+- The example can't show it (events are only created, `pages/[lang]/events/new.server.ts`); a
+  test in `e2e/dev/jobs.test.ts` edits a post's row and checks the queue translates it again.
+
 ## Tests
 
 New:
@@ -183,13 +198,6 @@ in dev and waits for real Gemini to translate it: it now goes through the new fu
 
 Other models or a model option; simplifying the post queue, cron and markers; the fbtee asks
 (`plans/fbtee-issues.md` #3, filed only with your OK).
-
-Found on the way, for its own change: a post's translation doesn't record which version of the
-post it was made from. Pages do (`translatedFrom`); strings needn't (fbtee's key changes with the
-English). So a post edited after it's translated keeps the old translation for good:
-`untranslated` (`content.ts`) only asks whether one exists. The example can't show it (events are
-only created, `pages/[lang]/events/new.server.ts`), but any app that edits posts would. The fix:
-record a hash of the post's fields with each translation, and translate again when it changes.
 
 ## Evidence (2026-11-18, `cf ai run`)
 
