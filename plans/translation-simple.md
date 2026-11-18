@@ -105,9 +105,10 @@ Step 1 checks the token counts first (below), so the US$ is what's paid.
 
 ## Order of the work
 
-1. **One request by hand** (`cf ai run google/gemini-4-hydrogen --body @request.json`, one sign-in
-   you approve): the six test entries (below), into `th-TH`. The answer, untouched, becomes
-   `test/answers.json`. Its token counts are compared with the request's AI Gateway log, to see
+1. **The test data, by hand, before any code,** so the code is tested against something it didn't
+   make: `test/entries.json` and `test/request.json` written from this plan's shapes, then one
+   request (`cf ai run google/gemini-4-hydrogen --body @test/request.json`, one sign-in you
+   approve), into `th-TH`. The answer, untouched, becomes `test/answers.json`. Its token counts are compared with the request's AI Gateway log, to see
    whether the `usage` Cloudflare returns includes Hydrogen's thinking (billed as output). If it
    doesn't, `costOf` (`models.ts`) adds the thinking, so `vp dev`'s "US$…" line is what's paid.
 2. The code.
@@ -245,11 +246,14 @@ The rows are read through the dev server's local explorer (`/cdn-cgi/local/explo
 
 New:
 
-- Test data of its own, not the example's: `test/entries.json` (six entries: a label, a `{time}`
-  sentence, a plural, a gender line, count and gender, a list joiner) and `test/answers.json`
-  (Hydrogen's real answer to them from step 1, with model, date and gateway log id).
-- `test/unit/translate-entries.test.ts`: our function on that data, both ways, including the
-  `usage` written from the recorded answer's token counts.
+- Test data of its own, not the example's, made by hand in step 1 (in `packages/void-fbtee/test/`):
+  - `entries.json`: six entries as a catalog holds them, `"status": "new"`: a label, a `{time}`
+    sentence, a plural, a gender line, count and gender, a list joiner.
+  - `request.json`: the request those six should become, exactly.
+  - `answers.json`: Hydrogen's real answer to it, with model, date and gateway log id.
+- `test/unit/translate-entries.test.ts`: our function on that data, both ways: `entries.json`
+  gives exactly `request.json`; `answers.json` is written back onto the right keys and lines,
+  with `usage` from its token counts.
 - `test:dev`: the same entries sent to the dev route (which writes nothing), real Gemini, checking
   keys, lines and placeholders, not wording.
 
