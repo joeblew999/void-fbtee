@@ -44,6 +44,15 @@ message: {"pyuIHcl9IjiwEfzc6+OZQw==": {"description": "How many seats at an even
 schema:  the same keys, each with the same line names, all required
 ```
 
+The English comes from what fbtee collects from the code (the collected strings `freshCatalog` in
+`catalogs.ts` uses), never from the entry's line in the file: that line holds the English only
+while the entry is new, and the translation after. Today's code reads the line (`toSend` in
+`translate.ts`).
+
+One plain function, with no file access, turns entries into the request and the answer back into
+entries. The plugin (in Node, which reads the files) uses it for the catalogs; the app's Worker uses
+it for runtime content. One piece of code to test, wherever it runs.
+
 **Pages** (one Markdown page per request; the answer is the page, no JSON)
 
 ```
@@ -92,14 +101,29 @@ translation that loses one: checked 2026-11-18, `plans/fbtee-issues.md` #3).
 
 The same function the app uses, from a running `vp dev`, with one HTTP request and nothing
 written: the dev server's route (`POST /__void-fbtee/translate`, `devTranslate` in `ai.ts`, with
-the token in `node_modules/.void-fbtee/dev-token`) takes entries in the catalog's own shape, the
-locales and an optional `"dryRun": true`, and answers with the request that went to Gemini, the
+the token in `node_modules/.void-fbtee/dev-token`) takes new entries in the catalog's own shape,
+the locales and an optional `"dryRun": true`, and answers with the request that went to Gemini, the
 answer, the entries as they would be written into the file, and the tokens and cost. Any entry, in
 any language, in seconds; the deploy cycle is never needed to see what Gemini gives back.
 
 Before something is in the code, a request shape is tried by hand with Cloudflare's CLI, as on
 2026-11-18: `cf ai run google/gemini-4-hydrogen --body @request.json` (signed in with
 `cf auth login --no-use-keyring`, which needs the user's approval once).
+
+## To settle by test before the code
+
+Three questions today's tests didn't answer, each settled by real requests with `cf ai run` before
+the code is written, and written into this plan with the result:
+
+1. **The code around each string, the words to keep exactly, and the glossary of the app's own
+   terms**, which today's requests send and today's tests didn't. Ten real entries (a plain label,
+   technical words, a time slot, a plural, a gender line, an email sentence) into `th-TH` and
+   `ar-EG`, with and without them. If the answers are as good without, they go; if not, they stay
+   in the request and this plan shows them.
+2. **A string that varies by a count and a gender at once** (none in the example; made up for the
+   test), its lines named by both (`few, female`): that Gemini fills every combination.
+3. **fbtee's 12 built-in strings** (the list joiners, `{number}+`, `<{number}`), with their English
+   and descriptions from fbtee's `Strings.json`.
 
 ## How we'll know it's right
 
@@ -122,6 +146,7 @@ Before something is in the code, a request shape is tried by hand with Cloudflar
 - Matching answers by position (`translateCatalog` in `translate.ts`), and the separate post
   translator (`translate()` in `ai.ts`).
 - `thinkingBudget`, `temperature`, the schema pasted into the prompt, language names.
+- Taking a new entry's English from its line in the file (`toSend` in `translate.ts`).
 - Today's uncommitted changes, except where kept below: the per-language rule picking, the capitals
   sentence and the small-letter check, the dev-only "no rules" switch and posts on the dev route.
 
@@ -141,6 +166,9 @@ Before something is in the code, a request shape is tried by hand with Cloudflar
   content, where fbtee's own messages use them. Fixed here.
 
 ## Not in this change
+
+- Retranslating anything already translated: this changes no existing translation, and offers no
+  way to redo one.
 
 - Simplifying what grew around posts (the queue, the "queued" markers, the nightly cron, the
   middleware). Runtime content moving to the catalog entry shape makes the markers unnecessary;
