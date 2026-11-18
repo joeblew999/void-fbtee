@@ -101,9 +101,15 @@ deleted, and `test:fresh` proves a new `void init` app gets all of it from the p
 ## Found (follow-ups)
 
 - **Void 1.8.0 can't build a new app today** (not void-fbtee's): its range for
-  `@cloudflare/vite-plugin` takes `2.0.0-rc.0`, whose output Void can't read. README "Reported to
-  Void" has it, not yet filed (filing needs the user's OK); `test:fresh` pins its apps meanwhile.
+  `@cloudflare/vite-plugin` takes `2.0.0-rc.0`, whose output Void can't read; and since Vite+
+  1.7.0 (2026-11-17) the Vite+ range `void init` writes can't take the core Vite+ needs. README
+  "Reported to Void" has both, not yet filed (filing needs the user's OK); `test:fresh` pins its
+  apps meanwhile (`pinUpstream`).
 
 - Gemini left an English word in a Thai post ("ว่ายน้ำชมพระอาทิตย์ขึ้นที่ Harbour", for "Harbour
   sunrise swim"). What people post isn't run through the checks the app's own text is
   (judge.ts): it should be, before it's stored, with one retry told what was wrong.
+  Fixed (2026-11-18): `postProblems` in judge.ts (an empty field, the line checks, and for a
+  language not in Latin letters a capitalised Latin word kept from the original, unless it's a
+  name); `translate()` in ai.ts asks once more with the problems listed, keeps the better answer
+  and warns if any are left.

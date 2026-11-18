@@ -16,6 +16,7 @@ import { ai } from "void/ai";
 import skill from "../skills/void-fbtee-translate/SKILL.md?raw";
 import { GEMINI, paymentProblem, paymentAdvice, type Usage } from "./models";
 import { MARKS } from "./plurals";
+import { postProblems } from "./judge";
 
 export { GEMINI, paymentProblem, paymentAdvice, type Usage };
 
@@ -142,25 +143,50 @@ export async function translate<K extends string>(
   { from, to, about, ...track }: { from: string; to: string; about: string } & Track,
 ): Promise<Record<K, string>> {
   const keys = Object.keys(fields) as K[];
-  const out = await ask<Record<K, string>>(
-    instructions(
-      "post",
-      about,
-      { from, to },
-      "Reply with JSON only: an object with the same keys.",
-    ),
-    // The language to write in, said again with the text, as the strings' request says it: given
-    // only in the system prompt, a model has answered with the text unchanged (a Thai post left in
-    // English, AI Gateway's logs, 2026-11-16).
-    `Translate from ${named(from)} into ${named(to)}:\n${JSON.stringify(fields)}`,
-    {
-      type: "object",
-      properties: Object.fromEntries(keys.map((k) => [k, { type: "string" }])),
-      required: keys,
-    },
-    { ...track, kind: "post" },
-  );
-  return Object.fromEntries(keys.map((k) => [k, String(out[k] ?? "")])) as Record<K, string>;
+  // Each answer's own log: the one kept is the one reported (track.onLog), with its tokens.
+  const once = async (feedback: string[]) => {
+    let logId: string | undefined;
+    const out = await ask<Record<K, string>>(
+      instructions(
+        "post",
+        about,
+        { from, to },
+        "Reply with JSON only: an object with the same keys.",
+      ),
+      // The language to write in, said again with the text, as the strings' request says it: given
+      // only in the system prompt, a model has answered with the text unchanged (a Thai post left
+      // in English, AI Gateway's logs, 2026-11-16).
+      `Translate from ${named(from)} into ${named(to)}:\n${JSON.stringify(fields)}` +
+        (feedback.length
+          ? `\n\nYour last answer had these problems; fix them:\n- ${feedback.join("\n- ")}`
+          : ""),
+      {
+        type: "object",
+        properties: Object.fromEntries(keys.map((k) => [k, { type: "string" }])),
+        required: keys,
+      },
+      { ...track, kind: "post", onLog: (id) => (logId = id) },
+    );
+    const answer = Object.fromEntries(keys.map((k) => [k, String(out[k] ?? "")])) as Record<
+      K,
+      string
+    >;
+    return { answer, logId, problems: postProblems(fields, answer, from, to) };
+  };
+  // Checked as the app's own text is (judge.ts postProblems); asked once more, told what was
+  // wrong, and the better of the two kept.
+  const first = await once([]);
+  let best = first;
+  if (first.problems.length) {
+    const second = await once(first.problems);
+    if (second.problems.length <= first.problems.length) best = second;
+    if (best.problems.length)
+      console.warn(
+        `void-fbtee: a post's translation into ${to} still has: ${best.problems.join(" ")}`,
+      );
+  }
+  if (best.logId) track.onLog?.(best.logId);
+  return best.answer;
 }
 
 /** What's translated: the app's `<fbt>` text, what people post, a markdown page. */

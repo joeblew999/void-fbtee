@@ -189,7 +189,7 @@ for (const target of targets) {
     `${target}: void init made a ${app.pm} app`,
   );
   strict(dir, app.pm);
-  pinCloudflarePlugin(dir, app.pm);
+  pinUpstream(dir, app.pm);
 
   const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
   if (app.source === "git") {
@@ -858,17 +858,34 @@ async function translatedContent(target: string, dir: string, app: App) {
 }
 
 /**
- * Void 1.8.0 asks for "@cloudflare/vite-plugin": "^2.0.0-beta.v.15", a range that also takes
- * 2.0.0-rc.0 (2026-11-17), which writes its build to .cloudflare/output/v1 while Void 1.8.0 reads
- * v0: every new Void 1.8.0 app's `vp build` fails ("no root config found"), void-fbtee or not
- * (README "Reported to Void"). So the fresh apps use the version this repo's lockfile has, the way
- * each package manager pins one: pnpm's overrides in pnpm-workspace.yaml, npm's in package.json.
+ * Two upstream releases break every new Void 1.8.0 app, void-fbtee or not (README "Reported to
+ * Void"), so the fresh apps use the versions this repo has:
+ * - Void asks for "@cloudflare/vite-plugin": "^2.0.0-beta.v.15", which also takes 2.0.0-rc.0
+ *   (2026-11-17); that writes its build to .cloudflare/output/v1 where Void reads v0 ("no root
+ *   config found"). Pinned to the lockfile's version, the way each package manager pins one:
+ *   pnpm's overrides in pnpm-workspace.yaml, npm's in package.json.
+ * - `void init` writes "vite-plus": "^1.6.0" and "vite": "npm:@voidzero-dev/vite-plus-core@^1.6.0".
+ *   Vite+ 1.7.0 (2026-11-17) needs its core at 8.3.8000, which that range can't take, so
+ *   `vp build` stops ("Failed to resolve vite command"). Pinned to the catalog in
+ *   pnpm-workspace.yaml, in the app's own devDependencies (Vite+ apps only).
  */
-function pinCloudflarePlugin(dir: string, pm: Pm) {
+function pinUpstream(dir: string, pm: Pm) {
   const version = /^\s+'@cloudflare\/vite-plugin@([^'(]+)':$/m.exec(
     readFileSync(join(root, "pnpm-lock.yaml"), "utf8"),
   )?.[1];
   if (!version) throw new Error("no @cloudflare/vite-plugin in pnpm-lock.yaml");
+  const catalog = readFileSync(join(root, "pnpm-workspace.yaml"), "utf8");
+  const pinned = (name: string) =>
+    new RegExp(`^  ${name}: (.+)$`, "m").exec(catalog)?.[1] ??
+    (() => {
+      throw new Error(`no ${name} in pnpm-workspace.yaml's catalog`);
+    })();
+  const pkgFile = join(dir, "package.json");
+  const pkg = JSON.parse(readFileSync(pkgFile, "utf8"));
+  if (pkg.devDependencies?.["vite-plus"]) {
+    pkg.devDependencies["vite-plus"] = pinned("vite-plus");
+    pkg.devDependencies.vite = pinned("vite");
+  }
   if (pm === "pnpm") {
     const file = join(dir, "pnpm-workspace.yaml");
     const text = existsSync(file) ? readFileSync(file, "utf8") : "";
@@ -879,10 +896,6 @@ function pinCloudflarePlugin(dir: string, pm: Pm) {
         ? text.replace(/^overrides:$/m, `overrides:\n${line}`)
         : `${text.replace(/\n*$/, "\n")}overrides:\n${line}\n`,
     );
-  } else {
-    const pkgFile = join(dir, "package.json");
-    const pkg = JSON.parse(readFileSync(pkgFile, "utf8"));
-    pkg.overrides = { ...pkg.overrides, "@cloudflare/vite-plugin": version };
-    writeFileSync(pkgFile, JSON.stringify(pkg, null, 2) + "\n");
-  }
+  } else pkg.overrides = { ...pkg.overrides, "@cloudflare/vite-plugin": version };
+  writeFileSync(pkgFile, JSON.stringify(pkg, null, 2) + "\n");
 }

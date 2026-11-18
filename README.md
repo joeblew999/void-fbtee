@@ -221,7 +221,14 @@ and if so remove what depends on it.
   "^2.0.0-beta.v.15"`, which also takes `2.0.0-rc.0`, and that writes its build to
   `.cloudflare/output/v1` where Void 1.8.0 reads `v0`, so a new Void app's `vp build` fails ("no
   root config found"). This repo's lockfile has `2.0.0-beta.v.17`; `test:fresh` pins its apps to it
-  (`pinCloudflarePlugin` in `e2e/fresh/check.ts`).
+  (`pinUpstream` in `e2e/fresh/check.ts`).
+
+- Not yet reported (2026-11-18, Void 1.8.0, Vite+ 1.7.0): `void init` writes `"vite-plus":
+  "^1.6.0"` and `"vite": "npm:@voidzero-dev/vite-plus-core@^1.6.0"`. Vite+ 1.7.0 needs its core at
+  `8.3.8000`, which that range can't take, so a new Void app's `vp build` stops ("Failed to resolve
+  vite command"). npm hits it now; pnpm, which waits a day before taking a release, from today.
+  This repo stays on Vite+ 1.6.0 (the catalog in `pnpm-workspace.yaml`); `test:fresh` pins its apps
+  to it (`pinUpstream` in `e2e/fresh/check.ts`).
 
 - [voidzero-dev/void#802](https://github.com/voidzero-dev/void/issues/802) (2026-11-12, Void
   1.8.0): `@void/md` in right-to-left and translated pages. Heading anchors and the copy button

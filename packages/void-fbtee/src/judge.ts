@@ -339,3 +339,39 @@ export function glossaryMisses(
     .filter((g) => !g.translation.split(/\s+/).every((w) => text.includes(stem(w))))
     .map((g) => `The app writes "${g.source}" as "${g.translation}": use that word, not another.`);
 }
+
+/**
+ * What's wrong with a post's translation (what people write, ai.ts translate), each field as one
+ * line: the checks the app's own text gets (problemsWith: English left in, the source unchanged,
+ * placeholders), and, into a language not written in Latin letters, a capitalised Latin word taken
+ * over from the source. That one may be a name, which stays ("Bondi"), or a word left untranslated
+ * ("Harbour" in a Thai title, AI Gateway's logs, 2026-11-17): the model is asked again and decides.
+ */
+export function postProblems(
+  fields: Record<string, string>,
+  out: Record<string, string>,
+  from: string,
+  to: string,
+): string[] {
+  const problems: string[] = [];
+  for (const [key, text] of Object.entries(fields)) {
+    const line = out[key] ?? "";
+    if (!line.trim() && text.trim()) {
+      problems.push(`"${key}" is empty: translate it.`);
+      continue;
+    }
+    for (const p of problemsWith([{ translation: text, variations: {} }], [line], to, from))
+      problems.push(`"${key}": ${p.replace(/^Line 1 /, "it ")}`);
+    if (scriptOf(to)) {
+      const source = new Set(text.match(LATIN_WORD) ?? []);
+      const kept = [...new Set(line.match(LATIN_WORD) ?? [])].filter(
+        (w) => /^\p{Lu}/u.test(w) && source.has(w),
+      );
+      if (kept.length)
+        problems.push(
+          `"${key}" keeps ${kept.map((w) => `"${w}"`).join(", ")} in Latin letters: translate ${kept.length > 1 ? "each" : "it"}, unless it's a name (a place, a person, a brand), which stays as written.`,
+        );
+    }
+  }
+  return problems;
+}

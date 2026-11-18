@@ -1,6 +1,6 @@
 // The judge's checks (judge.ts), without Void's AI.
 import { expect, test } from "vite-plus/test";
-import { inScript, keptTerms, problemsWith } from "../../src/judge";
+import { inScript, keptTerms, postProblems, problemsWith } from "../../src/judge";
 
 const line = (translation: string) => [{ translation, variations: {} }];
 
@@ -184,4 +184,27 @@ test("a line the same as its source is fine into the same language (fbtee's Engl
     "Line 1 is still the source text: translate it.",
   );
   expect(problemsWith(src, ["{list of items}, and {last item}"], "en-GB", "en-US")).toEqual([]);
+});
+
+test("a post's translation: a Latin word taken over from the source is asked about, English isn't let through", () => {
+  const swim = { title: "Harbour sunrise swim" };
+  // "Harbour" kept in a Thai title (AI Gateway's logs, 2026-11-17): asked, as it may be a name.
+  expect(postProblems(swim, { title: "ว่ายน้ำชมพระอาทิตย์ขึ้นที่ Harbour" }, "en-US", "th-TH")).toEqual([
+    '"title" keeps "Harbour" in Latin letters: translate it, unless it\'s a name (a place, a person, a brand), which stays as written.',
+  ]);
+  expect(postProblems(swim, { title: "ว่ายน้ำรับแสงอรุณที่อ่าว" }, "en-US", "th-TH")).toEqual([]);
+  // Lower-case English left in, and the source unchanged, as the app's own text is checked.
+  expect(
+    postProblems({ d: "Coffee on the sand" }, { d: "قهوة on the sand" }, "en-US", "ar-EG").join(
+      " ",
+    ),
+  ).toMatch(/in English/);
+  expect(postProblems(swim, swim, "en-US", "ar-EG").join(" ")).toMatch(/still the source text/);
+  // Into a language in Latin letters, names aren't asked about.
+  expect(
+    postProblems(swim, { title: "Sonnenaufgangsschwimmen im Harbour" }, "en-US", "de-DE"),
+  ).toEqual([]);
+  expect(postProblems(swim, { title: " " }, "en-US", "th-TH")).toEqual([
+    '"title" is empty: translate it.',
+  ]);
 });
