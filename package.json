@@ -12,7 +12,6 @@
     "postal-mime": "4.2.1",
     "vite": "catalog:",
     "vite-plus": "catalog:",
-    "vitest": "catalog:",
     "void-fbtee": "workspace:*"
   },
   "packageManager": "pnpm@12.18.0"
