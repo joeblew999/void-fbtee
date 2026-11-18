@@ -63,7 +63,24 @@ above in place of the rules.
    `"new"` written, with `translatedBy`, `translatedAt`, `gatewayLogId`, in fbtee's JSON layout.
    Pages: written and stamped as now, after the existing check that the code blocks, links and
    components came back unchanged. Posts: stored as now (`storeTranslation` in `content.ts`, the
-   `events_translations` table, same shape).
+   `events_translations` table, same shape plus `usage`, below).
+
+## What each translation cost, kept with it
+
+Gemini's answer gives token counts, never dollars. Each translation records them and the US$ they
+came to at that day's price (`GEMINI.price`, `models.ts`), as `usage`, beside `translatedBy`. One
+string per request makes it exact. (`tokens` is taken: fbtee uses it.)
+
+- Strings, in the catalog entry: `"usage": { "in": 321, "out": 53, "thinking": 88, "usd": 0.0015 }`.
+  fbtee keeps extra fields when it rewrites the file (checked 2026-11-18).
+- Pages, in the frontmatter, by `stamp` (`translate.ts`), beside `translatedFrom`: one `usage:` line.
+- Posts: a `usage` column (JSON, may be empty) in each app's translations table (`translationsOf`,
+  `db-schema.ts`), written by `storeTranslation` (`content.ts`). The example gets the migration from
+  `void db generate`: it adds a column and changes no existing row; posts translated before it have
+  none.
+- `vp dev` still prints each run's total.
+
+Step 1 checks the token counts first (below), so the US$ is what's paid.
 
 ## What `vp dev` and `vp build` check (`check.ts`)
 
@@ -132,7 +149,8 @@ New:
 - Test data of its own, not the example's: `test/entries.json` (six entries: a label, a `{time}`
   sentence, a plural, a gender line, count and gender, a list joiner) and `test/answers.json`
   (Hydrogen's real answer to them from step 1, with model, date and gateway log id).
-- `test/unit/translate-entries.test.ts`: our function on that data, both ways.
+- `test/unit/translate-entries.test.ts`: our function on that data, both ways, including the
+  `usage` written from the recorded answer's token counts.
 - `test:dev`: the same entries sent to the dev route (which writes nothing), real Gemini, checking
   keys, lines and placeholders, not wording.
 
