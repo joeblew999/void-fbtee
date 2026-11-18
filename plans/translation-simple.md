@@ -146,6 +146,13 @@ Step 1 checks the token counts first (below), so the US$ is what's paid.
 - The example's docs page (`pages/[lang]/docs/translating.tsx` and `.server.ts`) names Gemini 3.5
   Flash. Its sentences are updated; the strings that change come up as new and are translated like
   any new string. Only those.
+- `skills/void-fbtee/SKILL.md`, "What people post" (line 294): call `translateSoon(table, id)`
+  when a post is changed, as when it's posted.
+- The example's emails, in its docs: the table on the tour page (`pages/en-US/docs/tour.md`,
+  "What happens / Who gets an email") and the emails page (`pages/[lang]/docs/emails.tsx` and
+  `.server.ts`) gain "The organiser changes it: everyone booked, each their own". The tour page
+  changed, so its Thai and Arabic copies are translated again whole, as any changed page is
+  (about US$0.02 each); the emails page's changed strings come up as new.
 
 ## Also fixed
 
