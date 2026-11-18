@@ -39,9 +39,15 @@ export default defineConfig({
         command: ["vp run void-fbtee#build", "vp run -r --parallel dev"],
         cache: false,
       },
-      // Chromium for the browser tests (once per machine).
+      // Chromium and WebKit (Safari's engine) for the browser tests (once per machine).
       "install:browser": {
         command: "playwright install --with-deps chromium webkit",
+        cache: false,
+      },
+      // Chromium alone: what the live check after a deploy uses (e2e/deployed/), as CI's deploy
+      // job installs it.
+      "install:chromium": {
+        command: "playwright install --with-deps chromium",
         cache: false,
       },
       // The tests, one task per stage (Void's TESTING.md: run only the part you need). Where each

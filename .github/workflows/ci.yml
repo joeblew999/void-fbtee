@@ -29,7 +29,8 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
-      - run: vp run install:browser
+      # No browser: the checks, the unit tests and the build use none (installing Chromium and
+      # WebKit here took 1 to 24 minutes a run, 2026-11-18).
       - run: vp check
       - run: vp run check:tools
       - run: vp run test:unit
@@ -61,7 +62,8 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
-      - run: vp run install:browser
+      # Chromium only: the live check after the deploy (e2e/deployed/) uses no other browser.
+      - run: vp run install:chromium
       - run: vp run deploy
       - run: vp run test:deployed
 
