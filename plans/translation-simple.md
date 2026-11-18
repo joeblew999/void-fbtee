@@ -159,10 +159,18 @@ already record it (`translatedFrom`); strings needn't (fbtee's key changes with 
 the pages' way:
 
 - Each post translation stores a hash of the post's fields as they were (`translated_from`, a new
-  column beside `usage`: one migration for both).
+  column beside `usage`: one migration for both): SHA-256, its first 12 hex characters, as pages'
+  `translatedFrom` (`check.ts`), with the Worker's `crypto.subtle`.
 - `untranslated` counts a translation whose hash differs from the post's as missing, and
-  `storeTranslation` replaces it. An app that edits a post calls `translateSoon`, as on create;
-  the nightly cron (`reconcile`) catches any it didn't.
+  `translateSoon` and `storeTranslation`, which today replace only "queued" and "unknown" rows,
+  replace it too.
+- Caught two ways: an app that edits a post calls `translateSoon`, as on create; and a page that
+  reads it catches it, where a missing language is caught now (`textOf` has the post and its
+  translation, so compares the hash; the middleware queues it). The reader sees the old
+  translation until the new one lands.
+- The hourly job (`crons/translations.ts`, `17 * * * *`, `reconcile`) is unchanged: it finds
+  missing translations with one count in SQL, and D1 can't compute a SHA-256, so checking hashes
+  there would mean reading and hashing every post every hour.
 - A translation with no hash (all made before this) counts as current: nothing already translated
   is translated again.
 - The example can't show it (events are only created, `pages/[lang]/events/new.server.ts`); a
