@@ -88,6 +88,19 @@ line 836, except that it matches by key and name instead of position):
 One check stays: every `{placeholder}` and the number of lines came back (fbtee compiles a
 translation that loses one: checked 2026-11-18, `plans/fbtee-issues.md` #3).
 
+## Trying a translation without deploying
+
+The same function the app uses, from a running `vp dev`, with one HTTP request and nothing
+written: the dev server's route (`POST /__void-fbtee/translate`, `devTranslate` in `ai.ts`, with
+the token in `node_modules/.void-fbtee/dev-token`) takes entries in the catalog's own shape, the
+locales and an optional `"dryRun": true`, and answers with the request that went to Gemini, the
+answer, the entries as they would be written into the file, and the tokens and cost. Any entry, in
+any language, in seconds; the deploy cycle is never needed to see what Gemini gives back.
+
+Before something is in the code, a request shape is tried by hand with Cloudflare's CLI, as on
+2026-11-18: `cf ai run google/gemini-4-hydrogen --body @request.json` (signed in with
+`cf auth login --no-use-keyring`, which needs the user's approval once).
+
 ## What goes
 
 - The rules cut from the skill file and fbtee's rules in every request (`rulesFor`, `SECTIONS`,
