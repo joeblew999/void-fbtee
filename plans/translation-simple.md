@@ -80,6 +80,17 @@ string per request makes it exact. (`tokens` is taken: fbtee uses it.)
   none.
 - `vp dev` still prints each run's total.
 
+`models.ts` is rewritten to hold only this:
+
+- `GEMINI`: `id: "google/gemini-4-hydrogen"` and its price, `{ input: 1.5, output: 7.5 }` US$ per
+  million tokens, with its source (Google's Gemini pricing page) and the date checked.
+- `Usage` with the thinking tokens as well as in and out, and `costOf` counting thinking as output.
+- `paymentProblem` and `paymentAdvice`, unchanged: they tell "credits used up" (402) and "spend
+  limit reached" (429) apart, so the post queue waits an hour instead of failing.
+
+Going from it: the header about Gemini 3.5 Flash, wuchale and the Gemma measurement, the old id and
+price ("from Cloudflare's catalog page"), and `BATCH`.
+
 Step 1 checks the token counts first (below), so the US$ is what's paid.
 
 ## What `vp dev` and `vp build` check (`check.ts`)
