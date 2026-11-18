@@ -68,6 +68,23 @@ with the matching name; the entry becomes `"status": "translated"` with `transla
 `"new"`, to go again; nothing lands on the wrong string. Today's code matches by position, so a
 skipped item shifts everything after it.
 
+Writing the answer back into the catalog file, step by step (as `translate.ts` does today from
+line 836, except that it matches by key and name instead of position):
+
+1. For each key in the answer, the entry with that key. A key the request didn't send is ignored.
+2. Each answered line onto the entry's line whose `variations` code has that name: `MARKS` in
+   `plurals.ts` both ways (16 ↔ `zero`, 4 ↔ `one`, 8 ↔ `two`, 20 ↔ `few`, 12 ↔ `many`, 24 ↔
+   `other`; 1 ↔ `male`, 2 ↔ `female`, 3 ↔ `unknown`). A line that varies by two things (a count
+   and a gender) is named by both, `few, female`, and matched by both.
+3. The English line's spaces at its start and end put back on the translation (`spaced`,
+   `translate.ts` line 587): some lines are pieced together around other text, and Gemini trims.
+4. The checks (placeholders, number of lines). An entry that fails them stays `"new"` and is sent
+   again once, told what was wrong, as today.
+5. The file read again from disk, since a save may have changed it while Gemini answered; each
+   translated entry is written only where that key is still there and still `"new"`.
+6. Written as JSON in the layout fbtee writes (two spaces, a newline at the end), so a diff shows
+   only what changed.
+
 One check stays: every `{placeholder}` and the number of lines came back (fbtee compiles a
 translation that loses one: checked 2026-11-18, `plans/fbtee-issues.md` #3).
 
