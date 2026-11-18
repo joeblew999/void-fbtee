@@ -1,80 +1,122 @@
 # plans/translation-simple.md: translating with Gemini the simple way
 
-Status: 2026-11-18, waiting for the user's OK. No code changed yet.
+Status: 2026-11-18, checked line by line against the code, waiting for the user's OK. No code
+changed yet.
 
 ## The change
 
 Today every request to Gemini carries ~1,400 tokens of rules (built for Gemma 4, no longer used),
-and answers are matched back by position. Requests sent by hand on 2026-11-18 showed Gemini needs
-none of it. So: one model, one plain request with the locale codes, answers matched by key. The
-rules, and the tests built on them, go.
+answers are matched back by position, and every finished translation is judged by the same rules
+when `vp dev` starts and at `vp build`. One that fails is set back to "new" and translated
+again. Requests sent by hand on 2026-11-18 showed Gemini needs none of the rules. So: one model,
+one plain request with the locale codes, answers matched by key, and a check of only what can break
+the app. The rules, their checks and the tests built on them go.
 
 This covers everything the package translates: the app's strings, its Markdown pages, and posts
 people write at runtime (the example's events).
 
+## Where it runs (as now)
+
+- **Strings and pages, in `vp dev`:** the plugin (Node, `translate.ts`) finds what's new, sends it
+  to the dev server's route (`POST /__void-fbtee/translate`, `devTranslate` in `ai.ts`, in the
+  Worker, where Void's AI is), and writes the answers into the files. The route never writes.
+- **Posts, at runtime:** the queue (`queue-translate.ts`, run by the example's
+  `queues/translate.ts`) calls Void's AI in the Worker and stores the answer.
+- **Anything Gemini leaves:** Claude Code (`claude -p`, `translateTask` in `translate.ts`), then
+  Claude's review (`reviewApp`). Both stay.
+
 ## The request
 
-- Model `google/gemini-4-hydrogen`, `thinkingLevel: "low"`, no `temperature`, through Void's AI.
+- Model `google/gemini-4-hydrogen` (`GEMINI` in `models.ts`), `thinkingLevel: "low"`, no
+  `temperature`.
 - One instruction sentence naming the two locale codes (`en-US` into `ar-EG`). No language names,
   no style rules.
-- The answer's shape set with `responseJsonSchema`, the same keys as sent.
+- The answer's shape set with `responseJsonSchema`: the same keys as sent.
+- Strings go 50 to a request, 4 requests at once, as now (`BATCH` in `models.ts`).
 
-| What        | Sent as                                                                                                                                                                                                                                      | Example                                                                                    |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| App strings | each new catalog entry under its fbtee key: its description and its lines, each line named by its form (`one`, `few`, `female`, `few, female`) via `MARKS` in `plurals.ts`; the English from fbtee's collected strings, not the catalog line | `{"pyuIHcl…": {"description": "…", "lines": {"one": "{number} seat left", "other": "…"}}}` |
-| Posts       | each field under its name                                                                                                                                                                                                                    | `{"title": "…", "description": "…"}`                                                       |
-| Pages       | the whole Markdown page, answered as Markdown, not JSON; told to keep code blocks (their comments too), links, components and frontmatter keys                                                                                               | `pages/en-US/docs/tour.md`                                                                 |
+| What        | Sent as                                                                                                                                                                                                                                                                      | Example                                                                                    |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| App strings | each new catalog entry under its fbtee key: its description and its lines, each line named by its form (`one`, `few`, `female`, `few, female`) via `MARKS` in `plurals.ts`; the English from fbtee's collected strings (`freshCatalog`, `catalogs.ts`), not the catalog line | `{"pyuIHcl…": {"description": "…", "lines": {"one": "{number} seat left", "other": "…"}}}` |
+| Posts       | each field under its name                                                                                                                                                                                                                                                    | `{"title": "…", "description": "…"}`                                                       |
+| Pages       | the whole Markdown page, answered as Markdown, not JSON; told to keep code blocks (their comments too), links, components and frontmatter keys                                                                                                                               | `pages/en-US/docs/tour.md`                                                                 |
 
-One plain function builds the request and reads the answer. The plugin uses it for catalogs; the
-post queue (`queue-translate.ts`) uses it for posts. It replaces `translateStrings` and
-`translate` in `ai.ts`.
+One plain function builds the request and reads the answer, used by the dev route for strings and
+by the post queue. It replaces `translateStrings` and `translate` in `ai.ts`, and
+`translateEntry`'s three tries in `translate.ts`. Pages keep `translatePage` with the instruction
+above in place of the rules.
 
 ## The answer back
 
 1. Each key onto the entry with that key; each line onto the line with that name. Never by
    position. A key not sent is ignored; a key missing leaves the entry `"new"`.
 2. The English line's leading and trailing spaces put back (`spaced`, `translate.ts`).
-3. Checked: every `{placeholder}` there and no extra, every line there. If not, asked once more
-   with the reason; still wrong, left `"new"` (a post: left for the queue's next retry).
-4. Catalogs: the file read again and only entries still `"new"` written, with `translatedBy`,
-   `translatedAt`, `gatewayLogId`, in fbtee's JSON layout. Posts: stored as now
-   (`storeTranslation` in `content.ts`, the `events_translations` table, same shape).
+3. Checked: no line empty, every `{placeholder}` there and none extra, every line there. If not,
+   asked once more on its own with the reason; still wrong, left `"new"` for Claude Code (a post:
+   left for the queue's next retry).
+4. Strings: written as now (`translateWithVoidAi`): the file read again, only entries still
+   `"new"` written, with `translatedBy`, `translatedAt`, `gatewayLogId`, in fbtee's JSON layout.
+   Pages: written and stamped as now, after the existing check that the code blocks, links and
+   components came back unchanged. Posts: stored as now (`storeTranslation` in `content.ts`, the
+   `events_translations` table, same shape).
+
+## What `vp dev` and `vp build` check (`check.ts`)
+
+- Stays: anything untranslated fails the build; every translation says who made it
+  (`translatedBy`); every line there, none empty, every placeholder kept.
+- Goes: judging finished translations by the rules (the script, "still the source text", kept
+  words, `grammar.json`, wording; `problemsWith` in `judge.ts`).
+- Goes: `reopenFailing` (`check.ts`, called by `plugin.ts` when `vp dev` translates), which sets
+  finished translations back to `"new"` when they fail those checks. Nothing that's translated is
+  ever set back.
 
 ## Order of the work
 
 1. **By hand, no code** (`cf ai run google/gemini-4-hydrogen --body @request.json`, one sign-in you
-   approve): ten real example entries into `th-TH` and `ar-EG` with and without the code context,
-   keep-words and glossary we send today (as good without: dropped); a line varying by count and
-   gender; fbtee's built-in strings (list joiners, `{number}+`). The answer to the test entries is
-   saved as test data.
+   approve): ten real example entries into `th-TH` and `ar-EG` with and without what we send today
+   besides the text (the code around each string `sourceContext`, the words to keep `keptTerms`,
+   the glossary `glossaryFor`). As good without: dropped, with `glossaryMisses`. Also: a line
+   varying by count and gender, and fbtee's built-in strings (list joiners, `{number}+`). The
+   answer to the test entries is saved as test data.
 2. The code.
-3. The tests.
+3. The tests and docs.
 4. `vp check`, `test:unit`, `test:dev`, `test:preview`. Commit; push only when you say.
 
 ## Goes
 
-- The rules: `rulesFor`, `SECTIONS`, `languageRules`, `instructions` (`ai.ts`), `fbteeRules`
-  (`translate.ts`), the translate skill (`skills/void-fbtee-translate/`).
-- `grammar.json` and its checks in `judge.ts`, `postProblems`.
-- Matching by position, English read from the catalog line, `thinkingBudget`, `temperature`, the
-  schema pasted into the prompt, language names.
+- The rules: `rulesFor`, `SECTIONS`, `languageRules`, `instructions`, `TRANSLATING` (`ai.ts`),
+  `fbteeRules` (`translate.ts`), the translate skill (`skills/void-fbtee-translate/`) and its
+  bundling into `dist/ai.mjs` (`void-fbtee:raw` in the package's `vite.config.ts`).
+- `grammar.json` and `judge.ts`'s rule checks; what's left of `judge.ts` is the placeholder and
+  line check.
+- `reopenFailing`; `postProblems`; matching by position; English read from the catalog line;
+  `thinkingBudget`, `temperature`, the schema pasted into the prompt, language names.
 - Today's uncommitted experiments in `ai.ts`, `judge.ts`, `plugin.ts`, the translate skill and the
   tests (keeping only corrected comments).
 
 ## Stays
 
-- The example's real translations, pages and posts, as they are. Nothing retranslated.
+- The example's real translations, pages and posts, as they are. Nothing already translated is
+  translated again.
 - The catalog loop, who-translated-it, `vp build` failing on anything untranslated.
-- The post system: its table, `translationsFor`, `textOf`, the queue's retries, the cron, the
-  middleware, and all the example's post code.
-- The void-fbtee skill (`vp dev`'s review prompt points to its "Reviewing" section instead of the
-  deleted skill).
+- The post system: its table, `translationsFor`, `textOf`, the queue's retries and payment waits,
+  the cron, the middleware, and all the example's post code.
+- Claude Code for what's left and Claude's review; their prompts point only to the void-fbtee
+  skill, not the deleted one (`translateTask`, `reviewTask`, `translatingSkillPath`).
+
+## Docs that change with it
+
+- `skills/void-fbtee/SKILL.md` (ships to apps): its pointers to the translate skill and
+  `grammar.json`, and the model name.
+- The package README, the root README, the comments in `models.ts` and `plurals.ts` (`MARKS`).
+- The example's docs page (`pages/[lang]/docs/translating.tsx` and `.server.ts`) names Gemini 3.5
+  Flash. Its sentences are updated; the strings that change come up as new and are translated like
+  any new string. Only those.
 
 ## Also fixed
 
 `fallbacksOf` (`runtime.ts`) skips natural parents (`fr-CA` → `fr`), which fbtee's own lookup uses.
-It picks which post translation a page shows and which catalogs it preloads. The example has no
-fallbacks, so nothing there changes; a unit test covers it.
+It picks which post translation a page shows (`textLocales`, `server.ts`) and which catalogs a page
+preloads. The example has no fallbacks, so nothing there changes; a unit test covers it.
 
 ## Tests
 
@@ -84,14 +126,14 @@ New:
   sentence, a plural, a gender line, count and gender, a list joiner) and `test/answers.json`
   (Hydrogen's real answer to them from step 1, with model, date and gateway log id).
 - `test/unit/translate-entries.test.ts`: our function on that data, both ways.
-- `test:dev`: the same entries through the dev route with `dryRun`, to real Gemini, checking keys,
-  lines and placeholders, not wording.
+- `test:dev`: the same entries sent to the dev route (which writes nothing), real Gemini, checking
+  keys, lines and placeholders, not wording.
 
 Old, in `packages/void-fbtee/test/unit/`:
 
 | Test                                                | Action                                            |
 | --------------------------------------------------- | ------------------------------------------------- |
-| `judge.test.ts`                                     | deleted, except one placeholder-check test        |
+| `judge.test.ts`                                     | deleted, except the placeholder-check tests       |
 | `skills.test.ts`, `ai-rules.test.ts`                | deleted                                           |
 | `translate.test.ts`                                 | prompt tests changed; page stamping kept          |
 | `models.test.ts`                                    | rewritten for Hydrogen                            |
