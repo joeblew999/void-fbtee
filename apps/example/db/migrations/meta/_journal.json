@@ -71,6 +71,13 @@
       "when": 1794917595187,
       "tag": "20261117121315_perpetual_iceman",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1794987925299,
+      "tag": "20261118074525_normal_nuke",
+      "breakpoints": true
     }
   ]
 }

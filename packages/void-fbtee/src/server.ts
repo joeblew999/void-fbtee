@@ -274,13 +274,17 @@ const xmlText = (text: string) => text.replace(/[&<>"']/g, (ch) => `&#${ch.charC
 
 /**
  * The languages to look for a stored translation in, best first: the page's own, then its
- * fallbacks (`voidFbtee({ fallbackLocales })`, as fbtee uses them for the app's own strings).
+ * fallbacks as fbtee uses them for the app's own strings (its natural parents, fr-CA → fr, and
+ * `voidFbtee({ fallbackLocales })`: runtime.ts fallbacksOf), only the app's own languages.
  * For content people post, kept one row per language beside the original (a table such as
  * `event_texts`: the item's id, `locale`, and the translated fields, unique on the two):
  * `where(and(eq(event_texts.event_id, id), inArray(event_texts.locale, textLocales(locale))))`.
  */
 export function textLocales(locale: string): string[] {
-  return [...new Set([locale, ...fallbacksOf(locale, config.fallbackLocales)])];
+  const own = new Set(config.locales.map((l) => l.locale));
+  return [
+    ...new Set([locale, ...fallbacksOf(locale, config.fallbackLocales).filter((l) => own.has(l))]),
+  ];
 }
 
 /**

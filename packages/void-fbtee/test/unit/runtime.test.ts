@@ -6,6 +6,7 @@ import { fbt, runWithFbtee, setupLocaleContext } from "fbtee/server";
 import { resolveLocales } from "../../src/locales";
 import {
   allTranslations,
+  fallbacksOf,
   localeContextOptions,
   reportMissing,
   translationsFor,
@@ -108,4 +109,21 @@ test("text in one language loads that language's catalogs only, with its fallbac
   });
   expect(loaded.sort()).toEqual(["de", "de-AT"]);
   expect(Object.keys(t).sort()).toEqual(["de", "de-AT"]);
+});
+
+test("fallbacksOf: a locale's natural parents first, as fbtee's own lookup tries them", () => {
+  // fr-CA falls back to fr before any configured fallback.
+  expect(fallbacksOf("fr-CA", undefined)).toContain("fr");
+  expect(fallbacksOf("fr-CA", ["en-US"]).indexOf("fr")).toBeLessThan(
+    fallbacksOf("fr-CA", ["en-US"]).indexOf("en-US"),
+  );
+  // A parent's own fallbacks follow it; "default" applies to every locale.
+  expect(fallbacksOf("de-AT", { de: ["nl-NL"], default: ["en-US"] })).toEqual(
+    expect.arrayContaining(["de", "nl-NL", "en-US"]),
+  );
+  // Never to another script: zh-Hant-TW doesn't fall back to zh, which is Hans.
+  expect(fallbacksOf("zh-Hant-TW", undefined)).not.toContain("zh");
+  expect(fallbacksOf("zh-Hant-TW", undefined)).toContain("zh-Hant");
+  // The locale itself isn't its own fallback.
+  expect(fallbacksOf("th-TH", undefined)).not.toContain("th-TH");
 });

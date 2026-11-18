@@ -38,7 +38,7 @@ import {
   translateWithVoidAi,
   waitingReview,
 } from "./translate";
-import { check, reopenFailing } from "./check";
+import { check } from "./check";
 import { writeContentFiles } from "./content-files";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
@@ -71,16 +71,14 @@ function checkFallback(fallback: string | undefined, config: LocaleConfig): stri
   return locale;
 }
 
-/** voidFbtee({ content }), each table with its fields and what it holds (content.ts ContentTable). */
+/** voidFbtee({ content }), each table with its fields (content.ts ContentTable). */
 export function contentOf(
   options: Pick<VoidFbteeOptions, "content">,
-): Record<string, { fields: string[]; about: string }> {
+): Record<string, { fields: string[] }> {
   return Object.fromEntries(
-    Object.entries(options.content ?? {}).map(([table, v]) => [
+    Object.entries(options.content ?? {}).map(([table, fields]) => [
       table,
-      Array.isArray(v)
-        ? { fields: v, about: table }
-        : { fields: v.fields, about: v.about ?? table },
+      { fields: [...fields] },
     ]),
   );
 }
@@ -127,13 +125,11 @@ export interface VoidFbteeOptions {
   common?: Record<string, string>;
   /**
    * What people write in the app's tables, to translate into its languages
-   * (plans/translated-content.md): each table, with its fields, and optionally what it holds,
-   * for the model ("listings for events"). E.g. { events: ["title", "description"] } or
-   * { events: { fields: ["title", "description"], about: "listings for events" } }. Each table
-   * has a text `id` and a `locale` column; its translations are in `<table>_translations`
-   * (translationsOf from void-fbtee/db/schema).
+   * (plans/translated-content.md): each table, with its fields, e.g.
+   * { events: ["title", "description"] }. Each table has a text `id` and a `locale` column; its
+   * translations are in `<table>_translations` (translationsOf from void-fbtee/db/schema).
    */
-  content?: Record<string, string[] | { fields: string[]; about?: string }>;
+  content?: Record<string, readonly string[]>;
 }
 
 /** What the plugin exposes on its `api`, read from the config without running the plugin (loadProject, for tests). */
@@ -263,19 +259,12 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         return;
       }
       if (!wanted || !agentAllowed()) return report(check(project()));
-      // Void's AI first, the one translator (models.ts: Gemini 3.5 Flash, as at runtime), through
-      // the dev server's own route, when the app has it. Then Claude Code for anything left (what
-      // didn't pass the checks, or everything when Void's AI isn't there): `claude -p` when it's
-      // signed in here, otherwise its prompt, for whatever coding agent the developer uses.
+      // Void's AI first, the one translator (models.ts GEMINI, as at runtime), through the dev
+      // server's own route, when the app has it. Then Claude Code for anything left (what didn't
+      // pass the checks, or everything when Void's AI isn't there): `claude -p` when it's signed
+      // in here, otherwise its prompt, for whatever coding agent the developer uses.
       const base = devServer?.resolvedUrls?.local[0];
       const url = base && new URL(DEV_TRANSLATE_PATH, base).href;
-      // A finished translation the checks now fail (a catalog from before they were stricter) is
-      // translated again, not left for the build to fail on (check.ts reopenFailing).
-      const reopened = reopenFailing(project());
-      if (reopened.length)
-        log(
-          `${reopened.length} finished translations fail the checks, so they're translated again:\n${reopened.join("\n")}`,
-        );
       // Who translates, said before they start.
       const open = openNow();
       if (count(open))
@@ -392,7 +381,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       } catch (error) {
         server.config.logger.warn(`void-fbtee: couldn't write the content files: ${String(error)}`);
       }
-      // The route's token, where the measurement of translators reads it (scripts/translator.ts),
+      // The route's token, for a request from outside the dev server (a script, a test by hand),
       // as Void keeps its own dev trigger token in a file (.void/dev-trigger-token).
       try {
         const dir = join(root, "node_modules/.void-fbtee");

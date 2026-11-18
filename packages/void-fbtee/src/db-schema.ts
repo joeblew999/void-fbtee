@@ -9,7 +9,8 @@
 // One shape for every app, so the package's runtime (void-fbtee/queues/translate,
 // void-fbtee/crons/translations, the read helpers in void-fbtee/content) reaches it by name: the
 // source row's id, the language, the translated fields as JSON (which fields: voidFbtee({ content })),
-// and who made it (plans/translation-provenance.md).
+// who made it (plans/translation-provenance.md), what it cost, and what it was made from
+// (plans/translation-simple.md).
 //
 // Only void/schema-d1 and void/db (for `sql`), as an app's own schema files: `void db generate` (drizzle-kit) loads the schema with require(), and a
 // module that also imports Void's main entry can't be loaded there (plans/translated-content.md).
@@ -70,8 +71,21 @@ export function translationsOf<
       // didn't say (an older deploy after a rollback); "unknown" is translated again.
       translatedBy: text("translated_by").notNull().default("unknown"),
       translatedAt: text("translated_at"),
-      // The AI Gateway log of the request that made it (its model, tokens, cost).
+      // The AI Gateway log of the request that made it.
       gatewayLogId: text("gateway_log_id"),
+      // What it cost, as JSON: the request's tokens and the US$ they came to that day,
+      // { "in": 263, "out": 58, "thinking": 136, "usd": 0.0018 } (void-fbtee's models.ts spent).
+      // Empty for one made before it was kept, or not by a model.
+      usage: text("usage", { mode: "json" }).$type<{
+        in: number;
+        out: number;
+        thinking: number;
+        usd: number;
+      }>(),
+      // The fingerprint of the row's fields it was made from (content.ts fieldsFingerprint):
+      // once the row is changed, it no longer matches, and the row is translated again. Empty for
+      // one made before it was kept: counted as current, so nothing is translated again for it.
+      translatedFrom: text("translated_from"),
       createdAt: text("created_at")
         .notNull()
         .default(sql`(datetime('now'))`),

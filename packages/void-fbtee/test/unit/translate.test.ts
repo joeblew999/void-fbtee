@@ -16,7 +16,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vite-plus/test";
 import { copyFixture } from "./copy-fixture";
 import type { Project } from "../../src/catalogs";
-import { check, markdownPages, missingHead, reopenFailing } from "../../src/check";
+import { check, markdownPages, missingHead } from "../../src/check";
 import { loadProject, prepare } from "../../src/commands";
 import { init } from "../../src/init";
 import {
@@ -255,40 +255,44 @@ test("a translation waits for review when an AI wrote it and no one has reviewed
   expect(awaitsReview({ ...ai, status: "new" })).toBe(false);
 });
 
-test("a finished translation the checks fail goes back to new, with its source line; one that passes stays", () => {
+test("a finished translation that would break the app fails the build, and is never set back to new", () => {
   prepare(p);
   const file = join(root, "i18n/translations/de-DE.json");
   const hello = "SSJ6IVWoQjvWr8iQwHsMTA==";
-  expect(reopenFailing(p)).toEqual([]);
   const catalog = JSON.parse(readFileSync(file, "utf8"));
   catalog.translations[hello].translations[0].translation = "Hallo {name}";
   writeFileSync(file, JSON.stringify(catalog, null, 2));
-  const reopened = reopenFailing(p);
-  expect(reopened).toHaveLength(1);
-  expect(reopened[0]).toMatch(/^de-DE: "Hello": .*\{name\}/);
-  const after = JSON.parse(readFileSync(file, "utf8")).translations[hello];
-  expect(after.status).toBe("new");
-  expect(after.translations[0].translation).toBe("Hello");
-  expect(after.description).toBe("Greeting in the test fixture");
-  expect(reopenFailing(p)).toEqual([]);
+  const before = readFileSync(file, "utf8");
+  expect(check(p).join("\n")).toMatch(
+    /de-DE: "Hello": Line 1 has \{name\}, which the source hasn't/,
+  );
+  expect(readFileSync(file, "utf8")).toBe(before);
 });
 
-test("stamp records who translated a page, when, and the request's gateway log", () => {
+test("stamp records who translated a page, when, the request's gateway log and what it cost", () => {
   write("pages/en-US/blog/hello.md", POST);
   write("pages/de-DE/blog/hello.md", POST.replace("Hello", "Hallo"));
   const file = join(root, "pages/de-DE/blog/hello.md");
-  stamp(p, file, { by: "google/gemini-3.5-flash", at: "2026-11-17", gatewayLogId: "01abc" });
+  const usage = { in: 2143, out: 2283, thinking: 0, usd: 0.020337 };
+  stamp(p, file, {
+    by: "google/gemini-4-hydrogen",
+    at: "2026-11-18",
+    gatewayLogId: "01abc",
+    usage,
+  });
   const text = readFileSync(file, "utf8");
-  expect(text).toMatch(/^translatedBy: "google\/gemini-3.5-flash"$/m);
-  expect(text).toMatch(/^translatedAt: "2026-11-17"$/m);
+  expect(text).toMatch(/^translatedBy: "google\/gemini-4-hydrogen"$/m);
+  expect(text).toMatch(/^translatedAt: "2026-11-18"$/m);
   expect(text).toMatch(/^gatewayLogId: "01abc"$/m);
+  expect(text).toMatch(/^usage: \{"in":2143,"out":2283,"thinking":0,"usd":0.020337\}$/m);
   // Stamped again by someone else: replaced, not added twice.
   stamp(p, file, { by: "claude", at: "2026-11-18" });
   const again = readFileSync(file, "utf8");
   expect(again.match(/^translatedBy:/gm)).toHaveLength(1);
   expect(again).toMatch(/^translatedBy: "claude"$/m);
-  // Without a gateway log now: the old one isn't left saying a request made it.
+  // Without a gateway log or cost now: the old ones aren't left saying a request made it.
   expect(again).not.toMatch(/^gatewayLogId:/m);
+  expect(again).not.toMatch(/^usage:/m);
 });
 
 test("a finished entry that doesn't say who translated it fails the check", () => {

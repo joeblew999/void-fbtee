@@ -6,7 +6,7 @@ import { spawn, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import { catalogFile, collect, missing, type Project } from "./catalogs";
+import { catalogFile, collect, freshCatalog, missing, type Project } from "./catalogs";
 import {
   frontmatter,
   keptParts,
@@ -18,9 +18,10 @@ import {
   type MarkdownPage,
 } from "./check";
 import { sourceOf } from "./locales";
-import { glossaryMisses, keptTerms, problemsWith, sourceLanguageOf } from "./judge";
+import { sourceLanguageOf } from "./judge";
 import { check } from "./check";
-import { BATCH, costOf, GEMINI, paymentAdvice, type Usage } from "./models";
+import { GEMINI, paymentAdvice, type Spent } from "./models";
+import type { Entry } from "./gemini";
 
 /** void-fbtee's own folder (dist/ is one level down), where skills/ ships. */
 export const packageDir = () => dirname(dirname(fileURLToPath(import.meta.url)));
@@ -67,8 +68,7 @@ export function translateTask(p: Project): TranslateTask | undefined {
   });
   if (!strings.length && !pageLines.length) return;
   const prompt = [
-    `Translate this Void app. First read ${skillPath(p.root)} (the void-fbtee skill) and follow it; ` +
-      `how to translate is in ${translatingSkillPath(p.root)}.`,
+    `Translate this Void app. First read ${skillPath(p.root)} (the void-fbtee skill) and follow it.`,
     "",
     ...(strings.length ? ["Strings (fbtee catalogs):", ...strings, ""] : []),
     ...(pageLines.length ? ["Markdown pages:", ...pageLines, ""] : []),
@@ -115,9 +115,13 @@ export function stamp(p: Project, file: string, by?: Provenance): void {
   if (by) {
     out = frontmatterLine(out, "translatedBy", by.by);
     out = frontmatterLine(out, "translatedAt", by.at ?? today());
-    // Only a request's own log: one left from an earlier translation would say a request made this.
+    // Only a request's own log and cost: one left from an earlier translation would say a request
+    // made this.
     if (by.gatewayLogId) out = frontmatterLine(out, "gatewayLogId", by.gatewayLogId);
     else out = out.replace(/^gatewayLogId:.*\n/m, "");
+    // What it cost (plans/translation-simple.md), as one line of YAML (JSON is YAML).
+    if (by.usage) out = frontmatterLine(out, "usage", by.usage);
+    else out = out.replace(/^usage:.*\n/m, "");
     // A review was of what someone else wrote.
     out = out.replace(/^review(edBy|edAt|Note):.*\n/gm, "");
   }
@@ -137,15 +141,19 @@ export function agentProvenance(text: string): Provenance {
   return { by: said && !said.includes("/") ? said : "unknown" };
 }
 
-/** Who translated something: a model's id, "claude", a person; when; the request's gateway log. */
+/**
+ * Who translated something: a model's id, "claude", a person; when; the request's gateway log;
+ * and what it cost.
+ */
 export interface Provenance {
   by: string;
   at?: string;
   gatewayLogId?: string;
+  usage?: Spent;
 }
 
-/** `key: "value"` in a page's frontmatter (which stamp() has made sure is there): set or added. */
-function frontmatterLine(text: string, key: string, value: string): string {
+/** `key: value` in a page's frontmatter (which stamp() has made sure is there): set or added. */
+function frontmatterLine(text: string, key: string, value: string | object): string {
   const line = `${key}: ${JSON.stringify(value)}`;
   const existing = new RegExp(`^${key}:.*$`, "m");
   const fm = frontmatter(text)!;
@@ -380,7 +388,7 @@ export function reviewTask(p: Project): string | undefined {
   );
   if (!lines.length && !pages.length) return;
   return [
-    `Review this Void app's machine translations. First read ${skillPath(p.root)} (the void-fbtee skill), its "Reviewing" section, and follow it; how a translation should be is in ${translatingSkillPath(p.root)}.`,
+    `Review this Void app's machine translations. First read ${skillPath(p.root)} (the void-fbtee skill), its "Reviewing" section, and follow it.`,
     ...(lines.length ? ["", "Catalogs:", ...lines] : []),
     ...(pages.length ? ["", "Pages:", ...pages] : []),
     "",
@@ -468,8 +476,6 @@ interface CatalogLine {
 }
 interface CatalogEntry {
   description?: string;
-  /** Not in fbtee's file: the source text, added here for glossaryFor. */
-  source?: string;
   status?: string;
   translations?: CatalogLine[];
   /** Who wrote the translation: a model's id, "claude", a person, or "unknown" when nothing said
@@ -477,8 +483,10 @@ interface CatalogEntry {
   translatedBy?: string;
   /** The day it was written, YYYY-MM-DD. */
   translatedAt?: string;
-  /** The AI Gateway log of the request that wrote it: its exact request, answer and cost. */
+  /** The AI Gateway log of the request that wrote it: its exact request and answer. */
   gatewayLogId?: string;
+  /** What it cost: the request's tokens, and the US$ they came to that day (models.ts spent). */
+  usage?: Spent;
   /** Claude's review of a translation an AI wrote (reviewTask). Cleared when it's translated again. */
   review?: Review;
 }
@@ -497,99 +505,6 @@ export interface Review {
   was?: string[];
 }
 
-/**
- * fbtee's own rules for translating its catalog entries: its skill's steps 3 to 5 (match the
- * catalog's style, read the description and the code, keep placeholders, the plural and gender
- * variants), from the app's installed fbtee, so they're always that fbtee's own. The other steps
- * are commands for an agent. Sent with every `<fbt>` request (ai.ts rulesFor).
- */
-export function fbteeRules(root: string): string | undefined {
-  try {
-    const skill = readFileSync(
-      join(root, "node_modules/fbtee/skills/fbtee-translate/SKILL.md"),
-      "utf8",
-    );
-    const steps = skill.split("\n").filter((l) => /^[345]\. /.test(l));
-    return steps.length ? steps.join("\n") : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-/** The translating skill, the same text Void's AI is sent (ai.ts TRANSLATING), as the app has it. */
-export function translatingSkillPath(root: string): string {
-  return skillPath(root).replace("skills/void-fbtee/", "skills/void-fbtee-translate/");
-}
-
-/** A few lines of the code a string is written in, around it, from fbtee's collected phrases. */
-export function sourceContext(p: Project, hash: string): string | undefined {
-  const phrase = (
-    collect(p).phrases as {
-      hashToLeaf?: Record<string, unknown>;
-      filename?: string;
-      loc?: { start: { line: number }; end: { line: number } };
-    }[]
-  ).find((ph) => ph.hashToLeaf && hash in ph.hashToLeaf);
-  if (!phrase?.filename || !phrase.loc || phrase.filename.includes("node_modules")) return;
-  try {
-    const lines = readFileSync(join(p.root, phrase.filename), "utf8").split("\n");
-    return lines.slice(Math.max(0, phrase.loc.start.line - 4), phrase.loc.end.line + 2).join("\n");
-  } catch {
-    return;
-  }
-}
-
-const wordsOf = (t: string) => new Set(t.toLowerCase().match(/[a-z0-9']+/g) ?? []);
-
-/**
- * The app's own words for the terms an entry uses: its one-word entries ("Strings", "Language")
- * and its common strings (fbtee's `common`, the app's own list of terms), when the entry uses that
- * word. Void's AI is told to use them, so a term is written the way the rest of the app writes it.
- * Longer entries ("Post them") aren't terms: asked to use them, the model tacked them on.
- */
-export function glossaryFor(
-  done: CatalogEntry[],
-  entries: { lines: { text: string }[] }[],
-  common: string[] = [],
-): { source: string; translation: string }[] {
-  const singular = (w: string) => w.replace(/s$/, "");
-  const want = new Set(
-    [...wordsOf(entries.map((e) => e.lines.map((l) => l.text).join(" ")).join(" "))].map(singular),
-  );
-  const terms = new Set(common);
-  return done
-    .filter(
-      (e) =>
-        e.status === "translated" &&
-        e.translations?.length === 1 &&
-        e.source &&
-        (terms.has(e.source) || /^[A-Za-z]{4,}$/.test(e.source.trim())) &&
-        [...wordsOf(e.source)].every((w) => want.has(singular(w))),
-    )
-    .slice(0, 20)
-    .map((e) => ({ source: e.source!, translation: e.translations![0]!.translation }));
-}
-
-/**
- * One request to the dev server's translate route (ai.ts devTranslate): its answer, with the
- * tokens it used (`usage`). Undefined: no Void's AI. Empty lines: an answer that couldn't be used.
- */
-export type TranslateCall = (body: object) => Promise<Record<string, unknown> | undefined>;
-
-/** What the requests of a run cost, in US$, from the tokens each answer reports. */
-export const spentOn = (answers: (Record<string, unknown> | undefined)[]) =>
-  answers.reduce((a, r) => a + ((r?.usage as Usage[]) ?? []).reduce((b, u) => b + costOf(u), 0), 0);
-
-/**
- * Each line with its source line's own leading and trailing spaces, whatever the model added (a
- * Thai answer once began " {name} จอง…", 2026-11-15).
- */
-const spaced = (source: { translation: string }[], lines: string[]) =>
-  lines.map((l, i) => {
-    const src = source[i]?.translation ?? "";
-    return src.match(/^\s*/)![0] + l.trim() + src.match(/\s*$/)![0];
-  });
-
 /** Run `work` on every item, `n` at a time, in order. */
 async function inTurn<T, R>(items: T[], n: number, work: (item: T) => Promise<R>): Promise<R[]> {
   const out: R[] = [];
@@ -598,66 +513,27 @@ async function inTurn<T, R>(items: T[], n: number, work: (item: T) => Promise<R>
   return out;
 }
 
-/**
- * One string through Void's AI on its own, for one the batches didn't get right: sent, checked
- * (problemsWith), and asked again with what was wrong, up to twice (judge.ts: problemsWith,
- * glossaryMisses). Every problem must be gone; a glossary word not used is asked about too, and
- * accepted on the last answer. Undefined when Void's AI isn't there.
- */
-export async function translateEntry(
-  call: TranslateCall,
-  o: {
-    from: string;
-    to: string;
-    entry: {
-      description: string;
-      lines: { text: string; variations: Record<string, number> }[];
-      keep?: string[];
-      context?: string;
-    };
-    glossary?: { source: string; translation: string }[];
-    /** fbtee's own rules (fbteeRules). */
-    fbtee?: string;
-    /** Told each answer, to count what it cost. */
-    onAnswer?: (answer: Record<string, unknown>) => void;
-  },
-): Promise<
-  | { lines: string[]; problems: string[]; attempts: number; last: Record<string, unknown> }
-  | undefined
-> {
-  const source = o.entry.lines.map((l) => ({ translation: l.text, variations: l.variations }));
-  const glossary = o.glossary ?? [];
-  let feedback: string[] = [];
-  let out: string[] = [];
-  let attempts = 0;
-  let last: Record<string, unknown> = {};
-  for (; attempts < 3;) {
-    const answer = await call({
-      kind: "strings",
-      from: o.from,
-      to: o.to,
-      entries: [o.entry],
-      glossary,
-      fbtee: o.fbtee,
-      feedback: feedback.length ? { answer: out, problems: feedback } : undefined,
-    });
-    attempts++;
-    if (!answer) return;
-    o.onAnswer?.(answer);
-    last = answer;
-    out = spaced(source, ((answer.lines ?? []) as string[][])[0] ?? []);
-    const hard = problemsWith(source, out, o.to, o.from);
-    const soft = glossaryMisses(glossary, out);
-    feedback = [...hard, ...soft];
-    if (!hard.length && (!soft.length || attempts === 3)) break;
-  }
-  return { lines: out, problems: problemsWith(source, out, o.to, o.from), attempts, last };
+/** How many requests go to Void's AI at once: one string each (plans/translation-simple.md). */
+const AT_ONCE = 4;
+
+/** The dev server's route's answer (ai.ts devTranslate): a translation, its problems, cost, log. */
+export interface RouteAnswer {
+  result?: unknown;
+  problems?: string[];
+  usage?: Spent;
+  logId?: string;
 }
 
 /**
+ * One request to the dev server's translate route (ai.ts devTranslate). Undefined: no Void's AI,
+ * or not paid for now. An answer with no `result`: it was unusable.
+ */
+export type TranslateCall = (body: object) => Promise<RouteAnswer | undefined>;
+
+/**
  * Requests to the dev server's translate route (ai.ts devTranslate). Undefined: Void's AI isn't
- * there (503), or not paid for now (402, 429: credits used up, a spend limit reached); empty lines:
- * an answer that couldn't be used (502), with what it still cost.
+ * there (503), or not paid for now (402, 429: credits used up, a spend limit reached); no result:
+ * an answer that couldn't be used (502).
  */
 export function routeCall(
   url: string,
@@ -666,7 +542,9 @@ export function routeCall(
   app?: string,
 ): TranslateCall {
   let paymentSaid = false;
+  let gone = false;
   return async (body) => {
+    if (gone) return undefined;
     const res = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json", "x-void-fbtee-token": token },
@@ -674,40 +552,64 @@ export function routeCall(
     });
     if (res.status === 503) {
       const { error } = (await res.json().catch(() => ({}))) as { error?: string };
-      log(`Void's AI isn't available here (${error ?? "no answer"}), so Claude Code translates`);
+      if (!gone)
+        log(`Void's AI isn't available here (${error ?? "no answer"}), so Claude Code translates`);
+      gone = true;
       return undefined;
     }
     if (res.status === 402 || res.status === 429) {
-      // Not paid for now: asking again (entry by entry) would only fail again. The rest is left
-      // new, for Claude Code, or the next save once credits are back.
+      // Not paid for now: asking again would only fail again. The rest is left new, for Claude
+      // Code, or the next save once credits are back.
       if (!paymentSaid)
         log(`Void's AI stopped: ${paymentAdvice[res.status === 402 ? "credits" : "limit"]}`);
       paymentSaid = true;
+      gone = true;
       return undefined;
     }
     if (res.status === 502) {
-      const { error, usage } = (await res.json().catch(() => ({}))) as {
-        error?: string;
-        usage?: Usage[];
-      };
-      log(`Void's AI gave an unusable answer (${error ?? "no answer"}); asked again`);
-      return { usage };
+      const { error } = (await res.json().catch(() => ({}))) as { error?: string };
+      log(`Void's AI gave an unusable answer (${error ?? "no answer"})`);
+      return {};
     }
     if (!res.ok) throw new Error(`the dev server's translate route answered ${res.status}`);
-    return (await res.json()) as Record<string, unknown>;
+    return (await res.json()) as RouteAnswer;
   };
 }
 
 /** Today, as a catalog records it: YYYY-MM-DD. */
 const today = () => new Date().toISOString().slice(0, 10);
 
+/** A line's forms as one key, to match a line with its source line: `{"0":20,"1":2}`. */
+const formsOf = (v: Record<string, number> | undefined) =>
+  JSON.stringify(
+    Object.fromEntries(Object.entries(v ?? {}).sort(([a], [b]) => Number(a) - Number(b))),
+  );
+
 /**
- * Every new entry of one language's catalog through Void's AI, wuchale's way (models.ts BATCH):
- * up to 50 entries a request, 4 requests at once; the entries that fail the checks go again in a
- * second round of batches; any still failing then go one at a time with what was wrong
- * (translateEntry). An answer that passes the checks is written into the catalog object (its
- * lines, "translated", who and when); the file is the caller's. The glossary is the catalog's
- * finished entries as it was when the run began. Undefined when Void's AI isn't there.
+ * What an entry is translated from: its lines in the source language, from what fbtee collects
+ * from the code (catalogs.ts freshCatalog), each matched to the catalog's line by the forms it's
+ * for. Never the catalog's own line: once a line is added to a translated entry (a language's new
+ * plural form), it holds the translation, not the source. Undefined when the code no longer has it.
+ */
+function sourceEntry(entry: CatalogEntry, fresh: CatalogEntry | undefined): Entry | undefined {
+  if (!fresh?.translations?.length || !entry.translations?.length) return;
+  const byForms = new Map(fresh.translations.map((l) => [formsOf(l.variations), l.translation]));
+  const lines = entry.translations.map((l) => ({
+    text: byForms.get(formsOf(l.variations)),
+    variations: l.variations ?? {},
+  }));
+  if (lines.some((l) => l.text === undefined)) return;
+  return {
+    description: entry.description ?? fresh.description ?? "",
+    lines: lines as Entry["lines"],
+  };
+}
+
+/**
+ * Every new entry of one language's catalog through Void's AI, one entry a request, a few at once
+ * (AT_ONCE). Each answer is checked in the Worker (ai.ts translateString: asked once more if
+ * anything was wrong); one with no problems is written into the catalog object, with who, when,
+ * its log and its cost; the file is the caller's. Undefined when Void's AI isn't there.
  */
 export async function translateCatalog(
   p: Project,
@@ -717,105 +619,57 @@ export async function translateCatalog(
   log: (line: string) => void,
 ): Promise<{ done: number; open: number; usd: number } | undefined> {
   const { texts, builtinHashes } = collect(p);
-  const fbtee = fbteeRules(p.root);
-  const from = p.config.sourceLocale;
-  const common = Object.keys(p.common ?? {});
-  // The app's own translations, each with its source text, for the glossary (not written back).
-  // Not fbtee's built-in strings: list joiners, and English where an app hasn't translated them.
-  const finished = Object.entries(catalog.translations)
-    .filter(([hash]) => !builtinHashes.has(hash))
-    .map(([hash, e]) => ({ ...e, source: texts[hash] }));
-  const answers: (Record<string, unknown> | undefined)[] = [];
-  const toSend = (hash: string, entry: CatalogEntry) => ({
-    description: entry.description ?? "",
-    lines: entry.translations!.map((l) => ({ text: l.translation, variations: l.variations })),
-    keep: [...new Set(entry.translations!.flatMap((l) => keptTerms(l.translation)))],
-    context: sourceContext(p, hash),
-  });
-  const keep = (entry: CatalogEntry, lines: string[], answer: Record<string, unknown>) => {
+  const fresh = (
+    JSON.parse(freshCatalog(p, locale)) as { translations: Record<string, CatalogEntry> }
+  ).translations;
+  const open = Object.entries(catalog.translations).filter(
+    ([, e]) => e.status === "new" && e.translations?.length,
+  );
+  let usd = 0;
+  let done = 0;
+  let gone = false;
+  await inTurn(open, AT_ONCE, async ([hash, entry]) => {
+    const source = sourceEntry(entry, fresh[hash]);
+    if (!source || gone) return;
+    const answer = await call({
+      kind: "string",
+      from: sourceLanguageOf(hash, builtinHashes, p.config.sourceLocale),
+      to: locale,
+      entry: source,
+    });
+    if (!answer) {
+      gone = true;
+      return;
+    }
+    usd += answer.usage?.usd ?? 0;
+    const lines = answer.result as (string | null | undefined)[] | undefined;
+    if (!lines || answer.problems?.length) {
+      if (answer.problems?.length)
+        log(`${texts[hash] ?? hash} → ${JSON.stringify(lines)}: ${answer.problems.join(" ")}`);
+      return;
+    }
     entry.translations = entry.translations!.map((l, k) => ({ ...l, translation: lines[k]! }));
     entry.status = "translated";
     entry.translatedBy = GEMINI.id;
     entry.translatedAt = today();
-    const logId = ((answer.logs ?? []) as string[]).at(-1);
-    if (logId) entry.gatewayLogId = logId;
+    if (answer.logId) entry.gatewayLogId = answer.logId;
     else delete entry.gatewayLogId;
+    if (answer.usage) entry.usage = answer.usage;
+    else delete entry.usage;
     delete entry.review;
-  };
-  let open = Object.entries(catalog.translations).filter(
-    ([, e]) => e.status === "new" && e.translations?.length,
-  );
-  const total = open.length;
-  let gone = false;
-  for (let round = 1; round <= 2 && open.length && !gone; round++) {
-    const batches: (typeof open)[] = [];
-    for (let i = 0; i < open.length; i += BATCH.size) batches.push(open.slice(i, i + BATCH.size));
-    const failed: typeof open = [];
-    await inTurn(batches, BATCH.parallel, async (batch) => {
-      const sends = batch.map(([hash, entry]) => toSend(hash, entry));
-      const answer = await call({
-        kind: "strings",
-        from,
-        to: locale,
-        entries: sends,
-        glossary: glossaryFor(finished, sends, common),
-        fbtee,
-      });
-      answers.push(answer);
-      if (!answer) {
-        gone = true;
-        return;
-      }
-      const lines = (answer.lines ?? []) as string[][];
-      batch.forEach(([hash, entry], i) => {
-        const out = spaced(entry.translations!, lines[i] ?? []);
-        if (
-          problemsWith(
-            entry.translations!,
-            out,
-            locale,
-            sourceLanguageOf(hash, builtinHashes, from),
-          ).length
-        )
-          failed.push([hash, entry]);
-        else keep(entry, out, answer);
-      });
-    });
-    open = failed;
-  }
-  if (gone) return;
-  // Still failing after two rounds: each on its own, told what was wrong.
-  const results = await inTurn(open, BATCH.parallel, async ([hash, entry]) => {
-    const send = toSend(hash, entry);
-    const answer = await translateEntry(call, {
-      from: sourceLanguageOf(hash, builtinHashes, from),
-      to: locale,
-      entry: send,
-      glossary: glossaryFor(finished, [send], common),
-      fbtee,
-      onAnswer: (a) => answers.push(a),
-    });
-    if (!answer) return;
-    // Not kept: say what was wrong with its last answer, so the reason is in the log.
-    if (answer.problems.length) {
-      log(`${texts[hash]} → ${JSON.stringify(answer.lines)}: ${answer.problems.join(" ")}`);
-      return false;
-    }
-    keep(entry, answer.lines, answer.last);
-    return true;
+    done++;
   });
-  if (results.includes(undefined)) return;
-  const usd = spentOn(answers);
-  return { done: total - results.filter((r) => r === false).length, open: total, usd };
+  if (gone && !done) return;
+  return { done, open: open.length, usd };
 }
 
 /**
  * Translate what's new with Void's AI, through the dev server's own route (ai.ts devTranslate,
  * in the app's Worker): every catalog's new entries and every markdown page missing or out of
- * date, all at once (translateCatalog, routeCall). Every answer is checked as the build checks it
- * (placeholders kept; a page's kept parts, title and description), and only what passes is
- * written: an entry marked translated, a page stamped. Resolves false when Void's AI isn't there
- * (the app doesn't use `void/ai`, or no Cloudflare sign-in); what passed is still written.
+ * date, all at once (translateCatalog, routeCall). Only what passes is written: an entry marked
+ * translated, a page stamped after its kept parts are checked (check.ts keptParts). Resolves false
+ * when Void's AI isn't there (the app doesn't use `void/ai`, or no Cloudflare sign-in); what
+ * passed is still written.
  */
 export async function translateWithVoidAi(
   p: Project,
@@ -839,11 +693,15 @@ export async function translateWithVoidAi(
     // its entry is still there and still new. What passed is written even when another answer
     // found Void's AI gone.
     const now = JSON.parse(readFileSync(file, "utf8")) as typeof catalog;
+    let changed = false;
     for (const [hash, entry] of Object.entries(catalog.translations)) {
       const there = now.translations[hash];
-      if (entry.status === "translated" && there?.status === "new") now.translations[hash] = entry;
+      if (entry.status === "translated" && there?.status === "new") {
+        now.translations[hash] = entry;
+        changed = true;
+      }
     }
-    writeFileSync(file, JSON.stringify(now, null, 2) + "\n");
+    if (changed) writeFileSync(file, JSON.stringify(now, null, 2) + "\n");
     if (ran?.open)
       log(
         `${rel(file)}: ${ran.done} of ${ran.open} translated with ${GEMINI.id}, US$${ran.usd.toFixed(4)}`,
@@ -856,15 +714,10 @@ export async function translateWithVoidAi(
     .filter((page) => page.state === "missing" || page.state === "stale")
     .map(async (page) => {
       const original = readFileSync(page.original, "utf8");
-      const answer = await call({
-        kind: "page",
-        from,
-        to: page.locale,
-        text: original,
-      });
+      const answer = await call({ kind: "page", from, to: page.locale, text: original });
       if (!answer) return false;
-      log(`${rel(page.file)}: asked ${GEMINI.id}, US$${spentOn([answer]).toFixed(4)}`);
-      const copy = typeof answer.page === "string" ? answer.page : "";
+      log(`${rel(page.file)}: asked ${GEMINI.id}, US$${(answer.usage?.usd ?? 0).toFixed(4)}`);
+      const copy = typeof answer.result === "string" ? answer.result : "";
       if (!copy.trim()) return true;
       const same = (a: string[], b: string[]) => a.join("\n") === b.join("\n");
       if (missingHead(original, copy).length || !same(keptParts(original), keptParts(copy))) {
@@ -873,8 +726,7 @@ export async function translateWithVoidAi(
       }
       mkdirSync(dirname(page.file), { recursive: true });
       writeFileSync(page.file, copy.endsWith("\n") ? copy : copy + "\n");
-      const logs = (answer.logs ?? []) as string[];
-      stamp(p, page.file, { by: GEMINI.id, gatewayLogId: logs.at(-1) });
+      stamp(p, page.file, { by: GEMINI.id, gatewayLogId: answer.logId, usage: answer.usage });
       log(`${rel(page.file)}: translated with Void's AI from ${source.segment}/${page.path}`);
       return true;
     });

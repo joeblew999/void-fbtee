@@ -16,7 +16,7 @@ export interface RuntimeConfig extends LocaleConfig {
   /** voidFbtee({ redirectHome }): whether "/" sends each visitor to their own language. */
   redirectHome: boolean;
   /** voidFbtee({ content }): the tables people write in, each with its fields (content.ts). */
-  content?: Record<string, { fields: string[]; about: string }>;
+  content?: Record<string, { fields: string[] }>;
   /** The app's name, its package.json's, for AI Gateway's logs. */
   app?: string;
 }
@@ -61,12 +61,52 @@ export function localeContextOptions(
   };
 }
 
-/** A language's fallbacks (`voidFbtee({ fallbackLocales })`, fbtee's option), best first. */
+/**
+ * A locale and its natural parents, as fbtee 6 makes them (lib/localeFallback.tsx
+ * getLocaleHierarchy, not exported): its base name, its language with script and region, its
+ * language with its likely script, and its bare language when that's the language's own script
+ * (fr-CA → fr; zh-Hant-TW → zh-Hant, never zh, which is Hans).
+ */
+function hierarchy(locale: string): string[] {
+  const out = new Set([locale]);
+  try {
+    const parsed = new Intl.Locale(locale);
+    out.add(parsed.baseName);
+    out.add([parsed.language, parsed.script, parsed.region].filter(Boolean).join("-"));
+    const script = parsed.maximize().script;
+    if (script) out.add(`${parsed.language}-${script}`);
+    if (script === new Intl.Locale(parsed.language).maximize().script) out.add(parsed.language);
+  } catch {
+    // Not a locale Intl knows: only itself.
+  }
+  return [...out];
+}
+
+/**
+ * A language's fallbacks, best first, as fbtee's own lookup tries them (fbtee 6
+ * lib/localeFallback.tsx getLocaleFallbackChain, not exported), without the locale itself and the
+ * source language, which callers add: its natural parents (fr-CA → fr), each with its own
+ * fallbacks from `voidFbtee({ fallbackLocales })`, then the default ones. Some are fbtee's own
+ * identities ("th-Thai") that name no catalog; callers keep only the ones the app has.
+ */
 export function fallbacksOf(locale: string, fallbacks: FallbackLocales | undefined): string[] {
-  if (!fallbacks) return [];
-  return Array.isArray(fallbacks)
-    ? [...fallbacks]
-    : [...((fallbacks as Readonly<Record<string, readonly string[]>>)[locale] ?? [])];
+  const map = (fallbacks && !Array.isArray(fallbacks) ? fallbacks : {}) as Readonly<
+    Record<string, readonly string[]>
+  >;
+  const result = new Set<string>();
+  const append = (value: string) => {
+    const added: string[] = [];
+    for (const parent of hierarchy(value))
+      if (!result.has(parent)) {
+        result.add(parent);
+        added.push(parent);
+      }
+    for (const parent of added) map[parent]?.forEach(append);
+  };
+  append(locale);
+  (Array.isArray(fallbacks) ? (fallbacks as readonly string[]) : map.default)?.forEach(append);
+  result.delete(locale);
+  return [...result];
 }
 
 /**

@@ -1,79 +1,52 @@
 // Translating with Void's AI (`ai` from `void/ai`), in the app's Worker. One translator for
-// everything: what people post, at runtime (an app's queue calls translate()), and the app's own
-// strings and pages while `vp dev` runs (the dev server's route calls translateStrings() and
-// translatePage(): plugin.ts, devTranslate below). Each is told how to translate by the translating
-// skill (skills/void-fbtee-translate/SKILL.md, bundled into the code: TRANSLATING), the text a
-// coding agent reads too: instructions() below, the one place a request is worded.
+// everything: the app's own strings and pages while `vp dev` runs (the dev server's route,
+// devTranslate below, which plugin.ts and translate.ts call), and what people post, at runtime (an
+// app's queue: queue-translate.ts). What's sent and how the answer is read: gemini.ts.
 //
 // Void's AI is there wherever Void runs the app's code: dev, the preview and Cloudflare, in a
 // route, a queue or a job (found 2026-11-13, plans/quiet-harbor-atlas.md, 7b). Void only connects
 // it when the app's own files import `void/ai` (Void 1.8.0's binding inference reads the app's
 // files, not its packages), so importing this module from void-fbtee changes nothing for an app
 // without AI: ai.run then throws "Not available", and the dev server translates another way.
-//
-// The model, and why: models.ts.
 import { ai } from "void/ai";
-import skill from "../skills/void-fbtee-translate/SKILL.md?raw";
-import { GEMINI, paymentProblem, paymentAdvice, type Usage } from "./models";
-import { MARKS } from "./plurals";
-import { postProblems } from "./judge";
+import {
+  answerText,
+  fieldsAnswer,
+  fieldsRequest,
+  pageRequest,
+  stringAnswer,
+  stringRequest,
+  usageOf,
+  type Entry,
+  type GeminiAnswer,
+  type GeminiRequest,
+} from "./gemini";
+import { fieldProblems, problemsWith } from "./judge";
+import { GEMINI, paymentAdvice, paymentProblem, spent, type Spent, type Usage } from "./models";
 
-export { GEMINI, paymentProblem, paymentAdvice, type Usage };
+export { GEMINI, paymentProblem, paymentAdvice, type Spent, type Usage };
 
-/**
- * How to translate: the translating skill (skills/void-fbtee-translate/SKILL.md), the same text a
- * coding agent reads, bundled into the code so it travels with it. Its frontmatter is the
- * skill's own label, not a rule.
- */
-export const TRANSLATING = skill.replace(/^---\n[\s\S]*?\n---\n+/, "").trim();
+/** What's translated: the app's `<fbt>` text, what people post, a markdown page. */
+export type Kind = "fbt" | "post" | "page";
 
-/** A language's English name, for the prompt ("Thai" for "th-TH"). */
-const named = (locale: string) =>
-  new Intl.DisplayNames("en", { type: "language" }).of(locale) ?? locale;
-
-/** Gemini's own answer shape (generateContent). */
-interface GeminiAnswer {
-  candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[];
-  usageMetadata?: {
-    promptTokenCount?: number;
-    candidatesTokenCount?: number;
-    thoughtsTokenCount?: number;
-  };
+/** What a request is tagged with in the gateway's logs. */
+export interface Track {
+  /** The app's name, in the gateway's logs (its package.json name). */
+  app?: string;
 }
 
-/**
- * Ask Gemini for JSON of a given shape, in its own request shape, as wuchale sends it
- * (src/ai/gemini.ts): the instructions as systemInstruction, thinking off (thinkingBudget 0), JSON
- * asked for by mime type, and the schema in the instructions (asked only for "JSON", Gemini made up
- * its own shape, 2026-11-17). Cloudflare's catalog shows Gemini taking this shape through the
- * binding (its model page's examples, checked 2026-11-17). In the Chat Completions shape its
- * thinking stayed on and spent all 8192 tokens with no answer (2026-11-17).
- */
-async function ask<T>(
-  system: string,
-  user: string,
-  schema: object,
-  { kind, app, onUsage, onLog }: Track & { kind: Kind },
-): Promise<T> {
+/** One answer, with the tokens its request used and its AI Gateway log id. */
+interface Asked {
+  answer: GeminiAnswer;
+  usage: Usage;
+  logId?: string;
+}
+
+/** One request to Gemini through Void's AI, in Gemini's own shape (gemini.ts). */
+async function ask(body: GeminiRequest, { kind, app }: Track & { kind: Kind }): Promise<Asked> {
   const raw = (await ai.run(
     GEMINI.id as never,
-    {
-      systemInstruction: {
-        parts: [
-          {
-            text: `${system}\n\nReply with one JSON object and nothing else, matching this JSON Schema: ${JSON.stringify(schema)}`,
-          },
-        ],
-      },
-      contents: [{ role: "user", parts: [{ text: user }] }],
-      generationConfig: {
-        // A translation, not a story: the model's most likely answer.
-        temperature: 0,
-        maxOutputTokens: 8192,
-        responseMimeType: "application/json",
-        thinkingConfig: { thinkingBudget: 0 },
-      },
-    } as never,
+    body as never,
     // Through the account's AI Gateway ("default", Cloudflare's own, made on a first request),
     // which a third-party model needs, and which logs every request; its cache off: a string is
     // asked for once, and its accepted answer is kept in the catalog (AI Gateway docs, "Workers
@@ -82,8 +55,7 @@ async function ask<T>(
     // from `vp dev` or a built Worker (the live site, a Worker Preview, or `vp preview`), and what
     // it translated, so the gateway's logs, shared by every app on the account, can be told apart.
     // The raw response, for the gateway's log id (its cf-aig-log-id header): it names the exact
-    // request, answer and cost, and is stored with what the answer became
-    // (plans/translation-provenance.md).
+    // request and answer, and is stored with what the answer became.
     {
       gateway: {
         id: "default",
@@ -99,320 +71,157 @@ async function ask<T>(
       returnRawResponse: true,
     } as never,
   )) as unknown;
-  let result: GeminiAnswer;
+  let answer: GeminiAnswer;
+  let logId: string | undefined;
   if (raw instanceof Response) {
-    const logId = raw.headers.get("cf-aig-log-id");
-    if (logId) onLog?.(logId);
+    logId = raw.headers.get("cf-aig-log-id") ?? undefined;
     // The status in the message: paymentProblem() reads a 402 from it (models.ts). A 429 never
     // gets here: Void's runtime throws its own "usage limit" error first, which it reads too.
     if (!raw.ok) throw new Error(`ai: ${raw.status}: ${await raw.text()}`);
-    result = (await raw.json()) as GeminiAnswer;
-  } else result = raw as GeminiAnswer;
-  const m = result.usageMetadata;
-  // Thinking is paid as output: counted with it, so the cost is right even if it isn't off.
-  if (onUsage && m)
-    onUsage({
-      prompt_tokens: m.promptTokenCount ?? 0,
-      completion_tokens: (m.candidatesTokenCount ?? 0) + (m.thoughtsTokenCount ?? 0),
-    });
-  const candidate = result.candidates?.[0];
-  const text = candidate?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
-  if (!text || (candidate?.finishReason && candidate.finishReason !== "STOP"))
-    throw new Error(
-      `${GEMINI.id} gave no complete answer (${candidate?.finishReason ?? "no content"})`,
-    );
-  const start = text.indexOf("{");
-  const end = text.lastIndexOf("}");
+    answer = (await raw.json()) as GeminiAnswer;
+  } else answer = raw as GeminiAnswer;
+  return { answer, usage: usageOf(answer), logId };
+}
+
+/** An answer's text, which must be complete; parsed as JSON when `json`. */
+function read(asked: Asked, json: boolean): unknown {
+  const { text, complete } = answerText(asked.answer);
+  if (!complete) throw new Error(`${GEMINI.id} gave no complete answer`);
+  if (!json) return text;
   try {
-    return JSON.parse(start >= 0 && end > start ? text.slice(start, end + 1) : text) as T;
+    return JSON.parse(text);
   } catch (error) {
     // Say what came back, so a shape we don't read yet can be seen and fixed.
     throw new Error(
-      `${GEMINI.id}'s answer isn't one JSON object: ${String(error)}; it begins ${JSON.stringify(text.slice(0, 200))} and ends ${JSON.stringify(text.slice(-200))}`,
+      `${GEMINI.id}'s answer isn't JSON: ${String(error)}; it begins ${JSON.stringify(text.slice(0, 200))}`,
     );
   }
 }
 
 /**
- * Translate a few fields of text people wrote (an event's title and description, say) from one
- * language into another. `about` says what they are ("listings for events"). The same keys come
- * back.
+ * Each line with its source line's own leading and trailing spaces, whatever the model gave: some
+ * lines are pieced together around other text (a Thai answer once began " {name} จอง…",
+ * 2026-11-15).
  */
-export async function translate<K extends string>(
+const spaced = (entry: Entry, lines: (string | undefined)[]) =>
+  lines.map((l, i) => {
+    if (l === undefined) return undefined;
+    const src = entry.lines[i]?.text ?? "";
+    return src.match(/^\s*/)![0] + l.trim() + src.match(/\s*$/)![0];
+  });
+
+/** A translation, what was still wrong with it (nothing: it's right), what it cost, and its log. */
+export interface Translated<T> {
+  result: T;
+  problems: string[];
+  usage: Spent;
+  logId?: string;
+}
+
+/**
+ * One of the app's strings (a catalog entry, its lines in the source language) into `to`: asked,
+ * checked (judge.ts problemsWith), and asked once more, told what was wrong, if anything was. Its
+ * lines, in the entry's order; any problems left mean it isn't to be kept.
+ */
+export async function translateString(
+  entry: Entry,
+  { from, to, ...track }: { from: string; to: string } & Track,
+): Promise<Translated<(string | undefined)[]>> {
+  const source = entry.lines.map((l) => ({ translation: l.text, variations: l.variations }));
+  const usages: Usage[] = [];
+  let retry: { answer: unknown; problems: string[] } | undefined;
+  for (;;) {
+    const asked = await ask(stringRequest(entry, { from, to, retry }), { ...track, kind: "fbt" });
+    usages.push(asked.usage);
+    const answer = read(asked, true);
+    const lines = spaced(entry, stringAnswer(entry, answer));
+    const problems = problemsWith(source, lines, to);
+    if (!problems.length || retry)
+      return { result: lines, problems, usage: spent(usages), logId: asked.logId };
+    retry = { answer, problems };
+  }
+}
+
+/**
+ * A post's fields (an event's title and description, say) into `to`, by name: asked, checked
+ * (judge.ts fieldProblems), and asked once more if anything was wrong. Still wrong: an error, so
+ * the queue tries again later (queue-translate.ts).
+ */
+export async function translateFields<K extends string>(
   fields: Record<K, string>,
-  { from, to, about, ...track }: { from: string; to: string; about: string } & Track,
-): Promise<Record<K, string>> {
-  const keys = Object.keys(fields) as K[];
-  // Each answer's own log: the one kept is the one reported (track.onLog), with its tokens.
-  const once = async (feedback: string[]) => {
-    let logId: string | undefined;
-    const out = await ask<Record<K, string>>(
-      instructions(
-        "post",
-        about,
-        { from, to },
-        "Reply with JSON only: an object with the same keys.",
-      ),
-      // The language to write in, said again with the text, as the strings' request says it: given
-      // only in the system prompt, a model has answered with the text unchanged (a Thai post left
-      // in English, AI Gateway's logs, 2026-11-16).
-      `Translate from ${named(from)} into ${named(to)}:\n${JSON.stringify(fields)}` +
-        (feedback.length
-          ? `\n\nYour last answer had these problems; fix them:\n- ${feedback.join("\n- ")}`
-          : ""),
-      {
-        type: "object",
-        properties: Object.fromEntries(keys.map((k) => [k, { type: "string" }])),
-        required: keys,
-      },
-      { ...track, kind: "post", onLog: (id) => (logId = id) },
-    );
-    const answer = Object.fromEntries(keys.map((k) => [k, String(out[k] ?? "")])) as Record<
-      K,
-      string
-    >;
-    return { answer, logId, problems: postProblems(fields, answer, from, to) };
-  };
-  // Checked as the app's own text is (judge.ts postProblems); asked once more, told what was
-  // wrong, and the better of the two kept.
-  const first = await once([]);
-  let best = first;
-  if (first.problems.length) {
-    const second = await once(first.problems);
-    if (second.problems.length <= first.problems.length) best = second;
-    if (best.problems.length)
-      console.warn(
-        `void-fbtee: a post's translation into ${to} still has: ${best.problems.join(" ")}`,
-      );
+  { from, to, ...track }: { from: string; to: string } & Track,
+): Promise<Translated<Record<K, string>>> {
+  const usages: Usage[] = [];
+  let retry: { answer: unknown; problems: string[] } | undefined;
+  for (;;) {
+    const asked = await ask(fieldsRequest(fields, { from, to, retry }), {
+      ...track,
+      kind: "post",
+    });
+    usages.push(asked.usage);
+    const answer = read(asked, true);
+    const got = fieldsAnswer(fields, answer);
+    const problems = fieldProblems(fields, got);
+    if (!problems.length)
+      return {
+        result: got as Record<K, string>,
+        problems,
+        usage: spent(usages),
+        logId: asked.logId,
+      };
+    if (retry) throw new Error(`a post's translation into ${to} still has: ${problems.join(" ")}`);
+    retry = { answer, problems };
   }
-  if (best.logId) track.onLog?.(best.logId);
-  return best.answer;
 }
 
-/** What's translated: the app's `<fbt>` text, what people post, a markdown page. */
-export type Kind = "fbt" | "post" | "page";
-
-/** What a request is tagged with, and who is told what it cost and where it's logged. */
-export interface Track {
-  /** The app's name, in the gateway's logs (its package.json name). */
-  app?: string;
-  /** Told each request's tokens. */
-  onUsage?: (usage: Usage) => void;
-  /** Told each request's AI Gateway log id: store it with what the answer became. */
-  onLog?: (logId: string) => void;
-}
-
-/** The skill's sections each kind is sent (its `## ` headings). */
-const SECTIONS: Record<Kind, string[]> = {
-  fbt: [
-    "The app's strings",
-    "Counts: one line per plural form",
-    "People: one line per gender",
-    "fbtee's built-in strings",
-    "Languages",
-  ],
-  post: ["What people post", "Languages"],
-  page: ["Markdown pages", "Languages"],
-};
-
-const bySection = new Map(
-  TRANSLATING.split(/^## /m)
-    .slice(1)
-    .map((part) => [part.slice(0, part.indexOf("\n")).trim(), `## ${part.trim()}`] as const),
-);
-for (const heading of Object.values(SECTIONS).flat())
-  if (!bySection.has(heading)) throw new Error(`the translating skill has no "## ${heading}"`);
-
-/**
- * How a kind of text is translated: the translating skill's sections for it, and for `<fbt>` text
- * fbtee's own rules first (fbtee's skill, steps 3 to 5, read from the app's installed fbtee by
- * vp dev: translate.ts fbteeRules), so every AI gets the same rules a coding agent reads.
- */
-export function rulesFor(kind: Kind, fbtee?: string): string {
-  return [
-    ...(kind === "fbt" && fbtee ? [`## fbtee's own rules\n\n${fbtee}`] : []),
-    ...SECTIONS[kind].map((h) => bySection.get(h)!),
-  ].join("\n\n");
-}
-
-/** What every request says, whatever the kind: what it is, the rules, and how to reply. */
-function instructions(
-  kind: Kind,
-  what: string,
-  { from, to, fbtee }: { from: string; to: string; fbtee?: string },
-  reply: string,
-): string {
-  const into = from === to ? `in ${named(to)} itself` : `from ${named(from)} into ${named(to)}`;
-  return [`You translate ${what}, ${into}.`, rulesFor(kind, fbtee), reply].join("\n\n");
-}
-
-/** One catalog entry to translate: its description and its source lines, each maybe a form. */
-export interface StringEntry {
-  description: string;
-  lines: { text: string; variations: Record<string, number> }[];
-  /** Words to keep exactly as written: commands, file names, paths (translate.ts keptTerms). */
-  keep?: string[];
-  /** The code around the string, where it shows (translate.ts sourceContext). */
-  context?: string;
-}
-
-/**
- * Translate an app's strings (fbtee catalog entries), by the rules void-fbtee's skill gives:
- * read the description, keep every {placeholder} exactly, one line per plural form, each in the
- * grammar of its form. Returns each entry's lines, in order.
- */
-export async function translateStrings(
-  entries: StringEntry[],
-  {
-    from,
-    to,
-    glossary = [],
-    feedback,
-    fbtee,
-    ...track
-  }: Track & {
-    from: string;
-    to: string;
-    /** fbtee's own rules, from the app's installed fbtee (translate.ts fbteeRules). */
-    fbtee?: string;
-    /** The app's own words for terms these entries use (translate.ts glossaryFor). */
-    glossary?: { source: string; translation: string }[];
-    /** For one entry asked again: its last answer and what was wrong with it. */
-    feedback?: { answer: string[]; problems: string[] };
-  },
-): Promise<string[][]> {
-  const items = entries.map((e, i) => ({
-    id: i,
-    description: e.description,
-    ...(e.keep?.length ? { keep_exactly: e.keep } : {}),
-    ...(e.context ? { code: e.context } : {}),
-    lines: e.lines.map((l) => ({
-      form:
-        Object.values(l.variations)
-          .map((v) => MARKS[v] ?? `variation ${v}`)
-          .join(", ") || "only",
-      source: l.text,
-    })),
-  }));
-  const out = await ask<{ entries: { id: number; lines: string[] }[] }>(
-    instructions(
-      "fbt",
-      "the text of a web app's user interface",
-      { from, to, fbtee },
-      "Each entry comes with its description, its code (the source around it, to show where the " +
-        "text appears), its keep_exactly words and its lines, each marked with its form. Reply " +
-        "with JSON only.",
-    ),
-    (glossary.length
-      ? `The app's own words for these terms: always use them, never another word:\n${JSON.stringify(glossary)}\n\n`
-      : "") +
-      `Translate from ${named(from)} into ${named(to)}:\n${JSON.stringify(items)}` +
-      (feedback
-        ? `\n\nYour last answer was ${JSON.stringify(feedback.answer)}. Change only what these points name; add nothing else:\n- ${feedback.problems.join("\n- ")}`
-        : ""),
-    {
-      type: "object",
-      properties: {
-        entries: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              id: { type: "number" },
-              lines: { type: "array", items: { type: "string" } },
-            },
-            required: ["id", "lines"],
-          },
-        },
-      },
-      required: ["entries"],
-    },
-    { ...track, kind: "fbt" },
-  );
-  return entries.map((_, i) =>
-    (out.entries?.find((e) => e.id === i)?.lines ?? []).map((l) =>
-      typeof l === "string" ? l : "",
-    ),
-  );
-}
-
-/**
- * Translate a markdown page whole, by the rules void-fbtee's skill gives: the frontmatter's title
- * and description translated, its other keys and the `<script>` block kept, and every component
- * tag, code block, link target, heading id and marker kept exactly. Returns the page.
- */
+/** A markdown page into `to`, whole: the page, as Gemini wrote it. */
 export async function translatePage(
   text: string,
   { from, to, ...track }: { from: string; to: string } & Track,
-): Promise<string> {
-  const out = await ask<{ page: string }>(
-    instructions(
-      "page",
-      "markdown pages of a website",
-      { from, to },
-      "Don't add a translatedFrom line. Reply with JSON only: the whole page as one string.",
-    ),
-    `Translate from ${named(from)} into ${named(to)}:\n${text}`,
-    { type: "object", properties: { page: { type: "string" } }, required: ["page"] },
-    { ...track, kind: "page" },
-  );
-  return String(out.page ?? "");
+): Promise<Translated<string>> {
+  const asked = await ask(pageRequest(text, { from, to }), { ...track, kind: "page" });
+  return {
+    result: String(read(asked, false)),
+    problems: [],
+    usage: spent([asked.usage]),
+    logId: asked.logId,
+  };
 }
 
-/** What the dev server sends its route (plugin.ts). */
+/** What the dev server sends its route (translate.ts routeCall). */
 export type DevRequest = {
-  /** The app's name, for the gateway's logs (plugin.ts: its package.json name). */
+  /** The app's name, for the gateway's logs (its package.json name). */
   app?: string;
+  from: string;
+  to: string;
 } & (
-  | {
-      kind: "strings";
-      from: string;
-      to: string;
-      entries: StringEntry[];
-      glossary?: { source: string; translation: string }[];
-      feedback?: { answer: string[]; problems: string[] };
-      /** fbtee's own rules, from the app's installed fbtee (translate.ts fbteeRules). */
-      fbtee?: string;
-    }
-  | { kind: "page"; from: string; to: string; text: string }
+  | { kind: "string"; entry: Entry }
+  | { kind: "page"; text: string }
+  | { kind: "post"; fields: Record<string, string> }
 );
 
 /**
  * The dev server's route, `POST /__void-fbtee/translate`: only under `vp dev` (the plugin's
- * virtual:void-fbtee/dev is empty in a build), and only for the dev server itself (the token it
- * made as it started). 503 when Void's AI isn't there (the app doesn't use it, or no Cloudflare
- * sign-in), so the dev server translates another way; 402 when the account's AI Gateway credits are
- * used up, 429 when a spend limit is reached; 502 when one answer was unusable.
+ * virtual:void-fbtee/dev is empty in a build), and only with the token the dev server made as it
+ * started (node_modules/.void-fbtee/dev-token). It writes nothing: it answers with the
+ * translation, what was still wrong with it, its cost and its log id; whoever asked keeps it or
+ * not. 503 when Void's AI isn't there (the app doesn't use it, or no Cloudflare sign-in); 402
+ * when the account's AI Gateway credits are used up, 429 when a spend limit is reached; 502 when
+ * the answer was unusable.
  */
 export async function devTranslate(request: Request, token: string): Promise<Response> {
   if (request.headers.get("x-void-fbtee-token") !== token)
     return new Response("not found", { status: 404 });
   const body = (await request.json()) as DevRequest;
-  // Every request's tokens go back with its answer, a failed one's too: what it cost, for whoever
-  // is counting (translate.ts, scripts/translations-measure.ts).
-  // And each request's gateway log id, kept with what its answer becomes (translate.ts).
-  const usage: Usage[] = [];
-  const logs: string[] = [];
-  const track: Track = {
-    app: body.app,
-    onUsage: (u) => usage.push(u),
-    onLog: (id) => logs.push(id),
-  };
+  const track = { from: body.from, to: body.to, app: body.app };
   try {
-    const result =
+    const done =
       body.kind === "page"
-        ? { page: await translatePage(body.text, { from: body.from, to: body.to, ...track }) }
-        : {
-            lines: await translateStrings(body.entries, {
-              from: body.from,
-              to: body.to,
-              glossary: body.glossary,
-              feedback: body.feedback,
-              fbtee: body.fbtee,
-              ...track,
-            }),
-          };
-    return Response.json({ ...result, model: GEMINI.id, usage, logs });
+        ? await translatePage(body.text, track)
+        : body.kind === "post"
+          ? await translateFields(body.fields, track)
+          : await translateString(body.entry, track);
+    return Response.json({ ...done, model: GEMINI.id });
   } catch (error) {
     // 503: no Void's AI here (Void's own message, "ai: Not available…"); 402 and 429: the
     // account isn't paying for it now (models.ts paymentProblem); 502: it answered something
@@ -420,6 +229,6 @@ export async function devTranslate(request: Request, token: string): Promise<Res
     const unavailable = /not available/i.test(String(error));
     const payment = paymentProblem(error);
     const status = unavailable ? 503 : payment === "credits" ? 402 : payment ? 429 : 502;
-    return Response.json({ error: String(error), model: GEMINI.id, usage, logs }, { status });
+    return Response.json({ error: String(error), model: GEMINI.id }, { status });
   }
 }

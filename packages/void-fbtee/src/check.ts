@@ -1,7 +1,6 @@
 // What `vp build` and `vp dev` check (the plugin runs check()), as plain functions. Each problem is one
 // line a person can act on.
-import { createHash } from "node:crypto";
-import { existsSync, globSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, globSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import {
   catalogFile,
@@ -11,7 +10,8 @@ import {
   missing,
   type Project,
 } from "./catalogs";
-import { problemsWith, sourceLanguageOf } from "./judge";
+import { problemsWith } from "./judge";
+import { fingerprint } from "./fingerprint";
 import { contentProblems } from "./content-files";
 import { firstFile, hasI18nMiddleware, HOME_PAGES, LAYOUTS, VOID_CONFIGS } from "./app-files";
 import { sourceOf, translatedOf } from "./locales";
@@ -45,7 +45,7 @@ export function frontmatter(
  */
 export function markdownHash(text: string): string {
   const normalised = text.replace(TRANSLATED_FROM_LINE, "").replace(/\s+/g, " ").trim();
-  return createHash("sha256").update(normalised).digest("hex").slice(0, 12);
+  return fingerprint(normalised);
 }
 
 export const recordedHash = (text: string) =>
@@ -260,12 +260,12 @@ export function check(p: Project): string[] {
       problems.push(`strings: ${r.locale}: ${r.builtin} of fbtee's built-in strings untranslated`);
   }
 
-  // Every finished translation, by the same checker vp dev asks of each answer (judge.ts
+  // Every finished translation, by the same check vp dev asks of each answer (judge.ts
   // problemsWith), against its source lines as a new catalog would have them (catalogs.ts
-  // freshCatalog): one line for each plural form and gender the language needs, nothing in the
-  // source language left in, the language's script, every placeholder and kept term, its grammar.
-  // Whoever wrote it: an AI, an agent or a person (plans/translation-rework.md, step 5).
-  const { texts, builtinHashes } = collect(p);
+  // freshCatalog): every line there, none empty, every placeholder kept. Only what breaks the
+  // app; nothing finished is ever set back to new (plans/translation-simple.md). Whoever wrote it:
+  // an AI, an agent or a person.
+  const { texts } = collect(p);
   for (const locale of translatedOf(p.config).map((l) => l.locale)) {
     const file = catalogFile(p, locale);
     if (!existsSync(file)) continue;
@@ -293,7 +293,6 @@ export function check(p: Project): string[] {
         source[hash].translations,
         entry.translations.map((l) => l.translation),
         locale,
-        sourceLanguageOf(hash, builtinHashes, p.config.sourceLocale),
       ))
         problems.push(`strings: ${locale}: ${JSON.stringify(texts[hash] ?? hash)}: ${what}`);
     }
@@ -345,44 +344,4 @@ export function check(p: Project): string[] {
     }
   }
   return problems;
-}
-
-/**
- * Every finished translation that fails the checks (the same ones `check()` reports, judge.ts
- * problemsWith), back to new, with its source lines as a new catalog has them, so `vp dev`
- * translates it again; one line each, saying what was wrong. A catalog written before the checks
- * were stricter (an app upgrading from 0.6.0) would otherwise fail the build with nothing to
- * translate it. Whoever wrote it: what was there is in git.
- */
-export function reopenFailing(p: Project): string[] {
-  const reopened: string[] = [];
-  const { texts, builtinHashes } = collect(p);
-  for (const locale of translatedOf(p.config).map((l) => l.locale)) {
-    const file = catalogFile(p, locale);
-    if (!existsSync(file)) continue;
-    type Line = { translation: string; variations: Record<string, number> };
-    type Entry = { status?: string; translations?: Line[]; [k: string]: unknown };
-    const catalog = JSON.parse(readFileSync(file, "utf8")) as {
-      translations: Record<string, Entry>;
-    };
-    const source = (JSON.parse(freshCatalog(p, locale)) as { translations: Record<string, Entry> })
-      .translations;
-    let changed = false;
-    for (const [hash, entry] of Object.entries(catalog.translations)) {
-      const fresh = source[hash];
-      if (entry.status === "new" || !entry.translations?.length || !fresh?.translations) continue;
-      const wrong = problemsWith(
-        fresh.translations,
-        entry.translations.map((l) => l.translation),
-        locale,
-        sourceLanguageOf(hash, builtinHashes, p.config.sourceLocale),
-      );
-      if (!wrong.length) continue;
-      catalog.translations[hash] = { ...fresh, status: "new" };
-      changed = true;
-      reopened.push(`${locale}: ${JSON.stringify(texts[hash] ?? hash)}: ${wrong.join(" ")}`);
-    }
-    if (changed) writeFileSync(file, JSON.stringify(catalog, null, 2) + "\n");
-  }
-  return reopened;
 }

@@ -1,8 +1,9 @@
 // `void-fbtee/queues/translate`: the consumer of the app's `queues/translate.ts`
 // (plans/translated-content.md). Each message is one row of content ({ table, id }); every
-// language it lacks is translated by Void's AI (ai.ts translate) and stored as soon as it's done,
-// with who made it and the request's gateway log, so a retry asks (and pays) only for what's still
-// missing. The app's file, at Void's own place:
+// language it lacks, or whose translation was made before the row was changed, is translated by
+// Void's AI (ai.ts translateFields) and stored as soon as it's done, with who made it, the
+// request's gateway log, what it cost and what it was made from, so a retry asks (and pays) only
+// for what's still missing. The app's file, at Void's own place:
 //
 //   // queues/translate.ts
 //   import "void/ai"; // Void connects its AI when the app's own files import it
@@ -13,7 +14,7 @@
 // `onTranslated` is the app's: which of its pages to refresh, which live topic to tell.
 import { defineQueue } from "void";
 import config from "virtual:void-fbtee/config";
-import { translate } from "./ai";
+import { translateFields } from "./ai";
 import { contentTables, storeTranslation, untranslated, type TranslateMessage } from "./content";
 import { GEMINI, paymentAdvice, paymentProblem } from "./models";
 
@@ -30,8 +31,7 @@ export function translationQueue({ onTranslated }: TranslationQueueOptions = {})
   return defineQueue<TranslateMessage>(async (batch) => {
     for (const message of batch.messages) {
       const { table, id } = message.body;
-      const about = contentTables().get(table)?.about;
-      const found = about ? await untranslated(table, id) : undefined;
+      const found = contentTables().has(table) ? await untranslated(table, id) : undefined;
       // Gone (deleted, its translations with it), or a table the app no longer translates.
       if (!found) {
         message.ack();
@@ -39,16 +39,20 @@ export function translationQueue({ onTranslated }: TranslationQueueOptions = {})
       }
       try {
         for (const locale of found.missing) {
-          let gatewayLogId: string | undefined;
           // Only the fields: the row's other columns aren't to be translated.
-          const fields = await translate(found.source.fields, {
+          const done = await translateFields(found.source.fields, {
             from: found.source.locale,
             to: locale,
-            about: about!,
             app: config.app,
-            onLog: (logId) => (gatewayLogId = logId),
           });
-          if (await storeTranslation(table, id, locale, fields, { by: GEMINI.id, gatewayLogId }))
+          if (
+            await storeTranslation(table, id, locale, done.result, {
+              by: GEMINI.id,
+              gatewayLogId: done.logId,
+              usage: done.usage,
+              from: found.from,
+            })
+          )
             await onTranslated?.(table, id, locale);
         }
         message.ack();

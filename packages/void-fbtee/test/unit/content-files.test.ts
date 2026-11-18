@@ -14,7 +14,7 @@ beforeEach(async () => {
   root = copyFixture();
   p = {
     ...(await loadProject(root)),
-    content: { posts: { fields: ["body"], about: "posts" } },
+    content: { posts: { fields: ["body"] } },
   };
   mkdirSync(join(root, "db/schema"), { recursive: true });
   writeFileSync(

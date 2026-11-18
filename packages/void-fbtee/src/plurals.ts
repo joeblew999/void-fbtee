@@ -121,9 +121,9 @@ const keyOf = (v: Record<string, number | string> | undefined) =>
 export const GENDER_CODE = { male: 1, female: 2, unknown: 3 } as const;
 
 /**
- * The word for each code a line can be marked with, as the translating skill names them
- * ("Counts", "People"): what Void's AI is told each line is for (ai.ts). From the same codes
- * withVariants writes, so the two can't differ; test/unit/skills.test.ts holds the skills to them.
+ * The word for each code a line can be marked with: the name each line is sent to Void's AI under,
+ * and answered under (gemini.ts lineName: "few", "female", "few, female"). From the same codes
+ * withVariants writes, so the two can't differ.
  */
 export const MARKS: Record<number, string> = Object.fromEntries([
   ...Object.entries(CATEGORY_CODE).map(([word, code]) => [code, word]),
