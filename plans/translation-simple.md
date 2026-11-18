@@ -101,6 +101,17 @@ Before something is in the code, a request shape is tried by hand with Cloudflar
 2026-11-18: `cf ai run google/gemini-4-hydrogen --body @request.json` (signed in with
 `cf auth login --no-use-keyring`, which needs the user's approval once).
 
+## How we'll know it's right
+
+- `vp check`, `test:unit`, `test:dev` and `test:preview`, as for every change.
+- `test:dev` sends a few real entries through the dev route with `"dryRun": true`, for `th-TH` and
+  `ar-EG` (a plain string, a time slot, a plural count, a gender line) and checks that every answer
+  came back on its own key and line name, with its placeholders. Real Gemini, no mock, nothing
+  written; a few US cents a run.
+- The same entries by hand with `cf ai run`, to compare our code's answer with Gemini's own.
+- A post created in `vp dev` comes back translated through the same function.
+- After deploying (the user's call), the live site shows the same.
+
 ## What goes
 
 - The rules cut from the skill file and fbtee's rules in every request (`rulesFor`, `SECTIONS`,
