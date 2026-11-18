@@ -91,6 +91,8 @@ above in place of the rules.
   bundling into `dist/ai.mjs` (`void-fbtee:raw` in the package's `vite.config.ts`).
 - `grammar.json` and `judge.ts`'s rule checks; what's left of `judge.ts` is the placeholder and
   line check.
+- The extras sent with each string: `sourceContext`, `keptTerms`, `glossaryFor`, `glossaryMisses`;
+  batching (`BATCH`) and its second round; `translateEntry`'s three tries.
 - `reopenFailing`; `postProblems`; matching by position; English read from the catalog line;
   `thinkingBudget`, `temperature`, the schema pasted into the prompt, language names.
 - Today's uncommitted experiments in `ai.ts`, `judge.ts`, `plugin.ts`, the translate skill and the
