@@ -151,6 +151,29 @@ the code is written, and written into this plan with the result:
 - Today's uncommitted changes, except where kept below: the per-language rule picking, the capitals
   sentence and the small-letter check, the dev-only "no rules" switch and posts on the dev route.
 
+## The tests, file by file
+
+- Go: `test/unit/ai-rules.test.ts` (today's uncommitted test of the per-language rule picking).
+- Mostly go: `test/unit/judge.test.ts` (16 tests, nearly all on Gemma 4's saved answers: grammar,
+  script, English left in, capitals, the post checks); its placeholder and line-count tests stay.
+  `test/unit/skills.test.ts`: the parts holding the translating skill to `plurals.ts`'s codes.
+- Change: `test/unit/models.test.ts` (the model and its settings); `test/unit/content-files.test.ts`
+  and `e2e/dev/jobs.test.ts` (runtime content as entries); `test/unit/translate.test.ts` (the
+  prompts that point coding agents at the translating skill); `e2e/fresh/check.ts` and
+  `e2e/preview/strings.test.ts` (which skill files a new app gets).
+- New: the conversion function, both ways (entries to the request, the answer back onto the right
+  key and line name, spaces kept, a missing key left `"new"`); and the dev-route test in "How we'll
+  know it's right".
+- Unchanged: the other unit files and the browser, preview and deployed tests, which test fbtee,
+  routing, pages and the live site.
+
+## Claude's review
+
+`vp dev`'s review of machine translations (`reviewTask` and `reviewApp` in `translate.ts`) tells
+Claude to read the translating skill for "how a translation should be". With that skill gone, the
+prompt points only at the void-fbtee skill's "Reviewing" section, which says what to record; the
+judging is Claude's own, as it is Gemini's.
+
 ## What stays
 
 - The catalog loop: fbtee finds the strings and prepares the files; new entries go to Gemini; the
