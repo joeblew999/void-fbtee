@@ -340,7 +340,8 @@ Found while testing (2026-11-18), not yet explained: under `vp dev`, the transla
 `e2e/dev/jobs.test.ts` ("the translate queue on its own") makes workerd log three
 `Error: internal error; reference = …` lines; the test passes, and no other test makes any. Not
 from closing or reloading an event page, nor from a translate message sent by hand through Void's
-queue trigger (each tried alone: none). To check: whether the same test logs them on the commit
+queue trigger (each tried alone: none). The final run of all of `test:dev` logged none: it comes
+and goes. To check: whether the same test logs them on the commit
 before this change, and if so, report it to Void with the reproduction.
 
 Found on the first real run (2026-11-18), to decide later: the example's Arabic catalog now mixes
