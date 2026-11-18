@@ -41,3 +41,29 @@ export function otherDay(startsAt: string, reader: string) {
   const start = Temporal.ZonedDateTime.from(startsAt);
   return !start.toPlainDate().equals(start.withTimeZone(reader).toPlainDate());
 }
+
+/**
+ * An event's start to its end, on one clock, in `locale`: the dates and times from
+ * Intl.DateTimeFormat's formatRange (which says the day once when it's the same, in each language's
+ * own way), then the clock's name as `format` writes it. Not formatRange's own name: Chromium's
+ * writes the city in English in a range ("6:00–7:30 เวลาSydney", where `format` gives
+ * "เวลาออสเตรเลียตะวันออก", Chrome 158, 2026-11-18).
+ */
+export function formatWhen(
+  locale: string,
+  start: number,
+  end: number,
+  { timeZoneName, ...options }: Intl.DateTimeFormatOptions & { timeZone: string },
+): string {
+  const range = new Intl.DateTimeFormat(locale, options).formatRange(start, end);
+  if (!timeZoneName) return range;
+  const zone = part(
+    new Intl.DateTimeFormat(locale, {
+      timeZone: options.timeZone,
+      timeZoneName,
+      hour: "numeric",
+    }).formatToParts(start),
+    "timeZoneName",
+  );
+  return zone ? `${range} ${zone}` : range;
+}

@@ -126,7 +126,6 @@ export function EventFields({
           <Input
             id={id("local-end")}
             type="datetime-local"
-            min={form.data.local || undefined}
             data-testid={id("local-end-input")}
             value={form.data.local_end}
             onChange={(e) => form.setData("local_end", e.target.value)}

@@ -19,6 +19,7 @@ import { langAttrs, type AppLocale } from "void-fbtee/locales";
 import { routeUrl } from "void-fbtee/routes";
 import { inLocale } from "void-fbtee/server";
 import { emailHtml, logoAttachment } from "./EmailLayout";
+import { formatWhen } from "./event-clock";
 
 /** A file sent with an email: the logo, shown inside it, or a booking's PDF ticket, attached. */
 type Attachment = {
@@ -58,13 +59,13 @@ export type EventFor = {
 
 /**
  * When the event is, from its start to its end, on the clock where it happens, written the
- * reader's way: "Saturday 6 March, 6:30 – 9:30 pm GMT+7" (Intl.DateTimeFormat's formatRange,
- * which says the day once when it's the same).
+ * reader's way: "Saturday 6 March, 6:30 – 9:30 pm GMT+7" (event-clock.ts formatWhen, which says
+ * the day once when it's the same).
  */
 export const during = (event: { startsAt: string; endsAt: string }, locale: string) => {
   const start = Temporal.ZonedDateTime.from(event.startsAt);
   const end = Temporal.ZonedDateTime.from(event.endsAt);
-  return new Intl.DateTimeFormat(locale, {
+  return formatWhen(locale, start.epochMilliseconds, end.epochMilliseconds, {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -72,7 +73,7 @@ export const during = (event: { startsAt: string; endsAt: string }, locale: stri
     minute: "2-digit",
     timeZoneName: "short",
     timeZone: start.timeZoneId,
-  }).formatRange(new Date(start.epochMilliseconds), new Date(end.epochMilliseconds));
+  });
 };
 
 /**

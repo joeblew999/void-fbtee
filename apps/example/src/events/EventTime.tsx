@@ -5,6 +5,7 @@
 import { fbt } from "fbtee";
 import { Temporal } from "temporal-polyfill";
 import { Formatted, useLocale, useNow, useTimeZone } from "void-fbtee/react";
+import { formatWhen } from "@/events/event-clock";
 import { relativeDays } from "@/events/relative-days";
 import { cn } from "@/ui/utils";
 
@@ -23,7 +24,7 @@ export function EventTime({
   className,
 }: {
   startsAt: string;
-  /** Its end, on the same clock: shown as a range (Intl.DateTimeFormat's formatRange). */
+  /** Its end, on the same clock: shown as a range (event-clock.ts formatWhen). */
   endsAt?: string;
   className?: string;
 }) {
@@ -33,12 +34,10 @@ export function EventTime({
   const now = useNow({ updateInterval: 60_000 });
   const start = Temporal.ZonedDateTime.from(startsAt);
   const end = endsAt ? Temporal.ZonedDateTime.from(endsAt) : undefined;
-  const at = (timeZone: string) => {
-    const format = new Intl.DateTimeFormat(locale, { ...WHEN, timeZone });
-    return end
-      ? format.formatRange(start.epochMilliseconds, end.epochMilliseconds)
-      : format.format(start.epochMilliseconds);
-  };
+  const at = (timeZone: string) =>
+    end
+      ? formatWhen(locale, start.epochMilliseconds, end.epochMilliseconds, { ...WHEN, timeZone })
+      : new Intl.DateTimeFormat(locale, { ...WHEN, timeZone }).format(start.epochMilliseconds);
   return (
     <div className={cn("grid gap-1 text-sm", className)}>
       <div className="text-foreground" data-testid="event-local">

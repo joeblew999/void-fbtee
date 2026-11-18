@@ -96,11 +96,19 @@ async function open(p: import("playwright").Page, locale: string, path: string) 
   await p.goto(`/${locale}${path}`);
   await started(p);
 }
-const at = (locale: string, timeZone: string) =>
-  new Intl.DateTimeFormat(locale, { ...WHEN, timeZone }).formatRange(
+// The start to the end, as the page writes it (apps/example/src/events/event-clock.ts formatWhen):
+// the range, then the clock's name as a single time writes it.
+const at = (locale: string, timeZone: string) => {
+  const { timeZoneName, ...rest } = WHEN;
+  const range = new Intl.DateTimeFormat(locale, { ...rest, timeZone }).formatRange(
     new Date(SWIM),
     new Date(SWIM_END),
   );
+  const zone = new Intl.DateTimeFormat(locale, { timeZone, timeZoneName, hour: "numeric" })
+    .formatToParts(new Date(SWIM))
+    .find((p) => p.type === "timeZoneName")!.value;
+  return `${range} ${zone}`;
+};
 
 test("th-TH, in New York: Sydney's clock, the reader's, and how far off, in Thai", async () => {
   const p = await page({ timezoneId: "America/New_York" });
@@ -193,7 +201,9 @@ test.skipIf(onLiveSite())(
     );
     // The same event in English: the page in English, the stored record unchanged.
     await p.goto(p.url().replace("/ar-EG/", "/en-US/").replace(/#.*/, ""));
-    await untilText(p, '[data-testid="event-local"]', "has", "8:00 PM");
+    // Cairo's 20:00 to 22:00, the English way: "8:00 – 10:00 PM" (the day and PM said once).
+    await untilText(p, '[data-testid="event-local"]', "has", "8:00");
+    expect(await p.getByTestId("event-local").textContent()).toMatch(/8:00\s*–\s*10:00\sPM/);
     expect(await stored()).toBe(saved);
     expect(errors).toEqual([]);
   },
