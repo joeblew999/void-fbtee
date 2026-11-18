@@ -71,6 +71,9 @@ export default defineConfig({
       // The quick live check (e2e/deployed/live.test.ts) against what the last `vp run deploy`
       // deployed (scripts/deployed.ts). CI's deploy job runs it after deploying.
       "test:deployed": { command: "vpx scripts/deployed.ts", cache: false },
+      // The live site's database reads as visitors elsewhere get them: its /api/database asked
+      // from Globalping's probes in each place (default Thailand and Virginia), scripts/database-from.ts.
+      "database:from": { command: "vpx scripts/database-from.ts", cache: false },
       // The preview suite against the live site, at the URL Void reported on the last deploy
       // (scripts/production.ts), less the tests that post or book: on the live site those would
       // call Workers AI and send real email (Void: live tests are opt-in and send nothing).

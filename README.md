@@ -77,6 +77,8 @@ vp run deploy:preview    # this branch as a Worker Preview beside production (ne
 vp run test:deployed     # a quick check of what the last deploy put live: sitemap, a Thai
                          # not-found page, one event posted, translated by Void's AI and
                          # deleted (CI runs it after each deploy)
+vp run database:from TH,Virginia   # the live site's database reads as visitors there get
+                         # them: asked from Globalping's probes (globalping.io) in each place
 vp run test:browsers     # every page in every language in Chromium, WebKit and WebKit as today's
                          # iPhones have it (no built-in Temporal): no errors, fits a phone; and
                          # the Intl and Temporal pages' engine checks. It grows with each
