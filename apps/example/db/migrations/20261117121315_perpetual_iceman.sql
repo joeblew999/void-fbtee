@@ -1,3 +1,6 @@
+-- Drops event_texts once its rows are copied into events_translations (below): Void's deploy
+-- refuses a migration that drops a table unless the file says so with this line.
+-- void:allow-destructive
 CREATE TABLE `events_translations` (
 	`id` text PRIMARY KEY NOT NULL,
 	`source_id` text NOT NULL,

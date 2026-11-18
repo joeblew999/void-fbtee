@@ -113,3 +113,9 @@ deleted, and `test:fresh` proves a new `void init` app gets all of it from the p
   language not in Latin letters a capitalised Latin word kept from the original, unless it's a
   name); `translate()` in ai.ts asks once more with the problems listed, keeps the better answer
   and warns if any are left.
+
+- The first deploy with this refused the migration that drops `event_texts` (2026-11-18): Void's
+  deploy wants `-- void:allow-destructive` in a migration that drops a table, a rule its docs
+  don't state (`validateMigrations` in its `dist/validate-*.mjs`). Nothing was deployed. Fixed by
+  that line in `20261117121315_perpetual_iceman.sql`, checked with Void's own function on all
+  10 migrations. The local tests can't catch it: only `void deploy` runs the check.
