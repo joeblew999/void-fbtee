@@ -197,24 +197,28 @@ through the translation system for real.
   "Change" beside "Delete" to whoever has the key. A wrong or missing key is a 403. The sample
   events have no key, so nobody can change them. The file and column keep their names (renaming
   the column would mean a data migration); their comments say the key changes and deletes.
-- **Where:** `pages/[lang]/events/[id]/edit.tsx` and `.server.ts`: the posting form
-  (`new.tsx`), filled in with the event as it is. The key goes in the request body from the
-  page's `#`, as deleting sends it.
-- **What can change:** title, description, venue, start (time and zone), seats (never below the
-  seats booked). Not its language: it stays the one it was written in.
+- **Where:** on the event's own page, in the poster's box beside "Delete" (`YourEvent` in
+  `pages/[lang]/events/[id].tsx`): "Change this event" opens the posting form's fields, filled in
+  with the event as it is, saved by the page's `?change` action (`[id].server.ts`). The poster's
+  key is already there (the page's `#`, or the browser's copy), and goes in the request body as
+  deleting sends it. Not a page of its own (decided while building, 2026-11-18): it would need a
+  second way to carry the key, and a page in every language. The fields are shared with posting
+  (`src/events/EventFields.tsx`), so the two forms can't differ.
+- **What can change:** title, description, venue, start and end (time and zone), seats (never
+  below the seats booked). Not its language: it stays the one it was written in.
 - **On saving, in order:** the row updated (`updatedAt`); `translateSoon("events", id)`, which
   finds the translations' hash no longer matches and translates again; its pages cleared from
   Void's cache in every language (`eventPages(id)`); pages open on it told it changed
   (`src/events/live.ts`), and they reload; its bookings' stored PDF tickets deleted, since they
   show the title, time and venue, so the next download prints the new one; the bookers emailed
   (below).
-- **Who's emailed:** everyone booked, when the title, time or venue changed: what's on their
+- **Who's emailed:** everyone booked, when the title, start, end or venue changed: what's on their
   ticket and what gets them there. Not for the description or seats alone. The poster only if
   they booked.
 - **The email** (`changeEmail` in `src/events/emails.ts`, sent by a new `queues/change.ts`, one
   message per booking, as `queues/cancel.ts` does): in the language they booked in, saying what
-  changed (the old time and the new, on their clock and the event's; the new venue; the new
-  title), with the link to the event and its ticket. The title as they read it: the queue waits
+  changed (when it is now and when it was, on the event's clock; the new venue; the title as it
+  is now), with the link to the event and its ticket. The title as they read it: the queue waits
   until the translation into their language matches the post's hash, retrying a minute apart; on
   the last try it sends with the title as written, marked with its language, as the page shows it.
 - **Reminders:** `crons/reminders.ts` reads the start as it is now, so a changed event is reminded
@@ -228,6 +232,33 @@ through the translation system for real.
   - A description-only change emails nobody, and is still translated again.
   - Another event's key, or none, gets a 403 and changes nothing.
   - `changeEmail` in each language joins the other emails' tests (`src/events/emails.test.ts`).
+
+## Every event has a start and an end (the example)
+
+Asked for 2026-11-18: an event's end is as mandatory as its start.
+
+- **Stored:** `ends_at` and `ends_at_utc` in `events` (`db/schema/events.ts`), as `starts_at` and
+  `starts_at_utc` are: Temporal's text of the end on the event's clock, and the same moment in
+  UTC. Both `NOT NULL`. Same time zone as the start: an event happens in one place.
+- **Posting and changing:** the form has "Ends, local time" beside "Starts, local time", both
+  required (`newEventSchema`, `changeEventSchema`), the end after the start. `startsAt` becomes
+  `when(start, end, zone)`, giving all four columns.
+- **Shown:** the event page's time band says from when to when, on the event's clock and the
+  reader's; the ticket; the booking, reminder and change emails ("from … to …"); the event's
+  schema.org data gets `endDate` (Google's event results use it). The events list keeps the start.
+- **Changed:** a new end counts as a change of time: bookers are emailed (above).
+- **The events already stored** (the sample events, and any posted on the live site): the
+  migration adds the two columns and gives each an end two hours after its start, since none was
+  ever recorded; the sample events get their own ends, written in the migration. Said here so
+  nobody takes the two hours for something an organiser wrote.
+- **Docs:** the tour page's example row (`pages/en-US/docs/tour.md`) shows `ends_at` too, so its
+  Thai and Arabic copies are translated again (about US$0.02 each).
+- **Tests:** `src/events/starts-at.test.ts` (the end after the start, both on the event's clock,
+  the UTC moments); `src/events/emails.test.ts` (the end in each email); `e2e/dev/events.test.ts`
+  (posting gives an end; an end before the start is refused with its own message); the preview
+  and browser tests that read the time band.
+
+## Deleting an event (the example)
 
 A deleted post: the example deletes events already (the poster's private link, `remove` in
 `pages/[lang]/events/[id].server.ts`), and its translations go with it, by the database
