@@ -1,10 +1,11 @@
-# plans/fbtee-issues.md: two issues for nkzw-tech/fbtee
+# plans/fbtee-issues.md: issues for nkzw-tech/fbtee
 
 Status: drafted 2026-11-14, not filed: they wait for the user's OK. Moved here from the language
 plans, now done and deleted (git keeps them). When fbtee exports `negotiateLocale`,
 `packages/void-fbtee/src/negotiate.ts`'s copy goes and fbtee's is called.
 
-Two, one per subject, filed only with the user's OK.
+One per subject, filed only with the user's OK. The third (2026-11-18) comes from checking every
+place void-fbtee does fbtee's work against fbtee 6.0.0 itself (its README, CLI, exports and code).
 
 ### 1. Locale matching: regional variants, and using it on a server
 
@@ -54,3 +55,55 @@ Title: Arabic: the exactly-one form's digit, and the list's middle separator
 >   for "and", "or" and plain lists alike. CLDR's Arabic "and" list is `A وB وC` (what
 >   `Intl.ListFormat("ar-EG")` prints), but translating that string as `و` makes the "or" list
 >   `A وB أو C`. Would a separate middle string per conjunction be welcome?
+
+### 3. Using fbtee for content that isn't in the code, and in a Worker
+
+Title: An API for translations that don't come from source code (at runtime, in a Worker)
+
+> void-fbtee translates Void apps (Cloudflare Workers). Besides the app's own `<fbt>` strings, an
+> app has text people write (an event's title and description, stored in a database) that needs
+> the same treatment: entries in the catalog format, translated, then shown in the reader's
+> language. Today that can't go through fbtee, so we keep a second system beside it.
+>
+> What we'd use, each checked against fbtee 6.0.0:
+>
+> 1. **Render a registered translation by key.** Only the compiled form does it,
+>    `fbt._(…, { hk })`; calling `fbt()` on text that wasn't compiled throws ("fbt must be compiled
+>    with the fbtee compiler integration", `lib/index-core-*.mjs`). A documented call taking a key,
+>    the slot values, counts and genders would let runtime text use fbtee's rendering.
+> 2. **Keys an app makes itself.** The lookup (`getTranslatedInput`) finds a registered table by
+>    `hk` with the locale chain and doesn't care how the key was made. Could that be documented as
+>    supported for translations registered with `registerTranslations` / `mergeTranslations`?
+> 3. **Preparing an entry in JS.** `prepare-translations` gives a plural or gender string one line
+>    with `"variations": {}` and marks the token (`"types": [28]`, `[3]`); the lines each language
+>    needs are left to the translator. We write those lines ourselves, copying the codes from
+>    `IntlVariations` (16 zero, 4 one, 8 two, 20 few, 12 many, 24 other). Could prepare write them
+>    (per locale, from `Intl.PluralRules`), with readable names alongside the codes, and be callable
+>    from JS where the native compiler can't run?
+> 4. **Compiling entries into the runtime table in JS**, what `translateSync` does, for the same reason.
+> 5. **Checking tokens when compiling.** `fbtee translate` (and `--strict`) compiles a translation that
+>    drops a placeholder: a Thai "Your time: {time}" translated without `{time}` compiled, exit 0.
+>    It knows each message's tokens; a missing or unknown one could be reported.
+> 6. **The locale chain exported** (`getAvailableLocaleChain`, with the natural parents `fr-CA` →
+>    `fr`), so content outside fbtee falls back exactly as fbtee's own messages do.
+> 7. **`fbtee/server` in Workers.** `exports["./server"]` gives `runWithFbtee` only under the `node`
+>    condition; Cloudflare's `workerd` gets `index-core`. A `workerd` (or `worker`) condition would
+>    let Workers use the per-request build without a bundler alias.
+> 8. **Which key is stable.** Catalog files use one key (`sMtlR6Z8zMzZ6LalfCQsVQ==`), compiled code
+>    another (`hk: "3uo8du"`). A note on which to rely on, for what, would help anyone building on top.
+>
+> Alternatives to 3 and 4: publishing the WebAssembly build the compiler's loader already looks
+> for (`@nkzw/oxc-transform-fbtee-binding-wasm32-wasi` is a 404 on npm), or exporting the key
+> function (`fbt_hash_key`, `src/translate.rs`).
+
+What each changes here, when fbtee has it: 1, 2 and 3 replace void-fbtee's own runtime-content
+lookup and `plurals.ts`'s copied codes; 5 replaces the placeholder check in `judge.ts`; 6 fixes
+`fallbacksOf` (`runtime.ts`), which today skips natural parents for runtime content (a bug of
+ours, to fix whether or not fbtee exports the chain); 7 removes the alias in `plugin.ts`.
+
+Checked and not asked for (void-fbtee's code is needed, or it isn't fbtee's job): the catalog
+workflow in our Vite plugin (fbtee's Vite plugin only compiles: `@nkzw/vite-plugin-fbtee` 6.0.0,
+53 lines, options = `TransformOptions`); logging a missing string once across requests (fbtee
+reports once per runtime, and each request is a runtime); text direction (`Intl`'s job); the
+language picker and Void's links and forms in `react.tsx` (built on fbtee's own
+`createLocaleContext` / `LocaleProvider`).
