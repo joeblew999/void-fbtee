@@ -280,9 +280,11 @@ Void's own places, where they're missing (never over yours):
   checks the migration is there.
 - `queues/translate.ts`: void-fbtee's consumer (`void-fbtee/queues/translate`), with `void/ai`
   and `void/db` imported and the retries written there, since Void reads all of them from the
-  app's own files. To refresh pages or tell open ones when a translation lands, export
-  `translationQueue({ onTranslated })` instead of the default.
-- `crons/translations.ts`: the hourly job (`void-fbtee/crons/translations`), keeping every row in
+  app's own files. To refresh pages, tell open ones or take the next step when a translation
+  lands, export `translationQueue({ onTranslated })` instead of the default; add
+  `onTranslationFailed(table, id, locales)` for what mustn't wait for a retry (it's called each
+  time those languages fail: the app goes on with the row as written).
+- `crons/translations.ts`: the daily job (`void-fbtee/crons/translations`), keeping every row in
   the app's languages both ways: translations into a language the app no longer has are deleted,
   and anything missing (or `unknown`) is queued.
 

@@ -5,7 +5,7 @@ import { events, newEventSchema, when } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
-import { db } from "void/db";
+import { primaryDb } from "void-fbtee/db";
 import { translateSoon } from "void-fbtee/content";
 import { hashDeleteKey, keyCookie, newDeleteKey, privateLink } from "@/events/delete-key";
 import { routeUrl } from "void-fbtee/routes";
@@ -37,7 +37,7 @@ export const action = defineHandler.withValidator({
   // The poster's private delete link: the key goes to them, its SHA-256 to the database.
   const key = newDeleteKey();
   const times = when(body.local, body.local_end, body.time_zone);
-  const [created] = await db
+  const [created] = await primaryDb()
     .insert(events)
     .values({
       title: body.title,
@@ -64,7 +64,7 @@ export const action = defineHandler.withValidator({
       link: privateLink(new URL(c.req.url).origin + page, key),
     });
   // Its translations into the app's other languages, at once (void-fbtee's queue): without this,
-  // the first page read in another language would queue it, and the hourly job would find it.
+  // the first page read in another language would queue it, and the daily job would find it.
   await translateSoon("events", created.id);
   // The list in every language, and the sitemap, which lists the new event.
   await revalidate({ paths: eventPages() });

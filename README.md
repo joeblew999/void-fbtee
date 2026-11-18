@@ -121,6 +121,9 @@ vp upgrade && vp migrate   # upgrade Vite+, then vp check and the tests (Testing
 - `apps/example`: a Void app using it, in three languages. Production:
   https://void-fbtee-example.gedw99.workers.dev
   ([its Worker on Cloudflare](https://dash.cloudflare.com/7384af54e33b8a54ff240371ea368440/workers/services/view/void-fbtee-example/production)).
+  Its D1 database's main copy is in Eastern North America (`ENAM`, checked 2026-11-18), with read
+  replicas elsewhere; D1 sets where a database lives only when it's made (a location hint), so an
+  app whose visitors are mostly in Asia makes its database in `apac`.
 - `e2e/`: the end-to-end tests, by stage (see Testing): `e2e/preview/`, `e2e/dev/`,
   `e2e/browsers/`, `e2e/deployed/`, and `e2e/fresh/` (the fresh-install check; `e2e/fresh/app/`
   holds Void's own docs examples, put into each fresh app and checked in Thai, with what doesn't
@@ -238,6 +241,21 @@ and if so remove what depends on it.
   ("Copy Code"); task lists come out as text. What depends on it: the heading-anchor rule at the
   end of `apps/example/pages/style.css` (remove it when fixed), and the tour's numbered "Try it"
   list and the note in `e2e/preview/server.test.ts` (a task list, and checks for it, when they work).
+
+- Not reported yet (2026-11-18, Void 1.8.0 and 1.10.0; to be filed with the user's OK,
+  `plans/reliable-work.md`): every request's, queue job's, cron's and page rebuild's `db` starts on
+  a D1 replica (`first-unconstrained`), so a job run a second after a write can read the database
+  from before it. This repo reads through `primaryDb()` (`void-fbtee/db`, `first-primary`), and
+  `vp check` refuses `db` from `void/db` (`no-restricted-imports`, the root `vite.config.ts`).
+
+- Not reported yet (2026-11-18, Void 1.8.0 and 1.10.0; to be filed with the user's OK): on the
+  app's own Cloudflare account, clearing a cached page (`revalidate`) reaches KV, which other places
+  see 60 s or more later, and only the data centre that clears it (`caches.default`); a page being
+  built when the data changed can be written back after the clear. Workers Cache's
+  `ctx.cache.purge` is global. This repo caches the event page for 60 s, not a year
+  (`apps/example/pages/[lang]/events/[id].server.ts`). Related:
+  [voidzero-dev/void#856](https://github.com/voidzero-dev/void/issues/856), cached pages kept for
+  every deploy (ours: 1,876 from 86 deploys, none expiring, 2026-11-18).
 
 ## Releasing
 

@@ -1,63 +1,68 @@
-// Tells everyone who booked an event that its organiser changed what matters to them (its title,
-// when it is, where), each in their own language (the language they booked in). The change action
-// (pages/[lang]/events/[id].server.ts) sends one message per booking, with what it was before, so
-// the change answers at once however many booked, and a failed email is retried on its own (Void's
-// guide/queues.md).
+// Tells a booker that the organiser changed what matters to them (the event's title, start, end or
+// place), in the language they booked in. Queued, one message per booking, by the step before it
+// (plans/reliable-work.md): the change action for bookers whose language needs no new translation,
+// the translation queue when their language's translation is stored or fails
+// (src/events/translations.ts), and the sweep for any message lost (crons/owed.ts). Nothing here
+// waits for anything.
 //
-// The title as each booker reads it: a changed event is translated again (void-fbtee's queue), so
-// this waits, a minute at a time, until the translation into the booker's language is made from
-// what the event says now (void-fbtee/content untranslated); on the last try it goes with the title
-// as the organiser wrote it, marked with its language, as the event's page shows it meanwhile.
+// What's owed is in the database, not in the message: the booking's told_* (what they were last
+// told) against the event as it is now (src/events/owed.ts). Different: the email, saying what it
+// was; then told_* is the event as emailed. The same: nothing, so a message twice, a change undone
+// or two changes in a row (one email, of where it ended) need nothing else. Read from the
+// database's main copy (void-fbtee/db), so a change made a second ago is seen.
 import { bookings, events } from "@schema";
 import { defineQueue } from "void";
-import { db, eq } from "void/db";
-import { untranslated } from "void-fbtee/content";
+import { eq } from "void/db";
+import { primaryDb } from "void-fbtee/db";
 import type { AppLocale } from "void-fbtee/locales";
 import { sendChangeEmail } from "../src/events/emails";
+import { isBehind, toldOf } from "../src/events/owed";
 import { textsFor, titleFor } from "../src/events/translations";
+import { originOr } from "../src/site";
 
-type Message = {
-  bookingId: string;
-  eventId: string;
-  /** What changed, as it was: only the parts that changed. */
-  was: { startsAt?: string; endsAt?: string; venue?: string | null };
-  /** Where the change was made (dev, a Worker Preview, live): the email links back there. */
-  origin: string;
-};
+type Message = { bookingId: string };
 
-/** Tries: the first and five retries, a minute apart, for its translation to land. */
+/** A failed email is tried again a minute later, five times (Void's guide/queues.md); after that
+ * the booking is still behind, and the sweep queues it again. */
 export const maxRetries = 5;
-const TRIES = maxRetries + 1;
+export const retryDelay = 60;
 
 export default defineQueue<Message>(async (batch) => {
   for (const message of batch.messages) {
-    const { bookingId, eventId, was, origin } = message.body;
+    const db = primaryDb();
     const [row] = await db
       .select({ booking: bookings, event: events })
       .from(bookings)
       .innerJoin(events, eq(events.id, bookings.event_id))
-      .where(eq(bookings.id, bookingId));
-    // Deleted since (the event, or the booking with it): its cancellation has gone instead.
-    if (!row || row.event.id !== eventId) {
+      .where(eq(bookings.id, message.body.bookingId));
+    // Gone, cancelled (its cancellation says it), not yet confirmed (the confirmation will say it
+    // as it is), or told already: nothing owed.
+    if (
+      !row ||
+      row.event.cancelled_at ||
+      !row.booking.confirmed_at ||
+      !isBehind(row.booking, row.event)
+    ) {
       message.ack();
       continue;
     }
     const { booking, event } = row;
     const locale = booking.locale as AppLocale;
-    const waiting = (await untranslated("events", event.id))?.missing.includes(locale) ?? false;
-    if (waiting && message.attempts < TRIES) {
-      message.retry({ delaySeconds: 60 });
-      continue;
-    }
-    // Still not translated on the last try: the title as written, never an old translation.
-    const text = waiting
-      ? { title: event.title, locale: event.locale }
-      : titleFor(event, await textsFor([event.id], locale), locale);
+    // The title in their language where its translation is of the event as it is now, else as
+    // written, marked with its language (titleFor: a translation of what it said before is never used).
+    const text = titleFor(event, await textsFor([event.id], locale), locale);
+    const was = {
+      ...(booking.told_starts_at !== event.starts_at ? { startsAt: booking.told_starts_at! } : {}),
+      ...(booking.told_ends_at !== event.ends_at ? { endsAt: booking.told_ends_at! } : {}),
+      ...((booking.told_venue ?? null) !== (event.venue ?? null)
+        ? { venue: booking.told_venue }
+        : {}),
+    };
     const sent = await sendChangeEmail(booking.email, {
       locale,
       name: booking.name,
       id: event.id,
-      origin,
+      origin: originOr(booking.origin),
       title: text.title,
       titleLocale: text.locale,
       startsAt: event.starts_at,
@@ -65,7 +70,11 @@ export default defineQueue<Message>(async (batch) => {
       venue: event.venue,
       was,
     });
-    if (sent) message.ack();
-    else message.retry({ delaySeconds: 60 });
+    if (!sent) {
+      message.retry();
+      continue;
+    }
+    await db.update(bookings).set(toldOf(event)).where(eq(bookings.id, booking.id));
+    message.ack();
   }
 });

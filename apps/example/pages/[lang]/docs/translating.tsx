@@ -89,7 +89,7 @@ function points(): Point[] {
         },
         {
           file: "queues/translate.ts",
-          line: "export default translationQueue({ onTranslated });",
+          line: "export default translationQueue({ onTranslated, onTranslationFailed });",
         },
         {
           file: "crons/translations.ts",

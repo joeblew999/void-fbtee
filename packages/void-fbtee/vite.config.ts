@@ -29,6 +29,7 @@ export default defineConfig({
       routes: "src/routes.ts",
       ai: "src/ai.ts",
       content: "src/content.ts",
+      db: "src/db.ts",
       "crons/translations": "src/cron-translations.ts",
       "db/schema": "src/db-schema.ts",
       "queues/translate": "src/queue-translate.ts",

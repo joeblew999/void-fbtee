@@ -5,7 +5,8 @@ import { bookings, events } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
-import { asc, count, db, eq, gte } from "void/db";
+import { and, asc, count, eq, gte, isNull } from "void/db";
+import { primaryDb } from "void-fbtee/db";
 import { textFor, textsFor } from "../../../src/events/translations";
 
 export type Props = InferProps<typeof loader>;
@@ -18,8 +19,11 @@ export type Props = InferProps<typeof loader>;
 // void-fbtee's middleware).
 export const revalidate = 60;
 
+// Read from the database's main copy (void-fbtee/db), as the cache keeps what this returns: a
+// replica behind would cache the list from before a post, a change or a delete.
 export const loader = defineHandler(async (c) => {
   const { locale } = c.get("i18n");
+  const db = primaryDb();
   // Seats taken, per event, in the same query as the list.
   const taken = db
     .select({ event_id: bookings.event_id, n: count().as("n") })
@@ -30,7 +34,7 @@ export const loader = defineHandler(async (c) => {
     .select({ event: events, taken: taken.n })
     .from(events)
     .leftJoin(taken, eq(taken.event_id, events.id))
-    .where(gte(events.starts_at_utc, new Date().toISOString()))
+    .where(and(gte(events.starts_at_utc, new Date().toISOString()), isNull(events.cancelled_at)))
     .orderBy(asc(events.starts_at_utc));
   // Their stored translations for this page (the page's language and its fallbacks), and for each
   // the best (textFor).

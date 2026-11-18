@@ -216,7 +216,7 @@ export async function emailsTo(to: string): Promise<Mail[]> {
  * The email Void's dev inbox gets for `to` whose subject matches, once it's there: a queue or a job
  * sends it after the request that caused it has answered. Exactly one: a second would be a
  * duplicate. Vitest's own retrying wait (expect.poll), not a sleep. `timeout` for one that waits on
- * something first (a change email waits for its translation, a minute at a time).
+ * something first (a change of title is emailed once its translation is stored).
  */
 export async function emailTo(to: string, subject: RegExp, timeout = 30_000): Promise<Mail> {
   const matching = async () => (await emailsTo(to)).filter((m) => subject.test(m.subject));

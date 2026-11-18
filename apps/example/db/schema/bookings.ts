@@ -26,6 +26,17 @@ export const bookings = sqliteTable(
     origin: text("origin"),
     // Whether the booker asked for their PDF ticket again with the day-before reminder.
     ticket_in_reminder: integer("ticket_in_reminder", { mode: "boolean" }).notNull().default(false),
+    // What the system owes this booker is kept here, not only in a queue message, so a message lost
+    // to a crash or used-up retries is found again (crons/owed.ts; plans/reliable-work.md).
+    // When their confirmation email (with its ticket) went: null until then (queues/ticket.ts).
+    confirmed_at: text("confirmed_at"),
+    // What they were last told about the event, as its organiser wrote it: its title, start, end
+    // and place. Set when they book, and by each email that tells them (their confirmation, a
+    // change). When the event no longer matches, they're owed a change email (queues/change.ts).
+    told_title: text("told_title"),
+    told_starts_at: text("told_starts_at"),
+    told_ends_at: text("told_ends_at"),
+    told_venue: text("told_venue"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`(datetime('now'))`),

@@ -35,6 +35,7 @@
     "./client": "./dist/client.mjs",
     "./content": "./dist/content.mjs",
     "./crons/translations": "./dist/crons/translations.mjs",
+    "./db": "./dist/db.mjs",
     "./db/schema": "./dist/db/schema.mjs",
     "./head": "./dist/head.mjs",
     "./locales": "./dist/locales.mjs",

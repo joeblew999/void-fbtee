@@ -4,9 +4,9 @@
 // apart while the account isn't paying for the model).
 import "void/ai";
 import { translationQueue } from "void-fbtee/queues/translate";
-import { onTranslated } from "@/events/translations";
+import { onTranslated, onTranslationFailed } from "@/events/translations";
 
 export const maxRetries = 5;
 export const retryDelay = 300;
 
-export default translationQueue({ onTranslated });
+export default translationQueue({ onTranslated, onTranslationFailed });

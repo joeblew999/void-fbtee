@@ -12,8 +12,9 @@
 // again only when that's more than an hour old: a page read many times while it waits, posting,
 // and the daily job all ask through it, so a row is paid for once, not once per view.
 import config from "virtual:void-fbtee/config";
-import { db, sql } from "void/db";
+import { sql } from "void/db";
 import { queues } from "void/queues";
+import { primaryDb } from "./db";
 import { QUEUED, translationsTableName, UNKNOWN } from "./db-schema";
 import { notePending } from "./content-pending";
 import { fingerprint } from "./fingerprint";
@@ -85,6 +86,7 @@ export async function untranslated(
   table: string,
   id: string,
 ): Promise<{ source: Source; from: string; missing: string[] } | undefined> {
+  const db = primaryDb();
   const { fields } = tableOf(table);
   const rows = (await db.all(
     sql`SELECT ${ident("id")}, ${ident("locale")}, ${sql.join(
@@ -139,6 +141,7 @@ export async function storeTranslation(
   fields: Record<string, string>,
   made: Made,
 ): Promise<boolean> {
+  const db = primaryDb();
   const t = translationsTableName(table);
   const today = new Date().toISOString().slice(0, 10);
   const json = JSON.stringify(
@@ -183,6 +186,7 @@ export async function translateSoon(
   id: string,
   { changed = false }: { changed?: boolean } = {},
 ): Promise<boolean> {
+  const db = primaryDb();
   const found = await untranslated(table, id);
   if (!found?.missing.length) return false;
   const t = ident(translationsTableName(table));
@@ -216,6 +220,7 @@ export async function translateSoon(
  * one query a table. The daily job's work (void-fbtee/crons/translations).
  */
 export async function reconcile(): Promise<{ deleted: number; queued: number }> {
+  const db = primaryDb();
   const locales = appLocales();
   let deleted = 0;
   let queued = 0;
@@ -256,6 +261,7 @@ export async function translationsFor(
   ids: string[],
   locale?: string,
 ): Promise<Translation[]> {
+  const db = primaryDb();
   tableOf(table);
   const t = ident(translationsTableName(table));
   const wanted = locale ? new Set(textLocales(locale)) : undefined;

@@ -31,6 +31,11 @@ export const events = sqliteTable("events", {
   // The SHA-256 (hex) of the key in the poster's private delete link, never the key itself
   // (src/events/delete-key.ts). None on the sample events, so nobody can delete them.
   delete_key_hash: text("delete_key_hash"),
+  // When its organiser deleted it (plans/reliable-work.md). From then its pages say it's cancelled
+  // and it can't be booked, changed or listed; it stays until every booker's cancellation email has
+  // gone (queues/cancel.ts deletes each booking after its email, and the event with its last), so
+  // the database itself says who still needs telling. Null while it's on.
+  cancelled_at: text("cancelled_at"),
   createdAt: text("created_at")
     .notNull()
     .default(sql`(datetime('now'))`),

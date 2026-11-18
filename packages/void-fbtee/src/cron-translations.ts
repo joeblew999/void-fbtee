@@ -5,7 +5,7 @@
 // middleware). The app's file, at Void's own place:
 //
 //   // crons/translations.ts
-//   export const cron = "17 * * * *"; // Void reads it from this file
+//   export const cron = "17 4 * * *"; // Void reads it from this file
 //   export { default } from "void-fbtee/crons/translations";
 import { defineScheduled } from "void";
 import { reconcile } from "./content";

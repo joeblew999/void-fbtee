@@ -6,7 +6,9 @@
 // an event, and telling open ones.
 import type { AppLocale } from "void-fbtee/locales";
 import { textOf, translationsFor, type Translation } from "void-fbtee/content";
+import { primaryDb } from "void-fbtee/db";
 import { revalidate } from "void-fbtee/server";
+import { tellBookers } from "./owed";
 import { eventTopic, live } from "./live";
 
 export type Text = { title: string; description: string };
@@ -64,9 +66,22 @@ export function titleFor(
 
 /**
  * A translation landed (queues/translate.ts): the event's pages leave Void's page cache in every
- * language, and its open pages are told to load their data again.
+ * language, its open pages are told to load their data again, and its bookers in that language who
+ * are owed a change email are sent it now, with the title in their language (src/events/owed.ts;
+ * the next step of the change action, plans/reliable-work.md).
  */
-export async function onTranslated(_table: string, id: string) {
+export async function onTranslated(_table: string, id: string, locale: string) {
   await revalidate({ paths: eventPages(id) });
   await live.publish(eventTopic(id), {}, { type: "translated" });
+  await tellBookers(primaryDb(), id, [locale]);
+}
+
+/**
+ * Translating the event into these languages failed this time (Gemini erring, the account not
+ * paying; queues/translate.ts tries again): its bookers in them who are owed a change email aren't
+ * kept waiting for it, and get the title as written. If the translation lands later, they're owed
+ * nothing more.
+ */
+export async function onTranslationFailed(_table: string, id: string, locales: string[]) {
+  await tellBookers(primaryDb(), id, locales);
 }

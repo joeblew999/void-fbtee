@@ -11,7 +11,10 @@
 //   export const retryDelay = 300;
 //   export default translationQueue({ onTranslated }); // or: export { default } from …
 //
-// `onTranslated` is the app's: which of its pages to refresh, which live topic to tell.
+// `onTranslated` is the app's: which of its pages to refresh, which live topic to tell, what to do
+// next with the row now that it's in that language. `onTranslationFailed` is for what can't wait
+// for a retry (plans/reliable-work.md): called each time a language fails to translate (Gemini
+// erring, the account not paying), so the app can go on without it, as the row is written.
 import { defineQueue } from "void";
 import config from "virtual:void-fbtee/config";
 import { translateFields } from "./ai";
@@ -25,9 +28,15 @@ const PAYMENT_DELAY = 60 * 60;
 export interface TranslationQueueOptions {
   /** After a row's translation into `locale` is stored: refresh its pages, tell open ones. */
   onTranslated?: (table: string, id: string, locale: string) => unknown;
+  /** When translating a row into these languages failed this time (it's tried again as the queue
+   * says): whatever was waiting on them can go ahead with the row as written. */
+  onTranslationFailed?: (table: string, id: string, locales: string[]) => unknown;
 }
 
-export function translationQueue({ onTranslated }: TranslationQueueOptions = {}) {
+export function translationQueue({
+  onTranslated,
+  onTranslationFailed,
+}: TranslationQueueOptions = {}) {
   return defineQueue<TranslateMessage>(async (batch) => {
     for (const message of batch.messages) {
       const { table, id } = message.body;
@@ -61,6 +70,8 @@ export function translationQueue({ onTranslated }: TranslationQueueOptions = {})
               await onTranslated?.(table, id, locale);
           }),
         );
+        const failedLocales = found.missing.filter((_, i) => results[i]!.status === "rejected");
+        if (failedLocales.length) await onTranslationFailed?.(table, id, failedLocales);
         const failed = results.find((r) => r.status === "rejected");
         if (failed) throw failed.reason;
         message.ack();

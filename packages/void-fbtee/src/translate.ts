@@ -512,11 +512,22 @@ export interface Review {
   was?: string[];
 }
 
-/** Run `work` on every item, `n` at a time, in order. */
+/**
+ * Run `work` on every item, at most `n` at once: the next starts as soon as any finishes. Not in
+ * groups that wait for their slowest: Gemini 4 Hydrogen thinks before it answers, so one string
+ * can take three or four times as long as the next (102 to 797 thinking tokens on test/answers.json,
+ * 2026-11-18), and a group would leave the other slots idle (plans/reliable-work.md).
+ */
 async function inTurn<T, R>(items: T[], n: number, work: (item: T) => Promise<R>): Promise<R[]> {
-  const out: R[] = [];
-  for (let i = 0; i < items.length; i += n)
-    out.push(...(await Promise.all(items.slice(i, i + n).map(work))));
+  const out: R[] = new Array(items.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < items.length) {
+      const i = next++;
+      out[i] = await work(items[i]!);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(n, items.length) }, worker));
   return out;
 }
 

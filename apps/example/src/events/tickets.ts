@@ -11,7 +11,8 @@
 import { bookings, events } from "@schema";
 import { fbs } from "fbtee";
 import { Temporal } from "temporal-polyfill";
-import { db, eq } from "void/db";
+import { and, eq, isNull } from "void/db";
+import { primaryDb } from "void-fbtee/db";
 import { storage } from "void/storage";
 import { langAttrs, type AppLocale } from "void-fbtee/locales";
 import { routeUrl } from "void-fbtee/routes";
@@ -66,15 +67,17 @@ export function ticketPage(ticket: TicketFor): Promise<string> {
 
 /**
  * A booking as its email and ticket need it: who booked and where to send it, the event's title in
- * the booking's language (else as written), and the event's page on the site it was booked on.
- * Undefined when there's no such booking (its event was deleted since).
+ * the booking's language (else as written), and the event's page on the site it was booked on; and
+ * the event as it is, for what the booker is told (src/events/owed.ts). Undefined when there's no
+ * such booking, or its event is cancelled. Read from the database's main copy (void-fbtee/db): the
+ * booking may have been made a second ago.
  */
 export async function bookingTicket(id: string) {
-  const [row] = await db
+  const [row] = await primaryDb()
     .select({ booking: bookings, event: events })
     .from(bookings)
     .innerJoin(events, eq(events.id, bookings.event_id))
-    .where(eq(bookings.id, id));
+    .where(and(eq(bookings.id, id), isNull(events.cancelled_at)));
   if (!row) return undefined;
   const { booking, event } = row;
   const locale = booking.locale as AppLocale;
@@ -91,7 +94,7 @@ export async function bookingTicket(id: string) {
     endsAt: event.ends_at,
     url: originOr(booking.origin) + page,
   };
-  return { email: booking.email, ticket };
+  return { email: booking.email, ticket, event, confirmed: !!booking.confirmed_at };
 }
 
 /** How long after its event starts a booking's ticket is kept (it has the booker's name on it):

@@ -11,7 +11,8 @@
 // (`POST /__void/scheduled`, guide/jobs.md), as e2e/dev/jobs.test.ts does.
 import { bookings, events } from "@schema";
 import { defineScheduled } from "void";
-import { and, db, eq, gte, inArray, lt } from "void/db";
+import { and, eq, gte, inArray, isNull, lt } from "void/db";
+import { primaryDb } from "void-fbtee/db";
 import { Temporal } from "temporal-polyfill";
 import type { AppLocale } from "void-fbtee/locales";
 import { sendReminderEmail } from "@/events/emails";
@@ -35,7 +36,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  * R2 deletes what's there.
  */
 async function deleteOldTickets(from: number) {
-  const done = await db
+  const done = await primaryDb()
     .select({ id: bookings.id })
     .from(bookings)
     .innerJoin(events, eq(events.id, bookings.event_id))
@@ -53,6 +54,8 @@ async function deleteOldTickets(from: number) {
 export default defineScheduled(async (controller, env) => {
   const from = controller.scheduledTime;
   await deleteOldTickets(from);
+  // From the database's main copy (void-fbtee/db): a booking made a second ago is reminded too.
+  const db = primaryDb();
   const soon = await db
     .select()
     .from(events)
@@ -60,6 +63,8 @@ export default defineScheduled(async (controller, env) => {
       and(
         gte(events.starts_at_utc, utc(from)),
         lt(events.starts_at_utc, utc(from + 24 * 60 * 60 * 1000)),
+        // A cancelled event's bookers get its cancellation, not a reminder.
+        isNull(events.cancelled_at),
       ),
     );
   if (!soon.length) return;

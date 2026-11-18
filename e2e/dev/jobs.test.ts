@@ -1,5 +1,5 @@
 // Dev server: the jobs and queues, run with Void's own triggers (guide/jobs.md, guide/queues.md):
-// the reminder cron through `POST /__void/scheduled`, and each queue's consumer on its own through
+// the reminder cron and the sweep through `POST /__void/scheduled`, and each queue's consumer on its own through
 // `POST /__void/queue`, its decision for the message (ack or retry) checked as Void reports it. The
 // emails they send are read back from Void's dev inbox.
 //
@@ -9,6 +9,7 @@ import {
   address,
   book,
   browser,
+  dbRows,
   deleteEvent,
   emailsTo,
   emailTo,
@@ -25,8 +26,9 @@ const page = browser("prod");
 const skip = inject("devSkip" as never) as string;
 const site = url("prod");
 const posted: Posted[] = [];
-// The reminder job's schedule (apps/example/crons/reminders.ts).
+// The reminder job's schedule (apps/example/crons/reminders.ts), and the sweep's (crons/owed.ts).
 const DAILY = "0 6 * * *";
+const OWED = "*/15 * * * *";
 
 afterAll(async () => {
   for (const event of posted) await deleteEvent(event);
@@ -90,23 +92,71 @@ test.skipIf(!!skip)(
 );
 
 test.skipIf(!!skip)(
-  "the cancellation queue on its own: the message is acked and its email sent, in its language",
+  "the sweep: a lost confirmation, change email and cancellation are each found in the database and sent once; a queue message twice sends nothing more",
   async () => {
-    const to = address("laila");
-    const action = await runQueue("cancel", {
-      to,
-      name: "Laila",
-      locale: "ar-EG",
-      title: "أمسية خط عربي",
-      titleLocale: "ar-EG",
-      startsAt: "2027-03-08T19:00:00+02:00[Africa/Cairo]",
-      endsAt: "2027-03-08T21:00:00+02:00[Africa/Cairo]",
-      origin: site,
+    const p = await page();
+    const event = await postEvent(p, {
+      title: "Sweep check",
+      local: "2027-01-21T18:00",
+      end: "2027-01-21T20:00",
     });
-    expect(action).toBe("ack");
-    const mail = await emailTo(to, /^تم إلغاء /);
-    expect(mail.subject).toBe("تم إلغاء أمسية خط عربي");
-    expect(mail.text).toContain(`${site}/ar-EG/events`);
+    posted.push(event);
+    const to = address("ana");
+    await book(p, "Ana", to);
+    await emailTo(to, /^Your seat at /);
+    const [{ id: bookingId }] = (await dbRows("SELECT id FROM bookings WHERE email = ?", [to])) as {
+      id: string;
+    }[];
+    const count = async (subject: RegExp) =>
+      (await emailsTo(to)).filter((m) => subject.test(m.subject)).length;
+
+    // A confirmation lost (as if the Worker died after booking, or the ticket queue's tries ran
+    // out): owed, and older than 15 minutes. The sweep sends it, and records it.
+    await dbRows(
+      "UPDATE bookings SET confirmed_at = NULL, created_at = datetime('now', '-1 hour') WHERE id = ?",
+      [bookingId],
+    );
+    await runCron(OWED, Date.now());
+    await expect.poll(() => count(/^Your seat at /), { timeout: 30_000 }).toBe(2);
+    await expect
+      .poll(
+        async () =>
+          (await dbRows("SELECT confirmed_at FROM bookings WHERE id = ?", [bookingId]))[0]!
+            .confirmed_at,
+      )
+      .toBeTruthy();
+
+    // A change email lost: what Ana was told no longer matches the event, changed over 15 minutes
+    // ago. The sweep sends it, saying what it was, and records what she's told now.
+    await dbRows(
+      "UPDATE bookings SET told_starts_at = '2027-01-21T17:00:00+00:00[UTC]' WHERE id = ?",
+      [bookingId],
+    );
+    await dbRows("UPDATE events SET updated_at = datetime('now', '-1 hour') WHERE id = ?", [
+      event.id,
+    ]);
+    await runCron(OWED, Date.now());
+    await expect.poll(() => count(/ has changed$/), { timeout: 30_000 }).toBe(1);
+    const [told] = await dbRows(
+      "SELECT b.told_starts_at = e.starts_at AS same FROM bookings b JOIN events e ON e.id = b.event_id WHERE b.id = ?",
+      [bookingId],
+    );
+    expect(told!.same).toBe(1);
+    // The change queue asked again (a message delivered twice): nothing owed, nothing sent.
+    expect(await runQueue("change", { bookingId })).toBe("ack");
+    expect(await count(/ has changed$/)).toBe(1);
+
+    // A cancellation lost: the event cancelled over 15 minutes ago, its booking still there. The
+    // sweep sends it; the booking, then the event with its last, go.
+    await dbRows("UPDATE events SET cancelled_at = datetime('now', '-1 hour') WHERE id = ?", [
+      event.id,
+    ]);
+    await runCron(OWED, Date.now());
+    await expect.poll(() => count(/ is cancelled$/), { timeout: 30_000 }).toBe(1);
+    await expect.poll(() => dbRows("SELECT id FROM events WHERE id = ?", [event.id])).toEqual([]);
+    expect(await dbRows("SELECT id FROM bookings WHERE id = ?", [bookingId])).toEqual([]);
+    expect(await runQueue("cancel", { bookingId })).toBe("ack");
+    expect(await count(/ is cancelled$/)).toBe(1);
   },
 );
 

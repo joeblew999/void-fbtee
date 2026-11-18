@@ -19,6 +19,9 @@ Void"), and it waits for the second to be fixed in a Void release. Its place: `p
 
 ## When it's done, also
 
+- `export const maxConcurrency` (new in 1.10.0, `guide/queues.md`) on the example's
+  `queues/translate.ts`, so a burst of posts can't flood Gemini (`plans/reliable-work.md`).
+
 - Vite+ to 1.7.0 in the catalog (`pnpm-workspace.yaml`: `vite` and `vite-plus`), by `vp migrate`
   as Vite+ says, then `vp install`.
 - The two overrides in `pnpm-workspace.yaml` (`@cloudflare/vite-plugin`, `cf`) go, if the new Void
