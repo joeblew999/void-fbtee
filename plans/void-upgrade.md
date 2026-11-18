@@ -21,6 +21,8 @@ Void"), and it waits for the second to be fixed in a Void release. Its place: `p
 
 - Vite+ to 1.7.0 in the catalog (`pnpm-workspace.yaml`: `vite` and `vite-plus`), by `vp migrate`
   as Vite+ says, then `vp install`.
+- The two overrides in `pnpm-workspace.yaml` (`@cloudflare/vite-plugin`, `cf`) go, if the new Void
+  builds with the versions it asks for.
 - `pinUpstream` in `e2e/fresh/check.ts` goes, both pins, if the fresh apps build without it; and
   the two entries in README "Reported to Void" with it.
 

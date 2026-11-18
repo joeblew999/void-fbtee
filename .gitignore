@@ -6,8 +6,7 @@ dist/
 .wrangler/
 source_strings.json
 .enum_manifest.json
-# No lockfiles: dependencies are pinned exactly in package.json instead (plan #1).
-pnpm-lock.yaml
+# pnpm-lock.yaml is committed, so CI and deploys install what was tested; this repo doesn't use npm.
 package-lock.json
 .vitest/
 # Tailscale for the cloud-session dev server (vp run tailscale:login): its download, state and log.

@@ -862,7 +862,8 @@ async function translatedContent(target: string, dir: string, app: App) {
  * Void"), so the fresh apps use the versions this repo has:
  * - Void asks for "@cloudflare/vite-plugin": "^2.0.0-beta.v.15", which also takes 2.0.0-rc.0
  *   (2026-11-17); that writes its build to .cloudflare/output/v1 where Void reads v0 ("no root
- *   config found"). Pinned to the lockfile's version, the way each package manager pins one:
+ *   config found"). Pinned to this repo's version (pnpm-workspace.yaml's overrides, since a new app has no
+ *   lockfile), the way each package manager pins one:
  *   pnpm's overrides in pnpm-workspace.yaml, npm's in package.json.
  * - `void init` writes "vite-plus": "^1.6.0" and "vite": "npm:@voidzero-dev/vite-plus-core@^1.6.0".
  *   Vite+ 1.7.0 (2026-11-17) needs its core at 8.3.8000, which that range can't take, so
@@ -870,16 +871,13 @@ async function translatedContent(target: string, dir: string, app: App) {
  *   pnpm-workspace.yaml, in the app's own devDependencies (Vite+ apps only).
  */
 function pinUpstream(dir: string, pm: Pm) {
-  const version = /^\s+'@cloudflare\/vite-plugin@([^'(]+)':$/m.exec(
-    readFileSync(join(root, "pnpm-lock.yaml"), "utf8"),
-  )?.[1];
-  if (!version) throw new Error("no @cloudflare/vite-plugin in pnpm-lock.yaml");
-  const catalog = readFileSync(join(root, "pnpm-workspace.yaml"), "utf8");
+  const workspace = readFileSync(join(root, "pnpm-workspace.yaml"), "utf8");
   const pinned = (name: string) =>
-    new RegExp(`^  ${name}: (.+)$`, "m").exec(catalog)?.[1] ??
+    new RegExp(`^  "?${name.replace(/[/@.]/g, "\\$&")}"?: (.+)$`, "m").exec(workspace)?.[1] ??
     (() => {
-      throw new Error(`no ${name} in pnpm-workspace.yaml's catalog`);
+      throw new Error(`no ${name} in pnpm-workspace.yaml`);
     })();
+  const version = pinned("@cloudflare/vite-plugin");
   const pkgFile = join(dir, "package.json");
   const pkg = JSON.parse(readFileSync(pkgFile, "utf8"));
   if (pkg.devDependencies?.["vite-plus"]) {

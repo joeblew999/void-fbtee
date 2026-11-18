@@ -221,7 +221,7 @@ and if so remove what depends on it.
   `plans/void-upgrade.md`), not reported (2026-11-17, Void 1.8.0): Void asks for `"@cloudflare/vite-plugin":
   "^2.0.0-beta.v.15"`, which also takes `2.0.0-rc.0`, and that writes its build to
   `.cloudflare/output/v1` where Void 1.8.0 reads `v0`, so a new Void app's `vp build` fails ("no
-  root config found"). This repo's lockfile has `2.0.0-beta.v.17`; `test:fresh` pins its apps to it
+  root config found"). This repo pins `2.0.0-beta.v.17`, and the `cf` CLI's beta, in `pnpm-workspace.yaml`'s overrides; `test:fresh` pins its apps to it
   (`pinUpstream` in `e2e/fresh/check.ts`).
 
 - Reported 2026-11-18 (Void 1.8.0 and 1.10.0, Vite+ 1.7.0): `void init` writes `"vite-plus":

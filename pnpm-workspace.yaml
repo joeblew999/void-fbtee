@@ -15,6 +15,11 @@ pmOnFail: ignore
 overrides:
   vite@*: "catalog:"
   vitest@*: "catalog:"
+  # Void 1.8.0 takes these by range, and their release candidates (2026-11-16/17) break it: the
+  # Cloudflare plugin's rc writes its build where Void 1.8.0 can't read it (README "Reported to
+  # Void"), and the cf CLI's is untested here. They go with the Void upgrade (plans/void-upgrade.md).
+  "@cloudflare/vite-plugin": 2.0.0-beta.v.17
+  cf: 1.0.0-beta.32
 # One version each, for every workspace package: Vite+ (kept by `vp migrate`) and Void.
 catalog:
   vite: npm:@voidzero-dev/vite-plus-core@1.6.0
