@@ -79,7 +79,9 @@ above in place of the rules.
 
 1. **One request by hand** (`cf ai run google/gemini-4-hydrogen --body @request.json`, one sign-in
    you approve): the six test entries (below), into `th-TH`. The answer, untouched, becomes
-   `test/answers.json`.
+   `test/answers.json`. Its token counts are compared with the request's AI Gateway log, to see
+   whether the `usage` Cloudflare returns includes Hydrogen's thinking (billed as output). If it
+   doesn't, `costOf` (`models.ts`) adds the thinking, so `vp dev`'s "US$…" line is what's paid.
 2. The code.
 3. The tests and docs.
 4. `vp check`, `test:unit`, `test:dev`, `test:preview`. Commit; push only when you say.
