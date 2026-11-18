@@ -73,10 +73,34 @@ systemInstruction: "You translate a Markdown page from en-US into th-TH. Transla
 Tested on `pages/en-US/docs/tour.md`: its three code blocks and `<script>` block came back
 identical. Without "(their comments too)" it translated a comment inside a code block.
 
-**Runtime content:** posts, or any table's fields the app declares in `voidFbtee({ content })`
+**Posts:** the example's events, or any table's fields an app declares in `voidFbtee({ content })`
 
-The same as app strings: each field is an entry (`events/<id>/title`, its description, one line),
-sent and answered by key.
+The example's posts run on the package, so this change reaches them. Each field is an entry, sent
+and answered by key as app strings are:
+
+```
+systemInstruction: "You translate text people post in a web app from th-TH into en-US. …"
+message: {"title": "เวิร์กช็อปขนมไทยโบราณ", "description": "…"}
+schema:  the same keys, required
+```
+
+What changes for posts, all inside the package:
+
+- The queue (`queue-translate.ts`, which the example's `queues/translate.ts` runs) calls the one
+  function below instead of `translate()` in `ai.ts`, with the post's own language and the
+  reader's locale codes.
+- The dev route's `"post"` kind goes through the same function.
+- `postProblems` in `judge.ts` goes; a post is checked as a string is (every field there, no
+  placeholder lost), asked once more, then left for the queue's next retry as now.
+
+What stays the same:
+
+- The stored shape: a row per post and locale in `events_translations` (`source_id`, `locale`,
+  `fields` as JSON, who translated it), written by `storeTranslation` and read by
+  `translationsFor` and `textOf` in `content.ts`. Posts already translated stay as they are.
+- The example's own post code doesn't change: `queues/translate.ts`, `src/events/translations.ts`,
+  `pages/[lang]/events/*`, `crons/translations`, the middleware.
+- The queue's retries and the waiting when the account isn't paying (`paymentProblem`).
 
 **One function for all of it.** One plain function, with no file access, turns entries into the
 request and the answer back into entries. The plugin (Node, which reads the files) uses it for the
@@ -149,7 +173,10 @@ A difference between the two is a bug in our code.
 - In the example's `test:dev`: the same six entries through the dev route with `"dryRun": true`, to
   real Gemini, for `th-TH` and `ar-EG`, checking keys, line names and placeholders, never wording. A
   few US cents a run; `test:dev` isn't run in CI, so Gemini being down can't block a deploy.
-- A post created in `vp dev` comes back translated through the same function.
+- Posts: `e2e/dev/events.test.ts` already creates a post in `vp dev` and waits for the queue to
+  translate it with real Gemini, then books it in Thai and checks the Thai email; it runs unchanged
+  and now goes through the new function. `e2e/preview/events.test.ts` (an Arabic post read in
+  English) reads stored translations and runs unchanged.
 
 **Old tests and test data, in `packages/void-fbtee/test/`**
 
@@ -160,11 +187,12 @@ A difference between the two is a bug in our code.
 | `unit/ai-rules.test.ts`      | today's uncommitted per-language rules test                             | deleted                                                                         |
 | `unit/translate.test.ts`     | the coding-agent prompts, page stamping                                 | the prompt tests that name the translating skill change; page stamping stays    |
 | `unit/models.test.ts`        | the old model and payment errors                                        | rewritten for Hydrogen                                                          |
-| `unit/content-files.test.ts` | the content table's schema                                              | changed for runtime content as entries                                          |
+| `unit/content-files.test.ts` | the queue, cron and translations table files written for an app         | unchanged: those files don't change                                             |
 | `unit/fixture/`              | a tiny app with a German catalog, one entry falsely labelled `"claude"` | kept for the catalog and command tests; the label says it's hand-made test data |
 
-Elsewhere: `e2e/dev/jobs.test.ts` (runtime content as entries), and `e2e/fresh/check.ts` and
-`e2e/preview/strings.test.ts` (which skill files a new app gets) change. `e2e/fresh/check.ts`'s
+Elsewhere: `e2e/fresh/check.ts` and `e2e/preview/strings.test.ts` (which skill files a new app
+gets) change. `e2e/dev/jobs.test.ts` (the queue acks a translated post and a deleted one) runs
+unchanged. `e2e/fresh/check.ts`'s
 hand-written translations for a fresh app (`FROM_THAI`) stay, since that test can't call Gemini,
 but no longer claim to match the example's catalog.
 
@@ -205,8 +233,11 @@ judging is Claude's own, as it is Gemini's.
 
 ## Also in this change
 
-- `fallbacksOf` (`runtime.ts`) skips a locale's natural parents (`fr-CA` → `fr`) for runtime
-  content, where fbtee's own messages use them. Fixed.
+- `fallbacksOf` (`runtime.ts`) skips a locale's natural parents (`fr-CA` → `fr`), where fbtee's
+  own lookup uses them. It decides which stored post translation a page shows (`textLocales` in
+  `server.ts`) and which catalogs a page preloads (`translationsFor` in `runtime.ts`). Fixed. The
+  example (`en-US`, `ar-EG`, `th-TH`, no `fallbackLocales`) shows nothing different; a unit test in
+  `runtime.test.ts` covers it.
 
 ## Not in this change
 
