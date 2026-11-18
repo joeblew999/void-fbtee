@@ -79,7 +79,8 @@ The example's posts run on the package, so this change reaches them. Each field 
 and answered by key as app strings are:
 
 ```
-systemInstruction: "You translate text people post in a web app from th-TH into en-US. …"
+systemInstruction: "You translate a post someone wrote in a web app from th-TH into en-US. Each key
+  is one of the post's fields; translate its text."
 message: {"title": "เวิร์กช็อปขนมไทยโบราณ", "description": "…"}
 schema:  the same keys, required
 ```
