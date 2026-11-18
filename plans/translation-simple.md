@@ -91,7 +91,8 @@ translation that loses one: checked 2026-11-18, `plans/fbtee-issues.md` #3).
 ## What goes
 
 - The rules cut from the skill file and fbtee's rules in every request (`rulesFor`, `SECTIONS`,
-  `instructions` in `ai.ts`); the translating skill file (`skills/void-fbtee-translate/`).
+  `instructions` in `ai.ts`); the translating skill file (`skills/void-fbtee-translate/`), and the parts of
+  `test/unit/skills.test.ts` that hold that skill to `plurals.ts`'s codes.
 - `grammar.json` and the checks built on it in `judge.ts` (written for Gemma 4's mistakes),
   including the "always Modern Standard Arabic" rule, which contradicts the locale decision.
 - Matching answers by position (`translateCatalog` in `translate.ts`), and the separate post
