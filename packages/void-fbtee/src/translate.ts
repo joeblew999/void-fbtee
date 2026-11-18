@@ -334,18 +334,25 @@ function catalogsOf(
     .map((c) => ({ ...c, catalog: JSON.parse(readFileSync(c.file, "utf8")) }));
 }
 
-/** Whether an entry waits for review: translated by an AI (not by Claude or a person), not yet reviewed. */
+/**
+ * Whether a translation was made by a machine, or nobody can say who made it: a model's id (with a
+ * "/", models.ts) or "unknown". Those are reviewed; Claude's and a person's aren't (the void-fbtee
+ * skill's "Reviewing").
+ */
+const byMachine = (by: string | undefined) => !!by && (by === "unknown" || by.includes("/"));
+
+/** Whether an entry waits for review: by a machine or nobody known, not yet reviewed. */
 export const awaitsReview = (e: CatalogEntry) =>
-  e.status !== "new" && !!e.translatedBy && e.translatedBy !== "claude" && !e.review;
+  e.status !== "new" && byMachine(e.translatedBy) && !e.review;
 
 /**
  * Whether a translated page waits for review, as an entry does: its frontmatter's `translatedBy`
- * isn't "claude" (a model's id, "unknown") and it has no `reviewedBy`.
+ * is a model's id or "unknown", and it has no `reviewedBy`.
  */
 export function pageAwaitsReview(text: string): boolean {
   const yaml = frontmatter(text)?.yaml ?? "";
   const by = /^translatedBy:\s*"?([^"\n]*)"?\s*$/m.exec(yaml)?.[1]?.trim();
-  return !!by && by !== "claude" && !/^reviewedBy:\s*\S/m.test(yaml);
+  return byMachine(by) && !/^reviewedBy:\s*\S/m.test(yaml);
 }
 
 /** The translated pages that wait for review (up-to-date ones: a stale page is retranslated first). */

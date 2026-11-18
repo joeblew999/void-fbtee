@@ -251,6 +251,9 @@ test("a translation waits for review when an AI wrote it and no one has reviewed
     awaitsReview({ ...ai, review: { by: "claude", at: "2026-11-17", verdict: "ok" as const } }),
   ).toBe(false);
   expect(awaitsReview({ status: "translated", translatedBy: "claude" })).toBe(false);
+  // Nobody can say who: reviewed, as a machine's would be. A person's: not.
+  expect(awaitsReview({ status: "translated", translatedBy: "unknown" })).toBe(true);
+  expect(awaitsReview({ status: "translated", translatedBy: "Somchai" })).toBe(false);
   expect(awaitsReview({ status: "translated" })).toBe(false);
   expect(awaitsReview({ ...ai, status: "new" })).toBe(false);
 });

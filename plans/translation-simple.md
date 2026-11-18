@@ -165,6 +165,16 @@ price ("from Cloudflare's catalog page"), and `BATCH`.
 
 ## Also fixed
 
+Found while building (2026-11-18):
+
+- Only machine translations wait for Claude's review, as the void-fbtee skill's "Reviewing" says
+  (a model's id or "unknown"): the code sent anything not by "claude", a person's too, for review
+  (`awaitsReview`, `pageAwaitsReview` in `translate.ts`). Found when the test fixture's entry got
+  its honest label ("the tests", not "claude").
+- An event's time as a range: Chromium's `formatRange` writes the zone as an English city in Thai
+  and Arabic ("เวลาSydney"); the page and the emails share `formatWhen`
+  (`apps/example/src/events/event-clock.ts`), which takes the clock's name as a single time writes it.
+
 `fallbacksOf` (`runtime.ts`) skips natural parents (`fr-CA` → `fr`), which fbtee's own lookup uses.
 It picks which post translation a page shows (`textLocales`, `server.ts`) and which catalogs a page
 preloads. The example has no fallbacks, so nothing there changes; a unit test covers it.
