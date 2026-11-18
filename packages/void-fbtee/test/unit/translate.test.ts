@@ -23,8 +23,11 @@ import {
   agentProvenance,
   awaitsReview,
   markedDone,
+  pageAwaitsReview,
+  reviewTask,
   stamp,
   translateTask,
+  waitingReview,
 } from "../../src/translate";
 
 let root: string;
@@ -306,4 +309,31 @@ test("a page an agent marked done says who it is, or unknown if it still names a
     by: "unknown",
   });
   expect(agentProvenance(page(""))).toEqual({ by: "unknown" });
+});
+
+test("a translated page an AI or no one known wrote waits for review, until it says who reviewed it", () => {
+  prepare(p);
+  write("pages/en-US/blog/hello.md", POST);
+  write("pages/de-DE/blog/hello.md", POST.replace("Hello", "Hallo"));
+  const file = join(root, "pages/de-DE/blog/hello.md");
+  stamp(p, file, { by: "unknown", at: "2026-11-17" });
+  expect(pageAwaitsReview(readFileSync(file, "utf8"))).toBe(true);
+  expect(waitingReview(p)).toBe("1 page");
+  expect(reviewTask(p)).toContain(
+    "Pages:\n- pages/de-DE/blog/hello.md (de-DE), translated from pages/en-US/blog/hello.md",
+  );
+  // Reviewed: nothing left.
+  writeFileSync(
+    file,
+    readFileSync(file, "utf8").replace(/^translatedAt:.*$/m, '$&\nreviewedBy: "claude"'),
+  );
+  expect(pageAwaitsReview(readFileSync(file, "utf8"))).toBe(false);
+  expect(reviewTask(p)).toBeUndefined();
+  // Translated again by a model: the review was of the old one, so it's gone.
+  stamp(p, file, { by: "google/gemini-3.5-flash", at: "2026-11-18" });
+  expect(readFileSync(file, "utf8")).not.toMatch(/^reviewedBy:/m);
+  expect(waitingReview(p)).toBe("1 page");
+  // Claude's own page isn't reviewed.
+  stamp(p, file, { by: "claude", at: "2026-11-18" });
+  expect(reviewTask(p)).toBeUndefined();
 });

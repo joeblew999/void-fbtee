@@ -118,6 +118,8 @@ export function stamp(p: Project, file: string, by?: Provenance): void {
     // Only a request's own log: one left from an earlier translation would say a request made this.
     if (by.gatewayLogId) out = frontmatterLine(out, "gatewayLogId", by.gatewayLogId);
     else out = out.replace(/^gatewayLogId:.*\n/m, "");
+    // A review was of what someone else wrote.
+    out = out.replace(/^review(edBy|edAt|Note):.*\n/gm, "");
   }
   writeFileSync(file, out);
 }
@@ -328,6 +330,31 @@ function catalogsOf(
 export const awaitsReview = (e: CatalogEntry) =>
   e.status !== "new" && !!e.translatedBy && e.translatedBy !== "claude" && !e.review;
 
+/**
+ * Whether a translated page waits for review, as an entry does: its frontmatter's `translatedBy`
+ * isn't "claude" (a model's id, "unknown") and it has no `reviewedBy`.
+ */
+export function pageAwaitsReview(text: string): boolean {
+  const yaml = frontmatter(text)?.yaml ?? "";
+  const by = /^translatedBy:\s*"?([^"\n]*)"?\s*$/m.exec(yaml)?.[1]?.trim();
+  return !!by && by !== "claude" && !/^reviewedBy:\s*\S/m.test(yaml);
+}
+
+/** The translated pages that wait for review (up-to-date ones: a stale page is retranslated first). */
+export function unreviewedPages(p: Project): MarkdownPage[] {
+  return markdownPages(p).filter(
+    (page) => page.state === "ok" && pageAwaitsReview(readFileSync(page.file, "utf8")),
+  );
+}
+
+/** What waits for review, said: "th-TH 3, ar-EG 1, 2 pages", or "" for nothing. */
+export function waitingReview(p: Project): string {
+  const entries = [...unreviewed(p)].filter(([, n]) => n).map(([l, n]) => `${l} ${n}`);
+  const pages = unreviewedPages(p).length;
+  if (pages) entries.push(pages === 1 ? "1 page" : `${pages} pages`);
+  return entries.join(", ");
+}
+
 /** How many translations wait for review, by language. */
 export function unreviewed(p: Project): Map<string, number> {
   return new Map(
@@ -348,14 +375,16 @@ export function reviewTask(p: Project): string | undefined {
   const lines = [...unreviewed(p)]
     .filter(([, n]) => n)
     .map(([locale, n]) => `- ${rel(catalogFile(p, locale))} (${locale}): ${n} entries to review`);
-  if (!lines.length) return;
+  const pages = unreviewedPages(p).map(
+    (page) => `- ${rel(page.file)} (${page.locale}), translated from ${rel(page.original)}`,
+  );
+  if (!lines.length && !pages.length) return;
   return [
     `Review this Void app's machine translations. First read ${skillPath(p.root)} (the void-fbtee skill), its "Reviewing" section, and follow it; how a translation should be is in ${translatingSkillPath(p.root)}.`,
+    ...(lines.length ? ["", "Catalogs:", ...lines] : []),
+    ...(pages.length ? ["", "Pages:", ...pages] : []),
     "",
-    "Catalogs:",
-    ...lines,
-    "",
-    'Review the entries with a translatedBy that isn\'t "claude" and no review. Edit only these files.',
+    'Review the entries and pages with a translatedBy that isn\'t "claude" and no review. Edit only these files.',
     "Finish with one line per file: how many were right, how many you corrected, and what was wrong.",
   ].join("\n");
 }

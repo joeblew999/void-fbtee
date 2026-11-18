@@ -335,7 +335,8 @@ Pages under `pages/<source locale>/` have a copy per locale at the same path und
 
 `vp dev` has Void's AI translate, then asks Claude Code to review what the AI wrote: a signed-in
 `claude -p`, else a prompt in its log ("Review this Void app's machine translations"). An entry to
-review has `"translatedBy"` an AI's id or `"unknown"` (not `"claude"`) and no `"review"`.
+review has `"translatedBy"` an AI's id or `"unknown"` (not `"claude"`) and no `"review"`; a
+translated page to review, the same `translatedBy` in its frontmatter and no `reviewedBy`.
 
 Every translation says who made it (`translatedBy`), and `vp build` fails on one that doesn't: a
 model's id (with `gatewayLogId`, the AI Gateway log of the request, its exact request, answer and
@@ -350,7 +351,13 @@ An `"unknown"` one is reviewed like an AI's. Never write `"unknown"` for one you
 3. Wrong: correct the lines, set `"translatedBy": "claude"` and `"translatedAt"` to today, and add
    `"review": { "by": "claude", "at": "<YYYY-MM-DD>", "verdict": "wrong", "of": "<the AI's id it
    had>", "note": "<what was wrong, in a sentence>", "was": [<its lines as they were>] }`.
-4. When something is wrong in a way a rule could catch (a term changed, a word left in English, a
+4. A page: read it beside its original, by the same rules (and "Markdown pages" above: the
+   frontmatter's `title` and `description` translated, code, links and file names kept). Right:
+   add `reviewedBy: "claude"` and `reviewedAt: "<YYYY-MM-DD>"` to its frontmatter. Wrong: correct
+   it, set `translatedBy: "claude"` and `translatedAt` to today, and add `reviewedBy`,
+   `reviewedAt` and `reviewNote: "<what was wrong, in a sentence>"`. Leave `translatedFrom` as it
+   is.
+5. When something is wrong in a way a rule could catch (a term changed, a word left in English, a
    form that's always wrong), say so in your last line: it belongs in void-fbtee's checks
    (`judge.ts`, `grammar.json`), and when it's the meaning or the words, in the translating skill.
    Then `vp dev` checks your corrections like any translation.

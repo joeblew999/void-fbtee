@@ -36,7 +36,7 @@ import {
   stamp,
   translateApp,
   translateWithVoidAi,
-  unreviewed,
+  waitingReview,
 } from "./translate";
 import { check, reopenFailing } from "./check";
 import { writeContentFiles } from "./content-files";
@@ -242,11 +242,8 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         ? `${problems.length} to fix:\n${problems.join("\n")}`
         : "all translated, nothing to fix",
     );
-    const waiting = [...unreviewed(project())].filter(([, n]) => n);
-    if (waiting.length)
-      log(
-        `not yet reviewed by Claude: ${waiting.map(([locale, n]) => `${locale} ${n}`).join(", ")}`,
-      );
+    const waiting = waitingReview(project());
+    if (waiting) log(`not yet reviewed by Claude: ${waiting}`);
   };
   // Tests (Vitest's server, CI) don't start an agent: they report.
   const agentAllowed = () => !underVitest && !process.env.CI;
@@ -364,11 +361,8 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       if (command !== "build") return;
       const problems = check(project());
       // Not a failure (CI has no Claude), but said: what no one has looked at yet.
-      const waiting = [...unreviewed(project())].filter(([, n]) => n);
-      if (waiting.length)
-        this.info(
-          `void-fbtee: machine translations not yet reviewed: ${waiting.map(([locale, n]) => `${locale} ${n}`).join(", ")}`,
-        );
+      const waiting = waitingReview(project());
+      if (waiting) this.info(`void-fbtee: machine translations not yet reviewed: ${waiting}`);
       if (problems.length)
         this.error(
           `void-fbtee: ${problems.length} to fix before this can build (vp dev translates them):\n${problems.join("\n")}`,
