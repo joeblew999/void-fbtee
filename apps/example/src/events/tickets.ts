@@ -20,7 +20,7 @@ import { SAMPLE_EVENT, SAMPLE_ID, SAMPLE_NAME } from "@/docs/sample-event";
 import { originOr, SITE } from "@/site";
 import { sha256Hex } from "@/sha256";
 import { printImage, printPdf } from "@/pdf";
-import { startsAt, type EventFor } from "./emails";
+import { during, type EventFor } from "./emails";
 import { ticketHtml } from "./TicketLayout";
 import { textsFor, titleFor } from "./translations";
 
@@ -45,8 +45,11 @@ export function ticketPage(ticket: TicketFor): Promise<string> {
           value: ticket.name,
         },
         {
-          label: fbs("Starts", "PDF ticket: label of when the event starts, on its own clock"),
-          value: startsAt(ticket, locale),
+          label: fbs(
+            "When",
+            "PDF ticket: label of when the event is, from its start to its end, on its own clock",
+          ),
+          value: during(ticket, locale),
         },
       ],
       note: fbs(
@@ -85,6 +88,7 @@ export async function bookingTicket(id: string) {
     title: text.title,
     titleLocale: text.locale,
     startsAt: event.starts_at,
+    endsAt: event.ends_at,
     url: originOr(booking.origin) + page,
   };
   return { email: booking.email, ticket };

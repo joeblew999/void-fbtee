@@ -78,10 +78,6 @@ export default defineConfig({
       // Mac, open http://localhost:5173 instead.
       "tailscale:login": { command: "vpx scripts/tailscale.ts login", cache: false },
       "tailscale:logout": { command: "vpx scripts/tailscale.ts logout", cache: false },
-      // The translator on a sample of the example's strings, through the code vp dev uses
-      // (scripts/translations-measure.ts, plans/translation-rework.md step 2). Needs `vp run dev`
-      // running, signed in to Cloudflare.
-      "translations:measure": { command: "vpx scripts/translations-measure.ts", cache: false },
       // How the machine translations fared in Claude's reviews, by language and translator
       // (scripts/translations-reviews.ts, plans/translation-rework.md step 7).
       "translations:reviews": { command: "vpx scripts/translations-reviews.ts", cache: false },

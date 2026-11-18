@@ -1751,32 +1751,6 @@
       "types": [],
       "translatedBy": "unknown"
     },
-    "j3i6opoGHc7x96tN8JBCmw==": {
-      "description": "For whoever posted an event: keep this private link to delete it later",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ลิงก์นี้มีแค่คุณเท่านั้น เก็บไว้เพื่อลบกิจกรรมของคุณภายหลัง",
-          "variations": {}
-        }
-      ],
-      "types": [],
-      "translatedBy": "unknown"
-    },
-    "hKnW2a7iR5vyx0Tsfl749Q==": {
-      "description": "Label of the private link to delete an event",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ลิงก์ส่วนตัวของคุณ",
-          "variations": {}
-        }
-      ],
-      "types": [],
-      "translatedBy": "unknown"
-    },
     "dEkKZirV2EjNp4skRxL/yw==": {
       "description": "Button: really delete the event, after asking",
       "status": "translated",
@@ -1868,19 +1842,6 @@
       "types": [],
       "translatedBy": "unknown"
     },
-    "XhwAdRwSxWK0O0G1wMs54g==": {
-      "description": "Under the private link email field: what the link is for, and that the address isn't kept",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ลิงก์นี้ใช้ลบกิจกรรมของคุณภายหลังได้จากทุกอุปกรณ์ เราใช้อีเมลของคุณเพื่อส่งลิงก์นี้เท่านั้น",
-          "variations": {}
-        }
-      ],
-      "types": [],
-      "translatedBy": "unknown"
-    },
     "akdPP4Vwe0hB43GP/y6g0w==": {
       "description": "Form error: the email address isn't one",
       "status": "translated",
@@ -1888,19 +1849,6 @@
       "translations": [
         {
           "translation": "นี่ไม่ใช่ที่อยู่อีเมล",
-          "variations": {}
-        }
-      ],
-      "types": [],
-      "translatedBy": "unknown"
-    },
-    "M3pc8E4cZ9kvHeB4GhuKGw==": {
-      "description": "Private link email: why to keep the link, and to keep it private",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เก็บอีเมลนี้ไว้: ลิงก์ด้านล่างเป็นวิธีเดียวที่จะลบกิจกรรมของคุณภายหลัง ใครก็ตามที่มีลิงก์นี้สามารถลบกิจกรรมได้ อย่าแชร์ให้ใคร",
           "variations": {}
         }
       ],
@@ -3181,19 +3129,6 @@
       "types": [],
       "translatedBy": "unknown"
     },
-    "HAQ1EvLSj1obFRk2+rqrnA==": {
-      "description": "PDF ticket: label of when the event starts, on its own clock",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "เริ่ม",
-          "variations": {}
-        }
-      ],
-      "types": [],
-      "translatedBy": "unknown"
-    },
     "qVki9NW0D0cT5ZXsGVuC8w==": {
       "description": "PDF ticket: what to do with the ticket",
       "status": "translated",
@@ -4457,19 +4392,6 @@
       "types": [],
       "translatedBy": "unknown"
     },
-    "daZwA7a3sR4W2t05xan4fw==": {
-      "description": "Booking email: the reader has a seat at an event; {event} is the event's title, {time} when it starts on the clock where it happens, already formatted",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "คุณมีที่นั่งใน {event} เริ่ม {time}",
-          "variations": {}
-        }
-      ],
-      "types": [],
-      "translatedBy": "unknown"
-    },
     "w6QyRVIytetbTQkmcN1nzg==": {
       "description": "Booking email subject: the reader has booked a seat at an event; {event} is the event's title",
       "status": "translated",
@@ -4509,19 +4431,6 @@
       "types": [],
       "translatedBy": "unknown"
     },
-    "/R89OA5GUYekRxWiCvTRSA==": {
-      "description": "Cancellation email: the event the reader had a seat at is cancelled by its organiser; {event} is its title, {time} when it would have started, already formatted",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "{event} ซึ่งจะจัดขึ้น{time} ถูกผู้จัดยกเลิกแล้ว ที่นั่งของคุณจึงถูกยกเลิกไปด้วย",
-          "variations": {}
-        }
-      ],
-      "types": [],
-      "translatedBy": "unknown"
-    },
     "hbIy42QceIJ1mbs3FWf7WQ==": {
       "description": "Cancellation email subject: the event the reader had a seat at is cancelled; {event} is its title",
       "status": "translated",
@@ -4529,19 +4438,6 @@
       "translations": [
         {
           "translation": "{event} ถูกยกเลิกแล้ว",
-          "variations": {}
-        }
-      ],
-      "types": [],
-      "translatedBy": "unknown"
-    },
-    "UsFwsrTwe/3AzqvJm6d67A==": {
-      "description": "Reminder email: the event the reader has a seat at starts within a day; {event} is its title, {time} when it starts, already formatted",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ขอเตือนว่าคุณมีที่นั่งใน {event} ซึ่งจะเริ่ม{time}",
           "variations": {}
         }
       ],
@@ -4837,6 +4733,270 @@
         "at": "2026-11-17",
         "verdict": "ok"
       }
+    },
+    "yMCJv8jyZ3D5saHbW6nwSQ==": {
+      "description": "Form label: when the event ends, on the clock where it happens",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ends, local time",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Q3NjoqR7O0kVDWVbcCflFw==": {
+      "description": "Form error: no end time, or an end that isn't after the start",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "When does it end? After it starts.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RuUPue3qn8Du4avPEi+bIQ==": {
+      "description": "When an event is, on the reader's own clock; {time} is its start, or its start to its end, already formatted",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Your time: {time}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "V01CDGIuqFKtKSBPYriqXA==": {
+      "description": "Error changing an event: its seats can't be fewer than the seats already booked",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "More people have booked than that: give it at least as many seats as are booked.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "I7y/kYZ+QJs6EUDJDsR4/A==": {
+      "description": "Button: save the changes to the event you posted",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Save the changes",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VHCMJqh9G+2BlfTs5LAPcA==": {
+      "description": "Button: close the form for changing an event without saving",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Never mind",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0CAb5P4KIc9cxY5l0kv+7g==": {
+      "description": "For whoever posted an event: keep this private link to change or delete it later",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Only you have this link. Keep it to change or delete your event later.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3bPO3Z53qF3k1fJZW/kNEA==": {
+      "description": "Label of the private link to change or delete an event",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Your private link",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "y8NIwLYOSqB9gYsU0KMESg==": {
+      "description": "Button: change the event you posted",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Change this event",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6+cKYCjdhXgzQiyA8jOU8g==": {
+      "description": "Under the private link email field: what the link is for, and that the address isn't kept",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "The link lets you change or delete your event later, from any device. Your address is only used to send it.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ohuNNueQvwBJZYzlJFX5Bw==": {
+      "description": "Booking email: the reader has a seat at an event; {event} is the event's title, {time} when it is, from its start to its end on the clock where it happens, already formatted",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "You have a seat at {event}, {time}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "F6vtXR8+B+Stqx//PanA5A==": {
+      "description": "Private link email: why to keep the link, and to keep it private",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keep this email: the link below is the only way to change or delete your event later. Anyone with it can change or delete the event, so don't share it.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LIv6TjauAYpsig2L8TwIOw==": {
+      "description": "Cancellation email: the event the reader had a seat at is cancelled by its organiser; {event} is its title, {time} when it would have been, from its start to its end, already formatted",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{event}, {time}, has been cancelled by its organiser. Your seat is gone with it.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kcR+E5vWboT5tLMIMEiZwQ==": {
+      "description": "Change email: greeting, with the name the booker gave",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hello {name},",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dch1b8l636N/6FhmxZMyHQ==": {
+      "description": "Change email: the organiser of the event the reader has a seat at changed it; {event} is its title as it is now",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "The organiser of {event} has changed it.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "api8K8WolAQWnmHNX3NV2Q==": {
+      "description": "Change email: when the event is now; {time} is its new start to end and {before} what it was, both already formatted",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "It's now {time}, not {before}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AyVEAaw0bYv9V+i17sIf+w==": {
+      "description": "Change email: where the event is now; {venue} is the place, as its organiser wrote it",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "It's now at {venue}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0X6CEL+t0CCpXXwFhJYPMA==": {
+      "description": "Change email: the organiser removed the event's place",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "It no longer says where it is: see its page.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DvNw5Mb7XO7z2d9O05qNcw==": {
+      "description": "Change email: the reader's seat is kept; before the link to the event's page, where the ticket can be downloaded again",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Your seat is kept. Your ticket, with the new details, is on the event's page:",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LCF/aU+a5FkWxJkiGshG1Q==": {
+      "description": "Change email subject: the organiser changed the event the reader has a seat at; {event} is its title as it is now",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{event} has changed",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9Ef6937OcPBvwxm5t3Wt3Q==": {
+      "description": "Reminder email: the event the reader has a seat at starts within a day; {event} is its title, {time} when it is, from its start to its end, already formatted",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "A reminder: you have a seat at {event}, {time}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "avsVYoPnCnj2mH5ewuVM+Q==": {
+      "description": "PDF ticket: label of when the event is, from its start to its end, on its own clock",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "When",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

@@ -3,6 +3,8 @@
 //   - a booking's confirmation, to whoever booked, in the language they booked in (bookings.locale);
 //   - the private link, to whoever posted an event and asked for it, in the language they posted in;
 //   - a cancellation, to everyone who booked, each in their own language (queues/cancel.ts);
+//   - a change its organiser made to the title, the time or the place, to everyone who booked, each
+//     in their own language (queues/change.ts);
 //   - a reminder, the day before, to everyone who booked, each in their own (crons/reminders.ts).
 // Each links to the site it was made on (dev, a Worker Preview, live), not the canonical address.
 // Sent with Void's sendEmail (guide/email/sending.md): in dev it lands in Void's local inbox; on the
@@ -43,23 +45,35 @@ export type Email = {
   attachments: Attachment[];
 };
 
-/** An event as one reader sees it: its title in their language (or as written), and its start. */
+/**
+ * An event as one reader sees it: its title in their language (or as written), and its start and
+ * end (as stored: Temporal's text on the event's own clock).
+ */
 export type EventFor = {
   title: string;
   titleLocale: string;
   startsAt: string;
+  endsAt: string;
 };
 
-/** The event's start, on the clock where it happens, written the reader's way. */
-export const startsAt = (event: EventFor, locale: string) =>
-  Temporal.ZonedDateTime.from(event.startsAt).toLocaleString(locale, {
+/**
+ * When the event is, from its start to its end, on the clock where it happens, written the
+ * reader's way: "Saturday 6 March, 6:30 – 9:30 pm GMT+7" (Intl.DateTimeFormat's formatRange,
+ * which says the day once when it's the same).
+ */
+export const during = (event: { startsAt: string; endsAt: string }, locale: string) => {
+  const start = Temporal.ZonedDateTime.from(event.startsAt);
+  const end = Temporal.ZonedDateTime.from(event.endsAt);
+  return new Intl.DateTimeFormat(locale, {
     weekday: "long",
     day: "numeric",
     month: "long",
     hour: "numeric",
     minute: "2-digit",
     timeZoneName: "short",
-  });
+    timeZone: start.timeZoneId,
+  }).formatRange(new Date(start.epochMilliseconds), new Date(end.epochMilliseconds));
+};
 
 /**
  * The email from its lines and closing link: the plain text as the lines and the link, and the HTML
@@ -114,11 +128,11 @@ export function bookingEmail(
         [
           "You have a seat at ",
           fbs.param("event", booking.title),
-          ". It starts ",
-          fbs.param("time", startsAt(booking, locale)),
+          ", ",
+          fbs.param("time", during(booking, locale)),
           ".",
         ],
-        "Booking email: the reader has a seat at an event; {event} is the event's title, {time} when it starts on the clock where it happens, already formatted",
+        "Booking email: the reader has a seat at an event; {event} is the event's title, {time} when it is, from its start to its end on the clock where it happens, already formatted",
       ),
       ...ticket.line,
       fbs("The event's page:", "Booking email: before the link to the event's page"),
@@ -131,7 +145,7 @@ export function bookingEmail(
   });
 }
 
-/** The poster's private link, in `locale`: the only way to delete their event later. */
+/** The poster's private link, in `locale`: the only way to change or delete their event later. */
 export function linkEmail(post: EventFor & { locale: AppLocale; link: string }): Promise<Email> {
   return inLocale(post.locale, ({ locale, dir }) => {
     const lines = [
@@ -140,7 +154,7 @@ export function linkEmail(post: EventFor & { locale: AppLocale; link: string }):
         "Private link email: the reader has just posted an event; {event} is its title",
       ),
       fbs(
-        "Keep this email: the link below is the only way to delete your event later. Anyone with it can delete the event, so don't share it.",
+        "Keep this email: the link below is the only way to change or delete your event later. Anyone with it can change or delete the event, so don't share it.",
         "Private link email: why to keep the link, and to keep it private",
       ),
     ];
@@ -168,11 +182,11 @@ export function cancellationEmail(
       fbs(
         [
           fbs.param("event", booking.title),
-          ", on ",
-          fbs.param("time", startsAt(booking, locale)),
+          ", ",
+          fbs.param("time", during(booking, locale)),
           ", has been cancelled by its organiser. Your seat is gone with it.",
         ],
-        "Cancellation email: the event the reader had a seat at is cancelled by its organiser; {event} is its title, {time} when it would have started, already formatted",
+        "Cancellation email: the event the reader had a seat at is cancelled by its organiser; {event} is its title, {time} when it would have been, from its start to its end, already formatted",
       ),
       fbs("Other events:", "Cancellation email: before the link to the events list"),
     ];
@@ -182,6 +196,78 @@ export function cancellationEmail(
     );
     const events = booking.origin + routeUrl("/[lang]/events");
     return written(subject, lines, events, booking, locale, dir);
+  });
+}
+
+/**
+ * A change, in `locale`: the event's organiser changed what matters to someone with a seat (its
+ * title, when it starts, where), and what it is now: its start then and now, on the clock where it
+ * happens; its place now; and its page in that language on the site at `origin`, where the ticket
+ * is printed again with the new details.
+ */
+export function changeEmail(
+  booking: EventFor & {
+    locale: AppLocale;
+    name: string;
+    id: string;
+    origin: string;
+    venue: string | null;
+    was: { startsAt?: string; endsAt?: string; venue?: string | null };
+  },
+): Promise<Email> {
+  return inLocale(booking.locale, ({ locale, dir }) => {
+    const lines = [
+      fbs(
+        ["Hello ", fbs.param("name", booking.name), ","],
+        "Change email: greeting, with the name the booker gave",
+      ),
+      fbs(
+        ["The organiser of ", fbs.param("event", booking.title), " has changed it."],
+        "Change email: the organiser of the event the reader has a seat at changed it; {event} is its title as it is now",
+      ),
+    ];
+    if (booking.was.startsAt || booking.was.endsAt) {
+      const before = {
+        startsAt: booking.was.startsAt ?? booking.startsAt,
+        endsAt: booking.was.endsAt ?? booking.endsAt,
+      };
+      lines.push(
+        fbs(
+          [
+            "It's now ",
+            fbs.param("time", during(booking, locale)),
+            ", not ",
+            fbs.param("before", during(before, locale)),
+            ".",
+          ],
+          "Change email: when the event is now; {time} is its new start to end and {before} what it was, both already formatted",
+        ),
+      );
+    }
+    if (booking.was.venue !== undefined)
+      lines.push(
+        booking.venue
+          ? fbs(
+              ["It's now at ", fbs.param("venue", booking.venue), "."],
+              "Change email: where the event is now; {venue} is the place, as its organiser wrote it",
+            )
+          : fbs(
+              "It no longer says where it is: see its page.",
+              "Change email: the organiser removed the event's place",
+            ),
+      );
+    lines.push(
+      fbs(
+        "Your seat is kept. Your ticket, with the new details, is on the event's page:",
+        "Change email: the reader's seat is kept; before the link to the event's page, where the ticket can be downloaded again",
+      ),
+    );
+    const subject = fbs(
+      [fbs.param("event", booking.title), " has changed"],
+      "Change email subject: the organiser changed the event the reader has a seat at; {event} is its title as it is now",
+    );
+    const page = booking.origin + routeUrl("/[lang]/events/[id]", { params: { id: booking.id } });
+    return written(subject, lines, page, booking, locale, dir);
   });
 }
 
@@ -210,11 +296,11 @@ export function reminderEmail(
         [
           "A reminder: you have a seat at ",
           fbs.param("event", booking.title),
-          ", which starts ",
-          fbs.param("time", startsAt(booking, locale)),
+          ", ",
+          fbs.param("time", during(booking, locale)),
           ".",
         ],
-        "Reminder email: the event the reader has a seat at starts within a day; {event} is its title, {time} when it starts, already formatted",
+        "Reminder email: the event the reader has a seat at starts within a day; {event} is its title, {time} when it is, from its start to its end, already formatted",
       ),
       ...ticket.line,
       fbs("The event's page:", "Reminder email: before the link to the event's page"),
@@ -247,6 +333,9 @@ export const sendLinkEmail = (to: string, post: Parameters<typeof linkEmail>[0])
 
 export const sendReminderEmail = (to: string, booking: Parameters<typeof reminderEmail>[0]) =>
   send(to, reminderEmail(booking), "reminder");
+
+export const sendChangeEmail = (to: string, booking: Parameters<typeof changeEmail>[0]) =>
+  send(to, changeEmail(booking), "change");
 
 export const sendCancellationEmail = (
   to: string,

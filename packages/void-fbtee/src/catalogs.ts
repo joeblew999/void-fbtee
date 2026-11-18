@@ -190,8 +190,8 @@ export function prepared(p: Project): { locale: string; json: string; existed: b
 
 /**
  * A language's catalog as it would be made from nothing: every string new, with its source lines,
- * one per plural form and gender (addVariants). What a translator is given (and the measuring of
- * translators: scripts/translations-measure.ts).
+ * one per plural form and gender (addVariants): what each string is translated from, and what
+ * `vp build` checks translations against.
  */
 export function freshCatalog(p: Project, locale: string): string {
   const { phrases } = collect(p);

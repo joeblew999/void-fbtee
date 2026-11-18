@@ -5,6 +5,7 @@
 // screen readers use the right one); the seats left are live, in a split-flap chip that turns over
 // as people book; booking is Void's useForm, with the page's language filled in (void-fbtee/react).
 import { Fragment, useEffect, useRef, useState, useSyncExternalStore, type RefObject } from "react";
+import { Temporal } from "temporal-polyfill";
 import { fbs, fbt } from "fbtee";
 import { action, Form, isVoidActionError, useRouter } from "@void/react";
 import { routeUrl } from "void-fbtee/routes";
@@ -19,6 +20,7 @@ import {
   useTimeZone,
 } from "void-fbtee/react";
 import { MapPin } from "lucide-react";
+import { EventFields } from "@/events/EventFields";
 import { EventTime } from "@/events/EventTime";
 import { EventsCrumbs } from "@/events/EventsCrumbs";
 import { Field } from "@/events/Field";
@@ -32,8 +34,8 @@ import type { Props } from "./[id].server";
 
 /**
  * The event's live stream: the seats left (seats only go down, so the lower count wins); its
- * translations arriving after the post (queues/translate.ts), when the page loads its data again;
- * and its deletion, when the page says it's cancelled. Neither while this page is deleting it
+ * translations arriving after the post (queues/translate.ts), and its organiser changing it, when
+ * the page loads its data again; and its deletion, when the page says it's cancelled. Neither while this page is deleting it
  * (`leaving`): the reload would land on top of the move to the list.
  */
 function useLiveEvent(id: string, left: number, leaving: RefObject<boolean>) {
@@ -49,7 +51,8 @@ function useLiveEvent(id: string, left: number, leaving: RefObject<boolean>) {
         topic: `event:${id}`,
         onEvent: (event) => {
           if (event.type === "seats") setLive((event.data as { left: number }).left);
-          if (event.type === "translated" && !leaving.current) void router.refresh();
+          if ((event.type === "translated" || event.type === "changed") && !leaving.current)
+            void router.refresh();
           if (event.type === "deleted" && !leaving.current) setCancelled(true);
         },
       })
@@ -176,6 +179,8 @@ function Stored({ event }: { event: Props["event"] }) {
   const fields = {
     starts_at: event.starts_at,
     starts_at_utc: event.starts_at_utc,
+    ends_at: event.ends_at,
+    ends_at_utc: event.ends_at_utc,
     seats: event.seats,
     locale: event.locale,
   };
@@ -271,6 +276,64 @@ function keyHere(id: string, hash: string): string | null {
   return fromLink ?? fromCookie ?? keyStore.get(id);
 }
 
+/** A stored time as the form's datetime-local value, on the event's own clock: "2027-03-06T18:30". */
+const localValue = (stored: string) =>
+  Temporal.ZonedDateTime.from(stored).toPlainDateTime().toString({ smallestUnit: "minute" });
+
+/**
+ * Changing the event, for whoever posted it: the posting form's fields (src/events/EventFields.tsx),
+ * filled in with the event as it is, and the key from their private link. Saved by the page's
+ * "?change" action; the page then shows the event as changed (Void reruns the loader).
+ */
+function ChangeEvent({
+  event,
+  eventKey,
+  onDone,
+}: {
+  event: Props["event"];
+  eventKey: string;
+  onDone: () => void;
+}) {
+  const start = Temporal.ZonedDateTime.from(event.starts_at);
+  // The browser's zones, with the event's own first: the server checks the zone it gets.
+  const [zones] = useState(() => [start.timeZoneId, ...Intl.supportedValuesOf("timeZone")]);
+  const form = useForm(
+    "/[lang]/events/[id]?change",
+    {
+      title: event.title,
+      description: event.description,
+      venue: event.venue ?? "",
+      local: localValue(event.starts_at),
+      local_end: localValue(event.ends_at),
+      time_zone: start.timeZoneId,
+      seats: event.seats,
+      key: eventKey,
+    },
+    { params: { id: event.id }, onSuccess: onDone },
+  );
+  return (
+    <Form form={form} className="grid gap-4" data-testid="change-form">
+      <EventFields form={form} zones={zones} prefix="change" />
+      {/* The 409 from the action: fewer seats than people have booked. */}
+      {form.error?.status === 409 && (
+        <p className="text-destructive" data-testid="change-seats-error">
+          <fbt desc="Error changing an event: its seats can't be fewer than the seats already booked">
+            More people have booked than that: give it at least as many seats as are booked.
+          </fbt>
+        </p>
+      )}
+      <div className="flex flex-wrap gap-2">
+        <Button type="submit" disabled={form.pending} data-testid="change-save">
+          <fbt desc="Button: save the changes to the event you posted">Save the changes</fbt>
+        </Button>
+        <Button type="button" variant="ghost" onClick={onDone} data-testid="change-cancel">
+          <fbt desc="Button: close the form for changing an event without saving">Never mind</fbt>
+        </Button>
+      </div>
+    </Form>
+  );
+}
+
 /**
  * For whoever posted the event: its private delete link (src/events/delete-key.ts). Only in the
  * browser, which alone sees the "#" part, and only for an event that can be deleted. Just after
@@ -279,7 +342,14 @@ function keyHere(id: string, hash: string): string | null {
  * the key back in the address whenever it's lost it (booking a seat here does). Deleting asks once
  * more, on the page (no browser dialog), and removes the copy.
  */
-function YourEvent({ id, onLeaving }: { id: string; onLeaving: (leaving: boolean) => void }) {
+function YourEvent({
+  event,
+  onLeaving,
+}: {
+  event: Props["event"];
+  onLeaving: (leaving: boolean) => void;
+}) {
+  const id = event.id;
   const { lang } = useLocale();
   // The address and cookies are the browser's own: read once hydrated, so the server's HTML and the
   // first render in the browser are the same (nothing), as useHydrated is for.
@@ -292,6 +362,7 @@ function YourEvent({ id, onLeaving }: { id: string; onLeaving: (leaving: boolean
   const key = hydrated ? keyHere(id, hash) : null;
   const [sure, setSure] = useState(false);
   const [wrong, setWrong] = useState(false);
+  const [changing, setChanging] = useState(false);
   // The event's own address, not location's: just after posting, this renders before Void's router
   // has moved the address from the form's page to this one.
   const page = routeUrl("/[lang]/events/[id]", { params: { id } });
@@ -321,8 +392,8 @@ function YourEvent({ id, onLeaving }: { id: string; onLeaving: (leaving: boolean
   return (
     <section className="grid gap-3 rounded-xl border p-5 text-sm" data-testid="your-event">
       <p>
-        <fbt desc="For whoever posted an event: keep this private link to delete it later">
-          Only you have this link. Keep it to delete your event later.
+        <fbt desc="For whoever posted an event: keep this private link to change or delete it later">
+          Only you have this link. Keep it to change or delete your event later.
         </fbt>
       </p>
       <input
@@ -331,9 +402,19 @@ function YourEvent({ id, onLeaving }: { id: string; onLeaving: (leaving: boolean
         value={link}
         onFocus={(e) => e.target.select()}
         className="w-full rounded-md border bg-muted/40 px-2 py-1.5 font-mono text-xs"
-        aria-label={fbs("Your private link", "Label of the private link to delete an event")}
+        aria-label={fbs(
+          "Your private link",
+          "Label of the private link to change or delete an event",
+        )}
         data-testid="delete-link"
       />
+      {changing ? (
+        <ChangeEvent event={event} eventKey={key} onDone={() => setChanging(false)} />
+      ) : (
+        <Button variant="outline" onClick={() => setChanging(true)} data-testid="change">
+          <fbt desc="Button: change the event you posted">Change this event</fbt>
+        </Button>
+      )}
       {sure ? (
         <Button variant="destructive" onClick={remove} data-testid="delete-sure">
           <fbt desc="Button: really delete the event, after asking">Delete it for good</fbt>
@@ -416,6 +497,7 @@ export default function Event({ event, text, left, deletable }: Props) {
           <DateTile startsAt={event.starts_at} />
           <EventTime
             startsAt={event.starts_at}
+            endsAt={event.ends_at}
             className="gap-1.5 text-sm [&>:first-child]:text-base [&>:first-child]:font-medium md:[&>:first-child]:text-lg"
           />
         </div>
@@ -481,7 +563,7 @@ export default function Event({ event, text, left, deletable }: Props) {
         )}
         {deletable && !cancelled && (
           <YourEvent
-            id={event.id}
+            event={event}
             onLeaving={(on) => {
               leaving.current = on;
             }}

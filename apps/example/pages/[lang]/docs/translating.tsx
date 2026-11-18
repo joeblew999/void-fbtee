@@ -1,5 +1,5 @@
 // The Translating page, a reference: how this app gets translated. Its own text and pages, and what
-// people post, by the same AI (Void's AI: Gemini 3.5 Flash), the first into files in the
+// people post, by the same AI (Void's AI: Gemini 4 Hydrogen), the first into files in the
 // repository (with each catalog's counts, from the loader), the second as it's posted; Claude Code
 // for what it leaves. With the lines that do it.
 import { fbt } from "fbtee";
@@ -20,12 +20,12 @@ function points(): Point[] {
         </fbt>
       ),
       why: (
-        <fbt desc="Translating page point: as you save, the dev server prepares new strings and has Void's AI translate them, many at a time; every answer is checked, and what still fails goes to Claude Code; each translation records who wrote it">
+        <fbt desc="Translating page point: as you save, the dev server prepares new strings and has Void's AI translate them, one at a time; every answer is checked, and what still fails goes to Claude Code; each translation records who wrote it, when, and what it cost">
           There's nothing to run. As you save, vp dev adds each new string to every language's
           catalog and translates what's new, the strings and the markdown pages that changed, with
-          Void's AI in the app's own Worker: Gemini 3.5 Flash, many strings at a time. Every answer
+          Void's AI in the app's own Worker: Gemini 4 Hydrogen, one string at a time. Every answer
           is checked, and what still fails goes to Claude Code with void-fbtee's skill. Each
-          translation records who wrote it and when.
+          translation records who wrote it, when, and what it cost.
         </fbt>
       ),
       code: [
@@ -67,20 +67,25 @@ function points(): Point[] {
         </fbt>
       ),
       why: (
-        <fbt desc="Translating page point: a posted event goes to a queue whose consumer translates it with Void's AI, the same model as the app's own text">
+        <fbt desc="Translating page point: a posted event goes to a queue whose consumer translates it with Void's AI, the same model as the app's own text; changed, it's translated again">
           An event someone posts isn't in the repository, so it's translated as it's posted: the
           post goes to a queue, and its consumer asks Void's AI, the same model as the app's own
-          text, for each of the app's other languages, after the poster has their answer.
+          text, for each of the app's other languages, after the poster has their answer. When its
+          poster changes it, it's translated again.
         </fbt>
       ),
       code: [
         {
           file: "vite.config.ts",
-          line: 'content: { events: { fields: ["title", "description"], about: "listings for events" } },',
+          line: 'content: { events: ["title", "description"] },',
         },
         {
           file: "pages/[lang]/events/new.server.ts",
           line: 'await translateSoon("events", created.id);',
+        },
+        {
+          file: "pages/[lang]/events/[id].server.ts",
+          line: 'await translateSoon("events", id);',
         },
         {
           file: "queues/translate.ts",
@@ -186,7 +191,7 @@ export default function TranslatingPage({ catalogs }: Props) {
       title={<fbt common>Translating</fbt>}
       intro={
         <fbt desc="Translating page introduction">
-          The app's own text and what people post are translated by the same AI, Gemini 3.5 Flash
+          The app's own text and what people post are translated by the same AI, Gemini 4 Hydrogen
           through Void's AI: the text into files in the repository that you review, posts as they're
           posted. Claude Code translates what it leaves. Here is each, with the lines that do it.
         </fbt>

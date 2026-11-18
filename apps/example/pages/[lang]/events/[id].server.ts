@@ -1,5 +1,6 @@
-// One event, by its id, with its seats left (the loader), and booking a seat (the action).
-import { bookings, bookSchema, events } from "@schema";
+// One event, by its id, with its seats left (the loader); booking a seat (the page's action); and,
+// for whoever posted it, changing it and deleting it (with the key from their private link).
+import { bookings, bookSchema, changeEventSchema, events, when } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { count, db, eq, sql } from "void/db";
 import { queues } from "void/queues";
@@ -15,6 +16,7 @@ import { deleteKeyMatches } from "../../../src/events/delete-key";
 import { ticketKey } from "../../../src/events/tickets";
 import { eventTopic, live } from "../../../src/events/live";
 import { eventPages, textFor, textsFor, titleFor } from "../../../src/events/translations";
+import { translateSoon } from "void-fbtee/content";
 
 export type Props = InferProps<typeof loader>;
 
@@ -118,6 +120,7 @@ const remove = defineHandler.withValidator({ params, body: z.object({ key: z.str
           title: text.title,
           titleLocale: text.locale,
           startsAt: event.starts_at,
+          endsAt: event.ends_at,
           origin,
         });
       }),
@@ -134,8 +137,61 @@ const remove = defineHandler.withValidator({ params, body: z.object({ key: z.str
   },
 );
 
-// Void's named actions: booking on the page itself, deleting on "?delete".
-export const actions = { default: book, delete: remove };
+/**
+ * Changing the event, with the key from the poster's private link: its title, description, place,
+ * start and end, and seats (never fewer than are booked: a 409). Its language stays the one it was
+ * written in. Then, in order: it's translated again (void-fbtee's translateSoon: its translations
+ * no longer match what it says); when its title, start, end or place changed, everyone who booked
+ * is told, each in their own language (queues/change.ts), and their stored PDF tickets, which show
+ * those, go, so the next download prints the new ones; its pages leave the cache in every language,
+ * with the list and the sitemap; and pages open on it hear "changed" and load it again. No return:
+ * Void reruns the loader, so the page shows the change. A wrong key is a 403.
+ */
+const change = defineHandler.withValidator({ params, body: changeEventSchema })(async (
+  c,
+  { params: { id }, body },
+) => {
+  const [event] = await db.select().from(events).where(eq(events.id, id));
+  if (!event) return c.notFound();
+  if (!(await deleteKeyMatches(body.key, event.delete_key_hash)))
+    return c.json({ message: "wrong key" }, 403);
+  const taken = await booked(id);
+  if (body.seats < taken) return c.json({ message: "fewer seats than are booked", taken }, 409);
+  const times = when(body.local, body.local_end, body.time_zone);
+  const venue = body.venue?.trim() || null;
+  await db
+    .update(events)
+    .set({
+      title: body.title,
+      description: body.description,
+      venue,
+      seats: body.seats,
+      ...times,
+      updatedAt: sql`(datetime('now'))`,
+    })
+    .where(eq(events.id, id));
+  await translateSoon("events", id);
+  // What someone with a seat must know: what's on their ticket, and what gets them there.
+  const was = {
+    ...(event.starts_at !== times.starts_at ? { startsAt: event.starts_at } : {}),
+    ...(event.ends_at !== times.ends_at ? { endsAt: event.ends_at } : {}),
+    ...(event.venue !== venue ? { venue: event.venue } : {}),
+  };
+  if (Object.keys(was).length || event.title !== body.title) {
+    const booked = await db.select().from(bookings).where(eq(bookings.event_id, id));
+    // Where the change is made: the emails link back to the event's page there.
+    const origin = new URL(c.req.url).origin;
+    await Promise.all(
+      booked.map((b) => queues.change.send({ bookingId: b.id, eventId: id, was, origin })),
+    );
+    if (booked.length) await storage.delete(booked.map((b) => ticketKey(b.id)));
+  }
+  await clearCache({ paths: eventPages(id) });
+  await live.publish(eventTopic(id), {}, { type: "changed" });
+});
+
+// Void's named actions: booking on the page itself, changing on "?change", deleting on "?delete".
+export const actions = { default: book, change, delete: remove };
 
 // The event's own title and description, in the page's language where translated, and the event
 // described for search engines (schema.org's Event, which Google shows as an event in results). Its
@@ -150,6 +206,7 @@ export const head = defineHead<Props>((c, { event, text }) => {
     name: shown.title,
     description: shown.description,
     startDate: Temporal.ZonedDateTime.from(event.starts_at).toString({ timeZoneName: "never" }),
+    endDate: Temporal.ZonedDateTime.from(event.ends_at).toString({ timeZoneName: "never" }),
     eventStatus: "https://schema.org/EventScheduled",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     inLanguage: text ? locale : event.locale,

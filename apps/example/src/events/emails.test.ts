@@ -5,6 +5,7 @@ import { expect, test } from "vite-plus/test";
 import { createEmailTestHarness } from "void/email/testing";
 import {
   bookingEmail,
+  changeEmail,
   cancellationEmail,
   linkEmail,
   reminderEmail,
@@ -19,6 +20,7 @@ const event = {
   title: "أمسية خط عربي",
   titleLocale: "ar-EG",
   startsAt: "2027-03-08T19:00:00+02:00[Africa/Cairo]",
+  endsAt: "2027-03-08T21:00:00+02:00[Africa/Cairo]",
 } as const;
 const booking = {
   ...event,
@@ -30,8 +32,8 @@ test("the booking, in the booker's language, the time on the clock where it happ
   const email = await bookingEmail({ ...booking, locale: "th-TH" });
   expect(email.subject).toBe("ที่นั่งของคุณใน أمسية خط عربي");
   expect(email.text).toContain("สวัสดี Laila");
-  // Thai's own calendar and words for the date (8 March, a Monday), and Cairo's 19:00.
-  expect(email.text).toMatch(/วันจันทร์.*มีนาคม.*19:00/);
+  // Thai's own calendar and words for the date (8 March, a Monday), and Cairo's 19:00 to 21:00.
+  expect(email.text).toMatch(/วันจันทร์.*มีนาคม.*19:00.*21:00/);
   expect(email.text).toContain(booking.url);
 });
 
@@ -80,7 +82,7 @@ test("the private link, in the poster's language, with the link as given", async
   expect(ar.html).toContain(`>${link}</a>`);
   const en = await linkEmail({ ...event, locale: "en-US", link });
   expect(en.subject).toBe("Your private link for أمسية خط عربي");
-  expect(en.text).toContain("the only way to delete your event later");
+  expect(en.text).toContain("the only way to change or delete your event later");
 });
 
 test("a cancellation, in the booker's language, linking to the events in it", async () => {
@@ -120,6 +122,34 @@ test("a reminder, in the booker's language, linking to the event on the site the
   const th = await reminderEmail({ ...reminder, locale: "th-TH" });
   expect(th.subject).toBe("แจ้งเตือน: أمسية خط عربي");
   expect(th.text).toMatch(/วันจันทร์.*มีนาคม.*19:00/);
+});
+
+test("a change, in the booker's language: when it is now and when it was, and the new place", async () => {
+  const change = {
+    ...event,
+    name: "Laila",
+    id: "d57a8bf2-5909-4475-a407-12a879df5f01",
+    origin: "https://example.com",
+    venue: "Al-Azhar Park",
+    // It was an hour earlier, and nowhere said.
+    was: {
+      startsAt: "2027-03-08T18:00:00+02:00[Africa/Cairo]",
+      endsAt: "2027-03-08T20:00:00+02:00[Africa/Cairo]",
+      venue: null,
+    },
+  } as const;
+  const en = await changeEmail({ ...change, locale: "en-US" });
+  expect(en.subject).toBe("أمسية خط عربي has changed");
+  expect(en.text).toContain("Hello Laila,");
+  // Intl writes a narrow no-break space before "PM", so any one character there.
+  expect(en.text).toMatch(/It.s now .*7:00.*9:00.PM.*, not .*6:00.*8:00.PM/);
+  expect(en.text).toContain("It's now at Al-Azhar Park.");
+  expect(en.text.trimEnd().endsWith(`https://example.com/en-US/events/${change.id}`)).toBe(true);
+  // Only what changed: a new title alone says nothing about the time or the place.
+  const titled = await changeEmail({ ...change, locale: "en-US", was: {} });
+  expect(titled.text).not.toContain("It's now");
+  const ar = await changeEmail({ ...change, locale: "ar-EG" });
+  expect(ar.html).toMatch(/<html dir="rtl" lang="ar-EG">/);
 });
 
 test("each sent through Void's sendEmail", async () => {

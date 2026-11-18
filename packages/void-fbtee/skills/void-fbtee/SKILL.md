@@ -9,15 +9,17 @@ The app's own Vite+ commands do the work; there are no i18n scripts or other com
 an app up is the one void-fbtee command: `vp exec void-fbtee init`. After that:
 
 - `vp dev` prepares: as it starts and on each save, every new string goes into every catalog,
-  marked new. Straight after, it translates what's new with Void's AI (Gemini 3.5 Flash, many
-  strings a request, each answer checked), then Claude Code for what that leaves: a signed-in
+  marked new. Straight after, it translates what's new with Void's AI (Gemini 4 Hydrogen, one
+  string a request, each answer checked), then Claude Code for what that leaves: a signed-in
   `claude -p` with this skill, else a prompt in its log ("void-fbtee: … entries with "status":
   "new""); a coding agent given it translates by this skill. Each entry records who translated
-  it (`translatedBy`, `translatedAt`). It records each markdown page you mark done and reports
+  it (`translatedBy`, `translatedAt`), and what it cost (`usage`, when Void's AI made it). It
+  records each markdown page you mark done and reports
   what's left, until "all translated, nothing to fix".
-- `vp build` (and so `void deploy` and CI) fails on anything left or wrong: untranslated strings
-  and pages, a translation that fails the checks `vp dev` runs on each answer, setup problems, a
-  removed language's leftovers. Its message lists them.
+- `vp build` (and so `void deploy` and CI) fails on anything left or broken: untranslated strings
+  and pages, a translation missing a line or a `{placeholder}` (the check `vp dev` runs on each
+  answer), setup problems, a removed language's leftovers. Its message lists them. Nothing
+  translated is ever set back to new.
 - `vp check` runs fbtee's lint rules (text no one wrapped for translation).
 
 Translate only this way, never by other means, so the app's own tooling is what's used.
@@ -29,10 +31,10 @@ Translate only this way, never by other means, so the app's own tooling is what'
    `"status": "new"`, fbtee's built-in strings included. Don't run `fbtee collect` or
    `fbtee prepare-translations`: the dev server does that.
 2. Translate every entry with `"status": "new"` by fbtee's own skill,
-   `node_modules/fbtee/skills/fbtee-translate/SKILL.md`, steps 3 to 5, and void-fbtee's
-   translating skill, `node_modules/void-fbtee/skills/void-fbtee-translate/SKILL.md`: how to
-   translate, the same rules Void's AI is sent. Then mark the entry done: `"status":
-   "translated"`, with `"translatedBy": "claude"` and `"translatedAt"` the day (YYYY-MM-DD).
+   `node_modules/fbtee/skills/fbtee-translate/SKILL.md`, steps 3 to 5, into the catalog's locale
+   (the code: `ar-EG` is Egyptian Arabic, `ar-SA` standard Arabic): each line for its plural form
+   or gender, every `{placeholder}` kept. Then mark the entry done: `"status": "translated"`, with
+   `"translatedBy": "claude"` and `"translatedAt"` the day (YYYY-MM-DD).
 3. What's specific to editing a void-fbtee app's catalogs is below.
 
 **Page titles and descriptions.** A page's `head()` (Void's `defineHead`, in its `.server.ts`)
@@ -291,7 +293,10 @@ translations a page in `locale` can show, and `textOf(table, row, translations, 
 row's fields in the best of them, else the original. A page that showed a row not yet in its
 language isn't kept in Void's page cache, and the translation is queued then (void-fbtee's
 middleware): a new post is translated the first time it's read in another language. To queue one
-at once, as it's posted, call `translateSoon(table, id)`.
+at once, call `translateSoon(table, id)` as it's posted, and again when it's changed: each
+translation keeps a fingerprint of the fields it was made from (`translated_from`), so a changed
+row is translated again, its old translation shown until the new one lands (a page that reads it
+asks for it too).
 
 Mark the element showing it with its own language, whichever that is, by spreading
 `langAttrs(locale)` from `void-fbtee/react` on it (`<h1 {...langAttrs(text.locale)}>`): `lang` for
@@ -302,14 +307,14 @@ another language than the page's, in the page's own words (`<fbt>`, with the lan
 `Intl.DisplayNames` in `<Formatted>`): "Written in Arabic", or "Translated by machine from Arabic"
 with the original one click away.
 
-Void's AI translates it (Gemini 3.5 Flash, the same model as the app's own text) on Cloudflare in
+Void's AI translates it (Gemini 4 Hydrogen, the same model as the app's own text) on Cloudflare in
 dev and the preview too, through Void's Cloudflare sign-in (`void cloudflare login`), paid from the
 account's AI Gateway credits (Unified Billing, no key); for the preview, mark the binding remote in
 `void.config.ts`: `cloudflare: { ai: { binding: "AI", remote: true } }`. Each language is stored as
 soon as it's translated, so a retry pays only for what's still missing; while the account isn't
-paying (credits used up, a spend limit reached) a message waits an hour. Posts go to Google's
-Gemini (not Zero Data Retention), and aren't kept in AI Gateway's logs (`collectLog: false`): their
-log has the model, tokens and cost, not the text. The example (github.com/joeblew999/void-fbtee,
+paying (credits used up, a spend limit reached) a message waits an hour. Each keeps what it cost
+(`usage`). Posts go to Google's Gemini, and aren't kept in AI Gateway's logs (`collectLog: false`):
+their log has the model, tokens and cost, not the text. The example (github.com/joeblew999/void-fbtee,
 `apps/example`) shows all of it.
 
 ## Markdown pages
@@ -317,8 +322,10 @@ log has the model, tokens and cost, not the text. The example (github.com/joeble
 Pages under `pages/<source locale>/` have a copy per locale at the same path under
 `pages/<locale>/` (the locale's URL segment). Translate the whole file:
 
-- **How to translate it:** `node_modules/void-fbtee/skills/void-fbtee-translate/SKILL.md`,
-  "Markdown pages": what's translated and what's kept exactly.
+- **What's translated, what's kept:** the text, and the frontmatter's `title` and
+  `description`, into the page's locale; the Markdown structure, code blocks (their comments
+  too), links, components, the `<script>` block and the other frontmatter keys exactly as they
+  are (`vp build` checks the kept parts match the original's).
 - **Dates, times, numbers:** a page shows them through a component that formats them with `Intl`
   (an island, with the value as a prop), not as written-out text. Leave the component as it is;
   if the original has one written out, keep it as written and say so in your summary. An island
@@ -339,13 +346,13 @@ review has `"translatedBy"` an AI's id or `"unknown"` (not `"claude"`) and no `"
 translated page to review, the same `translatedBy` in its frontmatter and no `reviewedBy`.
 
 Every translation says who made it (`translatedBy`), and `vp build` fails on one that doesn't: a
-model's id (with `gatewayLogId`, the AI Gateway log of the request, its exact request, answer and
-cost, when Void's AI made it), `"claude"`, or `"unknown"` for one from before this was recorded.
+model's id (with `gatewayLogId`, the AI Gateway log of the request, and `usage`, what it cost,
+when Void's AI made it), `"claude"`, or `"unknown"` for one from before this was recorded.
 An `"unknown"` one is reviewed like an AI's. Never write `"unknown"` for one you translate.
 
 1. Read each such entry as a reader of the language would: its description and source lines, and
-   the code around the string if you need it. Judge it by the translating skill: the meaning
-   kept, the language's own words and grammar (each plural form for its count, each gender
+   the code around the string if you need it. Judge it as a reader of that locale would: the
+   meaning kept, the locale's own words and grammar (each plural form for its count, each gender
    line), the app's words for its terms, product names, commands and file names kept.
 2. Right: add `"review": { "by": "claude", "at": "<YYYY-MM-DD>", "verdict": "ok" }`.
 3. Wrong: correct the lines, set `"translatedBy": "claude"` and `"translatedAt"` to today, and add
@@ -357,10 +364,8 @@ An `"unknown"` one is reviewed like an AI's. Never write `"unknown"` for one you
    it, set `translatedBy: "claude"` and `translatedAt` to today, and add `reviewedBy`,
    `reviewedAt` and `reviewNote: "<what was wrong, in a sentence>"`. Leave `translatedFrom` as it
    is.
-5. When something is wrong in a way a rule could catch (a term changed, a word left in English, a
-   form that's always wrong), say so in your last line: it belongs in void-fbtee's checks
-   (`judge.ts`, `grammar.json`), and when it's the meaning or the words, in the translating skill.
-   Then `vp dev` checks your corrections like any translation.
+5. Say in your last line what was wrong, if anything was. Then `vp dev` checks your corrections
+   like any translation.
 
 ## Finish
 
@@ -407,8 +412,8 @@ missing; where it can't safely edit a file it prints the line to add). The piece
   products') go in that rule's `ignoredWords`.
 - A void-fbtee section in `AGENTS.md`. No scripts: an older init's `i18n:*` scripts are removed.
 
-From 0.7.0, `vp build` runs every check on every finished translation, not only on new ones, so a
-catalog from an older version can fail it. `vp dev` sends each finished translation the checks fail
-back to be translated, and logs it with what was wrong (`reopenFailing`, check.ts); what was there
-is in git. Void's AI translates with Gemini 3.5 Flash on AI Gateway credits (no model to choose:
-`models.json` and its options are gone).
+`vp build` checks every finished translation for what breaks the app (a line or a
+`{placeholder}` missing), and reports it; it never sets one back to new, so a catalog from an older
+version keeps its translations. Void's AI translates with Gemini 4 Hydrogen on AI Gateway credits
+(no model to choose). `voidFbtee({ content })` takes each table's fields only
+(`{ events: ["title", "description"] }`): what a table holds (`about`) is no longer sent.

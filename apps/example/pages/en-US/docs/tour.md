@@ -54,11 +54,12 @@ it.
 
 ## Every time, twice {#times}
 
-Each event shows its start where it happens, again on your own clock, and how far off it is.
+Each event shows when it is, from its start to its end, where it happens, again on your own
+clock, and how far off it is.
 Daylight saving is worked out for the date of the event, not for today.[^dst] Here is the night
 market in Bangkok, in your language and your time zone:
 
-<EventTime startsAt="2027-03-06T18:30:00+07:00[Asia/Bangkok]" />
+<EventTime startsAt="2027-03-06T18:30:00+07:00[Asia/Bangkok]" endsAt="2027-03-06T21:30:00+07:00[Asia/Bangkok]" />
 
 <dl>
   <dt>The event's clock</dt>
@@ -96,6 +97,8 @@ that box.
   "title": "Night market",
   "starts_at": "2027-03-06T18:30:00+07:00[Asia/Bangkok]",
   "starts_at_utc": "2027-03-06T11:30:00Z",
+  "ends_at": "2027-03-06T21:30:00+07:00[Asia/Bangkok]",
+  "ends_at_utc": "2027-03-06T14:30:00Z",
   "seats": 40,
   "locale": "th-TH"
 }
@@ -130,12 +133,13 @@ Book a seat, and the confirmation comes in the language you booked in, with the 
 event's clock written your way. Each email goes to someone in their own language, whoever caused
 it:
 
-| What happens          | Who gets an email          | In whose language    |
-| --------------------- | -------------------------- | -------------------- |
-| You book a seat       | You                        | Yours, as you booked |
-| You post an event     | You, with its private link | Yours, as you posted |
-| The day before it     | Everyone booked            | Each their own       |
-| The organiser cancels | Everyone booked            | Each their own       |
+| What happens             | Who gets an email          | In whose language    |
+| ------------------------ | -------------------------- | -------------------- |
+| You book a seat          | You                        | Yours, as you booked |
+| You post an event        | You, with its private link | Yours, as you posted |
+| The day before it        | Everyone booked            | Each their own       |
+| The organiser changes it | Everyone booked            | Each their own       |
+| The organiser cancels    | Everyone booked            | Each their own       |
 
 The language is saved with the booking, as the event's is with the event, and the email is
 written in it:

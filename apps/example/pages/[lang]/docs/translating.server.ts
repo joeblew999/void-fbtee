@@ -36,7 +36,7 @@ export const head = defineHead(() =>
   pageHead({
     title: fbs.c("Translating"),
     description: fbs(
-      "The app's own text and what people post are translated by the same AI, Gemini 3.5 Flash through Void's AI: the text into files in the repository that you review, posts as they're posted. Claude Code translates what it leaves. Here is each, with the lines that do it.",
+      "The app's own text and what people post are translated by the same AI, Gemini 4 Hydrogen through Void's AI: the text into files in the repository that you review, posts as they're posted. Claude Code translates what it leaves. Here is each, with the lines that do it.",
       "Translating page introduction",
     ),
   }),

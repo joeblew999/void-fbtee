@@ -1,7 +1,7 @@
 // Posting an event: the zones the form offers (the loader), and saving it (the action). The action
 // clears the list of events from Void's page cache in every language, then goes to the new event's
 // page. A static segment beats `[id]` in Void's routing, so /events/new is never read as an id.
-import { events, newEventSchema, startsAt } from "@schema";
+import { events, newEventSchema, when } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
@@ -36,7 +36,7 @@ export const action = defineHandler.withValidator({
   const { locale } = c.get("i18n");
   // The poster's private delete link: the key goes to them, its SHA-256 to the database.
   const key = newDeleteKey();
-  const start = startsAt(body.local, body.time_zone);
+  const times = when(body.local, body.local_end, body.time_zone);
   const [created] = await db
     .insert(events)
     .values({
@@ -46,7 +46,7 @@ export const action = defineHandler.withValidator({
       venue: body.venue || null,
       locale,
       delete_key_hash: await hashDeleteKey(key),
-      ...start,
+      ...times,
     })
     .returning({ id: events.id });
   const page = routeUrl("/[lang]/events/[id]", { params: { id: created.id } });
@@ -58,7 +58,8 @@ export const action = defineHandler.withValidator({
       locale,
       title: body.title,
       titleLocale: locale,
-      startsAt: start.starts_at,
+      startsAt: times.starts_at,
+      endsAt: times.ends_at,
       // Where it was posted (dev, a Worker Preview, live), not the site's canonical address.
       link: privateLink(new URL(c.req.url).origin + page, key),
     });

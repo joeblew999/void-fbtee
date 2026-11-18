@@ -87,6 +87,7 @@ export default defineScheduled(async (controller, env) => {
       title: text.title,
       titleLocale: text.locale,
       startsAt: event.starts_at,
+      endsAt: event.ends_at,
       // Bookings from before the origin was kept: the live site.
       origin: originOr(b.origin),
       ticket,

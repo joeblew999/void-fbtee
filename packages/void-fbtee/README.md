@@ -169,16 +169,19 @@ runs, the same on a developer's machine as in CI. There are no i18n scripts.
 | `vp check` | Lints with fbtee's strict rules: text nobody wrapped for translation is an error.                                                                                                                                                                                                                                                                                                                                          |
 
 **What people post.** Name the table and its fields, `voidFbtee({ content: { events: ["title",
-"description"] } })`, and void-fbtee translates every row into the app's languages: `vp dev` writes
+"description"] } })`, and void-fbtee translates every row into the app's languages, and again
+when a row is changed (call `translateSoon` when it is, as when it's posted): `vp dev` writes
 the few files Void needs at its own places (`queues/translate.ts`, `crons/translations.ts`,
 `db/schema/events_translations.ts`), and `vp build` fails while one is missing or the table has no
 migration. The SKILL's "What people post" has the rest.
 
-**What translating costs, and where the text goes.** Void's AI translates with Google's Gemini 3.5
-Flash through Cloudflare's AI Gateway, paid from the Cloudflare account's AI Gateway credits
-(Unified Billing): about US$0.001 a string per language (the example: 361 strings, about US$0.36
-a language). So the text goes to Google, and Cloudflare's catalog doesn't list this model for Zero
-Data Retention: don't send what mustn't leave you. When the credits are used up (HTTP 402) or a
+**What translating costs, and where the text goes.** Void's AI translates with Google's Gemini 4
+Hydrogen through Cloudflare's AI Gateway, one string, post or page a request, paid from the
+Cloudflare account's AI Gateway credits (Unified Billing): US$1.50 a million tokens in and US$7.50
+out, its thinking paid as out, so about US$0.001–0.01 a string per language (the example: 361
+strings, about US$1–2 a language; measured 2026-11-18). Each translation keeps what it cost
+(`usage`: in the catalog entry, the page's frontmatter, the post's row). The text goes to Google:
+don't send what mustn't leave you. When the credits are used up (HTTP 402) or a
 spend limit set on the gateway is reached (429), `vp dev` says so once and stops asking; what's
 left stays new for Claude Code or the next save. A spend limit (Cloudflare's AI Gateway docs,
 "Spend limits") caps what dev and the live site can spend together.
