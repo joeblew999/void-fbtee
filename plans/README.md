@@ -15,9 +15,9 @@ what it changes; this list is the only place that says when.
 
 Waiting on others, not in the order:
 
-- `void-1.9.md`: Void 1.8.0 to 1.9.1. Left on 2026-11-16, the user's call: it buys little now (at
-  most #810's fix, which lets the example drop its key cookie). Done when a Void release gives us
-  something we need.
+- `void-upgrade.md`: Void 1.8.0 to 1.10.0 and Vite+ 1.6.0 to 1.7.0, together. Waits for a Void
+  release whose `void init` writes a Vite+ range that 1.7.0 can use (reported 2026-11-18); then
+  the fresh test's pins and README "Reported to Void" go.
 - `fbtee-issues.md`: two issues for fbtee (locale matching on a server, and two things in Arabic),
   drafted, filed only with the user's OK.
 - `void-form-without-javascript.md`: waits on Void (an issue drafted for voidzero-dev/void, filed

@@ -232,7 +232,7 @@ Each step is shipped and proven before the next, each with its docs example in t
 - **Telling Void about the preview's AI:** `guide/ai.md` says Workers AI is remote "during
   development and preview", but the preview needs `cloudflare.ai = { binding: "AI", remote: true }`
   in `void.config.ts` (found 2026-11-13). The user's call whether to raise it.
-- **Void 1.9.1, and the key cookie it may let go:** its own plan, `plans/void-1.9.md`.
+- **Upgrading Void (and Vite+), and the key cookie it may let go:** its own plan, `plans/void-upgrade.md`.
 
 ## Not in this plan
 

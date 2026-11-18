@@ -217,13 +217,14 @@ Then `vp check`, `vp run test:unit`, `vp run test:dev`, `vp run test:preview` an
 Problems in Void that this repo works around. After upgrading Void, check whether each is fixed,
 and if so remove what depends on it.
 
-- Not yet reported (2026-11-17, Void 1.8.0): Void asks for `"@cloudflare/vite-plugin":
+- Fixed in Void 1.10.0, it looks (it asks for `^2.0.0-rc.0`; checked when upgrading,
+  `plans/void-upgrade.md`), not reported (2026-11-17, Void 1.8.0): Void asks for `"@cloudflare/vite-plugin":
   "^2.0.0-beta.v.15"`, which also takes `2.0.0-rc.0`, and that writes its build to
   `.cloudflare/output/v1` where Void 1.8.0 reads `v0`, so a new Void app's `vp build` fails ("no
   root config found"). This repo's lockfile has `2.0.0-beta.v.17`; `test:fresh` pins its apps to it
   (`pinUpstream` in `e2e/fresh/check.ts`).
 
-- Not yet reported (2026-11-18, Void 1.8.0, Vite+ 1.7.0): `void init` writes `"vite-plus":
+- Reported 2026-11-18 (Void 1.8.0 and 1.10.0, Vite+ 1.7.0): `void init` writes `"vite-plus":
   "^1.6.0"` and `"vite": "npm:@voidzero-dev/vite-plus-core@^1.6.0"`. Vite+ 1.7.0 needs its core at
   `8.3.8000`, which that range can't take, so a new Void app's `vp build` stops ("Failed to resolve
   vite command"). npm hits it now; pnpm, which waits a day before taking a release, from today.
