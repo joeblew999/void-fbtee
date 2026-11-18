@@ -26,6 +26,16 @@ const settled = sql`datetime('now', '-15 minutes')`;
 
 export default defineScheduled(async () => {
   const db = primaryDb();
+  // Where a background job's reads are answered, and how fast: the session's first query, which
+  // primaryDb sends to the main copy (D1's served_by_primary and served_by_region; absent locally).
+  // One line a run, in the Worker's logs (plans/reliable-work.md).
+  const t = performance.now();
+  const probe = (await db.run(sql`SELECT 1`)) as unknown as {
+    meta: { served_by_primary?: boolean; served_by_region?: string };
+  };
+  console.log(
+    `owed: database first read ${Math.round(performance.now() - t)} ms, primary=${probe.meta.served_by_primary ?? "?"}, region=${probe.meta.served_by_region ?? "?"}`,
+  );
 
   const unconfirmed = await db
     .select({ id: bookings.id })

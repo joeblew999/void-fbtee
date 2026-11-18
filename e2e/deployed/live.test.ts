@@ -24,6 +24,20 @@ const page = browser("prod");
 let posted: Posted | undefined;
 
 describe.skipIf(!site)("the live site (run with `vp run test:deployed`)", () => {
+  // What only Cloudflare can show (plans/reliable-work.md): a session the app starts with
+  // primaryDb() (first-primary) has its first read answered by D1's main copy. Where this runs from
+  // decides the timings (the colo is in the answer), so they're logged, not checked.
+  test("the app's database reads start on D1's main copy", async () => {
+    const r = await fetch(`${site}/api/database`);
+    expect(r.status).toBe(200);
+    const answer = (await r.json()) as {
+      worker: { colo: string | null };
+      "first-primary": { ms: number; primary: boolean | null; region: string | null }[];
+    };
+    console.log("database reads from", JSON.stringify(answer));
+    expect(answer["first-primary"][0]!.primary).toBe(true);
+  });
+
   test("the sitemap lists every language's pages", async () => {
     const r = await fetch(`${site}/sitemap.xml`);
     expect(r.status).toBe(200);
