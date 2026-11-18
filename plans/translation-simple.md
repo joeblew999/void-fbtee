@@ -184,6 +184,13 @@ in dev and waits for real Gemini to translate it: it now goes through the new fu
 Other models or a model option; simplifying the post queue, cron and markers; the fbtee asks
 (`plans/fbtee-issues.md` #3, filed only with your OK).
 
+Found on the way, for its own change: a post's translation doesn't record which version of the
+post it was made from. Pages do (`translatedFrom`); strings needn't (fbtee's key changes with the
+English). So a post edited after it's translated keeps the old translation for good:
+`untranslated` (`content.ts`) only asks whether one exists. The example can't show it (events are
+only created, `pages/[lang]/events/new.server.ts`), but any app that edits posts would. The fix:
+record a hash of the post's fields with each translation, and translate again when it changes.
+
 ## Evidence (2026-11-18, `cf ai run`)
 
 | Request                                    | Model     | Result                       | Tokens in / out / thinking | Cost    |
