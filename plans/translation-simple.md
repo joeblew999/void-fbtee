@@ -132,6 +132,10 @@ price ("from Cloudflare's catalog page"), and `BATCH`.
   `thinkingBudget`, `temperature`, the schema pasted into the prompt, language names.
 - Today's uncommitted experiments in `ai.ts`, `judge.ts`, `plugin.ts`, the translate skill and the
   tests (keeping only corrected comments).
+- Found while building: `scripts/translations-measure.ts` and its `translations:measure` task (the
+  old way to try the translator, replaced by "Trying a translation without deploying"), and the
+  content option's `about` (what a table holds, sent to the old prompt):
+  `voidFbtee({ content: { events: ["title", "description"] } })`.
 
 ## Stays
 
@@ -172,11 +176,17 @@ the pages' way:
 
 - Each post translation stores a hash of the post's fields as they were (`translated_from`, a new
   column beside `usage`: one migration for both): SHA-256, its first 12 hex characters, as pages'
-  `translatedFrom` (`check.ts`), with the Worker's `crypto.subtle`.
+  `translatedFrom` (`check.ts`), from one function for both (`fingerprint.ts`). In plain
+  JavaScript, found while building (2026-11-18): the Worker has no Node crypto (Void runs it with
+  `nodejs_als`, not `nodejs_compat`: `dist/ssr/wrangler.json`; importing `node:crypto` failed under
+  `vp dev`), and a page's loader reads posts synchronously, so no Web Crypto either. It gives the
+  same as Node's SHA-256 (`test/unit/fingerprint.test.ts`), so pages keep their fingerprints.
 - `untranslated` counts a translation whose hash differs from the post's as missing, and
   `translateSoon` and `storeTranslation`, which today replace only "queued" and "unknown" rows,
   replace it too.
-- Caught two ways: an app that edits a post calls `translateSoon`, as on create; and a page that
+- Caught two ways: an app that edits a post calls `translateSoon(table, id, { changed: true })`,
+  which asks at once (found while testing: the once-an-hour limit on asking blocked a change made
+  minutes after the translations were stored); and a page that
   reads it catches it, where a missing language is caught now (`textOf` has the post and its
   translation, so compares the hash; the middleware queues it). The reader sees the old
   translation until the new one lands.
@@ -291,18 +301,19 @@ New:
   gives exactly `request.json`; `answers.json` is written back onto the right keys and lines,
   with `usage` from its token counts.
 - `test:dev`: the same entries sent to the dev route (which writes nothing), real Gemini, checking
-  keys, lines and placeholders, not wording.
+  keys, lines and placeholders, not wording (`e2e/dev/translate-route.test.ts`).
+- `test/unit/fingerprint.test.ts`: the fingerprint is Node's SHA-256.
 
 Old, in `packages/void-fbtee/test/unit/`:
 
-| Test                                                | Action                                            |
-| --------------------------------------------------- | ------------------------------------------------- |
-| `judge.test.ts`                                     | deleted, except the placeholder-check tests       |
-| `skills.test.ts`, `ai-rules.test.ts`                | deleted                                           |
-| `translate.test.ts`                                 | prompt tests changed; page stamping kept          |
-| `models.test.ts`                                    | rewritten for Hydrogen                            |
-| `fixture/`                                          | kept; its entry falsely labelled `"claude"` fixed |
-| `e2e/fresh/check.ts`, `e2e/preview/strings.test.ts` | the skill files a new app gets                    |
+| Test                                                | Action                                                              |
+| --------------------------------------------------- | ------------------------------------------------------------------- |
+| `judge.test.ts`                                     | deleted, except the placeholder-check tests                         |
+| `skills.test.ts`, `ai-rules.test.ts`                | deleted                                                             |
+| `translate.test.ts`                                 | prompt tests changed; page stamping kept                            |
+| `models.test.ts`                                    | rewritten for Hydrogen                                              |
+| `fixture/`                                          | kept; its entry falsely labelled `"claude"` fixed                   |
+| `e2e/fresh/check.ts`, `e2e/preview/strings.test.ts` | unchanged: neither names the deleted skill (checked while building) |
 
 `e2e/dev/events.test.ts` gains the changed-event tests, the deleted-before-translated test, and
 its delete test the check on translation rows (above). Everything else runs unchanged, including
@@ -314,6 +325,13 @@ the new function.
 
 Other models or a model option; simplifying the post queue, cron and markers; the fbtee asks
 (`plans/fbtee-issues.md` #3, filed only with your OK).
+
+Found while testing (2026-11-18), not yet explained: under `vp dev`, the translate-queue test in
+`e2e/dev/jobs.test.ts` ("the translate queue on its own") makes workerd log three
+`Error: internal error; reference = …` lines; the test passes, and no other test makes any. Not
+from closing or reloading an event page, nor from a translate message sent by hand through Void's
+queue trigger (each tried alone: none). To check: whether the same test logs them on the commit
+before this change, and if so, report it to Void with the reproduction.
 
 Found on the first real run (2026-11-18), to decide later: the example's Arabic catalog now mixes
 two kinds of Arabic. The strings translated before this change were made under the old rule

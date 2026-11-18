@@ -9,11 +9,16 @@ import {
   address,
   book,
   browser,
+  changeEvent,
+  dbRows,
   deleteEvent,
   deleteInPage,
+  emailsTo,
   emailTo,
   keptTickets,
   postEvent,
+  runCron,
+  runQueue,
   seeText,
   started,
   url,
@@ -28,6 +33,24 @@ const posted: Posted[] = [];
 afterAll(async () => {
   for (const event of posted) await deleteEvent(event);
 });
+
+/** An event's stored translations: language, fields, and the fingerprint each was made from. */
+const translationsOf = (id: string) =>
+  dbRows(
+    "SELECT locale, fields, translated_by, translated_from, usage FROM events_translations WHERE source_id = ?",
+    [id],
+  );
+
+/** Waits for the event's translations into both other languages, made from what it says now. */
+const translatedNow = async (id: string, from?: unknown) => {
+  const done = async () =>
+    (await translationsOf(id)).filter(
+      (r) =>
+        r.translated_by === "google/gemini-4-hydrogen" && (!from || r.translated_from !== from),
+    ).length;
+  await expect.poll(done, { timeout: 60_000 }).toBe(2);
+  return translationsOf(id);
+};
 
 /** Waits for the open page's title to be in Thai script: Void's AI's translation, any wording. */
 const thaiTitle = (p: import("playwright").Page) =>
@@ -114,7 +137,14 @@ test.skipIf(!!skip)(
         (await page.getByTestId("ticket").getAttribute("href"))!.replace("/tickets/", ""),
       ),
     );
+    // Translated by now (Laila's page read it in Arabic): its rows are there, to see them go.
+    await translatedNow(event.id);
     await deleteInPage(p);
+    // Its translations went with it (the foreign key's cascade), and the hourly job asks for
+    // nothing for it.
+    expect(await translationsOf(event.id)).toEqual([]);
+    await runCron("17 * * * *", Date.now());
+    expect(await translationsOf(event.id)).toEqual([]);
     // The open Arabic page says so, with no reload.
     await seeText(other, "event-cancelled-text", "تم إلغاء هذه الفعالية.");
     expect(await other.getByTestId("book").count()).toBe(0);
@@ -130,5 +160,108 @@ test.skipIf(!!skip)(
     const left = async () =>
       (await keptTickets()).filter((k) => ticketIds.some((id) => k.includes(id)));
     await expect.poll(left, { timeout: 15_000 }).toEqual([]);
+  },
+);
+
+test.skipIf(!!skip)(
+  "a post deleted before the queue gets to it: the queue acks it, and nothing is left",
+  async () => {
+    const p = await page();
+    const event = await postEvent(p, { title: "Deleted at once", local: "2027-01-20T18:00" });
+    expect(await deleteEvent(event)).toBe(true);
+    expect(await runQueue("translate", { table: "events", id: event.id })).toBe("ack");
+    // No translation, and no "queued" marker either.
+    expect(await translationsOf(event.id)).toEqual([]);
+  },
+);
+
+test.skipIf(!!skip)(
+  "the poster changes the title and the time: translated again, an Arabic booker told in Arabic, the open page and the ticket follow",
+  { timeout: 240_000 },
+  async () => {
+    const p = await page();
+    const event = await postEvent(p, {
+      title: "Pottery for beginners",
+      local: "2027-02-10T18:00",
+      end: "2027-02-10T20:00",
+    });
+    posted.push(event);
+    const before = await translatedNow(event.id);
+    // Laila books in Arabic and keeps the page open.
+    const other = await page();
+    await other.goto(`/ar-EG${event.path}`);
+    await started(other);
+    const laila = address("laila");
+    await book(other, "Laila", laila);
+    const ticketId = (await other.getByTestId("ticket").getAttribute("href"))!.replace(
+      "/tickets/",
+      "",
+    );
+    await emailTo(laila, /./);
+    // The poster changes it on the event's own page, with the key the page has.
+    await p.getByTestId("change").click();
+    await p.getByTestId("change-title-input").fill("Pottery for everyone");
+    await p.getByTestId("change-local-input").fill("2027-02-10T19:00");
+    await p.getByTestId("change-local-end-input").fill("2027-02-10T21:30");
+    await p.getByTestId("change-save").click();
+    await seeText(p, "event-title", "Pottery for everyone");
+    // Translated again, from what it says now: a new fingerprint, and a new cost, in each language.
+    const after = await translatedNow(event.id, before[0]!.translated_from);
+    for (const row of after) expect(row.usage, String(row.locale)).toBeTruthy();
+    const arabic = JSON.parse(String(after.find((r) => r.locale === "ar-EG")!.fields)) as {
+      title: string;
+    };
+    // Laila's email, in Arabic, with the new Arabic title, once that translation is in.
+    const escaped = arabic.title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const mail = await emailTo(laila, new RegExp(escaped), 150_000);
+    expect(mail.html).toMatch(/<html dir="rtl" lang="ar-EG">/);
+    expect(mail.text).toContain(`${site}/ar-EG${event.path}`);
+    // Her open page follows (the live "changed", then its translation), with no reload.
+    await seeText(other, "event-title", arabic.title);
+    // Her stored ticket, which showed the old time, is gone; the next download prints the new one.
+    expect((await keptTickets()).some((k) => k.includes(ticketId))).toBe(false);
+    const download = await fetch(`${site}/tickets/${ticketId}`);
+    expect(download.headers.get("content-type")).toBe("application/pdf");
+  },
+);
+
+test.skipIf(!!skip)(
+  "a change to the description alone emails nobody, and is still translated again; a wrong key changes nothing",
+  { timeout: 180_000 },
+  async () => {
+    const p = await page();
+    const event = await postEvent(p, {
+      title: "Quiet reading hour",
+      local: "2027-02-11T10:00",
+      end: "2027-02-11T11:00",
+    });
+    posted.push(event);
+    const before = await translatedNow(event.id);
+    const somchai = address("somchai");
+    await book(p, "Somchai", somchai);
+    await emailTo(somchai, /./);
+    const fields = {
+      title: "Quiet reading hour",
+      description: "Bring a book; tea is on us.",
+      local: "2027-02-11T10:00",
+      local_end: "2027-02-11T11:00",
+      time_zone: "UTC",
+      seats: 20,
+    };
+    // The time zone is the form's own: the browser's, which these tests run in.
+    const [row] = await dbRows("SELECT starts_at FROM events WHERE id = ?", [event.id]);
+    fields.time_zone = String(row!.starts_at).replace(/^.*\[(.*)\]$/, "$1");
+    // Another event's key, or a made-up one: refused, and nothing changes.
+    expect(await changeEvent(event, "not-the-key", fields)).toBe(403);
+    const [still] = await dbRows("SELECT description FROM events WHERE id = ?", [event.id]);
+    expect(still!.description).toBe("Posted by the tests.");
+    // No seats at all: refused by the form's own check, Void's 422. (Fewer seats than are booked,
+    // with more than one booked, is the action's own 409.)
+    expect(await changeEvent(event, event.key, { ...fields, seats: 0 })).toBe(422);
+    // The description alone, with the poster's key.
+    expect([200, 204, 302]).toContain(await changeEvent(event, event.key, fields));
+    await translatedNow(event.id, before[0]!.translated_from);
+    // Nobody is told: the title, time and place are as they were.
+    expect((await emailsTo(somchai)).filter((m) => / has changed$/.test(m.subject))).toEqual([]);
   },
 );

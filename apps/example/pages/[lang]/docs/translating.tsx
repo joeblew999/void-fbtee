@@ -85,7 +85,7 @@ function points(): Point[] {
         },
         {
           file: "pages/[lang]/events/[id].server.ts",
-          line: 'await translateSoon("events", id);',
+          line: 'await translateSoon("events", id, { changed: true });',
         },
         {
           file: "queues/translate.ts",

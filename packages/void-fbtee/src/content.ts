@@ -173,11 +173,16 @@ export type TranslateMessage = { table: string; id: string };
  * "queued" (or, for an "unknown" one or one made before the row was changed, as asked, keeping it
  * to show meanwhile) and sends one message, unless every one was asked for in the last hour (then
  * nothing: it's on its way, or the daily job asks again). Resolves whether it was sent. Call it
- * when a post is made and when it's changed; a row read in a language it lacks, or whose
- * translation is out of date, is asked for then too (the middleware), and the daily job finds any
- * missing.
+ * when a post is made, and with `{ changed: true }` when it's just been changed: then it asks at
+ * once, whatever was asked or stored in the last hour (its translations were likely stored
+ * minutes ago). A row read in a language it lacks, or whose translation is out of date, is asked
+ * for then too (the middleware), and the daily job finds any missing.
  */
-export async function translateSoon(table: string, id: string): Promise<boolean> {
+export async function translateSoon(
+  table: string,
+  id: string,
+  { changed = false }: { changed?: boolean } = {},
+): Promise<boolean> {
   const found = await untranslated(table, id);
   if (!found?.missing.length) return false;
   const t = ident(translationsTableName(table));
@@ -194,7 +199,7 @@ export async function translateSoon(table: string, id: string): Promise<boolean>
           WHERE (${t}.${ident("translated_by")} IN (${QUEUED}, ${UNKNOWN})
               OR (${t}.${ident("translated_from")} IS NOT NULL
                 AND ${t}.${ident("translated_from")} <> ${found.from}))
-            AND ${t}.${ident("updated_at")} < datetime('now', '-1 hour')`,
+            AND (${changed ? 1 : 0} = 1 OR ${t}.${ident("updated_at")} < datetime('now', '-1 hour'))`,
       ),
     );
   if (!asked) return false;

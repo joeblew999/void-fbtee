@@ -170,7 +170,7 @@ runs, the same on a developer's machine as in CI. There are no i18n scripts.
 
 **What people post.** Name the table and its fields, `voidFbtee({ content: { events: ["title",
 "description"] } })`, and void-fbtee translates every row into the app's languages, and again
-when a row is changed (call `translateSoon` when it is, as when it's posted): `vp dev` writes
+when a row is changed (call `translateSoon(table, id, { changed: true })` when it is): `vp dev` writes
 the few files Void needs at its own places (`queues/translate.ts`, `crons/translations.ts`,
 `db/schema/events_translations.ts`), and `vp build` fails while one is missing or the table has no
 migration. The SKILL's "What people post" has the rest.

@@ -42,12 +42,14 @@ const WHEN: Intl.DateTimeFormatOptions = {
   timeZoneName: "longGeneric",
 };
 const SWIM = "2027-03-06T19:00:00Z"; // Harbour sunrise swim: 6:00 on 7 March in Sydney
+const SWIM_END = "2027-03-06T20:30:00Z"; // until 7:30 there
 
 /**
  * When the tests' events start: already past, so on the live site they never show in the list of
  * upcoming events (its loader lists only those still to come), yet posting and booking run for real.
  */
 const TEST_START = "2026-01-01T20:00";
+const TEST_END = "2026-01-01T22:00";
 
 /**
  * The events these tests post, each with the key from its poster's private delete link: deleted
@@ -95,7 +97,10 @@ async function open(p: import("playwright").Page, locale: string, path: string) 
   await started(p);
 }
 const at = (locale: string, timeZone: string) =>
-  new Intl.DateTimeFormat(locale, { ...WHEN, timeZone }).format(new Date(SWIM));
+  new Intl.DateTimeFormat(locale, { ...WHEN, timeZone }).formatRange(
+    new Date(SWIM),
+    new Date(SWIM_END),
+  );
 
 test("th-TH, in New York: Sydney's clock, the reader's, and how far off, in Thai", async () => {
   const p = await page({ timezoneId: "America/New_York" });
@@ -133,6 +138,7 @@ test.skipIf(onLiveSite())(
     await p.getByTestId("event-title-input").fill(name);
     await p.getByTestId("event-description-input").fill("Posted by the tests.");
     await p.getByTestId("event-local-input").fill(TEST_START);
+    await p.getByTestId("event-local-end-input").fill(TEST_END);
     await p.getByTestId("event-post").click();
     await kept(p);
     // The page as the server sends it, as a search engine reads it: Void updates titles and meta
@@ -163,16 +169,25 @@ test.skipIf(onLiveSite())(
     await p.getByTestId("event-title-input").fill("أمسية شعر");
     await p.getByTestId("event-description-input").fill("قراءات شعرية على السطح.");
     await p.getByTestId("event-local-input").fill(TEST_START);
+    // An end before the start: refused, with its own message on the end's field.
+    await p.getByTestId("event-local-end-input").fill("2026-01-01T19:00");
+    await p.getByTestId("event-post").click();
+    await p.getByTestId("error-local_end").waitFor();
+    expect(new URL(p.url()).pathname).toBe("/ar-EG/events/new");
+    await p.getByTestId("event-local-end-input").fill(TEST_END);
     await p.getByTestId("event-post").click();
     await kept(p);
     expect(new URL(p.url()).pathname).toMatch(/^\/ar-EG\/events\//);
     await seeText(p, "event-title", "أمسية شعر");
-    // Saved neutral: the time on Cairo's clock with its zone, the same moment in UTC, a plain number.
+    // Saved neutral: the start and end on Cairo's clock with its zone, the same moments in UTC, a
+    // plain number.
     const stored = () => p.getByTestId("event-stored").textContent();
     const saved = await stored();
     expect(saved).toBe(
       "starts_at2026-01-01T20:00:00+02:00[Africa/Cairo]" +
         "starts_at_utc2026-01-01T18:00:00Z" +
+        "ends_at2026-01-01T22:00:00+02:00[Africa/Cairo]" +
+        "ends_at_utc2026-01-01T20:00:00Z" +
         "seats20" +
         "localear-EG",
     );

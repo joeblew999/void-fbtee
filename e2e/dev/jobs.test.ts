@@ -100,6 +100,7 @@ test.skipIf(!!skip)(
       title: "أمسية خط عربي",
       titleLocale: "ar-EG",
       startsAt: "2027-03-08T19:00:00+02:00[Africa/Cairo]",
+      endsAt: "2027-03-08T21:00:00+02:00[Africa/Cairo]",
       origin: site,
     });
     expect(action).toBe("ack");

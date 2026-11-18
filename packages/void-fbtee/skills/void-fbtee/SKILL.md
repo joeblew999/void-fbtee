@@ -293,7 +293,8 @@ translations a page in `locale` can show, and `textOf(table, row, translations, 
 row's fields in the best of them, else the original. A page that showed a row not yet in its
 language isn't kept in Void's page cache, and the translation is queued then (void-fbtee's
 middleware): a new post is translated the first time it's read in another language. To queue one
-at once, call `translateSoon(table, id)` as it's posted, and again when it's changed: each
+at once, call `translateSoon(table, id)` as it's posted, and `translateSoon(table, id, { changed:
+true })` when it's changed (asked at once, whatever was asked in the last hour): each
 translation keeps a fingerprint of the fields it was made from (`translated_from`), so a changed
 row is translated again, its old translation shown until the new one lands (a page that reads it
 asks for it too).

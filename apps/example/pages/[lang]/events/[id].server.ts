@@ -170,7 +170,7 @@ const change = defineHandler.withValidator({ params, body: changeEventSchema })(
       updatedAt: sql`(datetime('now'))`,
     })
     .where(eq(events.id, id));
-  await translateSoon("events", id);
+  await translateSoon("events", id, { changed: true });
   // What someone with a seat must know: what's on their ticket, and what gets them there.
   const was = {
     ...(event.starts_at !== times.starts_at ? { startsAt: event.starts_at } : {}),

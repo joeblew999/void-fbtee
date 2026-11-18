@@ -215,12 +215,37 @@ export async function emailsTo(to: string): Promise<Mail[]> {
 /**
  * The email Void's dev inbox gets for `to` whose subject matches, once it's there: a queue or a job
  * sends it after the request that caused it has answered. Exactly one: a second would be a
- * duplicate. Vitest's own retrying wait (expect.poll), not a sleep.
+ * duplicate. Vitest's own retrying wait (expect.poll), not a sleep. `timeout` for one that waits on
+ * something first (a change email waits for its translation, a minute at a time).
  */
-export async function emailTo(to: string, subject: RegExp): Promise<Mail> {
+export async function emailTo(to: string, subject: RegExp, timeout = 30_000): Promise<Mail> {
   const matching = async () => (await emailsTo(to)).filter((m) => subject.test(m.subject));
-  await expect.poll(async () => (await matching()).length, { timeout: 30_000 }).toBe(1);
+  await expect.poll(async () => (await matching()).length, { timeout }).toBe(1);
   return (await matching())[0]!;
+}
+
+/**
+ * Rows from the dev server's database, read through the Cloudflare Vite plugin's local explorer
+ * (`/cdn-cgi/local/explorer/api`, its D1 `raw` query), as keptTickets reads R2: each row as an
+ * object by column name.
+ */
+export async function dbRows(
+  sql: string,
+  params: unknown[] = [],
+): Promise<Record<string, unknown>[]> {
+  const api = `${url("prod")}/cdn-cgi/local/explorer/api/d1/database`;
+  const { result: dbs } = (await (await fetch(api)).json()) as { result: { uuid: string }[] };
+  expect(dbs, "the dev server's D1 databases").toHaveLength(1);
+  const r = await fetch(`${api}/${dbs[0]!.uuid}/raw`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ sql, params }),
+  });
+  const { result } = (await r.json()) as {
+    result: { results: { columns: string[]; rows: unknown[][] } }[];
+  };
+  const { columns, rows } = result[0]!.results;
+  return rows.map((row) => Object.fromEntries(columns.map((c, i) => [c, row[i]])));
 }
 
 /**
@@ -253,14 +278,16 @@ export type Posted = { id: string; key: string; path: string };
 
 /**
  * Posts an event through the app's form, as a visitor would, in `locale` (the source language if
- * not given), starting at `local` (the picker's "2027-01-20T18:00") on the browser's clock; with
- * `email`, its private link is emailed there.
+ * not given), starting at `local` (the picker's "2027-01-20T18:00") on the browser's clock and
+ * ending at `end` (two hours after the start if not given); with `email`, its private link is
+ * emailed there.
  */
 export async function postEvent(
   page: Page,
   {
     title,
     local,
+    end = later(local, 2),
     email,
     seats,
     description = "Posted by the tests.",
@@ -268,6 +295,7 @@ export async function postEvent(
   }: {
     title: string;
     local: string;
+    end?: string;
     email?: string;
     seats?: number;
     description?: string;
@@ -279,6 +307,7 @@ export async function postEvent(
   await page.getByTestId("event-title-input").fill(title);
   await page.getByTestId("event-description-input").fill(description);
   await page.getByTestId("event-local-input").fill(local);
+  await page.getByTestId("event-local-end-input").fill(end);
   if (seats) await page.getByTestId("event-seats-input").fill(String(seats));
   if (email) await page.getByTestId("event-email-input").fill(email);
   await page.getByTestId("event-post").click();
@@ -289,6 +318,37 @@ export async function postEvent(
     key: new URLSearchParams(at.hash.slice(1)).get("key")!,
     path: at.pathname.replace(/^\/[^/]+/, ""),
   };
+}
+
+/** A picker's local time ("2027-01-20T18:00") `hours` later, on the same clock. */
+export const later = (local: string, hours: number) =>
+  new Date(Date.parse(`${local}:00Z`) + hours * 3_600_000).toISOString().slice(0, 16);
+
+/**
+ * Changes a posted event with a key, as its page's "Save the changes" does: the answer's status
+ * (200 when changed, 403 with a wrong key, 409 with fewer seats than are booked).
+ */
+export async function changeEvent(
+  { id }: Pick<Posted, "id">,
+  key: string,
+  fields: {
+    title: string;
+    description: string;
+    venue?: string;
+    local: string;
+    local_end: string;
+    time_zone: string;
+    seats: number;
+  },
+): Promise<number> {
+  const r = await fetch(`${url("prod")}/en-US/events/${id}?change`, {
+    method: "POST",
+    // From the site itself, as the page sends it (Void refuses page actions from elsewhere).
+    headers: { "Content-Type": "application/json", "X-VoidPages": "true", origin: url("prod") },
+    body: JSON.stringify({ ...fields, key }),
+    redirect: "manual",
+  });
+  return r.status;
 }
 
 /** Deletes a posted event with its key, as its page's "Delete it for good" does; true if it was. */
