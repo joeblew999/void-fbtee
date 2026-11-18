@@ -32,7 +32,10 @@ people write at runtime (the example's events).
 - One instruction sentence naming the two locale codes (`en-US` into `ar-EG`). No language names,
   no style rules.
 - The answer's shape set with `responseJsonSchema`: the same keys as sent.
-- Strings go 50 to a request, 4 requests at once, as now (`BATCH` in `models.ts`).
+- How many strings go in one request is settled by test first (step 1 below), not carried over
+  from today's 50 (`BATCH` in `models.ts`, set for Gemini 3.5 Flash). Only 1 and 2 have been
+  tried: thinking grew with the strings (one: 57–88 tokens; two: 520–690), so batching may save
+  little with Hydrogen.
 
 | What        | Sent as                                                                                                                                                                                                                                                                      | Example                                                                                    |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
@@ -75,8 +78,11 @@ above in place of the rules.
    approve): ten real example entries into `th-TH` and `ar-EG` with and without what we send today
    besides the text (the code around each string `sourceContext`, the words to keep `keptTerms`,
    the glossary `glossaryFor`). As good without: dropped, with `glossaryMisses`. Also: a line
-   varying by count and gender, and fbtee's built-in strings (list joiners, `{number}+`). The
-   answer to the test entries is saved as test data.
+   varying by count and gender, and fbtee's built-in strings (list joiners, `{number}+`). And
+   batching: the same 50 real new entries sent one per request, 10 per request, and all 50 in
+   one, comparing what each costs, how long it takes, and whether every key comes back right. The
+   cheapest that comes back right is the size. The answer to the test entries is saved as test
+   data.
 2. The code.
 3. The tests and docs.
 4. `vp check`, `test:unit`, `test:dev`, `test:preview`. Commit; push only when you say.
