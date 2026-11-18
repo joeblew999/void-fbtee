@@ -32,10 +32,13 @@ people write at runtime (the example's events).
 - One instruction sentence naming the two locale codes (`en-US` into `ar-EG`). No language names,
   no style rules.
 - The answer's shape set with `responseJsonSchema`: the same keys as sent.
-- How many strings go in one request is settled by test first (step 1 below), not carried over
-  from today's 50 (`BATCH` in `models.ts`, set for Gemini 3.5 Flash). Only 1 and 2 have been
-  tried: thinking grew with the strings (one: 57–88 tokens; two: 520–690), so batching may save
-  little with Hydrogen.
+- One string per request, 4 requests at once. Batching goes (`BATCH` in `models.ts`, 50 a
+  request, set for Gemini 3.5 Flash): Hydrogen's thinking grew with the strings sent (one: 57–88
+  tokens; two: 520–690), so it saves little; one per request needs no batching code, and a bad
+  answer loses one string. About $0.001 a string, well under a dollar a language.
+- Only the text is sent. The code around each string (`sourceContext`), the words to keep
+  (`keptTerms`) and the glossary (`glossaryFor`, `glossaryMisses`) go: every request sent without
+  them on 2026-11-18 came back right.
 
 | What        | Sent as                                                                                                                                                                                                                                                                      | Example                                                                                    |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
@@ -74,15 +77,9 @@ above in place of the rules.
 
 ## Order of the work
 
-1. **By hand, no code** (`cf ai run google/gemini-4-hydrogen --body @request.json`, one sign-in you
-   approve): ten real example entries into `th-TH` and `ar-EG` with and without what we send today
-   besides the text (the code around each string `sourceContext`, the words to keep `keptTerms`,
-   the glossary `glossaryFor`). As good without: dropped, with `glossaryMisses`. Also: a line
-   varying by count and gender, and fbtee's built-in strings (list joiners, `{number}+`). And
-   batching: the same 50 real new entries sent one per request, 10 per request, and all 50 in
-   one, comparing what each costs, how long it takes, and whether every key comes back right. The
-   cheapest that comes back right is the size. The answer to the test entries is saved as test
-   data.
+1. **One request by hand** (`cf ai run google/gemini-4-hydrogen --body @request.json`, one sign-in
+   you approve): the six test entries (below), into `th-TH`. The answer, untouched, becomes
+   `test/answers.json`.
 2. The code.
 3. The tests and docs.
 4. `vp check`, `test:unit`, `test:dev`, `test:preview`. Commit; push only when you say.
