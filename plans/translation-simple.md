@@ -173,8 +173,23 @@ the pages' way:
   there would mean reading and hashing every post every hour.
 - A translation with no hash (all made before this) counts as current: nothing already translated
   is translated again.
-- The example can't show it (events are only created, `pages/[lang]/events/new.server.ts`); a
-  test in `e2e/dev/jobs.test.ts` edits a post's row and checks the queue translates it again.
+- The example can't show it (events can be posted and deleted, not edited); a test in
+  `e2e/dev/jobs.test.ts` edits a post's row and checks the queue translates it again.
+
+A deleted post: the example deletes events already (the poster's private link, `remove` in
+`pages/[lang]/events/[id].server.ts`), and its translations go with it, by the database
+(`onDelete: "cascade"`, `translationsOf` in `db-schema.ts`), with their `usage` and hash. But only
+the deployed test deletes one (`e2e/deployed/live.test.ts`), and it checks only that the page is
+gone. A test in `e2e/dev/events.test.ts` makes sure the translation system copes:
+
+- a post translated, then deleted with its private link (`deleteEvent`, `e2e/helpers.ts`): none of
+  its rows left in `events_translations`, its pages gone in every language, and the hourly job
+  (`runCron`) queues nothing for it;
+- a post deleted before the queue gets to it: the queue acks it (`runQueue`), stores nothing, and
+  no "queued" marker row is left.
+
+The rows are read through the dev server's local explorer (`/cdn-cgi/local/explorer/api`), as
+`keptTickets` reads R2; its D1 part is checked before the test is written.
 
 ## Tests
 
@@ -199,9 +214,10 @@ Old, in `packages/void-fbtee/test/unit/`:
 | `fixture/`                                          | kept; its entry falsely labelled `"claude"` fixed |
 | `e2e/fresh/check.ts`, `e2e/preview/strings.test.ts` | the skill files a new app gets                    |
 
-`e2e/dev/jobs.test.ts` gains the edited-post test (above). Everything else runs unchanged,
-including `e2e/dev/events.test.ts`, which already creates a post in dev and waits for real Gemini
-to translate it: it now goes through the new function.
+`e2e/dev/jobs.test.ts` gains the edited-post test and `e2e/dev/events.test.ts` the deleted-post
+tests (above). Everything else runs unchanged, including the post test already in
+`e2e/dev/events.test.ts`, which waits for real Gemini to translate a new post: it now goes through
+the new function.
 
 ## Not in this change
 
