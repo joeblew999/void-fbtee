@@ -16,25 +16,12 @@ Every request goes through Void's AI (Cloudflare, Unified Billing), as now.
 
 **Settings, for every request**
 
-- Model: any of Google's current text models on Cloudflare, chosen in the app's `vite.config.ts`
-  (`voidFbtee({ model: "google/gemini-3.1-flash-lite" })`), one model for everything, as now. The
-  request is the same for each; only the thinking setting differs, so `models.ts` holds one line per
-  model with its id, its thinking setting and the source of both:
-
-  | Model                                                          | Thinking setting sent      | Why                                    |
-  | -------------------------------------------------------------- | -------------------------- | -------------------------------------- |
-  | `google/gemini-4-hydrogen`                                     | `thinkingLevel: "low"`     | its lowest; `minimal` fails with a 400 |
-  | `google/gemini-3.8-flash`, `google/gemini-3.7-flash`           | `thinkingLevel: "low"`     | the same                               |
-  | `google/gemini-3.6-flash`, `google/gemini-3.5-flash`           | `thinkingLevel: "minimal"` | supported                              |
-  | `google/gemini-3.5-flash-lite`, `google/gemini-3.1-flash-lite` | none                       | `minimal` is their default             |
-
-  From Google's thinking guide (Vertex AI's table, which is what Cloudflare sends our requests to;
-  Firebase's notes the 400 for `minimal`), checked 2026-11-18. Gemini 2.5 (numeric
-  `thinkingBudget`) and the Pro, Argon and Carbon models (large and dear) aren't in the table. A
-  model not in it is refused with a message naming the ones that are. The default is whichever
-  wins the comparison below. Hydrogen `low` was tested on 2026-11-18; each other line is tested
-  before it goes in.
-
+- Model: `google/gemini-4-hydrogen` (Google's current fast model, released 2026-11-12, the
+  successor to Gemini 3.8 Flash; on Cloudflare's model list, checked 2026-11-18), one model for
+  everything, as now. It costs $1.50 / $7.50 per million tokens in / out (Google's price; thinking
+  is billed as output).
+- `generationConfig.thinkingConfig.thinkingLevel: "low"`, the lowest Hydrogen takes (it rejects
+  `minimal` and `thinkingBudget`, which we send today).
 - No `temperature` (Hydrogen ignores it; Google advises leaving Gemini 3.x's sampling defaults).
 - The answer's shape as `responseMimeType: "application/json"` plus `responseJsonSchema`, not
   pasted into the prompt (Google's structured output). Tested: the answer had exactly the schema's
@@ -138,13 +125,6 @@ the code is written, and written into this plan with the result:
    test), its lines named by both (`few, female`): that Gemini fills every combination.
 3. **fbtee's 12 built-in strings** (the list joiners, `{number}+`, `<{number}`), with their English
    and descriptions from fbtee's `Strings.json`.
-
-4. **Which model.** The same payloads (the ten entries, the tour page, a post) sent to
-   `gemini-4-hydrogen`, `gemini-3.8-flash`, `gemini-3.5-flash-lite` and `gemini-3.1-flash-lite`,
-   each with its thinking setting from the table: the answers side by side, with tokens and cost.
-   This also settles whether `minimal` works in a single request: Vertex's guide says `minimal`
-   still needs thought signatures and returns a 400 without them, which should only matter for a
-   conversation of several turns. The best answers for the money become the default.
 
 ## How we'll know it's right
 
