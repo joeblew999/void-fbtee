@@ -1,40 +1,47 @@
 # plans/translation-simple.md: translating with Gemini the simple way
 
-Status: written 2026-11-18, waiting for the user's OK. Nothing in the code is changed yet.
+Status: rewritten 2026-11-18, waiting for the user's OK. Nothing in the code is changed yet.
 
 ## Why
 
-The way void-fbtee calls Gemini today was built to prop up Gemma 4, a small local model we no
-longer use. Every request carries about 1,400 tokens of rules cut out of the translating skill
-file, plus fbtee's own rules. Today's requests showed Gemini doesn't need them: with only the
-locale codes and one sentence, it translated strings, a whole page and posts correctly, and one of
-our rules (Thai's "no full stop") leaked into English answers and made them worse.
+The way void-fbtee calls Gemini was built to prop up Gemma 4, a small local model we no longer
+use. Every request carries about 1,400 tokens of rules cut out of a skill file, plus fbtee's own
+rules, and answers are matched back by their position in the list. Requests sent by hand on
+2026-11-18 showed Gemini needs none of the rules: with the locale codes and one sentence it
+translated strings, a whole page and posts correctly, and one of our rules (Thai's "no full stop")
+leaked into English answers and made them worse. The tests and test data grew around the same
+rules and are cleared out with them.
+
+## The order of the work
+
+1. Three questions answered by real requests, before any code (below, "First: three questions").
+   Their answers to the test entries become the test data's recorded answer.
+2. The code: the request and the answer as below, the old pieces deleted.
+3. The tests and test data: the old ones out, the new ones in (below).
+4. Everything run: `vp check`, `test:unit`, `test:dev`, `test:preview`. Committed here; pushed and
+   deployed only when the user says.
 
 ## What we send
 
 Every request goes through Void's AI (Cloudflare, Unified Billing), as now.
 
-**Settings, for every request**
+**For every request**
 
-- Model: `google/gemini-4-hydrogen` (Google's current fast model, released 2026-11-12, the
-  successor to Gemini 3.8 Flash; on Cloudflare's model list, checked 2026-11-18), one model for
-  everything, as now. It costs $1.50 / $7.50 per million tokens in / out (Google's price; thinking
-  is billed as output).
-- `generationConfig.thinkingConfig.thinkingLevel: "low"`, the lowest Hydrogen takes (it rejects
-  `minimal` and `thinkingBudget`, which we send today).
-- No `temperature` (Hydrogen ignores it; Google advises leaving Gemini 3.x's sampling defaults).
-- The answer's shape as `responseMimeType: "application/json"` plus `responseJsonSchema`, not
-  pasted into the prompt (Google's structured output). Tested: the answer had exactly the schema's
-  keys.
-- A one-sentence `systemInstruction` with the two locale codes (`en-US`, `th-TH`), not language
-  names. The code alone picks the country's language: `ar-SA` gave standard Arabic, `ar-EG`
-  Egyptian, `ar-MA` Moroccan. That's the decision: stick to the locales, no style rules.
+- Model: `google/gemini-4-hydrogen`, one model for everything (Google's current fast model,
+  released 2026-11-12, the successor to Gemini 3.8 Flash; on Cloudflare's model list, checked
+  2026-11-18). $1.50 / $7.50 per million tokens in / out (Google's price; thinking is billed as
+  output).
+- `generationConfig.thinkingConfig.thinkingLevel: "low"`, the lowest Hydrogen takes (`minimal` and
+  `thinkingBudget`, which we send today, fail with a 400 on Hydrogen).
+- No `temperature` (Hydrogen ignores it; Google advises Gemini 3.x's sampling defaults).
+- The answer's shape as a setting, `responseMimeType: "application/json"` with
+  `responseJsonSchema`, not pasted into the prompt (Google's structured output). Tested: the answer
+  had exactly the schema's keys.
+- One `systemInstruction` sentence with the two locale codes (`en-US`, `ar-EG`), never language
+  names and no style rules. The code alone picks the country's language: `ar-SA` gave standard
+  Arabic, `ar-EG` Egyptian, `ar-MA` Moroccan (the user's decision: stick to the locales).
 
-**App strings** (the catalog's new entries, several per request)
-
-The entries as they are in the catalog, by their own keys, with each line named by its plural form
-or gender (`zero`, `one`, `two`, `few`, `many`, `other`; `male`, `female`, `unknown`) instead of
-fbtee's codes:
+**App strings:** the catalog's new entries, several per request, by their own keys
 
 ```
 systemInstruction: "You translate a web app's interface text from en-US into ar-EG. Each entry
@@ -45,16 +52,17 @@ message: {"pyuIHcl9IjiwEfzc6+OZQw==": {"description": "How many seats at an even
 schema:  the same keys, each with the same line names, all required
 ```
 
-The English comes from what fbtee collects from the code (the collected strings `freshCatalog` in
-`catalogs.ts` uses), never from the entry's line in the file: that line holds the English only
-while the entry is new, and the translation after. Today's code reads the line (`toSend` in
-`translate.ts`).
+- Each line is named by its plural form or gender instead of fbtee's code: `MARKS` in `plurals.ts`
+  (16 `zero`, 4 `one`, 8 `two`, 20 `few`, 12 `many`, 24 `other`; 1 `male`, 2 `female`, 3
+  `unknown`). A line that varies by a count and a gender is named by both, `few, female`. A line
+  with no variation is a plain string.
+- The English comes from what fbtee collects from the code (the collected strings `freshCatalog`
+  in `catalogs.ts` uses), never from the entry's line in the file, which holds the translation once
+  translated. Today's code reads the line (`toSend` in `translate.ts`).
+- Left out unless the first test shows they're needed: the code around each string, the words to
+  keep exactly, and the glossary of the app's own terms, which today's requests send.
 
-One plain function, with no file access, turns entries into the request and the answer back into
-entries. The plugin (in Node, which reads the files) uses it for the catalogs; the app's Worker uses
-it for runtime content. One piece of code to test, wherever it runs.
-
-**Pages** (one Markdown page per request; the answer is the page, no JSON)
+**Pages:** one Markdown page per request; the answer is the page itself, no JSON
 
 ```
 systemInstruction: "You translate a Markdown page from en-US into th-TH. Translate the text and the
@@ -62,110 +70,108 @@ systemInstruction: "You translate a Markdown page from en-US into th-TH. Transla
   too), links, components and frontmatter keys as they are. Reply with the page only."
 ```
 
-Tested on `pages/en-US/docs/tour.md`: its three code blocks and its `<script>` block came back
-identical, the rest in Thai. Without "(their comments too)" it translated a comment in a code block.
+Tested on `pages/en-US/docs/tour.md`: its three code blocks and `<script>` block came back
+identical. Without "(their comments too)" it translated a comment inside a code block.
 
-**Runtime content** (posts, or any table's fields the app declares in `content`)
+**Runtime content:** posts, or any table's fields the app declares in `voidFbtee({ content })`
 
-The same shape as app strings: each field is an entry (`events/<id>/title` with its description
-and one line), sent and answered by key, by the same function. One translate function for both.
+The same as app strings: each field is an entry (`events/<id>/title`, its description, one line),
+sent and answered by key.
+
+**One function for all of it.** One plain function, with no file access, turns entries into the
+request and the answer back into entries. The plugin (Node, which reads the files) uses it for the
+catalogs; the app's Worker uses it for runtime content. It replaces the two translators we have
+(`translateStrings` and `translate` in `ai.ts`).
 
 ## What comes back
 
-Answers are matched by key and line name, never by position. Each line goes onto the entry's line
-with the matching name; the entry becomes `"status": "translated"` with `translatedBy`,
-`translatedAt` and `gatewayLogId`. A key or line missing from the answer leaves that entry
-`"new"`, to go again; nothing lands on the wrong string. Today's code matches by position, so a
-skipped item shifts everything after it.
+Matched by key and line name, never by position:
 
-Writing the answer back into the catalog file, step by step (as `translate.ts` does today from
-line 836, except that it matches by key and name instead of position):
+1. For each key in the answer, the entry with that key; a key the request didn't send is ignored.
+2. Each answered line onto the entry's line with that name (`MARKS` both ways; `few, female` by both).
+3. The English line's spaces at its start and end put back (`spaced`, `translate.ts`): some lines
+   are pieced together around other text, and Gemini trims.
+4. The check: every `{placeholder}` of the English line is in the translation, and no other, and
+   every line is there. An entry that fails stays `"new"` and is asked once more, told what was
+   wrong. (fbtee itself compiles a translation that loses a placeholder: checked 2026-11-18,
+   `plans/fbtee-issues.md` #3.)
+5. The file read again, since a save may have changed it while Gemini answered; each translated
+   entry is written only where its key is still there and still `"new"`, with
+   `"status": "translated"`, `translatedBy`, `translatedAt` and `gatewayLogId`.
+6. Written as JSON in fbtee's layout (two spaces, a newline at the end), so a diff shows only what
+   changed.
 
-1. For each key in the answer, the entry with that key. A key the request didn't send is ignored.
-2. Each answered line onto the entry's line whose `variations` code has that name: `MARKS` in
-   `plurals.ts` both ways (16 ↔ `zero`, 4 ↔ `one`, 8 ↔ `two`, 20 ↔ `few`, 12 ↔ `many`, 24 ↔
-   `other`; 1 ↔ `male`, 2 ↔ `female`, 3 ↔ `unknown`). A line that varies by two things (a count
-   and a gender) is named by both, `few, female`, and matched by both.
-3. The English line's spaces at its start and end put back on the translation (`spaced`,
-   `translate.ts` line 587): some lines are pieced together around other text, and Gemini trims.
-4. The checks (placeholders, number of lines). An entry that fails them stays `"new"` and is sent
-   again once, told what was wrong, as today.
-5. The file read again from disk, since a save may have changed it while Gemini answered; each
-   translated entry is written only where that key is still there and still `"new"`.
-6. Written as JSON in the layout fbtee writes (two spaces, a newline at the end), so a diff shows
-   only what changed.
+A key or line missing from the answer leaves that entry `"new"`. Nothing lands on the wrong string.
 
-One check stays: every `{placeholder}` and the number of lines came back (fbtee compiles a
-translation that loses one: checked 2026-11-18, `plans/fbtee-issues.md` #3).
+## First: three questions, answered with `cf ai run`
+
+Real requests in the shape above, sent by hand with Cloudflare's CLI (`cf ai run
+google/gemini-4-hydrogen --body @request.json`, signed in with `cf auth login --no-use-keyring`,
+which needs the user's approval once). No code. Each result is written into this plan.
+
+1. **The code around each string, the words to keep, the glossary.** Ten real entries from the
+   example (a plain label, technical words, a time slot, a plural, a gender line, an email
+   sentence) into `th-TH` and `ar-EG`, with and without them. As good without: they're dropped.
+   Not: they stay, and this plan shows them.
+2. **A count and a gender at once** (none in the example, so made up), lines named `few, female`:
+   that every combination comes back.
+3. **fbtee's built-in strings** (the list joiners, `{number}+`, `<{number}`), with their English and
+   descriptions from fbtee's `Strings.json`.
 
 ## Trying a translation without deploying
 
-The same function the app uses, from a running `vp dev`, with one HTTP request and nothing
-written: the dev server's route (`POST /__void-fbtee/translate`, `devTranslate` in `ai.ts`, with
-the token in `node_modules/.void-fbtee/dev-token`) takes new entries in the catalog's own shape,
-the locales and an optional `"dryRun": true`, and answers with the request that went to Gemini, the
-answer, the entries as they would be written into the file, and the tokens and cost. Any entry, in
-any language, in seconds; the deploy cycle is never needed to see what Gemini gives back.
+- `cf ai run`, as above: Cloudflare and Google only, none of our code. Shows what Gemini does with a
+  request.
+- The dev route, with `vp dev` running: `POST /__void-fbtee/translate` (`devTranslate` in `ai.ts`,
+  the token in `node_modules/.void-fbtee/dev-token`) takes new entries in the catalog's shape, the
+  locales and `"dryRun": true`, and answers with the request that went to Gemini, the answer, the
+  entries as they would be written, and the tokens and cost. Nothing is written. Shows what our code
+  does.
 
-Before something is in the code, a request shape is tried by hand with Cloudflare's CLI, as on
-2026-11-18: `cf ai run google/gemini-4-hydrogen --body @request.json` (signed in with
-`cf auth login --no-use-keyring`, which needs the user's approval once).
+A difference between the two is a bug in our code.
 
-## To settle by test before the code
+## Tests and test data
 
-Three questions today's tests didn't answer, each settled by real requests with `cf ai run` before
-the code is written, and written into this plan with the result:
+**Test data, independent of the example app** (which keeps changing):
 
-1. **The code around each string, the words to keep exactly, and the glossary of the app's own
-   terms**, which today's requests send and today's tests didn't. Ten real entries (a plain label,
-   technical words, a time slot, a plural, a gender line, an email sentence) into `th-TH` and
-   `ar-EG`, with and without them. If the answers are as good without, they go; if not, they stay
-   in the request and this plan shows them.
-2. **A string that varies by a count and a gender at once** (none in the example; made up for the
-   test), its lines named by both (`few, female`): that Gemini fills every combination.
-3. **fbtee's 12 built-in strings** (the list joiners, `{number}+`, `<{number}`), with their English
-   and descriptions from fbtee's `Strings.json`.
+- `packages/void-fbtee/test/entries.json`: six entries in fbtee's catalog format, `"status": "new"`,
+  English in place, written for the tests: a plain label, a sentence with a `{time}` slot, a plural
+  count, a gender line, a count and a gender together, and a list joiner.
+- `packages/void-fbtee/test/answers.json`: Hydrogen's real answer to exactly those entries, captured
+  with `cf ai run` in step 1, untouched, labelled with the model, the date and the AI Gateway log id.
 
-## How we'll know it's right
+**New tests**
 
-- `vp check`, `test:unit`, `test:dev` and `test:preview`, as for every change.
-- `test:dev` sends a few real entries through the dev route with `"dryRun": true`, for `th-TH` and
-  `ar-EG` (a plain string, a time slot, a plural count, a gender line) and checks that every answer
-  came back on its own key and line name, with its placeholders. Real Gemini, no mock, nothing
-  written; a few US cents a run.
-- The same entries by hand with `cf ai run`, to compare our code's answer with Gemini's own.
+- `test/unit/translate-entries.test.ts`, our code on that data both ways: entries to the request
+  (every key, description and named line, nothing extra); the recorded answer back into a copy of
+  the catalog (each line on its own key and line name, spaces and placeholders kept, a missing key
+  left `"new"`, a placeholder lost caught).
+- In the example's `test:dev`: the same six entries through the dev route with `"dryRun": true`, to
+  real Gemini, for `th-TH` and `ar-EG`, checking keys, line names and placeholders, never wording. A
+  few US cents a run; `test:dev` isn't run in CI, so Gemini being down can't block a deploy.
 - A post created in `vp dev` comes back translated through the same function.
-- After deploying (the user's call), the live site shows the same.
 
-## What goes
+**Old tests and test data, in `packages/void-fbtee/test/`**
 
-- The rules cut from the skill file and fbtee's rules in every request (`rulesFor`, `SECTIONS`,
-  `instructions` in `ai.ts`); the translating skill file (`skills/void-fbtee-translate/`), and the parts of
-  `test/unit/skills.test.ts` that hold that skill to `plurals.ts`'s codes.
-- `grammar.json` and the checks built on it in `judge.ts` (written for Gemma 4's mistakes),
-  including the "always Modern Standard Arabic" rule, which contradicts the locale decision.
-- Matching answers by position (`translateCatalog` in `translate.ts`), and the separate post
-  translator (`translate()` in `ai.ts`).
-- `thinkingBudget`, `temperature`, the schema pasted into the prompt, language names.
-- Taking a new entry's English from its line in the file (`toSend` in `translate.ts`).
-- Today's uncommitted changes, except where kept below: the per-language rule picking, the capitals
-  sentence and the small-letter check, the dev-only "no rules" switch and posts on the dev route.
+| File                         | What it is                                                              | In this change                                                                  |
+| ---------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `unit/judge.test.ts`         | 16 tests on Gemma 4's saved answers and the old checks                  | deleted; one test of the placeholder check stays                                |
+| `unit/skills.test.ts`        | holds the translating skill to fbtee's codes                            | deleted with the skill                                                          |
+| `unit/ai-rules.test.ts`      | today's uncommitted per-language rules test                             | deleted                                                                         |
+| `unit/translate.test.ts`     | the coding-agent prompts, page stamping                                 | the prompt tests that name the translating skill change; page stamping stays    |
+| `unit/models.test.ts`        | the old model and payment errors                                        | rewritten for Hydrogen                                                          |
+| `unit/content-files.test.ts` | the content table's schema                                              | changed for runtime content as entries                                          |
+| `unit/fixture/`              | a tiny app with a German catalog, one entry falsely labelled `"claude"` | kept for the catalog and command tests; the label says it's hand-made test data |
 
-## The tests, file by file
+Elsewhere: `e2e/dev/jobs.test.ts` (runtime content as entries), and `e2e/fresh/check.ts` and
+`e2e/preview/strings.test.ts` (which skill files a new app gets) change. `e2e/fresh/check.ts`'s
+hand-written translations for a fresh app (`FROM_THAI`) stay, since that test can't call Gemini,
+but no longer claim to match the example's catalog.
 
-- Go: `test/unit/ai-rules.test.ts` (today's uncommitted test of the per-language rule picking).
-- Mostly go: `test/unit/judge.test.ts` (16 tests, nearly all on Gemma 4's saved answers: grammar,
-  script, English left in, capitals, the post checks); its placeholder and line-count tests stay.
-  `test/unit/skills.test.ts`: the parts holding the translating skill to `plurals.ts`'s codes.
-- Change: `test/unit/models.test.ts` (the model and its settings); `test/unit/content-files.test.ts`
-  and `e2e/dev/jobs.test.ts` (runtime content as entries); `test/unit/translate.test.ts` (the
-  prompts that point coding agents at the translating skill); `e2e/fresh/check.ts` and
-  `e2e/preview/strings.test.ts` (which skill files a new app gets).
-- New: the conversion function, both ways (entries to the request, the answer back onto the right
-  key and line name, spaces kept, a missing key left `"new"`); and the dev-route test in "How we'll
-  know it's right".
-- Unchanged: the other unit files and the browser, preview and deployed tests, which test fbtee,
-  routing, pages and the live site.
+Unchanged: the other unit tests (`catalogs`, `commands`, `negotiate`, `server`, `plugin`,
+`plurals`, `head`, `init`, `language-list`, `runtime`, `constructs`) and the browser, preview and
+deployed tests. They test fbtee, routing, setup, pages and the live site against the example's real
+content, which stays as it is.
 
 ## Claude's review
 
@@ -174,6 +180,18 @@ Claude to read the translating skill for "how a translation should be". With tha
 prompt points only at the void-fbtee skill's "Reviewing" section, which says what to record; the
 judging is Claude's own, as it is Gemini's.
 
+## What goes
+
+- The rules in every request: `rulesFor`, `SECTIONS`, `languageRules` and `instructions` in
+  `ai.ts`, fbtee's rules (`fbteeRules` in `translate.ts`), and the translating skill
+  (`skills/void-fbtee-translate/`).
+- `grammar.json` and the checks built on it in `judge.ts`, including the "always Modern Standard
+  Arabic" rule, which contradicts the locale decision.
+- Matching answers by position (`translateCatalog` in `translate.ts`); the separate post translator
+  (`translate()` and `postProblems`); taking the English from the line in the file.
+- `thinkingBudget`, `temperature`, the schema pasted into the prompt, language names.
+- Today's uncommitted changes, except the two kept below.
+
 ## What stays
 
 - The catalog loop: fbtee finds the strings and prepares the files; new entries go to Gemini; the
@@ -181,27 +199,24 @@ judging is Claude's own, as it is Gemini's.
 - Who made each translation, and `vp build` failing on anything untranslated.
 - The void-fbtee skill (`skills/void-fbtee/`), which tells a developer's coding agent how to write
   translatable code.
+- The example's real content: its catalogs and pages stay as they are.
 - From today's uncommitted changes: the fix that stops the capitals check comparing against an
-  original with no capitals, and the corrected comments.
+  original with no capitals (if any capitals check is left), and the corrected comments.
 
 ## Also in this change
 
 - `fallbacksOf` (`runtime.ts`) skips a locale's natural parents (`fr-CA` → `fr`) for runtime
-  content, where fbtee's own messages use them. Fixed here.
+  content, where fbtee's own messages use them. Fixed.
 
 ## Not in this change
 
-- Retranslating anything already translated: this changes no existing translation, and offers no
-  way to redo one.
-
+- Retranslating anything already translated.
+- Other Gemini models, a model option, a repeatable smoke test: later.
 - Simplifying what grew around posts (the queue, the "queued" markers, the nightly cron, the
-  middleware). Runtime content moving to the catalog entry shape makes the markers unnecessary;
-  the rest is its own plan.
-- What we'd like from fbtee: `plans/fbtee-issues.md` #3. Filed only with the user's OK.
-- The example's Arabic is standard Arabic today; under the locale decision new `ar-EG` strings
-  come back Egyptian. Whether to retranslate the existing ones to match is the user's call.
+  middleware): its own plan.
+- What we'd like from fbtee: `plans/fbtee-issues.md` #3, filed only with the user's OK.
 
-## The tests behind this (2026-11-18, `cf ai run`, Cloudflare's CLI)
+## The requests behind this (2026-11-18, `cf ai run`)
 
 | Request                                               | Model     | Result                                        | Tokens in / out / thinking | Cost    |
 | ----------------------------------------------------- | --------- | --------------------------------------------- | -------------------------- | ------- |
@@ -222,7 +237,6 @@ a few hundred strings for a language is about a dollar.
   https://ai.google.dev/gemini-api/docs/generate-content/whats-new-gemini-3.5
 - Google, "Structured outputs": https://ai.google.dev/gemini-api/docs/generate-content/structured-output
 - Google, "Prompt design strategies": https://ai.google.dev/gemini-api/docs/prompting-strategies
-- Cloudflare's model list (Hydrogen, 3.8 Flash): https://developers.cloudflare.com/ai/models/
-- Hydrogen's thinking levels, `minimal` and `thinkingBudget` rejected, sampling ignored: Google's
-  Hydrogen migration guide as reported by apiyi.com and agentpedia.codes (2026-11-12); not read on
-  Google's own page, which wasn't reachable from here. The tests above confirm `low` works.
+- Google, "Gemini thinking" and Vertex AI's thinking page (levels per model; Hydrogen and 3.8 Flash
+  reject `minimal`): https://ai.google.dev/gemini-api/docs/generate-content/thinking
+- Cloudflare's model list: https://developers.cloudflare.com/ai/models/
