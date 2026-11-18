@@ -2187,18 +2187,6 @@
       "types": [],
       "translatedBy": "unknown"
     },
-    "s96U1PJw3Ypy+kEOLoP6MA==": {
-      "description": "Emails page introduction",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "يراسل هذا التطبيق الناس بلغتهم: تأكيد الحجز، وتذكير قبل يوم، والإلغاء، والرابط الخاص لحذف فعالية. هذه اثنتان منها، صنعتهما شيفرة التطبيق نفسها لفعالية تجريبية، بلغة هذه الصفحة، وما يلزم كي تصل كل منها في الاتجاه الصحيح.",
-          "variations": {}
-        }
-      ],
-      "types": [],
-      "translatedBy": "unknown"
-    },
     "dRNSEr8XFaAgyTWvKq4xcA==": {
       "description": "Emails page section title: the sample emails",
       "tokens": [],
@@ -4749,44 +4737,6 @@
         "verdict": "ok"
       }
     },
-    "RDmZOKQne5lXFwwEOtPf1w==": {
-      "description": "Translating page point: as you save, the dev server prepares new strings and has Void's AI translate them, many at a time; every answer is checked, and what still fails goes to Claude Code; each translation records who wrote it",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "لا يوجد شيء لتشغيله. بمجرد الحفظ، يضيف vp dev كل نص جديد إلى كتالوج كل لغة ويترجم الجديد، النصوص وصفحات Markdown التي تغيرت، باستخدام Void's AI في الـ Worker الخاص بالتطبيق: Gemini 3.5 Flash، العديد من النصوص في المرة الواحدة. يتم فحص كل إجابة، وما يستمر في الفشل يذهب إلى Claude Code بمهارة void-fbtee. وتسجل كل ترجمة من كتبها ومتى.",
-          "variations": {}
-        }
-      ],
-      "types": [],
-      "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17",
-      "review": {
-        "by": "claude",
-        "at": "2026-11-17",
-        "verdict": "ok"
-      }
-    },
-    "52BVoeSoml1sJh7/JrUk6Q==": {
-      "description": "Translating page point: a posted event goes to a queue whose consumer translates it with Void's AI, the same model as the app's own text",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "الفعالية التي ينشرها شخص ما لا تكون موجودة في المستودع، لذلك تُترجم بمجرد نشرها: يذهب منشور الفعالية إلى طابور انتظار، ويطلب مستهلك الطابور من Void's AI، وهو نفس النموذج المستخدم لنصوص التطبيق نفسه، الترجمة إلى كل لغة من لغات التطبيق الأخرى، بعد أن يحصل الناشر على إجابته.",
-          "variations": {}
-        }
-      ],
-      "types": [],
-      "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17",
-      "review": {
-        "by": "claude",
-        "at": "2026-11-17",
-        "verdict": "ok"
-      }
-    },
     "0lZ+v47QSOzy6IAWK4T/Dg==": {
       "description": "Translating page: what the dev server does about translations as you save: preparing, translating with Void's AI then Claude Code, and reporting by itself",
       "status": "translated",
@@ -4828,25 +4778,6 @@
         "was": [
           "يفشل عند وجود أي شيء ناقص أو خاطئ: نص أو صفحة غير مترجمة، أو ترجمة تفشل في الفحوصات التي يجريها vp dev، أو صفحة أقدم من نسختها الأصلية، أو مشكلة في الإعداد. وبذلك لا يمكن لأي عملية نشر شحن أي منها."
         ]
-      }
-    },
-    "5AtDKB1g3YMwQWILBRxDjw==": {
-      "description": "Translating page introduction",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "تتم ترجمة نصوص التطبيق نفسه وما ينشره الأشخاص بواسطة الذكاء الاصطناعي ذاته، Gemini 3.5 Flash من خلال Void's AI: النصوص إلى ملفات في المستودع الذي تراجعه، والمنشورات فور نشرها. ويترجم Claude Code ما يتركه. إليك كل منها، مع السطور التي تفعل ذلك.",
-          "variations": {}
-        }
-      ],
-      "types": [],
-      "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17",
-      "review": {
-        "by": "claude",
-        "at": "2026-11-17",
-        "verdict": "ok"
       }
     },
     "A3T96LuiZD94KEB/GfigmA==": {
@@ -5025,267 +4956,549 @@
     },
     "yMCJv8jyZ3D5saHbW6nwSQ==": {
       "description": "Form label: when the event ends, on the clock where it happens",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Ends, local time",
+          "translation": "ينتهي، التوقيت المحلي",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-13d3-754a-b398-2d768d1c3fcf",
+      "usage": {
+        "in": 269,
+        "out": 34,
+        "thinking": 152,
+        "usd": 0.001799
+      }
     },
     "Q3NjoqR7O0kVDWVbcCflFw==": {
       "description": "Form error: no end time, or an end that isn't after the start",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "When does it end? After it starts.",
+          "translation": "هيخلص إمتى؟ بعد ما يبدأ.",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-13b3-744b-a91f-bf4d751830f0",
+      "usage": {
+        "in": 276,
+        "out": 36,
+        "thinking": 184,
+        "usd": 0.002064
+      }
     },
     "RuUPue3qn8Du4avPEi+bIQ==": {
       "description": "When an event is, on the reader's own clock; {time} is its start, or its start to its end, already formatted",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Your time: {time}",
+          "translation": "بتوقيتك: {time}",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-1424-75d4-b23f-347269cefde7",
+      "usage": {
+        "in": 285,
+        "out": 29,
+        "thinking": 274,
+        "usd": 0.0027
+      }
     },
     "V01CDGIuqFKtKSBPYriqXA==": {
       "description": "Error changing an event: its seats can't be fewer than the seats already booked",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "More people have booked than that: give it at least as many seats as are booked.",
+          "translation": "عدد اللي حجزوا أكتر من كده: خلي عدد المقاعد على الأقل قد اللي اتحجزوا.",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-157b-77c5-afad-6889d7256679",
+      "usage": {
+        "in": 285,
+        "out": 48,
+        "thinking": 222,
+        "usd": 0.002453
+      }
     },
     "I7y/kYZ+QJs6EUDJDsR4/A==": {
       "description": "Button: save the changes to the event you posted",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Save the changes",
+          "translation": "حفظ التغييرات",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-25da-76cb-81dd-46cbda7f42a2",
+      "usage": {
+        "in": 264,
+        "out": 32,
+        "thinking": 204,
+        "usd": 0.002166
+      }
     },
     "VHCMJqh9G+2BlfTs5LAPcA==": {
       "description": "Button: close the form for changing an event without saving",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Never mind",
+          "translation": "خلاص، مش مهم",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-25d3-7110-bbc8-f378ce0ec58d",
+      "usage": {
+        "in": 264,
+        "out": 31,
+        "thinking": 208,
+        "usd": 0.002189
+      }
     },
     "0CAb5P4KIc9cxY5l0kv+7g==": {
       "description": "For whoever posted an event: keep this private link to change or delete it later",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Only you have this link. Keep it to change or delete your event later.",
+          "translation": "الرابط ده معاك إنت بس. احتفظ بيه عشان تعدل أو تحذف الحدث بتاعك بعدين.",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-25da-77ab-b7a8-27f3896943f8",
+      "usage": {
+        "in": 282,
+        "out": 47,
+        "thinking": 317,
+        "usd": 0.003153
+      }
     },
     "3bPO3Z53qF3k1fJZW/kNEA==": {
       "description": "Label of the private link to change or delete an event",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Your private link",
+          "translation": "رابطك الخاص",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-25d5-738e-9f7a-51311702c798",
+      "usage": {
+        "in": 265,
+        "out": 29,
+        "thinking": 193,
+        "usd": 0.002063
+      }
     },
     "y8NIwLYOSqB9gYsU0KMESg==": {
       "description": "Button: change the event you posted",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Change this event",
+          "translation": "غيّر الفعالية دي",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-3de4-72be-aacb-f3407c193aca",
+      "usage": {
+        "in": 261,
+        "out": 32,
+        "thinking": 167,
+        "usd": 0.001884
+      }
     },
     "6+cKYCjdhXgzQiyA8jOU8g==": {
       "description": "Under the private link email field: what the link is for, and that the address isn't kept",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "The link lets you change or delete your event later, from any device. Your address is only used to send it.",
+          "translation": "الرابط ده بيخليك تغير أو تمسح الحدث بتاعك بعدين، من أي جهاز. عنوانك بيستخدم بس عشان نبعته.",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-3de9-775c-873f-baef98472f0e",
+      "usage": {
+        "in": 295,
+        "out": 59,
+        "thinking": 472,
+        "usd": 0.004425
+      }
     },
     "ohuNNueQvwBJZYzlJFX5Bw==": {
       "description": "Booking email: the reader has a seat at an event; {event} is the event's title, {time} when it is, from its start to its end on the clock where it happens, already formatted",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "You have a seat at {event}, {time}.",
+          "translation": "ليك مكان في {event}، {time}.",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-3deb-7009-8a11-d3a1e7eecd77",
+      "usage": {
+        "in": 306,
+        "out": 35,
+        "thinking": 225,
+        "usd": 0.002409
+      }
     },
     "F6vtXR8+B+Stqx//PanA5A==": {
       "description": "Private link email: why to keep the link, and to keep it private",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Keep this email: the link below is the only way to change or delete your event later. Anyone with it can change or delete the event, so don't share it.",
+          "translation": "احتفظ بالإيميل ده: اللينك اللي تحت هو الطريقة الوحيدة عشان تغير أو تمسح الحدث بتاعك بعدين. أي حد معاه اللينك يقدر يغير أو يمسح الحدث، فعشان كده متشاركوش مع حد.",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-3de2-73b7-b0f4-7ed4933b7500",
+      "usage": {
+        "in": 301,
+        "out": 83,
+        "thinking": 396,
+        "usd": 0.004044
+      }
     },
     "LIv6TjauAYpsig2L8TwIOw==": {
       "description": "Cancellation email: the event the reader had a seat at is cancelled by its organiser; {event} is its title, {time} when it would have been, from its start to its end, already formatted",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "{event}, {time}, has been cancelled by its organiser. Your seat is gone with it.",
+          "translation": "تم إلغاء {event}، {time}، من قِبل المنظم. وبكده مقعدك اتلغى معاه.",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-5228-7265-9bb1-6b12c493a262",
+      "usage": {
+        "in": 312,
+        "out": 57,
+        "thinking": 508,
+        "usd": 0.004706
+      }
     },
     "kcR+E5vWboT5tLMIMEiZwQ==": {
       "description": "Change email: greeting, with the name the booker gave",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Hello {name},",
+          "translation": "أهلاً {name}،",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-5226-710b-baf1-c1d3527f6ce6",
+      "usage": {
+        "in": 267,
+        "out": 33,
+        "thinking": 119,
+        "usd": 0.001541
+      }
     },
     "dch1b8l636N/6FhmxZMyHQ==": {
       "description": "Change email: the organiser of the event the reader has a seat at changed it; {event} is its title as it is now",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "The organiser of {event} has changed it.",
+          "translation": "منظم {event} غيّره.",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-5226-7442-b88b-b81c3cc7c184",
+      "usage": {
+        "in": 287,
+        "out": 29,
+        "thinking": 334,
+        "usd": 0.003153
+      }
     },
     "api8K8WolAQWnmHNX3NV2Q==": {
       "description": "Change email: when the event is now; {time} is its new start to end and {before} what it was, both already formatted",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "It's now {time}, not {before}.",
+          "translation": "دلوقتي بقى {time}، مش {before}.",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-5228-7282-9120-d2e5dd86b493",
+      "usage": {
+        "in": 291,
+        "out": 38,
+        "thinking": 157,
+        "usd": 0.001899
+      }
     },
     "AyVEAaw0bYv9V+i17sIf+w==": {
       "description": "Change email: where the event is now; {venue} is the place, as its organiser wrote it",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "It's now at {venue}.",
+          "translation": "دلوقتي في {venue}.",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-65df-73a3-809c-6b60dc5e2fdc",
+      "usage": {
+        "in": 280,
+        "out": 32,
+        "thinking": 247,
+        "usd": 0.002513
+      }
     },
     "0X6CEL+t0CCpXXwFhJYPMA==": {
       "description": "Change email: the organiser removed the event's place",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "It no longer says where it is: see its page.",
+          "translation": "مبقاش مكتوب مكانه فين: شوف صفحته.",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-65dc-74e3-a360-729196619e0c",
+      "usage": {
+        "in": 273,
+        "out": 41,
+        "thinking": 219,
+        "usd": 0.00236
+      }
     },
     "DvNw5Mb7XO7z2d9O05qNcw==": {
       "description": "Change email: the reader's seat is kept; before the link to the event's page, where the ticket can be downloaded again",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Your seat is kept. Your ticket, with the new details, is on the event's page:",
+          "translation": "مكانك محفوظ. تذكرتك، بالتفاصيل الجديدة، موجودة على صفحة الفعالية:",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-65de-7698-8481-22478b97fb11",
+      "usage": {
+        "in": 300,
+        "out": 47,
+        "thinking": 282,
+        "usd": 0.002918
+      }
     },
     "LCF/aU+a5FkWxJkiGshG1Q==": {
       "description": "Change email subject: the organiser changed the event the reader has a seat at; {event} is its title as it is now",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "{event} has changed",
+          "translation": "تم تغيير {event}",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-65e0-747e-b0d3-f8742f7914b8",
+      "usage": {
+        "in": 282,
+        "out": 30,
+        "thinking": 216,
+        "usd": 0.002268
+      }
     },
     "9Ef6937OcPBvwxm5t3Wt3Q==": {
       "description": "Reminder email: the event the reader has a seat at starts within a day; {event} is its title, {time} when it is, from its start to its end, already formatted",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "A reminder: you have a seat at {event}, {time}.",
+          "translation": "تذكير: لديك مقعد في {event}، {time}.",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-7245-726c-aeb1-744ed3f1c94d",
+      "usage": {
+        "in": 304,
+        "out": 40,
+        "thinking": 0,
+        "usd": 0.000756
+      }
     },
     "avsVYoPnCnj2mH5ewuVM+Q==": {
       "description": "PDF ticket: label of when the event is, from its start to its end, on its own clock",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "When",
+          "translation": "الموعد",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-7242-74b3-b755-23bb0a56a247",
+      "usage": {
+        "in": 273,
+        "out": 29,
+        "thinking": 152,
+        "usd": 0.001767
+      }
+    },
+    "Fa5N/tRcbjYgQ+bg+5crQA==": {
+      "description": "Emails page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "التطبيق ده بيبعت إيميلات للناس بلغتهم: تأكيد الحجز، وتذكير قبلها بيوم، وتغيير أو إلغاء، والرابط الخاص لتعديل أو حذف الموعد. هنا فيه اتنين منهم، معمولين بكود التطبيق نفسه لموعد تجريبي، بلغة الصفحة دي، واللي محتاجه كل واحد عشان يوصل بشكل مظبوط.",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-7245-7674-84e6-e2db8a52879c",
+      "usage": {
+        "in": 330,
+        "out": 108,
+        "thinking": 462,
+        "usd": 0.00477
+      }
+    },
+    "NbIB1vSjhG/i3vl7e1AQLQ==": {
+      "description": "Translating page point: as you save, the dev server prepares new strings and has Void's AI translate them, one at a time; every answer is checked, and what still fails goes to Claude Code; each translation records who wrote it, when, and what it cost",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "مفيش حاجة محتاجة تشغيل. بمجرد ما تحفظ، بيضيف vp dev كل نص جديد لكتالوج كل لغة ويترجم الجديد، سواء النصوص أو صفحات الـ markdown اللي اتغيرت، باستخدام ذكاء Void الاصطناعي جوه الـ Worker الخاص بالتطبيق: Gemini 4 Hydrogen، نص بنص. كل إجابة بتتراجع، واللي لسه بيفشل بيروح لـ Claude Code مع مهارة void-fbtee. كل ترجمة بتسجل مين كتبها، إمتى، وكلفت كام.",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-7243-77ac-a513-ad8fd374159f",
+      "usage": {
+        "in": 405,
+        "out": 142,
+        "thinking": 336,
+        "usd": 0.004193
+      }
+    },
+    "iV2rrTp6CbuKPmMLmMbezg==": {
+      "description": "Translating page point: a posted event goes to a queue whose consumer translates it with Void's AI, the same model as the app's own text; changed, it's translated again",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "الحدث اللي حد بينشره مش موجود في المستودع، عشان كده بيترجم وقت النشر: المنشور بيروح لقائمة انتظار، والمستهلك بتاعها بيطلب من ذكاء Void الاصطناعي، نفس النموذج بتاع نص التطبيق نفسه، لكل لغة تانية في التطبيق، بعد ما اللي نشره ياخد رده. ولما اللي نشره يغيّره، بيترجم تاني.",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-871f-70bc-b202-c05f68de727c",
+      "usage": {
+        "in": 368,
+        "out": 113,
+        "thinking": 530,
+        "usd": 0.005375
+      }
+    },
+    "69fmSjFHQVJ+ThiVsBjoaw==": {
+      "description": "Translating page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "نصوص التطبيق نفسه واللي الناس بتنشره بيترجموا بنفس الذكاء الاصطناعي، Gemini 4 Hydrogen من خلال Void's AI: النصوص بتتحط في ملفات في المستودع عشان تراجعها، والمنشورات بتترجم أول ما تتنشر. Claude Code بيترجم اللي بيفضل. وهنا كل واحد منهم، مع السطور اللي بتعمل ده.",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-8723-7057-b4e1-cf6659a85ff6",
+      "usage": {
+        "in": 317,
+        "out": 110,
+        "thinking": 326,
+        "usd": 0.003746
+      }
     }
   }
 }

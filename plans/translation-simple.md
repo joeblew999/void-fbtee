@@ -315,6 +315,13 @@ the new function.
 Other models or a model option; simplifying the post queue, cron and markers; the fbtee asks
 (`plans/fbtee-issues.md` #3, filed only with your OK).
 
+Found on the first real run (2026-11-18), to decide later: the example's Arabic catalog now mixes
+two kinds of Arabic. The strings translated before this change were made under the old rule
+"always Modern Standard Arabic"; the 22 new ones came back in Egyptian Arabic, as the locale code
+`ar-EG` asks ("هيخلص إمتى؟" for "When does it end?"). Making them one again means translating the
+old ones again (not done here: nothing already translated is translated again), or choosing
+`ar-SA`-style standard Arabic for the site.
+
 ## Evidence (2026-11-18, `cf ai run`)
 
 | Request                                    | Model     | Result                       | Tokens in / out / thinking | Cost    |

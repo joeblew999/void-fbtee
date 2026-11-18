@@ -2123,18 +2123,6 @@
       "types": [],
       "translatedBy": "unknown"
     },
-    "s96U1PJw3Ypy+kEOLoP6MA==": {
-      "description": "Emails page introduction",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "แอปนี้ส่งอีเมลถึงผู้คนในภาษาของพวกเขาเอง: การยืนยันการจอง การแจ้งเตือนล่วงหน้าหนึ่งวัน การยกเลิก และลิงก์ส่วนตัวสำหรับลบกิจกรรม นี่คือสองฉบับ ที่โค้ดของแอปเองสร้างขึ้นสำหรับกิจกรรมตัวอย่าง ในภาษาของหน้านี้ พร้อมสิ่งที่ต้องทำเพื่อให้แต่ละฉบับแสดงผลในทิศทางที่ถูกต้อง",
-          "variations": {}
-        }
-      ],
-      "types": [],
-      "translatedBy": "unknown"
-    },
     "dRNSEr8XFaAgyTWvKq4xcA==": {
       "description": "Emails page section title: the sample emails",
       "tokens": [],
@@ -4546,49 +4534,6 @@
         "verdict": "ok"
       }
     },
-    "RDmZOKQne5lXFwwEOtPf1w==": {
-      "description": "Translating page point: as you save, the dev server prepares new strings and has Void's AI translate them, many at a time; every answer is checked, and what still fails goes to Claude Code; each translation records who wrote it",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ไม่มีอะไรต้องรัน ขณะที่คุณบันทึก vp dev จะเพิ่มข้อความใหม่แต่ละข้อความลงในแค็ตตาล็อกของทุกภาษา และแปลสิ่งใหม่ ทั้งข้อความและหน้า Markdown ที่เปลี่ยนแปลง ด้วย Void's AI ใน Worker ของแอปเอง: Gemini 3.5 Flash ครั้งละหลายข้อความ ทุกคำตอบจะได้รับการตรวจสอบ และส่วนที่ยังล้มเหลวจะถูกส่งไปยัง Claude Code ด้วยทักษะของ void-fbtee การแปลแต่ละครั้งจะบันทึกว่าใครเป็นผู้เขียนและเขียนเมื่อใด",
-          "variations": {}
-        }
-      ],
-      "types": [],
-      "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17",
-      "review": {
-        "by": "claude",
-        "at": "2026-11-17",
-        "verdict": "ok"
-      }
-    },
-    "52BVoeSoml1sJh7/JrUk6Q==": {
-      "description": "Translating page point: a posted event goes to a queue whose consumer translates it with Void's AI, the same model as the app's own text",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "กิจกรรมที่มีผู้โพสต์ไม่ได้อยู่ในที่เก็บข้อมูล (repository) จึงแปลทันทีที่โพสต์ โดยโพสต์จะเข้าคิว และตัวรับของคิวจะขอให้ Void's AI ซึ่งเป็นโมเดลเดียวกับข้อความของแอป แปลเป็นภาษาอื่นๆ ของแอป หลังจากที่ผู้โพสต์ได้รับคำตอบแล้ว",
-          "variations": {}
-        }
-      ],
-      "types": [],
-      "translatedBy": "claude",
-      "translatedAt": "2026-11-17",
-      "review": {
-        "by": "claude",
-        "at": "2026-11-17",
-        "verdict": "wrong",
-        "of": "google/gemini-3.5-flash",
-        "note": "Words that differ from the app's own: คลังข้อมูล for the repository (the app says ที่เก็บข้อมูล) and ผู้บริโภคคิว, a shopper, for the queue's consumer (the app says ตัวรับของคิว).",
-        "was": [
-          "กิจกรรมที่มีผู้โพสต์จะไม่ได้อยู่ในคลังข้อมูล ดังนั้นจึงได้รับการแปลทันทีที่โพสต์กิจกรรม โดยโพสต์ดังกล่าวจะถูกส่งไปยังคิว และผู้บริโภคคิวจะขอให้ Void's AI ซึ่งเป็นโมเดลเดียวกับข้อความของแอป แปลเป็นภาษาอื่นๆ ของแอป หลังจากที่ผู้โพสต์ได้รับคำตอบแล้ว"
-        ]
-      }
-    },
     "0lZ+v47QSOzy6IAWK4T/Dg==": {
       "description": "Translating page: what the dev server does about translations as you save: preparing, translating with Void's AI then Claude Code, and reporting by itself",
       "status": "translated",
@@ -4615,25 +4560,6 @@
       "translations": [
         {
           "translation": "จะล้มเหลวหากมีสิ่งใดตกค้างหรือผิดพลาด: ข้อความหรือหน้าที่ยังไม่ได้แปล การแปลที่ไม่ผ่านการตรวจสอบของ vp dev หน้าที่เก่ากว่าต้นฉบับ หรือปัญหาการตั้งค่า เพื่อไม่ให้การติดตั้งใช้งานนำสิ่งเหล่านี้ขึ้นระบบจริง",
-          "variations": {}
-        }
-      ],
-      "types": [],
-      "translatedBy": "google/gemini-3.5-flash",
-      "translatedAt": "2026-11-17",
-      "review": {
-        "by": "claude",
-        "at": "2026-11-17",
-        "verdict": "ok"
-      }
-    },
-    "5AtDKB1g3YMwQWILBRxDjw==": {
-      "description": "Translating page introduction",
-      "status": "translated",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ข้อความของแอปเองและสิ่งที่ผู้คนโพสต์จะได้รับการแปลโดย AI ตัวเดียวกันคือ Gemini 3.5 Flash ผ่าน Void's AI โดยข้อความจะถูกแปลลงในไฟล์ในที่เก็บข้อมูลเพื่อให้คุณตรวจสอบ ส่วนโพสต์จะได้รับการแปลทันทีที่โพสต์ Claude Code จะแปลส่วนที่เหลืออยู่ และนี่คือแต่ละส่วนพร้อมกับบรรทัดที่ดำเนินการ",
           "variations": {}
         }
       ],
@@ -4736,267 +4662,549 @@
     },
     "yMCJv8jyZ3D5saHbW6nwSQ==": {
       "description": "Form label: when the event ends, on the clock where it happens",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Ends, local time",
+          "translation": "สิ้นสุด (เวลาท้องถิ่น)",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-1423-75c5-bdfa-161aa24d0afa",
+      "usage": {
+        "in": 269,
+        "out": 32,
+        "thinking": 146,
+        "usd": 0.001739
+      }
     },
     "Q3NjoqR7O0kVDWVbcCflFw==": {
       "description": "Form error: no end time, or an end that isn't after the start",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "When does it end? After it starts.",
+          "translation": "สิ้นสุดเมื่อไหร่? ต้องหลังจากเวลาเริ่มต้น",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-13b3-732c-8455-b08795f18e6e",
+      "usage": {
+        "in": 276,
+        "out": 37,
+        "thinking": 209,
+        "usd": 0.002259
+      }
     },
     "RuUPue3qn8Du4avPEi+bIQ==": {
       "description": "When an event is, on the reader's own clock; {time} is its start, or its start to its end, already formatted",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Your time: {time}",
+          "translation": "เวลาของคุณ: {time}",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-1585-7540-ab53-7c7e0d00681c",
+      "usage": {
+        "in": 285,
+        "out": 31,
+        "thinking": 103,
+        "usd": 0.001433
+      }
     },
     "V01CDGIuqFKtKSBPYriqXA==": {
       "description": "Error changing an event: its seats can't be fewer than the seats already booked",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "More people have booked than that: give it at least as many seats as are booked.",
+          "translation": "มีผู้จองมากกว่าจำนวนนั้น: โปรดกำหนดจำนวนที่นั่งอย่างน้อยเท่ากับจำนวนที่จองไว้แล้ว",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-141e-74b7-bed1-010eb064f54b",
+      "usage": {
+        "in": 285,
+        "out": 48,
+        "thinking": 126,
+        "usd": 0.001733
+      }
     },
     "I7y/kYZ+QJs6EUDJDsR4/A==": {
       "description": "Button: save the changes to the event you posted",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Save the changes",
+          "translation": "บันทึกการเปลี่ยนแปลง",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-27d9-7568-a076-590fc9a4d17c",
+      "usage": {
+        "in": 264,
+        "out": 29,
+        "thinking": 74,
+        "usd": 0.001169
+      }
     },
     "VHCMJqh9G+2BlfTs5LAPcA==": {
       "description": "Button: close the form for changing an event without saving",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Never mind",
+          "translation": "ไม่เป็นไร",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-27eb-749c-b8c6-92f1c9ddc1fb",
+      "usage": {
+        "in": 264,
+        "out": 29,
+        "thinking": 132,
+        "usd": 0.001604
+      }
     },
     "0CAb5P4KIc9cxY5l0kv+7g==": {
       "description": "For whoever posted an event: keep this private link to change or delete it later",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Only you have this link. Keep it to change or delete your event later.",
+          "translation": "มีเพียงคุณเท่านั้นที่มีลิงก์นี้ เก็บไว้เพื่อแก้ไขหรือลบกิจกรรมของคุณในภายหลัง",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-27d4-7400-a23f-cbe91b5fbcea",
+      "usage": {
+        "in": 282,
+        "out": 42,
+        "thinking": 164,
+        "usd": 0.001968
+      }
     },
     "3bPO3Z53qF3k1fJZW/kNEA==": {
       "description": "Label of the private link to change or delete an event",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Your private link",
+          "translation": "ลิงก์ส่วนตัวของคุณ",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-27d7-7573-8219-53153ec33816",
+      "usage": {
+        "in": 265,
+        "out": 31,
+        "thinking": 72,
+        "usd": 0.00117
+      }
     },
     "y8NIwLYOSqB9gYsU0KMESg==": {
       "description": "Button: change the event you posted",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Change this event",
+          "translation": "เปลี่ยนกิจกรรมนี้",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-3295-70ba-9863-6dcb285ac5cd",
+      "usage": {
+        "in": 261,
+        "out": 29,
+        "thinking": 103,
+        "usd": 0.001382
+      }
     },
     "6+cKYCjdhXgzQiyA8jOU8g==": {
       "description": "Under the private link email field: what the link is for, and that the address isn't kept",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "The link lets you change or delete your event later, from any device. Your address is only used to send it.",
+          "translation": "ลิงก์นี้ให้คุณแก้ไขหรือลบกิจกรรมของคุณในภายหลังได้จากทุกอุปกรณ์ อีเมลของคุณจะใช้เพื่อส่งลิงก์นี้เท่านั้น",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-3294-7797-8684-8d8e855c9772",
+      "usage": {
+        "in": 295,
+        "out": 58,
+        "thinking": 227,
+        "usd": 0.00258
+      }
     },
     "ohuNNueQvwBJZYzlJFX5Bw==": {
       "description": "Booking email: the reader has a seat at an event; {event} is the event's title, {time} when it is, from its start to its end on the clock where it happens, already formatted",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "You have a seat at {event}, {time}.",
+          "translation": "คุณมีที่นั่งสำหรับ {event} เวลา {time}",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-3290-70bf-93f8-6d24ac78cf53",
+      "usage": {
+        "in": 306,
+        "out": 37,
+        "thinking": 241,
+        "usd": 0.002544
+      }
     },
     "F6vtXR8+B+Stqx//PanA5A==": {
       "description": "Private link email: why to keep the link, and to keep it private",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Keep this email: the link below is the only way to change or delete your event later. Anyone with it can change or delete the event, so don't share it.",
+          "translation": "เก็บอีเมลนี้ไว้: ลิงก์ด้านล่างเป็นวิธีเดียวในการแก้ไขหรือลบกิจกรรมของคุณในภายหลัง ทุกคนที่มีลิงก์นี้สามารถแก้ไขหรือลบกิจกรรมได้ ดังนั้นโปรดอย่าแชร์ลิงก์นี้",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-3292-7295-925c-0d011d0243bd",
+      "usage": {
+        "in": 301,
+        "out": 72,
+        "thinking": 260,
+        "usd": 0.002942
+      }
     },
     "LIv6TjauAYpsig2L8TwIOw==": {
       "description": "Cancellation email: the event the reader had a seat at is cancelled by its organiser; {event} is its title, {time} when it would have been, from its start to its end, already formatted",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "{event}, {time}, has been cancelled by its organiser. Your seat is gone with it.",
+          "translation": "{event} ({time}) ถูกยกเลิกโดยผู้จัดงานแล้ว ที่นั่งของคุณจึงถูกยกเลิกไปด้วย",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-40b2-7381-bc5d-e876149ac571",
+      "usage": {
+        "in": 312,
+        "out": 48,
+        "thinking": 267,
+        "usd": 0.002831
+      }
     },
     "kcR+E5vWboT5tLMIMEiZwQ==": {
       "description": "Change email: greeting, with the name the booker gave",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Hello {name},",
+          "translation": "สวัสดีคุณ {name},",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-40b7-7303-b6af-288578b6dd54",
+      "usage": {
+        "in": 267,
+        "out": 28,
+        "thinking": 160,
+        "usd": 0.001811
+      }
     },
     "dch1b8l636N/6FhmxZMyHQ==": {
       "description": "Change email: the organiser of the event the reader has a seat at changed it; {event} is its title as it is now",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "The organiser of {event} has changed it.",
+          "translation": "ผู้จัดงาน {event} ได้ทำการเปลี่ยนแปลงแล้ว",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-40bb-7655-9501-db1d02ead6cc",
+      "usage": {
+        "in": 287,
+        "out": 36,
+        "thinking": 172,
+        "usd": 0.001991
+      }
     },
     "api8K8WolAQWnmHNX3NV2Q==": {
       "description": "Change email: when the event is now; {time} is its new start to end and {before} what it was, both already formatted",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "It's now {time}, not {before}.",
+          "translation": "ตอนนี้เป็น {time} ไม่ใช่ {before}",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-4122-70a4-97fd-21af1a3d0fec",
+      "usage": {
+        "in": 291,
+        "out": 35,
+        "thinking": 166,
+        "usd": 0.001944
+      }
     },
     "AyVEAaw0bYv9V+i17sIf+w==": {
       "description": "Change email: where the event is now; {venue} is the place, as its organiser wrote it",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "It's now at {venue}.",
+          "translation": "ตอนนี้จัดที่ {venue}",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-4ecb-7357-87f0-e0ec1b8d9da1",
+      "usage": {
+        "in": 280,
+        "out": 31,
+        "thinking": 176,
+        "usd": 0.001972
+      }
     },
     "0X6CEL+t0CCpXXwFhJYPMA==": {
       "description": "Change email: the organiser removed the event's place",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "It no longer says where it is: see its page.",
+          "translation": "ไม่ได้ระบุสถานที่อีกต่อไป: ดูที่หน้าของกิจกรรม",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-4ce1-76d8-bc0b-aa537d822013",
+      "usage": {
+        "in": 273,
+        "out": 37,
+        "thinking": 239,
+        "usd": 0.00248
+      }
     },
     "DvNw5Mb7XO7z2d9O05qNcw==": {
       "description": "Change email: the reader's seat is kept; before the link to the event's page, where the ticket can be downloaded again",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "Your seat is kept. Your ticket, with the new details, is on the event's page:",
+          "translation": "ที่นั่งของคุณยังคงอยู่ ตั๋วของคุณพร้อมรายละเอียดใหม่อยู่ที่หน้ากิจกรรม:",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-4cdf-72f6-8d67-257fe71e784f",
+      "usage": {
+        "in": 300,
+        "out": 45,
+        "thinking": 288,
+        "usd": 0.002948
+      }
     },
     "LCF/aU+a5FkWxJkiGshG1Q==": {
       "description": "Change email subject: the organiser changed the event the reader has a seat at; {event} is its title as it is now",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "{event} has changed",
+          "translation": "{event} มีการเปลี่ยนแปลง",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-4ce7-7352-be68-fb27503d9a10",
+      "usage": {
+        "in": 282,
+        "out": 31,
+        "thinking": 294,
+        "usd": 0.002861
+      }
     },
     "9Ef6937OcPBvwxm5t3Wt3Q==": {
       "description": "Reminder email: the event the reader has a seat at starts within a day; {event} is its title, {time} when it is, from its start to its end, already formatted",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "A reminder: you have a seat at {event}, {time}.",
+          "translation": "แจ้งเตือน: คุณมีที่นั่งใน {event} {time}",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-5d1c-73d9-a340-615359a4d6d5",
+      "usage": {
+        "in": 304,
+        "out": 39,
+        "thinking": 401,
+        "usd": 0.003756
+      }
     },
     "avsVYoPnCnj2mH5ewuVM+Q==": {
       "description": "PDF ticket: label of when the event is, from its start to its end, on its own clock",
-      "status": "new",
+      "status": "translated",
       "tokens": [],
       "translations": [
         {
-          "translation": "When",
+          "translation": "วันและเวลา",
           "variations": {}
         }
       ],
-      "types": []
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-5d1c-715f-99ca-f78786be7ea3",
+      "usage": {
+        "in": 273,
+        "out": 29,
+        "thinking": 202,
+        "usd": 0.002142
+      }
+    },
+    "Fa5N/tRcbjYgQ+bg+5crQA==": {
+      "description": "Emails page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "แอปนี้ส่งอีเมลถึงผู้คนในภาษาของพวกเขาเอง ได้แก่ การยืนยันการจอง การแจ้งเตือนล่วงหน้าหนึ่งวัน การเปลี่ยนแปลงและการยกเลิก และลิงก์ส่วนตัวสำหรับแก้ไขหรือลบกิจกรรม นี่คือตัวอย่างสองฉบับที่สร้างโดยโค้ดของแอปเองสำหรับกิจกรรมตัวอย่าง ในภาษาของหน้านี้ และสิ่งที่ต้องใช้เพื่อให้แต่ละฉบับส่งถึงอย่างถูกต้อง",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-5d1c-7035-8e60-7496a8440e42",
+      "usage": {
+        "in": 330,
+        "out": 103,
+        "thinking": 410,
+        "usd": 0.004343
+      }
+    },
+    "NbIB1vSjhG/i3vl7e1AQLQ==": {
+      "description": "Translating page point: as you save, the dev server prepares new strings and has Void's AI translate them, one at a time; every answer is checked, and what still fails goes to Claude Code; each translation records who wrote it, when, and what it cost",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ไม่ต้องรันอะไรเพิ่มเลย ทันทีที่คุณบันทึก vp dev จะเพิ่มข้อความใหม่แต่ละรายการลงในแคตตาล็อกของทุกภาษา และแปลส่วนที่เพิ่มเข้ามาใหม่ ทั้งข้อความและหน้า Markdown ที่เปลี่ยนแปลง ด้วย AI ของ Void ใน Worker ของแอปเองอย่าง Gemini 4 Hydrogen ทีละข้อความ ทุกคำตอบจะถูกตรวจสอบ และส่วนที่ยังไม่ผ่านจะถูกส่งต่อไปยัง Claude Code พร้อมสกิลของ void-fbtee โดยการแปลแต่ละครั้งจะบันทึกว่าใครเป็นผู้เขียน เขียนเมื่อไหร่ และมีค่าใช้จ่ายเท่าไหร่",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-5d1f-7466-a47f-0e451f22e010",
+      "usage": {
+        "in": 405,
+        "out": 133,
+        "thinking": 0,
+        "usd": 0.001605
+      }
+    },
+    "iV2rrTp6CbuKPmMLmMbezg==": {
+      "description": "Translating page point: a posted event goes to a queue whose consumer translates it with Void's AI, the same model as the app's own text; changed, it's translated again",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "กิจกรรมที่มีคนโพสต์ไม่ได้อยู่ในที่เก็บข้อมูล จึงถูกแปลเมื่อมีการโพสต์: โพสต์จะเข้าสู่คิว และตัวประมวลผลจะให้ AI ของ Void ซึ่งเป็นโมเดลเดียวกับข้อความของแอปเอง แปลเป็นภาษาอื่นๆ ของแอป หลังจากที่ผู้โพสต์ได้รับคำตอบแล้ว เมื่อผู้โพสต์แก้ไข กิจกรรมนั้นจะถูกแปลใหม่อีกครั้ง",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-6c0c-7040-a7d1-330bb761adca",
+      "usage": {
+        "in": 368,
+        "out": 105,
+        "thinking": 539,
+        "usd": 0.005382
+      }
+    },
+    "69fmSjFHQVJ+ThiVsBjoaw==": {
+      "description": "Translating page introduction",
+      "status": "translated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ข้อความของแอปเองและสิ่งที่ผู้คนโพสต์จะถูกแปลโดย AI ตัวเดียวกัน คือ Gemini 4 Hydrogen ผ่าน AI ของ Void: ข้อความจะถูกแปลลงในไฟล์ในคลังโค้ดที่คุณตรวจสอบ ส่วนโพสต์จะถูกแปลทันทีที่มีการโพสต์ สำหรับส่วนที่เหลือ Claude Code จะเป็นผู้แปล นี่คือรายละเอียดของแต่ละส่วน พร้อมบรรทัดโค้ดที่ทำงานนั้น",
+          "variations": {}
+        }
+      ],
+      "types": [],
+      "translatedBy": "google/gemini-4-hydrogen",
+      "translatedAt": "2026-11-18",
+      "gatewayLogId": "01a1edab-6c06-7298-933b-374fcae6c41d",
+      "usage": {
+        "in": 317,
+        "out": 107,
+        "thinking": 471,
+        "usd": 0.004811
+      }
     }
   }
 }
