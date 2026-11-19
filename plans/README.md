@@ -13,9 +13,11 @@ what it changes; this list is the only place that says when.
 5. `use-cases.md`: one event, many people, as data, built on the primitives.
 6. `video-conferencing.md`: `void-moq`, built on all of the above.
 
-Next: `types-from-schema.md`: void-fbtee fits Void like a library: the app's settings in one file
-of its own, translations as generated plain Drizzle in the app, pages typed by Void's own types; no
-string config, no hand-written types at run time. Waits for the user's approval.
+Next: `like-better-auth.md`: the translations table kept by the package, as Void keeps Better
+Auth's (rewritten by `vp dev`, checked by `vp build`), the app keeping only its list of fields; then
+the issue in `void-package-schema-issue.md` is filed. Waits for the user's approval.
+
+Before it: `types-from-schema.md`: built, committed locally.
 
 Now: `layout.md`: the package's `src/` laid out as a Void app's folders, and every query in one file each
 (the app's `src/events/store.ts`, the package's `src/db/translations.ts`), one database session per handler.
