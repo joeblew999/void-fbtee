@@ -55,10 +55,6 @@ export default defineConfig({
       locales,
       site: SITE,
       common,
-      // What people post, translated into the app's languages by the package
-      // (plans/translated-content.md): db/schema/events_translations.ts, queues/translate.ts and
-      // crons/translations.ts, each a few lines at Void's own place.
-      content: { events: ["title", "description"] },
     }),
     voidPlugin(),
     voidReact({ react: { compiler: true } }),

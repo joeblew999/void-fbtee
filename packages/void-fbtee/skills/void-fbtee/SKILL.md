@@ -261,51 +261,60 @@ recipient's language.
 ## What people post
 
 Text people write (an event's title, a review, a message) isn't in the catalogs: it's stored, in
-the language its writer wrote it in. void-fbtee translates it into the app's other languages,
-from one line in `vite.config.ts`, naming the table and the fields:
+the language its writer wrote it in. void-fbtee translates it into the app's other languages. The
+table needs a text `id` and a `locale` column, the language each row was written in, and the
+fields to translate are text. Name the table and its fields, once, in the app's folder:
 
-```ts
-voidFbtee({ …, content: { events: { fields: ["title", "description"], about: "listings for events" } } })
+```sh
+vp exec void-fbtee gen translations events title description
 ```
 
-(or `content: { events: ["title", "description"] }`). The table needs a text `id` and a `locale`
-column, the language each row was written in. Then `vp dev` writes the app's few files for it, at
-Void's own places, where they're missing (never over yours):
+It writes ordinary files at Void's own places, once, and never over one that's there (what it
+can't write, it says): they're the app's own from then on.
 
-- `db/schema/<table>_translations.ts`: `translationsOf(<table>)` from `void-fbtee/db/schema`,
-  re-exported from `db/schema.ts`. One shape for every table: the row's id, the language, the
-  fields as JSON, who made it (`translatedBy`, the AI Gateway log). Deleting a row deletes its
+- `db/schema/events_translations.ts`: plain Drizzle, re-exported from `db/schema.ts`. The row's id,
+  the language, the fields as JSON typed from the table's own columns
+  (`Pick<typeof events.$inferSelect, "title" | "description">`), who made it (`translatedBy`, the
+  AI Gateway log, what it cost, what it was made from). Beside it, `events_translations_fields`,
+  the list of fields, which is how void-fbtee knows them when it runs. Deleting a row deletes its
   translations (the foreign key cascades). Then run `vp exec void db generate` in a terminal, for
-  its migration: without a terminal it may write nothing and still say it's done, so `vp build`
-  checks the migration is there.
-- `queues/translate.ts`: void-fbtee's consumer (`void-fbtee/queues/translate`), with `void/ai`
-  and `void/db` imported and the retries written there, since Void reads all of them from the
-  app's own files. To refresh pages, tell open ones or take the next step when a translation
-  lands, export `translationQueue({ onTranslated })` instead of the default; add
+  its migration.
+- `src/content.ts`: `export const content = translatedContent(schema, primaryDb)`, the app's
+  schema (`import * as schema from "@schema"`) and its database session handed to the package
+  once. Everything `content` gives is typed from the schema: `content.textOf(events, …)` gives the
+  events' own fields, and a table with no translations, or a field it doesn't translate, doesn't
+  compile.
+- `queues/translate.ts`: `translationQueue(content)` from `void-fbtee/queues/translate`, with
+  `void/ai` imported and the retries written there, since Void reads them from the app's own files
+  (`vp build` fails while `void/ai` isn't imported). To refresh pages, tell open ones or take the
+  next step when a translation lands, pass `{ onTranslated }`; add
   `onTranslationFailed(table, id, locales)` for what mustn't wait for a retry (it's called each
   time those languages fail: the app goes on with the row as written).
-- `crons/translations.ts`: the daily job (`void-fbtee/crons/translations`), keeping every row in
-  the app's languages both ways: translations into a language the app no longer has are deleted,
-  and anything missing (or `unknown`) is queued.
+- `crons/translations.ts`: `translationsCron(content)` from `void-fbtee/crons/translations`, the
+  daily job, keeping every row in the app's languages both ways: translations into a language the
+  app no longer has are deleted, and anything missing (or `unknown`) is queued.
+- `middleware/99.i18n.ts`: `i18nMiddleware({ content })` from `void-fbtee/middleware`, so a page
+  that showed a row not yet in its language asks for the translation. Without it, that page's log
+  says so.
 
-`vp build` fails, saying what to do, while one is missing or the table has no migration.
-
-To show it, from `void-fbtee/content`: `translationsFor(table, ids, locale)` gets the stored
-translations a page in `locale` can show, and `textOf(table, row, translations, locale)` gives the
-row's fields in the best of them, else the original. A page that showed a row not yet in its
-language isn't kept in Void's page cache, and the translation is queued then (void-fbtee's
+To show it, from the app's `content`: `content.translationsFor(events, ids, locale)` gets the
+stored translations a page in `locale` can show, and `content.textOf(events, row, translations,
+locale)` gives the row's fields in the best of them, else the original. A page that showed a row
+not yet in its language isn't kept in Void's page cache, and the translation is queued then (the
 middleware): a new post is translated the first time it's read in another language. To queue one
-at once, call `translateSoon(table, id)` as it's posted, and `translateSoon(table, id, { changed:
-true })` when it's changed (asked at once, whatever was asked in the last hour): each
-translation keeps a fingerprint of the fields it was made from (`translated_from`), so a changed
-row is translated again, its old translation shown until the new one lands (a page that reads it
-asks for it too).
+at once, call `content.translateSoon(events, id)` as it's posted, and
+`content.translateSoon(events, id, { changed: true })` when it's changed (asked at once, whatever
+was asked in the last hour): each translation keeps a fingerprint of the fields it was made from
+(`translated_from`), so a changed row is translated again, its old translation shown until the
+new one lands (a page that reads it asks for it too).
 
-Read the app's database through `primaryDb()` from `void-fbtee/db`: a session that starts on D1's
-main copy, as Void's own `db` may read a replica that hasn't caught up (`vp check` refuses `db` from
-`void/db`). Open one per loader, action, queue message or cron, and pass it to these functions as
-their last argument (`translationsFor(table, ids, locale, db)`, `translateSoon(table, id, {}, db)`),
-so all their reads share it: each session's first read is a trip to the main copy.
+Read the app's database through a session that starts on D1's main copy,
+`createDb(env.DB, { session: "first-primary" })` (the `primaryDb` in `src/content.ts`), as Void's
+own `db` may read a replica that hasn't caught up. Open one per loader, action, queue message or
+cron, and pass it to these functions as their last argument
+(`content.translationsFor(events, ids, locale, db)`, `content.translateSoon(events, id, {}, db)`),
+so all their reads share it: each session's first read is a trip to the main copy. Without one,
+each opens its own.
 
 Mark the element showing it with its own language, whichever that is, by spreading
 `langAttrs(locale)` from `void-fbtee/react` on it (`<h1 {...langAttrs(text.locale)}>`): `lang` for
@@ -424,5 +433,5 @@ missing; where it can't safely edit a file it prints the line to add). The piece
 `vp build` checks every finished translation for what breaks the app (a line or a
 `{placeholder}` missing), and reports it; it never sets one back to new, so a catalog from an older
 version keeps its translations. Void's AI translates with Gemini 4 Hydrogen on AI Gateway credits
-(no model to choose). `voidFbtee({ content })` takes each table's fields only
-(`{ events: ["title", "description"] }`): what a table holds (`about`) is no longer sent.
+(no model to choose). A table's translation is told only its fields: what a table holds is no
+longer sent.

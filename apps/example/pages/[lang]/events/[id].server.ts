@@ -1,6 +1,6 @@
 // One event, by its id, with its seats left (the loader); booking a seat (the page's action); and,
 // for whoever posted it, changing it and deleting it (with the key from their private link).
-import { bookSchema, changeEventSchema, when } from "@schema";
+import { bookSchema, changeEventSchema, events, when } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { queues } from "void/queues";
 import { storage } from "void/storage";
@@ -14,8 +14,8 @@ import { deleteKeyMatches } from "../../../src/events/delete-key";
 import { ticketKey } from "../../../src/events/tickets";
 import { eventTopic, live } from "../../../src/events/live";
 import { eventPages, textFor, textsFor } from "../../../src/events/translations";
-import { translateSoon, untranslated } from "void-fbtee/content";
-import { primaryDb } from "void-fbtee/db";
+import { content } from "@/content";
+import { primaryDb } from "@/db";
 import { tellBookers } from "../../../src/events/owed";
 import {
   bookerLocales,
@@ -49,7 +49,7 @@ const params = z.object({ id: z.string() });
 // The event, its title and description in the page's language where a translation is stored (else
 // its fallbacks', else as its organiser wrote it: textFor), seats left,
 // and whether it can be deleted (a posted event, not a sample). Never its delete key's hash: the
-// page and its data are public, and cached. Read from the database's main copy (void-fbtee/db), as
+// page and its data are public, and cached. Read from the database's main copy (src/db.ts), as
 // the cache keeps what this returns; one session for all its reads (plans/layout.md). A cancelled
 // event is gone to its readers: the not-found page.
 export const loader = defineHandler.withValidator({ params })(async (c, { params: { id } }) => {
@@ -166,7 +166,7 @@ const change = defineHandler.withValidator({ params, body: changeEventSchema })(
     seats: body.seats,
     ...times,
   });
-  await translateSoon("events", id, { changed: true }, db);
+  await content.translateSoon(events, id, { changed: true }, db);
   // Stored PDF tickets show the title, start, end and place: when one changed they go, so the next
   // download prints the new ones.
   if (
@@ -179,7 +179,7 @@ const change = defineHandler.withValidator({ params, body: changeEventSchema })(
     if (ids.length) await storage.delete(ids.map((b) => ticketKey(b.id)));
   }
   // Languages still waiting for their translation are told when it lands (or fails); the rest now.
-  const waiting = (await untranslated("events", id, db))?.missing ?? [];
+  const waiting = (await content.untranslated(events, id, db))?.missing ?? [];
   const now = [...new Set(await bookerLocales(db, id))].filter((l) => !waiting.includes(l));
   if (now.length) await tellBookers(db, id, now);
   await clearCache({ paths: eventPages(id) });

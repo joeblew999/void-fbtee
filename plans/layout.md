@@ -74,3 +74,5 @@ Globalping figures after it wait for a deploy.
   dev server starts; once (2026-11-19) the Thai title took past its 30 s wait. Alone it passed
   twice, in 23 s and 13 s; every other translation test passed in the same run. Gemini 4 Hydrogen's
   time varies a lot by call (plans/reliable-work.md): a cold start puts this one near its limit.
+  In the full `test:dev` run after `plans/types-from-schema.md` (2026-11-19), it passed in 7.5 s.
+  Still watched: one slow Gemini call can put it past its wait again.

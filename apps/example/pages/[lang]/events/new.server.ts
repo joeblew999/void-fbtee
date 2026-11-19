@@ -1,12 +1,12 @@
 // Posting an event: the zones the form offers (the loader), and saving it (the action). The action
 // clears the list of events from Void's page cache in every language, then goes to the new event's
 // page. A static segment beats `[id]` in Void's routing, so /events/new is never read as an id.
-import { newEventSchema, when } from "@schema";
+import { events, newEventSchema, when } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
-import { primaryDb } from "void-fbtee/db";
-import { translateSoon } from "void-fbtee/content";
+import { primaryDb } from "@/db";
+import { content } from "@/content";
 import { hashDeleteKey, keyCookie, newDeleteKey, privateLink } from "@/events/delete-key";
 import { routeUrl } from "void-fbtee/routes";
 import { langParams, revalidate } from "void-fbtee/server";
@@ -64,7 +64,7 @@ export const action = defineHandler.withValidator({
     });
   // Its translations into the app's other languages, at once (void-fbtee's queue): without this,
   // the first page read in another language would queue it, and the daily job would find it.
-  await translateSoon("events", id, {}, db);
+  await content.translateSoon(events, id, {}, db);
   // The list in every language, and the sitemap, which lists the new event.
   await revalidate({ paths: eventPages() });
   // To the new event's page, with the key in a short-lived cookie, which the page turns into the

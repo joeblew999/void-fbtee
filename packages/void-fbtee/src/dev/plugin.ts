@@ -39,7 +39,6 @@ import {
   waitingReview,
 } from "./translate";
 import { check } from "./check";
-import { writeContentFiles } from "./content-files";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
 import type { FallbackLocales } from "fbtee";
@@ -69,18 +68,6 @@ function checkFallback(fallback: string | undefined, config: LocaleConfig): stri
   if (!config.locales.some((l) => l.locale === locale))
     throw new Error(`void-fbtee: fallbackLocale "${fallback}" is not in locales.`);
   return locale;
-}
-
-/** voidFbtee({ content }), each table with its fields (content.ts ContentTable). */
-export function contentOf(
-  options: Pick<VoidFbteeOptions, "content">,
-): Record<string, { fields: string[] }> {
-  return Object.fromEntries(
-    Object.entries(options.content ?? {}).map(([table, fields]) => [
-      table,
-      { fields: [...fields] },
-    ]),
-  );
 }
 
 export interface VoidFbteeOptions {
@@ -123,13 +110,6 @@ export interface VoidFbteeOptions {
    * (or `fbt.c("Save")`) without repeating it. See fbtee's README, "Common Strings".
    */
   common?: Record<string, string>;
-  /**
-   * What people write in the app's tables, to translate into its languages
-   * (plans/translated-content.md): each table, with its fields, e.g.
-   * { events: ["title", "description"] }. Each table has a text `id` and a `locale` column; its
-   * translations are in `<table>_translations` (translationsOf from void-fbtee/db/schema).
-   */
-  content?: Record<string, readonly string[]>;
 }
 
 /** What the plugin exposes on its `api`, read from the config without running the plugin (loadProject, for tests). */
@@ -154,10 +134,6 @@ const MD_PAGES_ID = "virtual:void-fbtee/md-pages";
 const ZOD_ID = "virtual:void-fbtee/zod";
 /** `vp dev` only: the dev server's route for translating with Void's AI (ai.ts devTranslate). */
 const DEV_ID = "virtual:void-fbtee/dev";
-// What the middleware asks for a row a page read in a language it lacks with: the package's
-// translateSoon when the app has voidFbtee({ content }), else nothing, so an app without content
-// doesn't bundle void/db and void/queues (content.ts).
-const CONTENT_ASK_ID = "virtual:void-fbtee/content-ask";
 export const DEV_TRANSLATE_PATH = "/__void-fbtee/translate";
 /**
  * The app's pages in every language: each page under pages/[lang]/ whose only parameter is the
@@ -326,7 +302,6 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
     src,
     common: options.common,
     redirectHome: options.redirectHome ?? true,
-    content: contentOf(options),
   });
 
   const api: VoidFbteeApi = { options, project };
@@ -368,18 +343,6 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         if (written.length) log(`prepared ${written.join(", ")}`);
       } catch (error) {
         server.config.logger.warn(`void-fbtee: couldn't prepare: ${String(error)}`);
-      }
-      // voidFbtee({ content }): the app's few files for it, at Void's places, where they're
-      // missing (content-files.ts); never over the app's own. Void rescans queues and jobs as files
-      // change.
-      try {
-        const written = writeContentFiles(project());
-        if (written.length)
-          log(
-            `wrote ${written.join(", ")} for voidFbtee({ content }); a new table needs its migration: vp exec void db generate`,
-          );
-      } catch (error) {
-        server.config.logger.warn(`void-fbtee: couldn't write the content files: ${String(error)}`);
       }
       // The route's token, for a request from outside the dev server (a script, a test by hand),
       // as Void keeps its own dev trigger token in a file (.void/dev-trigger-token).
@@ -477,7 +440,6 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           id === MD_PAGES_ID ||
           id === ZOD_ID ||
           id === DEV_ID ||
-          id === CONTENT_ASK_ID ||
           id === PAGES_ID ||
           id.startsWith(CATALOG_PREFIX)
         )
@@ -506,7 +468,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       async handler(id) {
         if (id === SERVER_TEMPORAL_ID) return SERVER_TEMPORAL;
         if (id === "\0" + CONFIG_ID)
-          return `export default ${JSON.stringify({ ...config, fallbackLocale, redirectHome: options.redirectHome ?? true, fallbackLocales: options.fallbackLocales, site: options.site, content: contentOf(options), app: appName(root) })};`;
+          return `export default ${JSON.stringify({ ...config, fallbackLocale, redirectHome: options.redirectHome ?? true, fallbackLocales: options.fallbackLocales, site: options.site, app: appName(root) })};`;
         if (id === "\0" + CATALOGS_ID) {
           // The translated languages, and the source's own when it needs one (catalogs.ts).
           const entries = catalogLocales(project()).map(
@@ -525,10 +487,6 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           const core = await this.resolve("zod/v4/core", join(root, "package.json"));
           return zodMessages(root, Boolean(core && !core.external), config);
         }
-        if (id === "\0" + CONTENT_ASK_ID)
-          return Object.keys(contentOf(options)).length
-            ? `export { translateSoon } from "void-fbtee/content";`
-            : "export const translateSoon = undefined;";
         // The route exists only under `vp dev`, on the server, and answers only the dev server.
         if (id === "\0" + DEV_ID)
           return command === "serve" && !isClient(this.environment)
@@ -564,13 +522,23 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
 
 /**
  * The pages under pages/[lang]/ with no parameter but the language ("/[lang]/docs"), from Void's
- * generated route types: PagePathMap's entries whose parameters are exactly "lang". Void writes the
- * file on install (`void prepare`) and whenever the pages change; none yet, none listed.
+ * generated route types: PagePathMap's entries whose parameters are exactly "lang". The same set
+ * the package's types take (LangPage in server.ts, from Void's `PagePath`); Void has no run-time
+ * list of pages, so this one is read from its generated file. Void writes it before the app's code
+ * loads (`void prepare`, `vp dev`, `vp build`). Missing, or without PagePathMap, it stops with an
+ * error: an empty list would quietly leave every page out of the sitemap.
  */
 export function langPages(file: string): string[] {
-  if (!existsSync(file)) return [];
+  if (!existsSync(file))
+    throw new Error(
+      `void-fbtee: no ${file}: Void writes it (vp exec void prepare); the sitemap's pages come from it.`,
+    );
   const block = /export interface PagePathMap \{([\s\S]*?)\n\s*\}/.exec(readFileSync(file, "utf8"));
-  return [...(block?.[1] ?? "").matchAll(/^\s*"(\/\[lang\][^"]*)": "lang";$/gm)].map((m) => m[1]!);
+  if (!block)
+    throw new Error(
+      `void-fbtee: ${file} has no PagePathMap: Void's generated route types changed; the sitemap's pages come from it.`,
+    );
+  return [...block[1]!.matchAll(/^\s*"(\/\[lang\][^"]*)": "lang";$/gm)].map((m) => m[1]!);
 }
 
 /**

@@ -1,6 +1,7 @@
 # plans/types-from-schema.md: void-fbtee fits Void like a library, and every type comes from the app
 
-Status: 2026-11-19, written; waits for the user's approval in the conversation. Nothing built yet.
+Status: 2026-11-19, approved by the user in the conversation; built, committed locally. Part 1 was
+not built, after reading the code (said under it).
 
 ## Why
 
@@ -37,16 +38,14 @@ void-fbtee works at dev time and at run time, and that decides where each piece 
 
 ## The changes
 
-### 1. The app's settings: one file, typed by itself
+### 1. The app's settings: already one file, typed by itself (not built)
 
-- `apps/example/src/i18n.ts` (replaces `src/locales.ts`) holds `export default defineI18n({ sourceLocale,
-  locales, site, common, fallbackLocale?, redirectHome? } as const)` and
-  `declare global { interface VoidFbteeRegister { i18n: typeof i18n } }`. This is the same register
-  pattern already used for `locales`, and Void's own `RoutePathMap` works the same way.
-- `voidFbtee()` in `vite.config.ts` takes no app settings. It reads `src/i18n.ts`, as Void reads
-  `void.config.ts`. `virtual:void-fbtee/config` becomes one line that re-exports that file, and its
-  type in `virtual.d.ts` is `VoidFbteeRegister["i18n"]`, so the app's own type comes through.
-- `RuntimeConfig` in `src/runtime.ts` (`locales: string`, `content?: Record<string, …>`) goes.
+Planned: a new `i18n.ts` holding every setting, read by the plugin. Reading the code showed the
+settings already work that way: `apps/example/src/locales.ts` is the one file, `vite.config.ts`
+imports it, and it registers its own type (`VoidFbteeRegister`, as Void's `RoutePathMap` is), so
+the package's locale types are the app's. The only setting typed by hand was `content`, which
+part 2 removes. Moving the rest into a new file would have changed `init`, the docs and the tests
+for no type gained.
 
 ### 2. Translated content: generated plain Drizzle, owned by the app
 
@@ -89,7 +88,7 @@ void-fbtee works at dev time and at run time, and that decides where each piece 
 
 | Module                  | After                                                                            |
 | ----------------------- | -------------------------------------------------------------------------------- |
-| `config`                | re-exports `src/i18n.ts`, typed `VoidFbteeRegister["i18n"]`                      |
+| `config`                | stays: the settings from `vite.config.ts`, locales typed by the app's register   |
 | `content-ask`           | gone: the app passes tables                                                      |
 | `pages`                 | stays (no run-time list in Void), typed by `PagePath`, fails loudly              |
 | `catalogs`, `catalog/*` | stay: built from catalog files at build time; keyed by the app's locales type    |
@@ -100,25 +99,32 @@ void-fbtee works at dev time and at run time, and that decides where each piece 
 
 ### 5. Removed in the same change
 
-- `content` in `voidFbtee()`, and the plugin's other app-setting options (moved to `src/i18n.ts`)
+- `content` in `voidFbtee()`
 - the exports `void-fbtee/db/schema` and `void-fbtee/db`
 - `packages/void-fbtee/src/db/` in its current form: `contentTable`, the table-by-name queries,
   `primaryDb`'s cast
 - `src/dev/content-files.ts` writing re-export stubs (replaced by `gen translations`)
 - the migration-snapshot checks that existed only because the package owned a table
-- `apps/example/src/locales.ts`
 - the docs that describe any of the above: README, `packages/void-fbtee/skills/void-fbtee/SKILL.md`,
   the example's docs pages
 
-## Not proven yet (proven before building, or reported plainly)
+## The open points, as they came out
 
-- Inside the package's generic functions, one internal line needed a loose type: Drizzle can't
-  type "any table of this shape". The public inputs and outputs are exact. I'll try constraining
-  the column types; if Drizzle won't allow it, it stays one internal line, said in a comment.
-- Pairing a translations table with its field list at run time: by the `as const` export in the
-  same file. To be checked against how `import * as schema` hands it over.
-- The re-exporting `config` module reaching the browser build with the app's types (the same
-  mechanism as `md-pages`, so expected to work).
+- **Loose types inside the package.** One line puts the app's table under the queries' shape
+  (`src/db/schema.ts`, `value as unknown as TranslationsTable`), after checking at run time that it
+  has every column of the shape. In `src/content.ts`, five lines hand the generic functions' results
+  back as the app's types (`as FieldsOf<S, T>` and alike): Drizzle can't type "any table of this
+  shape" or a generic table's rows, so these can't go. What an app passes in and gets back is
+  exact, and `apps/example/src/content.types.test.ts` keeps it so (a wrong table or field fails to
+  compile; checked by removing a marker, 2026-11-19).
+- **A table and its field list at run time:** the generator writes `<table>_translations_fields`
+  beside the table; `contentEntries` pairs them by that name in `import * as schema`, and stops with
+  an error naming what's wrong. `test:dev` translated, re-translated and cleaned up through it.
+- **The `config` module in the browser:** moot, since part 1 wasn't built; it's unchanged.
+- **Found on the way:** the middleware's built type spelled out Hono's (`import("hono")`), which isn't
+  a dependency of the package: the build failed when `NODE_PATH` reached Hono (as under `vp test`),
+  and an app with pnpm's strict layout would have got no type. Now named once through Void's own
+  `defineMiddleware` (`VoidMiddleware`); no built type mentions Hono.
 
 ## Checks
 

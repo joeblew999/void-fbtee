@@ -11,9 +11,9 @@
 // The 15 minutes is how long a step may still be running: a job at work and a dead one look the
 // same from outside, so work is taken over only once nobody can still be doing it. Each queue
 // checks again before it sends, so a step queued twice does it once. Read from the database's main
-// copy (void-fbtee/db).
+// copy (src/db.ts).
 import { defineScheduled } from "void";
-import { primaryDb } from "void-fbtee/db";
+import { primaryDb } from "@/db";
 import { queues } from "void/queues";
 import { behind, cancelledLeft, deleteIfDone, timedRead, unconfirmed } from "../src/events/store";
 

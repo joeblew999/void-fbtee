@@ -15,8 +15,6 @@ export interface RuntimeConfig extends LocaleConfig {
   fallbackLocale: string;
   /** voidFbtee({ redirectHome }): whether "/" sends each visitor to their own language. */
   redirectHome: boolean;
-  /** voidFbtee({ content }): the tables people write in, each with its fields (content.ts). */
-  content?: Record<string, { fields: string[] }>;
   /** The app's name, its package.json's, for AI Gateway's logs. */
   app?: string;
 }

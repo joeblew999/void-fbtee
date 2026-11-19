@@ -4,6 +4,14 @@
 //
 //   export { default } from "void-fbtee/middleware";
 //
+// An app that translates what people post hands it its content (content.ts), so a page that showed
+// a row not yet in the reader's language asks for the translation (`void-fbtee gen translations`
+// writes this):
+//
+//   import { i18nMiddleware } from "void-fbtee/middleware";
+//   import { content } from "@/content";
+//   export default i18nMiddleware({ content });
+//
 // - The locale comes from the first URL segment (/th-TH/...): one URL per language, as Google
 //   wants, and never a redirect from one language's page to another's. Only "/" follows the
 //   visitor: a 302 to their own language, by fbtee's rule (negotiate.ts), or the fallback
@@ -39,6 +47,7 @@ import { setup as setupZod } from "virtual:void-fbtee/zod";
 import dev from "virtual:void-fbtee/dev";
 import { currentLocale, runIn, siteOrigin } from "../server";
 import { withPending } from "../content-pending";
+import type { TranslatedContent } from "../content";
 
 // Zod's own validation messages (a form's errors) in each request's language, when the app has
 // Zod 4 (dev/plugin.ts, zodMessages).
@@ -98,132 +107,164 @@ function answeringRoute(c: { req: { routeIndex: number } }): string | undefined 
 
 // Typed by Void's own name for it, so the built types point to "void" (every app has it) rather than
 // carrying a copy of Hono's (Void's dependency; a pnpm app can't import it).
-const middleware: ReturnType<typeof defineMiddleware> = defineMiddleware(async (c, next) => {
-  const path = c.req.path;
-  // `vp dev` only: the dev server's own route for translating with Void's AI (ai.ts). Nothing
-  // in a build.
-  if (dev && path === dev.path && c.req.method === "POST") return dev.handle(c.req.raw);
-  // "/": to the visitor's own language. The query string as it came; only GET and HEAD.
-  if (path === "/" && config.redirectHome && (c.req.method === "GET" || c.req.method === "HEAD")) {
-    const best = negotiate(
-      acceptedLanguages(c.req.header("Accept-Language")),
-      config.locales.map((l) => l.locale),
-      config.fallbackLocale,
-    );
-    const segment = config.locales.find((l) => l.locale === best)!.segment;
-    // Each visitor's own answer: never stored by a browser or the edge, and marked as depending on
-    // Accept-Language for anything that ignores no-store. Void adds neither here ("/" is no page
-    // of its own: seen on Void 1.8.0, 2026-11-14).
-    c.header("Cache-Control", "no-store");
-    c.header("Vary", "Accept-Language", { append: true });
-    return c.redirect(`/${segment}${new URL(c.req.url).search}`, 302);
-  }
-  const light = LIGHT.test(path);
+/**
+ * A Void middleware, as `defineMiddleware` returns it. Named here so the package's built types say
+ * it through Void's own `defineMiddleware`: spelled out, it's Hono's type, and an app that can't
+ * reach Hono from this package (pnpm's strict node_modules) would get no type at all.
+ */
+export type VoidMiddleware = ReturnType<typeof defineMiddleware>;
 
-  const found = localeFromPath(path, config);
-  const source = sourceOf(config);
-  const current = found ?? source;
-  const rest = found ? path.slice(found.segment.length + 1) : path;
-  const i18n: SharedI18n = {
-    locale: current.locale as AppLocale,
-    lang: current.segment,
-    dir: current.dir,
-    now: Temporal.Now.instant().toString(),
-    path: rest,
-  };
-  const origin = siteOrigin(c);
-  // Only on a page in one of the languages: anywhere else (a page with no language in its path)
-  // the same path under each language isn't a page.
-  const alternates = !found
-    ? []
-    : [...config.locales.map((l) => ({ hreflang: l.locale, segment: l.segment }))]
-        .map(({ hreflang, segment }) => ({
-          rel: "alternate",
-          hreflang,
-          href: `${origin}/${segment}${rest}`,
-        }))
-        .concat({ rel: "alternate", hreflang: "x-default", href: xDefault(origin, rest) });
-  c.set("i18n", i18n);
-  const shared = (c.get("shared") ?? {}) as Record<string, unknown>;
-  const head = c.get("headDefaults") ?? {};
-  c.set("shared", { ...shared, i18n });
-  // On a page in one of the languages: its own address as canonical (each language version is its
-  // own canonical; one pointing at another language makes search engines ignore its hreflang), and
-  // Open Graph's locale in its language_TERRITORY form (en_US, not en-US), so link previews are in
-  // the page's language (ogp.me, og:locale). Not og:locale:alternate: it's one tag per other
-  // language, and Void keeps one meta tag per property (resolveHead, packages/void/src/pages/head.ts
-  // in Void 1.8.0), so only the last would be left.
-  const page: { link: { rel: string; href: string }[]; meta: MetaTag[] } = found
-    ? {
-        link: [{ rel: "canonical", href: `${origin}/${found.segment}${rest}` }],
-        meta: [
-          { property: "og:locale", content: found.locale.replace("-", "_") },
-          { property: "og:url", content: `${origin}/${found.segment}${rest}` },
-        ],
-      }
-    : { link: [], meta: [] };
-  // A markdown page's title and description for link previews: Void puts its frontmatter's into
-  // <title> and description only (packages/void/src/router/compile.ts), and a markdown page has no
-  // head() of its own. A code page's come from its head() (pageHead from void-fbtee/head).
-  const markdown = found && markdownPage(path);
-  if (markdown) {
-    const { title, description } = markdown.frontmatter;
-    page.meta.push(
-      ...meta({
-        ogTitle: typeof title === "string" ? title : undefined,
-        ogDescription: typeof description === "string" ? description : undefined,
-      }),
-    );
-  }
-  c.set("headDefaults", {
-    ...head,
-    htmlAttrs: { ...head.htmlAttrs, lang: current.locale, dir: current.dir },
-    link: [...(head.link ?? []), ...alternates, ...page.link],
-    // Islands hydrate without Void's shared data, so they read i18n from here (install.ts).
-    meta: [...(head.meta ?? []), ...page.meta, { name: META_NAME, content: JSON.stringify(i18n) }],
-  });
-  // No catalogs for light requests, but still inside fbtee state, so a not-found page with <fbt> renders.
-  const translations = light ? {} : await allTranslations(catalogs);
-  // A page under [lang] for a language the app doesn't have (/xx-XX/events, /nope) doesn't exist:
-  // Void's not-found page, in the source language, rather than a copy of the page under a made-up
-  // language. Only when the route that will answer is one whose first segment is a parameter, as
-  // Void finds the answering route (matchedRoutes after this middleware, as Void's own
-  // packages/void/src/runtime/routing-pages.ts does), so the app's own routes (/webhook) are left
-  // alone. c.notFound() runs the app's not-found handler (docs/guide/pages-routing/errors.md).
-  // Files too (/void.svg, /robots.txt): on Cloudflare, an app with middleware sends every request
-  // to the Worker first (Void's asset-worker-bypass.ts), where [lang] matches them; Void's
-  // not-found handler serves the file if there is one ("Dynamic page patterns also match real
-  // files", packages/void/src/runtime/routing-pages.ts), else the not-found page.
-  const own = /^\/(__void|api)(\/|$)/.test(path);
-  const answering = found || own ? undefined : answeringRoute(c);
-  const madeUp = answering !== undefined && /^\/:[^/]+/.test(answering);
-  // The request's language for fbtee, and for routeUrl from void-fbtee/routes (server.ts).
-  const run = withPending(() =>
-    runIn(current, translations, () => (madeUp ? c.notFound() : next())),
-  );
-  const response = await run.result;
-  // A page that showed a row of content not yet in the reader's language (content.ts textOf):
-  // kept out of Void's page cache, so the cache never holds it in the wrong language, and the
-  // translation queued, after the response (plans/translated-content.md).
-  const pending = run.pending();
-  if (pending.length) {
-    c.header("x-revalidate", "0");
-    const queue = import("virtual:void-fbtee/content-ask").then(({ translateSoon: ask }) =>
-      ask ? Promise.all(pending.map((p) => ask(p.table, p.id))) : [],
-    );
-    try {
-      c.executionCtx.waitUntil(
-        queue.catch((e) => console.warn("void-fbtee: queuing failed:", String(e))),
+export function i18nMiddleware({
+  content,
+}: {
+  /** The app's translated content (content.ts translatedContent), when it has any. */
+  content?: Pick<TranslatedContent, "db" | "internal">;
+} = {}): VoidMiddleware {
+  return defineMiddleware(async (c, next) => {
+    const path = c.req.path;
+    // `vp dev` only: the dev server's own route for translating with Void's AI (ai.ts). Nothing
+    // in a build.
+    if (dev && path === dev.path && c.req.method === "POST") return dev.handle(c.req.raw);
+    // "/": to the visitor's own language. The query string as it came; only GET and HEAD.
+    if (
+      path === "/" &&
+      config.redirectHome &&
+      (c.req.method === "GET" || c.req.method === "HEAD")
+    ) {
+      const best = negotiate(
+        acceptedLanguages(c.req.header("Accept-Language")),
+        config.locales.map((l) => l.locale),
+        config.fallbackLocale,
       );
-    } catch {
-      // No execution context (a test): queue it anyway.
-      await queue.catch(() => {});
+      const segment = config.locales.find((l) => l.locale === best)!.segment;
+      // Each visitor's own answer: never stored by a browser or the edge, and marked as depending on
+      // Accept-Language for anything that ignores no-store. Void adds neither here ("/" is no page
+      // of its own: seen on Void 1.8.0, 2026-11-14).
+      c.header("Cache-Control", "no-store");
+      c.header("Vary", "Accept-Language", { append: true });
+      return c.redirect(`/${segment}${new URL(c.req.url).search}`, 302);
     }
-  }
-  // A copy of the site at another address (a Worker Preview, the dev server): kept out of search
-  // results, so it never competes with the site itself. Only when the app names its site.
-  if (config.site && new URL(c.req.url).origin !== config.site) c.header("X-Robots-Tag", "noindex");
-  return response;
-});
+    const light = LIGHT.test(path);
 
+    const found = localeFromPath(path, config);
+    const source = sourceOf(config);
+    const current = found ?? source;
+    const rest = found ? path.slice(found.segment.length + 1) : path;
+    const i18n: SharedI18n = {
+      locale: current.locale as AppLocale,
+      lang: current.segment,
+      dir: current.dir,
+      now: Temporal.Now.instant().toString(),
+      path: rest,
+    };
+    const origin = siteOrigin(c);
+    // Only on a page in one of the languages: anywhere else (a page with no language in its path)
+    // the same path under each language isn't a page.
+    const alternates = !found
+      ? []
+      : [...config.locales.map((l) => ({ hreflang: l.locale, segment: l.segment }))]
+          .map(({ hreflang, segment }) => ({
+            rel: "alternate",
+            hreflang,
+            href: `${origin}/${segment}${rest}`,
+          }))
+          .concat({ rel: "alternate", hreflang: "x-default", href: xDefault(origin, rest) });
+    c.set("i18n", i18n);
+    const shared = (c.get("shared") ?? {}) as Record<string, unknown>;
+    const head = c.get("headDefaults") ?? {};
+    c.set("shared", { ...shared, i18n });
+    // On a page in one of the languages: its own address as canonical (each language version is its
+    // own canonical; one pointing at another language makes search engines ignore its hreflang), and
+    // Open Graph's locale in its language_TERRITORY form (en_US, not en-US), so link previews are in
+    // the page's language (ogp.me, og:locale). Not og:locale:alternate: it's one tag per other
+    // language, and Void keeps one meta tag per property (resolveHead, packages/void/src/pages/head.ts
+    // in Void 1.8.0), so only the last would be left.
+    const page: { link: { rel: string; href: string }[]; meta: MetaTag[] } = found
+      ? {
+          link: [{ rel: "canonical", href: `${origin}/${found.segment}${rest}` }],
+          meta: [
+            { property: "og:locale", content: found.locale.replace("-", "_") },
+            { property: "og:url", content: `${origin}/${found.segment}${rest}` },
+          ],
+        }
+      : { link: [], meta: [] };
+    // A markdown page's title and description for link previews: Void puts its frontmatter's into
+    // <title> and description only (packages/void/src/router/compile.ts), and a markdown page has no
+    // head() of its own. A code page's come from its head() (pageHead from void-fbtee/head).
+    const markdown = found && markdownPage(path);
+    if (markdown) {
+      const { title, description } = markdown.frontmatter;
+      page.meta.push(
+        ...meta({
+          ogTitle: typeof title === "string" ? title : undefined,
+          ogDescription: typeof description === "string" ? description : undefined,
+        }),
+      );
+    }
+    c.set("headDefaults", {
+      ...head,
+      htmlAttrs: { ...head.htmlAttrs, lang: current.locale, dir: current.dir },
+      link: [...(head.link ?? []), ...alternates, ...page.link],
+      // Islands hydrate without Void's shared data, so they read i18n from here (install.ts).
+      meta: [
+        ...(head.meta ?? []),
+        ...page.meta,
+        { name: META_NAME, content: JSON.stringify(i18n) },
+      ],
+    });
+    // No catalogs for light requests, but still inside fbtee state, so a not-found page with <fbt> renders.
+    const translations = light ? {} : await allTranslations(catalogs);
+    // A page under [lang] for a language the app doesn't have (/xx-XX/events, /nope) doesn't exist:
+    // Void's not-found page, in the source language, rather than a copy of the page under a made-up
+    // language. Only when the route that will answer is one whose first segment is a parameter, as
+    // Void finds the answering route (matchedRoutes after this middleware, as Void's own
+    // packages/void/src/runtime/routing-pages.ts does), so the app's own routes (/webhook) are left
+    // alone. c.notFound() runs the app's not-found handler (docs/guide/pages-routing/errors.md).
+    // Files too (/void.svg, /robots.txt): on Cloudflare, an app with middleware sends every request
+    // to the Worker first (Void's asset-worker-bypass.ts), where [lang] matches them; Void's
+    // not-found handler serves the file if there is one ("Dynamic page patterns also match real
+    // files", packages/void/src/runtime/routing-pages.ts), else the not-found page.
+    const own = /^\/(__void|api)(\/|$)/.test(path);
+    const answering = found || own ? undefined : answeringRoute(c);
+    const madeUp = answering !== undefined && /^\/:[^/]+/.test(answering);
+    // The request's language for fbtee, and for routeUrl from void-fbtee/routes (server.ts).
+    const run = withPending(() =>
+      runIn(current, translations, () => (madeUp ? c.notFound() : next())),
+    );
+    const response = await run.result;
+    // A page that showed a row of content not yet in the reader's language (content.ts textOf):
+    // kept out of Void's page cache, so the cache never holds it in the wrong language, and the
+    // translation queued, after the response (plans/translated-content.md).
+    const pending = run.pending();
+    if (pending.length) {
+      c.header("x-revalidate", "0");
+      const queue = content
+        ? (async () => {
+            const db = content.db();
+            for (const p of pending) await content.internal.ask(p.table, p.id, db);
+          })()
+        : Promise.reject(
+            new Error(
+              "a page showed content not in its language, but middleware/99.i18n.ts has no content: `export default i18nMiddleware({ content })`",
+            ),
+          );
+      try {
+        c.executionCtx.waitUntil(
+          queue.catch((e) => console.warn("void-fbtee: queuing failed:", String(e))),
+        );
+      } catch {
+        // No execution context (a test): queue it anyway.
+        await queue.catch(() => {});
+      }
+    }
+    // A copy of the site at another address (a Worker Preview, the dev server): kept out of search
+    // results, so it never competes with the site itself. Only when the app names its site.
+    if (config.site && new URL(c.req.url).origin !== config.site)
+      c.header("X-Robots-Tag", "noindex");
+    return response;
+  });
+}
+
+/** The middleware for an app with no translated content. */
+const middleware: VoidMiddleware = i18nMiddleware();
 export default middleware;

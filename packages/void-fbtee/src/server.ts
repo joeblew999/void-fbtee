@@ -13,7 +13,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { runWithFbtee } from "fbtee/server";
 import { revalidate as voidRevalidate } from "void/isr";
-import type { RouteUrl } from "void/routes";
+import type { PagePath, PagePathMap, RouteUrl } from "void/routes";
 import config from "virtual:void-fbtee/config";
 import catalogs from "virtual:void-fbtee/catalogs";
 import markdownPages from "virtual:void-fbtee/md-pages";
@@ -161,9 +161,21 @@ export function appLocales(): string[] {
   return config.locales.map((l) => l.locale);
 }
 
+/**
+ * A page under pages/[lang]/, as Void's generated route types name it ("/[lang]/events/[id]"):
+ * the app's own pages, from `PagePath` (void/routes). Void's older ":lang" spellings aside.
+ */
+export type LangPagePattern = Exclude<Extract<PagePath, `/[lang]${string}`>, `/:${string}`>;
+
+/** A page under pages/[lang]/ whose only parameter is the language ("/[lang]/docs"): the pages the
+ * sitemap lists by itself. */
+export type LangPage = {
+  [P in LangPagePattern]: [PagePathMap[P]] extends ["lang"] ? P : never;
+}[LangPagePattern];
+
 /** A page for the sitemap: a route under pages/[lang]/, with its other params, and its last change. */
 export interface SitemapPage {
-  path: `/[lang]${string}`;
+  path: LangPagePattern;
   params?: Record<string, string | number>;
   /** When its content last changed (W3C date or date-time), in every language or per language. */
   lastmod?: string | ((locale: AppLocale) => string | undefined);
@@ -185,7 +197,7 @@ export interface SitemapPage {
  */
 export function sitemap(
   c: { req: { url: string } },
-  options: { pages?: readonly SitemapPage[]; exclude?: readonly `/[lang]${string}`[] } = {},
+  options: { pages?: readonly SitemapPage[]; exclude?: readonly LangPage[] } = {},
 ): Response {
   const origin = siteOrigin(c);
   const given = options.pages ?? [];
@@ -203,7 +215,7 @@ export function sitemap(
       .filter((path) => !options.exclude?.includes(path))
       .map((path) => ({ urls: urlsOf({ path }), lastmod: lastmodOf.get(path) })),
     ...given
-      .filter((p) => p.params || !langPages.includes(p.path))
+      .filter((p) => p.params || !(langPages as readonly string[]).includes(p.path))
       .map((p) => ({ urls: urlsOf(p), lastmod: p.lastmod })),
     ...markdownEntries(),
   ];

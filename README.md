@@ -121,9 +121,12 @@ vp upgrade && vp migrate   # upgrade Vite+, then vp check and the tests (Testing
 
 - `packages/void-fbtee`: the package. Its `src/` is laid out as a Void app is
   (`reference/structure.md`), so the code behind an app's file is at the same path: `queues/`,
-  `crons/`, `middleware/`, and `db/` (the schema, the database session `primaryDb()`, and every
-  query it runs, in `db/translations.ts`). `src/dev/` is what only the Vite plugin and the CLI load,
-  in Node, never in the Worker; the rest of `src/` runs in the Worker, some of it at build time too.
+  `crons/`, `middleware/`, and `db/` (the shape of a translations table, and every query it runs,
+  in `db/translations.ts`). It owns no table and no database session: an app's translations tables
+  are its own, written by `void-fbtee gen translations` as plain Drizzle, and the app hands over its
+  schema and session (`translatedContent(schema, primaryDb)`), so every type comes from the app
+  (`plans/types-from-schema.md`). `src/dev/` is what only the Vite plugin and the CLI load, in Node,
+  never in the Worker; the rest of `src/` runs in the Worker, some of it at build time too.
 - `apps/example`: a Void app using it, in three languages. Production:
   https://void-fbtee-example.gedw99.workers.dev
   ([its Worker on Cloudflare](https://dash.cloudflare.com/7384af54e33b8a54ff240371ea368440/workers/services/view/void-fbtee-example/production)).
@@ -251,7 +254,7 @@ and if so remove what depends on it.
 - Not reported yet (2026-11-18, Void 1.8.0 and 1.10.0; to be filed with the user's OK,
   `plans/reliable-work.md`): every request's, queue job's, cron's and page rebuild's `db` starts on
   a D1 replica (`first-unconstrained`), so a job run a second after a write can read the database
-  from before it. This repo reads through `primaryDb()` (`void-fbtee/db`, `first-primary`), and
+  from before it. This repo reads through the app's own `primaryDb()` (`apps/example/src/db.ts`, `first-primary`), and
   `vp check` refuses `db` from `void/db` (`no-restricted-imports`, the root `vite.config.ts`).
 
 - Not reported yet (2026-11-18, Void 1.8.0 and 1.10.0; to be filed with the user's OK): on the

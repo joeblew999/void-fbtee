@@ -2,15 +2,19 @@
 // their `<table>_translations`. What they mean (which translation is current, when to ask again,
 // what a reader sees) is content.ts's; this is only the queries.
 //
-// Typed Drizzle, from the tables' definitions, not hand-written SQL: the translations tables are
-// translationsOf()'s (./schema), the shape this package defines; a table of content is known only
-// by its name and fields (voidFbtee({ content })), so it's defined here from those, as far as the
-// queries need it. Each takes the session it's given (primaryDb(), ./index), so a handler opens one
-// and every query it makes shares it: one trip to D1's main copy, not one a query.
+// Typed Drizzle on the app's own tables, found in the schema it hands over (./schema
+// contentEntries), not tables built from names. Each takes the session it's given, so a handler
+// opens one and every query it makes shares it: one trip to D1's main copy, not one a query.
+import type { DrizzleD1Database } from "void/db";
 import { and, count, eq, inArray, isNotNull, lt, ne, notInArray, or, sql } from "void/db";
-import { sqliteTable, text } from "void/schema-d1";
-import type { Db } from "./index";
-import { QUEUED, translationsOf, UNKNOWN } from "./schema";
+import { QUEUED, UNKNOWN, type ContentEntry, type TranslationsTable } from "./schema";
+
+/**
+ * A database session. The app's own (`createDb(env.DB, { session: "first-primary" })`, typed by its
+ * schema in Void's generated `.void/db.d.ts`) fits: the queries here only use the tables they're
+ * given.
+ */
+export type Db = DrizzleD1Database<Record<string, unknown>>;
 
 // D1 takes at most 100 bound parameters a query (Cloudflare's D1 limits).
 const CHUNK = 90;
@@ -19,18 +23,6 @@ const chunks = <T>(items: T[]) =>
     items.slice(i * CHUNK, (i + 1) * CHUNK),
   );
 
-/** A table of content as the queries need it: its id, its language, and these text fields. */
-const contentTable = (name: string, fields: readonly string[] = []) =>
-  sqliteTable(name, {
-    id: text("id").primaryKey(),
-    locale: text("locale").notNull(),
-    ...Object.fromEntries(fields.map((f) => [f, text(f)])),
-  });
-
-/** A table of content's translations: translationsOf() over it, as the app's schema has it. */
-const translations = (table: string) => translationsOf(contentTable(table));
-
-type TranslationsTable = ReturnType<typeof translations>;
 export type TranslationInsert = Omit<
   TranslationsTable["$inferInsert"],
   "id" | "createdAt" | "updatedAt"
@@ -39,16 +31,21 @@ export type TranslationInsert = Omit<
 /** Not "unknown" (being replaced) nor "queued" (asked for): a translation someone can name. */
 const named = (t: TranslationsTable) => notInArray(t.translatedBy, [UNKNOWN, QUEUED]);
 
-/** A row of a table of content: its id, its language, and these fields. Undefined when it's gone. */
-export async function contentRow(db: Db, table: string, fields: readonly string[], id: string) {
-  const s = contentTable(table, fields);
-  const [row] = await db.select().from(s).where(eq(s.id, id));
-  return row as Record<string, string | null> | undefined;
+/** A row of a table of content: its id, its language, and its translated fields. Undefined when
+ * it's gone. */
+export async function contentRow(db: Db, c: ContentEntry, id: string) {
+  const s = c.source as ContentEntry["source"] & Record<string, never>;
+  const columns = Object.fromEntries(c.fields.map((f) => [f, s[f]]));
+  const [row] = await db
+    .select({ id: c.source.id, locale: c.source.locale, ...columns })
+    .from(c.source)
+    .where(eq(c.source.id, id));
+  return row as ({ id: string; locale: string } & Record<string, unknown>) | undefined;
 }
 
 /** The languages a row has a translation someone can name in, and what each was made from. */
-export async function namedTranslations(db: Db, table: string, id: string) {
-  const t = translations(table);
+export async function namedTranslations(db: Db, c: ContentEntry, id: string) {
+  const t = c.translations;
   return db
     .select({ locale: t.locale, translated_from: t.translatedFrom })
     .from(t)
@@ -61,13 +58,13 @@ export async function namedTranslations(db: Db, table: string, id: string) {
  */
 export async function upsertTranslation(
   db: Db,
-  table: string,
+  c: ContentEntry,
   row: TranslationInsert,
 ): Promise<boolean> {
-  const t = translations(table);
+  const t = c.translations;
   const result = await db
     .insert(t)
-    .values(row)
+    .values({ id: crypto.randomUUID(), ...row })
     .onConflictDoUpdate({
       target: [t.source_id, t.locale],
       set: {
@@ -94,16 +91,16 @@ export async function upsertTranslation(
  */
 export async function markAsked(
   db: Db,
-  table: string,
+  c: ContentEntry,
   id: string,
   locale: string,
   from: string,
   now: boolean,
 ): Promise<boolean> {
-  const t = translations(table);
+  const t = c.translations;
   const result = await db
     .insert(t)
-    .values({ source_id: id, locale, fields: {}, translatedBy: QUEUED })
+    .values({ id: crypto.randomUUID(), source_id: id, locale, fields: {}, translatedBy: QUEUED })
     .onConflictDoUpdate({
       target: [t.source_id, t.locale],
       set: { updatedAt: sql`(datetime('now'))` },
@@ -121,19 +118,19 @@ export async function markAsked(
 /** Deletes a table's translations into languages not in `locales`. How many went. */
 export async function deleteOtherLanguages(
   db: Db,
-  table: string,
+  c: ContentEntry,
   locales: string[],
 ): Promise<number> {
-  const t = translations(table);
+  const t = c.translations;
   const result = await db.delete(t).where(notInArray(t.locale, locales));
   return result.meta.changes;
 }
 
 /** The ids of a table's rows short of a translation someone can name in one of `locales` (their
  * own language aside). Counted in the database, one query. */
-export async function rowsShortOf(db: Db, table: string, locales: string[]): Promise<string[]> {
-  const s = contentTable(table);
-  const t = translations(table);
+export async function rowsShortOf(db: Db, c: ContentEntry, locales: string[]): Promise<string[]> {
+  const s = c.source;
+  const t = c.translations;
   const have = db
     .select({ n: count() })
     .from(t)
@@ -151,8 +148,8 @@ export async function rowsShortOf(db: Db, table: string, locales: string[]): Pro
 
 /** The translations someone can name of these rows, in every language: any number of ids (asked
  * for 90 at a time, under D1's limit). */
-export async function translationRows(db: Db, table: string, ids: string[]) {
-  const t = translations(table);
+export async function translationRows(db: Db, c: ContentEntry, ids: string[]) {
+  const t = c.translations;
   const out = [];
   for (const some of chunks([...new Set(ids)]))
     out.push(

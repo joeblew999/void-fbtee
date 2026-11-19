@@ -2,12 +2,12 @@
 // crons and routes call these and hold no SQL of their own, so this file is what the app does to
 // its database. What they mean (who's owed what, what a reader sees) is theirs; this is the SQL.
 //
-// Each takes the session it's given (void-fbtee/db primaryDb(), opened once per handler), so all of
+// Each takes the session it's given (primaryDb() from src/db.ts, opened once per handler), so all of
 // a page's or a job's reads share it: one trip to D1's main copy, not one a query. Writes go to the
 // main copy either way.
 import { bookings, events, events_translations } from "@schema";
 import { and, asc, count, eq, gte, inArray, isNotNull, isNull, lt, max, or, sql } from "void/db";
-import type { Db } from "void-fbtee/db";
+import type { Db } from "@/db";
 
 export type Event = typeof events.$inferSelect;
 export type Booking = typeof bookings.$inferSelect;

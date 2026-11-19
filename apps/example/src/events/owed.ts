@@ -4,9 +4,9 @@
 // event is cancelled (events.cancelled_at). The actions and queues use these to decide; the sweep
 // (crons/owed.ts) uses them to find what a crash or a lost message left undone.
 //
-// Each takes the database session of the handler calling it (void-fbtee/db primaryDb), so its reads
+// Each takes the database session of the handler calling it (primaryDb from src/db.ts), so its reads
 // are of the main copy and agree with that handler's own. The SQL is store.ts's.
-import type { Db } from "void-fbtee/db";
+import type { Db } from "@/db";
 import { queues } from "void/queues";
 import { bookingsOf, eventOn, type Booking, type Event } from "./store";
 

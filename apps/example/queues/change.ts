@@ -9,9 +9,9 @@
 // told) against the event as it is now (src/events/owed.ts). Different: the email, saying what it
 // was; then told_* is the event as emailed. The same: nothing, so a message twice, a change undone
 // or two changes in a row (one email, of where it ended) need nothing else. Read from the
-// database's main copy (void-fbtee/db), so a change made a second ago is seen.
+// database's main copy (src/db.ts), so a change made a second ago is seen.
 import { defineQueue } from "void";
-import { primaryDb } from "void-fbtee/db";
+import { primaryDb } from "@/db";
 import type { AppLocale } from "void-fbtee/locales";
 import { sendChangeEmail } from "../src/events/emails";
 import { isBehind, toldOf } from "../src/events/owed";

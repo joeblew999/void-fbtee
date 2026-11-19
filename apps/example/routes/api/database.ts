@@ -1,5 +1,5 @@
 // Where this Worker's database reads are answered, and how long they take: the check behind
-// plans/reliable-work.md, which reads through primaryDb() (void-fbtee/db). D1 says, with every
+// plans/reliable-work.md, which reads through primaryDb() (src/db.ts). D1 says, with every
 // query's result, which copy answered it (`served_by_primary`, `served_by_region`; Cloudflare's D1
 // read replication docs, "Observability"); they're absent locally, where there's one database.
 //

@@ -127,7 +127,8 @@ export default defineConfig({
         { ignoredWords: [" ", ".", "…", "$", "void-fbtee", "GitHub", "Intl", "Temporal"] },
       ],
       // Void's `db` may read a D1 replica that hasn't caught up (plans/reliable-work.md): the app
-      // and the package read through void-fbtee/db's primaryDb(), which starts on the main copy.
+      // reads through its own primaryDb() (apps/example/src/db.ts), which starts on the main copy,
+      // and hands it to the package (src/content.ts).
       "no-restricted-imports": [
         "error",
         {
@@ -136,7 +137,7 @@ export default defineConfig({
               name: "void/db",
               importNames: ["db"],
               message:
-                "use primaryDb() from void-fbtee/db (or ./db in the package): Void's db may read a replica that hasn't caught up (plans/reliable-work.md).",
+                "use the app's primaryDb() (src/db.ts): Void's db may read a replica that hasn't caught up (plans/reliable-work.md).",
             },
           ],
         },

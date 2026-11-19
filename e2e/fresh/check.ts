@@ -804,10 +804,11 @@ function checkMacLockfile(target: string, dir: string) {
 }
 
 /**
- * What people write, translated by the package (plans/translated-content.md), as a developer adds
- * it to a new app: a table of their own, one line in voidFbtee({ content }), then `vp dev` writes
- * the app's files at Void's places (the queue, the job, the translations table), `vp build` fails
- * until the table has its migration, `void db generate` makes it, and the build passes.
+ * What people write, translated by the package (plans/types-from-schema.md), as a developer adds
+ * it to a new app: a table of their own, then `void-fbtee gen translations` writes the app's files
+ * at Void's places (the translations table, src/content.ts, the queue, the job, the middleware
+ * given the content), `void db generate` makes the table's migration, and the app builds and
+ * typechecks: every type it uses comes from its own schema.
  */
 async function translatedContent(target: string, dir: string, app: App) {
   mkdirSync(join(dir, "db/schema"), { recursive: true });
@@ -825,31 +826,23 @@ async function translatedContent(target: string, dir: string, app: App) {
     ].join("\n"),
   );
   writeFileSync(join(dir, "db/schema.ts"), 'export * from "./schema/notes";\n');
-  const config = join(dir, "vite.config.ts");
-  writeFileSync(
-    config,
-    readFileSync(config, "utf8").replace(
-      "voidFbtee({",
-      'voidFbtee({ content: { notes: ["body"] },',
-    ),
-  );
-  await withDev(app, dir, async (_base, page) => void (await page(`/${app.written}`)));
+  run(...exec(app.pm, "vp", "exec", "void-fbtee", "gen", "translations", "notes", "body"), dir);
   for (const file of [
+    "db/schema/notes_translations.ts",
+    "src/content.ts",
     "queues/translate.ts",
     "crons/translations.ts",
-    "db/schema/notes_translations.ts",
   ])
-    check(
-      existsSync(join(dir, file)),
-      `${target}: vp dev wrote ${file} for voidFbtee({ content })`,
-    );
+    check(existsSync(join(dir, file)), `${target}: gen translations wrote ${file}`);
   check(
     readFileSync(join(dir, "db/schema.ts"), "utf8").includes("./schema/notes_translations"),
-    `${target}: vp dev re-exported the translations table from db/schema.ts`,
+    `${target}: gen translations re-exported the translations table from db/schema.ts`,
   );
   check(
-    /notes_translations has no migration/.test(failing(...exec(app.pm, "vp", "build"), dir)),
-    `${target}: vp build fails until the translations table has its migration`,
+    readFileSync(join(dir, "middleware/99.i18n.ts"), "utf8").includes(
+      "i18nMiddleware({ content })",
+    ),
+    `${target}: gen translations gave the middleware the content`,
   );
   run(...exec(app.pm, "vp", "exec", "void", "db", "generate"), dir);
   run(...exec(app.pm, "vp", "build"), dir);

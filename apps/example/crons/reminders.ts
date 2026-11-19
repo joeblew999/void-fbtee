@@ -10,7 +10,7 @@
 // Cloudflare runs it on its Cron Trigger; in dev, Void's trigger runs it on demand
 // (`POST /__void/scheduled`, guide/jobs.md), as e2e/dev/jobs.test.ts does.
 import { defineScheduled } from "void";
-import { primaryDb } from "void-fbtee/db";
+import { primaryDb } from "@/db";
 import { Temporal } from "temporal-polyfill";
 import type { AppLocale } from "void-fbtee/locales";
 import { sendReminderEmail } from "@/events/emails";
@@ -19,7 +19,7 @@ import { storage } from "void/storage";
 import { originOr } from "@/site";
 import { textsFor, titleFor } from "@/events/translations";
 import { bookingsOfEvents, bookingsStartingBetween, startingBetween } from "@/events/store";
-import type { Db } from "void-fbtee/db";
+import type { Db } from "@/db";
 
 // 06:00 UTC every day: early morning in Bangkok, late evening before in the Americas.
 export const cron = "0 6 * * *";
@@ -48,7 +48,7 @@ async function deleteOldTickets(db: Db, from: number) {
 
 export default defineScheduled(async (controller, env) => {
   const from = controller.scheduledTime;
-  // From the database's main copy (void-fbtee/db), one session for the run: a booking made a second
+  // From the database's main copy (src/db.ts), one session for the run: a booking made a second
   // ago is reminded too.
   const db = primaryDb();
   await deleteOldTickets(db, from);

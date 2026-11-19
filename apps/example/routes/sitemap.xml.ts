@@ -4,7 +4,7 @@
 // changed. Void's page cache keeps it until the next deploy (routing.revalidate in
 // void.config.ts); posting an event clears it (new.server.ts).
 import { defineHandler } from "void";
-import { primaryDb } from "void-fbtee/db";
+import { primaryDb } from "@/db";
 import { sitemap } from "void-fbtee/server";
 import { lastChanged } from "../src/events/store";
 
@@ -18,7 +18,7 @@ const newest = (...dates: (string | null | undefined)[]) =>
 
 export const GET = defineHandler(async (c) => {
   // Each event's last change: its own row, or a translation of it added later. Not the cancelled
-  // ones. Read from the database's main copy (void-fbtee/db): the cache keeps what this makes.
+  // ones. Read from the database's main copy (src/db.ts): the cache keeps what this makes.
   const changed = await lastChanged(primaryDb());
   const eventDate = changed.map((e) => ({ id: e.id, date: w3c(newest(e.at, e.text)!) }));
   return sitemap(c, {

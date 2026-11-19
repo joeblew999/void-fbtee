@@ -36,13 +36,8 @@ declare module "virtual:void-fbtee/dev" {
   export default dev;
 }
 
-declare module "virtual:void-fbtee/content-ask" {
-  /** void-fbtee/content's translateSoon when the app has voidFbtee({ content }), else undefined. */
-  export const translateSoon: ((table: string, id: string) => Promise<boolean>) | undefined;
-}
-
 declare module "virtual:void-fbtee/pages" {
   /** The app's pages under pages/[lang]/ with no other parameter ("/[lang]/docs"), from Void's routes. */
-  const pages: readonly `/[lang]${string}`[];
+  const pages: readonly import("./server").LangPage[];
   export default pages;
 }

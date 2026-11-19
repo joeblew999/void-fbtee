@@ -21,6 +21,7 @@ import {
   hasI18nMiddleware,
   HOME_PAGES,
   LAYOUTS,
+  MIDDLEWARE,
   SKILL_DIR,
   VITE_CONFIGS,
   VOID_CONFIGS,
@@ -84,11 +85,6 @@ declare global {
     locales: typeof locales;
   }
 }
-`;
-
-const MIDDLEWARE = `// Locale from the URL, fbtee's per-request state, <html lang dir>. 99 so Void runs it after the
-// app's own middleware (01.auth.ts and the like): it adds to the shared and head data they set.
-export { default } from "void-fbtee/middleware";
 `;
 
 // Void's not-found and error pages (pages/_not-found.tsx, pages/_error.tsx: Void's docs,

@@ -4,7 +4,7 @@
 import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
-import { primaryDb } from "void-fbtee/db";
+import { primaryDb } from "@/db";
 import { upcoming } from "../../../src/events/store";
 import { textFor, textsFor } from "../../../src/events/translations";
 
@@ -18,7 +18,7 @@ export type Props = InferProps<typeof loader>;
 // void-fbtee's middleware).
 export const revalidate = 60;
 
-// Read from the database's main copy (void-fbtee/db), as the cache keeps what this returns: a
+// Read from the database's main copy (src/db.ts), as the cache keeps what this returns: a
 // replica behind would cache the list from before a post, a change or a delete.
 export const loader = defineHandler(async (c) => {
   const { locale } = c.get("i18n");

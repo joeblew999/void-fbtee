@@ -3,9 +3,9 @@
 // (plans/reliable-work.md). The delete action marks the event cancelled and queues one message per
 // booking, so it answers at once however many booked; the sweep queues any booking of a cancelled
 // event left over (crons/owed.ts). Until its email has gone, the booking itself is what says this
-// booker is owed it. Read from the database's main copy (void-fbtee/db).
+// booker is owed it. Read from the database's main copy (src/db.ts).
 import { defineQueue } from "void";
-import { primaryDb } from "void-fbtee/db";
+import { primaryDb } from "@/db";
 import type { AppLocale } from "void-fbtee/locales";
 import { storage } from "void/storage";
 import { sendCancellationEmail } from "../src/events/emails";

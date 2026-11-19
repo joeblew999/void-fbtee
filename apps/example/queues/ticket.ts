@@ -11,7 +11,7 @@
 // booker was told (src/events/owed.ts), so a message lost or out of tries is found by the sweep
 // (crons/owed.ts), and one already confirmed isn't sent twice (plans/reliable-work.md).
 import { defineQueue } from "void";
-import { primaryDb } from "void-fbtee/db";
+import { primaryDb } from "@/db";
 import { sendBookingEmail } from "../src/events/emails";
 import { toldOf } from "../src/events/owed";
 import { confirmed } from "../src/events/store";

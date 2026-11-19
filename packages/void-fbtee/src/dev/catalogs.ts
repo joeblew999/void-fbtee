@@ -45,8 +45,6 @@ export interface Project {
   common?: Record<string, string>;
   /** voidFbtee({ redirectHome }): whether "/" sends each visitor to their language. Default true. */
   redirectHome?: boolean;
-  /** voidFbtee({ content }): the tables people write in, with their fields (content.ts). */
-  content?: Record<string, { fields: string[] }>;
 }
 
 interface Phrase {

@@ -76,24 +76,28 @@ function points(): Point[] {
       ),
       code: [
         {
-          file: "vite.config.ts",
-          line: 'content: { events: ["title", "description"] },',
+          file: "db/schema/events_translations.ts",
+          line: 'export const events_translations_fields = ["title", "description"] as const;',
+        },
+        {
+          file: "src/content.ts",
+          line: "export const content = translatedContent(schema, primaryDb);",
         },
         {
           file: "pages/[lang]/events/new.server.ts",
-          line: 'await translateSoon("events", created.id);',
+          line: "await content.translateSoon(events, id, {}, db);",
         },
         {
           file: "pages/[lang]/events/[id].server.ts",
-          line: 'await translateSoon("events", id, { changed: true });',
+          line: "await content.translateSoon(events, id, { changed: true }, db);",
         },
         {
           file: "queues/translate.ts",
-          line: "export default translationQueue({ onTranslated, onTranslationFailed });",
+          line: "export default translationQueue(content, { onTranslated, onTranslationFailed });",
         },
         {
           file: "crons/translations.ts",
-          line: 'export { default } from "void-fbtee/crons/translations";',
+          line: "export default translationsCron(content);",
         },
       ],
     },

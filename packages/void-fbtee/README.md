@@ -168,12 +168,15 @@ runs, the same on a developer's machine as in CI. There are no i18n scripts.
 | `vp build` | Fails on anything left: an untranslated string or page, a page older than its original, a setup problem. So `void deploy`, and CI, can't ship one.                                                                                                                                                                                                                                                                         |
 | `vp check` | Lints with fbtee's strict rules: text nobody wrapped for translation is an error.                                                                                                                                                                                                                                                                                                                                          |
 
-**What people post.** Name the table and its fields, `voidFbtee({ content: { events: ["title",
-"description"] } })`, and void-fbtee translates every row into the app's languages, and again
-when a row is changed (call `translateSoon(table, id, { changed: true })` when it is): `vp dev` writes
-the few files Void needs at its own places (`queues/translate.ts`, `crons/translations.ts`,
-`db/schema/events_translations.ts`), and `vp build` fails while one is missing or the table has no
-migration. The SKILL's "What people post" has the rest.
+**What people post.** Run `vp exec void-fbtee gen translations events title description` and
+void-fbtee translates every row of `events` into the app's languages, and again when a row is
+changed (call `content.translateSoon(events, id, { changed: true })` when it is). It writes, once,
+ordinary files the app owns at Void's own places: `db/schema/events_translations.ts` (plain
+Drizzle, its fields typed from the table's own columns), `src/content.ts` (the app's schema and
+database handed to the package), `queues/translate.ts` and `crons/translations.ts`. Every function
+is typed from the app's schema: a table with no translations, or a field it doesn't translate,
+doesn't compile. Then `vp exec void db generate` makes the table's migration. The SKILL's "What
+people post" has the rest.
 
 **What translating costs, and where the text goes.** Void's AI translates with Google's Gemini 4
 Hydrogen through Cloudflare's AI Gateway, one string, post or page a request, paid from the

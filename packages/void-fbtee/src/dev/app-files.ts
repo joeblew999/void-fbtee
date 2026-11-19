@@ -31,3 +31,10 @@ export function hasI18nMiddleware(root: string): boolean {
     )
   );
 }
+
+/** The middleware file `void-fbtee init` writes (middleware/99.i18n.ts); `gen translations` gives
+ * it the app's content when it's still this. */
+export const MIDDLEWARE = `// Locale from the URL, fbtee's per-request state, <html lang dir>. 99 so Void runs it after the
+// app's own middleware (01.auth.ts and the like): it adds to the shared and head data they set.
+export { default } from "void-fbtee/middleware";
+`;

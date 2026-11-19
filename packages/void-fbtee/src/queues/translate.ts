@@ -3,13 +3,16 @@
 // language it lacks, or whose translation was made before the row was changed, is translated by
 // Void's AI (ai.ts translateFields), every language at once, each stored as soon as it's done,
 // with who made it, the request's gateway log, what it cost and what it was made from, so a retry
-// asks (and pays) only for what's still missing. The app's file, at Void's own place:
+// asks (and pays) only for what's still missing. The app's file, at Void's own place (written by
+// `void-fbtee gen translations`):
 //
 //   // queues/translate.ts
 //   import "void/ai"; // Void connects its AI when the app's own files import it
+//   import { translationQueue } from "void-fbtee/queues/translate";
+//   import { content } from "@/content";
 //   export const maxRetries = 5; // Void reads these from this file, as numbers
 //   export const retryDelay = 300;
-//   export default translationQueue({ onTranslated }); // or: export { default } from …
+//   export default translationQueue(content, { onTranslated });
 //
 // `onTranslated` is the app's: which of its pages to refresh, which live topic to tell, what to do
 // next with the row now that it's in that language. `onTranslationFailed` is for what can't wait
@@ -18,8 +21,7 @@
 import { defineQueue } from "void";
 import config from "virtual:void-fbtee/config";
 import { translateFields } from "../ai";
-import { contentTables, storeTranslation, untranslated, type TranslateMessage } from "../content";
-import { primaryDb } from "../db";
+import type { TranslatedContent, TranslateMessage } from "../content";
 import { GEMINI, paymentAdvice, paymentProblem } from "../models";
 
 // When the account isn't paying for the model (credits used up, a spend limit reached), an hour
@@ -34,17 +36,18 @@ export interface TranslationQueueOptions {
   onTranslationFailed?: (table: string, id: string, locales: string[]) => unknown;
 }
 
-export function translationQueue({
-  onTranslated,
-  onTranslationFailed,
-}: TranslationQueueOptions = {}) {
+export function translationQueue(
+  content: Pick<TranslatedContent, "db" | "internal">,
+  { onTranslated, onTranslationFailed }: TranslationQueueOptions = {},
+) {
+  const { untranslated, store } = content.internal;
   return defineQueue<TranslateMessage>(async (batch) => {
     for (const message of batch.messages) {
       const { table, id } = message.body;
       // One database session for the message: its reads and stores share it, one trip to D1's main
       // copy (plans/layout.md).
-      const db = primaryDb();
-      const found = contentTables().has(table) ? await untranslated(table, id, db) : undefined;
+      const db = content.db();
+      const found = await untranslated(table, id, db);
       // Gone (deleted, its translations with it), or a table the app no longer translates.
       if (!found) {
         message.ack();
@@ -64,7 +67,7 @@ export function translationQueue({
               app: config.app,
             });
             if (
-              await storeTranslation(
+              await store(
                 table,
                 id,
                 locale,
@@ -85,7 +88,7 @@ export function translationQueue({
         // Deleted while it was being translated: its translations can't go in (the foreign key
         // refuses them), and there's nothing left to translate. A session of its own: the
         // message's may not see a delete made since its first read.
-        if (!(await untranslated(table, id, primaryDb()))) {
+        if (!(await untranslated(table, id, content.db()))) {
           message.ack();
           continue;
         }
@@ -107,6 +110,3 @@ export function translationQueue({
     }
   });
 }
-
-/** The consumer with no app hook: `export { default } from "void-fbtee/queues/translate"`. */
-export default translationQueue();

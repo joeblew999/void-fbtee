@@ -1,28 +1,13 @@
-// `void-fbtee/db/schema`: the table that holds translations of what people write in one of the app's
-// tables (plans/translated-content.md). The app's schema has it in one line, at Void's own place:
+// The translations tables as the package's queries see them (plans/types-from-schema.md). The app
+// owns them: `void-fbtee gen translations <table> <field…>` writes each, once, as plain Drizzle in
+// the app's db/schema/ (dev/gen.ts), and the app's code hands its schema over
+// (`translatedContent(schema, …)`, content.ts). Nothing here is a table of the app's.
 //
-//   // db/schema/events_translations.ts
-//   import { translationsOf } from "void-fbtee/db/schema";
-//   import { events } from "./events";
-//   export const events_translations = translationsOf(events);
-//
-// One shape for every app, so the package's runtime (void-fbtee/queues/translate,
-// void-fbtee/crons/translations, the read helpers in void-fbtee/content) reaches it by name: the
-// source row's id, the language, the translated fields as JSON (which fields: voidFbtee({ content })),
-// who made it (plans/translation-provenance.md), what it cost, and what it was made from
-// (plans/translation-simple.md).
-//
-// Only void/schema-d1 and void/db (for `sql`), as an app's own schema files: `void db generate` (drizzle-kit) loads the schema with require(), and a
-// module that also imports Void's main entry can't be loaded there (plans/translated-content.md).
-import {
-  getTableConfig,
-  sqliteTable,
-  text,
-  uniqueIndex,
-  type SQLiteColumn,
-  type SQLiteTableWithColumns,
-} from "void/schema-d1";
+// What's here: the values `translated_by` holds besides a maker's name, the shape every
+// translations table has (the columns the queries use, by their names in the app's Drizzle
+// table), and finding the app's content tables in its schema by that shape.
 import { sql } from "void/db";
+import { getTableConfig, sqliteTable, text, type SQLiteTable } from "void/schema-d1";
 
 /** What `translated_by` holds when nothing says who made a translation. */
 export const UNKNOWN = "unknown";
@@ -30,69 +15,96 @@ export const UNKNOWN = "unknown";
 /** What `translated_by` holds while a translation is only asked for (content.ts translateSoon). */
 export const QUEUED = "queued";
 
-// The app's schema calls translationsOf() as it loads, and loading it can come in the middle of
-// loading this module: void/db, imported here for `sql`, imports the app's schema, which imports
-// this (Void's plugin wires void/db to the app's schema). So translationsOf() uses nothing of this
-// module's but function declarations, which JavaScript has ready before any of the module runs,
-// and literal values: a `const` here could still be unset then (seen in a production build,
-// 2026-11-17: "translationsTableName is not a function").
+/**
+ * The columns every translations table has, as the queries use them. Only for typing the queries:
+ * each runs on the app's own table, which the generator writes with these columns (dev/gen.ts).
+ */
+const shape = sqliteTable("translations", {
+  id: text("id").primaryKey(),
+  source_id: text("source_id").notNull(),
+  locale: text("locale").notNull(),
+  fields: text("fields", { mode: "json" }).$type<Record<string, string>>().notNull(),
+  translatedBy: text("translated_by").notNull().default("unknown"),
+  translatedAt: text("translated_at"),
+  gatewayLogId: text("gateway_log_id"),
+  usage: text("usage", { mode: "json" }).$type<{
+    in: number;
+    out: number;
+    thinking: number;
+    usd: number;
+  }>(),
+  translatedFrom: text("translated_from"),
+  createdAt: text("created_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+  updatedAt: text("updated_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+});
 
-/** The translations table's name for a table of content: `<table>_translations`. */
-export function translationsTableName(table: string): string {
-  return `${table}_translations`;
+/** A translations table, as the queries type it. */
+export type TranslationsTable = typeof shape;
+
+/** A table of content, as the queries need it: its id and the language a row was written in. */
+export type SourceTable = SQLiteTable & {
+  id: TranslationsTable["id"];
+  locale: TranslationsTable["locale"];
+};
+
+/** One table of content the app translates, found in its schema. */
+export interface ContentEntry {
+  /** Its name in the database, which the queue's messages carry: "events". */
+  name: string;
+  source: SourceTable;
+  translations: TranslationsTable;
+  /** The fields translated, in the order the app's schema lists them. */
+  fields: readonly string[];
 }
 
+const DRIZZLE_TABLE = Symbol.for("drizzle:IsDrizzleTable");
+const isTable = (value: unknown): value is SQLiteTable =>
+  typeof value === "object" && value !== null && DRIZZLE_TABLE in value;
+
+/** The keys every translations table has (the shape's), and a table of content's. */
+const TRANSLATION_KEYS = Object.keys(shape) as (keyof TranslationsTable)[];
+
 /**
- * The table of translations for one of the app's tables of content. Deleting a row deletes its
- * translations (the foreign key's `ON DELETE CASCADE`, which D1 enforces).
+ * The app's tables of content, from its schema (`import * as schema from "@schema"`): each
+ * `<table>_translations` with the shape's columns, beside its `<export>_fields` list (both written
+ * by the generator), and the table it translates. Anything that doesn't add up stops with an error
+ * naming it, rather than leaving a table untranslated.
  */
-export function translationsOf<
-  T extends SQLiteTableWithColumns<{
-    name: string;
-    schema: undefined;
-    dialect: "sqlite";
-    columns: { id: SQLiteColumn };
-  }>,
->(source: T) {
-  const name = translationsTableName(getTableConfig(source).name);
-  return sqliteTable(
-    name,
-    {
-      id: text("id")
-        .primaryKey()
-        .$defaultFn(() => crypto.randomUUID()),
-      source_id: text("source_id")
-        .notNull()
-        .references(() => source.id, { onDelete: "cascade" }),
-      locale: text("locale").notNull(),
-      // The translated fields, as JSON: { "title": "…", "description": "…" }.
-      fields: text("fields", { mode: "json" }).$type<Record<string, string>>().notNull(),
-      // Who made it, never empty: a model's id, "claude", a person, or "unknown" for code that
-      // didn't say (an older deploy after a rollback); "unknown" is translated again.
-      translatedBy: text("translated_by").notNull().default("unknown"),
-      translatedAt: text("translated_at"),
-      // The AI Gateway log of the request that made it.
-      gatewayLogId: text("gateway_log_id"),
-      // What it cost, as JSON: the request's tokens and the US$ they came to that day,
-      // { "in": 263, "out": 58, "thinking": 136, "usd": 0.0018 } (void-fbtee's models.ts spent).
-      // Empty for one made before it was kept, or not by a model.
-      usage: text("usage", { mode: "json" }).$type<{
-        in: number;
-        out: number;
-        thinking: number;
-        usd: number;
-      }>(),
-      // The fingerprint of the row's fields it was made from (content.ts fieldsFingerprint):
-      // once the row is changed, it no longer matches, and the row is translated again. Empty for
-      // one made before it was kept: counted as current, so nothing is translated again for it.
-      translatedFrom: text("translated_from"),
-      createdAt: text("created_at")
-        .notNull()
-        .default(sql`(datetime('now'))`),
-      updatedAt: text("updated_at")
-        .notNull()
-        .default(sql`(datetime('now'))`),
-    },
-    (t) => [uniqueIndex(`${name}_source_locale`).on(t.source_id, t.locale)],
-  );
+export function contentEntries(schema: Record<string, unknown>): Map<string, ContentEntry> {
+  const tables = new Map<string, SQLiteTable>();
+  for (const value of Object.values(schema))
+    if (isTable(value)) tables.set(getTableConfig(value).name, value);
+  const found = new Map<string, ContentEntry>();
+  for (const [key, value] of Object.entries(schema)) {
+    if (!isTable(value)) continue;
+    const tableName = getTableConfig(value).name;
+    const name = /^(.+)_translations$/.exec(tableName)?.[1];
+    if (!name) continue;
+    const missing = TRANSLATION_KEYS.filter((k) => !(k in value));
+    if (missing.length)
+      throw new Error(
+        `void-fbtee: ${tableName} lacks ${missing.join(", ")} (\`void-fbtee gen translations\` writes it).`,
+      );
+    const source = tables.get(name);
+    if (!source || !("id" in source) || !("locale" in source))
+      throw new Error(
+        `void-fbtee: ${tableName} translates "${name}", which isn't a table in the schema with \`id\` and \`locale\`.`,
+      );
+    const fields = schema[`${key}_fields`];
+    if (!Array.isArray(fields) || !fields.length || fields.some((f) => !(f in source)))
+      throw new Error(
+        `void-fbtee: ${tableName} needs \`${key}_fields\` exported beside it: the ${name} columns it translates.`,
+      );
+    found.set(name, {
+      name,
+      source: source as SourceTable,
+      translations: value as unknown as TranslationsTable,
+      fields: fields as string[],
+    });
+  }
+  return found;
 }

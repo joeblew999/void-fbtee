@@ -1,17 +1,24 @@
 // The events' text in a reader's language, and what the app does when a translation lands. The
-// translating itself is the package's (plans/translated-content.md): voidFbtee({ content }) names
-// the events' title and description, queues/translate.ts translates them, crons/translations.ts
-// keeps them in the app's languages, and a page that shows an event not yet in its language isn't
-// cached and queues it (void-fbtee's middleware). What's here is the app's own: which pages show
-// an event, and telling open ones.
+// translating itself is the package's (plans/translated-content.md): db/schema/events_translations.ts
+// says the events' title and description are translated, queues/translate.ts translates them,
+// crons/translations.ts keeps them in the app's languages, and a page that shows an event not yet
+// in its language isn't cached and queues it (void-fbtee's middleware). What's here is the app's
+// own: which pages show an event, and telling open ones. Every type comes from the schema
+// (src/content.ts).
 import type { AppLocale } from "void-fbtee/locales";
-import { textOf, translationsFor, type Translation } from "void-fbtee/content";
-import { primaryDb, type Db } from "void-fbtee/db";
+import type { Translation } from "void-fbtee/content";
+import { events, events_translations } from "@schema";
+import { content } from "@/content";
+import { primaryDb, type Db } from "@/db";
 import { revalidate } from "void-fbtee/server";
 import { tellBookers } from "./owed";
 import { eventTopic, live } from "./live";
 
-export type Text = { title: string; description: string };
+/** An event's translated fields: its title and description, as the schema types them. */
+export type Text = (typeof events_translations.$inferSelect)["fields"];
+
+/** An event's stored translation, as the package gives it. */
+export type EventTranslation = Translation<Text>;
 
 /**
  * The pages that show an event, to clear from Void's page cache when it changes: its own page (with
@@ -28,7 +35,7 @@ export const eventPages = (id?: string): Parameters<typeof revalidate>[0]["paths
  * fallbacks), or all of them without `locale` (void-fbtee/content translationsFor).
  */
 export const textsFor = (ids: string[], locale?: AppLocale, db?: Db) =>
-  translationsFor("events", ids, locale, db);
+  content.translationsFor(events, ids, locale, db);
 
 /**
  * The event's title and description for a reader in `locale`, and the language they're in: the best
@@ -37,18 +44,14 @@ export const textsFor = (ids: string[], locale?: AppLocale, db?: Db) =>
  * of the page cache and queues it.
  */
 export function textFor(
-  event: { id: string; locale: string },
-  texts: readonly Translation[],
+  event: { id: string; locale: string } & Text,
+  texts: readonly EventTranslation[],
   locale: string,
   { note = true }: { note?: boolean } = {},
 ): (Text & { locale: string }) | null {
-  const text = textOf("events", event, texts, locale, { note });
+  const text = content.textOf(events, event, texts, locale, { note });
   if (!text.translated) return null;
-  return {
-    locale: text.locale,
-    title: text.fields.title ?? "",
-    description: text.fields.description ?? "",
-  };
+  return { locale: text.locale, ...text.fields };
 }
 
 /**
@@ -56,8 +59,8 @@ export function textFor(
  * an action, so it asks for nothing (a page's loader uses textFor).
  */
 export function titleFor(
-  event: { id: string; title: string; locale: string },
-  texts: readonly Translation[],
+  event: { id: string; locale: string } & Text,
+  texts: readonly EventTranslation[],
   locale: string,
 ): { title: string; locale: string } {
   const text = textFor(event, texts, locale, { note: false });
