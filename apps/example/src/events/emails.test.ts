@@ -59,13 +59,15 @@ test("in the site's look: its colours inlined, the link a button, nothing mail a
   expect(email.html).toContain("The event&#x27;s page</span>");
   // The site's card (--card in .dark, pages/style.css), as rgb: React Email turned its oklch.
   expect(email.html).toMatch(/background-color:rgb\(26,27,33\)/);
-  for (const unread of ["oklch(", "var(", "class="]) expect(email.html).not.toContain(unread);
+  for (const unread of ["oklch(", "var(", "class="]) {
+    expect(email.html).not.toContain(unread);
+  }
   // The site's logo, sent inside the email and shown from there.
   expect(email.html).toMatch(/<img[^>]*src="cid:logo"/);
   expect(email.attachments).toEqual([
     expect.objectContaining({ contentId: "logo", disposition: "inline", contentType: "image/png" }),
   ]);
-  expect(email.attachments[0]!.content.subarray(1, 4)).toEqual(new TextEncoder().encode("PNG"));
+  expect(email.attachments[0]?.content.subarray(1, 4)).toEqual(new TextEncoder().encode("PNG"));
   // The plain text is as before: the lines, then the link.
   expect(email.text).toContain("The event's page:");
   expect(email.text.trimEnd().endsWith(booking.url)).toBe(true);

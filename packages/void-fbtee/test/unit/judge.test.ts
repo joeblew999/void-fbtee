@@ -4,7 +4,7 @@
 import { expect, test } from "vite-plus/test";
 import { problemsWith } from "../../src/judge";
 
-const forms = (text: string, codes: number[][]) =>
+const forms = (text: string, codes: Array<Array<number>>) =>
   codes.map((c) => ({
     translation: text,
     variations: Object.fromEntries(c.map((v, i) => [i, v])),

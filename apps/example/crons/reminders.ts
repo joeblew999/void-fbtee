@@ -12,7 +12,7 @@
 import { defineScheduled } from "void";
 import { primaryDb } from "@/db";
 import { Temporal } from "temporal-polyfill";
-import type { AppLocale } from "void-fbtee/locales";
+import { appLocaleOf } from "void-fbtee/server";
 import { sendReminderEmail } from "@/events/emails";
 import { KEEP_TICKETS_MS, ticketKey, ticketPdf } from "@/events/tickets";
 import { storage } from "void/storage";
@@ -42,8 +42,9 @@ async function deleteOldTickets(db: Db, from: number) {
     utc(from - KEEP_TICKETS_MS),
   );
   // R2 deletes up to 1,000 keys a call (Cloudflare's R2 Workers API reference, checked 2026-11-14).
-  for (let i = 0; i < done.length; i += 1000)
+  for (let i = 0; i < done.length; i += 1000) {
     await storage.delete(done.slice(i, i + 1000).map((id) => ticketKey(id)));
+  }
 }
 
 export default defineScheduled(async (controller, env) => {
@@ -54,12 +55,18 @@ export default defineScheduled(async (controller, env) => {
   await deleteOldTickets(db, from);
   // Events that are on: a cancelled event's bookers get its cancellation, not a reminder.
   const soon = await startingBetween(db, utc(from), utc(from + DAY_MS));
-  if (!soon.length) return;
+  if (!soon.length) {
+    return;
+  }
   const ids = soon.map((e) => e.id);
   const booked = await bookingsOfEvents(db, ids);
   const texts = await textsFor(ids, undefined, db);
   for (const b of booked) {
-    const event = soon.find((e) => e.id === b.event_id)!;
+    // Every booking read is of one of these events (bookingsOfEvents above).
+    const event = soon.find((e) => e.id === b.event_id);
+    if (!event) {
+      continue;
+    }
     const text = titleFor(event, texts, b.locale);
     // Their PDF ticket too, if they asked for it when booking: kept since then, so no printing
     // (src/events/tickets.ts). If it can't be had now, the reminder goes without it.
@@ -71,7 +78,7 @@ export default defineScheduled(async (controller, env) => {
       : undefined;
     await sendReminderEmail(b.email, {
       // The language they booked in: one of the app's, as booking stores it.
-      locale: b.locale as AppLocale,
+      locale: appLocaleOf(b.locale),
       name: b.name,
       id: event.id,
       title: text.title,

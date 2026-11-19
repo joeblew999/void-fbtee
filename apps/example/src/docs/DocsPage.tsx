@@ -20,7 +20,7 @@ export function DocsPage({
   header?: ReactNode;
   /** Between the header and the contents list. */
   lead?: ReactNode;
-  sections: { id: string; title: ReactNode }[];
+  sections: ReadonlyArray<{ id: string; title: ReactNode }>;
   children: ReactNode;
 }) {
   return (

@@ -10,7 +10,7 @@ for (const engine of ["chromium", "webkit"] as const) {
       ["th-TH", "/th-TH", "ltr"],
       ["ar-SA", "/ar-EG", "rtl"],
       ["fr-FR", "/en-US", "ltr"],
-    ] as const)
+    ] as const) {
       test(`a browser in ${locale} opening "/" lands on ${lands}`, async () => {
         const p = await open({ locale });
         const errors = collectErrors(p);
@@ -19,5 +19,6 @@ for (const engine of ["chromium", "webkit"] as const) {
         expect(await p.locator("html").getAttribute("dir")).toBe(dir);
         expect(errors.filter((e) => !VOID_DEFER_MESSAGE.test(e))).toEqual([]);
       });
+    }
   });
 }

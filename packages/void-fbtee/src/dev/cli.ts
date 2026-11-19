@@ -51,19 +51,35 @@ async function main() {
       .filter(Boolean);
     const locales = [sourceLocale, ...rest.filter((l) => l !== sourceLocale)];
     const { done, todo } = await init({ root, sourceLocale, locales, site: values.site });
-    for (const line of done) console.log(`✓ ${line}`);
-    if (!done.length) console.log("void-fbtee is already wired in; nothing to change");
-    if (todo.length) console.log("\nnext:");
-    for (const line of todo) console.log(`  - ${line}`);
+    for (const line of done) {
+      console.log(`✓ ${line}`);
+    }
+    if (!done.length) {
+      console.log("void-fbtee is already wired in; nothing to change");
+    }
+    if (todo.length) {
+      console.log("\nnext:");
+    }
+    for (const line of todo) {
+      console.log(`  - ${line}`);
+    }
     return;
   }
   if (command === "gen" && positionals[1] === "translations") {
     const [table, ...fields] = positionals.slice(2);
-    if (!table) throw new Error("gen translations: name the table and its fields");
+    if (!table) {
+      throw new Error("gen translations: name the table and its fields");
+    }
     const { done, todo } = genTranslations(root, table, fields);
-    for (const line of done) console.log(`✓ ${line}`);
-    if (todo.length) console.log("\nnext:");
-    for (const line of todo) console.log(`  - ${line}`);
+    for (const line of done) {
+      console.log(`✓ ${line}`);
+    }
+    if (todo.length) {
+      console.log("\nnext:");
+    }
+    for (const line of todo) {
+      console.log(`  - ${line}`);
+    }
     return;
   }
   process.stderr.write(`void-fbtee: unknown command "${command}"\n\n${USAGE}`);

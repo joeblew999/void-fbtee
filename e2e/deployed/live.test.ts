@@ -12,12 +12,16 @@ import {
   browser,
   deleteEvent,
   deleteInPage,
+  json,
+  list,
   postEvent,
   started,
-  url,
   type Posted,
+  url,
 } from "../helpers";
 import { SOURCE, TRANSLATED } from "../locales";
+import { got } from "../got";
+import { field } from "../../packages/void-fbtee/src/guards";
 
 const site = url("prod");
 const page = browser("prod");
@@ -30,19 +34,18 @@ describe.skipIf(!site)("the live site (run with `vp run test:deployed`)", () => 
   test("the app's database reads start on D1's main copy", async () => {
     const r = await fetch(`${site}/api/database`);
     expect(r.status).toBe(200);
-    const answer = (await r.json()) as {
-      worker: { colo: string | null };
-      "first-primary": { ms: number; primary: boolean | null; region: string | null }[];
-    };
+    const answer = await json(r);
     console.log("database reads from", JSON.stringify(answer));
-    expect(answer["first-primary"][0]!.primary).toBe(true);
+    expect(field(list(field(answer, "first-primary"))[0], "primary")).toBe(true);
   });
 
   test("the sitemap lists every language's pages", async () => {
     const r = await fetch(`${site}/sitemap.xml`);
     expect(r.status).toBe(200);
     const xml = await r.text();
-    for (const lang of [SOURCE, ...TRANSLATED]) expect(xml).toContain(`/${lang}</loc>`);
+    for (const lang of [SOURCE, ...TRANSLATED]) {
+      expect(xml).toContain(`/${lang}</loc>`);
+    }
   });
 
   // What only Cloudflare can show: the edge never shares "/"'s answer.
@@ -57,7 +60,7 @@ describe.skipIf(!site)("the live site (run with `vp run test:deployed`)", () => 
         headers: { "accept-language": accept },
       });
       expect(r.status, accept).toBe(302);
-      expect(new URL(r.headers.get("location")!, site).pathname, accept).toBe(to);
+      expect(new URL(got(r.headers.get("location")), site).pathname, accept).toBe(to);
       expect(r.headers.get("cache-control"), accept).toMatch(/no-store/);
     }
   });
@@ -99,6 +102,7 @@ describe.skipIf(!site)("the live site (run with `vp run test:deployed`)", () => 
 
 // If the test stopped before deleting it, the event is deleted here, as its page would.
 afterAll(async () => {
-  if (posted)
+  if (posted) {
     expect(await deleteEvent(posted), `deleting the check's event ${posted.id}`).toBe(true);
+  }
 });

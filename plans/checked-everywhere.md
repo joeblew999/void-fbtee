@@ -1,6 +1,6 @@
 # plans/checked-everywhere.md: the same strict checks on the whole repo, proven to work
 
-Status: 2026-11-19, written; waits for the user's approval in the conversation.
+Status: 2026-11-19, approved in the conversation and built (see "As built" at the end).
 
 ## Why
 
@@ -80,3 +80,45 @@ The package's current override (`plans/no-casts.md`) goes: the same rules now co
 
 - Should `void init` give a new app lint rules (at least its own repo's list)? Today a new app gets
   none from Void.
+
+## As built (2026-11-19)
+
+- **Rules:** `lint/void-rules.ts` holds Void's list (commit `cb84536`); the root `vite.config.ts`
+  spreads it and adds ours. The package-only override is gone. `vp lint` and `vp check` are clean
+  on the whole repo.
+- **Every folder reached:** the root, `apps/example` and the package had files no tsconfig
+  covered (`vite.config.ts`, `void.config.ts`, `pwa-assets.config.ts`, `apps/example/scripts/`,
+  `lint/`), so TypeScript's own errors weren't reported there. Each tsconfig now takes its
+  folder's top-level `*.ts`, and a root `tsconfig.json` covers `vite.config.ts` and `lint/`.
+  `scripts/tsconfig.json` lacked `noUncheckedIndexedAccess` (why `scripts/` had `rows[0]!`).
+- **Proof:** `lint/rules.test.ts` (in `test:unit`, project `lint`) writes a file breaking every
+  rule into ten folders and runs `vp lint` on them; each folder must report each rule, including
+  TypeScript's unchecked index and `no-floating-promises`. Turning one rule or one tsconfig
+  setting off was tried: the test failed and named each folder. The same test lists every disable
+  comment in the repo (8 today) against its known list, and each must give its reason (`-- why`).
+- **Fixed, not silenced:** JSON from outside (fbtee's compiler, catalogs, package.json files, D1's
+  and R2's local APIs, Void's hooks, Globalping, Tailscale) is read as `unknown` and checked with
+  the package's guards (`src/guards.ts`), or `readCatalog` / `readPhrases`. `readPhrases`
+  (`src/dev/catalogs.ts`) now also checks `jsfbt.m`, which `pluralSlots` read unchecked, and
+  `runtimeTables` checks fbtee's compiled tables (they were `Record<string, unknown>`). The e2e
+  stages' shared values (`prod`, `live`, `devToken`, `devSkip`) are typed the way Vitest
+  documents (`e2e/provided.ts`, its `ProvidedContext`), which needs `vitest` itself as a root
+  devDependency (the catalog's 5.1.0, the one Vite+ re-exports). `scripts/check-tools.mjs`
+  became `.ts`, so it's type-checked.
+- **The 8 hidden modules** (`packages/void-fbtee/src/virtual.d.ts`): the data ones (config,
+  texts, each catalog) are declared by `JsonModules` (`src/virtual-types.ts`), and the plugin can
+  only write them through `jsonModule()`, which takes that type. The rest by the real types of
+  what they hold: `@void/md/pages`' own, Hono's `matchedRoutes` (`hono` added to the catalog at
+  the version Void resolves, 4.13.19, types only), Zod's `config` and `$ZodErrorMap` (the module
+  now holds data; `src/zod-language.ts` does the setup, used by the middleware and the test), and
+  `devTranslate`'s own type. `pages` stays declared as `LangPage`: the plugin reads it from the
+  same PagePathMap that type is made from.
+- **`skipLibCheck`:** off in `scripts/` and `e2e/` (no library errors there). On in the root,
+  the app and the package: Cloudflare's Worker types clash with TypeScript's DOM types, and
+  Vitest's browser, unplugin's, drizzle-orm's and typescript-eslint's types with TypeScript 7. The
+  reason is written beside it in the root's and the package's tsconfig; the app's stays plain JSON,
+  since `void-fbtee init` (and Void's own init) read it as JSON: with a comment in it, init said
+  to add fbtee's types by hand (caught by `vp run check:tools`).
+- **Found along the way:** `pnpm peers check` reports typescript-eslint (from fbtee's lint plugin)
+  wanting TypeScript below 6.1; it works with 7.0.2 here. For fbtee's plugin to follow, with the
+  user's OK (`plans/fbtee-issues.md`).

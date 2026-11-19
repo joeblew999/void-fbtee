@@ -18,7 +18,7 @@ export const HOME_PAGES = [
 export const SKILL_DIR = "node_modules/void-fbtee/skills/void-fbtee";
 
 /** The first of `names` (paths under `root`) that exists, as its path under `root`. */
-export const firstFile = (root: string, names: string[]) =>
+export const firstFile = (root: string, names: Array<string>) =>
   names.find((n) => existsSync(join(root, n)));
 
 /** Whether a file in middleware/ re-exports void-fbtee's middleware. */

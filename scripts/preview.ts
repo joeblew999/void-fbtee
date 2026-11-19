@@ -15,11 +15,14 @@
 import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { field, isRecord, parseJson, textField } from "../packages/void-fbtee/src/guards";
 
 const app = join(import.meta.dirname, "../apps/example");
-const run = (cmd: string, args: string[], cwd?: string, env?: NodeJS.ProcessEnv) => {
+const run = (cmd: string, args: Array<string>, cwd?: string, env?: NodeJS.ProcessEnv) => {
   const r = spawnSync(cmd, args, { cwd, env: { ...process.env, ...env }, stdio: "inherit" });
-  if (r.status !== 0) process.exit(r.status ?? 1);
+  if (r.status !== 0) {
+    process.exit(r.status ?? 1);
+  }
 };
 
 run("vp", ["run", "-t", "void-fbtee-example#build"], undefined, {
@@ -27,13 +30,17 @@ run("vp", ["run", "-t", "void-fbtee-example#build"], undefined, {
 });
 
 const file = join(app, ".cloudflare/output/v0/workers/default/worker.config.json");
-const worker = JSON.parse(readFileSync(file, "utf8")) as {
-  name: string;
-  triggers?: unknown;
-  env: Record<string, { type: string; name?: string }>;
-};
+const worker = parseJson(readFileSync(file, "utf8"));
+const workerName = textField(worker, "name");
+const bindings = field(worker, "env");
+if (!isRecord(worker) || !workerName || !isRecord(bindings)) {
+  throw new Error(`${file} isn't the Worker config Void writes: it has no name or env`);
+}
 delete worker.triggers;
-for (const binding of Object.values(worker.env))
-  if (binding.type === "queue" && binding.name && !binding.name.startsWith(`${worker.name}-`))
-    binding.name = `${worker.name}-${binding.name}`;
+for (const binding of Object.values(bindings)) {
+  const name = textField(binding, "name");
+  if (isRecord(binding) && binding.type === "queue" && name && !name.startsWith(`${workerName}-`)) {
+    binding.name = `${workerName}-${name}`;
+  }
+}
 writeFileSync(file, JSON.stringify(worker));

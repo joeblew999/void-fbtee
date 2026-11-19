@@ -103,7 +103,7 @@ export default function ComponentsPage() {
       id: "hooks",
       title: <fbt desc="Components page section title: the React hooks">Hooks</fbt>,
     },
-  ];
+  ] as const;
   return (
     <DocsPage
       testId="components-title"

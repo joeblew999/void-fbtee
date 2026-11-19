@@ -13,6 +13,7 @@
 //   `vp build` fails while one is missing or not wired to the content (wiringProblems).
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { group } from "../guards";
 import { MIDDLEWARE } from "./app-files";
 
 const SCHEMA_INDEX = "db/schema.ts";
@@ -24,14 +25,18 @@ function sourceTable(
   table: string,
 ): { name: string; from: string; text: string } | undefined {
   const dir = join(root, "db/schema");
-  if (!existsSync(dir)) return;
+  if (!existsSync(dir)) {
+    return;
+  }
   const pattern = new RegExp(
     `export\\s+const\\s+(\\w+)\\s*=\\s*sqliteTable\\(\\s*["'\`]${table}["'\`]`,
   );
   for (const f of readdirSync(dir).filter((f) => /\.m?ts$/.test(f) && !f.endsWith(".d.ts"))) {
     const text = readFileSync(join(dir, f), "utf8");
     const found = pattern.exec(text);
-    if (found) return { name: found[1]!, from: f.replace(/\.m?ts$/, ""), text };
+    if (found) {
+      return { name: group(found, 1), from: f.replace(/\.m?ts$/, ""), text };
+    }
   }
 }
 
@@ -39,17 +44,20 @@ function sourceTable(
 export const KEPT = "// Kept by void-fbtee:";
 
 /** The columns of `table` the list names that aren't there, or aren't text; and `id`, `locale`. */
-function columnProblems(source: { text: string }, table: string, fields: readonly string[]) {
-  const problems: string[] = [];
+function columnProblems(source: { text: string }, table: string, fields: ReadonlyArray<string>) {
+  const problems: Array<string> = [];
   for (const column of ["id", "locale", ...fields]) {
     const def = new RegExp(`\\b${column}\\s*:\\s*(\\w+)\\(`).exec(source.text);
-    if (!def) problems.push(`${table} has no "${column}" column`);
-    else if (def[1] !== "text") problems.push(`${table}.${column} is ${def[1]}, not text`);
+    if (!def) {
+      problems.push(`${table} has no "${column}" column`);
+    } else if (def[1] !== "text") {
+      problems.push(`${table}.${column} is ${def[1]}, not text`);
+    }
   }
   return problems;
 }
 
-const schemaFile = (table: string, name: string, from: string, fields: readonly string[]) => {
+const schemaFile = (table: string, name: string, from: string, fields: ReadonlyArray<string>) => {
   const t = `${table}_translations`;
   return `${KEPT} the list of fields is the app's; the rest is void-fbtee's translations table,
 // rewritten by \`vp dev\` to the one the package writes for that list, as Void keeps Better Auth's
@@ -173,22 +181,28 @@ export const sameCode = (a: string, b: string) => {
 };
 
 /** The app's list of fields in a kept translations file, and the table it translates. */
-function parseKept(text: string): { table: string; fields: string[] } | undefined {
-  if (!text.startsWith(KEPT)) return;
+function parseKept(text: string): { table: string; fields: Array<string> } | undefined {
+  if (!text.startsWith(KEPT)) {
+    return;
+  }
   const found = /export\s+const\s+(\w+)_translations_fields\s*=\s*\[([^\]]*)\]\s*as\s+const/.exec(
     text,
   );
-  if (!found) return;
+  if (!found) {
+    return;
+  }
   return {
-    table: found[1]!,
-    fields: [...found[2]!.matchAll(/["'`]([^"'`]+)["'`]/g)].map((m) => m[1]!),
+    table: group(found, 1),
+    fields: [...group(found, 2).matchAll(/["'`]([^"'`]+)["'`]/g)].map((m) => group(m, 1)),
   };
 }
 
 /** The translations files void-fbtee keeps in the app's db/schema/, by their first line. */
-function keptFiles(root: string): string[] {
+function keptFiles(root: string): Array<string> {
   const dir = join(root, "db/schema");
-  if (!existsSync(dir)) return [];
+  if (!existsSync(dir)) {
+    return [];
+  }
   return readdirSync(dir)
     .filter((f) => /\.m?ts$/.test(f) && !f.endsWith(".d.ts"))
     .map((f) => `db/schema/${f}`)
@@ -204,9 +218,9 @@ function keptFiles(root: string): string[] {
 export function keepTranslations(
   root: string,
   write: boolean,
-): { rewritten: string[]; problems: string[] } {
-  const rewritten: string[] = [];
-  const problems: string[] = [];
+): { rewritten: Array<string>; problems: Array<string> } {
+  const rewritten: Array<string> = [];
+  const problems: Array<string> = [];
   for (const rel of keptFiles(root)) {
     const text = readFileSync(join(root, rel), "utf8");
     const kept = parseKept(text);
@@ -229,14 +243,17 @@ export function keepTranslations(
       continue;
     }
     const wanted = schemaFile(kept.table, source.name, source.from, kept.fields);
-    if (sameCode(text, wanted)) continue;
+    if (sameCode(text, wanted)) {
+      continue;
+    }
     if (write) {
       writeFileSync(join(root, rel), wanted);
       rewritten.push(rel);
-    } else
+    } else {
       problems.push(
         `content: ${rel} isn't void-fbtee's current translations table: vp dev rewrites it (then vp exec void db generate if its columns changed)`,
       );
+    }
   }
   return { rewritten, problems };
 }
@@ -258,30 +275,36 @@ const anyFileHas = (root: string, dir: string, needs: string) =>
  * add: the content (src/content.ts), its queue with Void's AI, its daily job and the middleware
  * given it. None when the app translates no table.
  */
-export function wiringProblems(root: string): string[] {
-  if (!keptFiles(root).length) return [];
-  const problems: string[] = [];
-  if (!read(root, "src/content.ts").includes("translatedContent("))
+export function wiringProblems(root: string): Array<string> {
+  if (!keptFiles(root).length) {
+    return [];
+  }
+  const problems: Array<string> = [];
+  if (!read(root, "src/content.ts").includes("translatedContent(")) {
     problems.push(
       `content: src/content.ts doesn't hand void-fbtee the schema: export const content = translatedContent(schema, { db, queue }) from "void-fbtee/content"`,
     );
+  }
   const queue = read(root, "queues/translate.ts");
-  if (!queue.includes("translationQueue(content"))
+  if (!queue.includes("translationQueue(content")) {
     problems.push(
       `content: queues/translate.ts doesn't run void-fbtee's queue: export default translationQueue(content) from "void-fbtee/queues/translate"`,
     );
-  else if (!/["']void\/ai["']/.test(queue))
+  } else if (!/["']void\/ai["']/.test(queue)) {
     problems.push(
       `content: queues/translate.ts doesn't import "void/ai", so Void doesn't connect its AI: add import "void/ai";`,
     );
-  if (!anyFileHas(root, "crons", "translationsCron(content"))
+  }
+  if (!anyFileHas(root, "crons", "translationsCron(content")) {
     problems.push(
       `content: no job in crons/ runs void-fbtee's: crons/translations.ts, export const cron = "17 4 * * *"; export default translationsCron(content) from "void-fbtee/crons/translations"`,
     );
-  if (!anyFileHas(root, "middleware", "i18nMiddleware({ content"))
+  }
+  if (!anyFileHas(root, "middleware", "i18nMiddleware({ content")) {
     problems.push(
       `content: the middleware isn't given the content, so a page doesn't ask for what it shows untranslated: export default i18nMiddleware({ content }) from "void-fbtee/middleware"`,
     );
+  }
   return problems;
 }
 
@@ -293,22 +316,28 @@ export function wiringProblems(root: string): string[] {
 export function genTranslations(
   root: string,
   table: string,
-  fields: string[],
-): { done: string[]; todo: string[] } {
-  const done: string[] = [];
-  const todo: string[] = [];
-  if (!fields.length)
+  fields: Array<string>,
+): { done: Array<string>; todo: Array<string> } {
+  const done: Array<string> = [];
+  const todo: Array<string> = [];
+  if (!fields.length) {
     throw new Error("name the fields to translate: gen translations events title description");
+  }
   const source = sourceTable(root, table);
-  if (!source)
+  if (!source) {
     throw new Error(
       `no db/schema/ file exports sqliteTable("${table}", …): void-fbtee translates a table of the app's schema`,
     );
+  }
   const wrong = columnProblems(source, table, fields);
-  if (wrong.length) throw new Error(wrong.join("; "));
+  if (wrong.length) {
+    throw new Error(wrong.join("; "));
+  }
   const write = (rel: string, text: string) => {
     const file = join(root, rel);
-    if (existsSync(file)) return false;
+    if (existsSync(file)) {
+      return false;
+    }
     mkdirSync(dirname(file), { recursive: true });
     writeFileSync(file, text);
     done.push(`${rel}: written`);
@@ -319,11 +348,11 @@ export function genTranslations(
   const wanted = schemaFile(table, source.name, source.from, fields);
   if (!write(rel, wanted)) {
     const there = read(root, rel);
-    if (!there.startsWith(KEPT))
+    if (!there.startsWith(KEPT)) {
       todo.push(
         `${rel} is the app's own, not kept by void-fbtee: left as it is (delete it to have it kept)`,
       );
-    else if (!sameCode(there, wanted)) {
+    } else if (!sameCode(there, wanted)) {
       writeFileSync(join(root, rel), wanted);
       done.push(`${rel}: rewritten for ${fields.join(", ")}`);
     }
@@ -342,8 +371,9 @@ export function genTranslations(
   write("queues/translate.ts", QUEUE);
   write("crons/translations.ts", CRON);
   const middleware = join(root, MIDDLEWARE_FILE);
-  if (!existsSync(middleware)) write(MIDDLEWARE_FILE, MIDDLEWARE_WITH_CONTENT);
-  else if (readFileSync(middleware, "utf8") === MIDDLEWARE) {
+  if (!existsSync(middleware)) {
+    write(MIDDLEWARE_FILE, MIDDLEWARE_WITH_CONTENT);
+  } else if (readFileSync(middleware, "utf8") === MIDDLEWARE) {
     writeFileSync(middleware, MIDDLEWARE_WITH_CONTENT);
     done.push(`${MIDDLEWARE_FILE}: given the content`);
   }

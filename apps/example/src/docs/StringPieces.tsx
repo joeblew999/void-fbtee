@@ -8,8 +8,17 @@ import { fbs, fbt, GenderConst, IntlVariations, useFbt } from "fbtee";
 import { useState, type ReactNode } from "react";
 import { InLanguage, useLocale, useLocales } from "void-fbtee/react";
 
-type Gender = "female" | "male" | "unknown";
-type Way = "there" | "online";
+const GENDERS = ["female", "male", "unknown"] as const;
+type Gender = (typeof GENDERS)[number];
+const WAYS = ["there", "online"] as const;
+type Way = (typeof WAYS)[number];
+/** One of the form's own options: what a <select> of them gives back, checked. */
+const oneOf =
+  <T extends string>(options: ReadonlyArray<T>) =>
+  (value: string): value is T =>
+    options.some((o) => o === value);
+const isGender = oneOf(GENDERS);
+const isWay = oneOf(WAYS);
 
 /** The form's choices, each in fbtee's own constant for the piece that takes it. */
 const NAME_GENDER = {
@@ -161,7 +170,12 @@ export function StringPieces() {
           <select
             className={input}
             value={gender}
-            onChange={(event) => setGender(event.target.value as Gender)}
+            onChange={(event) => {
+              const value = event.target.value;
+              if (isGender(value)) {
+                setGender(value);
+              }
+            }}
             data-testid="try-gender"
           >
             <option value="female">{fbs("Female", "Strings page form: female gender")}</option>
@@ -187,7 +201,12 @@ export function StringPieces() {
           <select
             className={input}
             value={way}
-            onChange={(event) => setWay(event.target.value as Way)}
+            onChange={(event) => {
+              const value = event.target.value;
+              if (isWay(value)) {
+                setWay(value);
+              }
+            }}
             data-testid="try-way"
           >
             <option value="there">

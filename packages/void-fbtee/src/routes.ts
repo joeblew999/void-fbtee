@@ -46,12 +46,15 @@ export function routeUrl<R extends string>(
   ...args: `/${Lang}${R}` extends RoutePath ? [options?: MarkdownOptions] : [options: never]
 ): RouteUrl;
 export function routeUrl(path: string, options: UrlOptions = {}): RouteUrl {
-  if (!path.includes("[lang]")) return buildUrl(path, options);
+  if (!path.includes("[lang]")) {
+    return buildUrl(path, options);
+  }
   const lang = options.params?.lang ?? currentLang();
-  if (!lang)
+  if (!lang) {
     throw new Error(
       `void-fbtee: routeUrl("${path}"): no current language here (not in a request or inLocale()); pass params.lang`,
     );
+  }
   return buildUrl(path, { ...options, params: { ...options.params, lang } });
 }
 

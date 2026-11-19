@@ -48,8 +48,38 @@ const show = (v: unknown) =>
         v !== null &&
         !Array.isArray(v) &&
         v.toString !== Object.prototype.toString
-      ? (v as { toString(): string }).toString()
+      ? String(v)
       : JSON.stringify(v);
+
+/**
+ * `target[method](...args)`, by name, checked: a runtime that hasn't the method (an older browser's
+ * Intl) throws, and the row shows the error, as calling it directly would.
+ */
+function invoke(target: unknown, method: string, args: Array<unknown>): unknown {
+  const fn: unknown = Reflect.get(Object(target), method);
+  if (typeof fn !== "function") {
+    throw new TypeError(`${method} is not a function`);
+  }
+  const out: unknown = Reflect.apply(fn, target, args);
+  return out;
+}
+
+/** What an iterable (Intl.Segmenter's segments) holds, as a list; a value that isn't one, as none. */
+function listOf(value: unknown): Array<unknown> {
+  const iterator: unknown = Reflect.get(Object(value), Symbol.iterator);
+  if (typeof iterator !== "function") {
+    return [];
+  }
+  const items: Array<unknown> = [];
+  const it: unknown = Reflect.apply(iterator, value, []);
+  for (;;) {
+    const step: unknown = invoke(it, "next", []);
+    if (Reflect.get(Object(step), "done") === true) {
+      return items;
+    }
+    items.push(Reflect.get(Object(step), "value"));
+  }
+}
 const js = (v: unknown): string =>
   v instanceof Date
     ? `new Date("${v.toISOString()}")`
@@ -76,27 +106,34 @@ function call(
   api: Api,
   options: object | undefined,
   method: string,
-  ...args: unknown[]
+  ...args: Array<unknown>
 ): Row {
   return {
     id,
     code: `new Intl.${api}(lang${options ? `, ${js(options)}` : ""}).${method}(${args.map(js).join(", ")})`,
     run: (locale) => {
-      const Ctor = (Intl as unknown as Record<Api, new (l: string, o?: object) => object>)[api];
-      const formatter = new Ctor(locale, options) as Record<string, (...a: unknown[]) => unknown>;
-      let out = formatter[method]!(...args);
-      if (method === "segment")
-        out = [...(out as Iterable<{ segment: string; isWordLike?: boolean }>)].map((s) =>
-          s.isWordLike === undefined ? s.segment : `${s.segment}${s.isWordLike ? "" : "·"}`,
-        );
-      if (method === "resolvedOptions")
-        out = (out as { pluralCategories: string[] }).pluralCategories;
+      const Ctor: unknown = Reflect.get(Intl, api);
+      if (typeof Ctor !== "function") {
+        throw new TypeError(`Intl.${api} is not a constructor`);
+      }
+      const formatter: unknown = Reflect.construct(Ctor, [locale, options]);
+      let out = invoke(formatter, method, args);
+      if (method === "segment") {
+        out = listOf(out).map((s) => {
+          const text = String(Reflect.get(Object(s), "segment"));
+          const wordLike: unknown = Reflect.get(Object(s), "isWordLike");
+          return wordLike === undefined ? text : `${text}${wordLike ? "" : "·"}`;
+        });
+      }
+      if (method === "resolvedOptions") {
+        out = Reflect.get(Object(out), "pluralCategories");
+      }
       return show(out);
     },
   };
 }
 
-const dt = (id: string, options: object, method = "format", ...args: unknown[]) =>
+const dt = (id: string, options: object, method = "format", ...args: Array<unknown>) =>
   call(
     id,
     "DateTimeFormat",
@@ -104,7 +141,7 @@ const dt = (id: string, options: object, method = "format", ...args: unknown[]) 
     method,
     ...(args.length ? args : [at(INSTANT)]),
   );
-const num = (id: string, options: object | undefined, ...args: unknown[]) =>
+const num = (id: string, options: object | undefined, ...args: Array<unknown>) =>
   call(id, "NumberFormat", options, "format", ...args);
 const custom = (id: string, code: string, run: (locale: string) => unknown): Row => ({
   id,
@@ -114,7 +151,7 @@ const custom = (id: string, code: string, run: (locale: string) => unknown): Row
 
 const DURATION = { days: 1, hours: 2, minutes: 5, seconds: 30 };
 
-export const SECTIONS: { id: SectionId; rows: Row[] }[] = [
+export const SECTIONS: Array<{ id: SectionId; rows: Array<Row> }> = [
   {
     id: "dates",
     rows: [
@@ -392,7 +429,7 @@ export const SECTIONS: { id: SectionId; rows: Row[] }[] = [
       ] as const
     ).map((m) =>
       custom(m, `new Intl.Locale(lang).${m}()`, (l) => {
-        const out = (new Intl.Locale(l) as unknown as Record<string, () => unknown>)[m]!();
+        const out = invoke(new Intl.Locale(l), m, []);
         return out instanceof Intl.Locale ? out.toString() : out;
       }),
     ),
@@ -424,7 +461,7 @@ export const SECTIONS: { id: SectionId; rows: Row[] }[] = [
       ),
       custom("list", `list(["Bangkok", "Cairo", "New York"])`, () =>
         // fbtee's list() is typed as a React node; given plain text, it returns plain text.
-        // oxlint-disable-next-line no-base-to-string
+        // oxlint-disable-next-line no-base-to-string -- given plain text, list() returns plain text (the line above)
         String(list(["Bangkok", "Cairo", "New York"])),
       ),
       custom(
@@ -449,13 +486,15 @@ export const SECTIONS: { id: SectionId; rows: Row[] }[] = [
 /** Every row, run in `locale`: { id: text }. A call the platform doesn't have shows its error. */
 export function runAll(locale: string): Record<string, string> {
   const out: Record<string, string> = {};
-  for (const section of SECTIONS)
+  for (const section of SECTIONS) {
     for (const row of section.rows) {
       try {
         out[`${section.id}/${row.id}`] = row.run(locale);
       } catch (error) {
-        out[`${section.id}/${row.id}`] = `${(error as Error).name}: ${(error as Error).message}`;
+        out[`${section.id}/${row.id}`] =
+          error instanceof Error ? `${error.name}: ${error.message}` : String(error);
       }
     }
+  }
   return out;
 }

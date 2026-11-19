@@ -107,3 +107,9 @@ workflow in our Vite plugin (fbtee's Vite plugin only compiles: `@nkzw/vite-plug
 reports once per runtime, and each request is a runtime); text direction (`Intl`'s job); the
 language picker and Void's links and forms in `react.tsx` (built on fbtee's own
 `createLocaleContext` / `LocaleProvider`).
+
+Found 2026-11-19 (`plans/checked-everywhere.md`), to add to the issue for the lint plugin if the
+user agrees: `@nkzw/eslint-plugin-fbtee` 6.0.0 brings typescript-eslint 8.73.0, whose peer range
+wants TypeScript `>=4.8.4 <6.1.0`, so `pnpm peers check` warns in any app on TypeScript 7
+(`void init` apps get 7.0.2). The rules run under Oxlint here and work; the warning is the only
+effect seen.

@@ -38,18 +38,20 @@ async function startDev(): Promise<ChildProcess> {
 export default async function setup(project: TestProject) {
   const named = project.vitest.config.project;
   if (!named.includes("dev")) {
-    project.provide("devSkip" as never, "run it with `vp run test:dev`" as never);
+    project.provide("devSkip", "run it with `vp run test:dev`");
     return;
   }
-  project.provide("devSkip" as never, "" as never);
+  project.provide("devSkip", "");
   const ours = (await devServerRunning()) ? undefined : await startDev();
   // The token Void's dev hooks ask for (guide/email/sending.md; guide/queues.md; guide/jobs.md),
   // written by the dev server when it starts.
   const token = readFileSync(join(EXAMPLE, ".void/dev-trigger-token"), "utf8").trim();
-  project.provide("prod" as never, DEV as never);
-  project.provide("devToken" as never, token as never);
+  project.provide("prod", DEV);
+  project.provide("devToken", token);
   return () => {
     // Only a server this setup started: the developer's own keeps running.
-    if (ours?.pid) process.kill(-ours.pid, "SIGTERM");
+    if (ours?.pid) {
+      process.kill(-ours.pid, "SIGTERM");
+    }
   };
 }

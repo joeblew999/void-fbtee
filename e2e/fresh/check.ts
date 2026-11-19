@@ -31,6 +31,24 @@ import {
 } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { parseAst } from "vite";
+import { readCatalog } from "../../packages/void-fbtee/src/dev/catalog-file";
+import {
+  field,
+  isRecord,
+  parseJson,
+  textField,
+  textRecord,
+} from "../../packages/void-fbtee/src/guards";
+import { got } from "../got";
+
+/** A JSON file holding an object (a package.json), to read and change. */
+function readObject(file: string): Record<string, unknown> {
+  const value = parseJson(readFileSync(file, "utf8"));
+  if (!isRecord(value)) {
+    throw new Error(`${file} isn't a JSON object`);
+  }
+  return value;
+}
 
 const root = resolve(import.meta.dirname, "../..");
 const pkgDir = join(root, "packages/void-fbtee");
@@ -39,7 +57,6 @@ const { TRANSLATED } = await import("../locales");
 const work = join(root, ".vitest");
 
 type Pm = "npm" | "pnpm";
-type Translation = { translation: string; variations: Record<string, number> };
 type App = {
   pm: Pm;
   toolchain: "vite" | "vite-plus";
@@ -111,11 +128,18 @@ const VOID_INIT = ["init", "--framework", "react", "--starter", "static", "--dep
 
 // A clean environment, as Void's: no tokens, logins or tool settings of this machine's.
 const env: NodeJS.ProcessEnv = { ...process.env, CI: "true" };
-for (const key of Object.keys(env))
-  if (/^(VOID_|VP_|CLOUDFLARE_|CF_|WRANGLER_|NPM_TOKEN$|NODE_AUTH_TOKEN$)/i.test(key))
+for (const key of Object.keys(env)) {
+  if (/^(VOID_|VP_|CLOUDFLARE_|CF_|WRANGLER_|NPM_TOKEN$|NODE_AUTH_TOKEN$)/i.test(key)) {
     delete env[key];
+  }
+}
 
-const run = (cmd: string, args: string[], cwd: string, options: { capture?: boolean } = {}) => {
+const run = (
+  cmd: string,
+  args: Array<string>,
+  cwd: string,
+  options: { capture?: boolean } = {},
+) => {
   console.error(`\n$ (${cwd.replace(root, ".")}) ${cmd} ${args.join(" ")}`);
   return execFileSync(cmd, args, {
     cwd,
@@ -125,17 +149,18 @@ const run = (cmd: string, args: string[], cwd: string, options: { capture?: bool
   });
 };
 /** A command expected to fail: its output, or "" if it didn't fail. */
-const failing = (cmd: string, args: string[], cwd: string) => {
+const failing = (cmd: string, args: Array<string>, cwd: string) => {
   try {
     execFileSync(cmd, args, { cwd, env, encoding: "utf8", stdio: "pipe" });
     return "";
   } catch (error) {
-    const e = error as { stdout?: string; stderr?: string };
-    return `${e.stdout}${e.stderr}` || "failed";
+    return `${textField(error, "stdout") ?? ""}${textField(error, "stderr") ?? ""}` || "failed";
   }
 };
 const check = (ok: unknown, what: string) => {
-  if (!ok) throw new Error(`fresh check failed: ${what}`);
+  if (!ok) {
+    throw new Error(`fresh check failed: ${what}`);
+  }
   console.error(`✓ ${what}`);
 };
 /**
@@ -144,13 +169,15 @@ const check = (ok: unknown, what: string) => {
  * fixed it turns it into a check().
  */
 const gap = (ok: unknown, what: string, step: number) => {
-  if (ok) throw new Error(`fresh check: works now, make it a check(): ${what}`);
+  if (ok) {
+    throw new Error(`fresh check: works now, make it a check(): ${what}`);
+  }
   console.error(`✗ known gap (plans/quiet-harbor-atlas.md, step ${step}): ${what}`);
 };
-const exec = (pm: Pm, ...args: string[]): [Pm, string[]] => [pm, ["exec", "--", ...args]];
+const exec = (pm: Pm, ...args: Array<string>): [Pm, Array<string>] => [pm, ["exec", "--", ...args]];
 // These installs follow edits to package.json, as on a developer's machine; under CI (set, as in
 // GitHub Actions) pnpm would otherwise refuse to update the lockfile.
-const install = (pm: Pm): [Pm, string[]] => [
+const install = (pm: Pm): [Pm, Array<string>] => [
   pm,
   pm === "pnpm" ? ["install", "--no-frozen-lockfile"] : ["install"],
 ];
@@ -159,8 +186,9 @@ const pending = execFileSync("git", ["status", "--porcelain", "packages/void-fbt
   cwd: root,
   encoding: "utf8",
 });
-if (pending.trim())
+if (pending.trim()) {
   throw new Error(`commit packages/void-fbtee first; this installs the last commit:\n${pending}`);
+}
 const sha = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
 const repo = `git+file://${root}`;
 
@@ -170,19 +198,24 @@ const tarball = targets.some((t) => APPS[t]?.source === "tarball") ? pack() : ""
 
 for (const target of targets) {
   const app = APPS[target];
-  if (!app) throw new Error(`usage: vpx e2e/fresh/check.ts [${Object.keys(APPS).join("|")}]`);
+  if (!app) {
+    throw new Error(`usage: vpx e2e/fresh/check.ts [${Object.keys(APPS).join("|")}]`);
+  }
   const dir = join(work, `fresh-${target}`);
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(dir, { recursive: true });
   // Its own git repo, as a real app is: tools that honour .gitignore (Oxlint) would otherwise
   // skip it, since this repo ignores .vitest/.
   run("git", ["init", "--quiet"], dir);
-  if (app.toolchain === "vite" && app.pm === "pnpm") allowBuild(dir);
-  if (app.toolchain === "vite-plus" && app.pm === "npm")
+  if (app.toolchain === "vite" && app.pm === "pnpm") {
+    allowBuild(dir);
+  }
+  if (app.toolchain === "vite-plus" && app.pm === "npm") {
     writeFileSync(
       join(dir, "package.json"),
       JSON.stringify({ name: target, private: true, packageManager: `npm@${npmVersion()}` }) + "\n",
     );
+  }
   run(VOID, [...VOID_INIT, "--toolchain", app.toolchain], dir);
   check(
     existsSync(join(dir, app.pm === "npm" ? "package-lock.json" : "pnpm-lock.yaml")),
@@ -191,17 +224,23 @@ for (const target of targets) {
   strict(dir, app.pm);
   pinUpstream(dir, app.pm);
 
-  const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
+  const pkg = readObject(join(dir, "package.json"));
   if (app.source === "git") {
     allowBuild(dir, `void-fbtee@${repo}`);
-    pkg.dependencies["void-fbtee"] = `${repo}#${sha}&path:/packages/void-fbtee`;
-  } else pkg.dependencies["void-fbtee"] = `file:${tarball}`;
+  }
+  pkg.dependencies = {
+    ...textRecord(pkg.dependencies),
+    "void-fbtee":
+      app.source === "git" ? `${repo}#${sha}&path:/packages/void-fbtee` : `file:${tarball}`,
+  };
   writeFileSync(join(dir, "package.json"), JSON.stringify(pkg, null, 2) + "\n");
   run(...install(app.pm), dir);
   // Formatted as a Vite+ developer would first (void init's own output isn't, under Vite+ 1.6:
   // package.json, pages/style.css, tsconfig.json, vite.config.ts, void.config.ts), so anything
   // unformatted after void-fbtee init is void-fbtee's.
-  if (app.toolchain === "vite-plus") run(...exec(app.pm, "vp", "fmt"), dir);
+  if (app.toolchain === "vite-plus") {
+    run(...exec(app.pm, "vp", "fmt"), dir);
+  }
 
   const installed = realpathSync(join(dir, "node_modules/void-fbtee"));
   check(
@@ -236,7 +275,9 @@ for (const target of targets) {
   run(...exec(app.pm, app.toolchain === "vite-plus" ? "vp" : "vite", "build"), dir);
   run(...exec(app.pm, "tsc", "--noEmit"), dir);
   check(true, `${target}: builds (translations checked) and typechecks`);
-  if (app.source === "git") continue;
+  if (app.source === "git") {
+    continue;
+  }
 
   checkTypes(target, dir, app.pm);
   if (app.toolchain === "vite-plus") {
@@ -244,7 +285,9 @@ for (const target of targets) {
     checkFormatting(target, dir, app.pm);
   }
   await checkDev(target, dir, app);
-  if (target === "npm-vite-plus") checkMacLockfile(target, dir);
+  if (target === "npm-vite-plus") {
+    checkMacLockfile(target, dir);
+  }
 }
 
 /**
@@ -256,7 +299,7 @@ for (const target of targets) {
  * build without it under `pnpm exec`, whose NODE_PATH once made void-fbtee think Zod was there.
  */
 async function thaiSource(target: string, dir: string, app: App, installed: string) {
-  const source = app.written!;
+  const source = got(app.written);
   cpSync(join(import.meta.dirname, "thai"), dir, { recursive: true });
   const said = run(
     ...exec(app.pm, "void-fbtee", "init", "--source-locale", source, "--locales", "en-US,ar-EG"),
@@ -309,23 +352,24 @@ async function thaiSource(target: string, dir: string, app: App, installed: stri
   );
   for (const [locale, texts] of Object.entries(FROM_THAI)) {
     const file = join(dir, `i18n/translations/${locale}.json`);
-    const catalog = JSON.parse(readFileSync(file, "utf8")) as {
-      translations: Record<
-        string,
-        { status?: string; translations: Translation[]; translatedBy?: string }
-      >;
-    };
+    const catalog = readCatalog(readFileSync(file, "utf8"), file);
     for (const entry of Object.values(catalog.translations)) {
-      const wanted = texts[entry.translations[0]?.translation ?? ""];
-      if (wanted === undefined) continue;
-      if (typeof wanted === "string") entry.translations[0].translation = wanted;
-      else
-        for (const line of entry.translations) {
+      const first = entry.translations?.[0];
+      const wanted = texts[first?.translation ?? ""];
+      if (first === undefined || wanted === undefined) {
+        continue;
+      }
+      if (typeof wanted === "string") {
+        first.translation = wanted;
+      } else {
+        for (const line of entry.translations ?? []) {
           const form = wanted[Number(Object.values(line.variations)[0])];
-          if (form === undefined)
+          if (form === undefined) {
             throw new Error(`${locale}: no form for ${JSON.stringify(line.variations)}`);
+          }
           line.translation = form;
         }
+      }
       entry.status = "translated";
       // As the agent marks what it translated (void-fbtee's skill): the build asks who.
       entry.translatedBy = "claude";
@@ -336,14 +380,13 @@ async function thaiSource(target: string, dir: string, app: App, installed: stri
   // prepare gave them: this check is about the pages above, so they're only marked done.
   for (const locale of Object.keys(FROM_THAI)) {
     const file = join(dir, `i18n/translations/${locale}.json`);
-    const catalog = JSON.parse(readFileSync(file, "utf8")) as {
-      translations: Record<string, { status?: string; translatedBy?: string }>;
-    };
-    for (const entry of Object.values(catalog.translations))
+    const catalog = readCatalog(readFileSync(file, "utf8"), file);
+    for (const entry of Object.values(catalog.translations)) {
       if (entry.status === "new") {
         entry.status = "translated";
         entry.translatedBy = "claude";
       }
+    }
     writeFileSync(file, JSON.stringify(catalog, null, 2) + "\n");
   }
   run(...exec(app.pm, "vp", "build"), dir);
@@ -429,7 +472,9 @@ async function thaiSource(target: string, dir: string, app: App, installed: stri
  */
 function moveStarterHome(target: string, dir: string, said: string) {
   const starter = join(dir, "pages/index.tsx");
-  if (!existsSync(starter)) return;
+  if (!existsSync(starter)) {
+    return;
+  }
   check(
     said.includes(`pages/index.tsx: hidden, since "/" sends each visitor to their own language`),
     `${target}: init says Void's starter page at "/" is hidden`,
@@ -454,15 +499,21 @@ async function withDev(
       for (let i = 0; i < 300; i++) {
         try {
           const res = await fetch(`${base}${path}`);
-          if (res.ok) return await res.text();
-        } catch {}
+          if (res.ok) {
+            return await res.text();
+          }
+        } catch {
+          // The server isn't answering yet: ask again.
+        }
         await new Promise((r) => setTimeout(r, 100));
       }
       return "";
     };
     await use(base, page);
   } finally {
-    if (server.pid) process.kill(-server.pid, "SIGTERM");
+    if (server.pid) {
+      process.kill(-server.pid, "SIGTERM");
+    }
     // The port free again before the next server starts.
     for (let i = 0; i < 50; i++) {
       try {
@@ -482,33 +533,38 @@ function pack(): string {
   mkdirSync(packDir, { recursive: true });
   run("pnpm", ["pack", "--pack-destination", packDir], pkgDir);
   const file = readdirSync(packDir).find((f) => f.endsWith(".tgz"));
-  if (!file) throw new Error("pnpm pack made no tarball");
+  if (!file) {
+    throw new Error("pnpm pack made no tarball");
+  }
   const tgz = join(packDir, file);
-  const manifest = JSON.parse(
+  const manifest = parseJson(
     execFileSync("tar", ["-xOf", tgz, "package/package.json"], { encoding: "utf8" }),
   );
   const files = execFileSync("tar", ["-tf", tgz], { encoding: "utf8" }).trim().split("\n");
   const https = (u: unknown) => typeof u === "string" && u.startsWith("https://");
-  check(manifest.description?.trim(), "tarball: a description");
-  check(manifest.license === "MIT", "tarball: MIT license");
-  check(https(manifest.homepage) && https(manifest.bugs?.url), "tarball: https homepage and bugs");
+  check(textField(manifest, "description")?.trim(), "tarball: a description");
+  check(field(manifest, "license") === "MIT", "tarball: MIT license");
+  check(
+    https(field(manifest, "homepage")) && https(field(field(manifest, "bugs"), "url")),
+    "tarball: https homepage and bugs",
+  );
   // tsdown lists any package it copied into the build here (code or types).
-  check(!manifest.inlinedDependencies, "tarball: no other package copied into it");
+  check(!field(manifest, "inlinedDependencies"), "tarball: no other package copied into it");
   check(files.includes("package/LICENSE"), "tarball: LICENSE");
   check(files.includes("package/README.md"), "tarball: README.md");
   const unpacked = ["dependencies", "peerDependencies", "optionalDependencies", "devDependencies"]
-    .flatMap((f) => Object.entries((manifest[f] ?? {}) as Record<string, string>))
+    .flatMap((f) => Object.entries(textRecord(field(manifest, f))))
     .filter(([, v]) => /^(workspace:|catalog:|link:|file:)/.test(v));
   check(!unpacked.length, `tarball: no workspace or catalog versions ${unpacked.join(" ")}`);
   const stray = files.filter(
     (f) => !/^package\/(dist\/|skills\/|README\.md$|LICENSE$|package\.json$)/.test(f),
   );
   check(!stray.length, `tarball: only dist, skills, README.md, LICENSE ${stray.join(" ")}`);
-  const targetsOf = (v: unknown): string[] =>
-    typeof v === "string" ? [v] : Object.values((v ?? {}) as object).flatMap(targetsOf);
+  const targetsOf = (v: unknown): Array<string> =>
+    typeof v === "string" ? [v] : Object.values(isRecord(v) ? v : {}).flatMap(targetsOf);
   const missing = [
-    ...targetsOf(manifest.exports),
-    ...Object.values((manifest.bin ?? {}) as Record<string, string>),
+    ...targetsOf(field(manifest, "exports")),
+    ...Object.values(textRecord(field(manifest, "bin"))),
   ]
     .map((p) => `package/${p.replace(/^\.\//, "")}`)
     .filter((p) => !files.includes(p));
@@ -559,12 +615,22 @@ function allowBuild(dir: string, spec?: string) {
 }
 
 /** The modules a file imports: import and export-from statements, and import() with a string. */
-function importsOf(code: string): string[] {
-  const found: string[] = [];
+function importsOf(code: string): Array<string> {
+  const found: Array<string> = [];
   const walk = (node: unknown): void => {
-    if (!node || typeof node !== "object") return;
-    if (Array.isArray(node)) return node.forEach(walk);
-    const n = node as { type?: string; source?: { type?: string; value?: unknown } };
+    if (!node || typeof node !== "object") {
+      return;
+    }
+    if (Array.isArray(node)) {
+      return node.forEach(walk);
+    }
+    const n = {
+      type: textField(node, "type"),
+      source: {
+        type: textField(field(node, "source"), "type"),
+        value: field(field(node, "source"), "value"),
+      },
+    };
     if (
       (n.type === "ImportDeclaration" ||
         n.type === "ExportNamedDeclaration" ||
@@ -572,9 +638,12 @@ function importsOf(code: string): string[] {
         n.type === "ImportExpression") &&
       n.source?.type === "Literal" &&
       typeof n.source.value === "string"
-    )
+    ) {
       found.push(n.source.value);
-    for (const value of Object.values(n)) walk(value);
+    }
+    for (const value of Object.values(n)) {
+      walk(value);
+    }
   };
   walk(parseAst(code));
   return found;
@@ -586,22 +655,35 @@ function checkOwnDependencies(target: string, dir: string, installed: string) {
   // Real imports only, read by Vite's own parser: the plugin also holds code it writes into an app
   // (`export { default } from "@void/md/pages"`, only when the app has @void/md), which is text in
   // a string, not an import of the package's.
-  for (const f of readdirSync(join(installed, "dist")).filter((f) => f.endsWith(".mjs")))
-    for (const spec of importsOf(readFileSync(join(installed, "dist", f), "utf8")))
-      if (!spec.startsWith(".")) specifiers.add(spec);
-  const outside: string[] = [];
+  for (const f of readdirSync(join(installed, "dist")).filter((f) => f.endsWith(".mjs"))) {
+    for (const spec of importsOf(readFileSync(join(installed, "dist", f), "utf8"))) {
+      if (!spec.startsWith(".")) {
+        specifiers.add(spec);
+      }
+    }
+  }
+  const outside: Array<string> = [];
   for (const spec of specifiers) {
-    if (spec.startsWith("node:") || spec.startsWith("virtual:")) continue;
-    const name = spec.startsWith("@") ? spec.split("/").slice(0, 2).join("/") : spec.split("/")[0]!;
+    if (spec.startsWith("node:") || spec.startsWith("virtual:")) {
+      continue;
+    }
+    const name = spec.startsWith("@")
+      ? spec.split("/").slice(0, 2).join("/")
+      : got(spec.split("/")[0]);
     // Node's lookup: the first node_modules/<name> walking up from the package's folder.
     let found: string | undefined;
     for (let d = installed; !found; d = dirname(d)) {
       const candidate = join(d, "node_modules", name);
-      if (existsSync(candidate)) found = realpathSync(candidate);
-      if (d === dirname(d)) break;
+      if (existsSync(candidate)) {
+        found = realpathSync(candidate);
+      }
+      if (d === dirname(d)) {
+        break;
+      }
     }
-    if (!found || !found.startsWith(realpathSync(dir)))
+    if (!found || !found.startsWith(realpathSync(dir))) {
       outside.push(`${spec} → ${found ?? "not found"}`);
+    }
   }
   check(
     !outside.length,
@@ -672,7 +754,7 @@ function checkLint(target: string, dir: string, pm: Pm) {
  * wrote or changed fails a Vite+ developer's `vp check`. */
 function checkFormatting(target: string, dir: string, pm: Pm) {
   const out = failing(...exec(pm, "vp", "fmt", "--check"), dir);
-  const files = [...out.matchAll(/^(\S+) \(\d+ms\)$/gm)].map((m) => m[1]!).sort();
+  const files = [...out.matchAll(/^(\S+) \(\d+ms\)$/gm)].map((m) => got(m[1])).sort();
   check(!files.length, `${target}: everything init wrote is formatted ${files.join(", ")}`);
 }
 
@@ -691,9 +773,15 @@ async function checkDev(target: string, dir: string, app: App) {
     for (let i = 0; i < 300 && html === undefined; i++) {
       try {
         const res = await fetch(`${base}/th-TH`);
-        if (res.ok) html = await res.text();
-      } catch {}
-      if (html === undefined) await new Promise((r) => setTimeout(r, 100));
+        if (res.ok) {
+          html = await res.text();
+        }
+      } catch {
+        // The server isn't answering yet: ask again.
+      }
+      if (html === undefined) {
+        await new Promise((r) => setTimeout(r, 100));
+      }
     }
     check(html?.includes("i18n สำหรับแอป Void"), `${target}: dev serves /th-TH in Thai`);
     // Void's docs examples (e2e/fresh/app/), each in a language other than the source.
@@ -716,11 +804,11 @@ async function checkDev(target: string, dir: string, app: App) {
       headers: { "Content-Type": "application/json", "X-VoidPages": "true" },
       body: JSON.stringify({ name: "" }),
     });
-    const errors =
-      form.status === 422 ? ((await form.json()) as { errors?: { name?: string } }) : {};
+    const nameError =
+      form.status === 422 ? textField(field(parseJson(await form.text()), "errors"), "name") : "";
     check(
-      thai.test(errors.errors?.name ?? ""),
-      `${target}: a form from Void's docs shows Zod's validation error in Thai ("${errors.errors?.name}")`,
+      thai.test(nameError ?? ""),
+      `${target}: a form from Void's docs shows Zod's validation error in Thai ("${nameError}")`,
     );
     const nothing = await fetch(`${base}/th-TH/no-such-page`);
     const nothingHtml = await nothing.text();
@@ -749,11 +837,12 @@ async function checkDev(target: string, dir: string, app: App) {
     });
     const ran = await job.text();
     check(
-      job.ok && JSON.parse(ran).ok === true,
+      job.ok && field(parseJson(ran), "ok") === true,
       `${target}: a scheduled job from Void's docs translates with inLocale(), with no request ${ran}`,
     );
     const api = await fetch(`${base}/api/hello`, { headers: { "Accept-Language": "th-TH" } });
-    const hello = (await api.json()) as { locale?: string; message?: string };
+    const answer = parseJson(await api.text());
+    const hello = { locale: textField(answer, "locale"), message: textField(answer, "message") };
     gap(
       hello.locale === "th-TH" && thai.test(hello.message ?? ""),
       `${target}: a server route from Void's docs answers in the language asked for (got ${hello.locale})`,
@@ -775,7 +864,9 @@ async function checkDev(target: string, dir: string, app: App) {
     const madeUp = await fetch(`${base}/xx-XX`, { redirect: "manual" });
     check(madeUp.status === 404, `${target}: a language the app hasn't (/xx-XX) is not found`);
   } finally {
-    if (server.pid) process.kill(-server.pid, "SIGTERM");
+    if (server.pid) {
+      process.kill(-server.pid, "SIGTERM");
+    }
   }
 }
 
@@ -833,8 +924,9 @@ async function translatedContent(target: string, dir: string, app: App) {
     "src/content.ts",
     "queues/translate.ts",
     "crons/translations.ts",
-  ])
+  ]) {
     check(existsSync(join(dir, file)), `${target}: gen translations wrote ${file}`);
+  }
   check(
     readFileSync(join(dir, "db/schema.ts"), "utf8").includes("./schema/notes_translations"),
     `${target}: gen translations re-exported the translations table from db/schema.ts`,
@@ -885,10 +977,10 @@ function pinUpstream(dir: string, pm: Pm) {
     })();
   const version = pinned("@cloudflare/vite-plugin");
   const pkgFile = join(dir, "package.json");
-  const pkg = JSON.parse(readFileSync(pkgFile, "utf8"));
-  if (pkg.devDependencies?.["vite-plus"]) {
-    pkg.devDependencies["vite-plus"] = pinned("vite-plus");
-    pkg.devDependencies.vite = pinned("vite");
+  const pkg = readObject(pkgFile);
+  const dev = textRecord(pkg.devDependencies);
+  if (dev["vite-plus"]) {
+    pkg.devDependencies = { ...dev, "vite-plus": pinned("vite-plus"), vite: pinned("vite") };
   }
   if (pm === "pnpm") {
     const file = join(dir, "pnpm-workspace.yaml");
@@ -900,6 +992,11 @@ function pinUpstream(dir: string, pm: Pm) {
         ? text.replace(/^overrides:$/m, `overrides:\n${line}`)
         : `${text.replace(/\n*$/, "\n")}overrides:\n${line}\n`,
     );
-  } else pkg.overrides = { ...pkg.overrides, "@cloudflare/vite-plugin": version };
+  } else {
+    pkg.overrides = {
+      ...(isRecord(pkg.overrides) ? pkg.overrides : {}),
+      "@cloudflare/vite-plugin": version,
+    };
+  }
   writeFileSync(pkgFile, JSON.stringify(pkg, null, 2) + "\n");
 }

@@ -44,10 +44,13 @@ export const hashDeleteKey = (key: string): Promise<string> => sha256Hex(key);
 
 /** Whether `key` is the one `hash` was made from, compared in the same time whatever differs. */
 export async function deleteKeyMatches(key: string, hash: string | null): Promise<boolean> {
-  if (!hash) return false;
+  if (!hash) {
+    return false;
+  }
   const given = await hashDeleteKey(key);
   let differs = given.length ^ hash.length;
-  for (let i = 0; i < given.length; i++)
+  for (let i = 0; i < given.length; i++) {
     differs |= given.charCodeAt(i) ^ hash.charCodeAt(i % hash.length);
+  }
   return differs === 0;
 }

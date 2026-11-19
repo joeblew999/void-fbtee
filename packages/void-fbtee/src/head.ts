@@ -15,14 +15,21 @@ export type MetaTag = { name?: string; property?: string; content: string };
  * Meta tags from unhead's readable keys: `meta({ ogSiteName: "Acme", twitterCard:
  * "summary_large_image" })` is `[{ property: "og:site_name", … }, { name: "twitter:card", … }]`.
  */
-export function meta(input: MetaFlat): MetaTag[] {
+export function meta(input: MetaFlat): Array<MetaTag> {
   return unpackMeta(input).flatMap((tag) => {
     const name = textField(tag, "name");
     const property = textField(tag, "property");
     const content = field(tag, "content");
-    if (typeof content !== "string" && typeof content !== "number" && typeof content !== "boolean")
+    if (
+      typeof content !== "string" &&
+      typeof content !== "number" &&
+      typeof content !== "boolean"
+    ) {
       return [];
-    if (content === "") return [];
+    }
+    if (content === "") {
+      return [];
+    }
     return [
       { ...(name ? { name } : {}), ...(property ? { property } : {}), content: String(content) },
     ];
@@ -37,7 +44,7 @@ export function meta(input: MetaFlat): MetaTag[] {
  */
 export function pageHead(page: { title: unknown; description: unknown }): {
   title: string;
-  meta: MetaTag[];
+  meta: Array<MetaTag>;
 } {
   const title = String(page.title);
   const description = String(page.description);

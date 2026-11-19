@@ -21,17 +21,21 @@ import {
   url,
   type Posted,
 } from "../helpers";
+import { got } from "../got";
+import { textField } from "../../packages/void-fbtee/src/guards";
 
 const page = browser("prod");
-const skip = inject("devSkip" as never) as string;
+const skip = inject("devSkip");
 const site = url("prod");
-const posted: Posted[] = [];
+const posted: Array<Posted> = [];
 // The reminder job's schedule (apps/example/crons/reminders.ts), and the sweep's (crons/owed.ts).
 const DAILY = "0 6 * * *";
 const OWED = "*/15 * * * *";
 
 afterAll(async () => {
-  for (const event of posted) await deleteEvent(event);
+  for (const event of posted) {
+    await deleteEvent(event);
+  }
 });
 
 test.skipIf(!!skip)(
@@ -73,7 +77,7 @@ test.skipIf(!!skip)(
     expect(th.attachments.some(isTicket)).toBe(false);
 
     // Laila's ticket is kept until a week after the event started; the run that day deletes it.
-    const ticket = (await arabic.getByTestId("ticket").getAttribute("href"))!.replace(
+    const ticket = got(await arabic.getByTestId("ticket").getAttribute("href")).replace(
       "/tickets/",
       "",
     );
@@ -104,9 +108,10 @@ test.skipIf(!!skip)(
     const to = address("ana");
     await book(p, "Ana", to);
     await emailTo(to, /^Your seat at /);
-    const [{ id: bookingId }] = (await dbRows("SELECT id FROM bookings WHERE email = ?", [to])) as {
-      id: string;
-    }[];
+    const bookingId = got(
+      textField((await dbRows("SELECT id FROM bookings WHERE email = ?", [to]))[0], "id"),
+      "Ana's booking",
+    );
     const count = async (subject: RegExp) =>
       (await emailsTo(to)).filter((m) => subject.test(m.subject)).length;
 
@@ -121,7 +126,7 @@ test.skipIf(!!skip)(
     await expect
       .poll(
         async () =>
-          (await dbRows("SELECT confirmed_at FROM bookings WHERE id = ?", [bookingId]))[0]!
+          got((await dbRows("SELECT confirmed_at FROM bookings WHERE id = ?", [bookingId]))[0])
             .confirmed_at,
       )
       .toBeTruthy();
@@ -141,7 +146,7 @@ test.skipIf(!!skip)(
       "SELECT b.told_starts_at = e.starts_at AS same FROM bookings b JOIN events e ON e.id = b.event_id WHERE b.id = ?",
       [bookingId],
     );
-    expect(told!.same).toBe(1);
+    expect(got(told).same).toBe(1);
     // The change queue asked again (a message delivered twice): nothing owed, nothing sent.
     expect(await runQueue("change", { bookingId })).toBe("ack");
     expect(await count(/ has changed$/)).toBe(1);

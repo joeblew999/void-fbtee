@@ -16,15 +16,17 @@ for (const engine of ["chromium", "webkit"] as const) {
   describe(engine, () => {
     const open = browser("prod", engine);
 
-    for (const [kind, path, hydrated] of PAGES)
-      for (const page of ["en-US", "ar-EG"])
+    for (const [kind, path, hydrated] of PAGES) {
+      for (const page of ["en-US", "ar-EG"]) {
         test(`${kind} in ${page}: every language, each linking to this page, nothing stored`, async () => {
           const p = await open({ locale: "th-TH" });
           const errors = collectErrors(p);
           await p.goto(`/${page}${path}`);
           // Code pages hydrate the root layout; markdown and island pages don't, so there's
           // nothing to wait for but the page.
-          if (hydrated) await started(p);
+          if (hydrated) {
+            await started(p);
+          }
           // Closed, it names the page's language in itself.
           const summary = p.locator('[data-part="summary"]');
           expect(await summary.textContent()).toBe(page === "en-US" ? "English" : "العربية");
@@ -54,7 +56,9 @@ for (const engine of ["chromium", "webkit"] as const) {
             expect(await p.locator('[data-part="yours-label"]').textContent()).toBe(
               page === "en-US" ? "Your language" : "لغتك",
             );
-          } else expect(await yours.count()).toBe(0);
+          } else {
+            expect(await yours.count()).toBe(0);
+          }
           await p.locator(item("th-TH")).click();
           await p.waitForURL(`**/th-TH${path}`);
           expect(await p.locator("html").getAttribute("lang")).toBe("th-TH");
@@ -68,6 +72,8 @@ for (const engine of ["chromium", "webkit"] as const) {
           expect(stored).toEqual({ cookie: "", local: [], session: [] });
           expect(errors.filter((e) => !VOID_DEFER_MESSAGE.test(e))).toEqual([]);
         });
+      }
+    }
 
     test("search finds a language by either name or its code, in the page's words", async () => {
       const p = await open({ locale: "en-US" });
@@ -96,7 +102,9 @@ for (const engine of ["chromium", "webkit"] as const) {
       await p.goto("/en-US/docs/intl");
       await p.locator('[data-part="summary"]').click();
       expect(await p.locator('[data-part="search"]').count()).toBe(0);
-      for (const l of LOCALES) expect(await p.locator(item(l)).isVisible(), l).toBe(true);
+      for (const l of LOCALES) {
+        expect(await p.locator(item(l)).isVisible(), l).toBe(true);
+      }
       await p.locator(item("ar-EG")).click();
       await p.waitForURL("**/ar-EG/docs/intl");
       expect(await p.locator("html").getAttribute("dir")).toBe("rtl");

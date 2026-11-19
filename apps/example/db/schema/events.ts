@@ -79,11 +79,14 @@ const eventFields = createInsertSchema(events, {
 /** The end comes after the start: told on the end's field. */
 const endsAfterStart = (
   f: { local: string; local_end: string },
-  ctx: { addIssue: (issue: { code: "custom"; path: string[]; message: string }) => void },
+  ctx: { addIssue: (issue: { code: "custom"; path: Array<string>; message: string }) => void },
 ) => {
-  if (!isLocalTime(f.local) || !isLocalTime(f.local_end)) return;
-  if (Temporal.PlainDateTime.compare(f.local_end, f.local) <= 0)
+  if (!isLocalTime(f.local) || !isLocalTime(f.local_end)) {
+    return;
+  }
+  if (Temporal.PlainDateTime.compare(f.local_end, f.local) <= 0) {
     ctx.addIssue({ code: "custom", path: ["local_end"], message: "ends before it starts" });
+  }
 };
 
 /**

@@ -13,40 +13,54 @@ import {
   stringAnswer,
   stringRequest,
   usageOf,
+  isEntry,
+  isGeminiAnswer,
   type Entry,
-  type GeminiAnswer,
 } from "../../src/gemini";
+import { field, parseJson, textRecord } from "../../src/guards";
 import { fieldProblems, problemsWith } from "../../src/judge";
 import { spent } from "../../src/models";
+import { got } from "./got";
 
 type CatalogEntry = (typeof entries.translations)[keyof typeof entries.translations];
-const keys = Object.keys(entries.translations) as (keyof typeof entries.translations)[];
+const all = Object.entries(entries.translations);
+const keys = all.map(([key]) => key);
 const FROM = "en-US";
 const TO = entries.locale;
 
 /** A catalog entry as the code sends it: its description, and its lines in the source language. */
-const entryOf = (e: CatalogEntry): Entry => ({
-  description: e.description,
-  lines: e.translations.map((l) => ({
-    text: l.translation,
-    variations: l.variations as Record<string, number>,
-  })),
-});
+const entryOf = (e: CatalogEntry): Entry => {
+  const entry: unknown = {
+    description: e.description,
+    lines: e.translations.map((l) => ({ text: l.translation, variations: l.variations })),
+  };
+  if (!isEntry(entry)) {
+    throw new Error(`test/entries.json: "${e.description}" isn't an entry the code takes`);
+  }
+  return entry;
+};
 
-const answerOf = (key: string) => (answers.answers as Record<string, GeminiAnswer>)[key]!;
-const linesOf = (key: string) => JSON.parse(answerText(answerOf(key)).text);
+const answerOf = (key: string) => {
+  const answer = field(answers.answers, key);
+  if (!isGeminiAnswer(answer)) {
+    throw new Error(`test/answers.json: ${key} isn't in Gemini's shape`);
+  }
+  return answer;
+};
+const linesOf = (key: string): unknown => parseJson(answerText(answerOf(key)).text);
 
 test("every entry becomes exactly the request written for it by hand", () => {
   expect(keys).toEqual(Object.keys(requests.requests));
-  for (const key of keys)
-    expect(stringRequest(entryOf(entries.translations[key]), { from: FROM, to: TO }), key).toEqual(
-      (requests.requests as Record<string, unknown>)[key],
+  for (const [key, e] of all) {
+    expect(stringRequest(entryOf(e), { from: FROM, to: TO }), key).toEqual(
+      field(requests.requests, key),
     );
+  }
 });
 
 test("each recorded answer goes back onto its entry's own lines, by name", () => {
-  for (const key of keys) {
-    const entry = entryOf(entries.translations[key]);
+  for (const [key, e] of all) {
+    const entry = entryOf(e);
     const lines = stringAnswer(entry, linesOf(key));
     expect(lines, key).toHaveLength(entry.lines.length);
     expect(
@@ -67,15 +81,21 @@ test("each recorded answer goes back onto its entry's own lines, by name", () =>
 
 test("a line goes where its name says, whatever order the answer has", () => {
   const entry = entryOf(entries.translations["booked-seats"]);
-  const answer = linesOf("booked-seats") as { lines: Record<string, string> };
-  const reversed = { lines: Object.fromEntries(Object.entries(answer.lines).reverse()) };
+  const answer = linesOf("booked-seats");
+  const named = textRecord(field(answer, "lines"));
+  expect(Object.keys(named)).toHaveLength(entry.lines.length);
+  const reversed = { lines: Object.fromEntries(Object.entries(named).reverse()) };
   expect(stringAnswer(entry, reversed)).toEqual(stringAnswer(entry, answer));
   // The woman's lines say "حجزت", the man's "حجز", each on its own line.
   const lines = stringAnswer(entry, answer);
   entry.lines.forEach((l, i) => {
     const gender = l.variations["1"];
-    if (gender === 2) expect(lines[i]).toContain("حجزت");
-    if (gender === 1) expect(lines[i]).not.toContain("حجزت");
+    if (gender === 2) {
+      expect(lines[i]).toContain("حجزت");
+    }
+    if (gender === 1) {
+      expect(lines[i]).not.toContain("حجزت");
+    }
   });
 });
 
@@ -104,10 +124,10 @@ test("a line missing, a placeholder lost or made up: caught", () => {
   ]);
   // A name the request didn't have is ignored; a name it had and the answer hasn't is missing.
   const booked = entryOf(entries.translations.booked);
-  const got = stringAnswer(booked, {
+  const back = stringAnswer(booked, {
     lines: { male: "{name} حجز", female: "{name} حجزت", other: "x" },
   });
-  expect(got).toEqual(["{name} حجز", "{name} حجزت", undefined]);
+  expect(back).toEqual(["{name} حجز", "{name} حجزت", undefined]);
 });
 
 test("asked again, the request says what came back and what to fix, and nothing else changes", () => {
@@ -123,8 +143,8 @@ test("asked again, the request says what came back and what to fix, and nothing 
   });
   expect(again.systemInstruction).toEqual(first.systemInstruction);
   expect(again.generationConfig).toEqual(first.generationConfig);
-  expect(again.contents[0]!.parts[0]).toEqual(first.contents[0]!.parts[0]);
-  expect(again.contents[0]!.parts[1]!.text).toContain("{time}");
+  expect(got(again.contents[0]).parts[0]).toEqual(got(first.contents[0]).parts[0]);
+  expect(got(got(again.contents[0]).parts[1]).text).toContain("{time}");
 });
 
 test("what each answer cost, from its own token counts, thinking paid as output", () => {
@@ -132,8 +152,8 @@ test("what each answer cost, from its own token counts, thinking paid as output"
   expect(label).toEqual({ in: 265, out: 23, thinking: 102 });
   // US$1.50 a million in, US$7.50 out (models.ts GEMINI).
   expect(spent([label])).toEqual({ in: 265, out: 23, thinking: 102, usd: 0.001335 });
-  const all = spent(keys.map((k) => usageOf(answerOf(k))));
-  expect(all.usd).toBeCloseTo(0.0247, 3);
+  const total = spent(keys.map((k) => usageOf(answerOf(k))));
+  expect(total.usd).toBeCloseTo(0.0247, 3);
   // Asked twice: both paid.
   expect(spent([label, label]).usd).toBe(0.00267);
 });
@@ -141,24 +161,24 @@ test("what each answer cost, from its own token counts, thinking paid as output"
 test("a post's fields go by name and come back by name", () => {
   const fields = { title: "เวิร์กช็อปขนมไทยโบราณ", description: "มาเรียนทำขนมไทย" };
   const body = fieldsRequest(fields, { from: "th-TH", to: "en-US" });
-  expect(body.systemInstruction.parts[0]!.text).toBe(
+  expect(got(body.systemInstruction.parts[0]).text).toBe(
     "You translate a post someone wrote in a web app from th-TH into en-US. Each key is one of the post's fields; translate its text.",
   );
-  expect(JSON.parse(body.contents[0]!.parts[0]!.text)).toEqual(fields);
+  expect(parseJson(got(got(body.contents[0]).parts[0]).text)).toEqual(fields);
   expect(body.generationConfig.responseJsonSchema).toEqual({
     type: "object",
     properties: { title: { type: "string" }, description: { type: "string" } },
     required: ["title", "description"],
   });
-  const got = fieldsAnswer(fields, {
+  const back = fieldsAnswer(fields, {
     description: "Learn to make Thai desserts",
     title: "Thai Dessert Workshop",
   });
-  expect(got).toEqual({
+  expect(back).toEqual({
     title: "Thai Dessert Workshop",
     description: "Learn to make Thai desserts",
   });
-  expect(fieldProblems(fields, got)).toEqual([]);
+  expect(fieldProblems(fields, back)).toEqual([]);
   expect(fieldProblems(fields, { title: "Thai Dessert Workshop", description: undefined })).toEqual(
     ['The field "description" is missing.'],
   );

@@ -6,28 +6,32 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterAll, beforeAll, describe, expect, test } from "vite-plus/test";
 import { copyFixture, makeBuildable } from "./copy-fixture";
-import { createBuilder, type Plugin } from "vite";
+import { createBuilder } from "vite";
 import { langAttrs } from "../../src/locales";
 import { voidFbtee } from "../../src/dev/plugin";
+import { field, isStringArray } from "../../src/guards";
+import { got } from "./got";
 
 let root: string;
-let probe: {
-  german: () => Promise<string>;
-  afterAwait: () => Promise<string>;
-  nested: () => Promise<string[]>;
-  dir: () => Promise<string>;
-  unknown: () => Promise<string>;
-  link: () => Promise<string>;
-  linkWithParams: () => Promise<string>;
-  linkElsewhere: () => Promise<string>;
-  linkOutside: () => string;
-  linkPlain: () => string;
-  zodMessages: () => Promise<string[]>;
-  zodOwn: () => Promise<string>;
-  zodOutside: () => string;
-  map: () => Promise<string>;
-  texts: () => { de: string[]; ar: string; deFallsBack: string; none: null };
-};
+// The built module (dist/job.js): what it exports is read by name and checked to be a function.
+let built: unknown;
+/** Calls the built module's export `name`, awaiting what it returns. */
+async function probe(name: string): Promise<unknown> {
+  const fn: unknown = field(built, name);
+  if (typeof fn !== "function") {
+    throw new Error(`dist/job.js exports no function ${name}`);
+  }
+  const out: unknown = Reflect.apply(fn, undefined, []);
+  return await out;
+}
+/** As probe, for an export that gives text. */
+async function probeText(name: string): Promise<string> {
+  const out = await probe(name);
+  if (typeof out !== "string") {
+    throw new Error(`dist/job.js: ${name}() gave no text`);
+  }
+  return out;
+}
 
 beforeAll(async () => {
   root = copyFixture();
@@ -70,11 +74,11 @@ export const linkElsewhere = () =>
   inLocale("de-DE", () => routeUrl("/[lang]/events" as never, { params: { lang: "ar-EG" } } as never));
 export const linkOutside = () => { try { return routeUrl("/[lang]/events" as never); } catch (e) { return String(e.message); } };
 export const linkPlain = () => routeUrl("/api/live" as never);
-// Zod's messages in the current language, set up as the middleware does it.
+// Zod's messages in the current language, set up by what the middleware calls.
 import { z } from "zod";
-import { setup } from "virtual:void-fbtee/zod";
+import { setupZod } from ${JSON.stringify(join(import.meta.dirname, "../../src/zod-language.ts"))};
 import { currentLocale } from ${JSON.stringify(server)};
-setup(currentLocale);
+setupZod(currentLocale);
 const tooShort = () => z.string().min(1).safeParse("").error?.issues[0]?.message;
 const own = () => z.string().min(1, "Give it a name").safeParse("").error?.issues[0]?.message;
 export const zodMessages = () =>
@@ -113,7 +117,7 @@ export const map = () =>
     root,
     configFile: false,
     logLevel: "silent",
-    plugins: voidFbtee(options) as Plugin[],
+    plugins: voidFbtee(options),
     environments: {
       worker: {
         consumer: "server",
@@ -130,52 +134,53 @@ export const map = () =>
       },
     },
   });
-  await builder.build(builder.environments.worker!);
-  probe = await import(pathToFileURL(join(root, "dist/job.js")).href);
+  await builder.build(got(builder.environments.worker));
+  built = await import(pathToFileURL(join(root, "dist/job.js")).href);
 });
 afterAll(() => rmSync(root, { recursive: true, force: true }));
 
 test("translates with no request around it", async () => {
-  expect(await probe.german()).toBe("Hallo");
+  expect(await probe("german")).toBe("Hallo");
 });
 
 test("stays in its language after an await", async () => {
-  expect(await probe.afterAwait()).toBe("Hallo");
+  expect(await probe("afterAwait")).toBe("Hallo");
 });
 
 test("one language inside another, and back", async () => {
-  expect(await probe.nested()).toEqual(["Hello", "Hallo", "Hello"]);
+  expect(await probe("nested")).toEqual(["Hello", "Hallo", "Hello"]);
 });
 
 test("gives the language's text direction", async () => {
-  expect(await probe.dir()).toBe("rtl");
+  expect(await probe("dir")).toBe("rtl");
 });
 
 test("a language the app hasn't is an error", async () => {
-  expect(await probe.unknown()).toMatch(/inLocale\("xx-XX"\): not one of the app's languages/);
+  expect(await probe("unknown")).toMatch(/inLocale\("xx-XX"\): not one of the app's languages/);
 });
 
 test("routeUrl: the current language, with no lang given", async () => {
-  expect(await probe.link()).toBe("/de-DE/events");
-  expect(await probe.linkWithParams()).toBe("/de-DE/events/7");
+  expect(await probe("link")).toBe("/de-DE/events");
+  expect(await probe("linkWithParams")).toBe("/de-DE/events/7");
 });
 
 test("routeUrl: params.lang still picks another language", async () => {
-  expect(await probe.linkElsewhere()).toBe("/ar-EG/events");
+  expect(await probe("linkElsewhere")).toBe("/ar-EG/events");
 });
 
-test("routeUrl: with no current language, an error that says to pass lang", () => {
-  expect(probe.linkOutside()).toMatch(
+test("routeUrl: with no current language, an error that says to pass lang", async () => {
+  expect(await probe("linkOutside")).toMatch(
     /routeUrl\("\/\[lang\]\/events"\): no current language here.*pass params\.lang/,
   );
 });
 
-test("routeUrl: an address with no [lang] is Void's own", () => {
-  expect(probe.linkPlain()).toBe("/api/live");
+test("routeUrl: an address with no [lang] is Void's own", async () => {
+  expect(await probe("linkPlain")).toBe("/api/live");
 });
 
 test("Zod's own messages in the current language", async () => {
-  const [en, de, ar] = await probe.zodMessages();
+  const messages = await probe("zodMessages");
+  const [en, de, ar] = isStringArray(messages) ? messages : [];
   expect(en).toBe("Too small: expected string to have >=1 characters");
   expect(de).not.toBe(en);
   expect(de).toMatch(/Zeichen/);
@@ -183,17 +188,17 @@ test("Zod's own messages in the current language", async () => {
 });
 
 test("an app's own message still wins", async () => {
-  expect(await probe.zodOwn()).toBe("Give it a name");
+  expect(await probe("zodOwn")).toBe("Give it a name");
 });
 
-test("with no current language, Zod's English", () => {
-  expect(probe.zodOutside()).toBe("Too small: expected string to have >=1 characters");
+test("with no current language, Zod's English", async () => {
+  expect(await probe("zodOutside")).toBe("Too small: expected string to have >=1 characters");
 });
 
 describe("sitemap()", () => {
   const urls = (xml: string) => [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((m) => m[1]);
   test("every page under [lang] with no other param, in every language, plus the app's own", async () => {
-    expect(urls(await probe.map())).toEqual([
+    expect(urls(await probeText("map"))).toEqual([
       "https://example.com/en-US",
       "https://example.com/de-DE",
       "https://example.com/ar-EG",
@@ -208,25 +213,25 @@ describe("sitemap()", () => {
   });
 
   test("each lists all its languages and x-default: / for the home page, else the fallback's", async () => {
-    const urls = (await probe.map()).split("</url>");
+    const urls = (await probeText("map")).split("</url>");
     const links = (url: string) =>
       [...url.matchAll(/hreflang="([^"]+)" href="([^"]+)"/g)].map((m) => `${m[1]} ${m[2]}`);
     // The home page: "/" sends each visitor to their own language.
-    expect(links(urls[0]!)).toEqual([
+    expect(links(got(urls[0]))).toEqual([
       "en-US https://example.com/en-US",
       "de-DE https://example.com/de-DE",
       "ar-EG https://example.com/ar-EG",
       "x-default https://example.com/",
     ]);
     // Any other page: its page in the fallback language (the source, as none is set).
-    const events = urls.find((u) => u.includes("<loc>https://example.com/en-US/events</loc>"))!;
+    const events = got(urls.find((u) => u.includes("<loc>https://example.com/en-US/events</loc>")));
     expect(links(events).at(-1)).toBe("x-default https://example.com/en-US/events");
   });
 
   test("lastmod only where given, for every language or one", async () => {
-    const xml = await probe.map();
+    const xml = await probeText("map");
     const lastmods = [...xml.matchAll(/<loc>(.*?)<\/loc>\s*(?:<lastmod>(.*?)<\/lastmod>)?/g)].map(
-      (m) => `${m[1]!.replace("https://example.com", "")} ${m[2] ?? "-"}`,
+      (m) => `${got(m[1]).replace("https://example.com", "")} ${m[2] ?? "-"}`,
     );
     expect(lastmods).toContain("/en-US -");
     expect(lastmods).toContain("/de-DE/events 2026-11-12T09:00:00Z");
@@ -236,15 +241,15 @@ describe("sitemap()", () => {
 });
 
 describe("what people post, in their own language", () => {
-  test("textLocales: the page's language, then its fallbacks", () => {
-    expect(probe.texts().de).toEqual(["de-DE", "en-US"]);
+  test("textLocales: the page's language, then its fallbacks", async () => {
+    expect(field(await probe("texts"), "de")).toEqual(["de-DE", "en-US"]);
   });
 
-  test("pickText: the page's own, else a fallback's, else none (the original)", () => {
-    const { ar, deFallsBack, none } = probe.texts();
-    expect(ar).toBe("السوق الليلي");
-    expect(deFallsBack).toBe("Night market");
-    expect(none).toBeNull();
+  test("pickText: the page's own, else a fallback's, else none (the original)", async () => {
+    const texts = await probe("texts");
+    expect(field(texts, "ar")).toBe("السوق الليلي");
+    expect(field(texts, "deFallsBack")).toBe("Night market");
+    expect(field(texts, "none")).toBeNull();
   });
 
   test("langAttrs: its language, and its direction", () => {

@@ -19,10 +19,10 @@ export interface LanguageEntry extends Locale {
  * `th-TH`, which Intl names "ไทย (ไทย)"), by its whole tag where it has several (`en-GB`, `en-US`).
  */
 export function languageEntries(
-  locales: readonly Locale[],
+  locales: ReadonlyArray<Locale>,
   page: string,
   names?: Readonly<Record<string, string>>,
-): LanguageEntry[] {
+): Array<LanguageEntry> {
   const language = (l: string) => new Intl.Locale(l).language;
   const variants = (l: string) => locales.filter((o) => language(o.locale) === language(l)).length;
   const named = (l: string, inLocale: string) => {
@@ -45,11 +45,16 @@ export function languageEntries(
 }
 
 /** The visitor's own languages the app has, best first, by fbtee's rule; no fallback. */
-export function visitorsOwn(locales: readonly string[], visitor = navigator.languages): string[] {
-  const own: string[] = [];
+export function visitorsOwn(
+  locales: ReadonlyArray<string>,
+  visitor = navigator.languages,
+): Array<string> {
+  const own: Array<string> = [];
   for (const l of visitor) {
     const found = negotiateLocale(l, locales);
-    if (found && !own.includes(found)) own.push(found);
+    if (found && !own.includes(found)) {
+      own.push(found);
+    }
   }
   return own;
 }

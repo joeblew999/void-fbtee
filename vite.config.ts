@@ -3,6 +3,7 @@
 import { fileURLToPath } from "node:url";
 import fbtee from "@nkzw/eslint-plugin-fbtee";
 import { defineConfig } from "vite-plus";
+import { voidRules } from "./lint/void-rules";
 
 /**
  * A browser-test project: e2e/<name>/*.test.ts, with e2e/<setup>/setup.ts starting what it tests,
@@ -53,9 +54,10 @@ export default defineConfig({
       // The tests, one task per stage (Void's TESTING.md: run only the part you need). Where each
       // stage's email, AI, queues, crons and page cache come from, and what each suite checks: the
       // README's "Testing".
-      // Unit: the package's (packages/void-fbtee/test/unit/) and the example's (beside its code).
+      // Unit: the package's (packages/void-fbtee/test/unit/), the lint rules' (lint/rules.test.ts)
+      // and the example's (beside its code).
       "test:unit": {
-        command: "vp test run --project unit && vp run void-fbtee-example#test",
+        command: "vp test run --project unit --project lint && vp run void-fbtee-example#test",
         cache: false,
       },
       // The production build in the local preview: the full browser contract (e2e/preview/).
@@ -81,7 +83,7 @@ export default defineConfig({
       // void-fbtee installed into fresh `void init` apps, as a user's app installs it.
       "test:fresh": { command: "vpx e2e/fresh/check.ts", cache: false },
       // Vite+'s, Void's and void-fbtee's setup commands, run again: fails if any changes a file.
-      "check:tools": { command: "node scripts/check-tools.mjs", cache: false },
+      "check:tools": { command: "vpx scripts/check-tools.ts", cache: false },
       // In a Claude cloud session: the dev server (vp run dev) on a public https address through
       // Tailscale Funnel, so any browser can open it without deploying (scripts/tailscale.ts). On a
       // Mac, open http://localhost:5173 instead.
@@ -111,13 +113,25 @@ export default defineConfig({
   lint: {
     // e2e/fresh/app/ and thai/: pages copied into the fresh apps, linted and type-checked there.
     ignorePatterns: ["e2e/fresh/app/**", "e2e/fresh/thai/**"],
-    plugins: ["typescript", "react"],
-    // What `void-fbtee init` asks a workspace's root config for: fbtee's lint rules.
-    jsPlugins: ["@nkzw/eslint-plugin-fbtee"],
+    // Void's own settings (lint/void-rules.ts names the commit): its default category off and
+    // every rule listed, its plugins and environments, and its vite-plus plugin.
+    categories: { correctness: "off" },
+    env: { browser: true, builtin: true, es2024: true, node: true },
+    plugins: ["typescript", "import", "react", "unicorn", "vitest", "node", "jsdoc", "oxc"],
+    // Void's vite-plus plugin; then what `void-fbtee init` asks a workspace's root config for:
+    // fbtee's lint rules.
+    jsPlugins: [
+      { name: "vite-plus", specifier: "vite-plus/oxlint-plugin" },
+      "@nkzw/eslint-plugin-fbtee",
+    ],
     options: { typeAware: true, typeCheck: true },
     rules: {
+      // Void's own list, whole (lint/void-rules.ts). This repo's rules come after it.
+      ...voidRules,
       // `fbt` / `fbs` are used through <fbt> JSX, which fbtee's compiler rewrites into calls.
-      "no-unused-vars": ["warn", { varsIgnorePattern: "^(fbt|fbs)$" }],
+      // Void's setting (lint/void-rules.ts), with fbtee's names added: `fbt` / `fbs` are used
+      // through <fbt> JSX, which fbtee's compiler rewrites into calls.
+      "no-unused-vars": ["error", { args: "none", varsIgnorePattern: "^(_|fbt$|fbs$)" }],
       // fbtee's own set, as its README shows: strict, which also finds text nobody wrapped for
       // translation. Left as they are: names (the site's, products', APIs') and JSX spacing and
       // punctuation, which no language translates.
@@ -142,26 +156,23 @@ export default defineConfig({
           ],
         },
       ],
+      // This repo's own, on top of Void's (plans/checked-everywhere.md): every type comes from a real
+      // source (Void's generated types, the Drizzle schema, or a check on data as it arrives), never
+      // from code saying so. TypeScript allows each of these even when strict, and Void's list
+      // doesn't forbid them. A value read at run time goes through a check (a type guard) instead.
+      // No casts (`as const` is fine): a cast makes TypeScript believe what it can't check.
+      "typescript/consistent-type-assertions": ["error", { assertionStyle: "never" }],
+      // No value used as `any` (from JSON.parse, require(), a loosely typed library): `any` turns
+      // checking off for everything it touches.
+      "typescript/no-unsafe-assignment": "error",
+      "typescript/no-unsafe-member-access": "error",
+      "typescript/no-unsafe-call": "error",
+      "typescript/no-unsafe-return": "error",
+      "typescript/no-unsafe-argument": "error",
+      // No `!`: "this is never empty", unchecked. Lookups are "maybe nothing" too
+      // (noUncheckedIndexedAccess in each tsconfig), so the check is written where it's needed.
+      "typescript/no-non-null-assertion": "error",
     },
-    // No casts in the package (plans/no-casts.md): a cast tells TypeScript to believe what it can't
-    // check, and a wrong one loses the type with nothing to say so. A value read at run time
-    // becomes a type through a check (a type guard) instead. `as const` is allowed.
-    overrides: [
-      {
-        files: ["packages/void-fbtee/src/**"],
-        rules: {
-          "typescript/consistent-type-assertions": ["error", { assertionStyle: "never" }],
-          // And no `any`, which loses a type as surely as a cast: JSON.parse, a require(), a
-          // library typed loosely. Its value goes through a check (src/guards.ts) instead.
-          "typescript/no-explicit-any": "error",
-          "typescript/no-unsafe-assignment": "error",
-          "typescript/no-unsafe-member-access": "error",
-          "typescript/no-unsafe-call": "error",
-          "typescript/no-unsafe-return": "error",
-          "typescript/no-unsafe-argument": "error",
-        },
-      },
-    ],
   },
   fmt: {
     // Written by tools, not by hand: fbtee (catalogs), drizzle (migrations), Void, Vite+ and
@@ -187,6 +198,8 @@ export default defineConfig({
     // and names itself, where with no limit CI once hung for over an hour (2026-11-13).
     projects: [
       "packages/void-fbtee",
+      // The lint rules themselves, proven in every folder (lint/rules.test.ts): with the unit tests.
+      { test: { name: "lint", include: ["lint/*.test.ts"] } },
       {
         // The app's own `@/` (apps/example/tsconfig.json), for tests that import its code to compute
         // what a page should show (e2e/preview/islands.test.ts: src/docs/fmt.ts).

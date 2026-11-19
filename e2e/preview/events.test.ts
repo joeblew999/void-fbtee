@@ -18,6 +18,8 @@ import {
   type Posted,
 } from "../helpers";
 import { SOURCE } from "../locales";
+import { got } from "../got";
+import { parseJson } from "../../packages/void-fbtee/src/guards";
 
 const page = browser("prod");
 
@@ -29,7 +31,7 @@ async function goToEvent(p: import("playwright").Page, locale: string, englishTi
     .locator("a")
     .filter({ hasText: englishTitle })
     .getAttribute("href");
-  await p.goto(href!.replace(`/${SOURCE}/`, `/${locale}/`));
+  await p.goto(got(href).replace(`/${SOURCE}/`, `/${locale}/`));
   // Void's form works once the page has hydrated.
   await started(p);
 }
@@ -55,7 +57,7 @@ const TEST_END = "2026-01-01T22:00";
  * The events these tests post, each with the key from its poster's private delete link: deleted
  * when the file ends, as their poster would, so no test leaves an event behind on the live site.
  */
-const posted: Posted[] = [];
+const posted: Array<Posted> = [];
 
 /**
  * The event the page just posted: once the page has its key (the address's "#key=…", the private
@@ -66,16 +68,17 @@ async function kept(p: import("playwright").Page): Promise<string> {
   const at = new URL(p.url());
   const path = at.pathname.replace(/^\/[^/]+/, "");
   posted.push({
-    id: at.pathname.split("/").pop()!,
-    key: new URLSearchParams(at.hash.slice(1)).get("key")!,
+    id: got(at.pathname.split("/").pop()),
+    key: got(new URLSearchParams(at.hash.slice(1)).get("key")),
     path,
   });
   return path;
 }
 
 afterAll(async () => {
-  for (const event of posted)
+  for (const event of posted) {
     expect(await deleteEvent(event), `deleting the test event ${event.id}`).toBe(true);
+  }
 });
 
 /** A random title, so each test's event is its own. */
@@ -104,9 +107,11 @@ const at = (locale: string, timeZone: string) => {
     new Date(SWIM),
     new Date(SWIM_END),
   );
-  const zone = new Intl.DateTimeFormat(locale, { timeZone, timeZoneName, hour: "numeric" })
-    .formatToParts(new Date(SWIM))
-    .find((p) => p.type === "timeZoneName")!.value;
+  const zone = got(
+    new Intl.DateTimeFormat(locale, { timeZone, timeZoneName, hour: "numeric" })
+      .formatToParts(new Date(SWIM))
+      .find((p) => p.type === "timeZoneName"),
+  ).value;
   return `${range} ${zone}`;
 };
 
@@ -155,8 +160,8 @@ test.skipIf(onLiveSite())(
     await p.reload();
     await started(p);
     await seeText(p, "event-title", name);
-    expect(await p.evaluate(() => (window as { pwned?: number }).pwned)).toBeUndefined();
-    const data = JSON.parse(
+    expect(await p.evaluate((): unknown => Reflect.get(window, "pwned"))).toBeUndefined();
+    const data = parseJson(
       (await p.locator('script[type="application/ld+json"]').textContent()) ?? "{}",
     );
     expect(data).toMatchObject({ "@type": "Event", name });
@@ -283,6 +288,8 @@ test.skipIf(onLiveSite())(
       return (await p.getByTestId("booked").count()) ? "booked" : "sold out";
     };
     expect([await outcome(a), await outcome(b)].sort()).toEqual(["booked", "sold out"]);
-    for (const p of [a, b]) await seeText(p, "seats-left", "اكتمل الحجز");
+    for (const p of [a, b]) {
+      await seeText(p, "seats-left", "اكتمل الحجز");
+    }
   },
 );

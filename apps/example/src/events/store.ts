@@ -76,7 +76,10 @@ export async function lastChanged(db: Db) {
 /** Stores a new event. Its id. */
 export async function createEvent(db: Db, values: typeof events.$inferInsert): Promise<string> {
   const [created] = await db.insert(events).values(values).returning({ id: events.id });
-  return created!.id;
+  if (!created) {
+    throw new Error("createEvent: the insert gave back no row");
+  }
+  return created.id;
 }
 
 /** Changes an event's title, description, place, seats and times; its updated_at is now. */
@@ -116,7 +119,9 @@ export async function deleteIfDone(db: Db, eventId: string): Promise<void> {
     .from(bookings)
     .where(eq(bookings.event_id, eventId))
     .limit(1);
-  if (left) return;
+  if (left) {
+    return;
+  }
   await db.delete(events).where(and(eq(events.id, eventId), isNotNull(events.cancelled_at)));
 }
 
@@ -197,7 +202,7 @@ export async function bookingWithEvent(db: Db, id: string) {
 }
 
 /** An event's bookings: all, or those made in these languages. */
-export async function bookingsOf(db: Db, eventId: string, locales?: readonly string[]) {
+export async function bookingsOf(db: Db, eventId: string, locales?: ReadonlyArray<string>) {
   return db
     .select()
     .from(bookings)
@@ -210,14 +215,14 @@ export async function bookingsOf(db: Db, eventId: string, locales?: readonly str
 }
 
 /** The bookings of these events. */
-export async function bookingsOfEvents(db: Db, eventIds: string[]) {
+export async function bookingsOfEvents(db: Db, eventIds: Array<string>) {
   return eventIds.length
     ? db.select().from(bookings).where(inArray(bookings.event_id, eventIds))
     : [];
 }
 
 /** The languages an event's bookers booked in. */
-export async function bookerLocales(db: Db, eventId: string): Promise<string[]> {
+export async function bookerLocales(db: Db, eventId: string): Promise<Array<string>> {
   const rows = await db
     .selectDistinct({ locale: bookings.locale })
     .from(bookings)
@@ -226,7 +231,11 @@ export async function bookerLocales(db: Db, eventId: string): Promise<string[]> 
 }
 
 /** The ids of the bookings of events starting in [from, to) (ISO instants), cancelled or not. */
-export async function bookingsStartingBetween(db: Db, from: string, to: string): Promise<string[]> {
+export async function bookingsStartingBetween(
+  db: Db,
+  from: string,
+  to: string,
+): Promise<Array<string>> {
   const rows = await db
     .select({ id: bookings.id })
     .from(bookings)
@@ -270,7 +279,7 @@ export async function timedRead(db: Db) {
 // What's owed, for the sweep (crons/owed.ts): untouched for 15 minutes.
 
 /** Bookings of events that are on, made over 15 minutes ago, with no confirmation sent. */
-export async function unconfirmed(db: Db): Promise<string[]> {
+export async function unconfirmed(db: Db): Promise<Array<string>> {
   const rows = await db
     .select({ id: bookings.id })
     .from(bookings)
@@ -286,7 +295,7 @@ export async function unconfirmed(db: Db): Promise<string[]> {
 }
 
 /** Confirmed bookings whose event, changed over 15 minutes ago, no longer matches what they were told. */
-export async function behind(db: Db): Promise<string[]> {
+export async function behind(db: Db): Promise<Array<string>> {
   const rows = await db
     .select({ id: bookings.id })
     .from(bookings)

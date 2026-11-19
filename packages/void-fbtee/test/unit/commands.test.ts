@@ -7,6 +7,8 @@ import { copyFixture } from "./copy-fixture";
 import { check, markdownHash, TRANSLATED_FROM } from "../../src/dev/check";
 import { loadProject, prepare } from "../../src/dev/commands";
 import type { Project } from "../../src/dev/catalogs";
+import { readCatalog } from "../../src/dev/catalog-file";
+import { got } from "./got";
 
 let root: string;
 let p: Project;
@@ -133,15 +135,14 @@ describe("prepare", () => {
       "i18n/translations/th-TH.json",
     ]);
     const read = (l: string) => readFileSync(join(root, `i18n/translations/${l}.json`), "utf8");
-    const de = JSON.parse(read("de-DE"));
-    const entries = Object.values(de.translations) as {
-      status?: string;
-      translations: { translation: string }[];
-    }[];
-    expect(entries.find((e) => e.translations[0]!.translation === "Hallo")!.status).not.toBe("new");
+    const de = readCatalog(read("de-DE"), "de-DE");
+    const entries = Object.values(de.translations);
+    expect(
+      got(entries.find((e) => got(e.translations?.[0]).translation === "Hallo")).status,
+    ).not.toBe("new");
     expect(entries.filter((e) => e.status === "new")).toHaveLength(1 + 12);
-    expect(read("de-DE")).toMatch(/^\{\n  "fb-locale": "de-DE",\n/);
+    expect(read("de-DE")).toMatch(/^\{\n {2}"fb-locale": "de-DE",\n/);
     expect(read("de-DE").endsWith("}\n")).toBe(true);
-    expect(Object.keys(JSON.parse(read("th-TH")).translations)).toHaveLength(2 + 12);
+    expect(Object.keys(readCatalog(read("th-TH"), "th-TH").translations)).toHaveLength(2 + 12);
   });
 });

@@ -29,6 +29,8 @@ import {
   translateTask,
   waitingReview,
 } from "../../src/dev/translate";
+import { readCatalog } from "../../src/dev/catalog-file";
+import { got } from "./got";
 
 let root: string;
 let p: Project;
@@ -48,7 +50,7 @@ const stateOf = (locale: string) => markdownPages(p).find((x) => x.locale === lo
 test("lists each catalog with new entries and each page to translate, with the skill to read", () => {
   prepare(p);
   write("pages/en-US/blog/hello.md", POST);
-  const task = translateTask(p)!;
+  const task = got(translateTask(p));
   // Not installed in the fixture, so the path is to the package itself.
   expect(task.prompt).toContain("/skills/void-fbtee/SKILL.md (the void-fbtee skill) and follow it");
   // German: "Goodbye" plus fbtee's 12 built-in strings; Thai: everything.
@@ -98,7 +100,7 @@ test("a page the agent marks done is unrecorded until the dev server stamps it",
   expect(stateOf("de-DE")).toBe("ok");
   // The prompt tells the agent to mark pages done.
   write("pages/en-US/blog/other.md", POST);
-  expect(translateTask(p)!.prompt).toContain('set "translatedFrom: done"');
+  expect(got(translateTask(p)).prompt).toContain('set "translatedFrom: done"');
 });
 
 test("check reports a copy whose components or their values differ from the original's", () => {
@@ -137,7 +139,7 @@ const RICH = [
 
 test("check reports a copy that loses or changes what it must keep", () => {
   write("pages/en-US/blog/rich.md", RICH);
-  const cases: [string, string, string][] = [
+  const cases: Array<[string, string, string]> = [
     ["a box's marker", "::: tip A tip", "::: info Ein Tipp"],
     ["an alert's marker", "> [!NOTE] A note", "> [!TIP] Ein Hinweis"],
     ["a heading id", "{#hello}", "{#hallo}"],
@@ -189,9 +191,10 @@ test("nothing to do once everything is translated", () => {
   prepare(p);
   for (const locale of ["de-DE", "th-TH"]) {
     const file = join(root, `i18n/translations/${locale}.json`);
-    const catalog = JSON.parse(readFileSync(file, "utf8"));
-    for (const e of Object.values(catalog.translations) as { status: string }[])
+    const catalog = readCatalog(readFileSync(file, "utf8"), file);
+    for (const e of Object.values(catalog.translations)) {
       e.status = "translated";
+    }
     writeFileSync(file, JSON.stringify(catalog));
   }
   expect(translateTask(p)).toBeUndefined();
@@ -262,8 +265,8 @@ test("a finished translation that would break the app fails the build, and is ne
   prepare(p);
   const file = join(root, "i18n/translations/de-DE.json");
   const hello = "SSJ6IVWoQjvWr8iQwHsMTA==";
-  const catalog = JSON.parse(readFileSync(file, "utf8"));
-  catalog.translations[hello].translations[0].translation = "Hallo {name}";
+  const catalog = readCatalog(readFileSync(file, "utf8"), file);
+  got(got(catalog.translations[hello]).translations?.[0]).translation = "Hallo {name}";
   writeFileSync(file, JSON.stringify(catalog, null, 2));
   const before = readFileSync(file, "utf8");
   expect(check(p).join("\n")).toMatch(
@@ -301,8 +304,8 @@ test("stamp records who translated a page, when, the request's gateway log and w
 test("a finished entry that doesn't say who translated it fails the check", () => {
   prepare(p);
   const file = join(root, "i18n/translations/de-DE.json");
-  const catalog = JSON.parse(readFileSync(file, "utf8"));
-  delete catalog.translations["SSJ6IVWoQjvWr8iQwHsMTA=="].translatedBy;
+  const catalog = readCatalog(readFileSync(file, "utf8"), file);
+  delete got(catalog.translations["SSJ6IVWoQjvWr8iQwHsMTA=="]).translatedBy;
   writeFileSync(file, JSON.stringify(catalog, null, 2));
   expect(check(p)).toContain(
     'strings: de-DE: "Hello": doesn\'t say who translated it (translatedBy)',

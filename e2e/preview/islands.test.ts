@@ -6,6 +6,8 @@ import { expect, test } from "vite-plus/test";
 import { fmt } from "../../apps/example/src/docs/fmt";
 import { browser, hydrated, untilText } from "../helpers";
 import { EXAMPLE } from "./setup";
+import { got } from "../got";
+import { parseJson, textRecord } from "../../packages/void-fbtee/src/guards";
 
 const page = browser("prod");
 
@@ -20,15 +22,15 @@ test("Markdown pages: every <Fmt> value, formatted in the page's language and th
   await p.clock.install({ time: new Date(now) });
   for (const file of files) {
     const url = "/" + file.replace(/^pages\//, "").replace(/(\/index)?\.md$/, "");
-    const locale = url.split("/")[1];
+    const locale = got(url.split("/")[1], `the language in ${url}`);
     await p.goto(url);
     // Every <Fmt> island in the file, hydrated: one hydrated island doesn't show its siblings are
     // (voidzero-dev/void TESTING.md, waitForIslandsHydrated).
-    const islands = readFileSync(join(EXAMPLE, file), "utf8").match(/<Fmt /g)!.length;
+    const islands = got(readFileSync(join(EXAMPLE, file), "utf8").match(/<Fmt /g)).length;
     await hydrated(p, "Fmt", islands);
     const values = p.locator("[data-fmt]");
     for (let i = 0; i < (await values.count()); i++) {
-      const props = JSON.parse((await values.nth(i).getAttribute("data-fmt"))!);
+      const props = textRecord(parseJson(got(await values.nth(i).getAttribute("data-fmt"))));
       const want = fmt(props, locale, "America/New_York", now);
       // A <Fmt> that renders nothing is a mistake in the page, not a match.
       expect(want, `${url} ${JSON.stringify(props)}`).not.toBe("");

@@ -33,16 +33,16 @@ import { field, isRecord, isStringArray, parseJson, textRecord } from "../guards
 export interface InitOptions {
   root: string;
   sourceLocale: string;
-  locales: string[];
+  locales: Array<string>;
   /** The site's own address, for voidFbtee({ site }); checked as the plugin checks it. */
   site?: string;
 }
 
 export interface InitResult {
   /** What init changed, one line each. */
-  done: string[];
+  done: Array<string>;
   /** What the person must do by hand, one line each (with the exact text to add). */
-  todo: string[];
+  todo: Array<string>;
 }
 
 const SKILL = `${SKILL_DIR}/SKILL.md`;
@@ -73,7 +73,7 @@ export default function Layout({ children }: { children: ReactNode }) {
  */
 const localesFile = (
   sourceLocale: string,
-  locales: string[],
+  locales: Array<string>,
 ) => `// The app's languages, once: voidFbtee() in vite.config.ts gets this list, and the type below gives
 // the same list to void-fbtee's types, so a link built from the page's language is checked by Void's
 // typed routes (\`/\${lang}/docs/tour\` must be a real page in every language).
@@ -205,7 +205,9 @@ interface PackageJson {
 }
 const readJson = (file: string): PackageJson => {
   const value = parseJson(readFileSync(file, "utf8"));
-  if (!isRecord(value)) throw new Error(`void-fbtee: ${file} isn't a package.json`);
+  if (!isRecord(value)) {
+    throw new Error(`void-fbtee: ${file} isn't a package.json`);
+  }
   const list = (key: string) => (value[key] === undefined ? undefined : textRecord(value[key]));
   return {
     ...value,
@@ -221,7 +223,9 @@ const readJson = (file: string): PackageJson => {
  */
 function configObject(mod: ProxifiedModule, file: string): Record<string, unknown> {
   const options: unknown = getDefaultExportOptions(mod);
-  if (!isRecord(options)) throw new Error(`void-fbtee: ${file} doesn't export a config object`);
+  if (!isRecord(options)) {
+    throw new Error(`void-fbtee: ${file} doesn't export a config object`);
+  }
   return options;
 }
 
@@ -229,16 +233,20 @@ function configObject(mod: ProxifiedModule, file: string): Record<string, unknow
  * A list from a config file as plain values, or none. magicast's lists are proxies whose callbacks
  * (`.some`, `.every`) don't get the plain values; spreading one does (checked 2026-11-19).
  */
-function plainList(value: unknown): unknown[] {
-  const list: unknown[] = Array.isArray(value) ? value : [];
+function plainList(value: unknown): Array<unknown> {
+  const list: Array<unknown> = Array.isArray(value) ? value : [];
   return [...list];
 }
 
 /** An object's object field, made when it isn't one (magicast writes it into the file). */
 function child(parent: Record<string, unknown>, key: string): Record<string, unknown> {
-  if (!isRecord(parent[key])) parent[key] = {};
+  if (!isRecord(parent[key])) {
+    parent[key] = {};
+  }
   const value = parent[key];
-  if (!isRecord(value)) throw new Error(`void-fbtee: couldn't add "${key}"`);
+  if (!isRecord(value)) {
+    throw new Error(`void-fbtee: couldn't add "${key}"`);
+  }
   return value;
 }
 
@@ -246,24 +254,36 @@ function child(parent: Record<string, unknown>, key: string): Record<string, unk
  * `any`; it's an object, a proxy for that code. */
 function rawCode(source: string): Record<string, unknown> {
   const node: unknown = builders.raw(source);
-  if (!isRecord(node)) throw new Error(`void-fbtee: couldn't write ${source}`);
+  if (!isRecord(node)) {
+    throw new Error(`void-fbtee: couldn't write ${source}`);
+  }
   return node;
 }
 
 /** A tsconfig.json, its compilerOptions' `types` and `lib` checked; the rest kept as it is. */
 interface TsConfig {
-  compilerOptions?: { types?: string[]; lib?: string[]; [key: string]: unknown };
+  compilerOptions?: { types?: Array<string>; lib?: Array<string>; [key: string]: unknown };
   [key: string]: unknown;
 }
 const readTsconfig = (file: string): TsConfig => {
   const value = parseJson(readFileSync(file, "utf8"));
-  if (!isRecord(value)) throw new Error(`void-fbtee: ${file} isn't a tsconfig.json`);
+  if (!isRecord(value)) {
+    throw new Error(`void-fbtee: ${file} isn't a tsconfig.json`);
+  }
   const options = value.compilerOptions;
-  if (options === undefined) return value;
-  if (!isRecord(options)) throw new Error(`void-fbtee: ${file}'s compilerOptions isn't an object`);
+  if (options === undefined) {
+    return value;
+  }
+  if (!isRecord(options)) {
+    throw new Error(`void-fbtee: ${file}'s compilerOptions isn't an object`);
+  }
   const { types, lib } = options;
-  if ((types !== undefined && !isStringArray(types)) || (lib !== undefined && !isStringArray(lib)))
+  if (
+    (types !== undefined && !isStringArray(types)) ||
+    (lib !== undefined && !isStringArray(lib))
+  ) {
     throw new Error(`void-fbtee: ${file}'s compilerOptions.types and lib must be lists of text`);
+  }
   return { ...value, compilerOptions: { ...options, types, lib } };
 };
 const writeJson = (file: string, value: unknown) =>
@@ -279,8 +299,12 @@ const writeJson = (file: string, value: unknown) =>
 function workspaceRoot(root: string): string | undefined {
   for (let d = root; d !== dirname(d); d = dirname(d)) {
     const file = join(d, "pnpm-workspace.yaml");
-    if (!existsSync(file)) continue;
-    if (d === root) return undefined;
+    if (!existsSync(file)) {
+      continue;
+    }
+    if (d === root) {
+      return undefined;
+    }
     const globs = workspacePackages(readFileSync(file, "utf8"));
     const at = relative(d, root).split(sep).join("/");
     const listed = globs.filter((g) => !g.startsWith("!")).some((g) => matchesGlob(at, g));
@@ -290,34 +314,40 @@ function workspaceRoot(root: string): string | undefined {
 }
 
 /** pnpm-workspace.yaml's `packages` list: its `- glob` lines, quotes taken off. */
-function workspacePackages(yaml: string): string[] {
-  const out: string[] = [];
+function workspacePackages(yaml: string): Array<string> {
+  const out: Array<string> = [];
   let inList = false;
   for (const line of yaml.split("\n")) {
-    if (/^packages:\s*$/.test(line)) inList = true;
-    else if (inList && /^\s+-\s+/.test(line))
+    if (/^packages:\s*$/.test(line)) {
+      inList = true;
+    } else if (inList && /^\s+-\s+/.test(line)) {
       out.push(
         line
           .replace(/^\s+-\s+/, "")
           .replace(/\s+#.*$/, "")
           .replace(/^["']|["']$/g, ""),
       );
-    else if (inList && /^\S/.test(line)) inList = false;
+    } else if (inList && /^\S/.test(line)) {
+      inList = false;
+    }
   }
   return out;
 }
 
 export async function init(o: InitOptions): Promise<InitResult> {
-  if (o.site !== undefined) checkSite(o.site);
+  if (o.site !== undefined) {
+    checkSite(o.site);
+  }
   // The files init writes, to format with the app's own formatter at the end (Vite+ apps).
   const written = new Set<string>();
-  const done: string[] = [];
-  const todo: string[] = [];
+  const done: Array<string> = [];
+  const todo: Array<string> = [];
   const at = (f: string) => join(o.root, f);
-  if (!existsSync(at("package.json")))
+  if (!existsSync(at("package.json"))) {
     throw new Error(
       `no package.json in ${o.root}: run void-fbtee init in the app's folder (or pass --root)`,
     );
+  }
   const pkg = readJson(at("package.json"));
   const vitePlus = !!(pkg.devDependencies?.["vite-plus"] ?? pkg.dependencies?.["vite-plus"]);
   const versions = testedVersions();
@@ -326,18 +356,27 @@ export async function init(o: InitOptions): Promise<InitResult> {
 
   // 1. The peers void-fbtee needs in the app, at the versions void-fbtee is tested with.
   //    void-fbtee itself is already a dependency (it's installed to run init), so it's left as is.
-  const need: [string, "dependencies" | "devDependencies"][] = [
+  const need: Array<[string, "dependencies" | "devDependencies"]> = [
     ["fbtee", "dependencies"],
     ["temporal-polyfill", "dependencies"],
   ];
-  if (vitePlus && !wsRoot) need.push(["@nkzw/eslint-plugin-fbtee", "devDependencies"]);
+  if (vitePlus && !wsRoot) {
+    need.push(["@nkzw/eslint-plugin-fbtee", "devDependencies"]);
+  }
   const added = need.filter(([name]) => !pkg.dependencies?.[name] && !pkg.devDependencies?.[name]);
-  for (const [name, field] of added) (pkg[field] ??= {})[name] = versions[name];
+  for (const [name, field] of added) {
+    const version = versions[name];
+    if (version === undefined) {
+      throw new Error(`void-fbtee: no tested version of ${name} in void-fbtee's own package.json`);
+    }
+    (pkg[field] ??= {})[name] = version;
+  }
   // In name order, as package managers keep them.
-  for (const field of new Set(added.map(([, f]) => f)))
+  for (const field of new Set(added.map(([, f]) => f))) {
     pkg[field] = Object.fromEntries(
       Object.entries(pkg[field] ?? {}).sort(([a], [b]) => a.localeCompare(b)),
     );
+  }
 
   // 2. Scripts: none. vp dev and vp build do the work, so the i18n:* scripts an earlier init
   // added (their void-fbtee commands are gone) are taken out.
@@ -347,15 +386,20 @@ export async function init(o: InitOptions): Promise<InitResult> {
         k.startsWith("i18n:") && /^void-fbtee (prepare|check|translate|stamp)\b/.test(String(v)),
     )
     .map(([k]) => k);
-  for (const k of oldScripts) delete pkg.scripts![k];
+  for (const k of oldScripts) {
+    delete pkg.scripts?.[k];
+  }
   if (added.length || oldScripts.length) {
     writeJson(at("package.json"), pkg);
     written.add("package.json");
-    if (added.length) done.push(`package.json: added ${added.map(([n]) => n).join(", ")}`);
-    if (oldScripts.length)
+    if (added.length) {
+      done.push(`package.json: added ${added.map(([n]) => n).join(", ")}`);
+    }
+    if (oldScripts.length) {
       done.push(
         `package.json: removed scripts ${oldScripts.join(", ")} (vp dev and vp build do it)`,
       );
+    }
   }
 
   // 3. Middleware.
@@ -390,23 +434,25 @@ export async function init(o: InitOptions): Promise<InitResult> {
     { name: "_not-found", code: NOT_FOUND, what: "not-found page" },
     { name: "_error", code: ERROR, what: "error page" },
   ].filter((p) => !has("pages", p.name));
-  if (errorPages.length && !has("pages/[lang]", "index"))
+  if (errorPages.length && !has("pages/[lang]", "index")) {
     todo.push(
       `pages/_not-found.tsx and pages/_error.tsx: init writes them, in the page's language, once the app has a home page under pages/[lang]/ (their link home goes there); run init again then`,
     );
-  else
+  } else {
     for (const p of errorPages) {
       writeFileSync(at(`pages/${p.name}.tsx`), p.code);
       written.add(`pages/${p.name}.tsx`);
       done.push(`pages/${p.name}.tsx: created, Void's ${p.what} in the page's language`);
     }
+  }
   // Their text is in English, init's own language. In an app written in another language the code's
   // text is that language's (the source), so the developer rewrites it; prepare then translates it.
   const englishPages = errorPages.filter((p) => written.has(`pages/${p.name}.tsx`));
-  if (englishPages.length && new Intl.Locale(o.sourceLocale).language !== "en")
+  if (englishPages.length && new Intl.Locale(o.sourceLocale).language !== "en") {
     todo.push(
       `${englishPages.map((p) => `pages/${p.name}.tsx`).join(" and ")}: their text is in English; write it in ${o.sourceLocale}, the code's language; the dev server then translates it`,
     );
+  }
 
   // 4c. The sitemap, where the app has none.
   if (!has("routes", "sitemap.xml")) {
@@ -430,11 +476,11 @@ export async function init(o: InitOptions): Promise<InitResult> {
     const ownLocales =
       existsSync(at("src/locales.ts")) &&
       !readFileSync(at("src/locales.ts"), "utf8").includes("VoidFbteeRegister");
-    if (ownLocales && !code.includes("void-fbtee/plugin"))
+    if (ownLocales && !code.includes("void-fbtee/plugin")) {
       todo.push(
         `src/locales.ts is the app's own: add voidFbtee({ sourceLocale, locales }) from "void-fbtee/plugin" first in ${viteConfig}'s plugins, with the languages declared once and registered as in void-fbtee's SKILL.md`,
       );
-    else if (!code.includes("void-fbtee/plugin")) {
+    } else if (!code.includes("void-fbtee/plugin")) {
       if (!existsSync(at("src/locales.ts"))) {
         mkdirSync(at("src"), { recursive: true });
         writeFileSync(at("src/locales.ts"), localesFile(o.sourceLocale, o.locales));
@@ -462,56 +508,71 @@ export async function init(o: InitOptions): Promise<InitResult> {
       );
     }
     // The site's own address, for each page's canonical, hreflang and og:url (else each request's).
-    if (!o.site && !/\bsite\s*:/.test(generateCode(mod).code))
+    if (!o.site && !/\bsite\s*:/.test(generateCode(mod).code)) {
       todo.push(
         `${viteConfig}: add the site's address to voidFbtee(), e.g. voidFbtee({ sourceLocale, locales, site: "https://example.com" }), so every copy of the site names it in canonical, hreflang and og:url (or run init with --site)`,
       );
+    }
     if (vitePlus && wsRoot) {
       const rootConfig = join(wsRoot, "vite.config.ts");
       const rootPkg = readJson(join(wsRoot, "package.json"));
       const rootText = existsSync(rootConfig) ? readFileSync(rootConfig, "utf8") : "";
-      if (!rootText.includes("@nkzw/eslint-plugin-fbtee"))
+      if (!rootText.includes("@nkzw/eslint-plugin-fbtee")) {
         todo.push(
           `${rootConfig}: Vite+ only reads lint settings from the workspace's root config. Add lint: { jsPlugins: ["@nkzw/eslint-plugin-fbtee"], rules: ${JSON.stringify(LINT_RULES)} }`,
         );
-      if (rootText.includes(OLD_PLUGIN))
+      }
+      if (rootText.includes(OLD_PLUGIN)) {
         todo.push(
           `${rootConfig}: remove "${OLD_PLUGIN}" from lint.jsPlugins and "${OLD_RULE}" from lint.rules (void-fbtee no longer has them: fbtee 6 fixed what they caught)`,
         );
-      if (!rootPkg.devDependencies?.["@nkzw/eslint-plugin-fbtee"])
+      }
+      if (!rootPkg.devDependencies?.["@nkzw/eslint-plugin-fbtee"]) {
         todo.push(
           `${join(wsRoot, "package.json")}: add "@nkzw/eslint-plugin-fbtee": "${versions["@nkzw/eslint-plugin-fbtee"]}" to devDependencies (lint runs from the workspace root)`,
         );
+      }
     } else if (vitePlus) {
       // fbtee's lint plugin and rules, and none of what init added before fbtee 6. Only Vite+'s
       // defineConfig knows `lint`, so the import moves to vite-plus (as `vp migrate` does).
       const options = configObject(mod, viteConfig);
       const given = field(options, "lint");
       const givenPlugins = plainList(field(given, "jsPlugins"));
-      const plugins: string[] = isStringArray(givenPlugins) ? givenPlugins : [];
+      const plugins: Array<string> = isStringArray(givenPlugins) ? givenPlugins : [];
       const givenRules = field(given, "rules");
       const rules: Record<string, unknown> = isRecord(givenRules) ? { ...givenRules } : {};
-      const wanted = [...plugins.filter((p) => p !== OLD_PLUGIN)];
-      if (!wanted.includes("@nkzw/eslint-plugin-fbtee")) wanted.push("@nkzw/eslint-plugin-fbtee");
+      const wanted = plugins.filter((p) => p !== OLD_PLUGIN);
+      if (!wanted.includes("@nkzw/eslint-plugin-fbtee")) {
+        wanted.push("@nkzw/eslint-plugin-fbtee");
+      }
       const missingRules = Object.keys(LINT_RULES).filter((r) => !(r in rules));
       if (
         JSON.stringify(wanted) !== JSON.stringify(plugins) ||
         missingRules.length ||
         OLD_RULE in rules
       ) {
-        for (const imp of mod.imports.$items)
-          if (imp.from === "vite" && imp.imported === "defineConfig") imp.from = "vite-plus";
+        for (const imp of mod.imports.$items) {
+          if (imp.from === "vite" && imp.imported === "defineConfig") {
+            imp.from = "vite-plus";
+          }
+        }
         const lint = child(options, "lint");
         lint.jsPlugins = wanted;
         const lintRules = child(lint, "rules");
-        for (const r of missingRules) lintRules[r] = LINT_RULES[r];
+        for (const r of missingRules) {
+          lintRules[r] = LINT_RULES[r];
+        }
         delete lintRules[OLD_RULE];
         changed = true;
         done.push(`${viteConfig}: fbtee's lint rules (Vite+ lint.jsPlugins)`);
       }
     }
-    if (changed) writeModule(mod, at(viteConfig));
-    if (changed) written.add(viteConfig);
+    if (changed) {
+      writeModule(mod, at(viteConfig));
+    }
+    if (changed) {
+      written.add(viteConfig);
+    }
   }
 
   // 6. void.config.ts: Cloudflare's temporal flag (native Temporal in the worker). "/" is
@@ -524,7 +585,9 @@ export async function init(o: InitOptions): Promise<InitResult> {
     const mod = await loadFile(at(voidConfig));
     const options = configObject(mod, voidConfig);
     const worker = child(options, "worker");
-    if (!Array.isArray(worker.compatibility_flags)) worker.compatibility_flags = [];
+    if (!Array.isArray(worker.compatibility_flags)) {
+      worker.compatibility_flags = [];
+    }
     const flags: unknown = worker.compatibility_flags;
     let changed = false;
     if (Array.isArray(flags) && !plainList(flags).includes("temporal")) {
@@ -545,17 +608,22 @@ export async function init(o: InitOptions): Promise<InitResult> {
         `${voidConfig}: removed the fixed redirect from "/" to /${o.sourceLocale}: "/" now sends each visitor to their own language`,
       );
     }
-    if (changed) writeModule(mod, at(voidConfig));
-    if (changed) written.add(voidConfig);
+    if (changed) {
+      writeModule(mod, at(voidConfig));
+    }
+    if (changed) {
+      written.add(voidConfig);
+    }
   }
 
   // An own "/" page (a new Void app's starter, pages/index.tsx) is hidden: "/" goes to each
   // visitor's language. The developer decides: move it under pages/[lang]/, or keep it.
   const ownHome = HOME_PAGES.find((f) => existsSync(at(f)));
-  if (ownHome)
+  if (ownHome) {
     todo.push(
       `${ownHome}: hidden, since "/" sends each visitor to their own language; put the home page in pages/[lang]/index.tsx and delete ${ownHome}, or keep it with voidFbtee({ redirectHome: false })`,
     );
+  }
 
   // 7. tsconfig.json: fbtee's JSX types, ES2025 (Temporal, Intl.DurationFormat) and the DOM.
   if (existsSync(at("tsconfig.json"))) {
@@ -575,11 +643,12 @@ export async function init(o: InitOptions): Promise<InitResult> {
         c.types = [...(c.types ?? []), "fbtee/ReactTypes"];
         changed = true;
       }
-      for (const lib of ["ES2025", "DOM", "DOM.Iterable"])
+      for (const lib of ["ES2025", "DOM", "DOM.Iterable"]) {
         if (!c.lib?.includes(lib)) {
           c.lib = [...(c.lib ?? []), lib];
           changed = true;
         }
+      }
       if (changed) {
         writeJson(at("tsconfig.json"), ts);
         written.add("tsconfig.json");
@@ -607,14 +676,20 @@ export async function init(o: InitOptions): Promise<InitResult> {
   //     a relative link, for the agents whose folder the app already has.
   const target = join(o.root, SKILL_DIR);
   for (const agent of AGENTS) {
-    if (!agent.detect.some((f) => existsSync(at(f)))) continue;
+    if (!agent.detect.some((f) => existsSync(at(f)))) {
+      continue;
+    }
     const link = at(join(agent.skillsDir, "void-fbtee"));
     const want = relative(dirname(link), target);
     let current: string | undefined;
     try {
       current = lstatSync(link).isSymbolicLink() ? readlinkSync(link) : "(not a link)";
-    } catch {}
-    if (current === want) continue;
+    } catch {
+      // Nothing there yet: it's linked below.
+    }
+    if (current === want) {
+      continue;
+    }
     if (current) {
       todo.push(`${agent.skillsDir}/void-fbtee exists but isn't the link to ${want}; left alone`);
       continue;
@@ -637,7 +712,9 @@ export async function init(o: InitOptions): Promise<InitResult> {
 
   // Vite+ apps run everything through vp (it picks the package manager itself).
   const pm = vitePlus ? "vp" : packageManager(o.root);
-  if (added.length) todo.unshift(`${pm} install (for the added dependencies)`);
+  if (added.length) {
+    todo.unshift(`${pm} install (for the added dependencies)`);
+  }
   todo.push(
     `${vitePlus ? "vp dev" : `${pm} run dev`}: makes each language's catalog and translates what's new as you work; ${vitePlus ? "vp build" : `${pm} run build`} fails on anything left`,
   );

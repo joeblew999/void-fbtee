@@ -8,9 +8,10 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, inject, test } from "vite-plus/test";
 import entries from "../../packages/void-fbtee/test/entries.json" with { type: "json" };
-import { url } from "../helpers";
+import { json, list, url } from "../helpers";
+import { field } from "../../packages/void-fbtee/src/guards";
 
-const skip = inject("devSkip" as never) as string;
+const skip = inject("devSkip");
 // The token the dev server writes as it starts, for a request from outside it.
 const token = () =>
   readFileSync(
@@ -18,7 +19,7 @@ const token = () =>
     "utf8",
   ).trim();
 
-for (const to of ["th-TH", "ar-EG"])
+for (const to of ["th-TH", "ar-EG"]) {
   test.skipIf(!!skip)(
     `the six test entries into ${to}, through the dev route to Gemini`,
     async () => {
@@ -33,19 +34,17 @@ for (const to of ["th-TH", "ar-EG"])
           body: JSON.stringify({ kind: "string", from: "en-US", to, entry }),
         });
         expect(r.status, key).toBe(200);
-        const answer = (await r.json()) as {
-          result: (string | null)[];
-          problems: string[];
-          usage: { in: number; out: number; thinking: number; usd: number };
-          model: string;
-        };
-        expect(answer.model).toBe("google/gemini-4-hydrogen");
-        expect(answer.problems, key).toEqual([]);
-        expect(answer.result, key).toHaveLength(entry.lines.length);
-        for (const line of answer.result)
+        const answer = await json(r);
+        expect(field(answer, "model")).toBe("google/gemini-4-hydrogen");
+        expect(field(answer, "problems"), key).toEqual([]);
+        const result = list(field(answer, "result"), "the translated lines");
+        expect(result, key).toHaveLength(entry.lines.length);
+        for (const line of result) {
           expect(typeof line === "string" && line.trim(), key).toBeTruthy();
-        expect(answer.usage.in, key).toBeGreaterThan(0);
-        expect(answer.usage.usd, key).toBeGreaterThan(0);
+        }
+        expect(field(field(answer, "usage"), "in"), key).toBeGreaterThan(0);
+        expect(field(field(answer, "usage"), "usd"), key).toBeGreaterThan(0);
       }
     },
   );
+}

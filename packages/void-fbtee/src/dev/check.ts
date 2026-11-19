@@ -16,6 +16,7 @@ import { firstFile, hasI18nMiddleware, HOME_PAGES, LAYOUTS, VOID_CONFIGS } from 
 import { keepTranslations, wiringProblems } from "./gen";
 import { readCatalog } from "./catalog-file";
 import { sourceOf, translatedOf } from "../locales";
+import { group } from "../guards";
 
 /** Frontmatter key a translated markdown page records its original's hash in. */
 export const TRANSLATED_FROM = "translatedFrom";
@@ -32,11 +33,13 @@ export const TRANSLATED_FROM_LINE = new RegExp(`^${TRANSLATED_FROM}:.*$`, "m");
 export function frontmatter(
   text: string,
 ): { start: number; end: number; close: number; yaml: string } | undefined {
-  const start = /^\s*(?:<script\b[\s\S]*?<\/script>\s*)?/.exec(text)![0].length;
+  const start = /^\s*(?:<script\b[\s\S]*?<\/script>\s*)?/.exec(text)?.[0].length ?? 0;
   const block = /^---\r?\n([\s\S]*?)\r?\n(---)[ \t]*(?=\r?\n|$)/.exec(text.slice(start));
-  if (!block) return undefined;
+  if (!block) {
+    return undefined;
+  }
   const end = start + block[0].length;
-  return { start, end, close: start + block[0].lastIndexOf("---"), yaml: block[1]! };
+  return { start, end, close: start + block[0].lastIndexOf("---"), yaml: group(block, 1) };
 }
 
 /**
@@ -64,17 +67,21 @@ export interface MarkdownPage {
 }
 
 /** Every markdown page in the source locale's folder, per other locale. */
-export function markdownPages(p: Project): MarkdownPage[] {
+export function markdownPages(p: Project): Array<MarkdownPage> {
   const pages = join(p.root, "pages");
   const source = sourceOf(p.config);
   const sourceDir = join(pages, source.segment);
-  if (!existsSync(sourceDir)) return [];
+  if (!existsSync(sourceDir)) {
+    return [];
+  }
   const files = globSync("**/*.md", { cwd: sourceDir });
   return translatedOf(p.config).flatMap((l) =>
     files.map((path): MarkdownPage => {
       const file = join(pages, l.segment, path);
       const original = join(sourceDir, path);
-      if (!existsSync(file)) return { path, locale: l.locale, file, original, state: "missing" };
+      if (!existsSync(file)) {
+        return { path, locale: l.locale, file, original, state: "missing" };
+      }
       const recorded = recordedHash(readFileSync(file, "utf8"));
       const current = markdownHash(readFileSync(original, "utf8"));
       const state = !recorded ? "unrecorded" : recorded === current ? "ok" : "stale";
@@ -89,11 +96,11 @@ export function markdownPages(p: Project): MarkdownPage[] {
  * them, and void-fbtee's middleware gives them to og:title and og:description). A copy without
  * one has none of those in its language. Returns the missing ones.
  */
-export function missingHead(original: string, copy: string): string[] {
+export function missingHead(original: string, copy: string): Array<string> {
   const fields = (text: string) => {
     const yaml = frontmatter(text)?.yaml ?? "";
     return new Set(
-      [...yaml.matchAll(/^(title|description):[ \t]*(\S.*)$/gm)].map(([, key]) => key!),
+      [...yaml.matchAll(/^(title|description):[ \t]*(\S.*)$/gm)].map((m) => group(m, 1)),
     );
   };
   const has = fields(copy);
@@ -117,7 +124,7 @@ function splitPage(text: string) {
  * blocks, @void/md's markers (`::: tip`, `> [!NOTE]`, `[[toc]]`), attributes (`{#times}`),
  * footnote labels (`[^dst]`) and link targets. The rest is text to translate.
  */
-export function keptParts(text: string): string[] {
+export function keptParts(text: string): Array<string> {
   const squash = (s: string) => s.replace(/\s+/g, " ").trim();
   const page = splitPage(text);
   const all = (re: RegExp, as: (m: RegExpMatchArray) => string = (m) => m[0]) =>
@@ -127,7 +134,7 @@ export function keptParts(text: string): string[] {
     ...page.code,
     ...all(/<[A-Z][\w.]*\b[^>]*>/g),
     ...all(/^:::[ \t]*(\w+)/gm, (m) => `::: ${m[1]}`),
-    ...all(/^>[ \t]*\[!(\w+)\]/gm, (m) => `> [!${m[1]!.toUpperCase()}]`),
+    ...all(/^>[ \t]*\[!(\w+)\]/gm, (m) => `> [!${group(m, 1).toUpperCase()}]`),
     ...all(/\[\[toc\]\]/g),
     ...all(/\{[.#][^{}\n]*\}/g),
     ...all(/\[\^[^\]\s]+\]/g),
@@ -142,13 +149,15 @@ export function keptParts(text: string): string[] {
  * its own English default there ("TIP", "NOTE"), which no translation can change; the original
  * gives each one a title, and each copy translates it.
  */
-export function untitled(text: string): string[] {
+export function untitled(text: string): Array<string> {
   const { text: body } = splitPage(text);
   return [
     ...[...body.matchAll(/^:::[ \t]*(tip|info|warning|danger|details)[ \t]*$/gm)].map(
       (m) => `::: ${m[1]}`,
     ),
-    ...[...body.matchAll(/^>[ \t]*\[!(\w+)\][ \t]*$/gm)].map((m) => `> [!${m[1]!.toUpperCase()}]`),
+    ...[...body.matchAll(/^>[ \t]*\[!(\w+)\][ \t]*$/gm)].map(
+      (m) => `> [!${group(m, 1).toUpperCase()}]`,
+    ),
   ];
 }
 
@@ -158,7 +167,9 @@ function partsDiffer(original: string, copy: string): string | undefined {
   const have = keptParts(copy);
   const lacks = want.filter((x) => !have.includes(x));
   const extra = have.filter((x) => !want.includes(x));
-  if (!lacks.length && !extra.length) return undefined;
+  if (!lacks.length && !extra.length) {
+    return undefined;
+  }
   return [
     lacks.length && `lacks ${lacks.join(", ")}`,
     extra.length && `has ${extra.join(", ")} that the original doesn't`,
@@ -172,28 +183,38 @@ function partsDiffer(original: string, copy: string): string | undefined {
  * folder. Named for the developer to delete (nothing is deleted for them). A folder under pages/
  * counts only if it's named as a language Intl knows ("de-DE", not "events") and holds markdown.
  */
-export function leftovers(p: Project): string[] {
-  const out: string[] = [];
+export function leftovers(p: Project): Array<string> {
+  const out: Array<string> = [];
   const catalogs = join(p.root, p.translations);
   const wanted = new Set(catalogLocales(p));
-  if (existsSync(catalogs))
-    for (const f of readdirSync(catalogs))
-      if (f.endsWith(".json") && !wanted.has(f.slice(0, -".json".length)))
+  if (existsSync(catalogs)) {
+    for (const f of readdirSync(catalogs)) {
+      if (f.endsWith(".json") && !wanted.has(f.slice(0, -".json".length))) {
         out.push(`${p.translations}/${f}`);
+      }
+    }
+  }
   const pages = join(p.root, "pages");
   const segments = new Set<string>(p.config.locales.map((l) => l.segment));
-  if (existsSync(pages))
-    for (const d of readdirSync(pages, { withFileTypes: true }))
-      if (d.isDirectory() && !segments.has(d.name) && isLanguage(d.name))
-        if (globSync("**/*.{md,mdx}", { cwd: join(pages, d.name) }).length)
+  if (existsSync(pages)) {
+    for (const d of readdirSync(pages, { withFileTypes: true })) {
+      if (d.isDirectory() && !segments.has(d.name) && isLanguage(d.name)) {
+        if (globSync("**/*.{md,mdx}", { cwd: join(pages, d.name) }).length) {
           out.push(`pages/${d.name}/`);
+        }
+      }
+    }
+  }
   return out;
 }
 
 function isLanguage(name: string): boolean {
   try {
     const [tag] = Intl.getCanonicalLocales(name);
-    const language = new Intl.Locale(tag!).language;
+    if (tag === undefined) {
+      return false;
+    }
+    const language = new Intl.Locale(tag).language;
     return (
       new Intl.DisplayNames("en", { type: "language", fallback: "none" }).of(language) !== undefined
     );
@@ -206,29 +227,33 @@ function isLanguage(name: string): boolean {
 const frontmatterOf = (text: string) => frontmatter(text)?.yaml ?? "";
 
 /** Problems, one line each. Empty when everything is in order. */
-export function check(p: Project): string[] {
-  const problems: string[] = [];
+export function check(p: Project): Array<string> {
+  const problems: Array<string> = [];
   const rel = (f: string) => relative(p.root, f);
 
   // A language taken out of the app's list: what it left behind, to delete.
-  for (const left of leftovers(p))
+  for (const left of leftovers(p)) {
     problems.push(`languages: ${left} is for a language no longer in the app's list: delete it`);
+  }
 
   // Setup (what `void-fbtee init` writes).
-  if (!hasI18nMiddleware(p.root))
+  if (!hasI18nMiddleware(p.root)) {
     problems.push(
       `setup: no middleware re-exports "void-fbtee/middleware" (middleware/99.i18n.ts)`,
     );
+  }
   const layout = firstFile(p.root, LAYOUTS);
-  if (!layout || !readFileSync(join(p.root, layout), "utf8").includes("I18nProvider"))
+  if (!layout || !readFileSync(join(p.root, layout), "utf8").includes("I18nProvider")) {
     problems.push(`setup: the root layout (pages/layout.tsx) doesn't wrap pages in <I18nProvider>`);
+  }
   const voidConfig = firstFile(p.root, VOID_CONFIGS);
   const flag = /compatibility_flags\s*:\s*\[[^\]]*["']temporal["']/;
   const voidConfigText = voidConfig ? readFileSync(join(p.root, voidConfig), "utf8") : "";
-  if (!flag.test(voidConfigText))
+  if (!flag.test(voidConfigText)) {
     problems.push(
       `setup: Cloudflare's "temporal" flag is missing (void.config.ts: worker.compatibility_flags)`,
     );
+  }
   // "/" sends each visitor to their own language (the middleware), so a fixed redirect from "/" to
   // one of the app's languages (what init once wrote) sends everyone to that one.
   if (p.redirectHome !== false) {
@@ -237,15 +262,17 @@ export function check(p: Project): string[] {
       `["']/["']\\s*:\\s*\\{[^}]*to\\s*:\\s*["']/(${segments.join("|")})["']`,
     );
     const to = voidConfigText.match(fixed)?.[1];
-    if (to)
+    if (to) {
       problems.push(
         `setup: "/" always redirects to /${to} (void.config.ts: routing.redirects): remove it, void-fbtee sends "/" to each visitor's own language`,
       );
+    }
     const own = HOME_PAGES.find((f) => existsSync(join(p.root, f)));
-    if (own)
+    if (own) {
       problems.push(
         `setup: ${own} is the app's own "/" page, but void-fbtee sends "/" to each visitor's language: set voidFbtee({ redirectHome: false }) to keep it`,
       );
+    }
   }
 
   // What people write, translated by the package (plans/like-better-auth.md): each translations
@@ -255,11 +282,15 @@ export function check(p: Project): string[] {
 
   // Untranslated strings, by fbtee's own rule (same count as the plugin's report).
   for (const r of missing(p)) {
-    if (r.noCatalog) problems.push(`strings: ${r.locale}: no catalog yet`);
-    for (const text of r.app)
+    if (r.noCatalog) {
+      problems.push(`strings: ${r.locale}: no catalog yet`);
+    }
+    for (const text of r.app) {
       problems.push(`strings: ${r.locale}: untranslated ${JSON.stringify(text)}`);
-    if (r.builtin)
+    }
+    if (r.builtin) {
       problems.push(`strings: ${r.locale}: ${r.builtin} of fbtee's built-in strings untranslated`);
+    }
   }
 
   // Every finished translation, by the same check vp dev asks of each answer (judge.ts
@@ -270,7 +301,9 @@ export function check(p: Project): string[] {
   const { texts } = collect(p);
   for (const locale of translatedOf(p.config).map((l) => l.locale)) {
     const file = catalogFile(p, locale);
-    if (!existsSync(file)) continue;
+    if (!existsSync(file)) {
+      continue;
+    }
     const catalog = readCatalog(readFileSync(file, "utf8"), file);
     const source = readCatalog(
       freshCatalog(p, locale),
@@ -279,32 +312,38 @@ export function check(p: Project): string[] {
     for (const [hash, entry] of Object.entries(catalog.translations)) {
       // What the code says now: none (the string is gone from the code), nothing to check against.
       const from = source[hash]?.translations;
-      if (entry.status === "new" || !entry.translations?.length || !from?.length) continue;
+      if (entry.status === "new" || !entry.translations?.length || !from?.length) {
+        continue;
+      }
       // Who translated it, always (plans/translation-provenance.md): a model's id, "claude", a
       // person, or "unknown" when nothing says.
-      if (!entry.translatedBy?.trim())
+      if (!entry.translatedBy?.trim()) {
         problems.push(
           `strings: ${locale}: ${JSON.stringify(texts[hash] ?? hash)}: doesn't say who translated it (translatedBy)`,
         );
+      }
       for (const what of problemsWith(
         from,
         entry.translations.map((l) => l.translation),
         locale,
-      ))
+      )) {
         problems.push(`strings: ${locale}: ${JSON.stringify(texts[hash] ?? hash)}: ${what}`);
+      }
     }
   }
 
   // Markdown pages: every page in every locale, translated from the current original.
   const pages = markdownPages(p);
   const untitledIn = (locale: string, file: string) => {
-    for (const box of untitled(readFileSync(file, "utf8")))
+    for (const box of untitled(readFileSync(file, "utf8"))) {
       problems.push(
         `pages: ${locale}: ${rel(file)}: ${box} has no title, so it shows @void/md's English one: give it a title`,
       );
+    }
   };
-  for (const original of new Set(pages.map((page) => page.original)))
+  for (const original of new Set(pages.map((page) => page.original))) {
     untitledIn(p.config.sourceLocale, original);
+  }
   for (const page of pages) {
     const what = {
       ok: "",
@@ -312,7 +351,9 @@ export function check(p: Project): string[] {
       stale: "out of date (the original changed)",
       unrecorded: `doesn't record which original it was translated from (${TRANSLATED_FROM})`,
     }[page.state];
-    if (what) problems.push(`pages: ${page.locale}: ${rel(page.file)}: ${what}`);
+    if (what) {
+      problems.push(`pages: ${page.locale}: ${rel(page.file)}: ${what}`);
+    }
     // What keptParts() lists is the same in every copy (an out-of-date copy is reported above,
     // and is redone from the original anyway).
     if (page.state === "ok" || page.state === "unrecorded") {
@@ -320,24 +361,27 @@ export function check(p: Project): string[] {
         readFileSync(page.original, "utf8"),
         readFileSync(page.file, "utf8"),
       );
-      if (differ)
+      if (differ) {
         problems.push(
           `pages: ${page.locale}: ${rel(page.file)}: differs from the original where it must match: ${differ}`,
         );
+      }
     }
     if (page.state !== "missing") {
       untitledIn(page.locale, page.file);
-      if (!/^translatedBy:\s*\S/m.test(frontmatterOf(readFileSync(page.file, "utf8"))))
+      if (!/^translatedBy:\s*\S/m.test(frontmatterOf(readFileSync(page.file, "utf8")))) {
         problems.push(
           `pages: ${page.locale}: ${rel(page.file)}: doesn't say who translated it (translatedBy in its frontmatter)`,
         );
+      }
       for (const key of missingHead(
         readFileSync(page.original, "utf8"),
         readFileSync(page.file, "utf8"),
-      ))
+      )) {
         problems.push(
           `pages: ${page.locale}: ${rel(page.file)}: no ${key} in its frontmatter, though the original has one, so its search result and link preview have none: translate it`,
         );
+      }
     }
   }
   return problems;

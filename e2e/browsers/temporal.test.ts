@@ -7,6 +7,7 @@ import { describe, expect, test } from "vite-plus/test";
 import { browser, collectErrors, untilText } from "../helpers";
 import { SOURCE } from "../locales";
 import { ENGINES, prepare } from "./engines";
+import { got } from "../got";
 
 for (const e of ENGINES) {
   describe(e.name, () => {
@@ -21,17 +22,17 @@ for (const e of ENGINES) {
       // the polyfill on the Worker, the browser's own and the polyfill in the browser; "—" where there's no Temporal of its own.
       const rows = await p.$$eval("tr[data-row]", (rs) =>
         rs.map((r) => ({
-          row: (r as HTMLElement).dataset.row,
+          row: r.getAttribute("data-row"),
           results: [...r.querySelectorAll("[data-side]")].map(
-            (c) => [(c as HTMLElement).dataset.side, c.textContent] as const,
+            (c): [string | null, string | null] => [c.getAttribute("data-side"), c.textContent],
           ),
         })),
       );
       expect(rows.length).toBeGreaterThan(20);
       const differs = rows.flatMap(({ row, results }) =>
         results
-          .filter(([, text]) => text !== "—" && text !== results[0]![1])
-          .map(([side, text]) => `${row} ${side}: ${text} (Worker: ${results[0]![1]})`),
+          .filter(([, text]) => text !== "—" && text !== got(results[0])[1])
+          .map(([side, text]) => `${row} ${side}: ${text} (Worker: ${got(results[0])[1]})`),
       );
       const has = (side: string) =>
         !rows.some((r) => r.results.some(([s, t]) => s === side && t === "—"));

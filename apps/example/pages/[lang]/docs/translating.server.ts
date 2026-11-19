@@ -10,7 +10,7 @@ export const getPrerenderPaths = langParams;
 
 export type Props = InferProps<typeof loader>;
 
-type Catalog = Record<string, { status?: string; translations?: unknown[] }>;
+type Catalog = Record<string, { status?: string; translations?: Array<unknown> }>;
 // Every language's catalog, as the repository has it (the source language has none: its text is
 // the code's). Read at build, on the server; only the counts reach the page.
 const catalogs = import.meta.glob<Catalog>("../../../i18n/translations/*.json", {

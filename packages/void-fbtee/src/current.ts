@@ -32,7 +32,9 @@ export function currentTranslations(): TranslationDictionary | undefined {
 /** The current language's URL segment, or undefined where there is none (no request, no inLocale). */
 export function currentLang(): Lang | undefined {
   const fromServer = serverLang?.();
-  if (fromServer) return fromServer;
+  if (fromServer) {
+    return fromServer;
+  }
   // The page's own i18n data, as islands read it (install.ts, documentI18n).
   const lang = field(readMeta(), "lang");
   return isLang(config, lang) ? lang : undefined;

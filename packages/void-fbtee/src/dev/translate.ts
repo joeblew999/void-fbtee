@@ -7,8 +7,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { catalogFile, collect, freshCatalog, missing, type Project } from "./catalogs";
-import { isSpent, readCatalog, type CatalogEntry } from "./catalog-file";
-import { field, isRecord, isStringArray, parseJson, textField } from "../guards";
+import { isSpent, readCatalog, type CatalogEntry, type CatalogLine } from "./catalog-file";
+import { field, isRecord, isStringArray, parseJson, present, textField } from "../guards";
 
 export type { Review } from "./catalog-file";
 import {
@@ -31,14 +31,18 @@ import type { Entry } from "../gemini";
  * same from dist/ (built) and from src/dev/ (the tests). */
 export function packageDir(): string {
   let dir = dirname(fileURLToPath(import.meta.url));
-  while (!existsSync(join(dir, "package.json"))) dir = dirname(dir);
+  while (!existsSync(join(dir, "package.json"))) {
+    dir = dirname(dir);
+  }
   return dir;
 }
 
 /** The skill as the app sees it: through node_modules if it's installed there. */
 export function skillPath(root: string): string {
   const installed = join(root, "node_modules/void-fbtee/skills/void-fbtee/SKILL.md");
-  if (existsSync(installed)) return relative(root, installed);
+  if (existsSync(installed)) {
+    return relative(root, installed);
+  }
   return relative(root, join(packageDir(), "skills/void-fbtee/SKILL.md"));
 }
 
@@ -46,7 +50,7 @@ export interface TranslateTask {
   /** The prompt for the agent; one line per file to work on. */
   prompt: string;
   /** Markdown pages to translate (their translatedFrom is recorded afterwards). */
-  pages: MarkdownPage[];
+  pages: Array<MarkdownPage>;
 }
 
 /** What's left to translate, as a prompt for the agent. Undefined when nothing is. */
@@ -76,7 +80,9 @@ export function translateTask(p: Project): TranslateTask | undefined {
     }[page.state];
     return `- ${rel(page.file)} (${page.locale}): ${what}`;
   });
-  if (!strings.length && !pageLines.length) return;
+  if (!strings.length && !pageLines.length) {
+    return;
+  }
   const prompt = [
     `Translate this Void app. First read ${skillPath(p.root)} (the void-fbtee skill) and follow it.`,
     "",
@@ -103,19 +109,23 @@ export function stamp(p: Project, file: string, by?: Provenance): void {
   const source = sourceOf(p.config);
   const pagesDir = join(p.root, "pages");
   const [segment, ...rest] = relative(pagesDir, file).split(sep);
-  if (!segment || !rest.length || !p.config.locales.some((l) => l.segment === segment))
+  if (!segment || !rest.length || !p.config.locales.some((l) => l.segment === segment)) {
     throw new Error(`${relative(p.root, file)} isn't a page under pages/<locale>/`);
+  }
   const original = join(pagesDir, source.segment, ...rest);
-  if (!existsSync(original))
+  if (!existsSync(original)) {
     throw new Error(`no original for ${relative(p.root, file)} (${relative(p.root, original)})`);
+  }
   const line = `${TRANSLATED_FROM}: "${markdownHash(readFileSync(original, "utf8"))}"`;
   const text = readFileSync(file, "utf8");
   let out: string;
-  if (TRANSLATED_FROM_LINE.test(text)) out = text.replace(TRANSLATED_FROM_LINE, line);
-  else {
+  if (TRANSLATED_FROM_LINE.test(text)) {
+    out = text.replace(TRANSLATED_FROM_LINE, line);
+  } else {
     const fm = frontmatter(text);
-    if (fm) out = text.slice(0, fm.close) + `${line}\n` + text.slice(fm.close);
-    else {
+    if (fm) {
+      out = text.slice(0, fm.close) + `${line}\n` + text.slice(fm.close);
+    } else {
       const script = /^<script>[\s\S]*?<\/script>\n*/.exec(text)?.[0] ?? "";
       out = `${script}---\n${line}\n---\n\n${text.slice(script.length)}`;
     }
@@ -127,11 +137,17 @@ export function stamp(p: Project, file: string, by?: Provenance): void {
     out = frontmatterLine(out, "translatedAt", by.at ?? today());
     // Only a request's own log and cost: one left from an earlier translation would say a request
     // made this.
-    if (by.gatewayLogId) out = frontmatterLine(out, "gatewayLogId", by.gatewayLogId);
-    else out = out.replace(/^gatewayLogId:.*\n/m, "");
+    if (by.gatewayLogId) {
+      out = frontmatterLine(out, "gatewayLogId", by.gatewayLogId);
+    } else {
+      out = out.replace(/^gatewayLogId:.*\n/m, "");
+    }
     // What it cost (plans/translation-simple.md), as one line of YAML (JSON is YAML).
-    if (by.usage) out = frontmatterLine(out, "usage", by.usage);
-    else out = out.replace(/^usage:.*\n/m, "");
+    if (by.usage) {
+      out = frontmatterLine(out, "usage", by.usage);
+    } else {
+      out = out.replace(/^usage:.*\n/m, "");
+    }
     // A review was of what someone else wrote.
     out = out.replace(/^review(edBy|edAt|Note):.*\n/gm, "");
   }
@@ -162,13 +178,19 @@ export interface Provenance {
   usage?: Spent;
 }
 
-/** `key: value` in a page's frontmatter (which stamp() has made sure is there): set or added. */
+/** `key: value` in a page's frontmatter: set, or added, with the frontmatter itself when the page
+ * has none (a page someone wrote without it). */
 function frontmatterLine(text: string, key: string, value: string | object): string {
   const line = `${key}: ${JSON.stringify(value)}`;
   const existing = new RegExp(`^${key}:.*$`, "m");
-  const fm = frontmatter(text)!;
+  const fm = frontmatter(text);
+  if (!fm) {
+    return `---\n${line}\n---\n${text}`;
+  }
   const head = text.slice(0, fm.close);
-  if (existing.test(head)) return head.replace(existing, line) + text.slice(fm.close);
+  if (existing.test(head)) {
+    return head.replace(existing, line) + text.slice(fm.close);
+  }
   return head + `${line}\n` + text.slice(fm.close);
 }
 
@@ -184,12 +206,19 @@ export function appName(root: string): string | undefined {
 /** pnpm or npm, for messages: what the app is installed with. */
 export function packageManager(root: string): "pnpm" | "npm" {
   const agent = process.env.npm_config_user_agent ?? "";
-  if (agent.startsWith("pnpm")) return "pnpm";
-  if (agent.startsWith("npm")) return "npm";
+  if (agent.startsWith("pnpm")) {
+    return "pnpm";
+  }
+  if (agent.startsWith("npm")) {
+    return "npm";
+  }
   for (let d = root; d !== dirname(d); d = dirname(d)) {
-    if (existsSync(join(d, "pnpm-workspace.yaml")) || existsSync(join(d, "pnpm-lock.yaml")))
+    if (existsSync(join(d, "pnpm-workspace.yaml")) || existsSync(join(d, "pnpm-lock.yaml"))) {
       return "pnpm";
-    if (existsSync(join(d, "package-lock.json"))) return "npm";
+    }
+    if (existsSync(join(d, "package-lock.json"))) {
+      return "npm";
+    }
   }
   return "npm";
 }
@@ -199,8 +228,12 @@ export function runner(root: string): string {
   try {
     const pkg = parseJson(readFileSync(join(root, "package.json"), "utf8"));
     const has = (list: string) => field(field(pkg, list), "vite-plus") !== undefined;
-    if (has("devDependencies") || has("dependencies")) return "vp";
-  } catch {}
+    if (has("devDependencies") || has("dependencies")) {
+      return "vp";
+    }
+  } catch {
+    // No package.json to read: the package manager decides.
+  }
   return packageManager(root);
 }
 
@@ -210,7 +243,9 @@ export function runner(root: string): string {
  */
 export function hasClaude(): boolean {
   const run = spawnSync("claude", ["auth", "status"], { encoding: "utf8" });
-  if (run.status !== 0) return false;
+  if (run.status !== 0) {
+    return false;
+  }
   try {
     return field(parseJson(run.stdout), "loggedIn") === true;
   } catch {
@@ -244,7 +279,9 @@ export function runClaude(root: string, prompt: string): Promise<number> {
     buffer += chunk;
     const lines = buffer.split("\n");
     buffer = lines.pop() ?? "";
-    for (const line of lines) showEvent(root, line);
+    for (const line of lines) {
+      showEvent(root, line);
+    }
   });
   return new Promise((resolve) => child.on("close", (code) => resolve(code ?? 1)));
 }
@@ -261,9 +298,11 @@ function showEvent(root: string, line: string) {
   const type = textField(event, "type");
   if (type === "assistant") {
     const content = field(field(event, "message"), "content");
-    const parts: unknown[] = Array.isArray(content) ? content : [];
+    const parts: Array<unknown> = Array.isArray(content) ? content : [];
     for (const c of parts) {
-      if (textField(c, "type") !== "tool_use") continue;
+      if (textField(c, "type") !== "tool_use") {
+        continue;
+      }
       const input = field(c, "input");
       const target = [
         field(input, "file_path"),
@@ -293,7 +332,7 @@ export async function translateApp(
   root: string,
   log: (line: string) => void = console.log,
   handedOut?: string,
-): Promise<{ problems: string[]; prompt?: string }> {
+): Promise<{ problems: Array<string>; prompt?: string }> {
   const task = translateTask(p);
   if (!task) {
     // Nothing for an agent to do.
@@ -322,15 +361,21 @@ export async function translateApp(
     const wasNew = newEntries(p);
     const code = await runClaude(root, task.prompt);
     markTranslatedBy(p, wasNew, "claude");
-    if (code !== 0) log(`\nclaude exited with ${code}`);
+    if (code !== 0) {
+      log(`\nclaude exited with ${code}`);
+    }
     // Pages the agent wrote, and unrecorded ones it checked. An untouched stale page stays stale.
     const unrecorded = new Set(
       task.pages.filter((x) => x.state === "unrecorded").map((x) => x.file),
     );
     for (const [file, text] of before) {
-      if (!existsSync(file)) continue;
+      if (!existsSync(file)) {
+        continue;
+      }
       const changed = readFileSync(file, "utf8") !== text;
-      if (!changed && !(code === 0 && unrecorded.has(file))) continue;
+      if (!changed && !(code === 0 && unrecorded.has(file))) {
+        continue;
+      }
       // Claude wrote it only if it changed it: a page it only checked keeps who wrote it.
       stamp(p, file, changed ? { by: "claude" } : undefined);
       log(`stamped ${relative(root, file)}`);
@@ -340,9 +385,11 @@ export async function translateApp(
 }
 
 /** Each language's catalog, read. */
-function catalogsOf(
-  p: Project,
-): { locale: string; file: string; catalog: { translations: Record<string, CatalogEntry> } }[] {
+function catalogsOf(p: Project): Array<{
+  locale: string;
+  file: string;
+  catalog: { translations: Record<string, CatalogEntry> };
+}> {
   return missing(p)
     .map((m) => ({ locale: m.locale, file: catalogFile(p, m.locale) }))
     .filter(({ file }) => existsSync(file))
@@ -371,7 +418,7 @@ export function pageAwaitsReview(text: string): boolean {
 }
 
 /** The translated pages that wait for review (up-to-date ones: a stale page is retranslated first). */
-export function unreviewedPages(p: Project): MarkdownPage[] {
+export function unreviewedPages(p: Project): Array<MarkdownPage> {
   return markdownPages(p).filter(
     (page) => page.state === "ok" && pageAwaitsReview(readFileSync(page.file, "utf8")),
   );
@@ -381,7 +428,9 @@ export function unreviewedPages(p: Project): MarkdownPage[] {
 export function waitingReview(p: Project): string {
   const entries = [...unreviewed(p)].filter(([, n]) => n).map(([l, n]) => `${l} ${n}`);
   const pages = unreviewedPages(p).length;
-  if (pages) entries.push(pages === 1 ? "1 page" : `${pages} pages`);
+  if (pages) {
+    entries.push(pages === 1 ? "1 page" : `${pages} pages`);
+  }
   return entries.join(", ");
 }
 
@@ -408,7 +457,9 @@ export function reviewTask(p: Project): string | undefined {
   const pages = unreviewedPages(p).map(
     (page) => `- ${rel(page.file)} (${page.locale}), translated from ${rel(page.original)}`,
   );
-  if (!lines.length && !pages.length) return;
+  if (!lines.length && !pages.length) {
+    return;
+  }
   return [
     `Review this Void app's machine translations. First read ${skillPath(p.root)} (the void-fbtee skill), its "Reviewing" section, and follow it.`,
     ...(lines.length ? ["", "Catalogs:", ...lines] : []),
@@ -429,9 +480,11 @@ export async function reviewApp(
   root: string,
   log: (line: string) => void = console.log,
   handedOut?: string,
-): Promise<{ problems: string[]; prompt?: string }> {
+): Promise<{ problems: Array<string>; prompt?: string }> {
   const prompt = reviewTask(p);
-  if (!prompt) return { problems: check(p) };
+  if (!prompt) {
+    return { problems: check(p) };
+  }
   if (!hasClaude()) {
     if (prompt !== handedOut) {
       log(
@@ -446,7 +499,9 @@ export async function reviewApp(
   );
   log(prompt.replace(/^/gm, "  > "));
   const code = await runClaude(root, prompt);
-  if (code !== 0) log(`\nclaude exited with ${code}`);
+  if (code !== 0) {
+    log(`\nclaude exited with ${code}`);
+  }
   return { problems: check(p) };
 }
 
@@ -455,7 +510,9 @@ function newEntries(p: Project): Map<string, Set<string>> {
   const out = new Map<string, Set<string>>();
   for (const m of missing(p)) {
     const file = catalogFile(p, m.locale);
-    if (!existsSync(file)) continue;
+    if (!existsSync(file)) {
+      continue;
+    }
     const catalog = readCatalog(readFileSync(file, "utf8"), file);
     out.set(
       m.locale,
@@ -476,17 +533,23 @@ function newEntries(p: Project): Map<string, Set<string>> {
 function markTranslatedBy(p: Project, wasNew: Map<string, Set<string>>, by: string): void {
   for (const [locale, hashes] of wasNew) {
     const file = catalogFile(p, locale);
-    if (!existsSync(file) || !hashes.size) continue;
+    if (!existsSync(file) || !hashes.size) {
+      continue;
+    }
     const text = readFileSync(file, "utf8");
     const catalog = readCatalog(text, file);
     for (const h of hashes) {
       const e = catalog.translations[h];
-      if (!e || e.status === "new" || e.translatedBy) continue;
+      if (!e || e.status === "new" || e.translatedBy) {
+        continue;
+      }
       e.translatedBy = by;
       e.translatedAt = today();
     }
     const out = JSON.stringify(catalog, null, 2) + "\n";
-    if (out !== text) writeFileSync(file, out);
+    if (out !== text) {
+      writeFileSync(file, out);
+    }
   }
 }
 
@@ -496,13 +559,17 @@ function markTranslatedBy(p: Project, wasNew: Map<string, Set<string>>, by: stri
  * can take three or four times as long as the next (102 to 797 thinking tokens on test/answers.json,
  * 2026-11-18), and a group would leave the other slots idle (plans/reliable-work.md).
  */
-async function inTurn<T, R>(items: T[], n: number, work: (item: T) => Promise<R>): Promise<R[]> {
+async function inTurn<T, R>(
+  items: Array<T>,
+  n: number,
+  work: (item: T) => Promise<R>,
+): Promise<Array<R>> {
   const out = new Array<R>(items.length);
   let next = 0;
   const worker = async () => {
     while (next < items.length) {
       const i = next++;
-      out[i] = await work(items[i]!);
+      out[i] = await work(present(items[i], `item ${i} of ${items.length}`));
     }
   };
   await Promise.all(Array.from({ length: Math.min(n, items.length) }, worker));
@@ -521,7 +588,7 @@ const isRouteAnswer = (value: unknown): value is RouteAnswer =>
 
 export interface RouteAnswer {
   result?: unknown;
-  problems?: string[];
+  problems?: Array<string>;
   usage?: Spent;
   logId?: string;
 }
@@ -546,7 +613,9 @@ export function routeCall(
   let paymentSaid = false;
   let gone = false;
   return async (body) => {
-    if (gone) return undefined;
+    if (gone) {
+      return undefined;
+    }
     const res = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json", "x-void-fbtee-token": token },
@@ -554,16 +623,18 @@ export function routeCall(
     });
     if (res.status === 503) {
       const error = textField(await res.json().catch(() => undefined), "error");
-      if (!gone)
+      if (!gone) {
         log(`Void's AI isn't available here (${error ?? "no answer"}), so Claude Code translates`);
+      }
       gone = true;
       return undefined;
     }
     if (res.status === 402 || res.status === 429) {
       // Not paid for now: asking again would only fail again. The rest is left new, for Claude
       // Code, or the next save once credits are back.
-      if (!paymentSaid)
+      if (!paymentSaid) {
         log(`Void's AI stopped: ${paymentAdvice[res.status === 402 ? "credits" : "limit"]}`);
+      }
       paymentSaid = true;
       gone = true;
       return undefined;
@@ -573,9 +644,13 @@ export function routeCall(
       log(`Void's AI gave an unusable answer (${error ?? "no answer"})`);
       return {};
     }
-    if (!res.ok) throw new Error(`the dev server's translate route answered ${res.status}`);
+    if (!res.ok) {
+      throw new Error(`the dev server's translate route answered ${res.status}`);
+    }
     const answer: unknown = await res.json();
-    if (!isRouteAnswer(answer)) throw new Error("the dev server's translate route gave no answer");
+    if (!isRouteAnswer(answer)) {
+      throw new Error("the dev server's translate route gave no answer");
+    }
     return answer;
   };
 }
@@ -596,12 +671,16 @@ const formsOf = (v: Record<string, number> | undefined) =>
  * plural form), it holds the translation, not the source. Undefined when the code no longer has it.
  */
 function sourceEntry(entry: CatalogEntry, fresh: CatalogEntry | undefined): Entry | undefined {
-  if (!fresh?.translations?.length || !entry.translations?.length) return;
+  if (!fresh?.translations?.length || !entry.translations?.length) {
+    return;
+  }
   const byForms = new Map(fresh.translations.map((l) => [formsOf(l.variations), l.translation]));
   const lines: Entry["lines"] = [];
   for (const l of entry.translations) {
     const text = byForms.get(formsOf(l.variations));
-    if (text === undefined) return;
+    if (text === undefined) {
+      return;
+    }
     lines.push({ text, variations: l.variations ?? {} });
   }
   return { description: entry.description ?? fresh.description ?? "", lines };
@@ -633,7 +712,9 @@ export async function translateCatalog(
   let gone = false;
   await inTurn(open, AT_ONCE, async ([hash, entry]) => {
     const source = sourceEntry(entry, fresh[hash]);
-    if (!source || gone) return;
+    if (!source || gone) {
+      return;
+    }
     const answer = await call({
       kind: "string",
       from: sourceLanguageOf(hash, builtinHashes, p.config.sourceLocale),
@@ -654,22 +735,41 @@ export async function translateCatalog(
         ? result
         : undefined;
     if (!lines || answer.problems?.length) {
-      if (answer.problems?.length)
+      if (answer.problems?.length) {
         log(`${texts[hash] ?? hash} → ${JSON.stringify(lines)}: ${answer.problems.join(" ")}`);
+      }
       return;
     }
-    entry.translations = entry.translations!.map((l, k) => ({ ...l, translation: lines[k]! }));
+    // Every line answered, or the answer isn't used: a line left out isn't stored as nothing.
+    const answered: Array<CatalogLine> = [];
+    for (const [k, l] of (entry.translations ?? []).entries()) {
+      const translation = lines[k];
+      if (typeof translation !== "string") {
+        log(`${texts[hash] ?? hash}: Void's AI left line ${k + 1} out; asked again later`);
+        return;
+      }
+      answered.push({ ...l, translation });
+    }
+    entry.translations = answered;
     entry.status = "translated";
     entry.translatedBy = GEMINI.id;
     entry.translatedAt = today();
-    if (answer.logId) entry.gatewayLogId = answer.logId;
-    else delete entry.gatewayLogId;
-    if (answer.usage) entry.usage = answer.usage;
-    else delete entry.usage;
+    if (answer.logId) {
+      entry.gatewayLogId = answer.logId;
+    } else {
+      delete entry.gatewayLogId;
+    }
+    if (answer.usage) {
+      entry.usage = answer.usage;
+    } else {
+      delete entry.usage;
+    }
     delete entry.review;
     done++;
   });
-  if (gone && !done) return;
+  if (gone && !done) {
+    return;
+  }
   return { done, open: open.length, usd };
 }
 
@@ -693,7 +793,9 @@ export async function translateWithVoidAi(
 
   const catalogs = missing(p).map(async (m) => {
     const file = catalogFile(p, m.locale);
-    if (!existsSync(file)) return true;
+    if (!existsSync(file)) {
+      return true;
+    }
     const catalog = readCatalog(readFileSync(file, "utf8"), file);
     const ran = await translateCatalog(p, call, m.locale, catalog, log);
     // Saves don't wait for translating: a prepare may have changed the file meanwhile (a string
@@ -709,11 +811,14 @@ export async function translateWithVoidAi(
         changed = true;
       }
     }
-    if (changed) writeFileSync(file, JSON.stringify(now, null, 2) + "\n");
-    if (ran?.open)
+    if (changed) {
+      writeFileSync(file, JSON.stringify(now, null, 2) + "\n");
+    }
+    if (ran?.open) {
       log(
         `${rel(file)}: ${ran.done} of ${ran.open} translated with ${GEMINI.id}, US$${ran.usd.toFixed(4)}`,
       );
+    }
     return !!ran;
   });
 
@@ -723,11 +828,15 @@ export async function translateWithVoidAi(
     .map(async (page) => {
       const original = readFileSync(page.original, "utf8");
       const answer = await call({ kind: "page", from, to: page.locale, text: original });
-      if (!answer) return false;
+      if (!answer) {
+        return false;
+      }
       log(`${rel(page.file)}: asked ${GEMINI.id}, US$${(answer.usage?.usd ?? 0).toFixed(4)}`);
       const copy = typeof answer.result === "string" ? answer.result : "";
-      if (!copy.trim()) return true;
-      const same = (a: string[], b: string[]) => a.join("\n") === b.join("\n");
+      if (!copy.trim()) {
+        return true;
+      }
+      const same = (a: Array<string>, b: Array<string>) => a.join("\n") === b.join("\n");
       if (missingHead(original, copy).length || !same(keptParts(original), keptParts(copy))) {
         log(`${rel(page.file)}: Void's AI changed what a copy must keep; left for another way`);
         return true;

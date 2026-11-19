@@ -17,13 +17,13 @@ export interface Line {
 /** A catalog entry to translate: where it shows, and its lines in the source language. */
 export interface Entry {
   description: string;
-  lines: Line[];
+  lines: Array<Line>;
 }
 
 /** A request in Gemini's own shape (generateContent), as Void's AI passes it on. */
 export interface GeminiRequest {
-  systemInstruction: { parts: { text: string }[] };
-  contents: { role: "user"; parts: { text: string }[] }[];
+  systemInstruction: { parts: Array<{ text: string }> };
+  contents: Array<{ role: "user"; parts: Array<{ text: string }> }>;
   generationConfig: {
     thinkingConfig: { thinkingLevel: "low" };
     responseMimeType?: "application/json";
@@ -72,7 +72,7 @@ export const isEntry = (value: unknown): value is Entry =>
   );
 
 export interface GeminiAnswer {
-  candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[];
+  candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }>;
   usageMetadata?: {
     promptTokenCount?: number;
     candidatesTokenCount?: number;
@@ -87,7 +87,7 @@ const config = (schema?: object): GeminiRequest["generationConfig"] => ({
   ...(schema ? { responseMimeType: "application/json", responseJsonSchema: schema } : {}),
 });
 
-const request = (system: string, user: string[], schema?: object): GeminiRequest => ({
+const request = (system: string, user: Array<string>, schema?: object): GeminiRequest => ({
   systemInstruction: { parts: [{ text: system }] },
   contents: [{ role: "user", parts: user.map((text) => ({ text })) }],
   generationConfig: config(schema),
@@ -102,14 +102,19 @@ export const lineName = (variations: Record<string, number>) =>
     .map((v) => MARKS[v] ?? `variation ${v}`)
     .join(", ");
 
-/** Whether an entry is one line with no form or gender: sent and answered as plain text. */
-const plain = (entry: Entry) =>
-  entry.lines.length === 1 && !Object.keys(entry.lines[0]!.variations).length;
+/** An entry's one line when it has one, with no form or gender: sent and answered as plain text. */
+const plainLine = (entry: Entry): Line | undefined => {
+  const [only] = entry.lines;
+  return entry.lines.length === 1 && only && !Object.keys(only.variations).length
+    ? only
+    : undefined;
+};
+const plain = (entry: Entry) => plainLine(entry) !== undefined;
 
 const STRING = { type: "string" };
 
 /** Said once more when an answer had problems: what came back and what to fix. */
-const again = (retry?: { answer: unknown; problems: string[] }) =>
+const again = (retry?: { answer: unknown; problems: Array<string> }) =>
   retry
     ? [
         `Your last answer was ${JSON.stringify(retry.answer)}. Fix these and change nothing else:\n- ${retry.problems.join("\n- ")}`,
@@ -123,12 +128,15 @@ export function stringRequest(
     from,
     to,
     retry,
-  }: { from: string; to: string; retry?: { answer: unknown; problems: string[] } },
+  }: { from: string; to: string; retry?: { answer: unknown; problems: Array<string> } },
 ): GeminiRequest {
   const names = entry.lines.map((l) => lineName(l.variations));
-  const lines = plain(entry)
-    ? entry.lines[0]!.text
-    : Object.fromEntries(entry.lines.map((l, i) => [names[i], l.text]));
+  const one = plainLine(entry);
+  const lines = one
+    ? one.text
+    : Object.fromEntries(
+        entry.lines.map((l): [string, string] => [lineName(l.variations), l.text]),
+      );
   const schema = plain(entry)
     ? STRING
     : {
@@ -147,9 +155,11 @@ export function stringRequest(
  * An answer to stringRequest, read back: each of the entry's lines, in its order, by its name.
  * A line not answered is undefined.
  */
-export function stringAnswer(entry: Entry, answer: unknown): (string | undefined)[] {
+export function stringAnswer(entry: Entry, answer: unknown): Array<string | undefined> {
   const lines = field(answer, "lines");
-  if (plain(entry)) return [typeof lines === "string" ? lines : undefined];
+  if (plain(entry)) {
+    return [typeof lines === "string" ? lines : undefined];
+  }
   return entry.lines.map((l) => {
     const line = field(lines, lineName(l.variations));
     return typeof line === "string" ? line : undefined;
@@ -163,7 +173,7 @@ export function fieldsRequest(
     from,
     to,
     retry,
-  }: { from: string; to: string; retry?: { answer: unknown; problems: string[] } },
+  }: { from: string; to: string; retry?: { answer: unknown; problems: Array<string> } },
 ): GeminiRequest {
   const keys = Object.keys(fields);
   return request(

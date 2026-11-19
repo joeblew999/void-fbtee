@@ -42,7 +42,7 @@ import { languageEntries, normalize, visitorsOwn, type LanguageEntry } from "./l
 import { translationsFor } from "./runtime";
 export { langAttrs } from "./locales";
 import { install, documentI18n, sharedI18n } from "./install";
-import { field, isRecord } from "./guards";
+import { field, isRecord, present } from "./guards";
 import type { SharedI18n } from "./middleware/i18n";
 
 /**
@@ -83,19 +83,22 @@ export function useLocale(): SharedI18n {
   // Regular pages, and islands while the server renders them, have Void's shared data. An island
   // hydrating in the browser has only its props, so it reads the middleware's <meta> instead.
   const i18n = sharedI18n(field(useContext(SharedContext), "i18n")) ?? documentI18n();
-  if (!i18n)
+  if (!i18n) {
     throw new Error("void-fbtee: shared.i18n is missing. Is middleware/99.i18n.ts set up?");
+  }
   return i18n;
 }
 
 /** Every locale the app serves, as configured in voidFbtee(): for a list of language links. */
-export function useLocales(): Locale[] {
+export function useLocales(): Array<Locale> {
   return config.locales;
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const { locale } = useLocale();
-  if (!import.meta.env.SSR) use(install(locale));
+  if (!import.meta.env.SSR) {
+    use(install(locale));
+  }
   return children;
 }
 
@@ -150,11 +153,14 @@ const serverRuntimes = new WeakMap<TranslationDictionary, Map<string, FbteeRunti
 function serverRuntime(locale: string, gender: Gender | undefined): FbteeRuntime {
   const translations = currentTranslations() ?? {};
   let byKey = serverRuntimes.get(translations);
-  if (!byKey) serverRuntimes.set(translations, (byKey = new Map<string, FbteeRuntime>()));
+  if (!byKey) {
+    serverRuntimes.set(translations, (byKey = new Map<string, FbteeRuntime>()));
+  }
   const key = `${locale} ${gender ?? ""}`;
   let runtime = byKey.get(key);
-  if (!runtime)
+  if (!runtime) {
     byKey.set(key, (runtime = createFbteeRuntime(runtimeOptions(locale, gender, translations))));
+  }
   return runtime;
 }
 
@@ -187,7 +193,7 @@ export function Link(props: ComponentProps<typeof VoidLink>) {
 
 // An action's URL, as Void's useForm takes it. In this package Void's route types are its empty
 // stubs (ActionUrl is never; in an app, its routes), which the lint reads as redundant.
-// oxlint-disable-next-line no-redundant-type-constituents
+// oxlint-disable-next-line no-redundant-type-constituents -- ActionUrl is only never inside this package (the comment above)
 type FormUrl = ActionUrl & string;
 
 type VoidFormOptions<U extends FormUrl> = NonNullable<Parameters<typeof voidUseForm<U>>[2]>;
@@ -242,7 +248,9 @@ export function useNow(options?: { updateInterval?: number }): Temporal.Instant 
   const interval = options?.updateInterval;
   const subscribe = useCallback(
     (changed: () => void) => {
-      if (!interval) return () => {};
+      if (!interval) {
+        return () => {};
+      }
       const timer = setInterval(() => {
         browserInstant = Temporal.Now.instant();
         changed();
@@ -275,7 +283,9 @@ const browserNow = () => (browserInstant ??= Temporal.Now.instant());
 const serverInstants = new Map<string, Temporal.Instant>();
 const serverNow = (iso: string) => {
   let instant = serverInstants.get(iso);
-  if (!instant) serverInstants.set(iso, (instant = Temporal.Instant.from(iso)));
+  if (!instant) {
+    serverInstants.set(iso, (instant = Temporal.Instant.from(iso)));
+  }
   return instant;
 };
 
@@ -361,8 +371,12 @@ export function LanguagePicker({
       </a>
     </li>
   );
-  const current = entries.find((e) => e.locale === page)!;
-  const mine = own.map((l) => entries.find((e) => e.locale === l)!);
+  // The page's own language, and the visitor's own, among the app's (entries has every one).
+  const current = present(
+    entries.find((e) => e.locale === page),
+    `the language ${page} among the app's`,
+  );
+  const mine = own.flatMap((l) => entries.filter((e) => e.locale === l));
   return (
     <details
       {...part("root")}

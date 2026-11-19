@@ -14,7 +14,7 @@ export interface Pending {
 const store = new AsyncLocalStorage<Map<string, Pending>>();
 
 /** Runs a request with a fresh list of what it found missing (the middleware). */
-export function withPending<T>(fn: () => T): { result: T; pending: () => Pending[] } {
+export function withPending<T>(fn: () => T): { result: T; pending: () => Array<Pending> } {
   const found = new Map<string, Pending>();
   const result = store.run(found, fn);
   return { result, pending: () => [...found.values()] };

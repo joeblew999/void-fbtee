@@ -31,6 +31,9 @@ catalog:
   "@void/md": 1.8.0
   "@void/react": 1.8.0
   vitest: 5.1.0
+  # Hono's types, at the version Void 1.8.0 resolves (its range ^4.13.18): void-fbtee's build types
+  # Hono's route helper with them (src/virtual.d.ts), and the code uses Void's own copy at run time.
+  hono: 4.13.19
 peerDependencyRules:
   allowAny:
     - vite

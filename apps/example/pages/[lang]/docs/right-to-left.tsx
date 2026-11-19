@@ -1,15 +1,15 @@
 // The Right-to-left page, a reference: one address per language, and the same markup shown both
 // ways round (written with start and end, never left and right), and what it takes, with the lines
 // that do it.
+import { buildUrl } from "void-fbtee/routes";
 import { fbt } from "fbtee";
 import { ChevronRight } from "lucide-react";
-import type { RouteUrl } from "void/routes";
 import { langAttrs } from "void-fbtee/locales";
 import { Link, useLocale, useLocales } from "void-fbtee/react";
 import { DocsPage } from "@/docs/DocsPage";
 import { ComponentsLink, Points, Section, SkillLink, type Point } from "@/docs/Points";
 
-function points(): Point[] {
+function points(): Array<Point> {
   return [
     {
       id: "direction",
@@ -145,7 +145,7 @@ export default function RightToLeftPage() {
       id: "how",
       title: <fbt common>What it takes</fbt>,
     },
-  ];
+  ] as const;
   return (
     <DocsPage
       testId="right-to-left-title"
@@ -167,7 +167,7 @@ export default function RightToLeftPage() {
                 {l.dir}
               </span>
               <Link
-                href={`/${l.segment}${path}` as RouteUrl}
+                href={buildUrl(`/${l.segment}${path}`)}
                 className="font-mono text-xs underline"
                 dir="ltr"
               >

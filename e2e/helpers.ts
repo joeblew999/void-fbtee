@@ -10,15 +10,38 @@ import {
 } from "playwright";
 import PostalMime from "postal-mime";
 import { afterAll, afterEach, beforeAll, expect, inject } from "vite-plus/test";
+import { field, isRecord, isStringArray, textField } from "../packages/void-fbtee/src/guards";
+import { got } from "./got";
 
-export const url = (mode: "prod") => inject(mode as never) as string;
+declare global {
+  interface Window {
+    /** Every text each [data-testid] element has shown (watchTexts). */
+    __seen?: Record<string, Set<string>>;
+  }
+}
+
+/** A response's JSON, as unknown: each test reads it with the checked readers below. */
+export const json = async (r: Response): Promise<unknown> => {
+  const value: unknown = await r.json();
+  return value;
+};
+
+/** A list in JSON, or the test stops. */
+export function list(value: unknown, what = "a list"): Array<unknown> {
+  if (!Array.isArray(value)) {
+    throw new Error(`expected ${what}, got ${JSON.stringify(value)}`);
+  }
+  return value;
+}
+
+export const url = (mode: "prod") => inject(mode);
 
 /**
  * Whether the suite runs against the live site (`vp run test:production`): tests that post or book
  * skip themselves there, since that would call Void's AI and send real email (Void's TESTING.md:
  * live tests are opt-in and leave nothing behind).
  */
-export const onLiveSite = () => inject("live" as never) as boolean;
+export const onLiveSite = () => inject("live") === true;
 
 /**
  * One browser per test file; each `page()` gets a fresh context, closed after its test. Chromium
@@ -31,16 +54,19 @@ export const onLiveSite = () => inject("live" as never) as boolean;
  */
 export function browser(mode: "prod", engine: "chromium" | "webkit" = "chromium") {
   let b: Browser;
-  const contexts: BrowserContext[] = [];
-  const log: string[] = [];
+  const contexts: Array<BrowserContext> = [];
+  const log: Array<string> = [];
   beforeAll(async () => {
     b = await (engine === "webkit" ? webkit : chromium).launch();
   });
   afterEach(async ({ task }) => {
-    if (task.result?.state === "fail" && log.length)
+    if (task.result?.state === "fail" && log.length) {
       console.error(`What the pages did in "${task.name}":\n${log.slice(-60).join("\n")}`);
+    }
     log.length = 0;
-    for (const c of contexts.splice(0)) await c.close();
+    for (const c of contexts.splice(0)) {
+      await c.close();
+    }
   });
   afterAll(() => b?.close());
   return async (options: BrowserContextOptions = {}): Promise<Page> => {
@@ -70,16 +96,18 @@ export async function untilText(
   nth = 0,
 ) {
   await page.waitForFunction(
-    ([selector, kind, want, nth]) => {
-      const text = document.querySelectorAll(selector as string)[nth as number]?.textContent;
-      if (text == null) return false;
-      return kind === "is"
-        ? text === want
-        : kind === "has"
-          ? text.includes(want as string)
-          : text !== want;
+    (arg) => {
+      const text = document.querySelectorAll(arg.selector)[arg.nth]?.textContent;
+      if (text == null) {
+        return false;
+      }
+      return arg.kind === "is"
+        ? text === arg.want
+        : arg.kind === "has"
+          ? text.includes(arg.want)
+          : text !== arg.want;
     },
-    [selector, kind, want, nth] as const,
+    { selector, kind, want, nth },
   );
 }
 
@@ -116,26 +144,22 @@ export const hydrated = (page: Page, name: string, count: number) =>
 export async function watchTexts(page: Page) {
   await page.addInitScript(() => {
     const seen: Record<string, Set<string>> = {};
-    (window as unknown as { __seen: typeof seen }).__seen = seen;
+    window.__seen = seen;
     new MutationObserver(() =>
       document.querySelectorAll<HTMLElement>("[data-testid]").forEach((el) => {
-        (seen[el.dataset.testid!] ??= new Set()).add(el.textContent ?? "");
+        (seen[got(el.dataset.testid)] ??= new Set()).add(el.textContent ?? "");
       }),
     ).observe(document, { subtree: true, childList: true, characterData: true });
   });
-  return (): Promise<Record<string, string[]>> =>
+  return (): Promise<Record<string, Array<string>>> =>
     page.evaluate(() =>
-      Object.fromEntries(
-        Object.entries((window as unknown as { __seen: Record<string, Set<string>> }).__seen).map(
-          ([k, v]) => [k, [...v]],
-        ),
-      ),
+      Object.fromEntries(Object.entries(window.__seen ?? {}).map(([k, v]) => [k, [...v]])),
     );
 }
 
 /** Console errors and uncaught page errors. Call before page.goto. */
 /** Keeps what a page does, for a failing test's report (browser()). */
-function watch(page: Page, log: string[]) {
+function watch(page: Page, log: Array<string>) {
   page.on("console", (m) => log.push(`console.${m.type()}: ${m.text()}`));
   page.on("pageerror", (e) => log.push(`page error: ${String(e)}`));
   page.on("framenavigated", (f) => f === page.mainFrame() && log.push(`navigated: ${f.url()}`));
@@ -144,8 +168,8 @@ function watch(page: Page, log: string[]) {
   );
 }
 
-export function collectErrors(page: Page): string[] {
-  const errors: string[] = [];
+export function collectErrors(page: Page): Array<string> {
+  const errors: Array<string> = [];
   page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
   page.on("pageerror", (e) => errors.push(String(e)));
   return errors;
@@ -169,28 +193,30 @@ const hook = (path: string, init: { method?: string; body?: string } = {}) =>
     ...init,
     headers: {
       "Content-Type": "application/json",
-      "x-void-dev-trigger": inject("devToken" as never) as string,
+      "x-void-dev-trigger": got(inject("devToken"), "the dev server's trigger token"),
     },
   });
 
 /** An email from Void's dev inbox, as postal-mime (Void's own parser) reads it. */
 export type Mail = {
-  to: string[];
+  to: Array<string>;
   subject: string;
   text: string;
   html: string;
   /** What it carries: the logo shown inside it, a PDF attached. */
-  attachments: { filename: string; mimeType: string; content: Uint8Array }[];
+  attachments: Array<{ filename: string; mimeType: string; content: Uint8Array }>;
 };
 
 /**
  * The emails Void's dev inbox holds for `to`, newest first. The inbox's page links each message;
  * its raw form (`/__void/inbox/<id>/raw`) is the email as sent.
  */
-export async function emailsTo(to: string): Promise<Mail[]> {
+export async function emailsTo(to: string): Promise<Array<Mail>> {
   const page = await (await hook("inbox")).text();
-  const ids = [...new Set([...page.matchAll(/\/__void\/inbox\/([^/?"]+)\?/g)].map((m) => m[1]!))];
-  const mails: Mail[] = [];
+  const ids = [
+    ...new Set([...page.matchAll(/\/__void\/inbox\/([^/?"]+)\?/g)].map((m) => got(m[1]))),
+  ];
+  const mails: Array<Mail> = [];
   for (const id of ids) {
     const raw = await (await hook(`inbox/${id}/raw`)).arrayBuffer();
     const email = await PostalMime.parse(raw);
@@ -207,7 +233,9 @@ export async function emailsTo(to: string): Promise<Mail[]> {
         ),
       })),
     };
-    if (mail.to.includes(to)) mails.push(mail);
+    if (mail.to.includes(to)) {
+      mails.push(mail);
+    }
   }
   return mails;
 }
@@ -221,7 +249,7 @@ export async function emailsTo(to: string): Promise<Mail[]> {
 export async function emailTo(to: string, subject: RegExp, timeout = 30_000): Promise<Mail> {
   const matching = async () => (await emailsTo(to)).filter((m) => subject.test(m.subject));
   await expect.poll(async () => (await matching()).length, { timeout }).toBe(1);
-  return (await matching())[0]!;
+  return got((await matching())[0]);
 }
 
 /**
@@ -231,21 +259,25 @@ export async function emailTo(to: string, subject: RegExp, timeout = 30_000): Pr
  */
 export async function dbRows(
   sql: string,
-  params: unknown[] = [],
-): Promise<Record<string, unknown>[]> {
+  params: Array<unknown> = [],
+): Promise<Array<Record<string, unknown>>> {
   const api = `${url("prod")}/cdn-cgi/local/explorer/api/d1/database`;
-  const { result: dbs } = (await (await fetch(api)).json()) as { result: { uuid: string }[] };
+  const dbs = list(field(await json(await fetch(api)), "result"));
   expect(dbs, "the dev server's D1 databases").toHaveLength(1);
-  const r = await fetch(`${api}/${dbs[0]!.uuid}/raw`, {
+  const uuid = got(textField(dbs[0], "uuid"), "the D1 database's uuid");
+  const r = await fetch(`${api}/${uuid}/raw`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ sql, params }),
   });
-  const { result } = (await r.json()) as {
-    result: { results: { columns: string[]; rows: unknown[][] } }[];
-  };
-  const { columns, rows } = result[0]!.results;
-  return rows.map((row) => Object.fromEntries(columns.map((c, i) => [c, row[i]])));
+  const results = field(list(field(await json(r), "result"))[0], "results");
+  const columns = field(results, "columns");
+  if (!isStringArray(columns)) {
+    throw new Error(`D1 gave no column names for ${sql}`);
+  }
+  return list(field(results, "rows")).map((row) =>
+    Object.fromEntries(columns.map((c, i) => [c, list(row)[i]])),
+  );
 }
 
 /**
@@ -260,8 +292,9 @@ export async function runQueue(queue: string, body: unknown): Promise<string> {
       messages: [{ id: crypto.randomUUID(), timestamp: Date.now(), body, attempts: 1 }],
     }),
   });
-  const answer = (await r.json()) as { decisions: Record<string, { action: string }> };
-  return Object.values(answer.decisions)[0]!.action;
+  const decisions = field(await json(r), "decisions");
+  const action = textField(Object.values(isRecord(decisions) ? decisions : {})[0], "action");
+  return got(action, `Void's decision for the ${queue} message`);
 }
 
 /** Runs a cron job with Void's trigger (`POST /__void/scheduled`), as if at `scheduledTime`. */
@@ -270,7 +303,9 @@ export async function runCron(cron: string, scheduledTime: number) {
     method: "POST",
     body: JSON.stringify({ cron, scheduledTime }),
   });
-  if (!r.ok) throw new Error(`/__void/scheduled answered ${r.status}: ${await r.text()}`);
+  if (!r.ok) {
+    throw new Error(`/__void/scheduled answered ${r.status}: ${await r.text()}`);
+  }
 }
 
 /** An event a test posted: its id, its private key, and its path without the language. */
@@ -308,14 +343,18 @@ export async function postEvent(
   await page.getByTestId("event-description-input").fill(description);
   await page.getByTestId("event-local-input").fill(local);
   await page.getByTestId("event-local-end-input").fill(end);
-  if (seats) await page.getByTestId("event-seats-input").fill(String(seats));
-  if (email) await page.getByTestId("event-email-input").fill(email);
+  if (seats) {
+    await page.getByTestId("event-seats-input").fill(String(seats));
+  }
+  if (email) {
+    await page.getByTestId("event-email-input").fill(email);
+  }
   await page.getByTestId("event-post").click();
   await page.waitForURL(/\/events\/[0-9a-f-]{36}#key=/);
   const at = new URL(page.url());
   return {
-    id: at.pathname.split("/").pop()!,
-    key: new URLSearchParams(at.hash.slice(1)).get("key")!,
+    id: got(at.pathname.split("/").pop()),
+    key: got(new URLSearchParams(at.hash.slice(1)).get("key")),
     path: at.pathname.replace(/^\/[^/]+/, ""),
   };
 }
@@ -384,7 +423,9 @@ export async function book(
 ) {
   await page.getByTestId("book-name").fill(name);
   await page.getByTestId("book-email").fill(email);
-  if (options.ticketInReminder) await page.getByTestId("book-reminder-ticket").check();
+  if (options.ticketInReminder) {
+    await page.getByTestId("book-reminder-ticket").check();
+  }
   await page.getByTestId("book").click();
   await page.getByTestId("booked").waitFor();
 }
@@ -393,17 +434,17 @@ export async function book(
  * The PDF tickets the dev server keeps in R2 (not the docs' samples), read through the Cloudflare
  * Vite plugin's local explorer (`/cdn-cgi/local/explorer/api`, which the dev server prints).
  */
-export async function keptTickets(): Promise<string[]> {
+export async function keptTickets(): Promise<Array<string>> {
   const api = `${url("prod")}/cdn-cgi/local/explorer/api/r2/buckets`;
   // The app's one bucket, under whatever name it has: the dev server takes the deployed bucket's
   // name from apps/example/void.lock.json ("void-fbtee-example-storage"), not "default".
-  const { result: buckets } = (await (await fetch(api)).json()) as {
-    result: { buckets: { name: string }[] };
-  };
-  expect(buckets.buckets, "the dev server's R2 buckets").toHaveLength(1);
-  const r = await fetch(`${api}/${buckets.buckets[0]!.name}/objects?prefix=tickets/`);
-  const { result } = (await r.json()) as { result: { key: string }[] };
-  return result.map((o) => o.key).filter((k) => !k.startsWith("tickets/sample/"));
+  const buckets = list(field(field(await json(await fetch(api)), "result"), "buckets"));
+  expect(buckets, "the dev server's R2 buckets").toHaveLength(1);
+  const name = got(textField(buckets[0], "name"), "the R2 bucket's name");
+  const r = await fetch(`${api}/${name}/objects?prefix=tickets/`);
+  return list(field(await json(r), "result"))
+    .map((o) => got(textField(o, "key"), "an R2 object's key"))
+    .filter((k) => !k.startsWith("tickets/sample/"));
 }
 
 /** A fresh address, so a test reads only its own emails from the shared inbox. */

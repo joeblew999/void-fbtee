@@ -14,7 +14,7 @@ import { primaryDb } from "@/db";
 import { storage } from "void/storage";
 import { langAttrs, type AppLocale } from "void-fbtee/locales";
 import { routeUrl } from "void-fbtee/routes";
-import { inLocale } from "void-fbtee/server";
+import { inLocale, appLocaleOf } from "void-fbtee/server";
 import { SAMPLE_EVENT, SAMPLE_ID, SAMPLE_NAME } from "@/docs/sample-event";
 import { originOr, SITE } from "@/site";
 import { sha256Hex } from "@/sha256";
@@ -74,9 +74,11 @@ export function ticketPage(ticket: TicketFor): Promise<string> {
 export async function bookingTicket(id: string) {
   const db = primaryDb();
   const row = await bookingWithEvent(db, id);
-  if (!row || row.event.cancelled_at) return undefined;
+  if (!row || row.event.cancelled_at) {
+    return undefined;
+  }
   const { booking, event } = row;
-  const locale = booking.locale as AppLocale;
+  const locale = appLocaleOf(booking.locale);
   const text = titleFor(event, await textsFor([event.id], locale, db), locale);
   const page = await inLocale(locale, () =>
     routeUrl("/[lang]/events/[id]", { params: { id: event.id } }),
@@ -115,9 +117,13 @@ async function kept(
   contentType: string,
 ) {
   const found = await storage.get(key);
-  if (found) return new Uint8Array(await found.arrayBuffer());
+  if (found) {
+    return new Uint8Array(await found.arrayBuffer());
+  }
   const page = await html();
-  if (page === undefined) return undefined;
+  if (page === undefined) {
+    return undefined;
+  }
   const file = await print(page);
   await storage.put(key, file, { httpMetadata: { contentType } });
   return file;
@@ -135,7 +141,9 @@ export async function ticketPdf(id: string, browser: BrowserRun) {
     ticketKey(id),
     async () => {
       const booking = await bookingTicket(id);
-      if (!booking || past(booking.ticket.startsAt)) return undefined;
+      if (!booking || past(booking.ticket.startsAt)) {
+        return undefined;
+      }
       printed = true;
       return ticketPage(booking.ticket);
     },
@@ -177,7 +185,9 @@ async function keptSample(
   const kind = key.slice(key.lastIndexOf("."));
   const earlier = await storage.list({ prefix: `tickets/sample/${locale}-` });
   const old = earlier.objects.map((o) => o.key).filter((k) => k !== key && k.endsWith(kind));
-  if (old.length) await storage.delete(old);
+  if (old.length) {
+    await storage.delete(old);
+  }
   return file;
 }
 

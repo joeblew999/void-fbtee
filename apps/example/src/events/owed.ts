@@ -31,9 +31,11 @@ export const isBehind = (booking: Booking, event: Event) =>
  * covers bookers not yet confirmed; the cancellation covers a cancelled event. Asking twice is
  * harmless: the queue checks again before it sends.
  */
-export async function tellBookers(db: Db, eventId: string, locales?: readonly string[]) {
+export async function tellBookers(db: Db, eventId: string, locales?: ReadonlyArray<string>) {
   const event = await eventOn(db, eventId);
-  if (!event) return;
+  if (!event) {
+    return;
+  }
   const owed = (await bookingsOf(db, eventId, locales)).filter(
     (b) => b.confirmed_at && isBehind(b, event),
   );

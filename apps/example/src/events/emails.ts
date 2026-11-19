@@ -32,7 +32,9 @@ type Attachment = {
 
 /** A booking's PDF ticket, attached as ticket.pdf, and the line that says so; none without one. */
 function withTicket(ticket: Uint8Array | undefined) {
-  if (!ticket) return { line: [], attachments: [] };
+  if (!ticket) {
+    return { line: [], attachments: [] };
+  }
   return {
     line: [fbs("Your ticket is attached.", "Email: the booking's PDF ticket is attached to it")],
     attachments: [{ filename: "ticket.pdf", content: ticket, contentType: "application/pdf" }],
@@ -43,7 +45,7 @@ export type Email = {
   subject: string;
   text: string;
   html: string;
-  attachments: Attachment[];
+  attachments: Array<Attachment>;
 };
 
 /**
@@ -85,12 +87,12 @@ export const during = (event: { startsAt: string; endsAt: string }, locale: stri
  */
 async function written(
   subject: string,
-  lines: string[],
+  lines: Array<string>,
   link: string,
   event: EventFor,
   locale: string,
   dir: string,
-  attachments: Attachment[] = [],
+  attachments: Array<Attachment> = [],
 ): Promise<Email> {
   const last = lines.at(-1) ?? "";
   const intro = /[:：]\s*$/.test(last);
@@ -245,7 +247,7 @@ export function changeEmail(
         ),
       );
     }
-    if (booking.was.venue !== undefined)
+    if (booking.was.venue !== undefined) {
       lines.push(
         booking.venue
           ? fbs(
@@ -257,6 +259,7 @@ export function changeEmail(
               "Change email: the organiser removed the event's place",
             ),
       );
+    }
     lines.push(
       fbs(
         "Your seat is kept. Your ticket, with the new details, is on the event's page:",
@@ -318,11 +321,12 @@ export function reminderEmail(
 /** Sends an email; a failure is logged with its code only (never the address), not thrown. */
 async function send(to: string, email: Promise<Email>, what: string) {
   const result = await sendEmail({ from: EMAIL_FROM, to, ...(await email) });
-  if (!result.ok)
+  if (!result.ok) {
     console.warn(
       `${what} email not sent:`,
       "error" in result ? result.error.code : result.deliveries.map((d) => !d.ok && d.error.code),
     );
+  }
   return result.ok;
 }
 

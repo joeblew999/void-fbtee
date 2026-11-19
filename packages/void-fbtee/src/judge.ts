@@ -22,7 +22,11 @@ const CATEGORY_OF = new Map(Object.entries(CATEGORY_CODE).map(([c, n]) => [n, c]
 const forOneNumber = (to: string, category: string) => {
   const rules = new Intl.PluralRules(to);
   let n = 0;
-  for (let k = 0; k <= 1000 && n < 2; k++) if (rules.select(k) === category) n++;
+  for (let k = 0; k <= 1000 && n < 2; k++) {
+    if (rules.select(k) === category) {
+      n++;
+    }
+  }
   return n === 1;
 };
 
@@ -40,13 +44,14 @@ export const sourceLanguageOf = (
  * it, being 21 and 31 too (Intl.PluralRules).
  */
 export function problemsWith(
-  source: SourceLine[],
-  lines: (string | undefined)[],
+  source: Array<SourceLine>,
+  lines: Array<string | undefined>,
   to: string,
-): string[] {
-  if (lines.length !== source.length)
+): Array<string> {
+  if (lines.length !== source.length) {
     return [`Give exactly ${source.length} line(s), one per source line.`];
-  const problems: string[] = [];
+  }
+  const problems: Array<string> = [];
   const all = new Set(source.flatMap((l) => [...placeholders(l.translation)]));
   lines.forEach((line, i) => {
     if (line === undefined || !line.trim()) {
@@ -54,14 +59,22 @@ export function problemsWith(
       return;
     }
     const has = placeholders(line);
-    for (const x of has)
-      if (!all.has(x)) problems.push(`Line ${i + 1} has ${x}, which the source hasn't: remove it.`);
-    const worded = Object.values(source[i]!.variations).some(
-      (v) => WORDED.has(v) && forOneNumber(to, CATEGORY_OF.get(v)!),
-    );
-    if (!worded)
-      for (const x of all)
-        if (!has.has(x)) problems.push(`Line ${i + 1} must keep the placeholder ${x} exactly.`);
+    for (const x of has) {
+      if (!all.has(x)) {
+        problems.push(`Line ${i + 1} has ${x}, which the source hasn't: remove it.`);
+      }
+    }
+    const worded = Object.values(source[i]?.variations ?? {}).some((v) => {
+      const category = CATEGORY_OF.get(v);
+      return WORDED.has(v) && category !== undefined && forOneNumber(to, category);
+    });
+    if (!worded) {
+      for (const x of all) {
+        if (!has.has(x)) {
+          problems.push(`Line ${i + 1} must keep the placeholder ${x} exactly.`);
+        }
+      }
+    }
   });
   return problems;
 }
@@ -73,10 +86,12 @@ export function problemsWith(
 export function fieldProblems(
   fields: Record<string, string>,
   answer: Record<string, string | undefined>,
-): string[] {
+): Array<string> {
   return Object.entries(fields).flatMap(([k, text]) => {
     const got = answer[k];
-    if (!got?.trim()) return text.trim() ? [`The field "${k}" is missing.`] : [];
+    if (!got?.trim()) {
+      return text.trim() ? [`The field "${k}" is missing.`] : [];
+    }
     const want = placeholders(text);
     const has = placeholders(got);
     return [

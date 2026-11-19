@@ -15,7 +15,8 @@ import type { TranslatedContent } from "../content";
 export function translationsCron(content: Pick<TranslatedContent, "reconcile">) {
   return defineScheduled(async () => {
     const { deleted, queued } = await content.reconcile();
-    if (deleted || queued)
+    if (deleted || queued) {
       console.log(`void-fbtee: translations: ${deleted} deleted, ${queued} rows queued`);
+    }
   });
 }

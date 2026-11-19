@@ -20,7 +20,8 @@ import markdownPages from "virtual:void-fbtee/md-pages";
 import langPages from "virtual:void-fbtee/pages";
 import { setServerLang, setServerTranslations } from "./current";
 import type { TranslationDictionary } from "fbtee";
-import type { AppLocale, Dir, Lang, Locale } from "./locales";
+import { present } from "./guards";
+import { fallbackOf, type AppLocale, type Dir, type Lang, type Locale } from "./locales";
 import { buildUrl } from "./routes";
 import { allTranslations, fallbacksOf, reportMissing } from "./runtime";
 import texts from "virtual:void-fbtee/texts";
@@ -80,10 +81,11 @@ export async function inLocale<T>(
   fn: (language: { locale: AppLocale; dir: Dir }) => T,
 ): Promise<Awaited<T>> {
   const found = config.locales.find((l) => l.locale === locale);
-  if (!found)
+  if (!found) {
     throw new Error(
       `void-fbtee: inLocale("${locale}"): not one of the app's languages (${config.locales.map((l) => l.locale).join(", ")})`,
     );
+  }
   const translations = await allTranslations(catalogs);
   return await runIn(found, translations, () => fn({ locale, dir: found.dir }));
 }
@@ -96,11 +98,11 @@ export async function inLocale<T>(
  */
 export function revalidate(options: {
   // In this package RouteUrl is Void's stub (string); in an app it's the app's routes.
-  // oxlint-disable-next-line no-redundant-type-constituents
-  paths?: readonly (`/[lang]${string}` | RouteUrl)[];
+  // oxlint-disable-next-line no-redundant-type-constituents -- RouteUrl is only string inside this package (the line above)
+  paths?: ReadonlyArray<`/[lang]${string}` | RouteUrl>;
   all?: boolean;
 }): Promise<void> {
-  const paths = options.paths?.flatMap((path): string[] => {
+  const paths = options.paths?.flatMap((path): Array<string> => {
     const rest = path.startsWith("/[lang]") ? path.slice("/[lang]".length) : undefined;
     return rest !== undefined && isSubPath(rest) ? localizedPaths(rest) : [path];
   });
@@ -117,9 +119,10 @@ const isSubPath = (path: string): path is `/${string}` | "" => path === "" || pa
 // Void's revalidate, for paths built when the code runs: in an app it takes the app's own routes
 // (RouteUrl), which this package, built without an app, doesn't have; its parameter as plain
 // text is what Void's runtime takes. A typed view of the function, which TypeScript checks.
-const clearPaths: (options: { paths?: string[]; all?: boolean }) => Promise<void> = voidRevalidate;
+const clearPaths: (options: { paths?: Array<string>; all?: boolean }) => Promise<void> =
+  voidRevalidate;
 
-export function localizedPaths<P extends `/${string}` | "">(path: P): `/${Lang}${P}`[] {
+export function localizedPaths<P extends `/${string}` | "">(path: P): Array<`/${Lang}${P}`> {
   return config.locales.map((l) => `/${l.segment}${path}` as const);
 }
 
@@ -130,7 +133,7 @@ export function localizedPaths<P extends `/${string}` | "">(path: P): `/${Lang}$
  * first visit after a deploy on direct Cloudflare):
  * `export const prerender = true; export const getPrerenderPaths = langParams;`.
  */
-export function langParams(): { lang: Lang }[] {
+export function langParams(): Array<{ lang: Lang }> {
   return config.locales.map((l) => ({ lang: l.segment }));
 }
 
@@ -164,8 +167,22 @@ export function siteOrigin(c: { req: { url: string } }): string {
 }
 
 /** The app's languages (`voidFbtee({ locales })`), for server code that works per language. */
-export function appLocales(): string[] {
+export function appLocales(): Array<AppLocale> {
   return config.locales.map((l) => l.locale);
+}
+
+/**
+ * One of the app's languages, from text stored or sent (a booker's language in the database):
+ * the text when it's one of them, else the fallback language (`voidFbtee({ fallbackLocale })`),
+ * so someone whose language the app no longer has gets the one it gives everyone else. Checked,
+ * where a cast would believe any text.
+ */
+export function appLocaleOf(value: string): AppLocale {
+  const own = config.locales.find((l) => l.locale === value);
+  if (own) {
+    return own.locale;
+  }
+  return fallbackOf(config).locale;
 }
 
 /**
@@ -204,7 +221,7 @@ export interface SitemapPage {
  */
 export function sitemap(
   c: { req: { url: string } },
-  options: { pages?: readonly SitemapPage[]; exclude?: readonly LangPage[] } = {},
+  options: { pages?: ReadonlyArray<SitemapPage>; exclude?: ReadonlyArray<LangPage> } = {},
 ): Response {
   const origin = siteOrigin(c);
   const given = options.pages ?? [];
@@ -217,7 +234,7 @@ export function sitemap(
         buildUrl(page.path, { params: { ...page.params, lang: l.segment } }),
       ]),
     );
-  const entries: Entry[] = [
+  const entries: Array<Entry> = [
     ...langPages
       .filter((path) => !options.exclude?.includes(path))
       .map((path) => ({ urls: urlsOf({ path }), lastmod: lastmodOf.get(path) })),
@@ -228,9 +245,9 @@ export function sitemap(
   ];
   // x-default: "/" for the home page, which sends each visitor to their language; else the page in
   // the fallback language (as the middleware's xDefault).
-  const fallback = config.locales.find((l) => l.locale === config.fallbackLocale)!;
+  const fallback = fallbackOf(config);
   const xDefaultOf = (entry: Entry) => {
-    const url = entry.urls[fallback.locale]!;
+    const url = present(entry.urls[fallback.locale], `the sitemap's address in ${fallback.locale}`);
     return config.redirectHome && url.replace(/\/$/, "") === `/${fallback.segment}` ? "/" : url;
   };
   const xml = [
@@ -241,7 +258,13 @@ export function sitemap(
         const lastmod =
           typeof entry.lastmod === "function" ? entry.lastmod(l.locale) : entry.lastmod;
         const alternates = [
-          ...config.locales.map((a) => [a.locale, entry.urls[a.locale]!] as const),
+          ...config.locales.map(
+            (a) =>
+              [
+                a.locale,
+                present(entry.urls[a.locale], `the sitemap's address in ${a.locale}`),
+              ] as const,
+          ),
           ["x-default", xDefaultOf(entry)] as const,
         ].map(
           ([hreflang, url]) =>
@@ -264,10 +287,10 @@ export function sitemap(
 
 /** The markdown pages, from @void/md's own list: each one's copies under pages/<locale>/ as one
  * page, only where it's in every language (an alternate must exist). */
-function markdownEntries(): {
+function markdownEntries(): Array<{
   urls: Record<string, string>;
   lastmod: (l: string) => string | undefined;
-}[] {
+}> {
   const byPath = new Map<
     string,
     { urls: Record<string, string>; updated: Record<string, string> }
@@ -275,12 +298,16 @@ function markdownEntries(): {
   for (const page of markdownPages) {
     const [, segment, ...rest] = page.path.replace(/\/+$/, "").split("/");
     const locale = config.locales.find((l) => l.segment === segment)?.locale;
-    if (!locale) continue;
+    if (!locale) {
+      continue;
+    }
     const key = `/${rest.join("/")}`;
     const entry = byPath.get(key) ?? { urls: {}, updated: {} };
     entry.urls[locale] = page.path;
     const updated = page.frontmatter.updated;
-    if (typeof updated === "string") entry.updated[locale] = updated;
+    if (typeof updated === "string") {
+      entry.updated[locale] = updated;
+    }
     byPath.set(key, entry);
   }
   return [...byPath.values()]
@@ -299,7 +326,7 @@ const xmlText = (text: string) => text.replace(/[&<>"']/g, (ch) => `&#${ch.charC
  * `event_texts`: the item's id, `locale`, and the translated fields, unique on the two):
  * `where(and(eq(event_texts.event_id, id), inArray(event_texts.locale, textLocales(locale))))`.
  */
-export function textLocales(locale: string): string[] {
+export function textLocales(locale: string): Array<string> {
   const own = new Set(config.locales.map((l) => l.locale));
   return [
     ...new Set([locale, ...fallbacksOf(locale, config.fallbackLocales).filter((l) => own.has(l))]),
@@ -312,11 +339,13 @@ export function textLocales(locale: string): string[] {
  * with its own language (langAttrs).
  */
 export function pickText<T extends { locale: string }>(
-  rows: readonly T[],
+  rows: ReadonlyArray<T>,
   locale: string,
 ): T | undefined {
   for (const l of textLocales(locale)) {
     const found = rows.find((r) => r.locale === l);
-    if (found) return found;
+    if (found) {
+      return found;
+    }
   }
 }

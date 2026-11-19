@@ -34,7 +34,7 @@ export const eventPages = (id?: string): Parameters<typeof revalidate>[0]["paths
  * The stored translations of these events: those a page in `locale` can show (it and its
  * fallbacks), or all of them without `locale` (void-fbtee/content translationsFor).
  */
-export const textsFor = (ids: string[], locale?: AppLocale, db?: Db) =>
+export const textsFor = (ids: Array<string>, locale?: AppLocale, db?: Db) =>
   content.translationsFor(events, ids, locale, db);
 
 /**
@@ -45,12 +45,14 @@ export const textsFor = (ids: string[], locale?: AppLocale, db?: Db) =>
  */
 export function textFor(
   event: { id: string; locale: string } & Text,
-  texts: readonly EventTranslation[],
+  texts: ReadonlyArray<EventTranslation>,
   locale: string,
   { note = true }: { note?: boolean } = {},
 ): (Text & { locale: string }) | null {
   const text = content.textOf(events, event, texts, locale, { note });
-  if (!text.translated) return null;
+  if (!text.translated) {
+    return null;
+  }
   return { locale: text.locale, ...text.fields };
 }
 
@@ -60,7 +62,7 @@ export function textFor(
  */
 export function titleFor(
   event: { id: string; locale: string } & Text,
-  texts: readonly EventTranslation[],
+  texts: ReadonlyArray<EventTranslation>,
   locale: string,
 ): { title: string; locale: string } {
   const text = textFor(event, texts, locale, { note: false });
@@ -85,6 +87,6 @@ export async function onTranslated(_table: string, id: string, locale: string) {
  * kept waiting for it, and get the title as written. If the translation lands later, they're owed
  * nothing more.
  */
-export async function onTranslationFailed(_table: string, id: string, locales: string[]) {
+export async function onTranslationFailed(_table: string, id: string, locales: Array<string>) {
   await tellBookers(primaryDb(), id, locales);
 }

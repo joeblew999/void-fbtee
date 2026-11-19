@@ -4,8 +4,8 @@
 // gender, wherever it comes from); a pronoun, an enum's value and a list are their own entries or
 // fbtee's built-in strings, so one line each.
 import { expect, test } from "vite-plus/test";
-import { collectSync, prepareTranslationsBatchSync } from "@nkzw/fbtee-compiler";
-import { addVariants, pluralSlots, type PluralEntry } from "../../src/plurals";
+import { phrasesFrom, prepare } from "./fbtee-run";
+import { got } from "./got";
 
 const SOURCE = `import { fbt } from "fbtee";
 const a = (g) => <fbt desc="subject" subject={g}>You booked.</fbt>;
@@ -19,22 +19,19 @@ const k = (n) => <fbt desc="plural"><fbt:plural count={n} many="seats" showCount
 const l = (items) => <fbt desc="list"><fbt:list items={items} name="xs" conjunction="or" delimiter="semicolon" /></fbt>;
 const m = (g, n) => <fbt desc="subject and plural" subject={g}>You booked <fbt:plural count={n} many="seats" showCount="yes">seat</fbt:plural>.</fbt>;
 `;
-const phrases = JSON.parse(
-  collectSync("s.jsx", SOURCE, { collectPackager: "text" }).output!,
-).phrases;
-const catalog = JSON.parse(
-  addVariants(
-    prepareTranslationsBatchSync(JSON.stringify({ phrases }), [{ locale: "ar-EG" }])[0]!,
-    pluralSlots(phrases),
-    "ar-EG",
-  ),
-) as { translations: Record<string, PluralEntry> };
+const phrases = phrasesFrom("s.jsx", SOURCE);
+const catalog = prepare(phrases, "ar-EG");
 const text: Record<string, string> = {};
-for (const ph of phrases)
-  for (const [hash, leaf] of Object.entries<{ desc: string; text: string }>(ph.hashToLeaf ?? {}))
+for (const ph of phrases) {
+  for (const [hash, leaf] of Object.entries(ph.hashToLeaf ?? {})) {
     text[hash] = `${leaf.desc}: ${leaf.text}`;
+  }
+}
 const lines = Object.fromEntries(
-  Object.entries(catalog.translations).map(([hash, e]) => [text[hash], e.translations!.length]),
+  Object.entries(catalog.translations).map(([hash, e]) => [
+    got(text[hash], `the text of ${hash}`),
+    got(e.translations).length,
+  ]),
 );
 
 test("each construct gets the lines its variants need in Arabic", () => {

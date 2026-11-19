@@ -10,7 +10,7 @@ import { ChevronDown } from "lucide-react";
 import { useFrontmatter } from "@void/md";
 import pages from "@void/md/pages";
 import { Temporal } from "temporal-polyfill";
-import { routeUrl } from "void-fbtee/routes";
+import { routeUrl, buildUrl } from "void-fbtee/routes";
 import type { RouteUrl } from "void/routes";
 import type { Lang } from "void-fbtee/locales";
 import { Formatted, Link, useLocale } from "void-fbtee/react";
@@ -39,7 +39,7 @@ function sidebar(lang: Lang) {
     .map((p): Entry => ({
       slug: p.path.slice(prefix.length),
       title: p.title,
-      href: p.path as RouteUrl,
+      href: buildUrl(p.path),
     }));
   return [
     {
@@ -142,8 +142,11 @@ function Sidebar({ groups, current }: Pick<ReturnType<typeof useDocs>, "groups" 
  */
 function Updated() {
   const { locale } = useLocale();
-  const { updated } = useFrontmatter() as { updated?: string };
-  if (!updated) return null;
+  const given: unknown = Reflect.get(Object(useFrontmatter()), "updated");
+  const updated = typeof given === "string" ? given : undefined;
+  if (!updated) {
+    return null;
+  }
   const date = Temporal.PlainDate.from(updated).toLocaleString(locale, { dateStyle: "long" });
   return (
     <p className="mt-12 border-t pt-4 text-sm text-muted-foreground" data-testid="docs-updated">

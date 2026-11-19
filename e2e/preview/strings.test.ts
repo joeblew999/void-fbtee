@@ -11,7 +11,7 @@ const page = browser("prod");
 
 // Each piece as the page first shows it (the form's defaults: Laila, female, 3 seats, in person,
 // "and"): one entry per <p>.
-const PIECES: Record<string, Record<string, string[]>> = {
+const PIECES: Record<string, Record<string, Array<string>>> = {
   "en-US": {
     list: ["The menu has Home, Events and Docs."],
     enum: ["Laila takes part in person."],
@@ -48,7 +48,7 @@ const PIECES: Record<string, Record<string, string[]>> = {
 };
 
 // After the form is changed (Somchai, male, online, "or"), and the count tried at 1, 0, 2 and 11.
-const CHANGED: Record<string, Record<string, string[] | Record<number, string>>> = {
+const CHANGED: Record<string, Record<string, Array<string> | Record<number, string>>> = {
   "en-US": {
     plural: {
       1: "Somchai booked a seat.",
@@ -84,7 +84,7 @@ const CHANGED: Record<string, Record<string, string[] | Record<number, string>>>
   },
 };
 
-for (const [locale, changed] of Object.entries(CHANGED))
+for (const [locale, changed] of Object.entries(CHANGED)) {
   test(`${locale}: the form drives every piece, by the language's own rules`, async () => {
     const p = await page();
     const errors = collectErrors(p);
@@ -107,20 +107,23 @@ for (const [locale, changed] of Object.entries(CHANGED))
     }
     expect(errors.filter((e) => !VOID_DEFER_MESSAGE.test(e))).toEqual([]);
   });
+}
 
-for (const [locale, pieces] of Object.entries(PIECES))
+for (const [locale, pieces] of Object.entries(PIECES)) {
   test(`${locale}: every piece of fbtee, kept through hydration`, async () => {
     const p = await page();
     const errors = collectErrors(p);
     const seen = await watchTexts(p);
     await p.goto(`/${locale}/docs/strings`);
     await started(p);
-    for (const [id, lines] of Object.entries(pieces))
+    for (const [id, lines] of Object.entries(pieces)) {
       expect(await p.getByTestId(`piece-${id}`).locator("p").allTextContents(), id).toEqual(lines);
+    }
     // Nothing else was ever shown in them, from the first byte of HTML on.
     const texts = await seen();
-    for (const [id, lines] of Object.entries(pieces))
+    for (const [id, lines] of Object.entries(pieces)) {
       expect(texts[`piece-${id}`], id).toEqual([lines.join("")]);
+    }
     // <InLanguage> marks its part with its own language; the page keeps the page's.
     expect(await p.locator("html").getAttribute("lang")).toBe(locale);
     const others = p.getByTestId("piece-in-language").locator("p > span");
@@ -128,3 +131,4 @@ for (const [locale, pieces] of Object.entries(PIECES))
     expect(langs).toEqual(LOCALES.filter((l) => l !== locale));
     expect(errors.filter((e) => !VOID_DEFER_MESSAGE.test(e))).toEqual([]);
   });
+}

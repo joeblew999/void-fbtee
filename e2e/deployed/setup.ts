@@ -5,5 +5,5 @@
 import type { TestProject } from "vite-plus/test/node";
 
 export default function setup(project: TestProject) {
-  project.provide("prod" as never, (process.env.E2E_URL ?? "") as never);
+  project.provide("prod", process.env.E2E_URL ?? "");
 }

@@ -92,7 +92,7 @@ export const fieldsFingerprint = (fields: object) => fingerprint(JSON.stringify(
  * type (`FieldsOf`, from its schema): checked, never assumed. The generator builds that type and
  * the field list from the same list, so a value that passes is the app's type.
  */
-function isFields<F>(value: unknown, fields: readonly string[]): value is F {
+function isFields<F>(value: unknown, fields: ReadonlyArray<string>): value is F {
   return (
     typeof value === "object" &&
     value !== null &&
@@ -155,7 +155,9 @@ export function translatedContent<S extends Record<string, unknown>>(
         ? table
         : [...entries.values()].find((e) => Object.is(e.source, table))?.name;
     const found = name === undefined ? undefined : entries.get(name);
-    if (!found) throw new Error(`void-fbtee: ${String(name)} has no translations table.`);
+    if (!found) {
+      throw new Error(`void-fbtee: ${String(name)} has no translations table.`);
+    }
     return found;
   };
 
@@ -163,9 +165,11 @@ export function translatedContent<S extends Record<string, unknown>>(
     c: ContentEntry,
     id: string,
     session: Db,
-  ): Promise<{ source: Source<F>; from: string; missing: string[] } | undefined> {
+  ): Promise<{ source: Source<F>; from: string; missing: Array<string> } | undefined> {
     const row = await contentRow(session, c, id);
-    if (!row) return;
+    if (!row) {
+      return;
+    }
     // Each field as text, in the list's order: what the fingerprint is made from.
     const fields = Object.fromEntries(
       c.fields.map((f) => {
@@ -176,8 +180,12 @@ export function translatedContent<S extends Record<string, unknown>>(
     const from = fieldsFingerprint(fields);
     const rowId: unknown = Reflect.get(row, "id");
     const rowLocale: unknown = Reflect.get(row, "locale");
-    if (typeof rowId !== "string" || typeof rowLocale !== "string") return;
-    if (!isFields<F>(fields, c.fields)) return;
+    if (typeof rowId !== "string" || typeof rowLocale !== "string") {
+      return;
+    }
+    if (!isFields<F>(fields, c.fields)) {
+      return;
+    }
     const source: Source<F> = { id: rowId, locale: rowLocale, fields };
     const have = (await namedTranslations(session, c, id))
       .filter((r) => current(r.translated_from, from))
@@ -211,14 +219,22 @@ export function translatedContent<S extends Record<string, unknown>>(
 
   async function askOf(c: ContentEntry, id: string, changed: boolean, session: Db) {
     const found = await untranslatedOf(c, id, session);
-    if (!found?.missing.length) return false;
+    if (!found?.missing.length) {
+      return false;
+    }
     let asked = 0;
     for (const locale of found.missing)
-      // New: a "queued" row. There already (queued, an "unknown" translation, or one made before
-      // the row changed): asked again only when its last asking is over an hour old. A current
-      // translation someone can name isn't missing.
-      if (await markAsked(session, c, id, locale, found.from, changed)) asked++;
-    if (!asked) return false;
+    // New: a "queued" row. There already (queued, an "unknown" translation, or one made before
+    // the row changed): asked again only when its last asking is over an hour old. A current
+    // translation someone can name isn't missing.
+    {
+      if (await markAsked(session, c, id, locale, found.from, changed)) {
+        asked++;
+      }
+    }
+    if (!asked) {
+      return false;
+    }
     await queue().send({ table: c.name, id });
     return true;
   }
@@ -237,7 +253,9 @@ export function translatedContent<S extends Record<string, unknown>>(
       table: T,
       id: string,
       session: Db = db(),
-    ): Promise<{ source: Source<FieldsOf<S, T>>; from: string; missing: string[] } | undefined> {
+    ): Promise<
+      { source: Source<FieldsOf<S, T>>; from: string; missing: Array<string> } | undefined
+    > {
       return untranslatedOf<FieldsOf<S, T>>(entryOf(table), id, session);
     },
 
@@ -289,8 +307,11 @@ export function translatedContent<S extends Record<string, unknown>>(
       let queued = 0;
       for (const c of entries.values()) {
         deleted += await deleteOtherLanguages(session, c, locales);
-        for (const id of await rowsShortOf(session, c, locales))
-          if (await askOf(c, id, false, session)) queued++;
+        for (const id of await rowsShortOf(session, c, locales)) {
+          if (await askOf(c, id, false, session)) {
+            queued++;
+          }
+        }
       }
       return { deleted, queued };
     },
@@ -303,15 +324,17 @@ export function translatedContent<S extends Record<string, unknown>>(
      */
     async translationsFor<T extends ContentTable<S>>(
       table: T,
-      ids: string[],
+      ids: Array<string>,
       locale?: string,
       session: Db = db(),
-    ): Promise<Translation<FieldsOf<S, T>>[]> {
+    ): Promise<Array<Translation<FieldsOf<S, T>>>> {
       const c = entryOf(table);
       const wanted = locale ? new Set(textLocales(locale)) : undefined;
-      const out: Translation<FieldsOf<S, T>>[] = [];
+      const out: Array<Translation<FieldsOf<S, T>>> = [];
       for (const r of await translationRows(session, c, ids)) {
-        if (wanted && !wanted.has(r.locale)) continue;
+        if (wanted && !wanted.has(r.locale)) {
+          continue;
+        }
         // A stored translation missing a field (written by hand, or by older code) isn't shown:
         // said, so it can be fixed.
         if (!isFields<FieldsOf<S, T>>(r.fields, c.fields)) {
@@ -342,29 +365,35 @@ export function translatedContent<S extends Record<string, unknown>>(
     textOf<T extends ContentTable<S>>(
       table: T,
       row: { id: string; locale: string } & FieldsOf<S, T>,
-      translations: readonly Translation<FieldsOf<S, T>>[],
+      translations: ReadonlyArray<Translation<FieldsOf<S, T>>>,
       locale: string,
       { note = true }: { note?: boolean } = {},
     ): { fields: FieldsOf<S, T>; locale: string; translated: boolean } {
       const c = entryOf(table);
       const mine = translations.filter((t) => t.source_id === row.id);
       const picked = Object.fromEntries(c.fields.map((f) => [f, Reflect.get(row, f)]));
-      if (!isFields<FieldsOf<S, T>>(picked, c.fields))
+      if (!isFields<FieldsOf<S, T>>(picked, c.fields)) {
         throw new Error(
           `void-fbtee: the ${c.name} row passed to textOf lacks one of ${c.fields.join(", ")}`,
         );
+      }
       const fields = picked;
       const original = () => ({ fields, locale: row.locale, translated: false });
       // Not yet in the reader's own language, or out of date there: the page waits for it.
       if (note && row.locale !== locale && appLocales().includes(locale)) {
         const now = fieldsFingerprint(fields);
-        if (!mine.some((t) => t.locale === locale && current(t.from, now)))
+        if (!mine.some((t) => t.locale === locale && current(t.from, now))) {
           notePending(c.name, row.id);
+        }
       }
       for (const l of textLocales(locale)) {
-        if (l === row.locale) return original();
+        if (l === row.locale) {
+          return original();
+        }
         const found = mine.find((t) => t.locale === l);
-        if (found) return { fields: found.fields, locale: found.locale, translated: true };
+        if (found) {
+          return { fields: found.fields, locale: found.locale, translated: true };
+        }
       }
       return original();
     },
@@ -373,8 +402,10 @@ export function translatedContent<S extends Record<string, unknown>>(
      * steps they run with a table's name from a message or a note. */
     internal: {
       entries,
-      untranslated: (name: string, id: string, session: Db) =>
-        entries.has(name) ? untranslatedOf(entries.get(name)!, id, session) : undefined,
+      untranslated: (name: string, id: string, session: Db) => {
+        const c = entries.get(name);
+        return c ? untranslatedOf(c, id, session) : undefined;
+      },
       store: (
         name: string,
         id: string,
@@ -383,8 +414,10 @@ export function translatedContent<S extends Record<string, unknown>>(
         made: Made,
         session: Db,
       ) => storeOf(entryOf(name), id, locale, fields, made, session),
-      ask: (name: string, id: string, session: Db) =>
-        entries.has(name) ? askOf(entries.get(name)!, id, false, session) : false,
+      ask: (name: string, id: string, session: Db) => {
+        const c = entries.get(name);
+        return c ? askOf(c, id, false, session) : false;
+      },
     },
   };
 }

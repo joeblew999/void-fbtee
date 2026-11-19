@@ -34,6 +34,7 @@ import { matchedRoutes } from "virtual:void-fbtee/hono-route";
 import markdownPages from "virtual:void-fbtee/md-pages";
 import { meta, type MetaTag } from "../head";
 import {
+  fallbackOf,
   localeFromPath,
   META_NAME,
   sourceOf,
@@ -43,7 +44,7 @@ import {
 } from "../locales";
 import { acceptedLanguages, negotiate } from "../negotiate";
 import { allTranslations } from "../runtime";
-import { setup as setupZod } from "virtual:void-fbtee/zod";
+import { setupZod } from "../zod-language";
 import dev from "virtual:void-fbtee/dev";
 import { currentLocale, runIn, siteOrigin } from "../server";
 import { withPending } from "../content-pending";
@@ -51,7 +52,7 @@ import { isRecord } from "../guards";
 import type { TranslatedContent } from "../content";
 
 // Zod's own validation messages (a form's errors) in each request's language, when the app has
-// Zod 4 (dev/plugin.ts, zodMessages).
+// Zod 4 (zod-language.ts).
 setupZod(currentLocale);
 
 export interface SharedI18n {
@@ -83,8 +84,10 @@ declare module "void" {
  * fallback language, where a visitor the app has no language for goes.
  */
 export function xDefault(origin: string, rest: string): string {
-  if (rest === "" && config.redirectHome) return `${origin}/`;
-  const fallback = config.locales.find((l) => l.locale === config.fallbackLocale)!;
+  if (rest === "" && config.redirectHome) {
+    return `${origin}/`;
+  }
+  const fallback = fallbackOf(config);
   return `${origin}/${fallback.segment}${rest}`;
 }
 
@@ -100,7 +103,7 @@ const LIGHT = /^\/(__void|api)(\/|$)|\.[a-z0-9]+$/i;
 
 /** The path of the route that will answer this request: the first one after the middleware that
  * isn't itself middleware (those match every path). */
-function answeringRoute(c: { req: { routeIndex: number } }): string | undefined {
+function answeringRoute(c: Parameters<typeof matchedRoutes>[0]): string | undefined {
   return matchedRoutes(c)
     .slice(c.req.routeIndex + 1)
     .find((r) => r.path !== "*" && r.path !== "/*")?.path;
@@ -125,7 +128,9 @@ export function i18nMiddleware({
     const path = c.req.path;
     // `vp dev` only: the dev server's own route for translating with Void's AI (ai.ts). Nothing
     // in a build.
-    if (dev && path === dev.path && c.req.method === "POST") return dev.handle(c.req.raw);
+    if (dev && path === dev.path && c.req.method === "POST") {
+      return dev.translate(c.req.raw, dev.token);
+    }
     // "/": to the visitor's own language. The query string as it came; only GET and HEAD.
     if (
       path === "/" &&
@@ -137,7 +142,7 @@ export function i18nMiddleware({
         config.locales.map((l) => l.locale),
         config.fallbackLocale,
       );
-      const segment = config.locales.find((l) => l.locale === best)!.segment;
+      const segment = (config.locales.find((l) => l.locale === best) ?? fallbackOf(config)).segment;
       // Each visitor's own answer: never stored by a browser or the edge, and marked as depending on
       // Accept-Language for anything that ignores no-store. Void adds neither here ("/" is no page
       // of its own: seen on Void 1.8.0, 2026-11-14).
@@ -163,7 +168,8 @@ export function i18nMiddleware({
     // the same path under each language isn't a page.
     const alternates = !found
       ? []
-      : [...config.locales.map((l) => ({ hreflang: l.locale, segment: l.segment }))]
+      : config.locales
+          .map((l) => ({ hreflang: l.locale, segment: l.segment }))
           .map(({ hreflang, segment }) => ({
             rel: "alternate",
             hreflang,
@@ -181,7 +187,7 @@ export function i18nMiddleware({
     // the page's language (ogp.me, og:locale). Not og:locale:alternate: it's one tag per other
     // language, and Void keeps one meta tag per property (resolveHead, packages/void/src/pages/head.ts
     // in Void 1.8.0), so only the last would be left.
-    const page: { link: { rel: string; href: string }[]; meta: MetaTag[] } = found
+    const page: { link: Array<{ rel: string; href: string }>; meta: Array<MetaTag> } = found
       ? {
           link: [{ rel: "canonical", href: `${origin}/${found.segment}${rest}` }],
           meta: [
@@ -243,7 +249,9 @@ export function i18nMiddleware({
       const queue = content
         ? (async () => {
             const db = content.db();
-            for (const p of pending) await content.internal.ask(p.table, p.id, db);
+            for (const p of pending) {
+              await content.internal.ask(p.table, p.id, db);
+            }
           })()
         : Promise.reject(
             new Error(
@@ -261,8 +269,9 @@ export function i18nMiddleware({
     }
     // A copy of the site at another address (a Worker Preview, the dev server): kept out of search
     // results, so it never competes with the site itself. Only when the app names its site.
-    if (config.site && new URL(c.req.url).origin !== config.site)
+    if (config.site && new URL(c.req.url).origin !== config.site) {
       c.header("X-Robots-Tag", "noindex");
+    }
     return response;
   });
 }

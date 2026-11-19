@@ -85,18 +85,28 @@ async function ask(body: GeminiRequest, { kind, app }: Track & { kind: Kind }): 
     logId = raw.headers.get("cf-aig-log-id") ?? undefined;
     // The status in the message: paymentProblem() reads a 402 from it (models.ts). A 429 never
     // gets here: Void's runtime throws its own "usage limit" error first, which it reads too.
-    if (!raw.ok) throw new Error(`ai: ${raw.status}: ${await raw.text()}`);
+    if (!raw.ok) {
+      throw new Error(`ai: ${raw.status}: ${await raw.text()}`);
+    }
     answer = await raw.json();
-  } else answer = raw;
-  if (!isGeminiAnswer(answer)) throw new Error(`${GEMINI.id}: an answer not in Gemini's shape`);
+  } else {
+    answer = raw;
+  }
+  if (!isGeminiAnswer(answer)) {
+    throw new Error(`${GEMINI.id}: an answer not in Gemini's shape`);
+  }
   return { answer, usage: usageOf(answer), logId };
 }
 
 /** An answer's text, which must be complete; parsed as JSON when `json`. */
 function read(asked: Asked, json: boolean): unknown {
   const { text, complete } = answerText(asked.answer);
-  if (!complete) throw new Error(`${GEMINI.id} gave no complete answer`);
-  if (!json) return text;
+  if (!complete) {
+    throw new Error(`${GEMINI.id} gave no complete answer`);
+  }
+  if (!json) {
+    return text;
+  }
   try {
     return JSON.parse(text);
   } catch (error) {
@@ -112,17 +122,19 @@ function read(asked: Asked, json: boolean): unknown {
  * lines are pieced together around other text (a Thai answer once began " {name} จอง…",
  * 2026-11-15).
  */
-const spaced = (entry: Entry, lines: (string | undefined)[]) =>
+const spaced = (entry: Entry, lines: Array<string | undefined>) =>
   lines.map((l, i) => {
-    if (l === undefined) return undefined;
+    if (l === undefined) {
+      return undefined;
+    }
     const src = entry.lines[i]?.text ?? "";
-    return src.match(/^\s*/)![0] + l.trim() + src.match(/\s*$/)![0];
+    return (/^\s*/.exec(src)?.[0] ?? "") + l.trim() + (/\s*$/.exec(src)?.[0] ?? "");
   });
 
 /** A translation, what was still wrong with it (nothing: it's right), what it cost, and its log. */
 export interface Translated<T> {
   result: T;
-  problems: string[];
+  problems: Array<string>;
   usage: Spent;
   logId?: string;
 }
@@ -135,18 +147,19 @@ export interface Translated<T> {
 export async function translateString(
   entry: Entry,
   { from, to, ...track }: { from: string; to: string } & Track,
-): Promise<Translated<(string | undefined)[]>> {
+): Promise<Translated<Array<string | undefined>>> {
   const source = entry.lines.map((l) => ({ translation: l.text, variations: l.variations }));
-  const usages: Usage[] = [];
-  let retry: { answer: unknown; problems: string[] } | undefined;
+  const usages: Array<Usage> = [];
+  let retry: { answer: unknown; problems: Array<string> } | undefined;
   for (;;) {
     const asked = await ask(stringRequest(entry, { from, to, retry }), { ...track, kind: "fbt" });
     usages.push(asked.usage);
     const answer = read(asked, true);
     const lines = spaced(entry, stringAnswer(entry, answer));
     const problems = problemsWith(source, lines, to);
-    if (!problems.length || retry)
+    if (!problems.length || retry) {
       return { result: lines, problems, usage: spent(usages), logId: asked.logId };
+    }
     retry = { answer, problems };
   }
 }
@@ -160,8 +173,8 @@ export async function translateFields(
   fields: Record<string, string>,
   { from, to, ...track }: { from: string; to: string } & Track,
 ): Promise<Translated<Record<string, string>>> {
-  const usages: Usage[] = [];
-  let retry: { answer: unknown; problems: string[] } | undefined;
+  const usages: Array<Usage> = [];
+  let retry: { answer: unknown; problems: Array<string> } | undefined;
   for (;;) {
     const asked = await ask(fieldsRequest(fields, { from, to, retry }), {
       ...track,
@@ -171,14 +184,17 @@ export async function translateFields(
     const answer = read(asked, true);
     const got = fieldsAnswer(fields, answer);
     const problems = fieldProblems(fields, got);
-    if (!problems.length)
+    if (!problems.length) {
       return {
         result: textRecord(got),
         problems,
         usage: spent(usages),
         logId: asked.logId,
       };
-    if (retry) throw new Error(`a post's translation into ${to} still has: ${problems.join(" ")}`);
+    }
+    if (retry) {
+      throw new Error(`a post's translation into ${to} still has: ${problems.join(" ")}`);
+    }
     retry = { answer, problems };
   }
 }
@@ -231,10 +247,13 @@ export type DevRequest = {
  * the answer was unusable.
  */
 export async function devTranslate(request: Request, token: string): Promise<Response> {
-  if (request.headers.get("x-void-fbtee-token") !== token)
+  if (request.headers.get("x-void-fbtee-token") !== token) {
     return new Response("not found", { status: 404 });
+  }
   const body: unknown = await request.json();
-  if (!isDevRequest(body)) return new Response("not a translation request", { status: 400 });
+  if (!isDevRequest(body)) {
+    return new Response("not a translation request", { status: 400 });
+  }
   const track = { from: body.from, to: body.to, app: body.app };
   try {
     const done =

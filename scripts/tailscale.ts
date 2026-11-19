@@ -11,6 +11,7 @@ import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { mkdirSync, openSync, rmSync } from "node:fs";
 import { hostname } from "node:os";
 import { join } from "node:path";
+import { field, parseJson, textField } from "../packages/void-fbtee/src/guards";
 
 // Tailscale's version: newer ones are listed at https://pkgs.tailscale.com/stable/ (checked 2026-11-12).
 const VERSION = "1.104.5";
@@ -20,18 +21,17 @@ const PORT = 5173;
 const dir = join(import.meta.dirname, "../.tailscale");
 const bin = join(dir, "bin");
 const socket = join(dir, "tailscaled.sock");
-const name = `void-fbtee-${hostname()
-  .split(".")[0]
+const name = `void-fbtee-${(hostname().split(".")[0] ?? "")
   .toLowerCase()
   .replace(/[^a-z0-9-]/g, "-")}`.slice(0, 63);
 
-const tailscale = (...args: string[]) =>
+const tailscale = (...args: Array<string>) =>
   spawnSync(join(bin, "tailscale"), ["--socket", socket, ...args], { encoding: "utf8" });
 
 /** Tailscale's own view of this machine, or null when its tailscaled isn't running. */
-function status() {
+function status(): unknown {
   try {
-    return JSON.parse(tailscale("status", "--json").stdout);
+    return parseJson(tailscale("status", "--json").stdout);
   } catch {
     return null;
   }
@@ -39,9 +39,14 @@ function status() {
 
 /** Tailscale's Linux download, unpacked into .tailscale/bin/, unless it's already there. */
 function download() {
-  if (tailscale("version").stdout?.startsWith(`${VERSION}\n`)) return;
-  const arch = { x64: "amd64", arm64: "arm64" }[process.arch as string];
-  if (!arch) throw new Error(`No Tailscale download for ${process.arch}`);
+  if (tailscale("version").stdout?.startsWith(`${VERSION}\n`)) {
+    return;
+  }
+  const arches: Record<string, string> = { x64: "amd64", arm64: "arm64" };
+  const arch = arches[process.arch];
+  if (!arch) {
+    throw new Error(`No Tailscale download for ${process.arch}`);
+  }
   const url = `https://pkgs.tailscale.com/stable/tailscale_${VERSION}_${arch}.tgz`;
   console.log(`Downloading Tailscale ${VERSION}: ${url}`);
   rmSync(bin, { recursive: true, force: true });
@@ -54,7 +59,9 @@ function download() {
 
 /** This repo's tailscaled, started if it isn't running. */
 async function daemon() {
-  if (status()) return;
+  if (status()) {
+    return;
+  }
   mkdirSync(join(dir, "state"), { recursive: true });
   const log = openSync(join(dir, "tailscaled.log"), "a");
   spawn(
@@ -62,14 +69,18 @@ async function daemon() {
     ["--tun=userspace-networking", "--socket", socket, "--statedir", join(dir, "state")],
     { detached: true, stdio: ["ignore", log, log] },
   ).unref();
-  for (let i = 0; i < 30 && !status(); i++) await new Promise((done) => setTimeout(done, 500));
-  if (!status()) throw new Error(`tailscaled didn't start: see ${join(dir, "tailscaled.log")}`);
+  for (let i = 0; i < 30 && !status(); i++) {
+    await new Promise((done) => setTimeout(done, 500));
+  }
+  if (!status()) {
+    throw new Error(`tailscaled didn't start: see ${join(dir, "tailscaled.log")}`);
+  }
 }
 
 async function login() {
   download();
   await daemon();
-  if (status()?.BackendState !== "Running") {
+  if (textField(status(), "BackendState") !== "Running") {
     console.log(`Sign ${name} in to Tailscale: open the link below; this waits for it.`);
     execFileSync(join(bin, "tailscale"), ["--socket", socket, "up", "--hostname", name], {
       stdio: "inherit",
@@ -82,8 +93,10 @@ async function login() {
     ["--socket", socket, "funnel", "--bg", "--https=443", `http://localhost:${PORT}`],
     { stdio: "inherit" },
   );
-  const host = status()?.Self?.DNSName?.replace(/\.$/, "");
-  if (!host) throw new Error("Tailscale gave this machine no name");
+  const host = textField(field(status(), "Self"), "DNSName")?.replace(/\.$/, "");
+  if (!host) {
+    throw new Error("Tailscale gave this machine no name");
+  }
   console.log(`\nThe dev server (vp run dev) is on the internet at https://${host}`);
 }
 

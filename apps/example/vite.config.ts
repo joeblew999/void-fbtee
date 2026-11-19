@@ -4,7 +4,7 @@ import { voidPlugin } from "void";
 import { voidReact } from "@void/react/plugin";
 import { voidMarkdown } from "@void/md/plugin";
 import { voidFbtee } from "void-fbtee/plugin";
-import { locales, sourceLocale } from "./src/locales.ts";
+import { locales, sourceLocale } from "./src/locales";
 import common from "./i18n/common_strings.json" with { type: "json" };
 import tailwindcss from "@tailwindcss/vite";
 import { SITE } from "./src/site";

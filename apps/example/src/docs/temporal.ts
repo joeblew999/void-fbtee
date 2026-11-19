@@ -12,9 +12,19 @@ import { Temporal as Polyfill } from "temporal-polyfill/implementation";
 export type TemporalApi = typeof Polyfill;
 export { Polyfill };
 
+/** A Temporal with the parts this page uses, by their names: the platform's own, checked. */
+const isTemporal = (value: unknown): value is TemporalApi =>
+  typeof value === "object" &&
+  value !== null &&
+  ["Now", "Instant", "ZonedDateTime", "PlainDate", "PlainTime", "Duration"].every(
+    (k) => k in value,
+  );
+
 /** The browser's own Temporal, if it has one. */
-export const ownTemporal = () =>
-  (globalThis as { Temporal?: TemporalApi }).Temporal as TemporalApi | undefined;
+export const ownTemporal = (): TemporalApi | undefined => {
+  const own: unknown = Reflect.get(globalThis, "Temporal");
+  return isTemporal(own) ? own : undefined;
+};
 
 export type TemporalSectionId = "instants" | "zones" | "clock-changes" | "calendar" | "durations";
 
@@ -29,7 +39,7 @@ const row = (id: string, code: string, run: TemporalRow["run"]): TemporalRow => 
 
 const BANGKOK = "2026-12-24T19:30[Asia/Bangkok]";
 
-export const TEMPORAL_SECTIONS: { id: TemporalSectionId; rows: TemporalRow[] }[] = [
+export const TEMPORAL_SECTIONS: Array<{ id: TemporalSectionId; rows: Array<TemporalRow> }> = [
   {
     id: "instants",
     rows: [
@@ -194,14 +204,15 @@ export const TEMPORAL_SECTIONS: { id: TemporalSectionId; rows: TemporalRow[] }[]
 /** Every row's result as text with one Temporal, keyed "<section>/<row>" (an error as its name and message). */
 export function runTemporal(Temporal: TemporalApi): Record<string, string> {
   const out: Record<string, string> = {};
-  for (const section of TEMPORAL_SECTIONS)
+  for (const section of TEMPORAL_SECTIONS) {
     for (const r of section.rows) {
       const key = `${section.id}/${r.id}`;
       try {
         out[key] = String(r.run(Temporal));
       } catch (error) {
-        out[key] = `${(error as Error).name}: ${(error as Error).message}`;
+        out[key] = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
       }
     }
+  }
   return out;
 }

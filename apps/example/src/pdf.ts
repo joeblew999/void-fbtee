@@ -14,7 +14,9 @@ export class PrintError extends Error {}
 /** A Browser Run quick action's result as bytes, or PrintError. */
 async function quick(action: Promise<Response>): Promise<Uint8Array> {
   const res = await action;
-  if (!res.ok) throw new PrintError(`Browser Run answered ${res.status}: ${await res.text()}`);
+  if (!res.ok) {
+    throw new PrintError(`Browser Run answered ${res.status}: ${await res.text()}`);
+  }
   return new Uint8Array(await res.arrayBuffer());
 }
 
@@ -56,7 +58,9 @@ export async function printedResponse(
   try {
     bytes = await print();
   } catch (error) {
-    if (!(error instanceof PrintError)) throw error;
+    if (!(error instanceof PrintError)) {
+      throw error;
+    }
     console.warn(`${what} not printed:`, error.message);
     return new Response(`The ${what} can't be printed right now. Try again in a minute.`, {
       status: 503,

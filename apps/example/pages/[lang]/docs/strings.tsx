@@ -8,7 +8,7 @@ import { Formatted, useLocale } from "void-fbtee/react";
 
 const COUNTS = [0, 1, 2, 3, 11, 100];
 
-function points(): Point[] {
+function points(): Array<Point> {
   return [
     {
       id: "mark",
@@ -121,7 +121,7 @@ export default function StringsPage() {
       id: "how",
       title: <fbt common>What it takes</fbt>,
     },
-  ];
+  ] as const;
   return (
     <DocsPage
       testId="strings-title"

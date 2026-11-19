@@ -44,7 +44,7 @@ export type EmailLook = {
   dir: string;
   subject: string;
   /** The email's lines, the event's title in them as written. */
-  lines: string[];
+  lines: Array<string>;
   /** The email's link; under a button with this label, or shown whole when there's none. */
   link: string;
   label?: string;
@@ -56,7 +56,9 @@ export type EmailLook = {
  * heading too: TicketLayout.tsx). */
 export function titled(line: string, title: EmailLook["title"]): ReactNode {
   const at = line.indexOf(title.text);
-  if (at < 0) return line;
+  if (at < 0) {
+    return line;
+  }
   return (
     <>
       {line.slice(0, at)}

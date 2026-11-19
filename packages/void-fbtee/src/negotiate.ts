@@ -10,6 +10,8 @@
 // answers equal setupLocaleContext(...).getLocale(); when fbtee exports negotiateLocale
 // (plans/fbtee-issues.md, issue 1), this copy goes and fbtee's is called.
 
+import { group } from "./guards";
+
 /** The most entries of an Accept-Language header read: a real browser sends a handful. */
 const MOST = 20;
 
@@ -17,8 +19,10 @@ const MOST = 20;
  * The visitor's languages from `Accept-Language`, best first: by `q`, the header's own order
  * breaking ties; `*`, `q=0` and tags Intl rejects skipped; at most the first 20 entries read.
  */
-export function acceptedLanguages(header: string | null | undefined): string[] {
-  if (!header) return [];
+export function acceptedLanguages(header: string | null | undefined): Array<string> {
+  if (!header) {
+    return [];
+  }
   const entries = header
     .split(",")
     .slice(0, MOST)
@@ -47,13 +51,15 @@ function valid(tag: string): boolean {
  * fallbackLocale }).getLocale().
  */
 export function negotiate(
-  visitor: readonly string[],
-  locales: readonly string[],
+  visitor: ReadonlyArray<string>,
+  locales: ReadonlyArray<string>,
   fallbackLocale: string,
 ): string {
   for (const locale of visitor) {
     const found = negotiateLocale(locale, locales);
-    if (found) return found;
+    if (found) {
+      return found;
+    }
   }
   return negotiateLocale(fallbackLocale, locales) ?? fallbackLocale;
 }
@@ -129,8 +135,10 @@ function getLegacyAlias(locale: string): string | null {
     .trim()
     .replaceAll("-", "_")
     .match(/^([a-z]{2,3})_([\da-z]{2,3})$/i);
-  if (!match) return null;
-  return `${match[1]!.toLowerCase()}_${match[2]!.toUpperCase()}`;
+  if (!match) {
+    return null;
+  }
+  return `${group(match, 1).toLowerCase()}_${group(match, 2).toUpperCase()}`;
 }
 
 function getLocaleIdentity(locale: string): string {
@@ -138,7 +146,9 @@ function getLocaleIdentity(locale: string): string {
   const legacyAlias = getLegacyAlias(trimmed);
   if (legacyAlias) {
     const special = legacyToBCP47[legacyAlias];
-    if (special) return canonicalizeBCP47(special);
+    if (special) {
+      return canonicalizeBCP47(special);
+    }
     const specialLanguage = specialLocaleToLanguage[legacyAlias];
     if (specialLanguage) {
       const [, region] = legacyAlias.split("_");
@@ -160,7 +170,7 @@ function parseLocale(locale: string): Intl.Locale | null {
 }
 
 /** Locale parents must not silently switch writing systems (e.g. Hant to Hans). */
-function getLocaleHierarchy(locale: string): string[] {
+function getLocaleHierarchy(locale: string): Array<string> {
   const identity = getLocaleIdentity(locale);
   const result = new Set([identity]);
   const parsed = parseLocale(identity);
@@ -168,17 +178,23 @@ function getLocaleHierarchy(locale: string): string[] {
     result.add(parsed.baseName);
     result.add([parsed.language, parsed.script, parsed.region].filter(Boolean).join("-"));
     const script = parsed.maximize().script;
-    if (script) result.add(`${parsed.language}-${script}`);
-    if (script === new Intl.Locale(parsed.language).maximize().script) result.add(parsed.language);
+    if (script) {
+      result.add(`${parsed.language}-${script}`);
+    }
+    if (script === new Intl.Locale(parsed.language).maximize().script) {
+      result.add(parsed.language);
+    }
   }
   return Array.from(result);
 }
 
 // getLocaleFallbackChain with no fallbackLocales, as negotiateLocale calls it.
-function getLocaleFallbackChain(locale: string, sourceLocale: string): string[] {
+function getLocaleFallbackChain(locale: string, sourceLocale: string): Array<string> {
   const result = new Set<string>();
   const append = (value: string) => {
-    for (const parent of getLocaleHierarchy(value)) result.add(parent);
+    for (const parent of getLocaleHierarchy(value)) {
+      result.add(parent);
+    }
   };
   append(locale);
   append(sourceLocale);
@@ -188,9 +204,9 @@ function getLocaleFallbackChain(locale: string, sourceLocale: string): string[] 
 /** Match identities, not lossy aliases: zh-Hant-TW and zh-Hans-TW are distinct. */
 function getAvailableLocaleChain(
   locale: string,
-  available: readonly string[],
+  available: ReadonlyArray<string>,
   sourceLocale: string,
-): string[] {
+): Array<string> {
   return Array.from(
     new Set(
       getLocaleFallbackChain(locale, sourceLocale).flatMap((identity) =>
@@ -205,7 +221,9 @@ function getAvailableLocaleChain(
 function areEquivalentLocales(a: string, b: string): boolean {
   const left = getLocaleIdentity(a);
   const right = getLocaleIdentity(b);
-  if (left === right) return true;
+  if (left === right) {
+    return true;
+  }
   const leftLocale = parseLocale(left);
   const rightLocale = parseLocale(right);
   return (
@@ -223,9 +241,14 @@ function areEquivalentLocales(a: string, b: string): boolean {
 export function negotiateLocale(locale: string, availableLocales: Iterable<string>): string | null {
   const available = Array.from(availableLocales);
   const parents = getAvailableLocaleChain(locale, available, locale);
-  if (parents.length) return parents[0]!;
+  const [first] = parents;
+  if (first !== undefined) {
+    return first;
+  }
   const requested = parseLocale(getLocaleIdentity(locale));
-  if (!requested) return null;
+  if (!requested) {
+    return null;
+  }
   const maximized = requested.maximize();
   const defaultRegion = new Intl.Locale(
     [requested.language, maximized.script].filter(Boolean).join("-"),

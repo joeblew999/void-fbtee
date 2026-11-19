@@ -18,7 +18,7 @@ export type Db = DrizzleD1Database<Record<string, unknown>>;
 
 // D1 takes at most 100 bound parameters a query (Cloudflare's D1 limits).
 const CHUNK = 90;
-const chunks = <T>(items: T[]) =>
+const chunks = <T>(items: Array<T>) =>
   Array.from({ length: Math.ceil(items.length / CHUNK) }, (_, i) =>
     items.slice(i * CHUNK, (i + 1) * CHUNK),
   );
@@ -113,7 +113,7 @@ export async function markAsked(
 export async function deleteOtherLanguages(
   db: Db,
   c: ContentEntry,
-  locales: string[],
+  locales: Array<string>,
 ): Promise<number> {
   const t = c.translations;
   const result = await db.delete(t).where(notInArray(t.locale, locales));
@@ -122,7 +122,11 @@ export async function deleteOtherLanguages(
 
 /** The ids of a table's rows short of a translation someone can name in one of `locales` (their
  * own language aside). Counted in the database, one query. */
-export async function rowsShortOf(db: Db, c: ContentEntry, locales: string[]): Promise<string[]> {
+export async function rowsShortOf(
+  db: Db,
+  c: ContentEntry,
+  locales: Array<string>,
+): Promise<Array<string>> {
   const s = c.source;
   const t = c.translations;
   const have = db
@@ -142,10 +146,10 @@ export async function rowsShortOf(db: Db, c: ContentEntry, locales: string[]): P
 
 /** The translations someone can name of these rows, in every language: any number of ids (asked
  * for 90 at a time, under D1's limit). */
-export async function translationRows(db: Db, c: ContentEntry, ids: string[]) {
+export async function translationRows(db: Db, c: ContentEntry, ids: Array<string>) {
   const t = c.translations;
   const out = [];
-  for (const some of chunks([...new Set(ids)]))
+  for (const some of chunks([...new Set(ids)])) {
     out.push(
       ...(await db
         .select({
@@ -157,5 +161,6 @@ export async function translationRows(db: Db, c: ContentEntry, ids: string[]) {
         .from(t)
         .where(and(inArray(t.source_id, some), named(t)))),
     );
+  }
   return out;
 }

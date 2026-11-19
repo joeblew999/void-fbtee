@@ -36,7 +36,7 @@ export function EventFields({
   prefix,
 }: {
   form: EventForm;
-  zones: string[];
+  zones: Array<string>;
   prefix: string;
 }) {
   const id = (name: string) => `${prefix}-${name}`;

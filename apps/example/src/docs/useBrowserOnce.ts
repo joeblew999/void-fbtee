@@ -1,17 +1,23 @@
 // Work something out once in the browser: null while hydrating (the server sent nothing), then the
-// result, kept under `key` for as long as the page is open. The Intl and Temporal pages run their
-// rows this way.
-import { useSyncExternalStore } from "react";
+// result, kept by the component for its `key` (worked out again when the key changes: another
+// language). The Intl and Temporal pages run their rows this way. Kept in the component, so the
+// result keeps its own type (one shared map of every page's results could only be read back by
+// a cast).
+import { useRef, useSyncExternalStore } from "react";
 
 const noSubscribe = () => () => {};
-const kept = new Map<string, unknown>();
 
 export function useBrowserOnce<T>(key: string, make: () => T): T | null {
+  const kept = useRef<{ key: string; value: T } | null>(null);
   return useSyncExternalStore(
     noSubscribe,
     () => {
-      if (!kept.has(key)) kept.set(key, make());
-      return kept.get(key) as T;
+      let entry = kept.current;
+      if (entry?.key !== key) {
+        entry = { key, value: make() };
+        kept.current = entry;
+      }
+      return entry.value;
     },
     () => null,
   );

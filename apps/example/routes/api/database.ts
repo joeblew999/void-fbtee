@@ -8,18 +8,20 @@
 // compare. Under /api, so Void never caches it. It reads nothing anyone posted: a constant.
 import { defineHandler } from "void";
 import { createDb } from "void/db";
-import { env } from "void/env";
+import { env } from "cloudflare:workers";
 import { timedRead } from "../../src/events/store";
 
 async function reads(session: "first-primary" | "first-unconstrained") {
-  const db = createDb((env as unknown as { DB: Parameters<typeof createDb>[0] }).DB, { session });
+  const db = createDb(env.DB, { session });
   const out = [];
-  for (let i = 0; i < 3; i++) out.push(await timedRead(db));
+  for (let i = 0; i < 3; i++) {
+    out.push(await timedRead(db));
+  }
   return out;
 }
 
 export const GET = defineHandler(async (c) => {
-  const cf = (c.req.raw as { cf?: { colo?: string; country?: string } }).cf;
+  const cf = c.req.raw.cf;
   return c.json({
     // The Cloudflare data centre that ran this request, and the visitor's country.
     worker: { colo: cf?.colo ?? null, country: cf?.country ?? null },

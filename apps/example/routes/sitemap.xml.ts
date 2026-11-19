@@ -10,7 +10,7 @@ import { lastChanged } from "../src/events/store";
 
 /** SQLite's "2026-11-12 09:42:31" (UTC) as the W3C date-time the sitemap takes. */
 const w3c = (sqlite: string) => `${sqlite.replace(" ", "T")}Z`;
-const newest = (...dates: (string | null | undefined)[]) =>
+const newest = (...dates: Array<string | null | undefined>) =>
   dates
     .filter((d): d is string => !!d)
     .sort()
@@ -20,7 +20,7 @@ export const GET = defineHandler(async (c) => {
   // Each event's last change: its own row, or a translation of it added later. Not the cancelled
   // ones. Read from the database's main copy (src/db.ts): the cache keeps what this makes.
   const changed = await lastChanged(primaryDb());
-  const eventDate = changed.map((e) => ({ id: e.id, date: w3c(newest(e.at, e.text)!) }));
+  const eventDate = changed.map((e) => ({ id: e.id, date: w3c(newest(e.at, e.text) ?? e.at) }));
   return sitemap(c, {
     pages: [
       // The events list changes when an event is posted or changes.

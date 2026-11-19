@@ -11,6 +11,16 @@ import { createBuilder, type Plugin, type Rollup } from "vite";
 import { voidMarkdown } from "@void/md/plugin";
 import { voidReact } from "@void/react/plugin";
 import { voidFbtee } from "../../src/dev/plugin";
+import { field } from "../../src/guards";
+import { got } from "./got";
+
+/** The code a build wrote: one output, as these builds make. */
+function codeOf(out: Rollup.RollupOutput | Array<Rollup.RollupOutput> | Rollup.RollupWatcher) {
+  if (!("output" in out)) {
+    throw new Error("the build didn't give one output");
+  }
+  return out.output.map((c) => ("code" in c ? c.code : "")).join("\n");
+}
 
 let root: string;
 beforeAll(() => {
@@ -26,23 +36,33 @@ afterAll(() => rmSync(root, { recursive: true, force: true }));
 const options = { sourceLocale: "en-US", locales: ["en-US", "de-DE"], src: ["src/**/*.tsx"] };
 
 describe("its shape", () => {
-  const [core] = voidFbtee(options) as Plugin[];
-  const filter = (hook: unknown) => (hook as { filter: { id: RegExp } }).filter.id;
+  const [core] = voidFbtee(options);
+  const filter = (hook: unknown) => {
+    const id = field(field(hook, "filter"), "id");
+    if (!(id instanceof RegExp)) {
+      throw new Error("the hook has no id filter");
+    }
+    return id;
+  };
 
   test("named, first in order, with an api for other plugins", () => {
-    expect(core!.name).toBe("void-fbtee");
-    expect(core!.enforce).toBe("pre");
-    expect(core!.api).toMatchObject({ options });
+    expect(got(core).name).toBe("void-fbtee");
+    expect(got(core).enforce).toBe("pre");
+    expect(got(core).api).toMatchObject({ options });
   });
 
   test("resolveId and load run only for void-fbtee's ids", () => {
-    const resolve = filter(core!.resolveId);
-    for (const id of ["virtual:void-fbtee/config", "virtual:void-fbtee/catalog/de-DE"])
+    const resolve = filter(got(core).resolveId);
+    for (const id of ["virtual:void-fbtee/config", "virtual:void-fbtee/catalog/de-DE"]) {
       expect(resolve.test(id), id).toBe(true);
-    for (const id of ["fbtee/server", "temporal-polyfill"]) expect(resolve.test(id), id).toBe(true);
-    for (const id of ["react", "./main.tsx", "temporal-polyfill/global", "fbtee"])
+    }
+    for (const id of ["fbtee/server", "temporal-polyfill"]) {
+      expect(resolve.test(id), id).toBe(true);
+    }
+    for (const id of ["react", "./main.tsx", "temporal-polyfill/global", "fbtee"]) {
       expect(resolve.test(id), id).toBe(false);
-    const load = filter(core!.load);
+    }
+    const load = filter(got(core).load);
     expect(load.test("\0virtual:void-fbtee/config")).toBe(true);
     expect(load.test("\0void-fbtee:server-temporal")).toBe(true);
     expect(load.test("/app/src/main.tsx")).toBe(false);
@@ -59,8 +79,9 @@ describe("the site option", () => {
       "https://example.com/blog",
       "example.com",
       "https://example.com?x=1",
-    ])
+    ]) {
       expect(() => voidFbtee({ ...options, site }), site).toThrow(/https address of a host alone/);
+    }
   });
 });
 
@@ -87,8 +108,7 @@ describe("per environment", () => {
       },
     });
     const code = async (name: "client" | "browser" | "worker") => {
-      const out = (await builder.build(builder.environments[name]!)) as Rollup.RollupOutput;
-      return out.output.map((c) => ("code" in c ? c.code : "")).join("\n");
+      return codeOf(await builder.build(got(builder.environments[name])));
     };
     client = await code("client");
     browser = await code("browser");
@@ -101,14 +121,18 @@ describe("per environment", () => {
   });
 
   test("the browser keeps the polyfill, whatever its environment is called", () => {
-    for (const code of [client, browser]) expect(code).not.toContain("no Temporal on the server");
+    for (const code of [client, browser]) {
+      expect(code).not.toContain("no Temporal on the server");
+    }
   });
 
   test("the virtual config carries the app's languages, in both", () => {
     // Minified in the browser (locale:`en-US`), as JSON on the server ("locale": "en-US").
     const locale = (tag: string) => `["\`]?locale["\`]?\\s*:\\s*["\`]${tag}["\`]`;
     const both = new RegExp(`${locale("en-US")}.*${locale("de-DE")}`, "s");
-    for (const code of [client, worker]) expect(code).toMatch(both);
+    for (const code of [client, worker]) {
+      expect(code).toMatch(both);
+    }
   });
 });
 
@@ -116,7 +140,7 @@ describe("per environment", () => {
 // name, "void-md"), so the middleware can give a markdown page's frontmatter to link previews; an
 // empty list without it, so the package needs no peer dependency on @void/md.
 describe("markdown pages", () => {
-  const build = async (plugins: Plugin[]) => {
+  const build = async (plugins: Array<Plugin>) => {
     const dir = copyFixture();
     mkdirSync(join(dir, "pages/en-US"), { recursive: true });
     writeFileSync(join(dir, "pages/en-US/hello.md"), "---\ntitle: Hello page\n---\n\n# Hello\n");
@@ -138,8 +162,7 @@ describe("markdown pages", () => {
           },
         },
       });
-      const out = (await builder.build(builder.environments.worker!)) as Rollup.RollupOutput;
-      return out.output.map((c) => ("code" in c ? c.code : "")).join("\n");
+      return codeOf(await builder.build(got(builder.environments.worker)));
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -151,13 +174,13 @@ describe("markdown pages", () => {
       ...voidFbtee(options),
       ...[voidReact()].flat(),
       ...[voidMarkdown()].flat(),
-    ] as Plugin[]);
+    ]);
     expect(code).toContain("/en-US/hello");
     expect(code).toContain("Hello page");
   });
 
   test("without it: none", async () => {
-    const code = await build(voidFbtee(options) as Plugin[]);
+    const code = await build(voidFbtee(options));
     expect(code).not.toContain("/en-US/hello");
     expect(code).not.toContain("@void/md");
   });

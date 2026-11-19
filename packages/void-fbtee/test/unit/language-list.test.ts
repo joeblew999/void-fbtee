@@ -1,18 +1,18 @@
 // The language picker's list, with the example's three languages and with a hundred.
 import { describe, expect, test } from "vite-plus/test";
 import { languageEntries, normalize, visitorsOwn } from "../../src/language-list";
-import type { Locale } from "../../src/locales";
+import { resolveLocales, type Locale } from "../../src/locales";
+import { got } from "./got";
 
-const as = (tags: string[]): Locale[] =>
-  tags.map((locale) => ({ locale, segment: locale as Locale["segment"], dir: "ltr" }));
+const as = (tags: Array<string>): Array<Locale> => resolveLocales(got(tags[0]), tags).locales;
 const EXAMPLE = as(["en-US", "th-TH", "ar-EG"]);
 
 test("each named in itself and in the page's language, by the language alone", () => {
-  const th = languageEntries(EXAMPLE, "en-US").find((e) => e.locale === "th-TH")!;
+  const th = got(languageEntries(EXAMPLE, "en-US").find((e) => e.locale === "th-TH"));
   // "ไทย", not "ไทย (ไทย)" as Intl names th-TH.
   expect(th.name).toBe("ไทย");
   expect(th.pageName).toBe("Thai");
-  const ar = languageEntries(EXAMPLE, "th-TH").find((e) => e.locale === "ar-EG")!;
+  const ar = got(languageEntries(EXAMPLE, "th-TH").find((e) => e.locale === "ar-EG"));
   expect(ar.name).toBe("العربية");
   expect(ar.pageName).toBe("อาหรับ");
 });
@@ -61,6 +61,8 @@ describe("with a hundred languages", () => {
     expect(find("ไทย").map((e) => e.locale)).toEqual(["th"]);
     expect(find("FR").map((e) => e.locale)).toContain("fr");
     expect(find("espanol").map((e) => e.locale)).toEqual(["es"]);
-    for (const e of entries) expect(find(e.pageName).map((x) => x.locale)).toContain(e.locale);
+    for (const e of entries) {
+      expect(find(e.pageName).map((x) => x.locale)).toContain(e.locale);
+    }
   });
 });

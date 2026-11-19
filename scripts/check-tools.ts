@@ -12,9 +12,9 @@ import { join, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const example = join(root, "apps/example");
-const git = (...args) => execFileSync("git", args, { cwd: root, encoding: "utf8" });
+const git = (...args: Array<string>) => execFileSync("git", args, { cwd: root, encoding: "utf8" });
 const state = () => git("status", "--porcelain", "--untracked-files=all") + git("diff");
-const run = (cwd, cmd, ...args) => {
+const run = (cwd: string, cmd: string, ...args: Array<string>) => {
   console.error(`\n$ (${cwd.replace(root, ".") || "."}) ${cmd} ${args.join(" ")}`);
   execFileSync(cmd, args, { cwd, stdio: ["ignore", 2, 2] });
 };

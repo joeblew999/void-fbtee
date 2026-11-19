@@ -3,7 +3,6 @@
 // left to right in every language: code reads that way.
 import type { ReactNode } from "react";
 import { fbt } from "fbtee";
-import type { RouteUrl } from "void/routes";
 import { routeUrl } from "void-fbtee/routes";
 import { Link } from "void-fbtee/react";
 import { SKILL } from "@/shell/project";
@@ -13,10 +12,10 @@ export interface Point {
   title: ReactNode;
   why: ReactNode;
   /** Lines copied from the app's files, with the file they're in. */
-  code: { file: string; line: string }[];
+  code: Array<{ file: string; line: string }>;
 }
 
-export function Points({ points }: { points: Point[] }) {
+export function Points({ points }: { points: Array<Point> }) {
   return points.map((p) => (
     <div key={p.id} id={p.id} data-point={p.id} className="space-y-2">
       <h3 className="text-lg font-medium">{p.title}</h3>
@@ -76,7 +75,7 @@ export function SkillLink({ section }: { section: string }) {
  * The void-fbtee pieces a page uses, each explained once, on the Components page: linked there
  * rather than explained again. Their names are code, so left to right in every language.
  */
-export function ComponentsLink({ names }: { names: string[] }) {
+export function ComponentsLink({ names }: { names: Array<string> }) {
   return (
     <p className="text-sm text-muted-foreground" data-testid="components-link">
       <fbt desc="Docs: the void-fbtee pieces a page uses, each linking to where the Components page explains it">
@@ -85,7 +84,7 @@ export function ComponentsLink({ names }: { names: string[] }) {
           items={names.map((name) => (
             <Link
               key={name}
-              href={`${routeUrl("/[lang]/docs/components")}#${name}` as RouteUrl}
+              href={routeUrl("/[lang]/docs/components", { hash: name })}
               className="font-mono text-xs underline"
               dir="ltr"
             >

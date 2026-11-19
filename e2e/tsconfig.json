@@ -6,8 +6,12 @@
     "lib": ["ES2025", "DOM"],
     "types": ["node"],
     "strict": true,
+    "noUncheckedIndexedAccess": true,
     "noEmit": true,
-    "skipLibCheck": true
+    "skipLibCheck": false,
+    // The example's own "@/" (apps/example/tsconfig.json), as the preview project resolves it
+    // (vite.config.ts): e2e/preview/islands.test.ts imports the app's src/docs/fmt.ts.
+    "paths": { "@/*": ["../apps/example/src/*"] }
   },
   "include": ["*.ts", "preview/*.ts", "dev/*.ts", "browsers/*.ts", "deployed/*.ts", "fresh/*.ts"]
 }

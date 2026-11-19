@@ -7,7 +7,9 @@ export const live = defineLiveStream({
   id: "app",
   allowAnonymousControl: true,
   onSubscribe(ctx) {
-    if (/^event:[0-9a-f-]{36}$/.test(ctx.topic)) return;
+    if (/^event:[0-9a-f-]{36}$/.test(ctx.topic)) {
+      return;
+    }
     return new Response("Forbidden", { status: 403 });
   },
 });

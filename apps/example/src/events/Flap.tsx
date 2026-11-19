@@ -22,7 +22,9 @@ export function Flap({
   // Two names for the same turn, swapped on each change, so the browser plays it again.
   const [turn, setTurn] = useState<"a" | "b" | undefined>();
   useEffect(() => {
-    if (shown.current === value) return;
+    if (shown.current === value) {
+      return;
+    }
     shown.current = value;
     setTurn((t) => (t === "a" ? "b" : "a"));
   }, [value]);

@@ -7,9 +7,10 @@ import { join } from "node:path";
 import { expect, inject, test } from "vite-plus/test";
 import { browser, hydrated, seeText, started } from "../helpers";
 import { EXAMPLE } from "../preview/setup";
+import { got } from "../got";
 
 const page = browser("prod");
-const skip = inject("devSkip" as never) as string;
+const skip = inject("devSkip");
 
 test.skipIf(!!skip)(
   "a page loads and hydrates in its language, and a link navigates on the client",
@@ -32,7 +33,12 @@ test.skipIf(!!skip)("every island on a Markdown page hydrates", async () => {
     readFileSync(join(EXAMPLE, f), "utf8").includes("<Fmt "),
   );
   const p = await page();
-  await p.goto("/" + file!.replace(/^pages\//, "").replace(/(\/index)?\.md$/, ""));
-  const islands = readFileSync(join(EXAMPLE, file!), "utf8").match(/<Fmt /g)!.length;
+  await p.goto(
+    "/" +
+      got(file)
+        .replace(/^pages\//, "")
+        .replace(/(\/index)?\.md$/, ""),
+  );
+  const islands = got(readFileSync(join(EXAMPLE, got(file)), "utf8").match(/<Fmt /g)).length;
   await hydrated(p, "Fmt", islands);
 });

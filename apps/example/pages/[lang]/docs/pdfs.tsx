@@ -8,7 +8,7 @@ import { useLocale } from "void-fbtee/react";
 import { DocsPage } from "@/docs/DocsPage";
 import { Points, Section, SkillLink, type Point } from "@/docs/Points";
 
-function points(): Point[] {
+function points(): Array<Point> {
   return [
     {
       id: "browser",
@@ -167,7 +167,7 @@ export default function PdfsPage() {
         </fbt>
       ),
     },
-  ];
+  ] as const;
   return (
     <DocsPage
       testId="pdfs-title"

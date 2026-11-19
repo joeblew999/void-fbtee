@@ -31,13 +31,15 @@ async function cached(path: string) {
  * stored (none, if the translation was quicker than the first visit).
  */
 async function untilTranslated(path: string) {
-  const before: (string | null)[] = [];
+  const before: Array<string | null> = [];
   await expect
     .poll(
       async () => {
         const v = await visit(path);
         const done = v.html.includes('data-testid="event-translated"');
-        if (!done) before.push(v.cache);
+        if (!done) {
+          before.push(v.cache);
+        }
         return done;
       },
       { timeout: 60_000, interval: 500 },

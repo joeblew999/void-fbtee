@@ -56,7 +56,9 @@ export const loader = defineHandler.withValidator({ params })(async (c, { params
   const { locale } = c.get("i18n");
   const db = primaryDb();
   const row = await eventOn(db, id);
-  if (!row) return c.notFound();
+  if (!row) {
+    return c.notFound();
+  }
   const { delete_key_hash, ...event } = row;
   const text = textFor(event, await textsFor([id], locale, db), locale);
   return {
@@ -77,7 +79,9 @@ const book = defineHandler.withValidator({ params, body: bookSchema })(async (
   const origin = new URL(c.req.url).origin;
   const db = primaryDb();
   // The booking's id comes from the form (bookSchema): one that's taken is refused, not a crash.
-  if (await bookingExists(db, body.id)) return c.json({ message: "booking id taken" }, 400);
+  if (await bookingExists(db, body.id)) {
+    return c.json({ message: "booking id taken" }, 400);
+  }
   // Only while the event is on and has a seat left, in one statement (bookSeat); what the booker
   // is told (told_*) is the event as it is then: their confirmation says it (src/events/owed.ts).
   const booked = await bookSeat(db, {
@@ -91,8 +95,14 @@ const book = defineHandler.withValidator({ params, body: bookSchema })(async (
     ticket_in_reminder: !!body.ticket_in_reminder,
   });
   // Nothing went in: the event is full, or there's no such event (or it's cancelled).
-  if (!booked) return (await eventOn(db, id)) ? c.json({ message: "sold out" }, 409) : c.notFound();
-  const event = (await eventById(db, id))!;
+  if (!booked) {
+    return (await eventOn(db, id)) ? c.json({ message: "sold out" }, 409) : c.notFound();
+  }
+  const event = await eventById(db, id);
+  // Booked, then gone before this read (its organiser deleted it): as if it never was.
+  if (!event) {
+    return c.notFound();
+  }
   const left = event.seats - (await seatsTaken(db, id));
   // This event's page, in every language (the list shows each event's seats, not what's left).
   await clearCache({ paths: [`/[lang]/events/${id}`] });
@@ -118,9 +128,12 @@ const remove = defineHandler.withValidator({ params, body: z.object({ key: z.str
   async (c, { params: { id }, body }) => {
     const db = primaryDb();
     const event = await eventOn(db, id);
-    if (!event) return c.notFound();
-    if (!(await deleteKeyMatches(body.key, event.delete_key_hash)))
+    if (!event) {
+      return c.notFound();
+    }
+    if (!(await deleteKeyMatches(body.key, event.delete_key_hash))) {
       return c.json({ message: "wrong key" }, 403);
+    }
     await cancelEvent(db, id);
     // Everyone who booked, read after the event is marked: a booking can't go in once it is
     // (bookSeat), so none is missed.
@@ -152,11 +165,16 @@ const change = defineHandler.withValidator({ params, body: changeEventSchema })(
 ) => {
   const db = primaryDb();
   const event = await eventOn(db, id);
-  if (!event) return c.notFound();
-  if (!(await deleteKeyMatches(body.key, event.delete_key_hash)))
+  if (!event) {
+    return c.notFound();
+  }
+  if (!(await deleteKeyMatches(body.key, event.delete_key_hash))) {
     return c.json({ message: "wrong key" }, 403);
+  }
   const taken = await seatsTaken(db, id);
-  if (body.seats < taken) return c.json({ message: "fewer seats than are booked", taken }, 409);
+  if (body.seats < taken) {
+    return c.json({ message: "fewer seats than are booked", taken }, 409);
+  }
   const times = when(body.local, body.local_end, body.time_zone);
   const venue = body.venue?.trim() || null;
   await updateEvent(db, id, {
@@ -176,12 +194,16 @@ const change = defineHandler.withValidator({ params, body: changeEventSchema })(
     event.venue !== venue
   ) {
     const ids = await bookingsOf(db, id);
-    if (ids.length) await storage.delete(ids.map((b) => ticketKey(b.id)));
+    if (ids.length) {
+      await storage.delete(ids.map((b) => ticketKey(b.id)));
+    }
   }
   // Languages still waiting for their translation are told when it lands (or fails); the rest now.
   const waiting = (await content.untranslated(events, id, db))?.missing ?? [];
   const now = [...new Set(await bookerLocales(db, id))].filter((l) => !waiting.includes(l));
-  if (now.length) await tellBookers(db, id, now);
+  if (now.length) {
+    await tellBookers(db, id, now);
+  }
   await clearCache({ paths: eventPages(id) });
   await live.publish(eventTopic(id), {}, { type: "changed" });
 });

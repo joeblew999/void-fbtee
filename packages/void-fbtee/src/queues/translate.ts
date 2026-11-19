@@ -33,7 +33,7 @@ export interface TranslationQueueOptions {
   onTranslated?: (table: string, id: string, locale: string) => unknown;
   /** When translating a row into these languages failed this time (it's tried again as the queue
    * says): whatever was waiting on them can go ahead with the row as written. */
-  onTranslationFailed?: (table: string, id: string, locales: string[]) => unknown;
+  onTranslationFailed?: (table: string, id: string, locales: Array<string>) => unknown;
 }
 
 export function translationQueue(
@@ -75,14 +75,19 @@ export function translationQueue(
                 { by: GEMINI.id, gatewayLogId: done.logId, usage: done.usage, from: found.from },
                 db,
               )
-            )
+            ) {
               await onTranslated?.(table, id, locale);
+            }
           }),
         );
-        const failedLocales = found.missing.filter((_, i) => results[i]!.status === "rejected");
-        if (failedLocales.length) await onTranslationFailed?.(table, id, failedLocales);
+        const failedLocales = found.missing.filter((_, i) => results[i]?.status === "rejected");
+        if (failedLocales.length) {
+          await onTranslationFailed?.(table, id, failedLocales);
+        }
         const failed = results.find((r) => r.status === "rejected");
-        if (failed) throw failed.reason;
+        if (failed) {
+          throw failed.reason;
+        }
         message.ack();
       } catch (error) {
         // Deleted while it was being translated: its translations can't go in (the foreign key

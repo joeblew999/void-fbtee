@@ -5,6 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": true,
+    "noUncheckedIndexedAccess": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "types": ["void/env", "fbtee/ReactTypes"],
@@ -19,7 +20,18 @@
       "void/queues": ["./.void/queues.d.ts"]
     }
   },
-  "include": ["src", "pages", "routes", "middleware", "crons", "queues", "db", "i18n"],
+  "include": [
+    "src",
+    "pages",
+    "routes",
+    "middleware",
+    "crons",
+    "queues",
+    "db",
+    "i18n",
+    "scripts",
+    "*.ts"
+  ],
   "files": [
     "./.void/routes.d.ts",
     "./.void/db.d.ts",

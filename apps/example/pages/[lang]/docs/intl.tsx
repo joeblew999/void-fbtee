@@ -134,7 +134,7 @@ export default function IntlPage({ worker }: Props) {
                 {
                   side: "worker",
                   dir,
-                  content: differs ? showInvisible(worker[key]!) : worker[key],
+                  content: differs ? showInvisible(worker[key] ?? "") : worker[key],
                 },
                 {
                   side: "browser",
@@ -144,9 +144,9 @@ export default function IntlPage({ worker }: Props) {
                   ) : !differs ? (
                     browser[key]
                   ) : isInventory(key) ? (
-                    <ListDifference worker={worker[key]!} browser={browser[key]!} />
+                    <ListDifference worker={worker[key] ?? ""} browser={browser[key] ?? ""} />
                   ) : (
-                    showInvisible(browser[key]!)
+                    showInvisible(browser[key] ?? "")
                   ),
                 },
               ],

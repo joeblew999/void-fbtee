@@ -14,10 +14,11 @@ import {
   prepareTranslationsBatchSync,
   translateSync,
 } from "@nkzw/fbtee-compiler";
+import type { FbtRuntimeInput } from "fbtee";
 import { translatedOf, type LocaleConfig } from "../locales";
-import { addVariants, pluralCategories, pluralSlots } from "../plurals";
+import { addVariants, pluralCategories, pluralSlots, type PluralPhrase } from "../plurals";
 import { readCatalog } from "./catalog-file";
-import { field, isRecord, parseJson } from "../guards";
+import { field, isRecord, parseJson, present } from "../guards";
 
 // Where an app's strings can be: every folder of code in Void's project structure (Void's docs,
 // reference/structure.md: pages, routes, middleware, crons, queues, email, durable-objects, src),
@@ -42,31 +43,43 @@ export interface Project {
   config: LocaleConfig;
   /** Folder of editable catalogs, relative to root. */
   translations: string;
-  src: string[];
+  src: Array<string>;
   /** fbtee's common strings (fbtCommon): text → its description, for `<fbt common>`. */
   common?: Record<string, string>;
   /** voidFbtee({ redirectHome }): whether "/" sends each visitor to their language. Default true. */
   redirectHome?: boolean;
 }
 
-interface Phrase {
-  hashToLeaf?: Record<string, { text: string; desc: string }>;
-}
-
 const isLeaf = (value: unknown): value is { text: string; desc: string } =>
   isRecord(value) && typeof value.text === "string" && typeof value.desc === "string";
+const isLevel = (value: unknown): value is { token?: string; type?: number } | null =>
+  value === null ||
+  (isRecord(value) &&
+    (value.token === undefined || typeof value.token === "string") &&
+    (value.type === undefined || typeof value.type === "number"));
 
-/** fbtee's collected phrases, from its JSON, each one's `hashToLeaf` checked; the rest kept. */
-function phrasesOf(json: unknown, what: string): Phrase[] {
+/**
+ * fbtee's collected phrases, from its JSON, with the parts void-fbtee reads checked: each one's
+ * `hashToLeaf`, and the levels of its table (`jsfbt.m`) that pluralSlots walks. A phrase not in
+ * that shape stops with an error naming `what`.
+ */
+export function readPhrases(json: unknown, what: string): Array<PluralPhrase> {
   const phrases = field(json, "phrases") ?? [];
-  if (!Array.isArray(phrases)) throw new Error(`void-fbtee: ${what} has no list of phrases`);
-  return phrases.map((phrase: unknown) => {
+  if (!Array.isArray(phrases)) {
+    throw new Error(`void-fbtee: ${what} has no list of phrases`);
+  }
+  return phrases.map((phrase: unknown): PluralPhrase => {
     const leaves = field(phrase, "hashToLeaf");
+    const jsfbt = field(phrase, "jsfbt");
+    const levels = field(jsfbt, "m");
     if (
       !isRecord(phrase) ||
-      (leaves !== undefined && !(isRecord(leaves) && Object.values(leaves).every(isLeaf)))
-    )
+      (leaves !== undefined && !(isRecord(leaves) && Object.values(leaves).every(isLeaf))) ||
+      (jsfbt !== undefined && !isRecord(jsfbt)) ||
+      (levels !== undefined && !(Array.isArray(levels) && levels.every(isLevel)))
+    ) {
       throw new Error(`void-fbtee: ${what} has a phrase not in fbtee's shape`);
+    }
     return {
       ...phrase,
       hashToLeaf:
@@ -77,6 +90,9 @@ function phrasesOf(json: unknown, what: string): Phrase[] {
                 isLeaf(e[1]),
               ),
             ),
+      jsfbt: isRecord(jsfbt)
+        ? { m: Array.isArray(levels) ? levels.filter(isLevel) : undefined, t: jsfbt.t }
+        : undefined,
     };
   });
 }
@@ -85,17 +101,17 @@ const LANGS = ["tsx", "ts", "jsx", "js"] as const;
 const langOf = (file: string) => LANGS.find((l) => file.endsWith("." + l)) ?? "js";
 
 /** fbtee's built-in strings, resolved from the app's own fbtee. */
-function builtinPhrases(root: string): Phrase[] {
+function builtinPhrases(root: string): Array<PluralPhrase> {
   const require = createRequire(join(root, "package.json"));
   const file = require.resolve("fbtee/Strings.json");
-  return phrasesOf(parseJson(readFileSync(file, "utf8")), file);
+  return readPhrases(parseJson(readFileSync(file, "utf8")), file);
 }
 
 export const catalogFile = (p: Project, locale: string) =>
   join(p.root, p.translations, `${locale}.json`);
 
 /** The app's source files that may hold <fbt> or fbs. */
-export function sourceFiles(p: Project): string[] {
+export function sourceFiles(p: Project): Array<string> {
   return globSync(p.src, { cwd: p.root, exclude: (f) => f.includes("node_modules") })
     .map((f) => join(p.root, f))
     .filter((f) => {
@@ -106,12 +122,12 @@ export function sourceFiles(p: Project): string[] {
 
 export interface Collected {
   /** fbtee's collected strings: the app's, then fbtee's built-ins. */
-  phrases: Phrase[];
+  phrases: Array<PluralPhrase>;
   /** Hashes of fbtee's built-in strings, reported apart from the app's own. */
   builtinHashes: Set<string>;
   /** Source text per hash, for messages about missing translations. */
   texts: Record<string, string>;
-  files: string[];
+  files: Array<string>;
 }
 
 let cache: { key: string; value: Collected } | undefined;
@@ -125,27 +141,35 @@ export function collect(p: Project): Collected {
   const files = sourceFiles(p);
   const key =
     files.map((f) => `${f}:${statSync(f).mtimeMs}`).join("|") + JSON.stringify(p.common ?? {});
-  if (cache?.key === key) return cache.value;
-  const phrases: Phrase[] = [];
+  if (cache?.key === key) {
+    return cache.value;
+  }
+  const phrases: Array<PluralPhrase> = [];
   for (const lang of LANGS) {
     const batch = files.filter((f) => langOf(f) === lang);
-    if (!batch.length) continue;
+    if (!batch.length) {
+      continue;
+    }
     const out = collectBatchSync(
       batch.map((f) => ({ filename: relative(p.root, f), sourceText: readFileSync(f, "utf8") })),
       { lang, collectPackager: "text", fbtCommon: p.common },
     );
-    if (out.errors.length)
+    if (out.errors.length) {
       throw new Error(
         `void-fbtee: collecting strings failed: ${out.errors.map((e) => e.message).join("; ")}`,
       );
-    phrases.push(...phrasesOf(parseJson(out.output ?? "{}"), "fbtee's collected strings"));
+    }
+    phrases.push(...readPhrases(parseJson(out.output ?? "{}"), "fbtee's collected strings"));
   }
   const builtins = builtinPhrases(p.root);
   const builtinHashes = new Set(builtins.flatMap((ph) => Object.keys(ph.hashToLeaf ?? {})));
   const all = [...phrases, ...builtins];
   const texts: Record<string, string> = {};
-  for (const ph of all)
-    for (const [h, leaf] of Object.entries(ph.hashToLeaf ?? {})) texts[h] = leaf.text;
+  for (const ph of all) {
+    for (const [h, leaf] of Object.entries(ph.hashToLeaf ?? {})) {
+      texts[h] = leaf.text;
+    }
+  }
   const value = { phrases: all, builtinHashes, texts, files };
   cache = { key, value };
   return value;
@@ -182,7 +206,7 @@ export const catalogLocales = (p: Project) => [
  * prepare-translations (new strings marked "new", finished ones kept, stale ones removed), plus a
  * line for each plural form and gender the locale needs (plurals.ts addVariants).
  */
-export function prepared(p: Project): { locale: string; json: string; existed: boolean }[] {
+export function prepared(p: Project): Array<{ locale: string; json: string; existed: boolean }> {
   const { phrases } = collect(p);
   const locales = catalogLocales(p);
   const inputs = locales.map((locale) => {
@@ -195,7 +219,7 @@ export function prepared(p: Project): { locale: string; json: string; existed: b
   // write (sourceNeedsCatalog): gender there is the code's own.
   const slots = pluralSlots(phrases);
   return out.map((json, i) => {
-    const locale = locales[i]!;
+    const locale = present(locales[i], `the catalog for language ${i}`);
     let full = addVariants(json, slots, locale, { genders: locale !== p.config.sourceLocale });
     // The source language's catalog holds only the strings with a count: the rest is the code's.
     if (locale === p.config.sourceLocale) {
@@ -205,7 +229,7 @@ export function prepared(p: Project): { locale: string; json: string; existed: b
       );
       full = JSON.stringify(catalog, null, 2) + "\n";
     }
-    return { locale, json: full, existed: !!inputs[i]!.existingJson };
+    return { locale, json: full, existed: !!inputs[i]?.existingJson };
   });
 }
 
@@ -217,7 +241,7 @@ export function prepared(p: Project): { locale: string; json: string; existed: b
 export function freshCatalog(p: Project, locale: string): string {
   const { phrases } = collect(p);
   const [json] = prepareTranslationsBatchSync(JSON.stringify({ phrases }), [{ locale }]);
-  return addVariants(json!, pluralSlots(phrases), locale, {
+  return addVariants(present(json, `fbtee's ${locale} catalog`), pluralSlots(phrases), locale, {
     genders: locale !== p.config.sourceLocale,
   });
 }
@@ -225,7 +249,7 @@ export function freshCatalog(p: Project, locale: string): string {
 export interface LocaleMissing {
   locale: string;
   /** The app's own untranslated strings, as source text. */
-  app: string[];
+  app: Array<string>;
   /** fbtee's built-in strings still untranslated. */
   builtin: number;
   /** No catalog file yet. */
@@ -233,7 +257,7 @@ export interface LocaleMissing {
 }
 
 /** Untranslated strings per locale, by fbtee's own rule. */
-export function missing(p: Project): LocaleMissing[] {
+export function missing(p: Project): Array<LocaleMissing> {
   const { builtinHashes, texts } = collect(p);
   return prepared(p).map(({ locale, json, existed }) => {
     const entries = Object.entries(readCatalog(json, `the ${locale} catalog`).translations);
@@ -248,13 +272,17 @@ export function missing(p: Project): LocaleMissing[] {
 }
 
 /** One line per locale, for the dev server and the build. */
-export function formatMissing(report: LocaleMissing[]): string | undefined {
+export function formatMissing(report: Array<LocaleMissing>): string | undefined {
   const open = report.filter((r) => r.app.length || r.builtin);
-  if (!open.length) return;
+  if (!open.length) {
+    return;
+  }
   return open
     .map((r) => {
       const names = r.app.slice(0, 5).map((t) => JSON.stringify(t));
-      if (r.app.length > 5) names.push("…");
+      if (r.app.length > 5) {
+        names.push("…");
+      }
       const parts = [
         r.app.length ? `${r.app.length} untranslated (${names.join(", ")})` : "",
         r.builtin ? `${r.builtin} of fbtee's built-in strings` : "",
@@ -300,20 +328,54 @@ export function runtimeTexts(p: Project): Record<string, string> {
   const marked = field(table, "zz-ZZ");
   for (const [runtimeHash, value] of Object.entries(isRecord(marked) ? marked : {})) {
     const hash = firstMark(value);
-    if (hash) out[runtimeHash] = texts[hash] ?? hash;
+    if (hash) {
+      out[runtimeHash] = texts[hash] ?? hash;
+    }
   }
   return out;
 }
 
+const isPair = (value: unknown): value is [string, string] =>
+  Array.isArray(value) &&
+  value.length === 2 &&
+  typeof value[0] === "string" &&
+  typeof value[1] === "string";
+
+/** One of fbtee's runtime tables: a string, a [string, hash] pair, or branches of those. */
+const isRuntimeInput = (value: unknown): value is FbtRuntimeInput =>
+  typeof value === "string" ||
+  isPair(value) ||
+  (isRecord(value) &&
+    Object.values(value).every((v) => typeof v === "number" || isRuntimeInput(v)));
+
+/**
+ * `locale`'s tables from what fbtee's translateSync wrote (its JSON), each checked to be in the
+ * shape fbtee's runtime takes; none if it has none for `locale`.
+ */
+export function runtimeTables(json: string, locale: string): Record<string, FbtRuntimeInput> {
+  const own = field(parseJson(json), locale);
+  const tables: Record<string, FbtRuntimeInput> = {};
+  for (const [hash, table] of Object.entries(isRecord(own) ? own : {})) {
+    if (!isRuntimeInput(table)) {
+      throw new Error(
+        `void-fbtee: fbtee's compiled ${locale} table ${hash} isn't its runtime's shape`,
+      );
+    }
+    tables[hash] = table;
+  }
+  return tables;
+}
+
 /** fbtee's runtime table for one locale, from its editable catalog. Empty if there's none. */
-export function runtimeCatalog(p: Project, locale: string): Record<string, unknown> {
+export function runtimeCatalog(p: Project, locale: string): Record<string, FbtRuntimeInput> {
   const file = catalogFile(p, locale);
-  if (!existsSync(file)) return {};
+  if (!existsSync(file)) {
+    return {};
+  }
   const { phrases } = collect(p);
   const group = parseJson(readFileSync(file, "utf8"));
-  const table = parseJson(
+  return runtimeTables(
     translateSync(JSON.stringify({ phrases, translationGroups: [group] }), true),
+    locale,
   );
-  const own = field(table, locale);
-  return isRecord(own) ? own : {};
 }

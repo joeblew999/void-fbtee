@@ -74,7 +74,8 @@ export default defineConfig({
 
 /** A language's name in its own language: "English", "العربية", "ไทย". */
 const languageName = (locale: string) =>
-  new Intl.DisplayNames(locale, { type: "language" }).of(new Intl.Locale(locale).language)!;
+  new Intl.DisplayNames(locale, { type: "language" }).of(new Intl.Locale(locale).language) ??
+  locale;
 
 function Slow({ late }: { late: Props["late"] }) {
   const { count } = use(late);
@@ -112,7 +113,9 @@ function CodeWindow({ count, late }: Props) {
               onKeyDown={(e) => {
                 // The tabs pattern: one Tab stop, the arrow keys move between the files.
                 const step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
-                if (!step) return;
+                if (!step) {
+                  return;
+                }
                 e.preventDefault();
                 const next = (i + step + FILES.length) % FILES.length;
                 setOpen(next);
@@ -140,7 +143,7 @@ function CodeWindow({ count, late }: Props) {
         dir="ltr"
         className="min-h-72 overflow-x-auto p-5 font-mono text-sm leading-relaxed [scrollbar-color:var(--border)_transparent]"
       >
-        <Highlighted code={FILES[open]!.code} />
+        <Highlighted code={FILES[open]?.code ?? ""} />
       </pre>
       <div className="border-t bg-muted/40 p-5">
         {/* A fixed height: switching language changes the words, never the layout around them. */}

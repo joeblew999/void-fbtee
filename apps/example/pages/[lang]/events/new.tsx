@@ -15,7 +15,7 @@ import type { Props } from "./new.server";
  * The form, starting in the reader's zone (the page remounts it once the browser knows it), with
  * the server's zones. What it sends is neutral: the picker's "2026-04-01T20:00" and a zone name.
  */
-function PostEvent({ zone, zones }: { zone: string | null; zones: string[] }) {
+function PostEvent({ zone, zones }: { zone: string | null; zones: Array<string> }) {
   const form = useForm("/[lang]/events/new", {
     title: "",
     description: "",

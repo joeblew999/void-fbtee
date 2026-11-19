@@ -5,9 +5,12 @@ export function checkSite(site: string): void {
   let url: URL | undefined;
   try {
     url = new URL(site);
-  } catch {}
-  if (!url || url.protocol !== "https:" || url.origin !== site)
+  } catch {
+    // Not an address at all: said just below.
+  }
+  if (!url || url.protocol !== "https:" || url.origin !== site) {
     throw new Error(
       `voidFbtee({ site }): "${site}" isn't an https address of a host alone, e.g. "https://example.com" (no path, no trailing slash)`,
     );
+  }
 }

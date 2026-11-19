@@ -7,7 +7,7 @@ export const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
 /** A list of text. */
-export const isStringArray = (value: unknown): value is string[] =>
+export const isStringArray = (value: unknown): value is Array<string> =>
   Array.isArray(value) && value.every((v) => typeof v === "string");
 
 /** A field of an object, or undefined when the value isn't one. */
@@ -30,3 +30,22 @@ export const textRecord = (value: unknown): Record<string, string> =>
       (entry): entry is [string, string] => typeof entry[1] === "string",
     ),
   );
+
+/** A regular expression's capture group that its pattern always fills: checked, so a change to the
+ * pattern that leaves it empty is an error rather than an undefined passed on. */
+export function group(match: ReadonlyArray<string | undefined>, i: number): string {
+  const found = match[i];
+  if (found === undefined) {
+    throw new Error(`void-fbtee: no group ${i} in ${JSON.stringify(match[0])}`);
+  }
+  return found;
+}
+
+/** A list's item that the code's own logic says is there (an index from its own loop, a value it
+ * just found): checked, so a slip is an error naming `what`, not an undefined passed on. */
+export function present<T>(value: T | undefined, what: string): T {
+  if (value === undefined) {
+    throw new Error(`void-fbtee: ${what} is missing`);
+  }
+  return value;
+}

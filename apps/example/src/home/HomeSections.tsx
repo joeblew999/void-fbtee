@@ -101,12 +101,12 @@ export function AddIt() {
 interface Feature {
   icon: ReactNode;
   title: ReactNode;
-  facts: ReactNode[];
+  facts: Array<ReactNode>;
   /** Its docs page on this site, built by routeUrl (checked by Void's typed routes). */
   href: RouteUrl;
 }
 
-function features(): Feature[] {
+function features(): Array<Feature> {
   const icon = "size-5 text-brand";
   return [
     {

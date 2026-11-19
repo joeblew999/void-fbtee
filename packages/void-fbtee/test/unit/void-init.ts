@@ -16,11 +16,12 @@ export default function setup() {
     mkdirSync(dir, { recursive: true });
     execFileSync("git", ["init", "--quiet"], { cwd: dir });
     // `void init` picks pnpm for a new app when it finds a pnpm-workspace.yaml (else npm).
-    if (toolchain === "vite")
+    if (toolchain === "vite") {
       writeFileSync(
         join(dir, "pnpm-workspace.yaml"),
         "allowBuilds:\n  esbuild: true\n  workerd: true\n",
       );
+    }
     execFileSync(
       VOID,
       [

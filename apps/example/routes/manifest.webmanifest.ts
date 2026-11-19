@@ -27,6 +27,10 @@ export const GET = defineHandler(async (c) => {
     ),
   }));
   const [source, ...others] = Object.values(description);
+  // The source language is always one of the app's: none means there are no languages at all.
+  if (!source) {
+    throw new Error("manifest: the app has no languages");
+  }
   const manifest: WebAppManifest & { description_localized: Localized } = {
     id: "/",
     name: "void-fbtee",

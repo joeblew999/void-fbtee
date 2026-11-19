@@ -59,8 +59,12 @@ export function sharedI18n(meta: unknown): SharedI18n | undefined {
   const dir = field(meta, "dir");
   const now = textField(meta, "now");
   const path = textField(meta, "path");
-  if (!isAppLocale(config, locale) || !isLang(config, lang) || !isDir(dir)) return;
-  if (now === undefined || path === undefined) return;
+  if (!isAppLocale(config, locale) || !isLang(config, lang) || !isDir(dir)) {
+    return;
+  }
+  if (now === undefined || path === undefined) {
+    return;
+  }
   return { locale, lang, dir, now, path };
 }
 

@@ -14,7 +14,7 @@ export type TicketLook = {
   heading: string;
   title: EmailLook["title"];
   /** Label and value: who booked, when it starts. */
-  rows: { label: string; value: string }[];
+  rows: Array<{ label: string; value: string }>;
   /** What to do with the ticket. */
   note: string;
   /** The event's page, with the line that introduces it. */

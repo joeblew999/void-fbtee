@@ -16,15 +16,21 @@ function Preview({ id, name, email }: { id: string; name: ReactNode; email: Show
   const frame = useRef<HTMLIFrameElement>(null);
   useEffect(() => {
     const el = frame.current;
-    if (!el) return;
+    if (!el) {
+      return;
+    }
     // Measured collapsed: a document is never shorter than its frame.
     const fit = () => {
       const doc = el.contentDocument?.documentElement;
-      if (!doc) return;
+      if (!doc) {
+        return;
+      }
       el.style.height = "0px";
       el.style.height = `${doc.scrollHeight}px`;
     };
-    if (el.contentDocument?.readyState === "complete") fit();
+    if (el.contentDocument?.readyState === "complete") {
+      fit();
+    }
     el.addEventListener("load", fit);
     return () => el.removeEventListener("load", fit);
   }, [email.html]);
@@ -54,7 +60,7 @@ function Preview({ id, name, email }: { id: string; name: ReactNode; email: Show
   );
 }
 
-function points(): Point[] {
+function points(): Array<Point> {
   return [
     {
       id: "language",
@@ -189,20 +195,21 @@ function points(): Point[] {
 }
 
 // A function, so each is translated when the page renders, in its language.
-const sections = () => [
-  {
-    id: "emails",
-    title: <fbt desc="Emails page section title: the sample emails">Two of the emails</fbt>,
-  },
-  {
-    id: "how",
-    title: (
-      <fbt desc="Emails page section title: what a translated email needs">
-        What a translated email needs
-      </fbt>
-    ),
-  },
-];
+const sections = () =>
+  [
+    {
+      id: "emails",
+      title: <fbt desc="Emails page section title: the sample emails">Two of the emails</fbt>,
+    },
+    {
+      id: "how",
+      title: (
+        <fbt desc="Emails page section title: what a translated email needs">
+          What a translated email needs
+        </fbt>
+      ),
+    },
+  ] as const;
 
 export default function EmailsPage({ booking, link }: Props) {
   const all = { points: points(), sections: sections() };

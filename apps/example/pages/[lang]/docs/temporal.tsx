@@ -57,7 +57,7 @@ export default function TemporalPage({ worker }: Props) {
   const total = keys.length;
   // The four ways, in column order (undefined: the browser hasn't run yet; null: no Temporal of
   // its own there).
-  const columns: { side: string; rows: Rows | null | undefined }[] = [
+  const columns: Array<{ side: string; rows: Rows | null | undefined }> = [
     { side: "worker", rows: worker.own },
     { side: "worker-polyfill", rows: worker.polyfill },
     { side: "own", rows: browser ? browser.own : undefined },

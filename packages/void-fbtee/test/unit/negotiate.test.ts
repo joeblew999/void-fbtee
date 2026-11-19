@@ -6,7 +6,7 @@ import { setupLocaleContext } from "fbtee";
 import { describe, expect, test } from "vite-plus/test";
 import { acceptedLanguages, negotiate } from "../../src/negotiate";
 
-const fbtee = (visitor: string[], locales: string[], fallbackLocale: string) =>
+const fbtee = (visitor: Array<string>, locales: Array<string>, fallbackLocale: string) =>
   setupLocaleContext({
     availableLanguages: new Map(locales.map((l) => [l, l])),
     clientLocales: visitor,
@@ -56,14 +56,17 @@ describe("negotiate() equals fbtee's setupLocaleContext().getLocale()", () => {
   for (const [name, locales] of [
     ["the example's languages", EXAMPLE],
     ["a site with many", MANY],
-  ] as const)
-    for (const fallback of ["en-US", "th-TH"])
-      for (const visitor of VISITORS)
+  ] as const) {
+    for (const fallback of ["en-US", "th-TH"]) {
+      for (const visitor of VISITORS) {
         test(`${name}, fallback ${fallback}: [${visitor.join(", ")}]`, () => {
           expect(negotiate(visitor, locales, fallback)).toBe(
             fbtee(visitor, [...locales], fallback),
           );
         });
+      }
+    }
+  }
 });
 
 test("the example: inherited languages and ones it doesn't have", () => {

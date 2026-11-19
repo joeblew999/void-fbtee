@@ -6,7 +6,7 @@
 // booker is owed it. Read from the database's main copy (src/db.ts).
 import { defineQueue } from "void";
 import { primaryDb } from "@/db";
-import type { AppLocale } from "void-fbtee/locales";
+import { appLocaleOf } from "void-fbtee/server";
 import { storage } from "void/storage";
 import { sendCancellationEmail } from "../src/events/emails";
 import { bookingWithEvent, deleteBooking, deleteIfDone } from "../src/events/store";
@@ -33,7 +33,7 @@ export default defineQueue<Message>(async (batch) => {
     const { booking, event } = row;
     // The language they booked in: one of the app's, as booking stores it. The title as they
     // read it: its translations go only with the event's last booking.
-    const locale = booking.locale as AppLocale;
+    const locale = appLocaleOf(booking.locale);
     const text = titleFor(event, await textsFor([event.id], locale, db), locale);
     const sent = await sendCancellationEmail(booking.email, {
       locale,

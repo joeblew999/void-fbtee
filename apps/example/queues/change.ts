@@ -12,7 +12,7 @@
 // database's main copy (src/db.ts), so a change made a second ago is seen.
 import { defineQueue } from "void";
 import { primaryDb } from "@/db";
-import type { AppLocale } from "void-fbtee/locales";
+import { appLocaleOf } from "void-fbtee/server";
 import { sendChangeEmail } from "../src/events/emails";
 import { isBehind, toldOf } from "../src/events/owed";
 import { bookingWithEvent, told } from "../src/events/store";
@@ -42,13 +42,17 @@ export default defineQueue<Message>(async (batch) => {
       continue;
     }
     const { booking, event } = row;
-    const locale = booking.locale as AppLocale;
+    const locale = appLocaleOf(booking.locale);
     // The title in their language where its translation is of the event as it is now, else as
     // written, marked with its language (titleFor: a translation of what it said before is never used).
     const text = titleFor(event, await textsFor([event.id], locale, db), locale);
     const was = {
-      ...(booking.told_starts_at !== event.starts_at ? { startsAt: booking.told_starts_at! } : {}),
-      ...(booking.told_ends_at !== event.ends_at ? { endsAt: booking.told_ends_at! } : {}),
+      ...(booking.told_starts_at !== null && booking.told_starts_at !== event.starts_at
+        ? { startsAt: booking.told_starts_at }
+        : {}),
+      ...(booking.told_ends_at !== null && booking.told_ends_at !== event.ends_at
+        ? { endsAt: booking.told_ends_at }
+        : {}),
       ...((booking.told_venue ?? null) !== (event.venue ?? null)
         ? { venue: booking.told_venue }
         : {}),

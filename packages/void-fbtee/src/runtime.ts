@@ -28,7 +28,9 @@ export function reportMissing(texts: Record<string, string>) {
   const seen = new Set<string>();
   return ({ locale, hashKey }: { locale: string; hashKey: string }) => {
     const key = `${locale} ${hashKey}`;
-    if (seen.has(key)) return;
+    if (seen.has(key)) {
+      return;
+    }
     seen.add(key);
     console.warn(
       `void-fbtee: no ${locale} translation for ${JSON.stringify(texts[hashKey] ?? hashKey)}`,
@@ -40,8 +42,13 @@ export function reportMissing(texts: Record<string, string>) {
 export type CatalogLoaders = Record<string, () => Promise<{ default: TranslationDictionary }>>;
 
 /** Catalog modules' tables as one, later ones winning. */
-const merged = (modules: { default: TranslationDictionary }[]): TranslationDictionary =>
-  modules.reduce<TranslationDictionary>((all, m) => ({ ...all, ...m.default }), {});
+function merged(modules: Array<{ default: TranslationDictionary }>): TranslationDictionary {
+  const all: TranslationDictionary = {};
+  for (const m of modules) {
+    Object.assign(all, m.default);
+  }
+  return all;
+}
 
 const availableLanguages = (config: Pick<RuntimeConfig, "locales">) =>
   new Map(config.locales.map((l) => [l.locale, l.locale]));
@@ -69,15 +76,19 @@ export function localeContextOptions(
  * language with its likely script, and its bare language when that's the language's own script
  * (fr-CA → fr; zh-Hant-TW → zh-Hant, never zh, which is Hans).
  */
-function hierarchy(locale: string): string[] {
+function hierarchy(locale: string): Array<string> {
   const out = new Set([locale]);
   try {
     const parsed = new Intl.Locale(locale);
     out.add(parsed.baseName);
     out.add([parsed.language, parsed.script, parsed.region].filter(Boolean).join("-"));
     const script = parsed.maximize().script;
-    if (script) out.add(`${parsed.language}-${script}`);
-    if (script === new Intl.Locale(parsed.language).maximize().script) out.add(parsed.language);
+    if (script) {
+      out.add(`${parsed.language}-${script}`);
+    }
+    if (script === new Intl.Locale(parsed.language).maximize().script) {
+      out.add(parsed.language);
+    }
   } catch {
     // Not a locale Intl knows: only itself.
   }
@@ -92,21 +103,24 @@ function hierarchy(locale: string): string[] {
  * identities ("th-Thai") that name no catalog; callers keep only the ones the app has.
  */
 /** fbtee's fallbacks as one list for every language, rather than a list per language. */
-const isList = (fallbacks: FallbackLocales): fallbacks is readonly string[] =>
+const isList = (fallbacks: FallbackLocales): fallbacks is ReadonlyArray<string> =>
   Array.isArray(fallbacks);
 
-export function fallbacksOf(locale: string, fallbacks: FallbackLocales | undefined): string[] {
-  const map: Readonly<Record<string, readonly string[]>> =
+export function fallbacksOf(locale: string, fallbacks: FallbackLocales | undefined): Array<string> {
+  const map: Readonly<Record<string, ReadonlyArray<string>>> =
     fallbacks && !isList(fallbacks) ? fallbacks : {};
   const result = new Set<string>();
   const append = (value: string) => {
-    const added: string[] = [];
-    for (const parent of hierarchy(value))
+    const added: Array<string> = [];
+    for (const parent of hierarchy(value)) {
       if (!result.has(parent)) {
         result.add(parent);
         added.push(parent);
       }
-    for (const parent of added) map[parent]?.forEach(append);
+    }
+    for (const parent of added) {
+      map[parent]?.forEach(append);
+    }
   };
   append(locale);
   (fallbacks && isList(fallbacks) ? fallbacks : map.default)?.forEach(append);

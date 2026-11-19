@@ -5,9 +5,11 @@ import { globSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
 import { SITE } from "../../apps/example/src/site";
-import { onLiveSite, url } from "../helpers";
+import { json, list, onLiveSite, url } from "../helpers";
+import { field, parseJson, textField } from "../../packages/void-fbtee/src/guards";
 import { EXAMPLE } from "./setup";
 import { LOCALES, SOURCE } from "../locales";
+import { got } from "../got";
 
 const get = (path: string, init?: RequestInit) => fetch(url("prod") + path, init);
 
@@ -31,7 +33,7 @@ const PAGES = [
 
 /** The id of an event on the list. */
 const firstEventId = async () =>
-  (await (await get(`/${SOURCE}/events`)).text()).match(/\/events\/([0-9a-f-]{36})"/)![1]!;
+  got(got((await (await get(`/${SOURCE}/events`)).text()).match(/\/events\/([0-9a-f-]{36})"/))[1]);
 
 /** A booking for `event` as a plain form post (not the page's JSON), from the site itself. */
 const postBooking = (event: string, fields: Record<string, string>) =>
@@ -56,10 +58,10 @@ const home = (accept: string | undefined, headers: Record<string, string> = {}) 
     redirect: "manual",
     headers: { ...(accept === undefined ? {} : { "accept-language": accept }), ...headers },
   });
-const landsOn = (res: Response) => new URL(res.headers.get("location")!, "http://x").pathname;
+const landsOn = (res: Response) => new URL(got(res.headers.get("location")), "http://x").pathname;
 
 test('"/" goes to each visitor\'s own language, never cached, no cookie', async () => {
-  const cases: [string | undefined, string][] = [
+  const cases: Array<[string | undefined, string]> = [
     ["th", "/th-TH"],
     ["th-TH,th;q=0.9,en;q=0.8", "/th-TH"],
     ["ar-SA,ar;q=0.9", "/ar-EG"],
@@ -125,7 +127,9 @@ test("page head: lang, dir, hreflang alternates with x-default, canonical, og:ur
   const htmlTag = html.match(/<html\b[^>]*>/)?.[0] ?? "";
   expect(htmlTag).toContain('lang="ar-EG"');
   expect(htmlTag).toContain('dir="rtl"');
-  for (const l of LOCALES) expect(html).toContain(`hreflang="${l}" href="${SITE}/${l}/docs/intl"`);
+  for (const l of LOCALES) {
+    expect(html).toContain(`hreflang="${l}" href="${SITE}/${l}/docs/intl"`);
+  }
   // x-default: the page in the fallback language (the source); the home page's is "/", which sends
   // each visitor to their own.
   expect(html).toContain(`hreflang="x-default" href="${SITE}/en-US/docs/intl"`);
@@ -146,9 +150,9 @@ test("page head: lang, dir, hreflang alternates with x-default, canonical, og:ur
   expect(outside).not.toContain('rel="canonical"');
   expect(html).toContain('property="og:locale" content="ar_EG"');
   const meta = html.match(/<meta name="void-fbtee" content="([^"]*)"/)?.[1];
-  const i18n = JSON.parse(meta!.replaceAll("&quot;", '"'));
+  const i18n = parseJson(got(meta).replaceAll("&quot;", '"'));
   expect(i18n).toMatchObject({ locale: "ar-EG", dir: "rtl" });
-  expect(Number.isNaN(Date.parse(i18n.now))).toBe(false);
+  expect(Number.isNaN(Date.parse(got(textField(i18n, "now"), "the page's now")))).toBe(false);
 });
 
 test("the server never shows a stand-in for the reader's own time: those lines come empty", async () => {
@@ -171,8 +175,9 @@ test("the server never shows a stand-in for the reader's own time: those lines c
 });
 
 test("a page under a language the app doesn't have is not found", async () => {
-  for (const path of ["/xx-XX", "/xx-XX/events", "/xx-XX/docs/intl", "/no-such-page"])
+  for (const path of ["/xx-XX", "/xx-XX/events", "/xx-XX/docs/intl", "/no-such-page"]) {
     expect((await get(path, { redirect: "manual" })).status, path).toBe(404);
+  }
 });
 
 test("booking an event that doesn't exist is not found, not sold out", async () => {
@@ -247,17 +252,19 @@ test("the tour: every @void/md feature, in every language, every title in that l
       'data-testid="docs-updated"',
     ],
   };
-  const updated = { "en-US": "Updated", "th-TH": "อัปเดตเมื่อ", "ar-EG": "آخر تحديث" } as Record<
-    string,
-    string
-  >;
+  const updated: Record<string, string> = {
+    "en-US": "Updated",
+    "th-TH": "อัปเดตเมื่อ",
+    "ar-EG": "آخر تحديث",
+  };
   for (const l of LOCALES) {
     const html = await (await get(`/${l}/docs/tour`)).text();
-    for (const [what, marks] of Object.entries(features))
+    for (const [what, marks] of Object.entries(features)) {
       expect(
         marks.filter((m) => !html.includes(m)),
         `${l}: ${what}`,
       ).toEqual([]);
+    }
     expect(html, `${l}: a box with its English default title`).not.toContain(
       "custom-block-title-default",
     );
@@ -290,7 +297,9 @@ test("every page has a title and a description, in its own language", async () =
       const got = l === SOURCE ? source : await head(`/${l}${page}`);
       expect(got.title, `${l}${page}`).toMatch(/. · void-fbtee$/);
       expect(got.description, `${l}${page}`).not.toBe("");
-      if (l !== SOURCE) expect(got.description, `${l}${page}`).not.toBe(source.description);
+      if (l !== SOURCE) {
+        expect(got.description, `${l}${page}`).not.toBe(source.description);
+      }
     }
   }
 });
@@ -313,15 +322,17 @@ test("the Emails page shows the app's emails in its own language", async () => {
 // the same markup both ways round.
 test("the reference pages show their feature at work", async () => {
   const strings = await (await get("/ar-EG/docs/strings")).text();
-  for (const form of ["zero", "one", "two", "few", "many", "other"])
+  for (const form of ["zero", "one", "two", "few", "many", "other"]) {
     expect(strings, form).toContain(`>${form}<`);
+  }
   expect(strings).toContain("حجزت ليلتين");
   const markdown = await (await get("/th-TH/docs/markdown")).text();
   expect(markdown).toContain("docs/tour.md");
   expect(markdown).toContain("translatedFrom: ");
   const translating = await (await get("/en-US/docs/translating")).text();
-  for (const l of LOCALES.filter((l) => l !== SOURCE))
+  for (const l of LOCALES.filter((l) => l !== SOURCE)) {
     expect(translating).toContain(`i18n/translations/${l}.json`);
+  }
   const rtl = await (await get("/ar-EG/docs/right-to-left")).text();
   expect(rtl).toContain('dir="ltr" data-testid="row-ltr"');
   expect(rtl).toContain('dir="rtl" data-testid="row-rtl"');
@@ -338,8 +349,9 @@ test("every home page feature links to its docs page", async () => {
     "translating",
     "right-to-left",
     "emails",
-  ])
+  ]) {
     expect(html, page).toContain(`href="/th-TH/docs/${page}"`);
+  }
 });
 
 // The PDFs page shows the app's own ticket, printed by Cloudflare Browser Run for the page's
@@ -371,8 +383,10 @@ test("no page sets a cookie or varies by a request header, so Void can cache it"
   // Void serves from its cache can come without one. Cloudflare doesn't: the live site's /en-US/docs
   // and assets carry no Vary. So on the preview it isn't the site's, and is left out here; on the
   // live site (`vp run test:production`) nothing is left out.
-  if (!onLiveSite()) voids.add("origin");
-  for (const l of LOCALES)
+  if (!onLiveSite()) {
+    voids.add("origin");
+  }
+  for (const l of LOCALES) {
     for (const page of PAGES) {
       const res = await get(`/${l}${page}`);
       expect(res.headers.get("set-cookie"), `${l}${page}`).toBeNull();
@@ -382,6 +396,7 @@ test("no page sets a cookie or varies by a request header, so Void can cache it"
         .filter((h) => h && !voids.has(h));
       expect(vary, `${l}${page}`).toEqual([]);
     }
+  }
 });
 
 // Posting is its own page: the list links to it, and /events/new is that page in every language,
@@ -393,9 +408,9 @@ test("the events list links to /events/new, the form for posting one", async () 
     "ar-EG": "انشر فعالية",
   };
   for (const l of LOCALES) {
-    const list = await (await get(`/${l}/events`)).text();
-    expect(list, `${l}: the list links to the form`).toContain(`href="/${l}/events/new"`);
-    expect(list, `${l}: the form isn't on the list`).not.toContain('data-testid="event-post"');
+    const listHtml = await (await get(`/${l}/events`)).text();
+    expect(listHtml, `${l}: the list links to the form`).toContain(`href="/${l}/events/new"`);
+    expect(listHtml, `${l}: the form isn't on the list`).not.toContain('data-testid="event-post"');
     const res = await get(`/${l}/events/new`);
     expect(res.status, `${l}/events/new`).toBe(200);
     const form = await res.text();
@@ -414,24 +429,32 @@ test("the events list links to /events/new, the form for posting one", async () 
 // run time too, and the one link built at run time (the language switcher): every page reachable
 // from a language's home page, following its links, answers 200.
 test("every link, on every page reachable in each language, leads to a page", async () => {
-  const broken: string[] = [];
+  const broken: Array<string> = [];
   for (const l of LOCALES) {
     const seen = new Set([`/${l}`]);
     const queue = [`/${l}`];
     while (queue.length) {
-      const page = queue.shift()!;
+      const page = got(queue.shift());
       const html = await (await get(page)).text();
       // Every link on the site, relative ones (as markdown pages write theirs) resolved against
       // the page as the browser does; not other sites, mail and the like, or files.
       for (const [, href] of html.matchAll(/href="([^"#?]+)/g)) {
-        if (/^([a-z]+:|\/\/)/i.test(href!)) continue;
-        const link = new URL(href!, `https://site${page}`).pathname;
-        if (/\.[a-z0-9]+$/i.test(link) || seen.has(link)) continue;
+        if (/^([a-z]+:|\/\/)/i.test(got(href))) {
+          continue;
+        }
+        const link = new URL(got(href), `https://site${page}`).pathname;
+        if (/\.[a-z0-9]+$/i.test(link) || seen.has(link)) {
+          continue;
+        }
         seen.add(link);
         const res = await get(link, { redirect: "manual" });
-        if (res.status !== 200) broken.push(`${page} → ${href} (${link}): ${res.status}`);
+        if (res.status !== 200) {
+          broken.push(`${page} → ${href} (${link}): ${res.status}`);
+        }
         // Follow this language's own pages; the other languages' are reached from their home.
-        else if (link === `/${l}` || link.startsWith(`/${l}/`)) queue.push(link);
+        else if (link === `/${l}` || link.startsWith(`/${l}/`)) {
+          queue.push(link);
+        }
       }
     }
     expect(seen.size, l).toBeGreaterThan(10);
@@ -444,7 +467,7 @@ test("every link, on every page reachable in each language, leads to a page", as
 // void.config.ts's head: one picture, the site's name and X's large card on every page; each page's
 // own address as og:url.
 test("link previews: the site's picture, name and card on every page; og:url its own address", async () => {
-  for (const l of LOCALES)
+  for (const l of LOCALES) {
     for (const page of ["", "/events", "/docs/tour"]) {
       const html = await (await get(`/${l}${page}`)).text();
       for (const tag of [
@@ -456,9 +479,11 @@ test("link previews: the site's picture, name and card on every page; og:url its
         'property="og:type" content="website"',
         'name="twitter:card" content="summary_large_image"',
         `property="og:url" content="${SITE}/${l}${page}"`,
-      ])
+      ]) {
         expect(html, `${l}${page}`).toContain(tag);
+      }
     }
+  }
   const picture = await get("/og-1.png");
   expect(picture.headers.get("content-type")).toMatch(/^image\/png/);
   // 1200×630, from the PNG's own header (IHDR: width and height at bytes 16 and 20).
@@ -469,25 +494,26 @@ test("link previews: the site's picture, name and card on every page; og:url its
 // Structured data (schema.org JSON-LD, through jsonLd from void-fbtee/head): the site on each
 // language's home page, and each event on its page, in the language it's shown in.
 test("structured data: WebSite on each home page, Event on an event's page", async () => {
-  const data = (html: string) =>
+  const data = (html: string): Array<unknown> =>
     [...html.matchAll(/<script type="application\/ld\+json">([^<]*)<\/script>/g)].map(([, json]) =>
-      JSON.parse(json!),
+      parseJson(got(json)),
     );
-  for (const l of LOCALES)
+  for (const l of LOCALES) {
     expect(data(await (await get(`/${l}`)).text()), l).toEqual([
       expect.objectContaining({ "@type": "WebSite", url: `${SITE}/${l}`, inLanguage: l }),
     ]);
+  }
   // A sample event (db/migrations/*_sample_events.sql): the swim, 6:00 on 7 March in Sydney.
-  const list = await (await get(`/${SOURCE}/events`)).text();
-  const swim = list.match(
+  const listHtml = await (await get(`/${SOURCE}/events`)).text();
+  const swim = listHtml.match(
     /href="(\/en-US\/events\/[0-9a-f-]{36})"(?:(?!href=)[^])*?Harbour sunrise swim/,
   )?.[1];
   expect(swim).toBeTruthy();
-  expect(data(await (await get(swim!.replace("/en-US/", "/th-TH/"))).text())).toEqual([
+  expect(data(await (await get(got(swim).replace("/en-US/", "/th-TH/"))).text())).toEqual([
     expect.objectContaining({
       "@type": "Event",
       startDate: "2027-03-07T06:00:00+11:00",
-      url: `${SITE}${swim!.replace("/en-US/", "/th-TH/")}`,
+      url: `${SITE}${got(swim).replace("/en-US/", "/th-TH/")}`,
     }),
   ]);
 });
@@ -508,17 +534,19 @@ test("the site's icons, web app manifest and robots.txt", async () => {
     expect(res.status, file).toBe(200);
     expect(res.headers.get("content-type"), file).toMatch(type);
   }
-  const manifest = await (await get("/manifest.webmanifest")).json();
-  for (const icon of manifest.icons)
-    expect((await get(icon.src)).headers.get("content-type"), icon.src).toMatch(/^image\/png/);
+  const manifest = await json(await get("/manifest.webmanifest"));
+  for (const icon of list(field(manifest, "icons"), "the manifest's icons")) {
+    const src = got(textField(icon, "src"), "an icon's src");
+    expect((await get(src)).headers.get("content-type"), src).toMatch(/^image\/png/);
+  }
   // Made from the catalogs (routes/manifest.webmanifest.ts): the source language's description,
   // and every other language's, translated, with its direction.
   expect(manifest).toMatchObject({ lang: SOURCE, dir: "ltr" });
   for (const l of LOCALES.filter((l) => l !== SOURCE)) {
-    const d = manifest.description_localized[l];
-    expect(d.lang, l).toBe(l);
-    expect(d.dir, l).toBe(l === "ar-EG" ? "rtl" : "ltr");
-    expect(d.value, `${l}: translated`).not.toBe(manifest.description);
+    const d = field(field(manifest, "description_localized"), l);
+    expect(field(d, "lang"), l).toBe(l);
+    expect(field(d, "dir"), l).toBe(l === "ar-EG" ? "rtl" : "ltr");
+    expect(field(d, "value"), `${l}: translated`).not.toBe(field(manifest, "description"));
   }
   const html = await (await get("/th-TH")).text();
   for (const link of [
@@ -527,8 +555,9 @@ test("the site's icons, web app manifest and robots.txt", async () => {
     'rel="apple-touch-icon"',
     'rel="manifest" href="/manifest.webmanifest"',
     'name="theme-color"',
-  ])
+  ]) {
     expect(html, link).toContain(link);
+  }
 });
 
 // routes/sitemap.xml.ts and routes/robots.txt.ts, by Google's rules: every page in every language,
@@ -537,18 +566,24 @@ test("the sitemap: every page in every language, with its alternates; robots.txt
   const res = await get("/sitemap.xml");
   expect(res.headers.get("content-type")).toMatch(/^application\/xml/);
   const xml = await res.text();
-  const entries = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map(([, u]) => ({
-    loc: new URL(u.match(/<loc>(.*?)<\/loc>/)![1]).pathname,
-    lastmod: u.match(/<lastmod>(.*?)<\/lastmod>/)?.[1],
-    alternates: [...u.matchAll(/hreflang="([^"]+)"/g)].map(([, h]) => h),
-  }));
+  const entries = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map(([, found]) => {
+    const u = got(found, "a sitemap entry");
+    return {
+      loc: new URL(got(u.match(/<loc>(.*?)<\/loc>/)?.[1], "an entry's loc")).pathname,
+      lastmod: u.match(/<lastmod>(.*?)<\/lastmod>/)?.[1],
+      alternates: [...u.matchAll(/hreflang="([^"]+)"/g)].map(([, h]) => h),
+    };
+  });
   for (const l of LOCALES)
-    // Not the form for posting one, which routes/sitemap.xml.ts leaves out.
-    for (const page of PAGES.filter((p) => p !== "/events/new"))
+  // Not the form for posting one, which routes/sitemap.xml.ts leaves out.
+  {
+    for (const page of PAGES.filter((p) => p !== "/events/new")) {
       expect(
         entries.map((e) => e.loc),
         `${l}${page}`,
       ).toContain(`/${l}${page}`);
+    }
+  }
   for (const e of entries) {
     expect(e.alternates.sort(), e.loc).toEqual([...LOCALES, "x-default"].sort());
     expect((await get(e.loc)).status, e.loc).toBe(200);
@@ -562,15 +597,18 @@ test("the sitemap: every page in every language, with its alternates; robots.txt
   expect(xDefault(`/th-TH`)).toBe(`${SITE}/`);
   expect(xDefault(`/th-TH/docs/intl`)).toBe(`${SITE}/en-US/docs/intl`);
   // No date where nothing records one: the app's own pages.
-  for (const l of LOCALES)
-    for (const page of ["", "/docs", "/docs/intl"])
+  for (const l of LOCALES) {
+    for (const page of ["", "/docs", "/docs/intl"]) {
       expect(entries.find((e) => e.loc === `/${l}${page}`)?.lastmod, `${l}${page}`).toBeUndefined();
+    }
+  }
   // The tour's is its frontmatter's `updated`; an event's, a date-time.
   expect(entries.find((e) => e.loc === `/${SOURCE}/docs/tour`)?.lastmod).toMatch(
     /^\d{4}-\d{2}-\d{2}$/,
   );
-  for (const e of entries.filter((e) => /\/events\/[0-9a-f-]{36}$/.test(e.loc)))
+  for (const e of entries.filter((e) => /\/events\/[0-9a-f-]{36}$/.test(e.loc))) {
     expect(e.lastmod, e.loc).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/);
+  }
   const robots = await (await get("/robots.txt")).text();
   expect(robots).toMatch(/^Sitemap: https?:\/\/[^/]+\/sitemap\.xml$/m);
 });
@@ -615,7 +653,7 @@ test.skipIf(!!process.env.E2E_URL)(
     expect(
       worker.filter((f) => read(f).includes("void-fbtee: no Temporal on the server")),
     ).toHaveLength(1);
-    const name = (f: string) => f.split("/").pop()!;
+    const name = (f: string) => got(f.split("/").pop());
     const polyfill = worker.filter((f) => read(f).includes("Mismatching Calendars")).map(name);
     expect(polyfill.length).toBeGreaterThan(0);
     const rows = worker
@@ -630,10 +668,10 @@ test.skipIf(!!process.env.E2E_URL)(
       importers.filter((f) => !rows.includes(name(f)) && !rows.some((r) => read(f).includes(r))),
     ).toEqual([]);
     // Cloudflare's temporal flag reaches the Worker config `void deploy` uploads (init adds it, check requires it).
-    const config = JSON.parse(
+    const config = parseJson(
       read(join(EXAMPLE, ".cloudflare/output/v0/workers/default/worker.config.json")),
     );
-    expect(config.compatibilityFlags).toContain("temporal");
+    expect(field(config, "compatibilityFlags")).toContain("temporal");
   },
 );
 
@@ -646,12 +684,13 @@ test("each topic page's link to a piece lands on the Components page's piece", a
       const html = await (await get(`/${locale}/docs/${topic}`)).text();
       const block = html.match(/data-testid="components-link"[\s\S]*?<\/p>/)?.[0];
       expect(block, `${locale} ${topic}`).toBeDefined();
-      const pieces = [...block!.matchAll(/href="\/[^"#]+\/docs\/components#([^"]+)"/g)].map(
-        (m) => m[1]!,
+      const pieces = [...got(block).matchAll(/href="\/[^"#]+\/docs\/components#([^"]+)"/g)].map(
+        (m) => got(m[1]),
       );
       expect(pieces.length, `${locale} ${topic}`).toBeGreaterThan(0);
-      for (const piece of pieces)
+      for (const piece of pieces) {
         expect(components, `${locale} ${topic} → ${piece}`).toContain(`id="${piece}"`);
+      }
     }
   }
 });

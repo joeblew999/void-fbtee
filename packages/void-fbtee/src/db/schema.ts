@@ -58,7 +58,7 @@ export interface ContentEntry {
   source: SourceTable;
   translations: TranslationsTable;
   /** The fields translated, in the order the app's schema lists them. */
-  fields: readonly string[];
+  fields: ReadonlyArray<string>;
 }
 
 const DRIZZLE_TABLE = Symbol.for("drizzle:IsDrizzleTable");
@@ -66,7 +66,7 @@ const isTable = (value: unknown): value is SQLiteTable =>
   typeof value === "object" && value !== null && DRIZZLE_TABLE in value;
 
 /** The keys every translations table has: the shape's. */
-const TRANSLATION_KEYS: readonly string[] = Object.keys(shape);
+const TRANSLATION_KEYS: ReadonlyArray<string> = Object.keys(shape);
 
 /** A table with every column of the shape, by its keys: the queries' type for it holds. */
 const isTranslationsTable = (value: SQLiteTable): value is SQLiteTable & TranslationsTable =>
@@ -77,7 +77,7 @@ const isSourceTable = (value: SQLiteTable | undefined): value is SourceTable =>
   value !== undefined && "id" in value && "locale" in value;
 
 /** A non-empty list of the source table's columns. */
-const isFieldList = (value: unknown, source: SourceTable): value is readonly string[] =>
+const isFieldList = (value: unknown, source: SourceTable): value is ReadonlyArray<string> =>
   Array.isArray(value) &&
   value.length > 0 &&
   value.every((f) => typeof f === "string" && f in source);
@@ -90,28 +90,38 @@ const isFieldList = (value: unknown, source: SourceTable): value is readonly str
  */
 export function contentEntries(schema: Record<string, unknown>): Map<string, ContentEntry> {
   const tables = new Map<string, SQLiteTable>();
-  for (const value of Object.values(schema))
-    if (isTable(value)) tables.set(getTableConfig(value).name, value);
+  for (const value of Object.values(schema)) {
+    if (isTable(value)) {
+      tables.set(getTableConfig(value).name, value);
+    }
+  }
   const found = new Map<string, ContentEntry>();
   for (const [key, value] of Object.entries(schema)) {
-    if (!isTable(value)) continue;
+    if (!isTable(value)) {
+      continue;
+    }
     const tableName = getTableConfig(value).name;
     const name = /^(.+)_translations$/.exec(tableName)?.[1];
-    if (!name) continue;
-    if (!isTranslationsTable(value))
+    if (!name) {
+      continue;
+    }
+    if (!isTranslationsTable(value)) {
       throw new Error(
         `void-fbtee: ${tableName} lacks ${TRANSLATION_KEYS.filter((k) => !(k in value)).join(", ")} (\`void-fbtee gen translations\` writes it).`,
       );
+    }
     const source = tables.get(name);
-    if (!isSourceTable(source))
+    if (!isSourceTable(source)) {
       throw new Error(
         `void-fbtee: ${tableName} translates "${name}", which isn't a table in the schema with \`id\` and \`locale\`.`,
       );
+    }
     const fields = schema[`${key}_fields`];
-    if (!isFieldList(fields, source))
+    if (!isFieldList(fields, source)) {
       throw new Error(
         `void-fbtee: ${tableName} needs \`${key}_fields\` exported beside it: the ${name} columns it translates.`,
       );
+    }
     found.set(name, { name, source, translations: value, fields });
   }
   return found;

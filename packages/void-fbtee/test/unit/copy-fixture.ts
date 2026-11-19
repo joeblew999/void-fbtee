@@ -3,8 +3,10 @@
 import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { check, markdownPages } from "../../src/dev/check";
-import { prepare } from "../../src/dev/commands";
-import { voidFbtee, type VoidFbteeApi, type VoidFbteeOptions } from "../../src/dev/plugin";
+import { readCatalog } from "../../src/dev/catalog-file";
+import { apiOf, prepare } from "../../src/dev/commands";
+import { voidFbtee, type VoidFbteeOptions } from "../../src/dev/plugin";
+import { got } from "./got";
 import { stamp } from "../../src/dev/translate";
 
 export const FIXTURE = join(import.meta.dirname, "fixture");
@@ -20,8 +22,11 @@ export function copyFixture(): string {
  * a language with its own script, no English words left in (only the placeholders).
  */
 function madeUp(file: string, text: string): string {
-  const word = ({ ar: "(مترجم)", th: "(แปลแล้ว)" } as Record<string, string>)[file.slice(0, 2)];
-  if (!word) return `${text} (übersetzt)`;
+  const words: Record<string, string> = { ar: "(مترجم)", th: "(แปลแล้ว)" };
+  const word = words[file.slice(0, 2)];
+  if (!word) {
+    return `${text} (übersetzt)`;
+  }
   const kept = text
     .split(/(\{[^{}]+\})/)
     .map((part, i) => (i % 2 ? part : part.replace(/[A-Za-z']+/g, "")));
@@ -46,18 +51,14 @@ export function makeBuildable(root: string, options: VoidFbteeOptions): void {
     join(root, "void.config.ts"),
     `export default { worker: { compatibility_flags: ["temporal"] } };\n`,
   );
-  const api = (voidFbtee(options)[0] as { api: VoidFbteeApi }).api;
+  const api = got(apiOf(voidFbtee(options)), "voidFbtee()'s api");
   const p = { ...api.project(), root };
   prepare(p);
   for (const file of readdirSync(join(root, p.translations))) {
     const path = join(root, p.translations, file);
-    const catalog = JSON.parse(readFileSync(path, "utf8"));
+    const catalog = readCatalog(readFileSync(path, "utf8"), path);
     // Each line made a translation (madeUp), every placeholder kept, as the build checks.
-    for (const entry of Object.values(catalog.translations) as {
-      status: string;
-      translations: { translation: string }[];
-      translatedBy?: string;
-    }[]) {
+    for (const entry of Object.values(catalog.translations)) {
       // Who translated it, as the build asks (dev/check.ts): the tests, by hand (not a model, not
       // Claude); a translation the test wrote itself stays as it is, and says who only if it didn't.
       if (entry.status === "translated") {
@@ -66,7 +67,9 @@ export function makeBuildable(root: string, options: VoidFbteeOptions): void {
       }
       entry.status = "translated";
       entry.translatedBy = "the tests";
-      for (const l of entry.translations) l.translation = madeUp(file, l.translation);
+      for (const l of entry.translations ?? []) {
+        l.translation = madeUp(file, l.translation);
+      }
     }
     writeFileSync(path, JSON.stringify(catalog, null, 2));
   }
@@ -76,5 +79,7 @@ export function makeBuildable(root: string, options: VoidFbteeOptions): void {
     stamp(p, page.file, { by: "the tests" });
   }
   const left = check(p);
-  if (left.length) throw new Error(`fixture still has problems:\n${left.join("\n")}`);
+  if (left.length) {
+    throw new Error(`fixture still has problems:\n${left.join("\n")}`);
+  }
 }

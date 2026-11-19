@@ -50,15 +50,27 @@ function useLiveEvent(id: string, left: number, leaving: RefObject<boolean>) {
         id: "event",
         topic: `event:${id}`,
         onEvent: (event) => {
-          if (event.type === "seats") setLive((event.data as { left: number }).left);
-          if ((event.type === "translated" || event.type === "changed") && !leaving.current)
+          if (event.type === "seats") {
+            const data = event.data;
+            if (typeof data === "object" && data !== null && "left" in data) {
+              if (typeof data.left === "number") {
+                setLive(data.left);
+              }
+            }
+          }
+          if ((event.type === "translated" || event.type === "changed") && !leaving.current) {
             void router.refresh();
-          if (event.type === "deleted" && !leaving.current) setCancelled(true);
+          }
+          if (event.type === "deleted" && !leaving.current) {
+            setCancelled(true);
+          }
         },
       })
       // Closed by this effect's cleanup before subscribing finished: not an error.
       .catch((error: unknown) => {
-        if (!closed) throw error;
+        if (!closed) {
+          throw error;
+        }
       });
     return () => {
       closed = true;
@@ -77,7 +89,7 @@ function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut:
     { id: ticket, name: "", email: "", time_zone: zone ?? "", ticket_in_reminder: false },
     { params: { id } },
   );
-  if (form.wasSuccessful)
+  if (form.wasSuccessful) {
     return (
       <div className="space-y-3">
         <p className="font-medium" data-testid="booked">
@@ -99,8 +111,9 @@ function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut:
         </p>
       </div>
     );
+  }
   // The 409 from the action: someone else took the last seat (the live count may say so first).
-  if (form.error?.status === 409)
+  if (form.error?.status === 409) {
     return (
       <p className="text-destructive text-sm" data-testid="sold-out-error">
         <fbt desc="Booking error: the last seat went just before">
@@ -108,7 +121,10 @@ function Book({ id, zone, soldOut }: { id: string; zone: string | null; soldOut:
         </fbt>
       </p>
     );
-  if (soldOut) return null;
+  }
+  if (soldOut) {
+    return null;
+  }
   return (
     <Form form={form} className="grid gap-4">
       <div className="grid gap-4">
@@ -256,12 +272,16 @@ const keyStore = {
   set(id: string, key: string) {
     try {
       localStorage.setItem(keyStore.name(id), key);
-    } catch {}
+    } catch {
+      // Storage refused (a private window): the key stays in the page's link only.
+    }
   },
   remove(id: string) {
     try {
       localStorage.removeItem(keyStore.name(id));
-    } catch {}
+    } catch {
+      // Storage refused (a private window): nothing was kept to remove.
+    }
   },
 };
 
@@ -367,13 +387,19 @@ function YourEvent({
   // has moved the address from the form's page to this one.
   const page = routeUrl("/[lang]/events/[id]", { params: { id } });
   useEffect(() => {
-    if (!key) return;
+    if (!key) {
+      return;
+    }
     keyStore.set(id, key);
-    if (location.pathname !== page || location.hash.includes("key=")) return;
+    if (location.pathname !== page || location.hash.includes("key=")) {
+      return;
+    }
     history.replaceState(history.state, "", privateLink(page + location.search, key));
     document.cookie = noKeyCookie(id);
   }, [id, key, page, hash]);
-  if (!key) return null;
+  if (!key) {
+    return null;
+  }
   const link = privateLink(location.origin + page, key);
   const remove = async () => {
     // A wrong key is a 403, which Void's action() throws rather than returns (it returns only
@@ -385,8 +411,11 @@ function YourEvent({
       keyStore.remove(id);
     } catch (error) {
       onLeaving(false);
-      if (isVoidActionError(error) && error.status === 403) setWrong(true);
-      else throw error;
+      if (isVoidActionError(error) && error.status === 403) {
+        setWrong(true);
+      } else {
+        throw error;
+      }
     }
   };
   return (
@@ -466,7 +495,9 @@ export default function Event({ event, text, left, deletable }: Props) {
   // Marked with its own language and direction (langAttrs), whichever it's in.
   const shown = text ?? event;
   const textLang = text ? text.locale : event.locale;
-  const written = new Intl.DisplayNames(locale, { type: "language" }).of(event.locale);
+  // The language's name in the page's language, or its tag where the browser can't name it.
+  const written =
+    new Intl.DisplayNames(locale, { type: "language" }).of(event.locale) ?? event.locale;
   return (
     // Three parts: the event, booking, and the stored record. On a phone they stack in that order;
     // from 1024px booking is a column of its own beside the other two.
@@ -518,7 +549,7 @@ export default function Event({ event, text, left, deletable }: Props) {
                 <fbt desc="Note under an event: its text was machine-translated from the language its poster wrote it in; {language} is that language's name">
                   Translated by machine from{" "}
                   <fbt:param name="language">
-                    <Formatted>{written!}</Formatted>
+                    <Formatted>{written}</Formatted>
                   </fbt:param>
                 </fbt>
               </summary>
@@ -537,7 +568,7 @@ export default function Event({ event, text, left, deletable }: Props) {
               <fbt desc="Note under an event shown as its poster wrote it, in another language; {language} is that language's name">
                 Written in{" "}
                 <fbt:param name="language">
-                  <Formatted>{written!}</Formatted>
+                  <Formatted>{written}</Formatted>
                 </fbt:param>.
               </fbt>
             </p>

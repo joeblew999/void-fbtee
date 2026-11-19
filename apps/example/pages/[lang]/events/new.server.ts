@@ -52,7 +52,7 @@ export const action = defineHandler.withValidator({
   // The private link by email too, when the poster asked: in the language they posted in, so a
   // poster who loses the page (another device, cleared browser) can still delete it. The address
   // goes to sendEmail only.
-  if (body.email)
+  if (body.email) {
     await sendLinkEmail(body.email, {
       locale,
       title: body.title,
@@ -62,6 +62,7 @@ export const action = defineHandler.withValidator({
       // Where it was posted (dev, a Worker Preview, live), not the site's canonical address.
       link: privateLink(new URL(c.req.url).origin + page, key),
     });
+  }
   // Its translations into the app's other languages, at once (void-fbtee's queue): without this,
   // the first page read in another language would queue it, and the daily job would find it.
   await content.translateSoon(events, id, {}, db);

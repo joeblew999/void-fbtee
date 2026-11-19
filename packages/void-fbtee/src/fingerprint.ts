@@ -22,6 +22,16 @@ const K = new Uint32Array([
 
 const rotr = (x: number, n: number) => (x >>> n) | (x << (32 - n));
 
+/** A word of one of the arrays below, by an index the loops keep inside it: checked, so a slip in
+ * them is an error rather than a wrong hash. */
+function word(words: Uint32Array, i: number): number {
+  const w = words[i];
+  if (w === undefined) {
+    throw new RangeError(`sha256: no word ${i}`);
+  }
+  return w;
+}
+
 /** SHA-256 of `text`'s UTF-8, in hex. */
 export function sha256(text: string): string {
   const bytes = new TextEncoder().encode(text);
@@ -39,37 +49,44 @@ export function sha256(text: string): string {
   ]);
   const w = new Uint32Array(64);
   for (let block = 0; block < length; block += 64) {
-    for (let t = 0; t < 16; t++) w[t] = view.getUint32(block + t * 4);
-    for (let t = 16; t < 64; t++) {
-      const s0 = rotr(w[t - 15]!, 7) ^ rotr(w[t - 15]!, 18) ^ (w[t - 15]! >>> 3);
-      const s1 = rotr(w[t - 2]!, 17) ^ rotr(w[t - 2]!, 19) ^ (w[t - 2]! >>> 10);
-      w[t] = (w[t - 16]! + s0 + w[t - 7]! + s1) >>> 0;
+    for (let t = 0; t < 16; t++) {
+      w[t] = view.getUint32(block + t * 4);
     }
-    let [a, b, c, d, e, f, g, hh] = h;
+    for (let t = 16; t < 64; t++) {
+      const w15 = word(w, t - 15);
+      const w2 = word(w, t - 2);
+      const s0 = rotr(w15, 7) ^ rotr(w15, 18) ^ (w15 >>> 3);
+      const s1 = rotr(w2, 17) ^ rotr(w2, 19) ^ (w2 >>> 10);
+      w[t] = (word(w, t - 16) + s0 + word(w, t - 7) + s1) >>> 0;
+    }
+    let a = word(h, 0);
+    let b = word(h, 1);
+    let c = word(h, 2);
+    let d = word(h, 3);
+    let e = word(h, 4);
+    let f = word(h, 5);
+    let g = word(h, 6);
+    let hh = word(h, 7);
     for (let t = 0; t < 64; t++) {
-      const S1 = rotr(e!, 6) ^ rotr(e!, 11) ^ rotr(e!, 25);
-      const ch = (e! & f!) ^ (~e! & g!);
-      const t1 = (hh! + S1 + ch + K[t]! + w[t]!) >>> 0;
-      const S0 = rotr(a!, 2) ^ rotr(a!, 13) ^ rotr(a!, 22);
-      const maj = (a! & b!) ^ (a! & c!) ^ (b! & c!);
+      const S1 = rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25);
+      const ch = (e & f) ^ (~e & g);
+      const t1 = (hh + S1 + ch + word(K, t) + word(w, t)) >>> 0;
+      const S0 = rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22);
+      const maj = (a & b) ^ (a & c) ^ (b & c);
       const t2 = (S0 + maj) >>> 0;
       hh = g;
       g = f;
       f = e;
-      e = (d! + t1) >>> 0;
+      e = (d + t1) >>> 0;
       d = c;
       c = b;
       b = a;
       a = (t1 + t2) >>> 0;
     }
-    h[0]! += a!;
-    h[1]! += b!;
-    h[2]! += c!;
-    h[3]! += d!;
-    h[4]! += e!;
-    h[5]! += f!;
-    h[6]! += g!;
-    h[7]! += hh!;
+    // Each word plus the block's, kept to 32 bits (a Uint32Array keeps its values so).
+    for (const [i, x] of [a, b, c, d, e, f, g, hh].entries()) {
+      h[i] = word(h, i) + x;
+    }
   }
   return [...h].map((x) => x.toString(16).padStart(8, "0")).join("");
 }

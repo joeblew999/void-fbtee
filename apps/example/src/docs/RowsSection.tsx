@@ -10,7 +10,7 @@ export interface Row {
   key: string;
   code: string;
   differs: boolean;
-  cells: { side: string; dir: string; content: ReactNode }[];
+  cells: Array<{ side: string; dir: string; content: ReactNode }>;
 }
 
 export function RowsSection({
@@ -23,10 +23,10 @@ export function RowsSection({
   id: string;
   title: ReactNode;
   /** The column headings, each with its own classes if any. */
-  heads: { label: ReactNode; className?: string }[];
+  heads: Array<{ label: ReactNode; className?: string }>;
   /** The classes of every cell. */
   cell: string;
-  rows: Row[];
+  rows: Array<Row>;
 }) {
   return (
     <section id={id} data-section={id} className="scroll-mt-20 pt-6">

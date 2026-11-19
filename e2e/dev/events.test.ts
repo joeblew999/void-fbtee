@@ -24,14 +24,18 @@ import {
   url,
   type Posted,
 } from "../helpers";
+import { got } from "../got";
+import { parseJson, textField } from "../../packages/void-fbtee/src/guards";
 
 const page = browser("prod");
-const skip = inject("devSkip" as never) as string;
+const skip = inject("devSkip");
 const site = url("prod");
-const posted: Posted[] = [];
+const posted: Array<Posted> = [];
 
 afterAll(async () => {
-  for (const event of posted) await deleteEvent(event);
+  for (const event of posted) {
+    await deleteEvent(event);
+  }
 });
 
 /** An event's stored translations: language, fields, and the fingerprint each was made from. */
@@ -94,7 +98,7 @@ test.skipIf(!!skip)(
     await thai.goto(`/th-TH${event.path}`);
     await started(thai);
     await thaiTitle(thai);
-    const title = (await thai.locator("h1").textContent())!;
+    const title = got(await thai.locator("h1").textContent());
     const to = address("somchai");
     await book(thai, "Somchai", to);
     const mail = await emailTo(to, /^ที่นั่งของคุณใน /);
@@ -107,11 +111,11 @@ test.skipIf(!!skip)(
     expect(mail.text).toContain("แนบตั๋วของคุณมาแล้ว");
     const pdf = mail.attachments.find((a) => a.filename === "ticket.pdf");
     expect(pdf?.mimeType).toBe("application/pdf");
-    expect(new TextDecoder().decode(pdf!.content.slice(0, 5))).toBe("%PDF-");
+    expect(new TextDecoder().decode(got(pdf).content.slice(0, 5))).toBe("%PDF-");
     const href = await thai.getByTestId("ticket").getAttribute("href");
     const download = await fetch(site + href);
     expect(download.headers.get("content-type")).toBe("application/pdf");
-    expect(new Uint8Array(await download.arrayBuffer())).toEqual(pdf!.content);
+    expect(new Uint8Array(await download.arrayBuffer())).toEqual(got(pdf).content);
   },
 );
 
@@ -134,7 +138,7 @@ test.skipIf(!!skip)(
     await book(other, "Laila", laila);
     const ticketIds = await Promise.all(
       [p, other].map(async (page) =>
-        (await page.getByTestId("ticket").getAttribute("href"))!.replace("/tickets/", ""),
+        got(await page.getByTestId("ticket").getAttribute("href")).replace("/tickets/", ""),
       ),
     );
     // Translated by now (Laila's page read it in Arabic): its rows are there, to see them go.
@@ -195,7 +199,7 @@ test.skipIf(!!skip)(
     await started(other);
     const laila = address("laila");
     await book(other, "Laila", laila);
-    const ticketId = (await other.getByTestId("ticket").getAttribute("href"))!.replace(
+    const ticketId = got(await other.getByTestId("ticket").getAttribute("href")).replace(
       "/tickets/",
       "",
     );
@@ -208,10 +212,15 @@ test.skipIf(!!skip)(
     await p.getByTestId("change-save").click();
     await seeText(p, "event-title", "Pottery for everyone");
     // Translated again, from what it says now: a new fingerprint, and a new cost, in each language.
-    const after = await translatedNow(event.id, before[0]!.translated_from);
-    for (const row of after) expect(row.usage, String(row.locale)).toBeTruthy();
-    const arabic = JSON.parse(String(after.find((r) => r.locale === "ar-EG")!.fields)) as {
-      title: string;
+    const after = await translatedNow(event.id, got(before[0]).translated_from);
+    for (const row of after) {
+      expect(row.usage, String(row.locale)).toBeTruthy();
+    }
+    const arabic = {
+      title: got(
+        textField(parseJson(String(got(after.find((r) => r.locale === "ar-EG")).fields)), "title"),
+        "the Arabic title",
+      ),
     };
     // Laila's email, in Arabic, with the new Arabic title: sent when that translation was stored.
     const escaped = arabic.title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -252,17 +261,17 @@ test.skipIf(!!skip)(
     };
     // The time zone is the form's own: the browser's, which these tests run in.
     const [row] = await dbRows("SELECT starts_at FROM events WHERE id = ?", [event.id]);
-    fields.time_zone = String(row!.starts_at).replace(/^.*\[(.*)\]$/, "$1");
+    fields.time_zone = String(got(row).starts_at).replace(/^.*\[(.*)\]$/, "$1");
     // Another event's key, or a made-up one: refused, and nothing changes.
     expect(await changeEvent(event, "not-the-key", fields)).toBe(403);
     const [still] = await dbRows("SELECT description FROM events WHERE id = ?", [event.id]);
-    expect(still!.description).toBe("Posted by the tests.");
+    expect(got(still).description).toBe("Posted by the tests.");
     // No seats at all: refused by the form's own check, Void's 422. (Fewer seats than are booked,
     // with more than one booked, is the action's own 409.)
     expect(await changeEvent(event, event.key, { ...fields, seats: 0 })).toBe(422);
     // The description alone, with the poster's key.
     expect([200, 204, 302]).toContain(await changeEvent(event, event.key, fields));
-    await translatedNow(event.id, before[0]!.translated_from);
+    await translatedNow(event.id, got(before[0]).translated_from);
     // Nobody is told: the title, time and place are as they were.
     expect((await emailsTo(somchai)).filter((m) => / has changed$/.test(m.subject))).toEqual([]);
   },
@@ -291,23 +300,26 @@ test.skipIf(!!skip)(
       description: "Posted by the tests.",
       local: "2027-02-12T08:00",
       local_end: "2027-02-12T09:00",
-      time_zone: String(row!.starts_at).replace(/^.*\[(.*)\]$/, "$1"),
+      time_zone: String(got(row).starts_at).replace(/^.*\[(.*)\]$/, "$1"),
       seats: 20,
     };
     expect([200, 204, 302]).toContain(await changeEvent(event, event.key, fields));
     // Told in Arabic, with the Arabic title already stored: no translation to wait for (its
     // fingerprint is the same), so within the queue's own time, not the translator's.
-    const arabic = JSON.parse(String(before.find((r) => r.locale === "ar-EG")!.fields)) as {
-      title: string;
+    const arabic = {
+      title: got(
+        textField(parseJson(String(got(before.find((r) => r.locale === "ar-EG")).fields)), "title"),
+        "the Arabic title",
+      ),
     };
     // Her confirmation (with its ticket), then the change email, in Arabic, with the Arabic title.
     await expect.poll(async () => (await emailsTo(laila)).length, { timeout: 15_000 }).toBe(2);
     const mails = await emailsTo(laila);
-    const mail = mails.find((m) => !m.attachments.some((a) => a.filename === "ticket.pdf"))!;
+    const mail = got(mails.find((m) => !m.attachments.some((a) => a.filename === "ticket.pdf")));
     expect(mail.html).toMatch(/<html dir="rtl" lang="ar-EG">/);
     expect(mail.subject).toContain(arabic.title);
     // Not translated again: the same fingerprints as before the change.
-    const fingerprints = (rows: Record<string, unknown>[]) =>
+    const fingerprints = (rows: Array<Record<string, unknown>>) =>
       new Set(rows.map((r) => String(r.translated_from)));
     expect(fingerprints(await translationsOf(event.id))).toEqual(fingerprints(before));
     // Nothing more comes for it: what she was told now matches the event.

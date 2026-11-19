@@ -5,4 +5,6 @@
 import { install, documentI18n } from "./install";
 
 const i18n = documentI18n();
-if (i18n) await install(i18n.locale);
+if (i18n) {
+  await install(i18n.locale);
+}

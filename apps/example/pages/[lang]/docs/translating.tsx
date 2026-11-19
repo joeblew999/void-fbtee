@@ -10,7 +10,7 @@ import { DocsPage } from "@/docs/DocsPage";
 import { Points, Section, SkillLink, type Point } from "@/docs/Points";
 import type { Props } from "./translating.server";
 
-function points(): Point[] {
+function points(): Array<Point> {
   return [
     {
       id: "claude",
@@ -108,7 +108,7 @@ function points(): Point[] {
  * Each stage of a Vite+ app's work, and what it does about translations: the same commands on a
  * developer's machine as in CI, so nothing untranslated gets past any of them.
  */
-function stages(): { command: string; what: ReactNode; where: string }[] {
+function stages(): Array<{ command: string; what: ReactNode; where: string }> {
   return [
     {
       command: "vp exec void-fbtee init",
@@ -188,7 +188,7 @@ export default function TranslatingPage({ catalogs }: Props) {
         <fbt desc="Translating page section title: how the app is translated">How it's done</fbt>
       ),
     },
-  ];
+  ] as const;
   return (
     <DocsPage
       testId="translating-title"

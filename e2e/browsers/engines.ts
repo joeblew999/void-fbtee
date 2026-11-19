@@ -14,6 +14,7 @@ export type Engine = (typeof ENGINES)[number];
 
 /** Make a page what this engine stands for: for "iphone", no built-in Temporal. */
 export async function prepare(p: Page, e: Engine) {
-  if ("noTemporal" in e)
-    await p.addInitScript(() => delete (globalThis as { Temporal?: unknown }).Temporal);
+  if ("noTemporal" in e) {
+    await p.addInitScript(() => Reflect.deleteProperty(globalThis, "Temporal"));
+  }
 }

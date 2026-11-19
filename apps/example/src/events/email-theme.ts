@@ -13,7 +13,9 @@ import css from "../../pages/style.css?raw";
 function block(selector: RegExp): Record<string, string> {
   const body = selector.exec(css)?.[1] ?? "";
   return Object.fromEntries(
-    [...body.matchAll(/--([\w-]+):\s*([^;]+);/g)].map((m) => [m[1]!, m[2]!.trim()]),
+    [...body.matchAll(/--([\w-]+):\s*([^;]+);/g)].flatMap((m) =>
+      m[1] !== undefined && m[2] !== undefined ? [[m[1], m[2].trim()]] : [],
+    ),
   );
 }
 

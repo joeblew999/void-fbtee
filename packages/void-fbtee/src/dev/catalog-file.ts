@@ -22,13 +22,13 @@ export interface Review {
   verdict: "ok" | "wrong";
   of?: string;
   note?: string;
-  was?: string[];
+  was?: Array<string>;
 }
 
 export interface CatalogEntry {
   description?: string;
   status?: string;
-  translations?: CatalogLine[];
+  translations?: Array<CatalogLine>;
   /** Who wrote the translation: a model's id, "claude", a person, or "unknown" when nothing said
    * (plans/translation-provenance.md). Every finished entry has one (check.ts). */
   translatedBy?: string;
@@ -90,10 +90,13 @@ const isEntry = (value: unknown): value is CatalogEntry =>
 /** A catalog's text, read and checked. `what` names it in the error: its file, or the language. */
 export function readCatalog(text: string, what: string): Catalog {
   const value = parseJson(text);
-  if (!isRecord(value) || !optional(value["fb-locale"], isText) || !isRecord(value.translations))
+  if (!isRecord(value) || !optional(value["fb-locale"], isText) || !isRecord(value.translations)) {
     throw new Error(`void-fbtee: ${what} isn't a catalog: it has no "translations"`);
+  }
   const bad = Object.entries(value.translations).find(([, e]) => !isEntry(e));
-  if (bad) throw new Error(`void-fbtee: ${what}: entry ${bad[0]} isn't in a catalog's shape`);
+  if (bad) {
+    throw new Error(`void-fbtee: ${what}: entry ${bad[0]} isn't in a catalog's shape`);
+  }
   // Every entry was checked just above: each is one.
   const translations: Record<string, CatalogEntry> = Object.fromEntries(
     Object.entries(value.translations).filter((e): e is [string, CatalogEntry] => isEntry(e[1])),

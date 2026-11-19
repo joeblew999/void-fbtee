@@ -2,81 +2,52 @@
 // a translator fills them, fbtee's translateSync compiles them, and fbtee's runtime picks the
 // right one for each count.
 import { describe, expect, test } from "vite-plus/test";
-import {
-  collectSync,
-  prepareTranslationsBatchSync,
-  transformSync,
-  translateSync,
-} from "@nkzw/fbtee-compiler";
-import { createFbteeRuntime } from "fbtee";
-import {
-  addVariants,
-  CATEGORY_CODE,
-  pluralCategories,
-  pluralSlots,
-  type PluralEntry,
-} from "../../src/plurals";
+import { CATEGORY_CODE, pluralCategories, type PluralEntry } from "../../src/plurals";
+import { compiled, phrasesFrom, prepare as prepareFor, type Prepared } from "./fbtee-run";
+import { got } from "./got";
 
 // The two ways to write a count.
 const SOURCE = `import { fbt } from "fbtee";
 const param = (n) => <fbt desc="nights, param"><fbt:param name="count" number={n}>{n}</fbt:param> nights</fbt>;
 const plural = (n) => <fbt desc="nights, plural"><fbt:plural count={n} many="nights" showCount="yes">night</fbt:plural></fbt>;
 `;
-const phrases = JSON.parse(
-  collectSync("s.jsx", SOURCE, { collectPackager: "text" }).output!,
-).phrases;
-const slots = pluralSlots(phrases);
+const phrases = phrasesFrom("s.jsx", SOURCE);
 const hashOf: Record<string, string> = Object.fromEntries(
-  phrases.flatMap((p: any) => Object.entries(p.hashToLeaf).map(([h, l]: any) => [l.text, h])),
+  phrases.flatMap((p) => Object.entries(p.hashToLeaf ?? {}).map(([h, l]) => [l.text, h])),
 );
-const PARAM = hashOf["{count} nights"]!;
-const PLURAL = hashOf["{number} nights"]!;
-const ONE = hashOf["1 night"]!;
+const PARAM = got(hashOf["{count} nights"]);
+const PLURAL = got(hashOf["{number} nights"]);
+const ONE = got(hashOf["1 night"]);
 
-const prepare = (locale: string, existing?: object) =>
-  JSON.parse(
-    addVariants(
-      prepareTranslationsBatchSync(JSON.stringify({ phrases }), [
-        existing ? { locale, existingJson: JSON.stringify(existing) } : { locale },
-      ])[0]!,
-      slots,
-      locale,
-    ),
-  ) as { "fb-locale": string; translations: Record<string, PluralEntry> };
+const prepare = (locale: string, existing?: object) => prepareFor(phrases, locale, existing);
 
 /** Fill every line as a translator would: `forms` by category, {n} for the count. */
-const translate = (catalog: ReturnType<typeof prepare>, forms: Record<string, string>) => {
+const translate = (catalog: Prepared, forms: Record<string, string>) => {
   const byCode = Object.fromEntries(
     Object.entries(CATEGORY_CODE).map(([cat, code]) => [code, forms[cat]]),
   );
   for (const [hash, e] of Object.entries(catalog.translations)) {
-    if (hash === ONE) e.translations = [{ translation: forms.one!.replace("{n}", "1") }];
-    else if (hash === PARAM || hash === PLURAL)
-      for (const line of e.translations!) {
+    if (hash === ONE) {
+      e.translations = [{ translation: got(forms.one).replace("{n}", "1") }];
+    } else if (hash === PARAM || hash === PLURAL) {
+      for (const line of got(e.translations)) {
         const code = line.variations?.[0];
-        const text = code === undefined ? forms.other! : byCode[Number(code)]!;
+        const text = code === undefined ? got(forms.other) : got(byCode[Number(code)]);
         line.translation = text.replace("{n}", hash === PARAM ? "{count}" : "{number}");
       }
+    }
     e.status = "translated";
   }
   return catalog;
 };
 
 /** Both strings, rendered by fbtee's runtime for each count. */
-const render = (catalog: ReturnType<typeof prepare>, counts: number[]) => {
-  const locale = catalog["fb-locale"];
-  const table = JSON.parse(
-    translateSync(JSON.stringify({ phrases, translationGroups: [catalog] }), true),
-  )[locale];
-  const { fbt } = createFbteeRuntime({ locale, translations: { [locale]: table } });
-  const code = transformSync("s.jsx", SOURCE, { lang: "jsx" }).code.replace(/^import .*$/m, "");
-  // Runs fbtee's compiled output for the strings above.
-  // oxlint-disable-next-line no-implied-eval
-  const fns = new Function("fbt", `${code}; return { param, plural };`)(fbt);
-  return counts.map((n) => [n, String(fns.param(n)), String(fns.plural(n))]);
+const render = (catalog: Prepared, counts: Array<number>) => {
+  const fn = compiled("s.jsx", SOURCE, ["param", "plural"], phrases, catalog);
+  return counts.map((n) => [n, String(fn("param")(n)), String(fn("plural")(n))]);
 };
 
-const lines = (e: PluralEntry) => e.translations!.map((l) => l.variations);
+const lines = (e: PluralEntry) => got(e.translations).map((l) => l.variations);
 
 describe("which forms a catalog gets", () => {
   test("one line per form the locale uses; none where it has one form", () => {
@@ -93,14 +64,14 @@ describe("which forms a catalog gets", () => {
     expect(pluralCategories("de-DE", true)).toEqual(["other"]);
     const pl = prepare("pl-PL").translations;
     expect(pl[PARAM]).toMatchObject({ status: "new", tokens: ["count"], types: [28] });
-    expect(lines(pl[PARAM]!)).toEqual([{ 0: 4 }, { 0: 20 }, { 0: 12 }, { 0: 24 }]);
+    expect(lines(got(pl[PARAM]))).toEqual([{ 0: 4 }, { 0: 20 }, { 0: 12 }, { 0: 24 }]);
     // Polish "one" is only ever 1, which "1 night" already covers.
-    expect(lines(pl[PLURAL]!)).toEqual([{ 0: 20 }, { 0: 12 }, { 0: 24 }]);
-    expect(pl[ONE]!.tokens).toEqual([]);
+    expect(lines(got(pl[PLURAL]))).toEqual([{ 0: 20 }, { 0: 12 }, { 0: 24 }]);
+    expect(got(pl[ONE]).tokens).toEqual([]);
     // One form only: fbtee's single line, as it prepared it.
-    expect(lines(prepare("th-TH").translations[PARAM]!)).toEqual([{}]);
-    expect(lines(prepare("de-DE").translations[PLURAL]!)).toEqual([{}]);
-    expect(lines(prepare("de-DE").translations[PARAM]!)).toEqual([{ 0: 4 }, { 0: 24 }]);
+    expect(lines(got(prepare("th-TH").translations[PARAM]))).toEqual([{}]);
+    expect(lines(got(prepare("de-DE").translations[PLURAL]))).toEqual([{}]);
+    expect(lines(got(prepare("de-DE").translations[PARAM]))).toEqual([{ 0: 4 }, { 0: 24 }]);
   });
 });
 
@@ -164,9 +135,9 @@ describe("running prepare again", () => {
       types: [],
       translations: [{ translation: "noce: {count}", variations: {} }],
     };
-    const e = prepare("pl-PL", old).translations[PARAM]!;
+    const e = got(prepare("pl-PL", old).translations[PARAM]);
     expect(e.status).toBe("new");
-    expect(e.translations!.map((l) => l.translation)).toEqual(Array(4).fill("noce: {count}"));
+    expect(got(e.translations).map((l) => l.translation)).toEqual(Array(4).fill("noce: {count}"));
   });
 });
 
@@ -175,14 +146,8 @@ describe('a hidden count (showCount="no")', () => {
   const HIDDEN = `import { fbt } from "fbtee";
 const left = (n) => <fbt desc="seats left, count hidden"><fbt:plural count={n} many="seats are left" showCount="no">One seat is left</fbt:plural></fbt>;
 `;
-  const ph = JSON.parse(collectSync("h.jsx", HIDDEN, { collectPackager: "text" }).output!).phrases;
-  const prepared = JSON.parse(
-    addVariants(
-      prepareTranslationsBatchSync(JSON.stringify({ phrases: ph }), [{ locale: "ar-EG" }])[0]!,
-      pluralSlots(ph),
-      "ar-EG",
-    ),
-  ) as { "fb-locale": string; translations: Record<string, PluralEntry> };
+  const ph = phrasesFrom("h.jsx", HIDDEN);
+  const prepared = prepareFor(ph, "ar-EG");
 
   test("gets a line for each form Arabic uses, and the runtime picks the right one", () => {
     const forms: Record<number, string> = {
@@ -194,24 +159,20 @@ const left = (n) => <fbt desc="seats left, count hidden"><fbt:plural count={n} m
     };
     for (const e of Object.values(prepared.translations)) {
       // The exactly-one string has no forms; the other gets one line per form, 1 aside.
-      if (!e.translations![0]!.variations || !Object.keys(e.translations![0]!.variations).length)
+      if (!Object.keys(got(got(e.translations)[0]).variations ?? {}).length) {
         e.translations = [{ translation: "مقعد واحد" }];
-      else {
-        expect(e.translations!.map((l) => Number(l.variations![0]))).toEqual(
+      } else {
+        expect(got(e.translations).map((l) => Number(got(l.variations)[0]))).toEqual(
           (["zero", "two", "few", "many", "other"] as const).map((c) => CATEGORY_CODE[c]),
         );
-        for (const l of e.translations!) l.translation = forms[Number(l.variations![0])]!;
+        for (const l of got(e.translations)) {
+          l.translation = got(forms[Number(got(l.variations)[0])]);
+        }
       }
       e.status = "translated";
     }
-    const table = JSON.parse(
-      translateSync(JSON.stringify({ phrases: ph, translationGroups: [prepared] }), true),
-    )["ar-EG"];
-    const { fbt } = createFbteeRuntime({ locale: "ar-EG", translations: { "ar-EG": table } });
-    const code = transformSync("h.jsx", HIDDEN, { lang: "jsx" }).code.replace(/^import .*$/m, "");
-    // oxlint-disable-next-line no-implied-eval
-    const fn = new Function("fbt", `${code}; return left;`)(fbt);
-    expect([0, 1, 2, 3, 11, 100].map((n) => fn(n))).toEqual([
+    const left = compiled("h.jsx", HIDDEN, ["left"], ph, prepared)("left");
+    expect([0, 1, 2, 3, 11, 100].map((n) => left(n))).toEqual([
       "لا مقاعد",
       "مقعد واحد",
       "مقعدان",
@@ -231,20 +192,14 @@ describe("a name's gender, alone and with a count", () => {
 const booked = (name, g) => <fbt desc="someone booked"><fbt:name name="name" gender={g}>{name}</fbt:name> booked.</fbt>;
 const seats = (name, g, n) => <fbt desc="someone booked seats"><fbt:name name="name" gender={g}>{name}</fbt:name> booked <fbt:plural count={n} many="seats" showCount="yes">seat</fbt:plural>.</fbt>;
 `;
-  const ph = JSON.parse(collectSync("p.jsx", PEOPLE, { collectPackager: "text" }).output!).phrases;
-  const prepared = JSON.parse(
-    addVariants(
-      prepareTranslationsBatchSync(JSON.stringify({ phrases: ph }), [{ locale: "ar-EG" }])[0]!,
-      pluralSlots(ph),
-      "ar-EG",
-    ),
-  ) as { "fb-locale": string; translations: Record<string, PluralEntry> };
+  const ph = phrasesFrom("p.jsx", PEOPLE);
+  const prepared = prepareFor(ph, "ar-EG");
   const G: Record<number, string> = { 1: "he", 2: "she", 3: "they" };
 
   test("a line per gender, and per gender and plural form, each keyed by its own token", () => {
     const shapes = Object.values(prepared.translations)
       .filter((e) => e.tokens?.includes("name"))
-      .map((e) => ({ tokens: e.tokens, lines: e.translations!.length, status: e.status }));
+      .map((e) => ({ tokens: e.tokens, lines: got(e.translations).length, status: e.status }));
     expect(shapes).toContainEqual({ tokens: ["name"], lines: 3, status: "new" });
     // Arabic's five forms besides exactly one, times three genders.
     expect(shapes).toContainEqual({ tokens: ["name", "number"], lines: 15, status: "new" });
@@ -252,7 +207,7 @@ const seats = (name, g, n) => <fbt desc="someone booked seats"><fbt:name name="n
 
   test("fbtee's runtime picks the line for the person's gender and the count", () => {
     for (const e of Object.values(prepared.translations)) {
-      for (const l of e.translations!) {
+      for (const l of got(e.translations)) {
         const v = l.variations ?? {};
         const who = G[Number(v[0])] ?? "x";
         l.translation = e.tokens?.includes("number")
@@ -261,13 +216,9 @@ const seats = (name, g, n) => <fbt desc="someone booked seats"><fbt:name name="n
       }
       e.status = "translated";
     }
-    const table = JSON.parse(
-      translateSync(JSON.stringify({ phrases: ph, translationGroups: [prepared] }), true),
-    )["ar-EG"];
-    const { fbt } = createFbteeRuntime({ locale: "ar-EG", translations: { "ar-EG": table } });
-    const code = transformSync("p.jsx", PEOPLE, { lang: "jsx" }).code.replace(/^import .*$/m, "");
-    // oxlint-disable-next-line no-implied-eval
-    const [booked, seats] = new Function("fbt", `${code}; return [booked, seats];`)(fbt);
+    const fn = compiled("p.jsx", PEOPLE, ["booked", "seats"], ph, prepared);
+    const booked = fn("booked");
+    const seats = fn("seats");
     expect([1, 2, 3].map((g) => String(booked("Sara", g)))).toEqual([
       "he Sara",
       "she Sara",

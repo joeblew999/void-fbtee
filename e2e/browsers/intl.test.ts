@@ -8,6 +8,7 @@ import { describe, expect, test } from "vite-plus/test";
 import type { Page } from "playwright";
 import { browser, collectErrors, untilText } from "../helpers";
 import { LOCALES } from "../locales";
+import { got } from "../got";
 
 /**
  * Load the Intl page and return the rows it highlights as differing (as shown: invisible
@@ -18,9 +19,9 @@ async function differences(p: Page, locale: string) {
   await untilText(p, '[data-testid="intl-match"]', "not", "");
   return p.$$eval("tr[data-differs]", (rows) =>
     rows.map((r) => [
-      (r as HTMLElement).dataset.row,
-      r.querySelector('[data-side="worker"]')!.textContent,
-      r.querySelector('[data-side="browser"]')!.textContent,
+      r.getAttribute("data-row"),
+      got(r.querySelector('[data-side="worker"]')).textContent,
+      got(r.querySelector('[data-side="browser"]')).textContent,
     ]),
   );
 }
@@ -42,11 +43,11 @@ for (const engine of ["chromium", "webkit"] as const) {
 }
 
 /** Print the rows that differ, and add them to the GitHub job's summary when run there. */
-function report(title: string, rows: (string | null | undefined)[][]) {
+function report(title: string, rows: Array<Array<string | null | undefined>>) {
   const lines = rows.map(([row, worker, browser]) => `| ${row} | ${worker} | ${browser} |`);
   console.log(`${title}: ${rows.length} rows differ\n${lines.join("\n")}`);
   const summary = process.env.GITHUB_STEP_SUMMARY;
-  if (summary)
+  if (summary) {
     appendFileSync(
       summary,
       `### ${title}: ${rows.length} rows differ\n\n` +
@@ -54,4 +55,5 @@ function report(title: string, rows: (string | null | undefined)[][]) {
           ? `| Row | Worker | Browser |\n| --- | --- | --- |\n${lines.join("\n")}\n\n`
           : ""),
     );
+  }
 }

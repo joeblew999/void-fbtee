@@ -4,7 +4,7 @@
 // on 127.0.0.1 (so a server left by a stopped run can't block this one), and stop it at the end.
 import { execFileSync, spawn, type ChildProcess } from "node:child_process";
 import { once } from "node:events";
-import { connect, createServer, type AddressInfo } from "node:net";
+import { connect, createServer } from "node:net";
 import { join } from "node:path";
 import { stripVTControlCharacters } from "node:util";
 import type { TestProject } from "vite-plus/test/node";
@@ -17,13 +17,17 @@ export const EXAMPLE = join(root, "apps/example");
 export async function freePort(): Promise<number> {
   const server = createServer().listen(0, "127.0.0.1");
   await once(server, "listening");
-  const { port } = server.address() as AddressInfo;
+  const address = server.address();
+  if (address === null || typeof address === "string") {
+    throw new Error("the server isn't listening on a port");
+  }
+  const { port } = address;
   server.close();
   await once(server, "close");
   return port;
 }
 
-export const run = (args: string[], cwd: string) =>
+export const run = (args: Array<string>, cwd: string) =>
   execFileSync("vp", args, { cwd, stdio: "inherit" });
 
 /**
@@ -35,7 +39,9 @@ export function untilListening(child: ChildProcess, listening: RegExp, what: str
     let output = "";
     const read = (chunk: Buffer) => {
       output += chunk;
-      if (listening.test(stripVTControlCharacters(output))) resolve();
+      if (listening.test(stripVTControlCharacters(output))) {
+        resolve();
+      }
     };
     child.stdout?.on("data", read);
     child.stderr?.on("data", read);
@@ -48,7 +54,7 @@ export function untilListening(child: ChildProcess, listening: RegExp, what: str
  * and only this server's own "Local: http://…:<port>" line counts, not any answer on the port (as
  * voidzero-dev/void's startServer, test/integration-helpers.ts).
  */
-export async function start(args: string[], port: number, url: string): Promise<ChildProcess> {
+export async function start(args: Array<string>, port: number, url: string): Promise<ChildProcess> {
   const child = spawn(
     "vp",
     [...args, "--host", "127.0.0.1", "--port", String(port), "--strictPort"],
@@ -64,7 +70,9 @@ export async function start(args: string[], port: number, url: string): Promise<
     args.join(" "),
   );
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`${args.join(" ")}: ${url} answered ${res.status}`);
+  if (!res.ok) {
+    throw new Error(`${args.join(" ")}: ${url} answered ${res.status}`);
+  }
   return child;
 }
 
@@ -87,18 +95,19 @@ export default async function setup(project: TestProject) {
   // `vp run test:production` (scripts/production.ts): the tests against the live site, with no
   // local build or servers; the ones that post or book skip themselves there (onLiveSite()).
   if (process.env.E2E_URL) {
-    project.provide("prod" as never, process.env.E2E_URL as never);
-    project.provide("live" as never, true as never);
+    project.provide("prod", process.env.E2E_URL);
+    project.provide("live", true);
     return;
   }
   // The tests share two things with the dev server: the local database (reset below) and the
   // package's dist/ (rebuilt below, emptied first). Run while it's up, they wipe its data and break
   // its pages, so they stop here instead.
-  if (await devServerRunning())
+  if (await devServerRunning()) {
     throw new Error(
       `the dev server is running (port ${DEV_PORT}): stop vp run dev before running the tests, ` +
         "or they would reset its database and rebuild the package under it",
     );
+  }
   // A fresh local database with every migration, the sample events' one included.
   run(["exec", "void", "db", "reset", "--yes"], EXAMPLE);
   // The example's build, and before it void-fbtee's (Vite+'s transitive run: -t).
@@ -106,10 +115,14 @@ export default async function setup(project: TestProject) {
   const port = await freePort();
   const prod = `http://127.0.0.1:${port}`;
   const servers = [await start(["preview"], port, `${prod}/${SOURCE}`)];
-  project.provide("prod" as never, prod as never);
-  project.provide("live" as never, false as never);
+  project.provide("prod", prod);
+  project.provide("live", false);
   return () => {
     // Each server runs in its own process group (detached): stop vp and what it started.
-    for (const s of servers) if (s.pid) process.kill(-s.pid, "SIGTERM");
+    for (const s of servers) {
+      if (s.pid) {
+        process.kill(-s.pid, "SIGTERM");
+      }
+    }
   };
 }

@@ -14,6 +14,8 @@ import {
   type Project,
 } from "../../src/dev/catalogs";
 import { resolveLocales } from "../../src/locales";
+import { readCatalog } from "../../src/dev/catalog-file";
+import { got } from "./got";
 
 let root: string;
 // The fixture is copied for every test, so tests can change catalogs. fbtee resolves from this
@@ -34,8 +36,8 @@ const deFile = () => join(root, "i18n/translations/de-DE.json");
 describe("missing translations", () => {
   test("lists the app's untranslated strings per locale, built-ins apart", () => {
     const report = missing(project());
-    const de = report.find((r) => r.locale === "de-DE")!;
-    const th = report.find((r) => r.locale === "th-TH")!;
+    const de = got(report.find((r) => r.locale === "de-DE"));
+    const th = got(report.find((r) => r.locale === "th-TH"));
     expect(de).toMatchObject({ app: ["Goodbye"], builtin: 12, noCatalog: false });
     expect(th).toMatchObject({ app: ["Hello", "Goodbye"], builtin: 12, noCatalog: true });
   });
@@ -44,14 +46,16 @@ describe("missing translations", () => {
 describe("fbtee's built-in strings", () => {
   test("a translated built-in reaches the runtime catalog", () => {
     const { phrases, builtinHashes } = collect(project());
-    const hash = [...builtinHashes][0]!;
-    const json = JSON.parse(readFileSync(deFile(), "utf8"));
-    json.translations[hash] = {
+    const hash = got([...builtinHashes][0]);
+    const json = readCatalog(readFileSync(deFile(), "utf8"), deFile());
+    // fbtee's own fields (tokens, types) too, which a catalog entry keeps as they are.
+    const entry = {
       status: "translated",
       tokens: [],
       translations: [{ translation: "eingebaut", variations: {} }],
       types: [],
     };
+    json.translations[hash] = entry;
     writeFileSync(deFile(), JSON.stringify(json));
     expect(phrases.length).toBeGreaterThan(12);
     expect(JSON.stringify(runtimeCatalog(project(), "de-DE"))).toContain("eingebaut");
@@ -104,12 +108,14 @@ export const nights = (count: number) => (
     withNights();
     const { prepared, sourceNeedsCatalog } = await import("../../src/dev/catalogs");
     expect(sourceNeedsCatalog(arabic())).toBe(true);
-    const own = prepared(arabic()).find((c) => c.locale === "ar-EG")!;
+    const own = got(prepared(arabic()).find((c) => c.locale === "ar-EG"));
     const texts = runtimeTexts(arabic());
-    const entries = Object.entries(JSON.parse(own.json).translations) as [
-      string,
-      { translations: { translation: string; variations: Record<string, number> }[] },
-    ][];
+    const entries = Object.entries(readCatalog(own.json, "the ar-EG catalog").translations).map(
+      ([hash, e]): [string, { translations: NonNullable<typeof e.translations> }] => [
+        hash,
+        { translations: e.translations ?? [] },
+      ],
+    );
     // Only strings with a count: not "Hello" or "Goodbye".
     const lines = entries.flatMap(([, e]) => e.translations.map((l) => l.translation));
     expect(lines.some((l) => l.includes("Hello") || l.includes("Goodbye"))).toBe(false);
@@ -120,7 +126,7 @@ export const nights = (count: number) => (
       .filter(([, e]) => e.translations.some((l) => l.translation.includes("ليال")))
       .map(([, e]) => e.translations.map((l) => Object.values(l.variations)[0]))
       .find((f) => f.length > 1);
-    expect(forms?.sort((a, b) => a! - b!)).toEqual([8, 12, 16, 20, 24]);
+    expect(forms?.sort((a, b) => got(a) - got(b))).toEqual([8, 12, 16, 20, 24]);
   });
 
   test("an English or Thai source needs none", async () => {

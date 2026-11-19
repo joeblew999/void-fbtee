@@ -38,13 +38,15 @@ export default defineScheduled(async () => {
     ...behindIds.map((id) => queues.change.send({ bookingId: id })),
     ...cancelled.flatMap((r) => (r.booking ? [queues.cancel.send({ bookingId: r.booking })] : [])),
   ]);
-  for (const id of new Set(cancelled.filter((r) => !r.booking).map((r) => r.event)))
+  for (const id of new Set(cancelled.filter((r) => !r.booking).map((r) => r.event))) {
     await deleteIfDone(db, id);
+  }
 
   const found = unconfirmedIds.length + behindIds.length + cancelled.length;
-  if (found)
+  if (found) {
     console.warn(
       `owed: queued again ${unconfirmedIds.length} confirmations, ${behindIds.length} change emails, ` +
         `${cancelled.filter((r) => r.booking).length} cancellations (a step was lost)`,
     );
+  }
 });

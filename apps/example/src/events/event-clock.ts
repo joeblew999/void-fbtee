@@ -11,7 +11,7 @@ export type ClockParts = {
   zone: string;
 };
 
-const part = (parts: Intl.DateTimeFormatPart[], type: Intl.DateTimeFormatPartTypes) =>
+const part = (parts: Array<Intl.DateTimeFormatPart>, type: Intl.DateTimeFormatPartTypes) =>
   parts.find((p) => p.type === type)?.value ?? "";
 
 /** The start, as the board shows it, on the clock of `timeZone` (the place's, or the reader's). */
@@ -56,7 +56,9 @@ export function formatWhen(
   { timeZoneName, ...options }: Intl.DateTimeFormatOptions & { timeZone: string },
 ): string {
   const range = new Intl.DateTimeFormat(locale, options).formatRange(start, end);
-  if (!timeZoneName) return range;
+  if (!timeZoneName) {
+    return range;
+  }
   const zone = part(
     new Intl.DateTimeFormat(locale, {
       timeZone: options.timeZone,

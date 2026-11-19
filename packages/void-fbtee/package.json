@@ -71,6 +71,7 @@
     "@void/md": "catalog:",
     "@void/react": "catalog:",
     "fbtee": "6.0.0",
+    "hono": "catalog:",
     "publint": "0.3.25",
     "react": "19.3.1",
     "temporal-polyfill": "1.0.8",

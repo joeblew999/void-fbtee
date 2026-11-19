@@ -36,7 +36,7 @@ export interface Spent extends Usage {
 }
 
 /** Several requests' tokens added up, with their cost: a translation asked for more than once. */
-export function spent(usages: Usage[], model: TranslationModel = GEMINI): Spent {
+export function spent(usages: Array<Usage>, model: TranslationModel = GEMINI): Spent {
   const sum = usages.reduce(
     (a, u) => ({ in: a.in + u.in, out: a.out + u.out, thinking: a.thinking + u.thinking }),
     { in: 0, out: 0, thinking: 0 },
@@ -54,10 +54,14 @@ export function spent(usages: Usage[], model: TranslationModel = GEMINI): Spent 
  */
 export function paymentProblem(error: unknown): "credits" | "limit" | undefined {
   const text = String(error);
-  if (/insufficient[^.]*balance|\b(2052|2021)\b|\b402\b/i.test(text)) return "credits";
+  if (/insufficient[^.]*balance|\b(2052|2021)\b|\b402\b/i.test(text)) {
+    return "credits";
+  }
   // Void's runtime turns any 429 into its own error before the answer reaches us
   // (runtime/ai.mjs limitFromResponse: "…because its usage limit was reached").
-  if (/spend limit|rate limit|usage limit|\b2018\b|\b429\b/i.test(text)) return "limit";
+  if (/spend limit|rate limit|usage limit|\b2018\b|\b429\b/i.test(text)) {
+    return "limit";
+  }
   return undefined;
 }
 

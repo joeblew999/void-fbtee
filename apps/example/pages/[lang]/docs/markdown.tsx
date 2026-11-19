@@ -1,15 +1,15 @@
 // The Markdown pages page, a reference: this site's markdown pages, each with its copy in every
 // language (from @void/md's pages list, so a page added shows here by itself), and what it takes,
 // with the lines that do it.
+import { buildUrl } from "void-fbtee/routes";
 import { fbt } from "fbtee";
 import pages from "@void/md/pages";
-import type { RouteUrl } from "void/routes";
 import { langAttrs } from "void-fbtee/locales";
 import { Link, useLocales } from "void-fbtee/react";
 import { DocsPage } from "@/docs/DocsPage";
 import { ComponentsLink, Points, Section, SkillLink, type Point } from "@/docs/Points";
 
-function points(): Point[] {
+function points(): Array<Point> {
   return [
     {
       id: "copies",
@@ -97,14 +97,20 @@ function points(): Point[] {
 }
 
 /** Every markdown page under docs/, once, with its copy in each language (or none). */
-function copies(segments: string[]) {
+function copies(segments: Array<string>) {
   const byPath = new Map<string, Map<string, (typeof pages)[number]>>();
   for (const page of pages) {
     const [, segment, ...rest] = page.path.split("/");
-    if (!segments.includes(segment)) continue;
+    if (segment === undefined || !segments.includes(segment)) {
+      continue;
+    }
     const path = rest.join("/");
-    if (!byPath.has(path)) byPath.set(path, new Map());
-    byPath.get(path)!.set(segment, page);
+    let copiesOf = byPath.get(path);
+    if (!copiesOf) {
+      copiesOf = new Map();
+      byPath.set(path, copiesOf);
+    }
+    copiesOf.set(segment, page);
   }
   return [...byPath].map(([path, bySegment]) => ({ path, bySegment }));
 }
@@ -125,7 +131,7 @@ export default function MarkdownPage() {
       id: "how",
       title: <fbt common>What it takes</fbt>,
     },
-  ];
+  ] as const;
   return (
     <DocsPage
       testId="markdown-title"
@@ -155,7 +161,7 @@ export default function MarkdownPage() {
                     </td>
                     <td className="py-2 pe-4">
                       {page ? (
-                        <Link href={page.path as RouteUrl} {...langAttrs(l.locale)}>
+                        <Link href={buildUrl(page.path)} {...langAttrs(l.locale)}>
                           {page.title}
                         </Link>
                       ) : (

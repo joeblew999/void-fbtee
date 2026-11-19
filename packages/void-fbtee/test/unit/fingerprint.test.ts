@@ -21,8 +21,9 @@ test("the same as Node's SHA-256, for empty, short, multi-block and non-Latin te
     "เวิร์กช็อปขนมไทยโบราณ",
     "أمسية خط عربي 🎨",
     JSON.stringify({ title: "Night market", description: "Street food." }),
-  ])
+  ]) {
     expect(sha256(text), JSON.stringify(text.slice(0, 20))).toBe(node(text));
+  }
 });
 
 test("a whole markdown page: the same 12 characters as Node's", () => {

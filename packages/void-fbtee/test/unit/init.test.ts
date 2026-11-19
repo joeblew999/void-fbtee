@@ -15,13 +15,20 @@ import fbteeLint from "@nkzw/eslint-plugin-fbtee";
 import { afterEach, expect, test } from "vite-plus/test";
 import { init } from "../../src/dev/init";
 import { VOID_INIT_DIR } from "./void-init";
+import { field, isRecord, parseJson, textRecord } from "../../src/guards";
+
+/** The value at `keys` in parsed JSON, each step checked; undefined where one is missing. */
+const at = (value: unknown, ...keys: Array<string>): unknown =>
+  keys.reduce((v, key) => field(v, key), value);
 
 const generated = (toolchain: string) => join(VOID_INIT_DIR, toolchain);
 // What `void init` installs or generates, rather than writes as the app's files.
 const NOT_COPIED = new Set(["node_modules", ".void", "pnpm-lock.yaml", ".git"]);
-const dirs: string[] = [];
+const dirs: Array<string> = [];
 afterEach(() => {
-  for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true });
+  for (const d of dirs.splice(0)) {
+    rmSync(d, { recursive: true, force: true });
+  }
 });
 
 function app(toolchain: "vite-plus" | "vite") {
@@ -41,9 +48,11 @@ function snapshot(root: string, dir = root): Record<string, string> {
   const out: Record<string, string> = {};
   for (const e of readdirSync(dir, { withFileTypes: true })) {
     const path = join(dir, e.name);
-    if (e.isDirectory())
+    if (e.isDirectory()) {
       Object.assign(out, snapshot(root, path), { [relative(root, path) + "/"]: "" });
-    else out[relative(root, path)] = readFileSync(path, "utf8");
+    } else {
+      out[relative(root, path)] = readFileSync(path, "utf8");
+    }
   }
   return out;
 }
@@ -69,8 +78,9 @@ test("wires void-fbtee into a Vite+ app, and a second run changes nothing", asyn
   expect(vite.indexOf("voidFbtee({")).toBeLessThan(vite.indexOf("voidPlugin()"));
   expect(vite).toMatch(/jsPlugins: \["@nkzw\/eslint-plugin-fbtee"\]/);
   // fbtee's own strict set, as the installed fbtee lint plugin defines it.
-  for (const rule of Object.keys(fbteeLint.configs.strict.rules))
+  for (const rule of Object.keys(fbteeLint.configs.strict.rules)) {
     expect(vite).toMatch(new RegExp(`"${rule}": (\\[\\s*)?"(error|warn)"`));
+  }
   expect(vite.endsWith(");\n")).toBe(true);
 
   expect(read(root, "void.config.ts")).toMatch(/compatibility_flags: \["temporal"\]/);
@@ -80,22 +90,24 @@ test("wires void-fbtee into a Vite+ app, and a second run changes nothing", asyn
   expect(read(root, "pages/layout.tsx")).toContain("<I18nProvider>{children}</I18nProvider>");
   expect(existsSync(join(root, "i18n/translations"))).toBe(true);
 
-  const tsconfig = JSON.parse(read(root, "tsconfig.json"));
-  expect(tsconfig.compilerOptions.types).toContain("fbtee/ReactTypes");
-  expect(tsconfig.compilerOptions.lib).toEqual(
+  const tsconfig = parseJson(read(root, "tsconfig.json"));
+  expect(at(tsconfig, "compilerOptions", "types")).toContain("fbtee/ReactTypes");
+  expect(at(tsconfig, "compilerOptions", "lib")).toEqual(
     expect.arrayContaining(["ES2025", "DOM", "DOM.Iterable"]),
   );
 
-  const pkg = JSON.parse(read(root, "package.json"));
-  const own = JSON.parse(read(join(import.meta.dirname, "../.."), "package.json"));
+  const pkg = parseJson(read(root, "package.json"));
+  const own = parseJson(read(join(import.meta.dirname, "../.."), "package.json"));
   // void-fbtee itself is the app's own choice of source (installed before init runs).
-  expect(pkg.dependencies["void-fbtee"]).toBeUndefined();
-  expect(pkg.dependencies.fbtee).toBe(own.devDependencies.fbtee);
-  expect(pkg.devDependencies["@nkzw/eslint-plugin-fbtee"]).toBe(
-    own.devDependencies["@nkzw/eslint-plugin-fbtee"],
+  expect(at(pkg, "dependencies", "void-fbtee")).toBeUndefined();
+  expect(at(pkg, "dependencies", "fbtee")).toBe(at(own, "devDependencies", "fbtee"));
+  expect(at(pkg, "devDependencies", "@nkzw/eslint-plugin-fbtee")).toBe(
+    at(own, "devDependencies", "@nkzw/eslint-plugin-fbtee"),
   );
   // No scripts: vp dev and vp build do the work.
-  expect(Object.keys(pkg.scripts ?? {}).filter((k) => k.startsWith("i18n:"))).toEqual([]);
+  expect(
+    Object.keys(textRecord(field(pkg, "scripts"))).filter((k) => k.startsWith("i18n:")),
+  ).toEqual([]);
 
   const agents = read(root, "AGENTS.md");
   expect(agents).toContain("node_modules/void-fbtee/skills/void-fbtee/SKILL.md");
@@ -116,7 +128,7 @@ test("on plain Vite, it leaves defineConfig from vite and adds no lint settings"
   expect(vite).toContain("voidFbtee({");
   expect(vite).not.toContain("lint");
   expect(
-    JSON.parse(read(root, "package.json")).devDependencies["@nkzw/eslint-plugin-fbtee"],
+    at(parseJson(read(root, "package.json")), "devDependencies", "@nkzw/eslint-plugin-fbtee"),
   ).toBeUndefined();
 });
 
@@ -172,11 +184,18 @@ test("in an app written in Thai, init says to write its two pages' English text 
 
 test("removes the i18n scripts an older init added, and only those", async () => {
   const older = app("vite-plus");
-  const pkg = JSON.parse(read(older, "package.json"));
-  pkg.scripts = { ...pkg.scripts, "i18n:check": "void-fbtee check", "i18n:mine": "node mine.js" };
-  writeFileSync(join(older, "package.json"), JSON.stringify(pkg, null, 2));
+  const pkg = parseJson(read(older, "package.json"));
+  const scripts = {
+    ...textRecord(field(pkg, "scripts")),
+    "i18n:check": "void-fbtee check",
+    "i18n:mine": "node mine.js",
+  };
+  writeFileSync(
+    join(older, "package.json"),
+    JSON.stringify({ ...(isRecord(pkg) ? pkg : {}), scripts }, null, 2),
+  );
   const { done } = await init(options(older));
-  const after = JSON.parse(read(older, "package.json")).scripts;
+  const after = textRecord(field(parseJson(read(older, "package.json")), "scripts"));
   expect(after["i18n:check"]).toBeUndefined();
   expect(after["i18n:mine"]).toBe("node mine.js");
   expect(done.some((line) => line.includes("removed scripts i18n:check"))).toBe(true);
@@ -274,7 +293,7 @@ test("in a workspace, the lint settings and plugin are left for the root", async
   const vite = read(root, "vite.config.ts");
   expect(vite).toContain(`import { defineConfig } from "vite";`);
   expect(vite).not.toContain("lint");
-  expect(JSON.parse(read(root, "package.json")).devDependencies).not.toHaveProperty(
+  expect(at(parseJson(read(root, "package.json")), "devDependencies")).not.toHaveProperty(
     "@nkzw/eslint-plugin-fbtee",
   );
   expect(todo.join("\n")).toMatch(

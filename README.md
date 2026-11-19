@@ -144,6 +144,10 @@ vp upgrade && vp migrate   # upgrade Vite+, then vp check and the tests (Testing
   `e2e/helpers.ts` is what they share.
 - `scripts/`: the scripts behind the tasks (deploying, the deployed checks, Worker Previews,
   Tailscale, the tools check).
+- `lint/`: the lint rules for the whole repo. `lint/void-rules.ts` is Void's own list, copied from
+  its repo at the commit it names; the root `vite.config.ts` adds ours on top: no casts, no value
+  used as `any`, no `!`. `lint/rules.test.ts` (run with `test:unit`) breaks each rule in every
+  folder and checks each one reports, and lists every exception with its reason.
 
 ## Testing
 
@@ -223,6 +227,8 @@ Run them after a change to the head tags or the picture.
   `vp`, the version being replaced (Vite+'s `docs/guide/upgrade-project.md`).
 - **Void:** change `void`, `@void/md` and `@void/react` in `pnpm-workspace.yaml`'s catalog, then
   `vp install` and `vp run check:tools`, which shows what the new Void wants.
+- **Void's lint rules:** copy `lint.rules` and `lint.plugins` from the root `vite.config.ts` of
+  Void's repo into `lint/void-rules.ts`, and put the commit you copied from at its top.
 - **Node:** change `.node-version`.
 
 Then `vp check`, `vp run test:unit`, `vp run test:dev`, `vp run test:preview` and `vp run test:fresh`.

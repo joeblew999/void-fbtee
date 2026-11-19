@@ -8,7 +8,7 @@ export type Dir = "ltr" | "rtl";
 // What runtimes have that TypeScript's own types don't: a locale's text direction, as
 // `getTextInfo()` (the current proposal) or `textInfo` (the earlier one). Neither is everywhere.
 declare global {
-  // oxlint-disable-next-line typescript/no-namespace
+  // oxlint-disable-next-line typescript/no-namespace -- Intl is a namespace in TypeScript's own types; adding to it takes one
   namespace Intl {
     interface Locale {
       getTextInfo?(): { direction?: string };
@@ -35,7 +35,7 @@ export type LocaleInput = string | { locale: string; segment?: string; dir?: Dir
  * module can't reach it.
  */
 declare global {
-  // oxlint-disable-next-line no-empty-interface
+  // oxlint-disable-next-line no-empty-interface -- empty here; each app adds to it (the comment above)
   interface VoidFbteeRegister {}
 }
 
@@ -48,14 +48,14 @@ type SegmentOf<L> = L extends string
       : never;
 
 /** A language's URL segment ("th-TH" in /th-TH/events): one of the registered languages. */
-export type Lang = VoidFbteeRegister extends { locales: readonly (infer L)[] }
+export type Lang = VoidFbteeRegister extends { locales: ReadonlyArray<infer L> }
   ? SegmentOf<L>
   : string;
 
 type TagOf<L> = L extends string ? L : L extends { locale: infer T extends string } ? T : never;
 
 /** A language's BCP 47 tag ("th-TH"): one of the registered languages, as inLocale() takes it. */
-export type AppLocale = VoidFbteeRegister extends { locales: readonly (infer L)[] }
+export type AppLocale = VoidFbteeRegister extends { locales: ReadonlyArray<infer L> }
   ? TagOf<L>
   : string;
 
@@ -69,7 +69,7 @@ export interface Locale {
 
 export interface LocaleConfig {
   sourceLocale: string;
-  locales: Locale[];
+  locales: Array<Locale>;
 }
 
 const RTL_LANGUAGES = new Set(["ar", "fa", "he", "ur", "ps", "sd", "ug", "yi", "dv", "ckb"]);
@@ -88,11 +88,16 @@ export function langAttrs(locale: string): { lang: string; dir: Dir } {
 export function dirOf(locale: string): Dir {
   const intl = new Intl.Locale(locale);
   const info = intl.getTextInfo?.() ?? intl.textInfo;
-  if (info?.direction === "rtl" || info?.direction === "ltr") return info.direction;
+  if (info?.direction === "rtl" || info?.direction === "ltr") {
+    return info.direction;
+  }
   return RTL_LANGUAGES.has(new Intl.Locale(locale).language) ? "rtl" : "ltr";
 }
 
-export function resolveLocales(sourceLocale: string, inputs: readonly LocaleInput[]): LocaleConfig {
+export function resolveLocales(
+  sourceLocale: string,
+  inputs: ReadonlyArray<LocaleInput>,
+): LocaleConfig {
   // The list as the app wrote it, which its register gives the types of (VoidFbteeRegister): a tag
   // or segment in it is one of the app's. Checked against it, not assumed.
   const entries = inputs.map((input) => (typeof input === "string" ? { locale: input } : input));
@@ -101,12 +106,16 @@ export function resolveLocales(sourceLocale: string, inputs: readonly LocaleInpu
   const isTag = (s: string): s is AppLocale => tags.has(s);
   const isSegment = (s: string): s is Lang => segments.has(s);
   const locales = entries.map((entry): Locale => {
-    const locale = Intl.getCanonicalLocales(entry.locale)[0]!;
+    const locale = canonicalLocale(entry.locale);
     // Written as its canonical form, or the app's types and its URLs would name another spelling.
     const spelling = `void-fbtee: locale "${entry.locale}" is written "${locale}": write it so in locales.`;
-    if (!isTag(locale)) throw new Error(spelling);
+    if (!isTag(locale)) {
+      throw new Error(spelling);
+    }
     const segment = entry.segment ?? locale;
-    if (!isSegment(segment)) throw new Error(`void-fbtee: no segment for "${locale}".`);
+    if (!isSegment(segment)) {
+      throw new Error(`void-fbtee: no segment for "${locale}".`);
+    }
     return { locale, segment, dir: entry.dir ?? dirOf(locale) };
   });
   if (!locales.some((l) => l.locale === sourceLocale)) {
@@ -116,11 +125,32 @@ export function resolveLocales(sourceLocale: string, inputs: readonly LocaleInpu
 }
 
 /** The source language: the one the app is written in. */
-export const sourceOf = (config: LocaleConfig): Locale =>
-  config.locales.find((l) => l.locale === config.sourceLocale)!;
+export function sourceOf(config: LocaleConfig): Locale {
+  const source = config.locales.find((l) => l.locale === config.sourceLocale);
+  // resolveLocales refuses a source language that isn't among the locales.
+  if (!source) {
+    throw new Error(`void-fbtee: sourceLocale "${config.sourceLocale}" is not in locales.`);
+  }
+  return source;
+}
+
+/** The language for a visitor none of whose languages the app has: `fallbackLocale`, else the
+ * source language. */
+export function fallbackOf(config: LocaleConfig & { fallbackLocale?: string }): Locale {
+  return config.locales.find((l) => l.locale === config.fallbackLocale) ?? sourceOf(config);
+}
+
+/** A language tag in its canonical form ("en-us" is "en-US"): Intl's own, checked. */
+export function canonicalLocale(tag: string): string {
+  const [canonical] = Intl.getCanonicalLocales(tag);
+  if (canonical === undefined) {
+    throw new Error(`void-fbtee: "${tag}" is not a language tag.`);
+  }
+  return canonical;
+}
 
 /** Every language but the source: the ones translated into. */
-export const translatedOf = (config: LocaleConfig): Locale[] =>
+export const translatedOf = (config: LocaleConfig): Array<Locale> =>
   config.locales.filter((l) => l.locale !== config.sourceLocale);
 
 /** The locale whose segment starts this path, e.g. "/th-TH/bookings" -> th-TH. */
@@ -135,7 +165,9 @@ export const META_NAME = "void-fbtee";
 /** The page's <meta name="void-fbtee"> data, in the browser, for a check to read; undefined on the
  * server or without it. */
 export function readMeta(): unknown {
-  if (typeof document === "undefined") return;
+  if (typeof document === "undefined") {
+    return;
+  }
   const content = document.querySelector<HTMLMetaElement>(`meta[name="${META_NAME}"]`)?.content;
   return content ? parseJson(content) : undefined;
 }

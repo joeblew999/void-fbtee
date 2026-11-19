@@ -3,7 +3,11 @@
 import type { ReactNode } from "react";
 import { fbt } from "fbtee";
 
-export function PageSections({ sections }: { sections: { id: string; title: ReactNode }[] }) {
+export function PageSections({
+  sections,
+}: {
+  sections: ReadonlyArray<{ id: string; title: ReactNode }>;
+}) {
   return (
     <nav aria-labelledby="page-sections" className="border-s ps-4">
       <h2 id="page-sections" className="text-sm font-semibold">

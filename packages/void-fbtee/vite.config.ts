@@ -53,11 +53,12 @@ export default defineConfig({
     // while the dev server runs; its own watcher keeps dist/ current anyway.
     hooks: {
       async "build:prepare"(ctx) {
-        if (!ctx.options.watch && (await devServerRunning()))
+        if (!ctx.options.watch && (await devServerRunning())) {
           throw new Error(
             `the dev server is running (port ${DEV_PORT}), and it loads the package from dist/, ` +
               "which a full build empties: its watcher already keeps dist/ current; stop vp run dev to build",
           );
+        }
       },
     },
   },

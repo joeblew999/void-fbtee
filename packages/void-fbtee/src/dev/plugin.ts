@@ -40,11 +40,18 @@ import {
 } from "./translate";
 import { check } from "./check";
 import { keepTranslations } from "./gen";
-import { parseJson, textField } from "../guards";
+import { group, parseJson, textField } from "../guards";
 import type { Plugin, ViteDevServer } from "vite";
+import type { JsonModules } from "../virtual-types";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
 import type { FallbackLocales } from "fbtee";
-import { resolveLocales, sourceOf, type LocaleConfig, type LocaleInput } from "../locales";
+import {
+  resolveLocales,
+  sourceOf,
+  type LocaleConfig,
+  type LocaleInput,
+  canonicalLocale,
+} from "../locales";
 import {
   DEFAULT_SRC,
   DEFAULT_TRANSLATIONS,
@@ -65,10 +72,13 @@ const PREPARE_DELAY = 300;
 
 /** voidFbtee({ fallbackLocale }), canonical and one of the app's, or the source language. */
 function checkFallback(fallback: string | undefined, config: LocaleConfig): string {
-  if (fallback === undefined) return config.sourceLocale;
-  const locale = Intl.getCanonicalLocales(fallback)[0]!;
-  if (!config.locales.some((l) => l.locale === locale))
+  if (fallback === undefined) {
+    return config.sourceLocale;
+  }
+  const locale = canonicalLocale(fallback);
+  if (!config.locales.some((l) => l.locale === locale)) {
     throw new Error(`void-fbtee: fallbackLocale "${fallback}" is not in locales.`);
+  }
   return locale;
 }
 
@@ -76,11 +86,11 @@ export interface VoidFbteeOptions {
   /** The language the app's <fbt> strings are written in, e.g. "en-US". */
   sourceLocale: string;
   /** Every locale the app serves, the source locale included. */
-  locales: readonly LocaleInput[];
+  locales: ReadonlyArray<LocaleInput>;
   /** Folder of editable translation files, one <locale>.json each. Default "i18n/translations". */
   translations?: string;
   /** Source files to collect strings from. Default: every folder of code in a Void app (DEFAULT_SRC, catalogs.ts). */
-  src?: string[];
+  src?: Array<string>;
   /**
    * fbtee's own `fallbackLocales` option, passed to fbtee as is: catalogs to try after a
    * locale's natural parents (de-AT -> de) and before the source text. See fbtee's README,
@@ -119,6 +129,10 @@ export interface VoidFbteeApi {
   options: VoidFbteeOptions;
   project(): Project;
 }
+
+/** A data module: `value`, of exactly the type src/virtual.d.ts declares `id` by. */
+const jsonModule = <Id extends keyof JsonModules>(_id: Id, value: JsonModules[Id]) =>
+  `export default ${JSON.stringify(value)};`;
 
 const CONFIG_ID = "virtual:void-fbtee/config";
 const CATALOGS_ID = "virtual:void-fbtee/catalogs";
@@ -164,9 +178,11 @@ export const Intl = globalThis.Intl;
 export const toTemporalInstant = Date.prototype.toTemporalInstant;
 `;
 
-export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
+export function voidFbtee(options: VoidFbteeOptions): Array<Plugin> {
   const config: LocaleConfig = resolveLocales(options.sourceLocale, options.locales);
-  if (options.site !== undefined) checkSite(options.site);
+  if (options.site !== undefined) {
+    checkSite(options.site);
+  }
   const fallbackLocale = checkFallback(options.fallbackLocale, config);
   const translationsDir = options.translations ?? DEFAULT_TRANSLATIONS;
   const src = options.src ?? DEFAULT_SRC;
@@ -199,7 +215,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       .map(([locale, s]) => `${locale} ${s.size}`)
       .join(", ");
   const count = (by: Map<string, Set<string>>) => [...by.values()].reduce((n, s) => n + s.size, 0);
-  const report = (problems: string[]) => {
+  const report = (problems: Array<string>) => {
     if (count(withClaude)) {
       const open = openNow();
       const done = new Map(
@@ -208,8 +224,14 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
             [locale, new Set([...texts].filter((t) => !open.get(locale)?.has(t)))] as const,
         ),
       );
-      if (count(done)) log(`Claude Code translated ${count(done)} strings (${byLanguage(done)})`);
-      for (const [locale, texts] of done) for (const t of texts) withClaude.get(locale)?.delete(t);
+      if (count(done)) {
+        log(`Claude Code translated ${count(done)} strings (${byLanguage(done)})`);
+      }
+      for (const [locale, texts] of done) {
+        for (const t of texts) {
+          withClaude.get(locale)?.delete(t);
+        }
+      }
     }
     log(
       problems.length
@@ -217,7 +239,9 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         : "all translated, nothing to fix",
     );
     const waiting = waitingReview(project());
-    if (waiting) log(`not yet reviewed by Claude: ${waiting}`);
+    if (waiting) {
+      log(`not yet reviewed by Claude: ${waiting}`);
+    }
   };
   // Tests (Vitest's server, CI) don't start an agent: they report.
   const agentAllowed = () => !underVitest && !process.env.CI;
@@ -232,11 +256,15 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       translateWanted = false;
       if (translating) {
         // The agent's own edits, while it works: it reports when it's done.
-        if (!wanted) return;
+        if (!wanted) {
+          return;
+        }
         translateAgain = true;
         return;
       }
-      if (!wanted || !agentAllowed()) return report(check(project()));
+      if (!wanted || !agentAllowed()) {
+        return report(check(project()));
+      }
       // Void's AI first, the one translator (models.ts GEMINI, as at runtime), through the dev
       // server's own route, when the app has it. Then Claude Code for anything left (what didn't
       // pass the checks, or everything when Void's AI isn't there): `claude -p` when it's signed
@@ -245,7 +273,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       const url = base && new URL(DEV_TRANSLATE_PATH, base).href;
       // Who translates, said before they start.
       const open = openNow();
-      if (count(open))
+      if (count(open)) {
         log(
           `translating ${count(open)} new strings (${byLanguage(open)}) with ${
             url
@@ -253,6 +281,7 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
               : "nobody here: no Void's AI; Claude Code, or the prompt below for your coding agent"
           }`,
         );
+      }
       translating = (
         url ? translateWithVoidAi(project(), url, devToken, log) : Promise.resolve(false)
       )
@@ -262,19 +291,27 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         })
         .then(() => {
           // What Claude Code is given: whatever Void's AI left.
-          if (hasClaude())
-            for (const [locale, texts] of openNow())
+          if (hasClaude()) {
+            for (const [locale, texts] of openNow()) {
               for (const t of texts) {
-                if (!withClaude.has(locale)) withClaude.set(locale, new Set());
-                withClaude.get(locale)!.add(t);
+                let given = withClaude.get(locale);
+                if (!given) {
+                  given = new Set();
+                  withClaude.set(locale, given);
+                }
+                given.add(t);
               }
+            }
+          }
           return translateApp(project(), root, log, handedOut);
         })
         .then(async (result) => {
           handedOut = result.prompt;
           // Then Claude reviews what the AI wrote (step 6 of plans/translation-rework.md), once
           // nothing is left to translate: a review of half a catalog would be done twice.
-          if (result.prompt) return report(result.problems);
+          if (result.prompt) {
+            return report(result.problems);
+          }
           const reviewed = await reviewApp(project(), root, log, reviewHandedOut);
           reviewHandedOut = reviewed.prompt;
           report(reviewed.problems);
@@ -312,11 +349,14 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
   const keepTables = () => {
     try {
       const { rewritten, problems } = keepTranslations(root, true);
-      if (rewritten.length)
+      if (rewritten.length) {
         log(
           `rewrote ${rewritten.join(", ")} to void-fbtee's translations table: if its columns changed, vp exec void db generate`,
         );
-      for (const p of problems) log(p);
+      }
+      for (const p of problems) {
+        log(p);
+      }
     } catch (error) {
       log(`couldn't keep the translations tables: ${String(error)}`);
     }
@@ -338,15 +378,20 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
     // language's leftovers), so `void deploy`, which builds, can't ship gaps. Each environment's
     // build checks (Void builds the browser and the worker separately): the first one fails.
     buildStart() {
-      if (command !== "build") return;
+      if (command !== "build") {
+        return;
+      }
       const problems = check(project());
       // Not a failure (CI has no Claude), but said: what no one has looked at yet.
       const waiting = waitingReview(project());
-      if (waiting) this.info(`void-fbtee: machine translations not yet reviewed: ${waiting}`);
-      if (problems.length)
+      if (waiting) {
+        this.info(`void-fbtee: machine translations not yet reviewed: ${waiting}`);
+      }
+      if (problems.length) {
         this.error(
           `void-fbtee: ${problems.length} to fix before this can build (vp dev translates them):\n${problems.join("\n")}`,
         );
+      }
     },
     configureServer(server) {
       devServer = server;
@@ -356,7 +401,9 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       // then everything that isn't translated is, once the start has settled.
       try {
         const written = prepare(project());
-        if (written.length) log(`prepared ${written.join(", ")}`);
+        if (written.length) {
+          log(`prepared ${written.join(", ")}`);
+        }
       } catch (error) {
         server.config.logger.warn(`void-fbtee: couldn't prepare: ${String(error)}`);
       }
@@ -370,22 +417,33 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         const dir = join(root, "node_modules/.void-fbtee");
         mkdirSync(dir, { recursive: true });
         writeFileSync(join(dir, "dev-token"), devToken);
-      } catch {}
+      } catch {
+        // No node_modules to write in: only the dev server itself can call the route.
+      }
       // Once it's listening: Void's AI is reached through the dev server's own address.
-      if (server.httpServer) server.httpServer.once("listening", () => translateSoon());
-      else translateSoon();
+      if (server.httpServer) {
+        server.httpServer.once("listening", () => translateSoon());
+      } else {
+        translateSoon();
+      }
     },
     // Vite calls this for every watched file event, once per environment; act once (client).
     // A hook rather than watcher listeners: Vite, Void and Cloudflare's plugin already put Node
     // near its 10-listener warning on the watcher.
     watchChange(file, { event }) {
       const dir = join(root, translationsDir);
-      if (!devServer || !isClient(this.environment)) return;
+      if (!devServer || !isClient(this.environment)) {
+        return;
+      }
       const rel = relative(root, file).split(sep).join("/");
-      if (rel.startsWith("..")) return;
+      if (rel.startsWith("..")) {
+        return;
+      }
       // A schema file saved (a list of fields changed, a table renamed): the kept tables follow.
       // Rewriting one is another save, which then finds nothing to change.
-      if (rel.startsWith("db/schema/") && event !== "delete") keepTables();
+      if (rel.startsWith("db/schema/") && event !== "delete") {
+        keepTables();
+      }
       // A markdown page the agent marked done: record which version of the original it's from.
       // That write is another save, which then finds the page recorded.
       if (/\.mdx?$/.test(file) && event !== "delete" && existsSync(file)) {
@@ -408,7 +466,9 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           for (const env of Object.values(devServer.environments)) {
             for (const l of config.locales) {
               const mod = env.moduleGraph.getModuleById("\0" + CATALOG_PREFIX + l.locale);
-              if (mod) env.moduleGraph.invalidateModule(mod);
+              if (mod) {
+                env.moduleGraph.invalidateModule(mod);
+              }
             }
           }
           devServer.ws.send({ type: "full-reload" });
@@ -421,7 +481,9 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         prepareTimer = setTimeout(() => {
           try {
             const written = prepare(project());
-            if (written.length) log(`prepared ${written.join(", ")}: translating`);
+            if (written.length) {
+              log(`prepared ${written.join(", ")}: translating`);
+            }
           } catch (error) {
             devServer?.config.logger.warn(`void-fbtee: couldn't prepare: ${String(error)}`);
           }
@@ -429,7 +491,9 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           translateSoon(true);
         }, PREPARE_DELAY);
         return;
-      } else if (!/\.mdx?$/.test(file) || !rel.startsWith("pages/")) return;
+      } else if (!/\.mdx?$/.test(file) || !rel.startsWith("pages/")) {
+        return;
+      }
       // A markdown page saved: translate what's new (an original page), or report what's left.
       const original = `pages/${sourceOf(config).segment}/`;
       translateSoon(rel.startsWith(original));
@@ -465,15 +529,24 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           id === DEV_ID ||
           id === PAGES_ID ||
           id.startsWith(CATALOG_PREFIX)
-        )
+        ) {
           return "\0" + id;
-        if (isClient(this.environment)) return;
-        if (id === "fbtee/server") return fbteeServer;
-        if (id === "temporal-polyfill" && !underVitest) return SERVER_TEMPORAL_ID;
+        }
+        if (isClient(this.environment)) {
+          return;
+        }
+        if (id === "fbtee/server") {
+          return fbteeServer;
+        }
+        if (id === "temporal-polyfill" && !underVitest) {
+          return SERVER_TEMPORAL_ID;
+        }
         if (id === HONO_ROUTE_ID) {
           const voidEntry = await this.resolve("void", join(root, "package.json"));
           const route = voidEntry && (await this.resolve("hono/route", voidEntry.id));
-          if (!route) throw new Error("void-fbtee: can't find Hono's route helper beside Void.");
+          if (!route) {
+            throw new Error("void-fbtee: can't find Hono's route helper beside Void.");
+          }
           return route;
         }
       },
@@ -481,7 +554,9 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
     transform: {
       filter: { id: { include: /\.[jt]sx?$/, exclude: /node_modules|^\0/ }, code: /fbt|fbs/ },
       handler(code, id) {
-        if (!isClient(this.environment) || !id.startsWith(root)) return;
+        if (!isClient(this.environment) || !id.startsWith(root)) {
+          return;
+        }
         // Appended: imports run before the module body wherever they are, and line numbers stay put.
         return { code: `${code}\nimport "void-fbtee/client";`, map: null };
       },
@@ -489,9 +564,19 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
     load: {
       filter: { id: LOAD_FILTER },
       async handler(id) {
-        if (id === SERVER_TEMPORAL_ID) return SERVER_TEMPORAL;
-        if (id === "\0" + CONFIG_ID)
-          return `export default ${JSON.stringify({ ...config, fallbackLocale, redirectHome: options.redirectHome ?? true, fallbackLocales: options.fallbackLocales, site: options.site, app: appName(root) })};`;
+        if (id === SERVER_TEMPORAL_ID) {
+          return SERVER_TEMPORAL;
+        }
+        if (id === "\0" + CONFIG_ID) {
+          return jsonModule(CONFIG_ID, {
+            ...config,
+            fallbackLocale,
+            redirectHome: options.redirectHome ?? true,
+            fallbackLocales: options.fallbackLocales,
+            site: options.site,
+            app: appName(root),
+          });
+        }
         if (id === "\0" + CATALOGS_ID) {
           // The translated languages, and the source's own when it needs one (catalogs.ts).
           const entries = catalogLocales(project()).map(
@@ -502,8 +587,9 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
         }
         // @void/md's pages list exists only inside its plugin, so it's re-exported only when the
         // app has it.
-        if (id === "\0" + MD_PAGES_ID)
+        if (id === "\0" + MD_PAGES_ID) {
           return hasMarkdown ? `export { default } from "@void/md/pages";` : "export default [];";
+        }
         if (id === "\0" + ZOD_ID) {
           // Found as the bundler finds it: Node's require would also look in NODE_PATH, which
           // `pnpm exec` sets to every package pnpm installed, the app's or not.
@@ -511,30 +597,43 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
           return zodMessages(root, Boolean(core && !core.external), config);
         }
         // The route exists only under `vp dev`, on the server, and answers only the dev server.
-        if (id === "\0" + DEV_ID)
+        if (id === "\0" + DEV_ID) {
           return command === "serve" && !isClient(this.environment)
-            ? `import { devTranslate } from "void-fbtee/ai";\nexport default { path: ${JSON.stringify(DEV_TRANSLATE_PATH)}, handle: (r) => devTranslate(r, ${JSON.stringify(devToken)}) };`
+            ? `import { devTranslate } from "void-fbtee/ai";\nexport default { path: ${JSON.stringify(DEV_TRANSLATE_PATH)}, token: ${JSON.stringify(devToken)}, translate: devTranslate };`
             : "export default undefined;";
+        }
         if (id === "\0" + PAGES_ID) {
           const file = join(root, ".void/routes.d.ts");
-          if (existsSync(file)) this.addWatchFile(file);
+          if (existsSync(file)) {
+            this.addWatchFile(file);
+          }
           return `export default ${JSON.stringify(langPages(file))};`;
         }
         // Each string's source text, so a missing translation can be named: on the server always
         // (its log is where production shows them), in the browser only in dev (no page ships the
         // whole app's text to visitors).
-        if (id === "\0" + TEXTS_ID)
-          return `export default ${command === "serve" || !isClient(this.environment) ? JSON.stringify(runtimeTexts(project())) : "{}"};`;
+        if (id === "\0" + TEXTS_ID) {
+          return jsonModule(
+            TEXTS_ID,
+            command === "serve" || !isClient(this.environment) ? runtimeTexts(project()) : {},
+          );
+        }
         if (id.startsWith("\0" + CATALOG_PREFIX)) {
           const locale = id.slice(1 + CATALOG_PREFIX.length);
           const file = catalogFile(project(), locale);
           // A locale with no translations file yet gets an empty catalog. Only existing files are
           // watched: in the browser build Vite turns watch files into imports. A new file is picked
           // up by the folder watcher in configureServer.
-          if (!existsSync(file)) return `export default {};`;
+          if (!existsSync(file)) {
+            return jsonModule("virtual:void-fbtee/catalog/*", {});
+          }
           this.addWatchFile(file);
-          for (const f of collect(project()).files) this.addWatchFile(f);
-          return `export default ${JSON.stringify({ [locale]: runtimeCatalog(project(), locale) })};`;
+          for (const f of collect(project()).files) {
+            this.addWatchFile(f);
+          }
+          return jsonModule("virtual:void-fbtee/catalog/*", {
+            [locale]: runtimeCatalog(project(), locale),
+          });
         }
       },
     },
@@ -551,27 +650,34 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
  * loads (`void prepare`, `vp dev`, `vp build`). Missing, or without PagePathMap, it stops with an
  * error: an empty list would quietly leave every page out of the sitemap.
  */
-export function langPages(file: string): string[] {
-  if (!existsSync(file))
+export function langPages(file: string): Array<string> {
+  if (!existsSync(file)) {
     throw new Error(
       `void-fbtee: no ${file}: Void writes it (vp exec void prepare); the sitemap's pages come from it.`,
     );
+  }
   const block = /export interface PagePathMap \{([\s\S]*?)\n\s*\}/.exec(readFileSync(file, "utf8"));
-  if (!block)
+  if (!block) {
     throw new Error(
       `void-fbtee: ${file} has no PagePathMap: Void's generated route types changed; the sitemap's pages come from it.`,
     );
-  return [...block[1]!.matchAll(/^\s*"(\/\[lang\][^"]*)": "lang";$/gm)].map((m) => m[1]!);
+  }
+  return [...group(block, 1).matchAll(/^\s*"(\/\[lang\][^"]*)": "lang";$/gm)].map((m) =>
+    group(m, 1),
+  );
 }
 
 /**
- * virtual:void-fbtee/zod: `setup(currentLocale)` sets Zod's `localeError` to the message set of the
- * language `currentLocale()` gives (a locale's own, "pt-BR", else its language's, "th" for
- * "th-TH"), English where Zod has none. Without Zod 4 in the app, a `setup` that does nothing.
+ * virtual:void-fbtee/zod: the app's own Zod's `config` and its message sets, one per app language
+ * that Zod has (a locale's own, "pt-BR", else its language's, "th" for "th-TH"), with English as
+ * the fallback; the middleware points Zod at the current language's (setupZod). Without Zod 4 in
+ * the app, undefined.
  */
 function zodMessages(root: string, inApp: boolean, config: LocaleConfig): string {
-  const none = "export function setup() {}";
-  if (!inApp) return none;
+  const none = "export default undefined;";
+  if (!inApp) {
+    return none;
+  }
   // Where it is, by Node (in dev, Vite resolves it to its optimized copy). zod/v4/core is in
   // Zod 3.25 too; the package's own version says which Zod the app has.
   let pkg: string;
@@ -581,7 +687,9 @@ function zodMessages(root: string, inApp: boolean, config: LocaleConfig): string
     return none;
   }
   const version = textField(parseJson(readFileSync(join(pkg, "package.json"), "utf8")), "version");
-  if (Number(version?.split(".")[0] ?? 0) < 4) return none;
+  if (Number(version?.split(".")[0] ?? 0) < 4) {
+    return none;
+  }
   const dir = join(pkg, "v4/locales");
   const has = (name: string) => existsSync(join(dir, `${name}.js`));
   const found = config.locales.flatMap((l) => {
@@ -595,9 +703,6 @@ function zodMessages(root: string, inApp: boolean, config: LocaleConfig): string
       ([, name], i) => `import l${i} from ${JSON.stringify(`zod/v4/locales/${name}.js`)};`,
     ),
     `const sets = { ${found.map(([locale], i) => `${JSON.stringify(locale)}: l${i}().localeError`).join(", ")} };`,
-    `const fallback = en().localeError;`,
-    `export function setup(currentLocale) {`,
-    `  config({ localeError: (issue) => (sets[currentLocale()] ?? fallback)(issue) });`,
-    `}`,
+    `export default { config, sets, fallback: en().localeError };`,
   ].join("\n");
 }
