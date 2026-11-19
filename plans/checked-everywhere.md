@@ -122,3 +122,15 @@ The package's current override (`plans/no-casts.md`) goes: the same rules now co
 - **Found along the way:** `pnpm peers check` reports typescript-eslint (from fbtee's lint plugin)
   wanting TypeScript below 6.1; it works with 7.0.2 here. For fbtee's plugin to follow, with the
   user's OK (`plans/fbtee-issues.md`).
+- **Found by running the stages:** the earlier rewrite of `!` into `got()` had put `got()` inside
+  code Playwright runs in the page (`watchTexts`, the Intl page's `$$eval`), where imports don't
+  exist; `test:preview` failed on it. Fixed, and `lint/rules.test.ts` now fails on any imported
+  name called in page code (tried: it names the line). The fresh check's syntax-tree walk had been
+  rewritten to walk the wrong object; `test:fresh` caught it.
+- **The cloud session's keyring:** after this session was resumed, its shells didn't have
+  `DBUS_SESSION_BUS_ADDRESS`, which `.claude/hooks/cloud-session.sh` hands out at start, so cf
+  couldn't read Void's sign-in. Running the hook and setting the address fixed it with no new
+  sign-in. To see whether the hook's `CLAUDE_ENV_FILE` reaches a resumed session, next time it
+  happens (not changed here).
+- **All stages, 2026-11-19:** `vp check`, `test:unit` (197 package, 3 lint, 17 example), `test:dev`
+  (14), `test:preview` (44), `test:fresh`, `check:tools`: all pass.
