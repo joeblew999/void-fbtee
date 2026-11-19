@@ -13,6 +13,9 @@ what it changes; this list is the only place that says when.
 5. `use-cases.md`: one event, many people, as data, built on the primitives.
 6. `video-conferencing.md`: `void-moq`, built on all of the above.
 
+Next: `checked-everywhere.md`: Void's own lint rules plus ours (no casts, no unchecked `any`, no
+`!`) on the whole repo, proven by a file of deliberate violations. Waits for the user's approval.
+
 Before it, built and committed locally, newest first: `no-casts.md` (no casts or `any` in the
 package, but two explained ones); `like-better-auth.md` (the translations table kept by the
 package, as Void keeps Better Auth's; then the user files `void-package-schema-issue.md`);
