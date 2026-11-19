@@ -110,13 +110,14 @@ for no type gained.
 
 ## The open points, as they came out
 
-- **Loose types inside the package.** One line puts the app's table under the queries' shape
-  (`src/db/schema.ts`, `value as unknown as TranslationsTable`), after checking at run time that it
-  has every column of the shape. In `src/content.ts`, five lines hand the generic functions' results
-  back as the app's types (`as FieldsOf<S, T>` and alike): Drizzle can't type "any table of this
-  shape" or a generic table's rows, so these can't go. What an app passes in and gets back is
-  exact, and `apps/example/src/content.types.test.ts` keeps it so (a wrong table or field fails to
-  compile; checked by removing a marker, 2026-11-19).
+- **Casts:** none left in the translated-content code. First built with 13 (the user asked about
+  them, 2026-11-19): the schema's are type guards that check each table; a value read at run time
+  becomes the app's type only through `isFields` (`src/content.ts`), which checks every field, so a
+  stored translation missing one is warned about and not shown; and the queue is the app's own
+  `queues.translate`, typed by Void from `queues/translate.ts` (`translatedContent(schema, { db,
+  queue })`, annotated `(): TranslateQueue` so the two files' types don't depend on each other).
+  `apps/example/src/content.types.test.ts` checks the queue too: the translate queue fits, the
+  ticket queue doesn't. The rest of the package's casts: `plans/no-casts.md`.
 - **A table and its field list at run time:** the generator writes `<table>_translations_fields`
   beside the table; `contentEntries` pairs them by that name in `import * as schema`, and stops with
   an error naming what's wrong. `test:dev` translated, re-translated and cleaned up through it.

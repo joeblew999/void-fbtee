@@ -279,8 +279,10 @@ can't write, it says): they're the app's own from then on.
   the list of fields, which is how void-fbtee knows them when it runs. Deleting a row deletes its
   translations (the foreign key cascades). Then run `vp exec void db generate` in a terminal, for
   its migration.
-- `src/content.ts`: `export const content = translatedContent(schema, primaryDb)`, the app's
-  schema (`import * as schema from "@schema"`) and its database session handed to the package
+- `src/content.ts`: `export const content = translatedContent(schema, { db, queue })`, the app's
+  schema (`import * as schema from "@schema"`), its database session and its translate queue
+  (`queue: (): TranslateQueue => queues.translate`, typed by Void from `queues/translate.ts`; the
+  annotation keeps the two files' types from depending on each other) handed to the package
   once. Everything `content` gives is typed from the schema: `content.textOf(events, …)` gives the
   events' own fields, and a table with no translations, or a field it doesn't translate, doesn't
   compile.

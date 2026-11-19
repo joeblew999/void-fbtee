@@ -172,8 +172,8 @@ runs, the same on a developer's machine as in CI. There are no i18n scripts.
 void-fbtee translates every row of `events` into the app's languages, and again when a row is
 changed (call `content.translateSoon(events, id, { changed: true })` when it is). It writes, once,
 ordinary files the app owns at Void's own places: `db/schema/events_translations.ts` (plain
-Drizzle, its fields typed from the table's own columns), `src/content.ts` (the app's schema and
-database handed to the package), `queues/translate.ts` and `crons/translations.ts`. Every function
+Drizzle, its fields typed from the table's own columns), `src/content.ts` (the app's schema, database and
+queue handed to the package), `queues/translate.ts` and `crons/translations.ts`. Every function
 is typed from the app's schema: a table with no translations, or a field it doesn't translate,
 doesn't compile. Then `vp exec void db generate` makes the table's migration. The SKILL's "What
 people post" has the rest.

@@ -99,7 +99,7 @@ export function translationQueue(
           continue;
         }
         // D1's own reason is the error's cause.
-        const cause = (error as { cause?: unknown }).cause;
+        const cause = error instanceof Error ? error.cause : undefined;
         console.warn(
           "void-fbtee: translation failed, retried:",
           String(error),

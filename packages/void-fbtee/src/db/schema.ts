@@ -65,8 +65,22 @@ const DRIZZLE_TABLE = Symbol.for("drizzle:IsDrizzleTable");
 const isTable = (value: unknown): value is SQLiteTable =>
   typeof value === "object" && value !== null && DRIZZLE_TABLE in value;
 
-/** The keys every translations table has (the shape's), and a table of content's. */
-const TRANSLATION_KEYS = Object.keys(shape) as (keyof TranslationsTable)[];
+/** The keys every translations table has: the shape's. */
+const TRANSLATION_KEYS: readonly string[] = Object.keys(shape);
+
+/** A table with every column of the shape, by its keys: the queries' type for it holds. */
+const isTranslationsTable = (value: SQLiteTable): value is SQLiteTable & TranslationsTable =>
+  TRANSLATION_KEYS.every((k) => k in value);
+
+/** A table with an `id` and a `locale` column. */
+const isSourceTable = (value: SQLiteTable | undefined): value is SourceTable =>
+  value !== undefined && "id" in value && "locale" in value;
+
+/** A non-empty list of the source table's columns. */
+const isFieldList = (value: unknown, source: SourceTable): value is readonly string[] =>
+  Array.isArray(value) &&
+  value.length > 0 &&
+  value.every((f) => typeof f === "string" && f in source);
 
 /**
  * The app's tables of content, from its schema (`import * as schema from "@schema"`): each
@@ -84,27 +98,21 @@ export function contentEntries(schema: Record<string, unknown>): Map<string, Con
     const tableName = getTableConfig(value).name;
     const name = /^(.+)_translations$/.exec(tableName)?.[1];
     if (!name) continue;
-    const missing = TRANSLATION_KEYS.filter((k) => !(k in value));
-    if (missing.length)
+    if (!isTranslationsTable(value))
       throw new Error(
-        `void-fbtee: ${tableName} lacks ${missing.join(", ")} (\`void-fbtee gen translations\` writes it).`,
+        `void-fbtee: ${tableName} lacks ${TRANSLATION_KEYS.filter((k) => !(k in value)).join(", ")} (\`void-fbtee gen translations\` writes it).`,
       );
     const source = tables.get(name);
-    if (!source || !("id" in source) || !("locale" in source))
+    if (!isSourceTable(source))
       throw new Error(
         `void-fbtee: ${tableName} translates "${name}", which isn't a table in the schema with \`id\` and \`locale\`.`,
       );
     const fields = schema[`${key}_fields`];
-    if (!Array.isArray(fields) || !fields.length || fields.some((f) => !(f in source)))
+    if (!isFieldList(fields, source))
       throw new Error(
         `void-fbtee: ${tableName} needs \`${key}_fields\` exported beside it: the ${name} columns it translates.`,
       );
-    found.set(name, {
-      name,
-      source: source as SourceTable,
-      translations: value as unknown as TranslationsTable,
-      fields: fields as string[],
-    });
+    found.set(name, { name, source, translations: value, fields });
   }
   return found;
 }

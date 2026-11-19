@@ -31,16 +31,10 @@ export type TranslationInsert = Omit<
 /** Not "unknown" (being replaced) nor "queued" (asked for): a translation someone can name. */
 const named = (t: TranslationsTable) => notInArray(t.translatedBy, [UNKNOWN, QUEUED]);
 
-/** A row of a table of content: its id, its language, and its translated fields. Undefined when
- * it's gone. */
+/** A row of a table of content, all its columns. Undefined when it's gone. */
 export async function contentRow(db: Db, c: ContentEntry, id: string) {
-  const s = c.source as ContentEntry["source"] & Record<string, never>;
-  const columns = Object.fromEntries(c.fields.map((f) => [f, s[f]]));
-  const [row] = await db
-    .select({ id: c.source.id, locale: c.source.locale, ...columns })
-    .from(c.source)
-    .where(eq(c.source.id, id));
-  return row as ({ id: string; locale: string } & Record<string, unknown>) | undefined;
+  const [row] = await db.select().from(c.source).where(eq(c.source.id, id));
+  return row;
 }
 
 /** The languages a row has a translation someone can name in, and what each was made from. */

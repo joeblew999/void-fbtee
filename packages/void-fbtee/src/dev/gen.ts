@@ -97,12 +97,18 @@ const CONTENT = `// What people write in the app's tables, translated into its l
 import * as schema from "@schema";
 import { env } from "cloudflare:workers";
 import { createDb } from "void/db";
-import { translatedContent } from "void-fbtee/content";
+import { queues } from "void/queues";
+import { translatedContent, type TranslateQueue } from "void-fbtee/content";
 
 /** A database session that starts on D1's main copy, so what it reads is never behind a write. */
 const primaryDb = () => createDb(env.DB, { session: "first-primary" });
 
-export const content = translatedContent(schema, primaryDb);
+export const content = translatedContent(schema, {
+  db: primaryDb,
+  // Typed by Void from queues/translate.ts. Annotated: that file uses \`content\`, so without it the
+  // two types would depend on each other.
+  queue: (): TranslateQueue => queues.translate,
+});
 `;
 
 const QUEUE = `// What people write, translated into the app's other languages by void-fbtee
@@ -188,7 +194,7 @@ export function genTranslations(
     "src/content.ts",
     CONTENT,
     "translatedContent(",
-    'export const content = translatedContent(schema, primaryDb) from "void-fbtee/content"',
+    'export const content = translatedContent(schema, { db, queue }) from "void-fbtee/content"',
   );
   own(
     "queues/translate.ts",

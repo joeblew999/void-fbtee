@@ -3,13 +3,20 @@
 // with who made it, asking for one (once an hour at most), keeping every table in the app's
 // languages both ways, and reading a row in the reader's language.
 //
-// The app hands over its schema and its database session, once, in a file of its own:
+// The app hands over its schema, its database session and its translate queue, once, in a file of
+// its own:
 //
 //   // src/content.ts
 //   import * as schema from "@schema";
-//   import { translatedContent } from "void-fbtee/content";
+//   import { queues } from "void/queues";
+//   import { translatedContent, type TranslateQueue } from "void-fbtee/content";
 //   import { primaryDb } from "./db";
-//   export const content = translatedContent(schema, primaryDb);
+//   export const content = translatedContent(schema, {
+//     db: primaryDb,
+//     // Typed by Void from queues/translate.ts. Annotated: that file uses `content`, so without it
+//     // the two types would depend on each other.
+//     queue: (): TranslateQueue => queues.translate,
+//   });
 //
 // Which tables are translated, and which fields: the `<table>_translations` tables in that schema,
 // each beside its `<export>_fields` list (`void-fbtee gen translations` writes both, db/schema.ts).
@@ -23,8 +30,10 @@
 // The SQL is db/translations.ts's. Each function takes the database session to use, from the
 // handler calling it, so all of a page's or a job's reads share one: one trip to D1's main copy.
 // Without one, it opens its own (the `db` the app handed over).
+//
+// Nothing in this file is cast. A value read at run time (a row, a stored translation) becomes the
+// app's type only through isFields, which checks it first.
 import config from "virtual:void-fbtee/config";
-import { queues } from "void/queues";
 import {
   contentRow,
   deleteOtherLanguages,
@@ -75,8 +84,24 @@ export interface Source<F = Record<string, string>> {
  * fields, in the table's order (its `_fields` list), as JSON. Kept with the translation
  * (`translated_from`); a row changed since no longer matches, and is translated again.
  */
-export const fieldsFingerprint = (fields: Record<string, unknown>) =>
-  fingerprint(JSON.stringify(fields));
+export const fieldsFingerprint = (fields: object) => fingerprint(JSON.stringify(fields));
+
+/**
+ * Whether `value` holds every one of `fields` as text (or empty): a row's fields, or a stored
+ * translation's, read at run time. It's how the package's generic code knows a value is the app's
+ * type (`FieldsOf`, from its schema): checked, never assumed. The generator builds that type and
+ * the field list from the same list, so a value that passes is the app's type.
+ */
+function isFields<F>(value: unknown, fields: readonly string[]): value is F {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    fields.every((f) => {
+      const v: unknown = Reflect.get(value, f);
+      return typeof v === "string" || v === null;
+    })
+  );
+}
 
 /** Whether a stored translation was made from what the row says now: one with no fingerprint was
  * made before they were kept, and counts as current. */
@@ -113,29 +138,44 @@ const appLocales = () => config.locales.map((l) => l.locale);
  * `import * as schema from "@schema"`; `db` opens the session a function uses when the caller
  * doesn't pass one (the app's `createDb(env.DB, { session: "first-primary" })`).
  */
-export function translatedContent<S extends Record<string, unknown>>(schema: S, db: () => Db) {
+/** Where translations are asked for: the app's `queues.translate` (void/queues), which Void types
+ * from its `queues/translate.ts`. */
+export interface TranslateQueue {
+  send(message: TranslateMessage): Promise<unknown>;
+}
+
+export function translatedContent<S extends Record<string, unknown>>(
+  schema: S,
+  { db, queue }: { db: () => Db; queue: () => TranslateQueue },
+) {
   const entries = contentEntries(schema);
   const entryOf = (table: ContentTable<S> | string): ContentEntry => {
     const name =
       typeof table === "string"
         ? table
-        : [...entries.values()].find((e) => e.source === (table as unknown))?.name;
+        : [...entries.values()].find((e) => Object.is(e.source, table))?.name;
     const found = name === undefined ? undefined : entries.get(name);
     if (!found) throw new Error(`void-fbtee: ${String(name)} has no translations table.`);
     return found;
   };
 
-  async function untranslatedOf(c: ContentEntry, id: string, session: Db) {
+  async function untranslatedOf<F = Record<string, string>>(
+    c: ContentEntry,
+    id: string,
+    session: Db,
+  ): Promise<{ source: Source<F>; from: string; missing: string[] } | undefined> {
     const row = await contentRow(session, c, id);
     if (!row) return;
-    const source: Source = {
-      id: row.id,
-      locale: row.locale,
-      fields: Object.fromEntries(
-        c.fields.map((f) => [f, typeof row[f] === "string" ? (row[f] as string) : ""]),
-      ),
-    };
-    const from = fieldsFingerprint(source.fields);
+    // Each field as text, in the list's order: what the fingerprint is made from.
+    const fields = Object.fromEntries(
+      c.fields.map((f) => {
+        const v: unknown = Reflect.get(row, f);
+        return [f, typeof v === "string" ? v : ""];
+      }),
+    );
+    const from = fieldsFingerprint(fields);
+    if (!isFields<F>(fields, c.fields)) return;
+    const source: Source<F> = { id: row.id, locale: row.locale, fields };
     const have = (await namedTranslations(session, c, id))
       .filter((r) => current(r.translated_from, from))
       .map((r) => r.locale);
@@ -176,9 +216,7 @@ export function translatedContent<S extends Record<string, unknown>>(schema: S, 
       // translation someone can name isn't missing.
       if (await markAsked(session, c, id, locale, found.from, changed)) asked++;
     if (!asked) return false;
-    await (
-      queues as unknown as Record<string, { send(m: TranslateMessage): Promise<void> }>
-    ).translate!.send({ table: c.name, id });
+    await queue().send({ table: c.name, id });
     return true;
   }
 
@@ -197,9 +235,7 @@ export function translatedContent<S extends Record<string, unknown>>(schema: S, 
       id: string,
       session: Db = db(),
     ): Promise<{ source: Source<FieldsOf<S, T>>; from: string; missing: string[] } | undefined> {
-      return untranslatedOf(entryOf(table), id, session) as Promise<
-        { source: Source<FieldsOf<S, T>>; from: string; missing: string[] } | undefined
-      >;
+      return untranslatedOf<FieldsOf<S, T>>(entryOf(table), id, session);
     },
 
     /**
@@ -212,11 +248,11 @@ export function translatedContent<S extends Record<string, unknown>>(schema: S, 
       table: T,
       id: string,
       locale: string,
-      fields: FieldsOf<S, T>,
+      fields: FieldsOf<S, T> & Record<string, string>,
       made: Made,
       session: Db = db(),
     ): Promise<boolean> {
-      return storeOf(entryOf(table), id, locale, fields as Record<string, string>, made, session);
+      return storeOf(entryOf(table), id, locale, fields, made, session);
     },
 
     /**
@@ -270,14 +306,25 @@ export function translatedContent<S extends Record<string, unknown>>(schema: S, 
     ): Promise<Translation<FieldsOf<S, T>>[]> {
       const c = entryOf(table);
       const wanted = locale ? new Set(textLocales(locale)) : undefined;
-      return (await translationRows(session, c, ids))
-        .filter((r) => !wanted || wanted.has(r.locale))
-        .map((r) => ({
+      const out: Translation<FieldsOf<S, T>>[] = [];
+      for (const r of await translationRows(session, c, ids)) {
+        if (wanted && !wanted.has(r.locale)) continue;
+        // A stored translation missing a field (written by hand, or by older code) isn't shown:
+        // said, so it can be fixed.
+        if (!isFields<FieldsOf<S, T>>(r.fields, c.fields)) {
+          console.warn(
+            `void-fbtee: ${c.name}_translations ${r.source_id} ${r.locale} lacks one of ${c.fields.join(", ")}: not shown`,
+          );
+          continue;
+        }
+        out.push({
           source_id: r.source_id,
           locale: r.locale,
-          fields: r.fields as FieldsOf<S, T>,
+          fields: r.fields,
           from: r.translated_from,
-        }));
+        });
+      }
+      return out;
     },
 
     /**
@@ -298,15 +345,16 @@ export function translatedContent<S extends Record<string, unknown>>(schema: S, 
     ): { fields: FieldsOf<S, T>; locale: string; translated: boolean } {
       const c = entryOf(table);
       const mine = translations.filter((t) => t.source_id === row.id);
-      const own = row as unknown as Record<string, unknown>;
-      const original = () => ({
-        fields: Object.fromEntries(c.fields.map((f) => [f, own[f]])) as FieldsOf<S, T>,
-        locale: row.locale,
-        translated: false,
-      });
+      const picked = Object.fromEntries(c.fields.map((f) => [f, Reflect.get(row, f)]));
+      if (!isFields<FieldsOf<S, T>>(picked, c.fields))
+        throw new Error(
+          `void-fbtee: the ${c.name} row passed to textOf lacks one of ${c.fields.join(", ")}`,
+        );
+      const fields = picked;
+      const original = () => ({ fields, locale: row.locale, translated: false });
       // Not yet in the reader's own language, or out of date there: the page waits for it.
       if (note && row.locale !== locale && appLocales().includes(locale)) {
-        const now = fieldsFingerprint(original().fields as Record<string, unknown>);
+        const now = fieldsFingerprint(fields);
         if (!mine.some((t) => t.locale === locale && current(t.from, now)))
           notePending(c.name, row.id);
       }

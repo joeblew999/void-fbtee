@@ -124,7 +124,7 @@ vp upgrade && vp migrate   # upgrade Vite+, then vp check and the tests (Testing
   `crons/`, `middleware/`, and `db/` (the shape of a translations table, and every query it runs,
   in `db/translations.ts`). It owns no table and no database session: an app's translations tables
   are its own, written by `void-fbtee gen translations` as plain Drizzle, and the app hands over its
-  schema and session (`translatedContent(schema, primaryDb)`), so every type comes from the app
+  schema, session and queue (`translatedContent(schema, { db, queue })`), so every type comes from the app
   (`plans/types-from-schema.md`). `src/dev/` is what only the Vite plugin and the CLI load, in Node,
   never in the Worker; the rest of `src/` runs in the Worker, some of it at build time too.
 - `apps/example`: a Void app using it, in three languages. Production:

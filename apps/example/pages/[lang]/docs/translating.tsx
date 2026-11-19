@@ -81,7 +81,7 @@ function points(): Point[] {
         },
         {
           file: "src/content.ts",
-          line: "export const content = translatedContent(schema, primaryDb);",
+          line: "queue: (): TranslateQueue => queues.translate,",
         },
         {
           file: "pages/[lang]/events/new.server.ts",

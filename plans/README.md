@@ -30,6 +30,9 @@ Waiting on others, not in the order:
   the fresh test's pins and README "Reported to Void" go.
 - `fbtee-issues.md`: two issues for fbtee (locale matching on a server, and two things in Arabic),
   drafted, filed only with the user's OK.
+- `no-casts.md`: the package's other 53 lines with casts (JSON trusted as a shape, Void's types
+  not reaching the package, languages from plain strings), each with its way out. Found
+  2026-11-19; waits for the user's OK.
 - `void-package-schema-issue.md`: asks Void whether a package can bring tables into an app the way
   Better Auth's are (drafted 2026-11-19; filed by the user from the Mac, as this session can't).
 - `void-form-without-javascript.md`: waits on Void (an issue drafted for voidzero-dev/void, filed

@@ -4,9 +4,11 @@
 // unit run. Types only: nothing here runs the Worker's code.
 import { describe, expect, expectTypeOf, it } from "vite-plus/test";
 import type { bookings, events, events_translations } from "@schema";
+import type { TranslateQueue } from "void-fbtee/content";
 import type { LangPage, LangPagePattern } from "void-fbtee/server";
 
 type Content = typeof import("@/content").content;
+type Queues = typeof import("void/queues").queues;
 type Fields = (typeof events_translations.$inferSelect)["fields"];
 
 describe("types from the schema", () => {
@@ -28,6 +30,12 @@ describe("types from the schema", () => {
       void c.storeTranslation(e, "id", "th-TH", { title: "t", venue: "v" }, { by: "x" });
     };
     expect(check).toBeTypeOf("function");
+  });
+
+  it("takes the app's translate queue, as Void types it, and no other", () => {
+    expectTypeOf<Queues["translate"]>().toExtend<TranslateQueue>();
+    // @ts-expect-error the ticket queue carries another message
+    expectTypeOf<Queues["ticket"]>().toExtend<TranslateQueue>();
   });
 
   it("types the pages by Void's own route types", () => {
