@@ -130,7 +130,8 @@ void-fbtee works at dev time and at run time, and that decides where each piece 
 
 ## For Void (filed only with the user's OK)
 
-Dropped: asking Void to open `void gen` and `additionalSchemas` to packages.
+Asked as a question, not a demand: whether packages can bring tables into an app the way Better Auth's
+are (`plans/void-package-schema-issue.md`, drafted). The build doesn't wait on it.
 
 Kept, or added:
 

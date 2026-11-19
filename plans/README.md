@@ -30,6 +30,8 @@ Waiting on others, not in the order:
   the fresh test's pins and README "Reported to Void" go.
 - `fbtee-issues.md`: two issues for fbtee (locale matching on a server, and two things in Arabic),
   drafted, filed only with the user's OK.
+- `void-package-schema-issue.md`: asks Void whether a package can bring tables into an app the way
+  Better Auth's are (drafted 2026-11-19; filed by the user from the Mac, as this session can't).
 - `void-form-without-javascript.md`: waits on Void (an issue drafted for voidzero-dev/void, filed
   only with the user's OK).
 - `many-languages.md`: what grows (Worker size, catalogs per request, hreflang, sitemap) when an
