@@ -1,19 +1,4 @@
-# plans/void-package-schema-issue.md: a question for Void, drafted
-
-To file, from the repo's root (the issue's text is everything under "Issue body" below):
-
-```sh
-gh issue create -R voidzero-dev/void \
-  --title "Could the way Void brings Better Auth's tables into an app be open to other packages?" \
-  --body "$(sed -n '/^## Issue body$/,$p' plans/void-package-schema-issue.md | tail -n +3)"
-```
-
-Checked 2026-11-19: no issue like it in voidzero-dev/void (the Better Auth ones, #677, #756, #858,
-#872, are about the generated tables themselves). Filing from the cloud session failed: the GitHub
-connector gets 403 on voidzero-dev/void, and the session's `gh` token is invalid. Once filed, this
-file goes and README "Reported to Void" names the issue.
-
-## Issue body
+# Could the way Void brings Better Auth's tables into an app be open to other packages?
 
 ## The question
 

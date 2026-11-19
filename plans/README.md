@@ -34,6 +34,10 @@ Waiting on others, not in the order:
   drafted, filed only with the user's OK.
 - `void-package-schema-issue.md`: asks Void whether a package can bring tables into an app the way
   Better Auth's are (drafted 2026-11-19; filed by the user from the Mac, as this session can't).
+  The file is only the issue: its first line the title, the rest the body. To file it after a
+  push: `gh issue create -R voidzero-dev/void --title "$(head -1 plans/void-package-schema-issue.md | sed 's/^# //')" --body "$(tail -n +3 plans/void-package-schema-issue.md)"`.
+  Checked 2026-11-19: no issue like it there (#677, #756, #858, #872 are about Better Auth's
+  generated tables themselves). Once filed, the file goes and README "Reported to Void" names it.
 - `void-form-without-javascript.md`: waits on Void (an issue drafted for voidzero-dev/void, filed
   only with the user's OK).
 - `many-languages.md`: what grows (Worker size, catalogs per request, hreflang, sitemap) when an
