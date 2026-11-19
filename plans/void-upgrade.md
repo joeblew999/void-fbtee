@@ -22,7 +22,9 @@ Void"), and it waits for the second to be fixed in a Void release. Its place: `p
 - **The Void issues kept in the repo, each checked against the new Void** (the user's call,
   2026-11-19: they wait for this upgrade, since much of it touches the same things):
   `void-package-schema-issue.md` (packages bringing tables in like Better Auth's: does the new
-  Void still pass only `better-auth-schema.ts` to `additionalSchemas`?) and the issue in
+  Void still pass only `better-auth-schema.ts` to `additionalSchemas`?),
+  `void-deploy-record-issue.md` (the deploy record cut at 1000 characters; 1.11.0's
+  `@void/deploy-cloudflare` still writes it the same way) and the issue in
   `void-form-without-javascript.md`. Each is dropped if the new Void fixes it, rewritten for the
   new version if not, then filed with the user's OK and named in README "Reported to Void".
 

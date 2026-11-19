@@ -39,6 +39,9 @@ Waiting on others, not in the order:
   `gh issue create -R voidzero-dev/void --title "$(head -1 plans/void-package-schema-issue.md | sed 's/^# //')" --body "$(tail -n +3 plans/void-package-schema-issue.md)"`.
   Checked 2026-11-19: no issue like it there (#677, #756, #858, #872 are about Better Auth's
   generated tables themselves).
+- `void-deploy-record-issue.md`: Void's deploy record, kept in a version's message, cut at
+  Cloudflare's 1000 characters, so the next deploy refused (found 2026-11-19; worked around in
+  `apps/example/void.config.ts`). Only the issue, as above; kept until `void-upgrade.md`.
 - `void-form-without-javascript.md`: an issue drafted for voidzero-dev/void (on Void 1.8.0), kept
   in the repo, not filed, until `void-upgrade.md` checks it against the new Void.
 - `many-languages.md`: what grows (Worker size, catalogs per request, hreflang, sitemap) when an

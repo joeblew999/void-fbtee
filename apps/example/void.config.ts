@@ -93,11 +93,14 @@ export default defineConfig({
     observability: { enabled: true },
     // Where the Worker answers, as it's set on Cloudflare (checked with `cf workers get`,
     // 2026-11-19): its workers.dev address (the site, SITE in src/site.ts) and preview URLs (each
-    // branch's Worker Preview, scripts/preview.ts); no routes or custom domains. Void's deploy
-    // refuses to republish a Worker whose visibility isn't in its config ("dashboard-managed routes
-    // or visibility", Void's integrations/cloudflare.md), so it's stated here.
+    // branch's Worker Preview, scripts/preview.ts); no routes or custom domains. All three stated,
+    // so Void's deploy needn't read them from the last deploy's record: Void keeps that record in
+    // the Worker version's message, which Cloudflare cuts at 1000 characters, and ours grew past
+    // it (every migration's name is in it), so Void 1.8.0 refused to deploy (2026-11-19,
+    // plans/void-deploy-record-issue.md).
     workers_dev: true,
     preview_urls: true,
+    routes: [],
   },
   worker: {
     // 2026-03-24 or later for Browser Run's quickAction (src/pdf.ts). What it changed since
