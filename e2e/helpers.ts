@@ -147,7 +147,11 @@ export async function watchTexts(page: Page) {
     window.__seen = seen;
     new MutationObserver(() =>
       document.querySelectorAll<HTMLElement>("[data-testid]").forEach((el) => {
-        (seen[got(el.dataset.testid)] ??= new Set()).add(el.textContent ?? "");
+        // Runs in the page: no imports there, so the id is checked inline.
+        const id = el.dataset.testid;
+        if (id !== undefined) {
+          (seen[id] ??= new Set()).add(el.textContent ?? "");
+        }
       }),
     ).observe(document, { subtree: true, childList: true, characterData: true });
   });

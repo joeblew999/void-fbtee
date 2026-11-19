@@ -119,3 +119,42 @@ test("every exception is a known one, and says why", () => {
   expect(found.sort()).toEqual(EXCEPTIONS);
   expect(unexplained).toEqual([]);
 });
+
+// Code Playwright runs in the page (page.evaluate, $$eval, addInitScript, waitForFunction) is sent
+// there as text: a name imported in the test file doesn't exist in the page, and Vitest renames
+// imports, so using one fails only when the browser runs it ("__vite_ssr_import_4__ is not
+// defined", 2026-11-19). TypeScript can't see this; this does.
+test("code run in the page uses nothing imported", () => {
+  const PAGE_CALL = /\b(addInitScript|\$\$eval|\$eval|evaluate|evaluateHandle|waitForFunction)\(/g;
+  const found: Array<string> = [];
+  for (const file of globSync("e2e/**/*.ts", { cwd: ROOT })) {
+    const text = readFileSync(join(ROOT, file), "utf8");
+    const imported = [...text.matchAll(/^import\s+(?:type\s+)?\{([^}]*)\}\s+from/gm)]
+      .flatMap((m) => (m[1] ?? "").split(","))
+      .map(
+        (n) =>
+          n
+            .trim()
+            .replace(/^type\s+/, "")
+            .split(/\s+as\s+/)
+            .pop() ?? "",
+      )
+      .filter((n) => /^[A-Za-z_$][\w$]*$/.test(n));
+    for (const call of text.matchAll(PAGE_CALL)) {
+      let depth = 1;
+      let end = (call.index ?? 0) + call[0].length;
+      while (depth > 0 && end < text.length) {
+        depth += text[end] === "(" ? 1 : text[end] === ")" ? -1 : 0;
+        end += 1;
+      }
+      const body = text.slice(call.index, end);
+      for (const name of imported) {
+        if (new RegExp(`(?<![\\w$.])${name.replace("$", "\\$")}\\(`).test(body)) {
+          const line = text.slice(0, call.index).split("\n").length;
+          found.push(`${file}:${line} ${call[1]} calls ${name}()`);
+        }
+      }
+    }
+  }
+  expect(found).toEqual([]);
+});

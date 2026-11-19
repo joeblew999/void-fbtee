@@ -8,7 +8,6 @@ import { describe, expect, test } from "vite-plus/test";
 import type { Page } from "playwright";
 import { browser, collectErrors, untilText } from "../helpers";
 import { LOCALES } from "../locales";
-import { got } from "../got";
 
 /**
  * Load the Intl page and return the rows it highlights as differing (as shown: invisible
@@ -20,8 +19,9 @@ async function differences(p: Page, locale: string) {
   return p.$$eval("tr[data-differs]", (rows) =>
     rows.map((r) => [
       r.getAttribute("data-row"),
-      got(r.querySelector('[data-side="worker"]')).textContent,
-      got(r.querySelector('[data-side="browser"]')).textContent,
+      // Runs in the page: no imports there, so a missing cell is shown as null.
+      r.querySelector('[data-side="worker"]')?.textContent ?? null,
+      r.querySelector('[data-side="browser"]')?.textContent ?? null,
     ]),
   );
 }

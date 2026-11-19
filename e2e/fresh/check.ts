@@ -641,7 +641,7 @@ function importsOf(code: string): Array<string> {
     ) {
       found.push(n.source.value);
     }
-    for (const value of Object.values(n)) {
+    for (const value of Object.values(node)) {
       walk(value);
     }
   };
