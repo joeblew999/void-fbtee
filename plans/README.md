@@ -33,13 +33,14 @@ Waiting on others, not in the order:
 - `fbtee-issues.md`: two issues for fbtee (locale matching on a server, and two things in Arabic),
   drafted, filed only with the user's OK.
 - `void-package-schema-issue.md`: asks Void whether a package can bring tables into an app the way
-  Better Auth's are (drafted 2026-11-19; filed by the user from the Mac, as this session can't).
-  The file is only the issue: its first line the title, the rest the body. To file it after a
-  push: `gh issue create -R voidzero-dev/void --title "$(head -1 plans/void-package-schema-issue.md | sed 's/^# //')" --body "$(tail -n +3 plans/void-package-schema-issue.md)"`.
+  Better Auth's are (drafted 2026-11-19, on Void 1.8.0). The file is only the issue: its first
+  line the title, the rest the body. Kept in the repo, not filed, until `void-upgrade.md`, which
+  checks it against the new Void first. To file it then:
+  `gh issue create -R voidzero-dev/void --title "$(head -1 plans/void-package-schema-issue.md | sed 's/^# //')" --body "$(tail -n +3 plans/void-package-schema-issue.md)"`.
   Checked 2026-11-19: no issue like it there (#677, #756, #858, #872 are about Better Auth's
-  generated tables themselves). Once filed, the file goes and README "Reported to Void" names it.
-- `void-form-without-javascript.md`: waits on Void (an issue drafted for voidzero-dev/void, filed
-  only with the user's OK).
+  generated tables themselves).
+- `void-form-without-javascript.md`: an issue drafted for voidzero-dev/void (on Void 1.8.0), kept
+  in the repo, not filed, until `void-upgrade.md` checks it against the new Void.
 - `many-languages.md`: what grows (Worker size, catalogs per request, hreflang, sitemap) when an
   app has every language. To measure first.
 - `quiet-harbor-atlas.md`: the long plan, steps 1–8 done. Steps 9 (sign-in) and 10 (API routes with

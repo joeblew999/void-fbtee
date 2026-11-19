@@ -1,6 +1,7 @@
 # plans/void-form-without-javascript.md: booking and posting without JavaScript
 
-Status: found 2026-11-14; the upstream issue below is drafted, not filed (it waits for the user's OK).
+Status: found 2026-11-14; the upstream issue below is drafted, not filed: kept until the Void upgrade
+checks it against the new Void (`plans/void-upgrade.md`, "When it's done, also").
 
 ## What happens
 

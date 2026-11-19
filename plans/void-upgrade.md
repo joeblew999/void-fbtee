@@ -19,6 +19,13 @@ Void"), and it waits for the second to be fixed in a Void release. Its place: `p
 
 ## When it's done, also
 
+- **The Void issues kept in the repo, each checked against the new Void** (the user's call,
+  2026-11-19: they wait for this upgrade, since much of it touches the same things):
+  `void-package-schema-issue.md` (packages bringing tables in like Better Auth's: does the new
+  Void still pass only `better-auth-schema.ts` to `additionalSchemas`?) and the issue in
+  `void-form-without-javascript.md`. Each is dropped if the new Void fixes it, rewritten for the
+  new version if not, then filed with the user's OK and named in README "Reported to Void".
+
 - `export const maxConcurrency` (new in 1.10.0, `guide/queues.md`) on the example's
   `queues/translate.ts`, so a burst of posts can't flood Gemini (`plans/reliable-work.md`).
 
