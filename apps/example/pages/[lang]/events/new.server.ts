@@ -1,7 +1,7 @@
 // Posting an event: the zones the form offers (the loader), and saving it (the action). The action
 // clears the list of events from Void's page cache in every language, then goes to the new event's
 // page. A static segment beats `[id]` in Void's routing, so /events/new is never read as an id.
-import { events, newEventSchema, when } from "@schema";
+import { newEventSchema, when } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
@@ -14,6 +14,7 @@ import { sendLinkEmail } from "@/events/emails";
 import { z } from "zod";
 import { locales } from "@/locales";
 import { eventPages } from "@/events/translations";
+import { createEvent } from "@/events/store";
 
 // Cached until the next deploy, in every language (Void's prerendering: a one-year cache time,
 // and a deploy clears the cache). Void's own platform also builds it during the deploy; deployed
@@ -37,19 +38,17 @@ export const action = defineHandler.withValidator({
   // The poster's private delete link: the key goes to them, its SHA-256 to the database.
   const key = newDeleteKey();
   const times = when(body.local, body.local_end, body.time_zone);
-  const [created] = await primaryDb()
-    .insert(events)
-    .values({
-      title: body.title,
-      description: body.description,
-      seats: body.seats,
-      venue: body.venue || null,
-      locale,
-      delete_key_hash: await hashDeleteKey(key),
-      ...times,
-    })
-    .returning({ id: events.id });
-  const page = routeUrl("/[lang]/events/[id]", { params: { id: created.id } });
+  const db = primaryDb();
+  const id = await createEvent(db, {
+    title: body.title,
+    description: body.description,
+    seats: body.seats,
+    venue: body.venue || null,
+    locale,
+    delete_key_hash: await hashDeleteKey(key),
+    ...times,
+  });
+  const page = routeUrl("/[lang]/events/[id]", { params: { id } });
   // The private link by email too, when the poster asked: in the language they posted in, so a
   // poster who loses the page (another device, cleared browser) can still delete it. The address
   // goes to sendEmail only.
@@ -65,12 +64,12 @@ export const action = defineHandler.withValidator({
     });
   // Its translations into the app's other languages, at once (void-fbtee's queue): without this,
   // the first page read in another language would queue it, and the daily job would find it.
-  await translateSoon("events", created.id);
+  await translateSoon("events", id, {}, db);
   // The list in every language, and the sitemap, which lists the new event.
   await revalidate({ paths: eventPages() });
   // To the new event's page, with the key in a short-lived cookie, which the page turns into the
   // poster's private link (src/events/delete-key.ts).
-  c.header("Set-Cookie", keyCookie(created.id, key));
+  c.header("Set-Cookie", keyCookie(id, key));
   return c.redirect(page);
 });
 

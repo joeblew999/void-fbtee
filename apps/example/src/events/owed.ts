@@ -5,15 +5,10 @@
 // (crons/owed.ts) uses them to find what a crash or a lost message left undone.
 //
 // Each takes the database session of the handler calling it (void-fbtee/db primaryDb), so its reads
-// are of the main copy and agree with that handler's own.
-import { bookings, events } from "@schema";
-import { and, eq, inArray, isNotNull } from "void/db";
-import type { primaryDb } from "void-fbtee/db";
+// are of the main copy and agree with that handler's own. The SQL is store.ts's.
+import type { Db } from "void-fbtee/db";
 import { queues } from "void/queues";
-
-type Db = ReturnType<typeof primaryDb>;
-type Event = typeof events.$inferSelect;
-type Booking = typeof bookings.$inferSelect;
+import { bookingsOf, eventOn, type Booking, type Event } from "./store";
 
 /** What a booker is told about an event: its title, start, end and place, as its organiser wrote them. */
 export const toldOf = (event: Pick<Event, "title" | "starts_at" | "ends_at" | "venue">) => ({
@@ -37,28 +32,10 @@ export const isBehind = (booking: Booking, event: Event) =>
  * harmless: the queue checks again before it sends.
  */
 export async function tellBookers(db: Db, eventId: string, locales?: readonly string[]) {
-  const [event] = await db.select().from(events).where(eq(events.id, eventId));
-  if (!event || event.cancelled_at) return;
-  const rows = await db
-    .select()
-    .from(bookings)
-    .where(
-      and(
-        eq(bookings.event_id, eventId),
-        locales ? inArray(bookings.locale, [...locales]) : undefined,
-      ),
-    );
-  const owed = rows.filter((b) => b.confirmed_at && isBehind(b, event));
+  const event = await eventOn(db, eventId);
+  if (!event) return;
+  const owed = (await bookingsOf(db, eventId, locales)).filter(
+    (b) => b.confirmed_at && isBehind(b, event),
+  );
   await Promise.all(owed.map((b) => queues.change.send({ bookingId: b.id })));
-}
-
-/** A cancelled event whose every booker has been told goes, with its translations (they cascade). */
-export async function endCancelled(db: Db, eventId: string) {
-  const [left] = await db
-    .select({ id: bookings.id })
-    .from(bookings)
-    .where(eq(bookings.event_id, eventId))
-    .limit(1);
-  if (left) return;
-  await db.delete(events).where(and(eq(events.id, eventId), isNotNull(events.cancelled_at)));
 }

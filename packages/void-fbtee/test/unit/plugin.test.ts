@@ -10,7 +10,7 @@ import { copyFixture, makeBuildable } from "./copy-fixture";
 import { createBuilder, type Plugin, type Rollup } from "vite";
 import { voidMarkdown } from "@void/md/plugin";
 import { voidReact } from "@void/react/plugin";
-import { voidFbtee } from "../../src/plugin";
+import { voidFbtee } from "../../src/dev/plugin";
 
 let root: string;
 beforeAll(() => {

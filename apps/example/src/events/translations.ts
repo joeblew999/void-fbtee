@@ -6,7 +6,7 @@
 // an event, and telling open ones.
 import type { AppLocale } from "void-fbtee/locales";
 import { textOf, translationsFor, type Translation } from "void-fbtee/content";
-import { primaryDb } from "void-fbtee/db";
+import { primaryDb, type Db } from "void-fbtee/db";
 import { revalidate } from "void-fbtee/server";
 import { tellBookers } from "./owed";
 import { eventTopic, live } from "./live";
@@ -27,8 +27,8 @@ export const eventPages = (id?: string): Parameters<typeof revalidate>[0]["paths
  * The stored translations of these events: those a page in `locale` can show (it and its
  * fallbacks), or all of them without `locale` (void-fbtee/content translationsFor).
  */
-export const textsFor = (ids: string[], locale?: AppLocale) =>
-  translationsFor("events", ids, locale);
+export const textsFor = (ids: string[], locale?: AppLocale, db?: Db) =>
+  translationsFor("events", ids, locale, db);
 
 /**
  * The event's title and description for a reader in `locale`, and the language they're in: the best

@@ -6,7 +6,7 @@ import catalogs from "virtual:void-fbtee/catalogs";
 import config from "virtual:void-fbtee/config";
 import texts from "virtual:void-fbtee/texts";
 import { readMeta } from "./locales";
-import type { SharedI18n } from "./middleware";
+import type { SharedI18n } from "./middleware/i18n";
 import { localeContextOptions, reportMissing } from "./runtime";
 
 type Tracked = Promise<void> & { status?: "pending" | "fulfilled"; value?: void };
@@ -23,7 +23,7 @@ export function install(locale: string): Tracked {
     // Dev only in the browser: production's missing strings are logged where they're rendered
     // first, on the server (server.ts, runIn).
     const onMissing = import.meta.env.DEV ? missing : undefined;
-    // The source language's own catalog, when it has one (catalogs.ts, sourceNeedsCatalog), is
+    // The source language's own catalog, when it has one (dev/catalogs.ts, sourceNeedsCatalog), is
     // given up front: fbtee's setupLocaleContext never loads a catalog for the source language
     // itself, though it reads one it's given.
     const source = catalogs[config.sourceLocale];

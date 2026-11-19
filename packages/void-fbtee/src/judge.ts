@@ -1,6 +1,6 @@
 // Whether a translation can break the app, whoever wrote it: `vp dev` asks it of each answer before
-// writing it to the catalog (translate.ts: what it finds goes back to Void's AI once, as what to
-// fix), and `vp build` of every finished catalog entry (check.ts), against the entry's source lines.
+// writing it to the catalog (dev/translate.ts: what it finds goes back to Void's AI once, as what to
+// fix), and `vp build` of every finished catalog entry (dev/check.ts), against the entry's source lines.
 // Only what breaks an app: a line missing or empty, a {placeholder} lost or made up. How well it
 // reads is the translator's, and the reviewer's (plans/translation-simple.md).
 import { CATEGORY_CODE } from "./plurals";

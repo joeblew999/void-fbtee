@@ -10,11 +10,11 @@ import {
   missing,
   type Project,
 } from "./catalogs";
-import { problemsWith } from "./judge";
-import { fingerprint } from "./fingerprint";
+import { problemsWith } from "../judge";
+import { fingerprint } from "../fingerprint";
 import { contentProblems } from "./content-files";
 import { firstFile, hasI18nMiddleware, HOME_PAGES, LAYOUTS, VOID_CONFIGS } from "./app-files";
-import { sourceOf, translatedOf } from "./locales";
+import { sourceOf, translatedOf } from "../locales";
 
 /** Frontmatter key a translated markdown page records its original's hash in. */
 export const TRANSLATED_FROM = "translatedFrom";

@@ -301,6 +301,12 @@ translation keeps a fingerprint of the fields it was made from (`translated_from
 row is translated again, its old translation shown until the new one lands (a page that reads it
 asks for it too).
 
+Read the app's database through `primaryDb()` from `void-fbtee/db`: a session that starts on D1's
+main copy, as Void's own `db` may read a replica that hasn't caught up (`vp check` refuses `db` from
+`void/db`). Open one per loader, action, queue message or cron, and pass it to these functions as
+their last argument (`translationsFor(table, ids, locale, db)`, `translateSoon(table, id, {}, db)`),
+so all their reads share it: each session's first read is a trip to the main copy.
+
 Mark the element showing it with its own language, whichever that is, by spreading
 `langAttrs(locale)` from `void-fbtee/react` on it (`<h1 {...langAttrs(text.locale)}>`): `lang` for
 screen readers and search engines, and `dir`, so Arabic posted on an English page reads right to

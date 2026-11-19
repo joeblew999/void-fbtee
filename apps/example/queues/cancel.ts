@@ -4,14 +4,12 @@
 // booking, so it answers at once however many booked; the sweep queues any booking of a cancelled
 // event left over (crons/owed.ts). Until its email has gone, the booking itself is what says this
 // booker is owed it. Read from the database's main copy (void-fbtee/db).
-import { bookings, events } from "@schema";
 import { defineQueue } from "void";
-import { eq } from "void/db";
 import { primaryDb } from "void-fbtee/db";
 import type { AppLocale } from "void-fbtee/locales";
 import { storage } from "void/storage";
 import { sendCancellationEmail } from "../src/events/emails";
-import { endCancelled } from "../src/events/owed";
+import { bookingWithEvent, deleteBooking, deleteIfDone } from "../src/events/store";
 import { ticketKey } from "../src/events/tickets";
 import { textsFor, titleFor } from "../src/events/translations";
 import { originOr } from "../src/site";
@@ -26,11 +24,7 @@ export const retryDelay = 60;
 export default defineQueue<Message>(async (batch) => {
   for (const message of batch.messages) {
     const db = primaryDb();
-    const [row] = await db
-      .select({ booking: bookings, event: events })
-      .from(bookings)
-      .innerJoin(events, eq(events.id, bookings.event_id))
-      .where(eq(bookings.id, message.body.bookingId));
+    const row = await bookingWithEvent(db, message.body.bookingId);
     // Told already (the booking is gone), or the event isn't cancelled: nothing owed.
     if (!row || !row.event.cancelled_at) {
       message.ack();
@@ -40,7 +34,7 @@ export default defineQueue<Message>(async (batch) => {
     // The language they booked in: one of the app's, as booking stores it. The title as they
     // read it: its translations go only with the event's last booking.
     const locale = booking.locale as AppLocale;
-    const text = titleFor(event, await textsFor([event.id], locale), locale);
+    const text = titleFor(event, await textsFor([event.id], locale, db), locale);
     const sent = await sendCancellationEmail(booking.email, {
       locale,
       name: booking.name,
@@ -55,9 +49,9 @@ export default defineQueue<Message>(async (batch) => {
       continue;
     }
     // Told: their booking and its ticket (it has their name on it) go, and the event with its last.
-    await db.delete(bookings).where(eq(bookings.id, booking.id));
+    await deleteBooking(db, booking.id);
     await storage.delete(ticketKey(booking.id));
-    await endCancelled(db, event.id);
+    await deleteIfDone(db, event.id);
     message.ack();
   }
 });

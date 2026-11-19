@@ -8,7 +8,7 @@
 //   export const cron = "17 4 * * *"; // Void reads it from this file
 //   export { default } from "void-fbtee/crons/translations";
 import { defineScheduled } from "void";
-import { reconcile } from "./content";
+import { reconcile } from "../content";
 
 export default defineScheduled(async () => {
   const { deleted, queued } = await reconcile();

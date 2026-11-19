@@ -1,12 +1,12 @@
-// What vp dev writes and vp build checks for voidFbtee({ content }) (content-files.ts), on copies of
+// What vp dev writes and vp build checks for voidFbtee({ content }) (src/dev/content-files.ts), on copies of
 // test/unit/fixture with a table of the app's own: never over the app's files, and every gap said.
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vite-plus/test";
 import { copyFixture } from "./copy-fixture";
-import type { Project } from "../../src/catalogs";
-import { loadProject } from "../../src/commands";
-import { contentProblems, writeContentFiles } from "../../src/content-files";
+import type { Project } from "../../src/dev/catalogs";
+import { loadProject } from "../../src/dev/commands";
+import { contentProblems, writeContentFiles } from "../../src/dev/content-files";
 
 let root: string;
 let p: Project;

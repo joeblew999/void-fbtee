@@ -10,13 +10,12 @@
 // was; then told_* is the event as emailed. The same: nothing, so a message twice, a change undone
 // or two changes in a row (one email, of where it ended) need nothing else. Read from the
 // database's main copy (void-fbtee/db), so a change made a second ago is seen.
-import { bookings, events } from "@schema";
 import { defineQueue } from "void";
-import { eq } from "void/db";
 import { primaryDb } from "void-fbtee/db";
 import type { AppLocale } from "void-fbtee/locales";
 import { sendChangeEmail } from "../src/events/emails";
 import { isBehind, toldOf } from "../src/events/owed";
+import { bookingWithEvent, told } from "../src/events/store";
 import { textsFor, titleFor } from "../src/events/translations";
 import { originOr } from "../src/site";
 
@@ -30,11 +29,7 @@ export const retryDelay = 60;
 export default defineQueue<Message>(async (batch) => {
   for (const message of batch.messages) {
     const db = primaryDb();
-    const [row] = await db
-      .select({ booking: bookings, event: events })
-      .from(bookings)
-      .innerJoin(events, eq(events.id, bookings.event_id))
-      .where(eq(bookings.id, message.body.bookingId));
+    const row = await bookingWithEvent(db, message.body.bookingId);
     // Gone, cancelled (its cancellation says it), not yet confirmed (the confirmation will say it
     // as it is), or told already: nothing owed.
     if (
@@ -50,7 +45,7 @@ export default defineQueue<Message>(async (batch) => {
     const locale = booking.locale as AppLocale;
     // The title in their language where its translation is of the event as it is now, else as
     // written, marked with its language (titleFor: a translation of what it said before is never used).
-    const text = titleFor(event, await textsFor([event.id], locale), locale);
+    const text = titleFor(event, await textsFor([event.id], locale, db), locale);
     const was = {
       ...(booking.told_starts_at !== event.starts_at ? { startsAt: booking.told_starts_at! } : {}),
       ...(booking.told_ends_at !== event.ends_at ? { endsAt: booking.told_ends_at! } : {}),
@@ -74,7 +69,7 @@ export default defineQueue<Message>(async (batch) => {
       message.retry();
       continue;
     }
-    await db.update(bookings).set(toldOf(event)).where(eq(bookings.id, booking.id));
+    await told(db, booking.id, toldOf(event));
     message.ack();
   }
 });

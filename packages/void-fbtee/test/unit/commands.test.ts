@@ -4,9 +4,9 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vite-plus/test";
 import { copyFixture } from "./copy-fixture";
-import { check, markdownHash, TRANSLATED_FROM } from "../../src/check";
-import { loadProject, prepare } from "../../src/commands";
-import type { Project } from "../../src/catalogs";
+import { check, markdownHash, TRANSLATED_FROM } from "../../src/dev/check";
+import { loadProject, prepare } from "../../src/dev/commands";
+import type { Project } from "../../src/dev/catalogs";
 
 let root: string;
 let p: Project;

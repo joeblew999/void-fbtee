@@ -43,7 +43,7 @@ import { writeContentFiles } from "./content-files";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
 import type { FallbackLocales } from "fbtee";
-import { resolveLocales, sourceOf, type LocaleConfig, type LocaleInput } from "./locales";
+import { resolveLocales, sourceOf, type LocaleConfig, type LocaleInput } from "../locales";
 import {
   DEFAULT_SRC,
   DEFAULT_TRANSLATIONS,

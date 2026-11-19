@@ -15,10 +15,10 @@ import { VOID_INIT_DIR } from "./void-init";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vite-plus/test";
 import { copyFixture } from "./copy-fixture";
-import type { Project } from "../../src/catalogs";
-import { check, markdownPages, missingHead } from "../../src/check";
-import { loadProject, prepare } from "../../src/commands";
-import { init } from "../../src/init";
+import type { Project } from "../../src/dev/catalogs";
+import { check, markdownPages, missingHead } from "../../src/dev/check";
+import { loadProject, prepare } from "../../src/dev/commands";
+import { init } from "../../src/dev/init";
 import {
   agentProvenance,
   awaitsReview,
@@ -28,7 +28,7 @@ import {
   stamp,
   translateTask,
   waitingReview,
-} from "../../src/translate";
+} from "../../src/dev/translate";
 
 let root: string;
 let p: Project;

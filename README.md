@@ -119,7 +119,11 @@ vp upgrade && vp migrate   # upgrade Vite+, then vp check and the tests (Testing
 
 ## What's here
 
-- `packages/void-fbtee`: the package.
+- `packages/void-fbtee`: the package. Its `src/` is laid out as a Void app is
+  (`reference/structure.md`), so the code behind an app's file is at the same path: `queues/`,
+  `crons/`, `middleware/`, and `db/` (the schema, the database session `primaryDb()`, and every
+  query it runs, in `db/translations.ts`). `src/dev/` is what only the Vite plugin and the CLI load,
+  in Node, never in the Worker; the rest of `src/` runs in the Worker, some of it at build time too.
 - `apps/example`: a Void app using it, in three languages. Production:
   https://void-fbtee-example.gedw99.workers.dev
   ([its Worker on Cloudflare](https://dash.cloudflare.com/7384af54e33b8a54ff240371ea368440/workers/services/view/void-fbtee-example/production)).

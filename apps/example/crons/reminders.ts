@@ -9,9 +9,7 @@
 //
 // Cloudflare runs it on its Cron Trigger; in dev, Void's trigger runs it on demand
 // (`POST /__void/scheduled`, guide/jobs.md), as e2e/dev/jobs.test.ts does.
-import { bookings, events } from "@schema";
 import { defineScheduled } from "void";
-import { and, eq, gte, inArray, isNull, lt } from "void/db";
 import { primaryDb } from "void-fbtee/db";
 import { Temporal } from "temporal-polyfill";
 import type { AppLocale } from "void-fbtee/locales";
@@ -20,6 +18,8 @@ import { KEEP_TICKETS_MS, ticketKey, ticketPdf } from "@/events/tickets";
 import { storage } from "void/storage";
 import { originOr } from "@/site";
 import { textsFor, titleFor } from "@/events/translations";
+import { bookingsOfEvents, bookingsStartingBetween, startingBetween } from "@/events/store";
+import type { Db } from "void-fbtee/db";
 
 // 06:00 UTC every day: early morning in Bangkok, late evening before in the Americas.
 export const cron = "0 6 * * *";
@@ -35,44 +35,29 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  * window as the reminders, so each event's are deleted once. A ticket never printed is no matter:
  * R2 deletes what's there.
  */
-async function deleteOldTickets(from: number) {
-  const done = await primaryDb()
-    .select({ id: bookings.id })
-    .from(bookings)
-    .innerJoin(events, eq(events.id, bookings.event_id))
-    .where(
-      and(
-        gte(events.starts_at_utc, utc(from - KEEP_TICKETS_MS - DAY_MS)),
-        lt(events.starts_at_utc, utc(from - KEEP_TICKETS_MS)),
-      ),
-    );
+async function deleteOldTickets(db: Db, from: number) {
+  const done = await bookingsStartingBetween(
+    db,
+    utc(from - KEEP_TICKETS_MS - DAY_MS),
+    utc(from - KEEP_TICKETS_MS),
+  );
   // R2 deletes up to 1,000 keys a call (Cloudflare's R2 Workers API reference, checked 2026-11-14).
   for (let i = 0; i < done.length; i += 1000)
-    await storage.delete(done.slice(i, i + 1000).map((b) => ticketKey(b.id)));
+    await storage.delete(done.slice(i, i + 1000).map((id) => ticketKey(id)));
 }
 
 export default defineScheduled(async (controller, env) => {
   const from = controller.scheduledTime;
-  await deleteOldTickets(from);
-  // From the database's main copy (void-fbtee/db): a booking made a second ago is reminded too.
+  // From the database's main copy (void-fbtee/db), one session for the run: a booking made a second
+  // ago is reminded too.
   const db = primaryDb();
-  const soon = await db
-    .select()
-    .from(events)
-    .where(
-      and(
-        gte(events.starts_at_utc, utc(from)),
-        lt(events.starts_at_utc, utc(from + 24 * 60 * 60 * 1000)),
-        // A cancelled event's bookers get its cancellation, not a reminder.
-        isNull(events.cancelled_at),
-      ),
-    );
+  await deleteOldTickets(db, from);
+  // Events that are on: a cancelled event's bookers get its cancellation, not a reminder.
+  const soon = await startingBetween(db, utc(from), utc(from + DAY_MS));
   if (!soon.length) return;
   const ids = soon.map((e) => e.id);
-  const [booked, texts] = await Promise.all([
-    db.select().from(bookings).where(inArray(bookings.event_id, ids)),
-    textsFor(ids),
-  ]);
+  const booked = await bookingsOfEvents(db, ids);
+  const texts = await textsFor(ids, undefined, db);
   for (const b of booked) {
     const event = soon.find((e) => e.id === b.event_id)!;
     const text = titleFor(event, texts, b.locale);

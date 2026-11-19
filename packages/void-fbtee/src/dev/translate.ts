@@ -17,14 +17,19 @@ import {
   TRANSLATED_FROM_LINE,
   type MarkdownPage,
 } from "./check";
-import { sourceOf } from "./locales";
-import { sourceLanguageOf } from "./judge";
+import { sourceOf } from "../locales";
+import { sourceLanguageOf } from "../judge";
 import { check } from "./check";
-import { GEMINI, paymentAdvice, type Spent } from "./models";
-import type { Entry } from "./gemini";
+import { GEMINI, paymentAdvice, type Spent } from "../models";
+import type { Entry } from "../gemini";
 
-/** void-fbtee's own folder (dist/ is one level down), where skills/ ships. */
-export const packageDir = () => dirname(dirname(fileURLToPath(import.meta.url)));
+/** void-fbtee's own folder, where skills/ ships: the nearest one up with a package.json, so the
+ * same from dist/ (built) and from src/dev/ (the tests). */
+export function packageDir(): string {
+  let dir = dirname(fileURLToPath(import.meta.url));
+  while (!existsSync(join(dir, "package.json"))) dir = dirname(dir);
+  return dir;
+}
 
 /** The skill as the app sees it: through node_modules if it's installed there. */
 export function skillPath(root: string): string {

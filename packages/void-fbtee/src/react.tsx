@@ -42,7 +42,7 @@ import { languageEntries, normalize, visitorsOwn, type LanguageEntry } from "./l
 import { translationsFor } from "./runtime";
 export { langAttrs } from "./locales";
 import { install, documentI18n } from "./install";
-import type { SharedI18n } from "./middleware";
+import type { SharedI18n } from "./middleware/i18n";
 
 /**
  * Text formatted while rendering (Intl, or Temporal's toLocaleString), in a <span>. The server

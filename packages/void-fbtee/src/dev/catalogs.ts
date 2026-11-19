@@ -14,8 +14,8 @@ import {
   prepareTranslationsBatchSync,
   translateSync,
 } from "@nkzw/fbtee-compiler";
-import { translatedOf, type LocaleConfig } from "./locales";
-import { addVariants, pluralCategories, pluralSlots } from "./plurals";
+import { translatedOf, type LocaleConfig } from "../locales";
+import { addVariants, pluralCategories, pluralSlots } from "../plurals";
 
 // Where an app's strings can be: every folder of code in Void's project structure (Void's docs,
 // reference/structure.md: pages, routes, middleware, crons, queues, email, durable-objects, src),

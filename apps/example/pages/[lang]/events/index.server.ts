@@ -1,12 +1,11 @@
 // Upcoming events: only those not yet started, each with its title in the page's language where a
 // translation is stored (the sample events), and its seats left. Posting one is its own page
 // (new.server.ts), which clears this list.
-import { bookings, events } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
 import { fbs } from "fbtee";
 import { pageHead } from "void-fbtee/head";
-import { and, asc, count, eq, gte, isNull } from "void/db";
 import { primaryDb } from "void-fbtee/db";
+import { upcoming } from "../../../src/events/store";
 import { textFor, textsFor } from "../../../src/events/translations";
 
 export type Props = InferProps<typeof loader>;
@@ -23,28 +22,18 @@ export const revalidate = 60;
 // replica behind would cache the list from before a post, a change or a delete.
 export const loader = defineHandler(async (c) => {
   const { locale } = c.get("i18n");
+  // One session for its reads (plans/layout.md); seats taken come with the list, in one query.
   const db = primaryDb();
-  // Seats taken, per event, in the same query as the list.
-  const taken = db
-    .select({ event_id: bookings.event_id, n: count().as("n") })
-    .from(bookings)
-    .groupBy(bookings.event_id)
-    .as("taken");
-  const rows = await db
-    .select({ event: events, taken: taken.n })
-    .from(events)
-    .leftJoin(taken, eq(taken.event_id, events.id))
-    .where(and(gte(events.starts_at_utc, new Date().toISOString()), isNull(events.cancelled_at)))
-    .orderBy(asc(events.starts_at_utc));
+  const rows = await upcoming(db);
   // Their stored translations for this page (the page's language and its fallbacks), and for each
   // the best (textFor).
   const ids = rows.map((r) => r.event.id);
-  const texts = await textsFor(ids, locale);
+  const texts = await textsFor(ids, locale, db);
   return {
     events: rows.map(({ event, taken }) => ({
       ...event,
       text: textFor(event, texts, locale),
-      left: Math.max(0, event.seats - (taken ?? 0)),
+      left: Math.max(0, event.seats - taken),
     })),
   };
 });

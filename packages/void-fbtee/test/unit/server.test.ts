@@ -8,7 +8,7 @@ import { afterAll, beforeAll, describe, expect, test } from "vite-plus/test";
 import { copyFixture, makeBuildable } from "./copy-fixture";
 import { createBuilder, type Plugin } from "vite";
 import { langAttrs } from "../../src/locales";
-import { voidFbtee } from "../../src/plugin";
+import { voidFbtee } from "../../src/dev/plugin";
 
 let root: string;
 let probe: {

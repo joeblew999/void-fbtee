@@ -1,8 +1,7 @@
 // One event, by its id, with its seats left (the loader); booking a seat (the page's action); and,
 // for whoever posted it, changing it and deleting it (with the key from their private link).
-import { bookings, bookSchema, changeEventSchema, events, when } from "@schema";
+import { bookSchema, changeEventSchema, when } from "@schema";
 import { defineHandler, defineHead, type InferProps } from "void";
-import { and, count, eq, isNull, sql } from "void/db";
 import { queues } from "void/queues";
 import { storage } from "void/storage";
 import { z } from "zod";
@@ -17,7 +16,19 @@ import { eventTopic, live } from "../../../src/events/live";
 import { eventPages, textFor, textsFor } from "../../../src/events/translations";
 import { translateSoon, untranslated } from "void-fbtee/content";
 import { primaryDb } from "void-fbtee/db";
-import { endCancelled, tellBookers } from "../../../src/events/owed";
+import { tellBookers } from "../../../src/events/owed";
+import {
+  bookerLocales,
+  bookingExists,
+  bookingsOf,
+  bookSeat,
+  cancelEvent,
+  deleteIfDone,
+  eventById,
+  eventOn,
+  seatsTaken,
+  updateEvent,
+} from "../../../src/events/store";
 
 export type Props = InferProps<typeof loader>;
 
@@ -35,29 +46,25 @@ export const revalidate = 60;
 // an id that isn't one gets the not-found page (the loader) or a 404 (booking).
 const params = z.object({ id: z.string() });
 
-const booked = (db: ReturnType<typeof primaryDb>, id: string) =>
-  db
-    .select({ n: count() })
-    .from(bookings)
-    .where(eq(bookings.event_id, id))
-    .then(([row]) => row.n);
-
 // The event, its title and description in the page's language where a translation is stored (else
 // its fallbacks', else as its organiser wrote it: textFor), seats left,
 // and whether it can be deleted (a posted event, not a sample). Never its delete key's hash: the
 // page and its data are public, and cached. Read from the database's main copy (void-fbtee/db), as
-// the cache keeps what this returns. A cancelled event is gone to its readers: the not-found page.
+// the cache keeps what this returns; one session for all its reads (plans/layout.md). A cancelled
+// event is gone to its readers: the not-found page.
 export const loader = defineHandler.withValidator({ params })(async (c, { params: { id } }) => {
   const { locale } = c.get("i18n");
   const db = primaryDb();
-  const [row] = await db
-    .select()
-    .from(events)
-    .where(and(eq(events.id, id), isNull(events.cancelled_at)));
+  const row = await eventOn(db, id);
   if (!row) return c.notFound();
   const { delete_key_hash, ...event } = row;
-  const text = textFor(event, await textsFor([id], locale), locale);
-  return { event, text, left: event.seats - (await booked(db, id)), deletable: !!delete_key_hash };
+  const text = textFor(event, await textsFor([id], locale, db), locale);
+  return {
+    event,
+    text,
+    left: event.seats - (await seatsTaken(db, id)),
+    deletable: !!delete_key_hash,
+  };
 });
 
 /** Booking a seat: the page's own action (a POST to the page). */
@@ -70,33 +77,23 @@ const book = defineHandler.withValidator({ params, body: bookSchema })(async (
   const origin = new URL(c.req.url).origin;
   const db = primaryDb();
   // The booking's id comes from the form (bookSchema): one that's taken is refused, not a crash.
-  const [taken] = await db
-    .select({ id: bookings.id })
-    .from(bookings)
-    .where(eq(bookings.id, body.id));
-  if (taken) return c.json({ message: "booking id taken" }, 400);
-  // One statement, so two people can't take the last seat: the row goes in only while the event
-  // is on and has fewer bookings than seats. D1 runs each statement on the primary, one at a time.
-  // What the booker is told (told_*) is the event as it is in that same statement: their
-  // confirmation says it (src/events/owed.ts).
-  const result = await db.run(sql`
-    INSERT INTO ${bookings} (id, event_id, name, email, locale, time_zone, origin, ticket_in_reminder,
-      told_title, told_starts_at, told_ends_at, told_venue)
-    SELECT ${body.id}, ${id}, ${body.name}, ${body.email}, ${locale}, ${body.time_zone}, ${origin},
-      ${body.ticket_in_reminder ? 1 : 0}, title, starts_at, ends_at, venue
-    FROM ${events}
-    WHERE id = ${id} AND cancelled_at IS NULL
-      AND (SELECT COUNT(*) FROM ${bookings} WHERE event_id = ${id}) < seats`);
-  if (!result.meta.changes) {
-    // Nothing went in: the event is full, or there's no such event (or it's cancelled).
-    const [found] = await db
-      .select({ id: events.id })
-      .from(events)
-      .where(and(eq(events.id, id), isNull(events.cancelled_at)));
-    return found ? c.json({ message: "sold out" }, 409) : c.notFound();
-  }
-  const [event] = await db.select().from(events).where(eq(events.id, id));
-  const left = event.seats - (await booked(db, id));
+  if (await bookingExists(db, body.id)) return c.json({ message: "booking id taken" }, 400);
+  // Only while the event is on and has a seat left, in one statement (bookSeat); what the booker
+  // is told (told_*) is the event as it is then: their confirmation says it (src/events/owed.ts).
+  const booked = await bookSeat(db, {
+    id: body.id,
+    eventId: id,
+    name: body.name,
+    email: body.email,
+    locale,
+    timeZone: body.time_zone,
+    origin,
+    ticketInReminder: !!body.ticket_in_reminder,
+  });
+  // Nothing went in: the event is full, or there's no such event (or it's cancelled).
+  if (!booked) return (await eventOn(db, id)) ? c.json({ message: "sold out" }, 409) : c.notFound();
+  const event = (await eventById(db, id))!;
+  const left = event.seats - (await seatsTaken(db, id));
   // This event's page, in every language (the list shows each event's seats, not what's left).
   await clearCache({ paths: [`/[lang]/events/${id}`] });
   await live.publish(eventTopic(id), { left }, { type: "seats" });
@@ -120,25 +117,16 @@ const book = defineHandler.withValidator({ params, body: bookSchema })(async (
 const remove = defineHandler.withValidator({ params, body: z.object({ key: z.string().min(1) }) })(
   async (c, { params: { id }, body }) => {
     const db = primaryDb();
-    const [event] = await db
-      .select()
-      .from(events)
-      .where(and(eq(events.id, id), isNull(events.cancelled_at)));
+    const event = await eventOn(db, id);
     if (!event) return c.notFound();
     if (!(await deleteKeyMatches(body.key, event.delete_key_hash)))
       return c.json({ message: "wrong key" }, 403);
-    await db
-      .update(events)
-      .set({ cancelled_at: sql`(datetime('now'))` })
-      .where(eq(events.id, id));
-    // Everyone who booked, read after the event is marked: a booking can't go in once it is (book's
-    // statement), so none is missed.
-    const booked = await db
-      .select({ id: bookings.id })
-      .from(bookings)
-      .where(eq(bookings.event_id, id));
+    await cancelEvent(db, id);
+    // Everyone who booked, read after the event is marked: a booking can't go in once it is
+    // (bookSeat), so none is missed.
+    const booked = await bookingsOf(db, id);
     await Promise.all(booked.map((b) => queues.cancel.send({ bookingId: b.id })));
-    await endCancelled(db, id);
+    await deleteIfDone(db, id);
     await clearCache({ paths: eventPages(id) });
     await live.publish(eventTopic(id), {}, { type: "deleted" });
     return c.redirect(routeUrl("/[lang]/events"));
@@ -163,29 +151,22 @@ const change = defineHandler.withValidator({ params, body: changeEventSchema })(
   { params: { id }, body },
 ) => {
   const db = primaryDb();
-  const [event] = await db
-    .select()
-    .from(events)
-    .where(and(eq(events.id, id), isNull(events.cancelled_at)));
+  const event = await eventOn(db, id);
   if (!event) return c.notFound();
   if (!(await deleteKeyMatches(body.key, event.delete_key_hash)))
     return c.json({ message: "wrong key" }, 403);
-  const taken = await booked(db, id);
+  const taken = await seatsTaken(db, id);
   if (body.seats < taken) return c.json({ message: "fewer seats than are booked", taken }, 409);
   const times = when(body.local, body.local_end, body.time_zone);
   const venue = body.venue?.trim() || null;
-  await db
-    .update(events)
-    .set({
-      title: body.title,
-      description: body.description,
-      venue,
-      seats: body.seats,
-      ...times,
-      updatedAt: sql`(datetime('now'))`,
-    })
-    .where(eq(events.id, id));
-  await translateSoon("events", id, { changed: true });
+  await updateEvent(db, id, {
+    title: body.title,
+    description: body.description,
+    venue,
+    seats: body.seats,
+    ...times,
+  });
+  await translateSoon("events", id, { changed: true }, db);
   // Stored PDF tickets show the title, start, end and place: when one changed they go, so the next
   // download prints the new ones.
   if (
@@ -194,27 +175,16 @@ const change = defineHandler.withValidator({ params, body: changeEventSchema })(
     event.ends_at !== times.ends_at ||
     event.venue !== venue
   ) {
-    const ids = await db
-      .select({ id: bookings.id })
-      .from(bookings)
-      .where(eq(bookings.event_id, id));
+    const ids = await bookingsOf(db, id);
     if (ids.length) await storage.delete(ids.map((b) => ticketKey(b.id)));
   }
   // Languages still waiting for their translation are told when it lands (or fails); the rest now.
-  const waiting = (await untranslated("events", id))?.missing ?? [];
+  const waiting = (await untranslated("events", id, db))?.missing ?? [];
   const now = [...new Set(await bookerLocales(db, id))].filter((l) => !waiting.includes(l));
   if (now.length) await tellBookers(db, id, now);
   await clearCache({ paths: eventPages(id) });
   await live.publish(eventTopic(id), {}, { type: "changed" });
 });
-
-/** The languages the event's bookers booked in. */
-const bookerLocales = (db: ReturnType<typeof primaryDb>, id: string) =>
-  db
-    .selectDistinct({ locale: bookings.locale })
-    .from(bookings)
-    .where(eq(bookings.event_id, id))
-    .then((rows) => rows.map((r) => r.locale));
 
 // Void's named actions: booking on the page itself, changing on "?change", deleting on "?delete".
 export const actions = { default: book, change, delete: remove };

@@ -10,12 +10,11 @@
 // The confirmation is owed until it's sent: the booking's confirmed_at is set then, with what the
 // booker was told (src/events/owed.ts), so a message lost or out of tries is found by the sweep
 // (crons/owed.ts), and one already confirmed isn't sent twice (plans/reliable-work.md).
-import { bookings } from "@schema";
 import { defineQueue } from "void";
-import { eq, sql } from "void/db";
 import { primaryDb } from "void-fbtee/db";
 import { sendBookingEmail } from "../src/events/emails";
 import { toldOf } from "../src/events/owed";
+import { confirmed } from "../src/events/store";
 import { bookingTicket, ticketPdf } from "../src/events/tickets";
 
 type Message = { bookingId: string };
@@ -56,10 +55,7 @@ export default defineQueue<Message>(async (batch, env) => {
       message.retry({ delaySeconds: 60 });
       continue;
     }
-    await primaryDb()
-      .update(bookings)
-      .set({ confirmed_at: sql`(datetime('now'))`, ...toldOf(booking.event) })
-      .where(eq(bookings.id, message.body.bookingId));
+    await confirmed(primaryDb(), message.body.bookingId, toldOf(booking.event));
     message.ack();
   }
 });

@@ -11,11 +11,22 @@
 // Asking for a translation is recorded in that table, a "queued" row for the language, and asked
 // again only when that's more than an hour old: a page read many times while it waits, posting,
 // and the daily job all ask through it, so a row is paid for once, not once per view.
+//
+// The SQL is db/translations.ts's. Each function here takes the database session to use, from the
+// handler calling it (primaryDb()), so all of a page's or a job's reads share one: one trip to D1's
+// main copy. Without one, it opens its own.
 import config from "virtual:void-fbtee/config";
-import { sql } from "void/db";
 import { queues } from "void/queues";
-import { primaryDb } from "./db";
-import { QUEUED, translationsTableName, UNKNOWN } from "./db-schema";
+import { primaryDb, type Db } from "./db";
+import {
+  contentRow,
+  deleteOtherLanguages,
+  markAsked,
+  namedTranslations,
+  rowsShortOf,
+  translationRows,
+  upsertTranslation,
+} from "./db/translations";
 import { notePending } from "./content-pending";
 import { fingerprint } from "./fingerprint";
 import type { Spent } from "./models";
@@ -41,21 +52,6 @@ function tableOf(table: string): ContentTable {
 }
 
 const appLocales = () => config.locales.map((l) => l.locale);
-const ident = (name: string) => sql.identifier(name);
-const list = (values: string[]) =>
-  sql.join(
-    values.map((v) => sql`${v}`),
-    sql`, `,
-  );
-/** Translations someone can name: not "unknown" (being replaced), not "queued" (asked for). */
-const named = () => sql`${ident("translated_by")} NOT IN (${UNKNOWN}, ${QUEUED})`;
-// D1 takes at most 100 bound parameters a query (Cloudflare's D1 limits).
-const CHUNK = 90;
-const chunks = <T>(items: T[]) =>
-  Array.from({ length: Math.ceil(items.length / CHUNK) }, (_, i) =>
-    items.slice(i * CHUNK, (i + 1) * CHUNK),
-  );
-const changes = (result: unknown) => (result as { meta?: { changes?: number } }).meta?.changes ?? 0;
 
 /** One row of content: its id, the language it was written in, and its fields. */
 export interface Source {
@@ -85,16 +81,10 @@ const current = (from: string | null | undefined, now: string) => !from || from 
 export async function untranslated(
   table: string,
   id: string,
+  db: Db = primaryDb(),
 ): Promise<{ source: Source; from: string; missing: string[] } | undefined> {
-  const db = primaryDb();
   const { fields } = tableOf(table);
-  const rows = (await db.all(
-    sql`SELECT ${ident("id")}, ${ident("locale")}, ${sql.join(
-      fields.map((f) => ident(f)),
-      sql`, `,
-    )} FROM ${ident(table)} WHERE ${ident("id")} = ${id}`,
-  )) as Record<string, string>[];
-  const row = rows[0];
+  const row = await contentRow(db, table, fields, id);
   if (!row) return;
   const source: Source = {
     id: row.id!,
@@ -102,13 +92,7 @@ export async function untranslated(
     fields: Object.fromEntries(fields.map((f) => [f, row[f] ?? ""])),
   };
   const from = fieldsFingerprint(source.fields);
-  const have = (
-    (await db.all(
-      sql`SELECT ${ident("locale")} AS locale, ${ident("translated_from")} AS translated_from
-        FROM ${ident(translationsTableName(table))}
-        WHERE ${ident("source_id")} = ${id} AND ${named()}`,
-    )) as { locale: string; translated_from: string | null }[]
-  )
+  const have = (await namedTranslations(db, table, id))
     .filter((r) => current(r.translated_from, from))
     .map((r) => r.locale);
   return {
@@ -140,32 +124,20 @@ export async function storeTranslation(
   locale: string,
   fields: Record<string, string>,
   made: Made,
+  db: Db = primaryDb(),
 ): Promise<boolean> {
-  const db = primaryDb();
-  const t = translationsTableName(table);
-  const today = new Date().toISOString().slice(0, 10);
-  const json = JSON.stringify(
-    Object.fromEntries(Object.entries(fields).map(([k, v]) => [k, v.trim()])),
-  );
-  const result = await db.run(
-    sql`INSERT INTO ${ident(t)} (${ident("id")}, ${ident("source_id")}, ${ident("locale")}, ${ident("fields")},
-        ${ident("translated_by")}, ${ident("translated_at")}, ${ident("gateway_log_id")},
-        ${ident("usage")}, ${ident("translated_from")})
-      VALUES (${crypto.randomUUID()}, ${id}, ${locale}, ${json}, ${made.by}, ${today}, ${made.gatewayLogId ?? null},
-        ${made.usage ? JSON.stringify(made.usage) : null}, ${made.from ?? null})
-      ON CONFLICT (${ident("source_id")}, ${ident("locale")}) DO UPDATE SET
-        ${ident("fields")} = excluded.${ident("fields")},
-        ${ident("translated_by")} = excluded.${ident("translated_by")},
-        ${ident("translated_at")} = excluded.${ident("translated_at")},
-        ${ident("gateway_log_id")} = excluded.${ident("gateway_log_id")},
-        ${ident("usage")} = excluded.${ident("usage")},
-        ${ident("translated_from")} = excluded.${ident("translated_from")},
-        ${ident("updated_at")} = datetime('now')
-      WHERE ${ident(t)}.${ident("translated_by")} IN (${UNKNOWN}, ${QUEUED})
-        OR (${ident(t)}.${ident("translated_from")} IS NOT NULL
-          AND ${ident(t)}.${ident("translated_from")} <> excluded.${ident("translated_from")})`,
-  );
-  return changes(result) > 0;
+  return upsertTranslation(db, table, {
+    id,
+    locale,
+    fields: JSON.stringify(
+      Object.fromEntries(Object.entries(fields).map(([k, v]) => [k, v.trim()])),
+    ),
+    by: made.by,
+    at: new Date().toISOString().slice(0, 10),
+    gatewayLogId: made.gatewayLogId ?? null,
+    usage: made.usage ? JSON.stringify(made.usage) : null,
+    from: made.from ?? null,
+  });
 }
 
 /** The queue every translation goes through: the app's `queues/translate.ts`. */
@@ -185,27 +157,16 @@ export async function translateSoon(
   table: string,
   id: string,
   { changed = false }: { changed?: boolean } = {},
+  db: Db = primaryDb(),
 ): Promise<boolean> {
-  const db = primaryDb();
-  const found = await untranslated(table, id);
+  const found = await untranslated(table, id, db);
   if (!found?.missing.length) return false;
-  const t = ident(translationsTableName(table));
   let asked = 0;
   for (const locale of found.missing)
     // New: a "queued" row. There already (queued, an "unknown" translation, or one made before
     // the row changed): asked again only when its last asking is over an hour old. A current
     // translation someone can name isn't missing.
-    asked += changes(
-      await db.run(
-        sql`INSERT INTO ${t} (${ident("id")}, ${ident("source_id")}, ${ident("locale")}, ${ident("fields")}, ${ident("translated_by")})
-          VALUES (${crypto.randomUUID()}, ${id}, ${locale}, ${"{}"}, ${QUEUED})
-          ON CONFLICT (${ident("source_id")}, ${ident("locale")}) DO UPDATE SET ${ident("updated_at")} = datetime('now')
-          WHERE (${t}.${ident("translated_by")} IN (${QUEUED}, ${UNKNOWN})
-              OR (${t}.${ident("translated_from")} IS NOT NULL
-                AND ${t}.${ident("translated_from")} <> ${found.from}))
-            AND (${changed ? 1 : 0} = 1 OR ${t}.${ident("updated_at")} < datetime('now', '-1 hour'))`,
-      ),
-    );
+    if (await markAsked(db, table, id, locale, found.from, changed)) asked++;
   if (!asked) return false;
   await (
     queues as unknown as Record<string, { send(m: TranslateMessage): Promise<void> }>
@@ -219,25 +180,16 @@ export async function translateSoon(
  * one, is asked for (translateSoon: not one asked for in the last hour). Counted in the database,
  * one query a table. The daily job's work (void-fbtee/crons/translations).
  */
-export async function reconcile(): Promise<{ deleted: number; queued: number }> {
-  const db = primaryDb();
+export async function reconcile(
+  db: Db = primaryDb(),
+): Promise<{ deleted: number; queued: number }> {
   const locales = appLocales();
   let deleted = 0;
   let queued = 0;
   for (const table of contentTables().keys()) {
-    const t = ident(translationsTableName(table));
-    deleted += changes(
-      await db.run(sql`DELETE FROM ${t} WHERE ${ident("locale")} NOT IN (${list(locales)})`),
-    );
-    const rows = (await db.all(
-      sql`SELECT s.${ident("id")} AS id FROM ${ident(table)} s
-        WHERE (SELECT count(*) FROM ${t} x WHERE x.${ident("source_id")} = s.${ident("id")}
-          AND x.${ident("translated_by")} NOT IN (${UNKNOWN}, ${QUEUED})
-          AND x.${ident("locale")} <> s.${ident("locale")}
-          AND x.${ident("locale")} IN (${list(locales)}))
-        < ${locales.length} - (CASE WHEN s.${ident("locale")} IN (${list(locales)}) THEN 1 ELSE 0 END)`,
-    )) as { id: string }[];
-    for (const { id } of rows) if (await translateSoon(table, id)) queued++;
+    deleted += await deleteOtherLanguages(db, table, locales);
+    for (const id of await rowsShortOf(db, table, locales))
+      if (await translateSoon(table, id, {}, db)) queued++;
   }
   return { deleted, queued };
 }
@@ -260,28 +212,18 @@ export async function translationsFor(
   table: string,
   ids: string[],
   locale?: string,
+  db: Db = primaryDb(),
 ): Promise<Translation[]> {
-  const db = primaryDb();
   tableOf(table);
-  const t = ident(translationsTableName(table));
   const wanted = locale ? new Set(textLocales(locale)) : undefined;
-  const out: Translation[] = [];
-  for (const some of chunks([...new Set(ids)])) {
-    const rows = (await db.all(
-      sql`SELECT ${ident("source_id")} AS source_id, ${ident("locale")} AS locale, ${ident("fields")} AS fields,
-          ${ident("translated_from")} AS translated_from
-        FROM ${t} WHERE ${ident("source_id")} IN (${list(some)}) AND ${named()}`,
-    )) as { source_id: string; locale: string; fields: string; translated_from: string | null }[];
-    for (const r of rows)
-      if (!wanted || wanted.has(r.locale))
-        out.push({
-          source_id: r.source_id,
-          locale: r.locale,
-          fields: JSON.parse(r.fields),
-          from: r.translated_from,
-        });
-  }
-  return out;
+  return (await translationRows(db, table, ids))
+    .filter((r) => !wanted || wanted.has(r.locale))
+    .map((r) => ({
+      source_id: r.source_id,
+      locale: r.locale,
+      fields: JSON.parse(r.fields),
+      from: r.translated_from,
+    }));
 }
 
 /**

@@ -46,7 +46,7 @@ function points(): Point[] {
       ),
       code: [
         {
-          file: "packages/void-fbtee/src/check.ts",
+          file: "packages/void-fbtee/src/dev/check.ts",
           line: 'export const TRANSLATED_FROM = "translatedFrom";',
         },
       ],

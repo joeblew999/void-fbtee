@@ -1,5 +1,5 @@
 // A short fingerprint of what a translation was made from, to tell when it's out of date: a
-// markdown page's (check.ts markdownHash, its `translatedFrom`) and a post's fields
+// markdown page's (dev/check.ts markdownHash, its `translatedFrom`) and a post's fields
 // (content.ts, a translation's `translated_from`). The first 12 hex characters of SHA-256 of the
 // text's UTF-8, the same as Node's createHash("sha256") gives (test/unit/fingerprint.test.ts), so
 // pages translated before keep their fingerprints.

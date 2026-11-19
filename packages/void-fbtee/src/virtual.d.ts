@@ -26,7 +26,7 @@ declare module "virtual:void-fbtee/md-pages" {
 }
 
 declare module "virtual:void-fbtee/zod" {
-  /** Zod's own messages in the current language (plugin.ts, zodMessages); a no-op without Zod 4. */
+  /** Zod's own messages in the current language (dev/plugin.ts, zodMessages); a no-op without Zod 4. */
   export function setup(currentLocale: () => string | undefined): void;
 }
 

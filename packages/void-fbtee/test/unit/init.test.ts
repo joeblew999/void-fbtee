@@ -13,7 +13,7 @@ import {
 import { join, relative } from "node:path";
 import fbteeLint from "@nkzw/eslint-plugin-fbtee";
 import { afterEach, expect, test } from "vite-plus/test";
-import { init } from "../../src/init";
+import { init } from "../../src/dev/init";
 import { VOID_INIT_DIR } from "./void-init";
 
 const generated = (toolchain: string) => join(VOID_INIT_DIR, toolchain);

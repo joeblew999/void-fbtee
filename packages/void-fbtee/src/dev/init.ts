@@ -27,7 +27,7 @@ import {
 } from "./app-files";
 import { DEFAULT_TRANSLATIONS } from "./catalogs";
 import { checkSite } from "./site";
-import { packageManager } from "./translate";
+import { packageDir, packageManager } from "./translate";
 
 export interface InitOptions {
   root: string;
@@ -192,7 +192,7 @@ const OLD_RULE = "void-fbtee/no-show-count-no";
 
 /** Versions void-fbtee itself is built and tested with, for the app's package.json. */
 function testedVersions(): Record<string, string> {
-  const own = createRequire(import.meta.url)("../package.json") as {
+  const own = createRequire(join(packageDir(), "package.json"))("./package.json") as {
     devDependencies: Record<string, string>;
   };
   return own.devDependencies;

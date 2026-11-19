@@ -7,23 +7,19 @@
 // as the app reads), one allowed to start on a replica (`first-unconstrained`, Void's default), to
 // compare. Under /api, so Void never caches it. It reads nothing anyone posted: a constant.
 import { defineHandler } from "void";
-import { createDb, sql } from "void/db";
+import { createDb } from "void/db";
 import { env } from "void/env";
-
-type Meta = { served_by_primary?: boolean; served_by_region?: string };
+import type { Db } from "void-fbtee/db";
+import { timedRead } from "../../src/events/store";
 
 async function reads(session: "first-primary" | "first-unconstrained") {
-  const db = createDb((env as unknown as { DB: Parameters<typeof createDb>[0] }).DB, { session });
+  // The app's createDb types its schema in; the store takes void-fbtee/db's plain session type.
+  // The same D1 session either way.
+  const db = createDb((env as unknown as { DB: Parameters<typeof createDb>[0] }).DB, {
+    session,
+  }) as unknown as Db;
   const out = [];
-  for (let i = 0; i < 3; i++) {
-    const t = performance.now();
-    const result = (await db.run(sql`SELECT 1`)) as unknown as { meta: Meta };
-    out.push({
-      ms: Math.round(performance.now() - t),
-      primary: result.meta.served_by_primary ?? null,
-      region: result.meta.served_by_region ?? null,
-    });
-  }
+  for (let i = 0; i < 3; i++) out.push(await timedRead(db));
   return out;
 }
 

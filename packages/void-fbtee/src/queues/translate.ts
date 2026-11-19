@@ -17,9 +17,10 @@
 // erring, the account not paying), so the app can go on without it, as the row is written.
 import { defineQueue } from "void";
 import config from "virtual:void-fbtee/config";
-import { translateFields } from "./ai";
-import { contentTables, storeTranslation, untranslated, type TranslateMessage } from "./content";
-import { GEMINI, paymentAdvice, paymentProblem } from "./models";
+import { translateFields } from "../ai";
+import { contentTables, storeTranslation, untranslated, type TranslateMessage } from "../content";
+import { primaryDb } from "../db";
+import { GEMINI, paymentAdvice, paymentProblem } from "../models";
 
 // When the account isn't paying for the model (credits used up, a spend limit reached), an hour
 // before trying again: nothing changes sooner without someone (models.ts paymentProblem).
@@ -40,7 +41,10 @@ export function translationQueue({
   return defineQueue<TranslateMessage>(async (batch) => {
     for (const message of batch.messages) {
       const { table, id } = message.body;
-      const found = contentTables().has(table) ? await untranslated(table, id) : undefined;
+      // One database session for the message: its reads and stores share it, one trip to D1's main
+      // copy (plans/layout.md).
+      const db = primaryDb();
+      const found = contentTables().has(table) ? await untranslated(table, id, db) : undefined;
       // Gone (deleted, its translations with it), or a table the app no longer translates.
       if (!found) {
         message.ack();
@@ -60,12 +64,14 @@ export function translationQueue({
               app: config.app,
             });
             if (
-              await storeTranslation(table, id, locale, done.result, {
-                by: GEMINI.id,
-                gatewayLogId: done.logId,
-                usage: done.usage,
-                from: found.from,
-              })
+              await storeTranslation(
+                table,
+                id,
+                locale,
+                done.result,
+                { by: GEMINI.id, gatewayLogId: done.logId, usage: done.usage, from: found.from },
+                db,
+              )
             )
               await onTranslated?.(table, id, locale);
           }),
@@ -77,8 +83,9 @@ export function translationQueue({
         message.ack();
       } catch (error) {
         // Deleted while it was being translated: its translations can't go in (the foreign key
-        // refuses them), and there's nothing left to translate.
-        if (!(await untranslated(table, id))) {
+        // refuses them), and there's nothing left to translate. A session of its own: the
+        // message's may not see a delete made since its first read.
+        if (!(await untranslated(table, id, primaryDb()))) {
           message.ack();
           continue;
         }

@@ -2,10 +2,10 @@
 // fbtee and the rest resolve from the package's own node_modules. The caller removes it.
 import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { check, markdownPages } from "../../src/check";
-import { prepare } from "../../src/commands";
-import { voidFbtee, type VoidFbteeApi, type VoidFbteeOptions } from "../../src/plugin";
-import { stamp } from "../../src/translate";
+import { check, markdownPages } from "../../src/dev/check";
+import { prepare } from "../../src/dev/commands";
+import { voidFbtee, type VoidFbteeApi, type VoidFbteeOptions } from "../../src/dev/plugin";
+import { stamp } from "../../src/dev/translate";
 
 export const FIXTURE = join(import.meta.dirname, "fixture");
 
@@ -58,7 +58,7 @@ export function makeBuildable(root: string, options: VoidFbteeOptions): void {
       translations: { translation: string }[];
       translatedBy?: string;
     }[]) {
-      // Who translated it, as the build asks (check.ts): the tests, by hand (not a model, not
+      // Who translated it, as the build asks (dev/check.ts): the tests, by hand (not a model, not
       // Claude); a translation the test wrote itself stays as it is, and says who only if it didn't.
       if (entry.status === "translated") {
         entry.translatedBy ??= "the tests";

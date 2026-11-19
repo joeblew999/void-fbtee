@@ -601,7 +601,7 @@ test.skipIf(!!process.env.E2E_URL)(
     const worker = globSync(join(EXAMPLE, "dist/ssr/**/*.js"));
     expect(worker.length).toBeGreaterThan(0);
     // One copy of fbtee's per-request state: the Vite plugin keeps fbtee out of the server's
-    // pre-bundling, so `fbtee` and `fbtee/server` share one core (packages/void-fbtee/src/plugin.ts).
+    // pre-bundling, so `fbtee` and `fbtee/server` share one core (packages/void-fbtee/src/dev/plugin.ts).
     // Counted by what defines it: the middleware and void-fbtee/server both call runWithFbtee, so
     // the name appears in more than one file.
     expect(worker.filter((f) => read(f).includes("function runWithFbtee("))).toHaveLength(1);

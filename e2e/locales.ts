@@ -2,7 +2,7 @@
 // the way void-fbtee's plugin reads them. Tests that cover every language use these; tests that
 // check one language's own output (Arabic digits, Thai text) name it.
 import { join } from "node:path";
-import { loadProject } from "../packages/void-fbtee/src/commands";
+import { loadProject } from "../packages/void-fbtee/src/dev/commands";
 
 const { config } = await loadProject(join(import.meta.dirname, "../apps/example"));
 /** The language the code is written in. */

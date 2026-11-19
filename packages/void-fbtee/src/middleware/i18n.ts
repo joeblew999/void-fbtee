@@ -24,7 +24,7 @@ import config from "virtual:void-fbtee/config";
 import catalogs from "virtual:void-fbtee/catalogs";
 import { matchedRoutes } from "virtual:void-fbtee/hono-route";
 import markdownPages from "virtual:void-fbtee/md-pages";
-import { meta, type MetaTag } from "./head";
+import { meta, type MetaTag } from "../head";
 import {
   localeFromPath,
   META_NAME,
@@ -32,16 +32,16 @@ import {
   type AppLocale,
   type Dir,
   type Lang,
-} from "./locales";
-import { acceptedLanguages, negotiate } from "./negotiate";
-import { allTranslations } from "./runtime";
+} from "../locales";
+import { acceptedLanguages, negotiate } from "../negotiate";
+import { allTranslations } from "../runtime";
 import { setup as setupZod } from "virtual:void-fbtee/zod";
 import dev from "virtual:void-fbtee/dev";
-import { currentLocale, runIn, siteOrigin } from "./server";
-import { withPending } from "./content-pending";
+import { currentLocale, runIn, siteOrigin } from "../server";
+import { withPending } from "../content-pending";
 
 // Zod's own validation messages (a form's errors) in each request's language, when the app has
-// Zod 4 (plugin.ts, zodMessages).
+// Zod 4 (dev/plugin.ts, zodMessages).
 setupZod(currentLocale);
 
 export interface SharedI18n {

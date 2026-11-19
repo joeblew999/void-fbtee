@@ -1,5 +1,5 @@
 // `vp run translations:reviews`: how the machine translations fared in Claude's reviews
-// (plans/translation-rework.md, step 7), from the review each catalog entry keeps (translate.ts
+// (plans/translation-rework.md, step 7), from the review each catalog entry keeps (packages/void-fbtee/src/dev/translate.ts
 // Review): per language and translator, how many were reviewed, how many were right, and what was
 // wrong. So a change to the prompt, the checks or the skill has its before and after.
 import { readdirSync, readFileSync } from "node:fs";

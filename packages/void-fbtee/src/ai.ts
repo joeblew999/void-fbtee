@@ -1,7 +1,7 @@
 // Translating with Void's AI (`ai` from `void/ai`), in the app's Worker. One translator for
 // everything: the app's own strings and pages while `vp dev` runs (the dev server's route,
 // devTranslate below, which plugin.ts and translate.ts call), and what people post, at runtime (an
-// app's queue: queue-translate.ts). What's sent and how the answer is read: gemini.ts.
+// app's queue: queues/translate.ts). What's sent and how the answer is read: gemini.ts.
 //
 // Void's AI is there wherever Void runs the app's code: dev, the preview and Cloudflare, in a
 // route, a queue or a job (found 2026-11-13, plans/quiet-harbor-atlas.md, 7b). Void only connects
@@ -145,7 +145,7 @@ export async function translateString(
 /**
  * A post's fields (an event's title and description, say) into `to`, by name: asked, checked
  * (judge.ts fieldProblems), and asked once more if anything was wrong. Still wrong: an error, so
- * the queue tries again later (queue-translate.ts).
+ * the queue tries again later (queues/translate.ts).
  */
 export async function translateFields<K extends string>(
   fields: Record<K, string>,
@@ -188,7 +188,7 @@ export async function translatePage(
   };
 }
 
-/** What the dev server sends its route (translate.ts routeCall). */
+/** What the dev server sends its route (dev/translate.ts routeCall). */
 export type DevRequest = {
   /** The app's name, for the gateway's logs (its package.json name). */
   app?: string;

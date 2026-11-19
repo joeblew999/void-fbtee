@@ -19,3 +19,6 @@ export function primaryDb() {
     session: "first-primary",
   });
 }
+
+/** A database session, as primaryDb() gives one: pass it on, so a handler's reads share it. */
+export type Db = ReturnType<typeof primaryDb>;

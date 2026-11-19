@@ -8,10 +8,8 @@
 // The Emails and PDFs pages' sample ticket is printed the same way, kept under a hash of its HTML:
 // printed again only when the ticket's look or words change, and the version before it deleted.
 // A booking's ticket is deleted a week after its event started (crons/reminders.ts).
-import { bookings, events } from "@schema";
 import { fbs } from "fbtee";
 import { Temporal } from "temporal-polyfill";
-import { and, eq, isNull } from "void/db";
 import { primaryDb } from "void-fbtee/db";
 import { storage } from "void/storage";
 import { langAttrs, type AppLocale } from "void-fbtee/locales";
@@ -22,6 +20,7 @@ import { originOr, SITE } from "@/site";
 import { sha256Hex } from "@/sha256";
 import { printImage, printPdf } from "@/pdf";
 import { during, type EventFor } from "./emails";
+import { bookingWithEvent } from "./store";
 import { ticketHtml } from "./TicketLayout";
 import { textsFor, titleFor } from "./translations";
 
@@ -73,15 +72,12 @@ export function ticketPage(ticket: TicketFor): Promise<string> {
  * booking may have been made a second ago.
  */
 export async function bookingTicket(id: string) {
-  const [row] = await primaryDb()
-    .select({ booking: bookings, event: events })
-    .from(bookings)
-    .innerJoin(events, eq(events.id, bookings.event_id))
-    .where(and(eq(bookings.id, id), isNull(events.cancelled_at)));
-  if (!row) return undefined;
+  const db = primaryDb();
+  const row = await bookingWithEvent(db, id);
+  if (!row || row.event.cancelled_at) return undefined;
   const { booking, event } = row;
   const locale = booking.locale as AppLocale;
-  const text = titleFor(event, await textsFor([event.id], locale), locale);
+  const text = titleFor(event, await textsFor([event.id], locale, db), locale);
   const page = await inLocale(locale, () =>
     routeUrl("/[lang]/events/[id]", { params: { id: event.id } }),
   );

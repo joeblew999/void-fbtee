@@ -5,8 +5,14 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vite-plus/test";
 import { copyFixture } from "./copy-fixture";
 import { build } from "vite";
-import { voidFbtee } from "../../src/plugin";
-import { collect, missing, runtimeCatalog, runtimeTexts, type Project } from "../../src/catalogs";
+import { voidFbtee } from "../../src/dev/plugin";
+import {
+  collect,
+  missing,
+  runtimeCatalog,
+  runtimeTexts,
+  type Project,
+} from "../../src/dev/catalogs";
 import { resolveLocales } from "../../src/locales";
 
 let root: string;
@@ -96,7 +102,7 @@ export const nights = (count: number) => (
 
   test("prepare makes the source's own catalog, with only the counted string, in all its forms", async () => {
     withNights();
-    const { prepared, sourceNeedsCatalog } = await import("../../src/catalogs");
+    const { prepared, sourceNeedsCatalog } = await import("../../src/dev/catalogs");
     expect(sourceNeedsCatalog(arabic())).toBe(true);
     const own = prepared(arabic()).find((c) => c.locale === "ar-EG")!;
     const texts = runtimeTexts(arabic());
@@ -119,7 +125,7 @@ export const nights = (count: number) => (
 
   test("an English or Thai source needs none", async () => {
     withNights();
-    const { sourceNeedsCatalog } = await import("../../src/catalogs");
+    const { sourceNeedsCatalog } = await import("../../src/dev/catalogs");
     expect(sourceNeedsCatalog(project())).toBe(false);
     expect(
       sourceNeedsCatalog({ ...project(), config: resolveLocales("th-TH", ["th-TH", "en-US"]) }),

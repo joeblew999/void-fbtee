@@ -13,7 +13,10 @@ what it changes; this list is the only place that says when.
 5. `use-cases.md`: one event, many people, as data, built on the primitives.
 6. `video-conferencing.md`: `void-moq`, built on all of the above.
 
-Now: `reliable-work.md`: work done in order and nothing lost: the database records what's owed,
+Now: `layout.md`: the package's `src/` laid out as a Void app's folders, and every query in one file each
+(the app's `src/events/store.ts`, the package's `src/db/translations.ts`), one database session per handler.
+
+Before it: `reliable-work.md`: work done in order and nothing lost: the database records what's owed,
 one step starts the next, decisions read the main database, a sweep after crashes.
 
 Waiting on others, not in the order:
