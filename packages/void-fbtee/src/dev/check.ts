@@ -13,6 +13,7 @@ import {
 import { problemsWith } from "../judge";
 import { fingerprint } from "../fingerprint";
 import { firstFile, hasI18nMiddleware, HOME_PAGES, LAYOUTS, VOID_CONFIGS } from "./app-files";
+import { keepTranslations, wiringProblems } from "./gen";
 import { sourceOf, translatedOf } from "../locales";
 
 /** Frontmatter key a translated markdown page records its original's hash in. */
@@ -246,16 +247,10 @@ export function check(p: Project): string[] {
       );
   }
 
-  // What people write, translated by the package (`void-fbtee gen translations`): its queue needs
-  // Void's AI, which Void connects only when the app's own files import it.
-  const queue = join(p.root, "queues/translate.ts");
-  if (existsSync(queue)) {
-    const text = readFileSync(queue, "utf8");
-    if (text.includes("void-fbtee/queues/translate") && !/["']void\/ai["']/.test(text))
-      problems.push(
-        `content: queues/translate.ts doesn't import "void/ai", so Void doesn't connect its AI: add import "void/ai";`,
-      );
-  }
+  // What people write, translated by the package (plans/like-better-auth.md): each translations
+  // table void-fbtee keeps is the one it writes for its list (never rewritten here: `vp dev` does),
+  // and the app's own files are wired to it.
+  problems.push(...keepTranslations(p.root, false).problems, ...wiringProblems(p.root));
 
   // Untranslated strings, by fbtee's own rule (same count as the plugin's report).
   for (const r of missing(p)) {

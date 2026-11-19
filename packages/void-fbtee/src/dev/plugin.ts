@@ -39,6 +39,7 @@ import {
   waitingReview,
 } from "./translate";
 import { check } from "./check";
+import { keepTranslations } from "./gen";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
 import type { FallbackLocales } from "fbtee";
@@ -306,6 +307,20 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
 
   const api: VoidFbteeApi = { options, project };
 
+  /** The translations tables void-fbtee keeps, rewritten where they aren't its current ones. */
+  const keepTables = () => {
+    try {
+      const { rewritten, problems } = keepTranslations(root, true);
+      if (rewritten.length)
+        log(
+          `rewrote ${rewritten.join(", ")} to void-fbtee's translations table: if its columns changed, vp exec void db generate`,
+        );
+      for (const p of problems) log(p);
+    } catch (error) {
+      log(`couldn't keep the translations tables: ${String(error)}`);
+    }
+  };
+
   const core: Plugin = {
     name: "void-fbtee",
     enforce: "pre",
@@ -344,6 +359,10 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       } catch (error) {
         server.config.logger.warn(`void-fbtee: couldn't prepare: ${String(error)}`);
       }
+      // The translations tables void-fbtee keeps, made the package's current ones, as Void
+      // rewrites its Better Auth tables (plans/like-better-auth.md); and again on each save in
+      // db/schema/ (watchChange).
+      keepTables();
       // The route's token, for a request from outside the dev server (a script, a test by hand),
       // as Void keeps its own dev trigger token in a file (.void/dev-trigger-token).
       try {
@@ -363,6 +382,9 @@ export function voidFbtee(options: VoidFbteeOptions): Plugin[] {
       if (!devServer || !isClient(this.environment)) return;
       const rel = relative(root, file).split(sep).join("/");
       if (rel.startsWith("..")) return;
+      // A schema file saved (a list of fields changed, a table renamed): the kept tables follow.
+      // Rewriting one is another save, which then finds nothing to change.
+      if (rel.startsWith("db/schema/") && event !== "delete") keepTables();
       // A markdown page the agent marked done: record which version of the original it's from.
       // That write is another save, which then finds the page recorded.
       if (/\.mdx?$/.test(file) && event !== "delete" && existsSync(file)) {

@@ -122,9 +122,11 @@ vp upgrade && vp migrate   # upgrade Vite+, then vp check and the tests (Testing
 - `packages/void-fbtee`: the package. Its `src/` is laid out as a Void app is
   (`reference/structure.md`), so the code behind an app's file is at the same path: `queues/`,
   `crons/`, `middleware/`, and `db/` (the shape of a translations table, and every query it runs,
-  in `db/translations.ts`). It owns no table and no database session: an app's translations tables
-  are its own, written by `void-fbtee gen translations` as plain Drizzle, and the app hands over its
-  schema, session and queue (`translatedContent(schema, { db, queue })`), so every type comes from the app
+  in `db/translations.ts`). It owns no database session: an app's translations table is plain
+  Drizzle in its own `db/schema/`, kept by the package as Void keeps Better Auth's (`vp dev`
+  rewrites it to the current one, `vp build` checks it; the app's part is its list of fields:
+  `plans/like-better-auth.md`), and the app hands over its schema, session and queue
+  (`translatedContent(schema, { db, queue })`), so every type comes from the app
   (`plans/types-from-schema.md`). `src/dev/` is what only the Vite plugin and the CLI load, in Node,
   never in the Worker; the rest of `src/` runs in the Worker, some of it at build time too.
 - `apps/example`: a Void app using it, in three languages. Production:

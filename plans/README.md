@@ -13,11 +13,12 @@ what it changes; this list is the only place that says when.
 5. `use-cases.md`: one event, many people, as data, built on the primitives.
 6. `video-conferencing.md`: `void-moq`, built on all of the above.
 
-Next: `like-better-auth.md`: the translations table kept by the package, as Void keeps Better
-Auth's (rewritten by `vp dev`, checked by `vp build`), the app keeping only its list of fields; then
-the issue in `void-package-schema-issue.md` is filed. Waits for the user's approval.
+Next: `no-casts.md`: no casts in the package; its "Void's types" part through files the package
+keeps in the app, as Void keeps `.void/`. Approved by the user (2026-11-19).
 
-Before it: `types-from-schema.md`: built, committed locally.
+Before it: `like-better-auth.md`: the translations table kept by the package, as Void keeps Better
+Auth's; built, committed locally. Then the user files `void-package-schema-issue.md`.
+`types-from-schema.md`: built, committed locally.
 
 Now: `layout.md`: the package's `src/` laid out as a Void app's folders, and every query in one file each
 (the app's `src/events/store.ts`, the package's `src/db/translations.ts`), one database session per handler.

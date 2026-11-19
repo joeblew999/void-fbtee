@@ -269,16 +269,21 @@ fields to translate are text. Name the table and its fields, once, in the app's 
 vp exec void-fbtee gen translations events title description
 ```
 
-It writes ordinary files at Void's own places, once, and never over one that's there (what it
-can't write, it says): they're the app's own from then on.
+It writes ordinary files at Void's own places. The translations table is kept by void-fbtee, as
+Void keeps Better Auth's tables; the rest are the app's, written once and never over one that's
+there (what it can't write, it says):
 
-- `db/schema/events_translations.ts`: plain Drizzle, re-exported from `db/schema.ts`. The row's id,
-  the language, the fields as JSON typed from the table's own columns
-  (`Pick<typeof events.$inferSelect, "title" | "description">`), who made it (`translatedBy`, the
-  AI Gateway log, what it cost, what it was made from). Beside it, `events_translations_fields`,
-  the list of fields, which is how void-fbtee knows them when it runs. Deleting a row deletes its
-  translations (the foreign key cascades). Then run `vp exec void db generate` in a terminal, for
-  its migration.
+- `db/schema/events_translations.ts`, kept by void-fbtee (its first line says so), re-exported from
+  `db/schema.ts`. The app's part is one line, the list of fields,
+  `export const events_translations_fields = ["title", "description"] as const`: change it to
+  translate other columns (text ones). The rest is the package's table: the row's id, the
+  language, the fields as JSON typed through that list from the table's own columns
+  (`Pick<typeof events.$inferSelect, …>`), who made it (`translatedBy`, the AI Gateway log, what it
+  cost, what it was made from). `vp dev` rewrites the rest whenever it isn't the package's current
+  table (after upgrading void-fbtee, say), and says so: then run `vp exec void db generate` in a
+  terminal, for its migration. `vp build` never rewrites it: it fails while it isn't. The app's
+  formatter is welcome (quotes, semicolons, commas don't count). Deleting a row deletes its
+  translations (the foreign key cascades).
 - `src/content.ts`: `export const content = translatedContent(schema, { db, queue })`, the app's
   schema (`import * as schema from "@schema"`), its database session and its translate queue
   (`queue: (): TranslateQueue => queues.translate`, typed by Void from `queues/translate.ts`; the
@@ -298,6 +303,9 @@ can't write, it says): they're the app's own from then on.
 - `middleware/99.i18n.ts`: `i18nMiddleware({ content })` from `void-fbtee/middleware`, so a page
   that showed a row not yet in its language asks for the translation. Without it, that page's log
   says so.
+
+`vp build` fails, saying the line to add, while one of the app's files is missing or not wired to
+the content, as Void would wire Better Auth's routes itself.
 
 To show it, from the app's `content`: `content.translationsFor(events, ids, locale)` gets the
 stored translations a page in `locale` can show, and `content.textOf(events, row, translations,

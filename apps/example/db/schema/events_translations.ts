@@ -1,13 +1,13 @@
-// What people write in events (title, description), in the app's other languages, with who
-// made each translation.
-// Written by `void-fbtee gen translations events title description`: the app's own now.
-// void-fbtee finds it by its name and the list of fields beside it (src/content.ts hands it the
-// schema). Deleting a row of events deletes its translations.
+// Kept by void-fbtee: the list of fields is the app's; the rest is void-fbtee's translations table,
+// rewritten by `vp dev` to the one the package writes for that list, as Void keeps Better Auth's
+// tables (plans/like-better-auth.md in void-fbtee). To translate other columns of events, change
+// the list; `vp build` fails while the rest isn't what void-fbtee writes. Deleting a row of
+// events deletes its translations.
 import { sql } from "void/db";
 import { sqliteTable, text, uniqueIndex } from "void/schema-d1";
 import { events } from "./events";
 
-/** The columns of events that are translated. */
+/** The columns of events that are translated: the app's to change. */
 export const events_translations_fields = ["title", "description"] as const;
 
 export const events_translations = sqliteTable(

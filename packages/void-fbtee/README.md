@@ -170,12 +170,15 @@ runs, the same on a developer's machine as in CI. There are no i18n scripts.
 
 **What people post.** Run `vp exec void-fbtee gen translations events title description` and
 void-fbtee translates every row of `events` into the app's languages, and again when a row is
-changed (call `content.translateSoon(events, id, { changed: true })` when it is). It writes, once,
-ordinary files the app owns at Void's own places: `db/schema/events_translations.ts` (plain
-Drizzle, its fields typed from the table's own columns), `src/content.ts` (the app's schema, database and
-queue handed to the package), `queues/translate.ts` and `crons/translations.ts`. Every function
-is typed from the app's schema: a table with no translations, or a field it doesn't translate,
-doesn't compile. Then `vp exec void db generate` makes the table's migration. The SKILL's "What
+changed (call `content.translateSoon(events, id, { changed: true })` when it is). It writes
+ordinary files at Void's own places. `db/schema/events_translations.ts` is kept by void-fbtee, as
+Void keeps Better Auth's tables: the list of fields in it is the app's, and the rest (plain
+Drizzle, its fields typed from the table's own columns) is rewritten by `vp dev` to the package's
+current table, and checked by `vp build`. `src/content.ts` (the app's schema, database and queue
+handed to the package), `queues/translate.ts` and `crons/translations.ts` are the app's, written
+once; `vp build` fails while one is missing. Every function is typed from the app's schema: a
+table with no translations, or a field it doesn't translate, doesn't compile. Then
+`vp exec void db generate` makes the table's migration. The SKILL's "What
 people post" has the rest.
 
 **What translating costs, and where the text goes.** Void's AI translates with Google's Gemini 4

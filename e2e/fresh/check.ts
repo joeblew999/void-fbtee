@@ -804,11 +804,12 @@ function checkMacLockfile(target: string, dir: string) {
 }
 
 /**
- * What people write, translated by the package (plans/types-from-schema.md), as a developer adds
- * it to a new app: a table of their own, then `void-fbtee gen translations` writes the app's files
- * at Void's places (the translations table, src/content.ts, the queue, the job, the middleware
- * given the content), `void db generate` makes the table's migration, and the app builds and
- * typechecks: every type it uses comes from its own schema.
+ * What people write, translated by the package (plans/types-from-schema.md,
+ * plans/like-better-auth.md), as a developer adds it to a new app: a table of their own, then
+ * `void-fbtee gen translations` writes the kept translations table and the app's files at Void's
+ * places (src/content.ts, the queue, the job, the middleware given the content), `void db generate`
+ * makes the table's migration, and the app builds and typechecks: every type it uses comes from its
+ * own schema. Then the build fails while the queue is missing.
  */
 async function translatedContent(target: string, dir: string, app: App) {
   mkdirSync(join(dir, "db/schema"), { recursive: true });
@@ -848,6 +849,18 @@ async function translatedContent(target: string, dir: string, app: App) {
   run(...exec(app.pm, "vp", "build"), dir);
   run(...exec(app.pm, "tsc", "--noEmit"), dir);
   check(true, `${target}: with its migration, builds and typechecks`);
+  // The app's own files are checked, as Void wires Better Auth's routes itself
+  // (plans/like-better-auth.md): without the queue, the build fails, naming it.
+  const queue = join(dir, "queues/translate.ts");
+  const own = readFileSync(queue, "utf8");
+  rmSync(queue);
+  check(
+    /queues\/translate\.ts doesn't run void-fbtee's queue/.test(
+      failing(...exec(app.pm, "vp", "build"), dir),
+    ),
+    `${target}: vp build fails while queues/translate.ts is missing, naming it`,
+  );
+  writeFileSync(queue, own);
 }
 
 /**

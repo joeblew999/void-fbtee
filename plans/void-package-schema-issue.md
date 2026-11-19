@@ -32,9 +32,18 @@ Today a package can't put a table into an app's schema the way Void does for Bet
 
 ## What we do meanwhile
 
-The package now generates plain Drizzle into the app's own `db/schema/` (`void-fbtee gen translations events title description`), once, like `void gen model`, and the app owns it. Its package functions are typed by the schema the app hands them (`import * as schema from "@schema"`, as `defineSeed` does). That works, and `void db generate` treats the table as the app's own.
+As close to Better Auth's as a package can get today ([plans/like-better-auth.md](https://github.com/joeblew999/void-fbtee/blob/main/plans/like-better-auth.md)):
 
-What it costs: the package can't update the table's shape later the way Void updates Better Auth's (a new column means each app regenerates or edits by hand), and every app carries a file it didn't write.
+- `void-fbtee gen translations events title description` writes plain Drizzle into the app's own `db/schema/events_translations.ts`. Its first line marks it as kept by the package. The app's part is one line, the list of fields; the table's `fields` type is built from that list and the source table's own columns.
+- The package's Vite plugin rewrites the rest of the file whenever it isn't the package's current table: as `vp dev` starts, and on each save in `db/schema/`. That's the job Void's `prepareProject` does for `.void/better-auth-schema.ts`, only where the file differs. `vp build` never writes: it fails while the file isn't current. The app's formatter is allowed (quotes, semicolons, commas don't count).
+- The app's own files (`src/content.ts`, which hands the package `import * as schema from "@schema"`, its session and its queue, as `defineSeed` takes the schema; `queues/translate.ts`; `crons/translations.ts`; the middleware) are written once and checked by `vp build`, which names the line missing.
+- `void db generate` treats the table as the app's own ("No schema changes" on our example after the switch). Every package function is typed from the schema; a table without translations, or a field it doesn't translate, fails to compile.
+
+What it still costs, and only Void can change:
+
+- **The file has to be in the app's `db/schema/` and in git**, not in `.void/`: `void db generate`, `void prepare` and a fresh clone's type check run none of the package's code, so nothing would write it for them. And a file outside `db/schema/` that imports `void/db` loops (#472).
+- **Void's own commands don't refresh it.** After upgrading the package, it's `vp dev` (or the build failing) that brings the new table, where Void's `prepareProject` refreshes Better Auth's in every command.
+- **Void doesn't wire the package's queue, job and middleware**, as it wires Better Auth's routes. The app holds those files, and the build checks them.
 
 ## What would help, if it fits Void's design
 

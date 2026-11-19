@@ -76,3 +76,10 @@ Globalping figures after it wait for a deploy.
   time varies a lot by call (plans/reliable-work.md): a cold start puts this one near its limit.
   In the full `test:dev` run after `plans/types-from-schema.md` (2026-11-19), it passed in 7.5 s.
   Still watched: one slow Gemini call can put it past its wait again.
+- 2026-11-19, after `plans/like-better-auth.md`: a second test, `e2e/dev/jobs.test.ts` "the translate
+  queue on its own", waited past Playwright's default 30 s for the Thai title once, in a run where
+  Gemini was slow throughout (the route tests 41 s and 57 s, against 16 s and 22 s before). Alone it
+  passed, in 28 s. Both tests wait on one post's translation, and Gemini 4 Hydrogen took 7 to 28 s
+  for one: that's also how long a reader waits for the Thai page. The timeouts stay (they're the
+  tools' own); what to look at is the translation's time itself (its thinking, `thinkingLevel`, or a
+  faster model for posts), measured before anything changes.

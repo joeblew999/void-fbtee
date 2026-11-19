@@ -1,7 +1,8 @@
 # plans/like-better-auth.md: the translations table kept by the package, as Void keeps Better Auth's
 
-Status: 2026-11-19, written; waits for the user's approval in the conversation. Then the issue in
-`plans/void-package-schema-issue.md` is filed (by the user), showing how close a package can get.
+Status: 2026-11-19, approved by the user in the conversation; built, committed locally. Then the
+issue in `plans/void-package-schema-issue.md` is filed (by the user), showing how close a package
+can get; its "What we do meanwhile" says what was built.
 
 ## How Void keeps Better Auth's tables (Void 1.8.0, `dist/prepare-*.mjs`, read 2026-11-19)
 
@@ -55,6 +56,20 @@ nothing would change it in an app: each would have to regenerate it or edit it b
   failing) is what brings the new table, not Void's commands.
 - **Void doesn't wire the queue, the job and the middleware**, as it wires Better Auth's routes: the
   app holds those files, and the build checks them.
+
+## As built (2026-11-19)
+
+- `src/dev/gen.ts`: `keepTranslations(root, write)` (the kept files found by their first line,
+  `// Kept by void-fbtee:`), `wiringProblems(root)`, `genTranslations`. `vp dev` keeps the tables as
+  it starts and on each save in `db/schema/` (`src/dev/plugin.ts`); `check()` (so `vp build`)
+  reports both without writing.
+- Changing the list needs no rewrite: nothing else in the file names the fields (the `fields` type
+  is built from the list), so the app's one-line change is the whole change.
+- Kept files are compared by their code, not their layout (`sameCode`): an app formatted by
+  Prettier with single quotes, no semicolons, no trailing commas or `t =>` arrows is still
+  current, and `vp dev` doesn't rewrite it back after each format.
+- A translations file without the first line (an app's own, or one from before) is left alone:
+  `gen translations` says so ("delete it to have it kept").
 
 ## Checks
 
