@@ -13,12 +13,17 @@
 import { createDb } from "void/db";
 import { env } from "void/env";
 
-/** A database session that starts on D1's main copy: Void's `createDb` with `first-primary`. */
-export function primaryDb() {
+/**
+ * A database session that starts on D1's main copy: Void's `createDb` with `first-primary`. Typed
+ * as `createDb`'s own result, not spelled out: in an app, `void/db` is Void's generated
+ * `.void/db.d.ts`, whose `createDb` returns the app's schema (`DrizzleD1Database<typeof schema>`),
+ * so this does too, and follows the schema as it changes.
+ */
+export function primaryDb(): ReturnType<typeof createDb> {
   return createDb((env as unknown as { DB: Parameters<typeof createDb>[0] }).DB, {
     session: "first-primary",
   });
 }
 
 /** A database session, as primaryDb() gives one: pass it on, so a handler's reads share it. */
-export type Db = ReturnType<typeof primaryDb>;
+export type Db = ReturnType<typeof createDb>;

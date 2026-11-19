@@ -9,15 +9,10 @@
 import { defineHandler } from "void";
 import { createDb } from "void/db";
 import { env } from "void/env";
-import type { Db } from "void-fbtee/db";
 import { timedRead } from "../../src/events/store";
 
 async function reads(session: "first-primary" | "first-unconstrained") {
-  // The app's createDb types its schema in; the store takes void-fbtee/db's plain session type.
-  // The same D1 session either way.
-  const db = createDb((env as unknown as { DB: Parameters<typeof createDb>[0] }).DB, {
-    session,
-  }) as unknown as Db;
+  const db = createDb((env as unknown as { DB: Parameters<typeof createDb>[0] }).DB, { session });
   const out = [];
   for (let i = 0; i < 3; i++) out.push(await timedRead(db));
   return out;

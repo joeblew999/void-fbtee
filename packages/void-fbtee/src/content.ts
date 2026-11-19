@@ -127,16 +127,14 @@ export async function storeTranslation(
   db: Db = primaryDb(),
 ): Promise<boolean> {
   return upsertTranslation(db, table, {
-    id,
+    source_id: id,
     locale,
-    fields: JSON.stringify(
-      Object.fromEntries(Object.entries(fields).map(([k, v]) => [k, v.trim()])),
-    ),
-    by: made.by,
-    at: new Date().toISOString().slice(0, 10),
+    fields: Object.fromEntries(Object.entries(fields).map(([k, v]) => [k, v.trim()])),
+    translatedBy: made.by,
+    translatedAt: new Date().toISOString().slice(0, 10),
     gatewayLogId: made.gatewayLogId ?? null,
-    usage: made.usage ? JSON.stringify(made.usage) : null,
-    from: made.from ?? null,
+    usage: made.usage ?? null,
+    translatedFrom: made.from ?? null,
   });
 }
 
@@ -221,7 +219,7 @@ export async function translationsFor(
     .map((r) => ({
       source_id: r.source_id,
       locale: r.locale,
-      fields: JSON.parse(r.fields),
+      fields: r.fields,
       from: r.translated_from,
     }));
 }

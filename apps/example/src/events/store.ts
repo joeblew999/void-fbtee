@@ -19,7 +19,7 @@ const settled = sql`datetime('now', '-15 minutes')`;
 // Events
 
 /** An event that's on (not cancelled). Undefined when there's none. */
-export async function eventOn(db: Db, id: string): Promise<Event | undefined> {
+export async function eventOn(db: Db, id: string) {
   const [row] = await db
     .select()
     .from(events)
@@ -28,13 +28,13 @@ export async function eventOn(db: Db, id: string): Promise<Event | undefined> {
 }
 
 /** An event, cancelled or not. */
-export async function eventById(db: Db, id: string): Promise<Event | undefined> {
+export async function eventById(db: Db, id: string) {
   const [row] = await db.select().from(events).where(eq(events.id, id));
   return row;
 }
 
 /** The events from now on that are on, soonest first, each with its seats taken (one query). */
-export async function upcoming(db: Db): Promise<{ event: Event; taken: number }[]> {
+export async function upcoming(db: Db) {
   const taken = db
     .select({ event_id: bookings.event_id, n: count().as("n") })
     .from(bookings)
@@ -50,7 +50,7 @@ export async function upcoming(db: Db): Promise<{ event: Event; taken: number }[
 }
 
 /** The events that are on starting in [from, to) (ISO instants, as starts_at_utc holds them). */
-export async function startingBetween(db: Db, from: string, to: string): Promise<Event[]> {
+export async function startingBetween(db: Db, from: string, to: string) {
   return db
     .select()
     .from(events)
@@ -64,9 +64,7 @@ export async function startingBetween(db: Db, from: string, to: string): Promise
 }
 
 /** Each event that's on, with when it last changed: its own row, or its newest translation. */
-export async function lastChanged(
-  db: Db,
-): Promise<{ id: string; at: string; text: string | null }[]> {
+export async function lastChanged(db: Db) {
   return db
     .select({ id: events.id, at: events.updatedAt, text: max(events_translations.updatedAt) })
     .from(events)
@@ -143,37 +141,53 @@ export async function bookingExists(db: Db, id: string): Promise<boolean> {
  * Books a seat, in one statement so two people can't take the last one: the row goes in only while
  * the event is on and has fewer bookings than seats. What the booker is told (told_*) is the event
  * as it is in that same statement. True when it went in. D1 runs each statement on the primary, one
- * at a time.
+ * at a time. Drizzle's insert-select: it takes every column of the table, in the table's order,
+ * checked only when it runs (drizzle-orm 0.45.4's haveSameKeys). Its type
+ * (SQLiteInsertSelectQueryBuilder) lets the columns with defaults be left out, so the type check
+ * doesn't catch one missing: a column added to bookings is added here too, or every booking fails
+ * (the dev and preview tests book).
  */
 export async function bookSeat(
   db: Db,
-  b: {
-    id: string;
-    eventId: string;
-    name: string;
-    email: string;
-    locale: string;
-    timeZone: string;
-    origin: string;
-    ticketInReminder: boolean;
-  },
+  b: Pick<
+    typeof bookings.$inferInsert,
+    "id" | "event_id" | "name" | "email" | "locale" | "time_zone" | "origin" | "ticket_in_reminder"
+  >,
 ): Promise<boolean> {
-  const result = await db.run(sql`
-    INSERT INTO ${bookings} (id, event_id, name, email, locale, time_zone, origin, ticket_in_reminder,
-      told_title, told_starts_at, told_ends_at, told_venue)
-    SELECT ${b.id}, ${b.eventId}, ${b.name}, ${b.email}, ${b.locale}, ${b.timeZone}, ${b.origin},
-      ${b.ticketInReminder ? 1 : 0}, title, starts_at, ends_at, venue
-    FROM ${events}
-    WHERE id = ${b.eventId} AND cancelled_at IS NULL
-      AND (SELECT COUNT(*) FROM ${bookings} WHERE event_id = ${b.eventId}) < seats`);
-  return !!(result as { meta?: { changes?: number } }).meta?.changes;
+  const taken = db.select({ n: count() }).from(bookings).where(eq(bookings.event_id, b.event_id));
+  const result = await db.insert(bookings).select(
+    db
+      .select({
+        id: sql<string>`${b.id}`.as("id"),
+        event_id: events.id,
+        name: sql<string>`${b.name}`.as("name"),
+        email: sql<string>`${b.email}`.as("email"),
+        locale: sql<string>`${b.locale}`.as("locale"),
+        time_zone: sql<string>`${b.time_zone}`.as("time_zone"),
+        origin: sql<string | null>`${b.origin ?? null}`.as("origin"),
+        ticket_in_reminder: sql<boolean>`${b.ticket_in_reminder ? 1 : 0}`.as("ticket_in_reminder"),
+        confirmed_at: sql<string | null>`NULL`.as("confirmed_at"),
+        told_title: events.title,
+        told_starts_at: events.starts_at,
+        told_ends_at: events.ends_at,
+        told_venue: events.venue,
+        createdAt: sql<string>`datetime('now')`.as("created_at"),
+        updatedAt: sql<string>`datetime('now')`.as("updated_at"),
+      })
+      .from(events)
+      .where(
+        and(
+          eq(events.id, b.event_id),
+          isNull(events.cancelled_at),
+          sql`(${taken}) < ${events.seats}`,
+        ),
+      ),
+  );
+  return result.meta.changes > 0;
 }
 
 /** A booking with its event, or undefined when there's no such booking. */
-export async function bookingWithEvent(
-  db: Db,
-  id: string,
-): Promise<{ booking: Booking; event: Event } | undefined> {
+export async function bookingWithEvent(db: Db, id: string) {
   const [row] = await db
     .select({ booking: bookings, event: events })
     .from(bookings)
@@ -183,11 +197,7 @@ export async function bookingWithEvent(
 }
 
 /** An event's bookings: all, or those made in these languages. */
-export async function bookingsOf(
-  db: Db,
-  eventId: string,
-  locales?: readonly string[],
-): Promise<Booking[]> {
+export async function bookingsOf(db: Db, eventId: string, locales?: readonly string[]) {
   return db
     .select()
     .from(bookings)
@@ -200,7 +210,7 @@ export async function bookingsOf(
 }
 
 /** The bookings of these events. */
-export async function bookingsOfEvents(db: Db, eventIds: string[]): Promise<Booking[]> {
+export async function bookingsOfEvents(db: Db, eventIds: string[]) {
   return eventIds.length
     ? db.select().from(bookings).where(inArray(bookings.event_id, eventIds))
     : [];
@@ -247,13 +257,9 @@ export async function deleteBooking(db: Db, id: string): Promise<void> {
 
 /** One small read, timed, and which of D1's copies answered it (D1's served_by_primary and
  * served_by_region with its result; absent locally, where there's one database). */
-export async function timedRead(
-  db: Db,
-): Promise<{ ms: number; primary: boolean | null; region: string | null }> {
+export async function timedRead(db: Db) {
   const t = performance.now();
-  const result = (await db.run(sql`SELECT 1`)) as unknown as {
-    meta: { served_by_primary?: boolean; served_by_region?: string };
-  };
+  const result = await db.run(sql`SELECT 1`);
   return {
     ms: Math.round(performance.now() - t),
     primary: result.meta.served_by_primary ?? null,
@@ -302,7 +308,7 @@ export async function behind(db: Db): Promise<string[]> {
 }
 
 /** Events cancelled over 15 minutes ago, each with a booking still there (none when it has none). */
-export async function cancelledLeft(db: Db): Promise<{ event: string; booking: string | null }[]> {
+export async function cancelledLeft(db: Db) {
   return db
     .select({ booking: bookings.id, event: events.id })
     .from(events)

@@ -82,13 +82,13 @@ const book = defineHandler.withValidator({ params, body: bookSchema })(async (
   // is told (told_*) is the event as it is then: their confirmation says it (src/events/owed.ts).
   const booked = await bookSeat(db, {
     id: body.id,
-    eventId: id,
+    event_id: id,
     name: body.name,
     email: body.email,
     locale,
-    timeZone: body.time_zone,
+    time_zone: body.time_zone,
     origin,
-    ticketInReminder: !!body.ticket_in_reminder,
+    ticket_in_reminder: !!body.ticket_in_reminder,
   });
   // Nothing went in: the event is full, or there's no such event (or it's cancelled).
   if (!booked) return (await eventOn(db, id)) ? c.json({ message: "sold out" }, 409) : c.notFound();

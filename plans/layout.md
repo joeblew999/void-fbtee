@@ -45,8 +45,32 @@ Globalping figures after it wait for a deploy.
 - Each page loader, action, queue message and cron opens one session (`primaryDb()`) and passes it
   down: one trip to the main copy each, not one per function.
 
+### Types from the schema, not written out (Void's type safety, `guide/type-safety.md`)
+
+- `primaryDb()` returns `ReturnType<typeof createDb>`: in an app, `void/db` is Void's generated
+  `.void/db.d.ts`, so it's that app's `DrizzleD1Database<typeof schema>`. Before, its type was
+  written out and built as `DrizzleD1Database<Record<string, never>>`: a database with no tables.
+- The store's inputs from the schema (`typeof bookings.$inferInsert`), its results inferred.
+- Booking a seat with Drizzle's insert-select (0.45.4, as Void bundles it), checked against the
+  table, not hand-written SQL; still one statement. Found on the way: it needs every column, in the
+  table's order, but checks that only when it runs; its type lets columns with defaults be left out
+  (`SQLiteInsertSelectQueryBuilder`, `sqlite-core/query-builders/insert.d.ts`), so leaving out
+  `confirmed_at` and the dates type-checked and made every booking a 500 (2026-11-19). A Drizzle
+  issue to report, with the user's OK.
+- No casts on query results: `@cloudflare/workers-types` has `changes`, `served_by_primary` and
+  `served_by_region`.
+- The package's queries in Drizzle too: the translations tables are translationsOf()'s; a table of
+  content is defined from its name and fields (voidFbtee({ content })) where it's queried.
+
 ## Checks
 
 - `vp check`, `test:unit`, `test:dev`, `test:preview`.
 - After the deploy: Globalping, the first visit to a fresh page from Thailand and Virginia, against
   the figures above.
+
+## Open
+
+- `e2e/dev/events.test.ts`, "a new post is translated by Void's AI, live": the first test after the
+  dev server starts; once (2026-11-19) the Thai title took past its 30 s wait. Alone it passed
+  twice, in 23 s and 13 s; every other translation test passed in the same run. Gemini 4 Hydrogen's
+  time varies a lot by call (plans/reliable-work.md): a cold start puts this one near its limit.
