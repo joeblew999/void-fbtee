@@ -13,6 +13,10 @@ what it changes; this list is the only place that says when.
 5. `use-cases.md`: one event, many people, as data, built on the primitives.
 6. `video-conferencing.md`: `void-moq`, built on all of the above.
 
+Next: `types-from-schema.md`: void-fbtee fits Void like a library: the app's settings in one file
+of its own, translations as generated plain Drizzle in the app, pages typed by Void's own types; no
+string config, no hand-written types at run time. Waits for the user's approval.
+
 Now: `layout.md`: the package's `src/` laid out as a Void app's folders, and every query in one file each
 (the app's `src/events/store.ts`, the package's `src/db/translations.ts`), one database session per handler.
 
