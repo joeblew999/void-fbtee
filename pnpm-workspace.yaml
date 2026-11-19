@@ -25,6 +25,9 @@ catalog:
   vite: npm:@voidzero-dev/vite-plus-core@1.6.0
   vite-plus: 1.6.0
   void: 1.8.0
+  # Cloudflare's Worker types, at the version Void 1.8.0's lockfile entry resolves: loaded in
+  # void-fbtee's own build, so D1's results (D1Result) are typed there as they are in an app.
+  "@cloudflare/workers-types": 5.20261117.1
   "@void/md": 1.8.0
   "@void/react": 1.8.0
   vitest: 5.1.0

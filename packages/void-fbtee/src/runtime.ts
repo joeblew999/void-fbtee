@@ -39,6 +39,10 @@ export function reportMissing(texts: Record<string, string>) {
 /** One lazy loader per translated locale; each resolves to { [locale]: fbtee's table }. */
 export type CatalogLoaders = Record<string, () => Promise<{ default: TranslationDictionary }>>;
 
+/** Catalog modules' tables as one, later ones winning. */
+const merged = (modules: { default: TranslationDictionary }[]): TranslationDictionary =>
+  modules.reduce<TranslationDictionary>((all, m) => ({ ...all, ...m.default }), {});
+
 const availableLanguages = (config: Pick<RuntimeConfig, "locales">) =>
   new Map(config.locales.map((l) => [l.locale, l.locale]));
 
@@ -87,10 +91,13 @@ function hierarchy(locale: string): string[] {
  * fallbacks from `voidFbtee({ fallbackLocales })`, then the default ones. Some are fbtee's own
  * identities ("th-Thai") that name no catalog; callers keep only the ones the app has.
  */
+/** fbtee's fallbacks as one list for every language, rather than a list per language. */
+const isList = (fallbacks: FallbackLocales): fallbacks is readonly string[] =>
+  Array.isArray(fallbacks);
+
 export function fallbacksOf(locale: string, fallbacks: FallbackLocales | undefined): string[] {
-  const map = (fallbacks && !Array.isArray(fallbacks) ? fallbacks : {}) as Readonly<
-    Record<string, readonly string[]>
-  >;
+  const map: Readonly<Record<string, readonly string[]>> =
+    fallbacks && !isList(fallbacks) ? fallbacks : {};
   const result = new Set<string>();
   const append = (value: string) => {
     const added: string[] = [];
@@ -102,7 +109,7 @@ export function fallbacksOf(locale: string, fallbacks: FallbackLocales | undefin
     for (const parent of added) map[parent]?.forEach(append);
   };
   append(locale);
-  (Array.isArray(fallbacks) ? (fallbacks as readonly string[]) : map.default)?.forEach(append);
+  (fallbacks && isList(fallbacks) ? fallbacks : map.default)?.forEach(append);
   result.delete(locale);
   return [...result];
 }
@@ -124,7 +131,7 @@ export async function translationsFor(
   ]);
   const loads = [...wanted].flatMap((l) => (catalogs[l] ? [catalogs[l]()] : []));
   const modules = await Promise.all(loads);
-  return Object.assign({}, ...modules.map((m) => m.default));
+  return merged(modules);
 }
 
 /**
@@ -133,5 +140,5 @@ export async function translationsFor(
  */
 export async function allTranslations(catalogs: CatalogLoaders): Promise<TranslationDictionary> {
   const modules = await Promise.all(Object.values(catalogs).map((load) => load()));
-  return Object.assign({}, ...modules.map((m) => m.default));
+  return merged(modules);
 }

@@ -5,6 +5,7 @@ import { loadConfigFromFile } from "vite";
 import { catalogFile, prepared, type Project } from "./catalogs";
 import { runner } from "./translate";
 import type { VoidFbteeApi } from "./plugin";
+import { field, isRecord } from "../guards";
 
 /**
  * The app as the void-fbtee plugin in its vite.config.ts sees it. Vite only loads the config file
@@ -18,11 +19,14 @@ export async function loadProject(root: string): Promise<Project> {
     root,
     "silent",
   );
-  const plugins = ((loaded?.config.plugins ?? []) as unknown[]).flat(Infinity) as {
-    name?: string;
-    api?: VoidFbteeApi;
-  }[];
-  const api = plugins.find((p) => p?.name === "void-fbtee")?.api;
+  const given: unknown[] = loaded?.config.plugins ?? [];
+  const api = given
+    .flat(Infinity)
+    .map((p) => field(p, "api"))
+    .find(
+      (a): a is VoidFbteeApi =>
+        isRecord(a) && typeof a.project === "function" && isRecord(a.options),
+    );
   if (!api)
     throw new Error(
       `void-fbtee: no voidFbtee() plugin in ${relative(process.cwd(), loaded?.path ?? root) || "vite.config.ts"}. Run \`${runner(root)} exec void-fbtee init\` first.`,

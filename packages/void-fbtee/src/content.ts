@@ -174,15 +174,18 @@ export function translatedContent<S extends Record<string, unknown>>(
       }),
     );
     const from = fieldsFingerprint(fields);
+    const rowId: unknown = Reflect.get(row, "id");
+    const rowLocale: unknown = Reflect.get(row, "locale");
+    if (typeof rowId !== "string" || typeof rowLocale !== "string") return;
     if (!isFields<F>(fields, c.fields)) return;
-    const source: Source<F> = { id: row.id, locale: row.locale, fields };
+    const source: Source<F> = { id: rowId, locale: rowLocale, fields };
     const have = (await namedTranslations(session, c, id))
       .filter((r) => current(r.translated_from, from))
       .map((r) => r.locale);
     return {
       source,
       from,
-      missing: appLocales().filter((l) => l !== row.locale && !have.includes(l)),
+      missing: appLocales().filter((l) => l !== rowLocale && !have.includes(l)),
     };
   }
 

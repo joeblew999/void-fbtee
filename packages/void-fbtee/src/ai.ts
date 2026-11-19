@@ -9,9 +9,12 @@
 // files, not its packages), so importing this module from void-fbtee changes nothing for an app
 // without AI: ai.run then throws "Not available", and the dev server translates another way.
 import { ai } from "void/ai";
+import { isRecord, textRecord } from "./guards";
 import {
   answerText,
   fieldsAnswer,
+  isEntry,
+  isGeminiAnswer,
   fieldsRequest,
   pageRequest,
   stringAnswer,
@@ -42,11 +45,16 @@ interface Asked {
   logId?: string;
 }
 
+// Void's AI, for a model not in Cloudflare's own list: Void types `ai.run` with Workers AI's models,
+// which Gemini (through AI Gateway) isn't one of; its runtime takes any model id and passes the
+// body and options on. A typed view of the same function, which TypeScript checks.
+const run: (model: string, body: object, options: object) => Promise<unknown> = ai.run.bind(ai);
+
 /** One request to Gemini through Void's AI, in Gemini's own shape (gemini.ts). */
 async function ask(body: GeminiRequest, { kind, app }: Track & { kind: Kind }): Promise<Asked> {
-  const raw = (await ai.run(
-    GEMINI.id as never,
-    body as never,
+  const raw = await run(
+    GEMINI.id,
+    body,
     // Through the account's AI Gateway ("default", Cloudflare's own, made on a first request),
     // which a third-party model needs, and which logs every request; its cache off: a string is
     // asked for once, and its accepted answer is kept in the catalog (AI Gateway docs, "Workers
@@ -69,17 +77,18 @@ async function ask(body: GeminiRequest, { kind, app }: Track & { kind: Kind }): 
         collectLog: kind !== "post",
       },
       returnRawResponse: true,
-    } as never,
-  )) as unknown;
-  let answer: GeminiAnswer;
+    },
+  );
+  let answer: unknown;
   let logId: string | undefined;
   if (raw instanceof Response) {
     logId = raw.headers.get("cf-aig-log-id") ?? undefined;
     // The status in the message: paymentProblem() reads a 402 from it (models.ts). A 429 never
     // gets here: Void's runtime throws its own "usage limit" error first, which it reads too.
     if (!raw.ok) throw new Error(`ai: ${raw.status}: ${await raw.text()}`);
-    answer = (await raw.json()) as GeminiAnswer;
-  } else answer = raw as GeminiAnswer;
+    answer = await raw.json();
+  } else answer = raw;
+  if (!isGeminiAnswer(answer)) throw new Error(`${GEMINI.id}: an answer not in Gemini's shape`);
   return { answer, usage: usageOf(answer), logId };
 }
 
@@ -147,10 +156,10 @@ export async function translateString(
  * (judge.ts fieldProblems), and asked once more if anything was wrong. Still wrong: an error, so
  * the queue tries again later (queues/translate.ts).
  */
-export async function translateFields<K extends string>(
-  fields: Record<K, string>,
+export async function translateFields(
+  fields: Record<string, string>,
   { from, to, ...track }: { from: string; to: string } & Track,
-): Promise<Translated<Record<K, string>>> {
+): Promise<Translated<Record<string, string>>> {
   const usages: Usage[] = [];
   let retry: { answer: unknown; problems: string[] } | undefined;
   for (;;) {
@@ -164,7 +173,7 @@ export async function translateFields<K extends string>(
     const problems = fieldProblems(fields, got);
     if (!problems.length)
       return {
-        result: got as Record<K, string>,
+        result: textRecord(got),
         problems,
         usage: spent(usages),
         logId: asked.logId,
@@ -189,6 +198,18 @@ export async function translatePage(
 }
 
 /** What the dev server sends its route (dev/translate.ts routeCall). */
+/** A request to the dev route, each field it has checked. */
+const isDevRequest = (value: unknown): value is DevRequest =>
+  isRecord(value) &&
+  typeof value.from === "string" &&
+  typeof value.to === "string" &&
+  (value.app === undefined || typeof value.app === "string") &&
+  ((value.kind === "string" && isEntry(value.entry)) ||
+    (value.kind === "page" && typeof value.text === "string") ||
+    (value.kind === "post" &&
+      isRecord(value.fields) &&
+      Object.values(value.fields).every((v) => typeof v === "string")));
+
 export type DevRequest = {
   /** The app's name, for the gateway's logs (its package.json name). */
   app?: string;
@@ -212,7 +233,8 @@ export type DevRequest = {
 export async function devTranslate(request: Request, token: string): Promise<Response> {
   if (request.headers.get("x-void-fbtee-token") !== token)
     return new Response("not found", { status: 404 });
-  const body = (await request.json()) as DevRequest;
+  const body: unknown = await request.json();
+  if (!isDevRequest(body)) return new Response("not a translation request", { status: 400 });
   const track = { from: body.from, to: body.to, app: body.app };
   try {
     const done =

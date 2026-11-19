@@ -16,6 +16,8 @@ import {
 } from "@nkzw/fbtee-compiler";
 import { translatedOf, type LocaleConfig } from "../locales";
 import { addVariants, pluralCategories, pluralSlots } from "../plurals";
+import { readCatalog } from "./catalog-file";
+import { field, isRecord, parseJson } from "../guards";
 
 // Where an app's strings can be: every folder of code in Void's project structure (Void's docs,
 // reference/structure.md: pages, routes, middleware, crons, queues, email, durable-objects, src),
@@ -50,13 +52,33 @@ export interface Project {
 interface Phrase {
   hashToLeaf?: Record<string, { text: string; desc: string }>;
 }
-interface Entry {
-  status?: string;
-  translations?: unknown[];
-}
-interface Catalog {
-  "fb-locale"?: string;
-  translations: Record<string, Entry>;
+
+const isLeaf = (value: unknown): value is { text: string; desc: string } =>
+  isRecord(value) && typeof value.text === "string" && typeof value.desc === "string";
+
+/** fbtee's collected phrases, from its JSON, each one's `hashToLeaf` checked; the rest kept. */
+function phrasesOf(json: unknown, what: string): Phrase[] {
+  const phrases = field(json, "phrases") ?? [];
+  if (!Array.isArray(phrases)) throw new Error(`void-fbtee: ${what} has no list of phrases`);
+  return phrases.map((phrase: unknown) => {
+    const leaves = field(phrase, "hashToLeaf");
+    if (
+      !isRecord(phrase) ||
+      (leaves !== undefined && !(isRecord(leaves) && Object.values(leaves).every(isLeaf)))
+    )
+      throw new Error(`void-fbtee: ${what} has a phrase not in fbtee's shape`);
+    return {
+      ...phrase,
+      hashToLeaf:
+        leaves === undefined
+          ? undefined
+          : Object.fromEntries(
+              Object.entries(leaves).filter((e): e is [string, { text: string; desc: string }] =>
+                isLeaf(e[1]),
+              ),
+            ),
+    };
+  });
 }
 
 const LANGS = ["tsx", "ts", "jsx", "js"] as const;
@@ -65,7 +87,8 @@ const langOf = (file: string) => LANGS.find((l) => file.endsWith("." + l)) ?? "j
 /** fbtee's built-in strings, resolved from the app's own fbtee. */
 function builtinPhrases(root: string): Phrase[] {
   const require = createRequire(join(root, "package.json"));
-  return JSON.parse(readFileSync(require.resolve("fbtee/Strings.json"), "utf8")).phrases;
+  const file = require.resolve("fbtee/Strings.json");
+  return phrasesOf(parseJson(readFileSync(file, "utf8")), file);
 }
 
 export const catalogFile = (p: Project, locale: string) =>
@@ -115,7 +138,7 @@ export function collect(p: Project): Collected {
       throw new Error(
         `void-fbtee: collecting strings failed: ${out.errors.map((e) => e.message).join("; ")}`,
       );
-    phrases.push(...(JSON.parse(out.output ?? "{}").phrases ?? []));
+    phrases.push(...phrasesOf(parseJson(out.output ?? "{}"), "fbtee's collected strings"));
   }
   const builtins = builtinPhrases(p.root);
   const builtinHashes = new Set(builtins.flatMap((ph) => Object.keys(ph.hashToLeaf ?? {})));
@@ -176,7 +199,7 @@ export function prepared(p: Project): { locale: string; json: string; existed: b
     let full = addVariants(json, slots, locale, { genders: locale !== p.config.sourceLocale });
     // The source language's catalog holds only the strings with a count: the rest is the code's.
     if (locale === p.config.sourceLocale) {
-      const catalog = JSON.parse(full) as Catalog;
+      const catalog = readCatalog(full, `the ${locale} catalog`);
       catalog.translations = Object.fromEntries(
         Object.entries(catalog.translations).filter(([hash]) => slots.has(hash)),
       );
@@ -213,7 +236,7 @@ export interface LocaleMissing {
 export function missing(p: Project): LocaleMissing[] {
   const { builtinHashes, texts } = collect(p);
   return prepared(p).map(({ locale, json, existed }) => {
-    const entries = Object.entries((JSON.parse(json) as Catalog).translations);
+    const entries = Object.entries(readCatalog(json, `the ${locale} catalog`).translations);
     const open = entries.filter(([, e]) => e.status === "new" || !e.translations?.length);
     return {
       locale,
@@ -261,7 +284,7 @@ export function runtimeTexts(p: Project): Record<string, string> {
     ]),
   );
   const group = { "fb-locale": "zz-ZZ", translations };
-  const table = JSON.parse(
+  const table = parseJson(
     translateSync(JSON.stringify({ phrases, translationGroups: [group] }), true),
   );
   // A plural or gender string is a nested table; any leaf names the string.
@@ -274,7 +297,8 @@ export function runtimeTexts(p: Project): Record<string, string> {
         ? Object.values(v).map(firstMark).find(Boolean)
         : undefined;
   const out: Record<string, string> = {};
-  for (const [runtimeHash, value] of Object.entries(table["zz-ZZ"] ?? {})) {
+  const marked = field(table, "zz-ZZ");
+  for (const [runtimeHash, value] of Object.entries(isRecord(marked) ? marked : {})) {
     const hash = firstMark(value);
     if (hash) out[runtimeHash] = texts[hash] ?? hash;
   }
@@ -286,9 +310,10 @@ export function runtimeCatalog(p: Project, locale: string): Record<string, unkno
   const file = catalogFile(p, locale);
   if (!existsSync(file)) return {};
   const { phrases } = collect(p);
-  const group = JSON.parse(readFileSync(file, "utf8"));
-  const table = JSON.parse(
+  const group = parseJson(readFileSync(file, "utf8"));
+  const table = parseJson(
     translateSync(JSON.stringify({ phrases, translationGroups: [group] }), true),
   );
-  return table[locale] ?? {};
+  const own = field(table, locale);
+  return isRecord(own) ? own : {};
 }

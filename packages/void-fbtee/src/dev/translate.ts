@@ -7,6 +7,10 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { catalogFile, collect, freshCatalog, missing, type Project } from "./catalogs";
+import { isSpent, readCatalog, type CatalogEntry } from "./catalog-file";
+import { field, isRecord, isStringArray, parseJson, textField } from "../guards";
+
+export type { Review } from "./catalog-file";
 import {
   frontmatter,
   keptParts,
@@ -68,7 +72,8 @@ export function translateTask(p: Project): TranslateTask | undefined {
       missing: `new page: translate ${from}`,
       stale: `the original changed: update it to match ${from}, changing only what changed`,
       unrecorded: `already translated, not recorded: check it against ${from} and fix it only if it's wrong`,
-    }[page.state as "missing" | "stale" | "unrecorded"];
+      ok: "",
+    }[page.state];
     return `- ${rel(page.file)} (${page.locale}): ${what}`;
   });
   if (!strings.length && !pageLines.length) return;
@@ -170,7 +175,7 @@ function frontmatterLine(text: string, key: string, value: string | object): str
 /** The app's name, its package.json's, for the gateway's logs. */
 export function appName(root: string): string | undefined {
   try {
-    return (JSON.parse(readFileSync(join(root, "package.json"), "utf8")) as { name?: string }).name;
+    return textField(parseJson(readFileSync(join(root, "package.json"), "utf8")), "name");
   } catch {
     return undefined;
   }
@@ -192,8 +197,9 @@ export function packageManager(root: string): "pnpm" | "npm" {
 /** How to run a package's command in the app: `vp exec` in a Vite+ app, else its package manager's. */
 export function runner(root: string): string {
   try {
-    const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
-    if (pkg.devDependencies?.["vite-plus"] ?? pkg.dependencies?.["vite-plus"]) return "vp";
+    const pkg = parseJson(readFileSync(join(root, "package.json"), "utf8"));
+    const has = (list: string) => field(field(pkg, list), "vite-plus") !== undefined;
+    if (has("devDependencies") || has("dependencies")) return "vp";
   } catch {}
   return packageManager(root);
 }
@@ -206,7 +212,7 @@ export function hasClaude(): boolean {
   const run = spawnSync("claude", ["auth", "status"], { encoding: "utf8" });
   if (run.status !== 0) return false;
   try {
-    return JSON.parse(run.stdout).loggedIn === true;
+    return field(parseJson(run.stdout), "loggedIn") === true;
   } catch {
     return false;
   }
@@ -243,32 +249,36 @@ export function runClaude(root: string, prompt: string): Promise<number> {
   return new Promise((resolve) => child.on("close", (code) => resolve(code ?? 1)));
 }
 
-interface StreamEvent {
-  type: string;
-  subtype?: string;
-  result?: string;
-  message?: { content?: { type: string; name?: string; input?: Record<string, unknown> }[] };
-}
-
+/** One line of `claude -p --output-format stream-json`, shown as it comes: each tool it uses, and its
+ * result. Read field by field: a line that isn't that shape shows nothing. */
 function showEvent(root: string, line: string) {
-  let event: StreamEvent;
+  let event: unknown;
   try {
-    event = JSON.parse(line);
+    event = parseJson(line);
   } catch {
     return;
   }
-  if (event.type === "assistant")
-    for (const c of event.message?.content ?? []) {
-      if (c.type !== "tool_use") continue;
-      const target = [c.input?.file_path, c.input?.path, c.input?.pattern].find(
-        (v): v is string => typeof v === "string",
-      );
+  const type = textField(event, "type");
+  if (type === "assistant") {
+    const content = field(field(event, "message"), "content");
+    const parts: unknown[] = Array.isArray(content) ? content : [];
+    for (const c of parts) {
+      if (textField(c, "type") !== "tool_use") continue;
+      const input = field(c, "input");
+      const target = [
+        field(input, "file_path"),
+        field(input, "path"),
+        field(input, "pattern"),
+      ].find((v): v is string => typeof v === "string");
       const shown = target?.startsWith("/") ? relative(root, target) : (target ?? "");
-      console.log(`  ${c.name} ${shown}`);
+      console.log(`  ${textField(c, "name") ?? ""} ${shown}`);
     }
-  if (event.type === "result") {
+  }
+  if (type === "result") {
     console.log("");
-    console.log(event.result ?? `claude finished: ${event.subtype}`);
+    console.log(
+      textField(event, "result") ?? `claude finished: ${textField(event, "subtype") ?? ""}`,
+    );
   }
 }
 
@@ -336,7 +346,7 @@ function catalogsOf(
   return missing(p)
     .map((m) => ({ locale: m.locale, file: catalogFile(p, m.locale) }))
     .filter(({ file }) => existsSync(file))
-    .map((c) => ({ ...c, catalog: JSON.parse(readFileSync(c.file, "utf8")) }));
+    .map((c) => ({ ...c, catalog: readCatalog(readFileSync(c.file, "utf8"), c.file) }));
 }
 
 /**
@@ -446,9 +456,7 @@ function newEntries(p: Project): Map<string, Set<string>> {
   for (const m of missing(p)) {
     const file = catalogFile(p, m.locale);
     if (!existsSync(file)) continue;
-    const catalog = JSON.parse(readFileSync(file, "utf8")) as {
-      translations: Record<string, CatalogEntry>;
-    };
+    const catalog = readCatalog(readFileSync(file, "utf8"), file);
     out.set(
       m.locale,
       new Set(
@@ -470,7 +478,7 @@ function markTranslatedBy(p: Project, wasNew: Map<string, Set<string>>, by: stri
     const file = catalogFile(p, locale);
     if (!existsSync(file) || !hashes.size) continue;
     const text = readFileSync(file, "utf8");
-    const catalog = JSON.parse(text) as { translations: Record<string, CatalogEntry> };
+    const catalog = readCatalog(text, file);
     for (const h of hashes) {
       const e = catalog.translations[h];
       if (!e || e.status === "new" || e.translatedBy) continue;
@@ -482,41 +490,6 @@ function markTranslatedBy(p: Project, wasNew: Map<string, Set<string>>, by: stri
   }
 }
 
-interface CatalogLine {
-  translation: string;
-  variations: Record<string, number>;
-}
-interface CatalogEntry {
-  description?: string;
-  status?: string;
-  translations?: CatalogLine[];
-  /** Who wrote the translation: a model's id, "claude", a person, or "unknown" when nothing said
-   * (plans/translation-provenance.md). Every finished entry has one (check.ts). */
-  translatedBy?: string;
-  /** The day it was written, YYYY-MM-DD. */
-  translatedAt?: string;
-  /** The AI Gateway log of the request that wrote it: its exact request and answer. */
-  gatewayLogId?: string;
-  /** What it cost: the request's tokens, and the US$ they came to that day (models.ts spent). */
-  usage?: Spent;
-  /** Claude's review of a translation an AI wrote (reviewTask). Cleared when it's translated again. */
-  review?: Review;
-}
-
-/**
- * A reviewer's verdict on one entry, kept in the entry (plans/translation-rework.md, step 6):
- * "ok", or "wrong" with what was wrong (`note`), the translator it judged (`of`) and its lines
- * (`was`), the reviewer's correction being the entry's lines now.
- */
-export interface Review {
-  by: string;
-  at: string;
-  verdict: "ok" | "wrong";
-  of?: string;
-  note?: string;
-  was?: string[];
-}
-
 /**
  * Run `work` on every item, at most `n` at once: the next starts as soon as any finishes. Not in
  * groups that wait for their slowest: Gemini 4 Hydrogen thinks before it answers, so one string
@@ -524,7 +497,7 @@ export interface Review {
  * 2026-11-18), and a group would leave the other slots idle (plans/reliable-work.md).
  */
 async function inTurn<T, R>(items: T[], n: number, work: (item: T) => Promise<R>): Promise<R[]> {
-  const out: R[] = new Array(items.length);
+  const out = new Array<R>(items.length);
   let next = 0;
   const worker = async () => {
     while (next < items.length) {
@@ -540,6 +513,12 @@ async function inTurn<T, R>(items: T[], n: number, work: (item: T) => Promise<R>
 const AT_ONCE = 4;
 
 /** The dev server's route's answer (ai.ts devTranslate): a translation, its problems, cost, log. */
+const isRouteAnswer = (value: unknown): value is RouteAnswer =>
+  isRecord(value) &&
+  (value.problems === undefined || isStringArray(value.problems)) &&
+  (value.usage === undefined || isSpent(value.usage)) &&
+  (value.logId === undefined || typeof value.logId === "string");
+
 export interface RouteAnswer {
   result?: unknown;
   problems?: string[];
@@ -574,7 +553,7 @@ export function routeCall(
       body: JSON.stringify({ ...body, app }),
     });
     if (res.status === 503) {
-      const { error } = (await res.json().catch(() => ({}))) as { error?: string };
+      const error = textField(await res.json().catch(() => undefined), "error");
       if (!gone)
         log(`Void's AI isn't available here (${error ?? "no answer"}), so Claude Code translates`);
       gone = true;
@@ -590,12 +569,14 @@ export function routeCall(
       return undefined;
     }
     if (res.status === 502) {
-      const { error } = (await res.json().catch(() => ({}))) as { error?: string };
+      const error = textField(await res.json().catch(() => undefined), "error");
       log(`Void's AI gave an unusable answer (${error ?? "no answer"})`);
       return {};
     }
     if (!res.ok) throw new Error(`the dev server's translate route answered ${res.status}`);
-    return (await res.json()) as RouteAnswer;
+    const answer: unknown = await res.json();
+    if (!isRouteAnswer(answer)) throw new Error("the dev server's translate route gave no answer");
+    return answer;
   };
 }
 
@@ -617,15 +598,13 @@ const formsOf = (v: Record<string, number> | undefined) =>
 function sourceEntry(entry: CatalogEntry, fresh: CatalogEntry | undefined): Entry | undefined {
   if (!fresh?.translations?.length || !entry.translations?.length) return;
   const byForms = new Map(fresh.translations.map((l) => [formsOf(l.variations), l.translation]));
-  const lines = entry.translations.map((l) => ({
-    text: byForms.get(formsOf(l.variations)),
-    variations: l.variations ?? {},
-  }));
-  if (lines.some((l) => l.text === undefined)) return;
-  return {
-    description: entry.description ?? fresh.description ?? "",
-    lines: lines as Entry["lines"],
-  };
+  const lines: Entry["lines"] = [];
+  for (const l of entry.translations) {
+    const text = byForms.get(formsOf(l.variations));
+    if (text === undefined) return;
+    lines.push({ text, variations: l.variations ?? {} });
+  }
+  return { description: entry.description ?? fresh.description ?? "", lines };
 }
 
 /**
@@ -642,8 +621,9 @@ export async function translateCatalog(
   log: (line: string) => void,
 ): Promise<{ done: number; open: number; usd: number } | undefined> {
   const { texts, builtinHashes } = collect(p);
-  const fresh = (
-    JSON.parse(freshCatalog(p, locale)) as { translations: Record<string, CatalogEntry> }
+  const fresh = readCatalog(
+    freshCatalog(p, locale),
+    `the ${locale} strings in the code`,
   ).translations;
   const open = Object.entries(catalog.translations).filter(
     ([, e]) => e.status === "new" && e.translations?.length,
@@ -665,7 +645,14 @@ export async function translateCatalog(
       return;
     }
     usd += answer.usage?.usd ?? 0;
-    const lines = answer.result as (string | null | undefined)[] | undefined;
+    const result = answer.result;
+    const lines =
+      Array.isArray(result) &&
+      result.every(
+        (l: unknown): l is string | null | undefined => l == null || typeof l === "string",
+      )
+        ? result
+        : undefined;
     if (!lines || answer.problems?.length) {
       if (answer.problems?.length)
         log(`${texts[hash] ?? hash} → ${JSON.stringify(lines)}: ${answer.problems.join(" ")}`);
@@ -707,15 +694,13 @@ export async function translateWithVoidAi(
   const catalogs = missing(p).map(async (m) => {
     const file = catalogFile(p, m.locale);
     if (!existsSync(file)) return true;
-    const catalog = JSON.parse(readFileSync(file, "utf8")) as {
-      translations: Record<string, CatalogEntry>;
-    };
+    const catalog = readCatalog(readFileSync(file, "utf8"), file);
     const ran = await translateCatalog(p, call, m.locale, catalog, log);
     // Saves don't wait for translating: a prepare may have changed the file meanwhile (a string
     // dropped, a new one added). So what passed goes into the file as it is now, each only where
     // its entry is still there and still new. What passed is written even when another answer
     // found Void's AI gone.
-    const now = JSON.parse(readFileSync(file, "utf8")) as typeof catalog;
+    const now = readCatalog(readFileSync(file, "utf8"), file);
     let changed = false;
     for (const [hash, entry] of Object.entries(catalog.translations)) {
       const there = now.translations[hash];

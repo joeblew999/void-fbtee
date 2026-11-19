@@ -6,6 +6,7 @@
 // head(), a markdown page's (the middleware) or the site's (void.config.ts's head).
 import type { MetaFlat } from "unhead/types";
 import { unpackMeta } from "unhead/utils";
+import { field, textField } from "./guards";
 
 /** One meta tag, as Void's head takes it. */
 export type MetaTag = { name?: string; property?: string; content: string };
@@ -16,12 +17,12 @@ export type MetaTag = { name?: string; property?: string; content: string };
  */
 export function meta(input: MetaFlat): MetaTag[] {
   return unpackMeta(input).flatMap((tag) => {
-    const { name, property, content } = tag as {
-      name?: string;
-      property?: string;
-      content?: string | number | boolean | null;
-    };
-    if (content === undefined || content === null || content === "") return [];
+    const name = textField(tag, "name");
+    const property = textField(tag, "property");
+    const content = field(tag, "content");
+    if (typeof content !== "string" && typeof content !== "number" && typeof content !== "boolean")
+      return [];
+    if (content === "") return [];
     return [
       { ...(name ? { name } : {}), ...(property ? { property } : {}), content: String(content) },
     ];

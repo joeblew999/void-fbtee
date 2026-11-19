@@ -8,7 +8,7 @@
     "strict": true,
     "skipLibCheck": true,
     "isolatedDeclarations": false,
-    "types": ["vite/client", "fbtee/ReactTypes", "node"],
+    "types": ["vite/client", "fbtee/ReactTypes", "node", "@cloudflare/workers-types"],
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "noUnusedLocals": true

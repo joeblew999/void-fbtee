@@ -10,6 +10,8 @@
 // - At runtime fbtee picks the category with Intl.PluralRules (fbtee src/IntlNumberType.tsx), and
 //   for n = 1 it tries a <fbt:plural>'s exactly-one form "_1" first (src/IntlVariationResolver.tsx).
 
+import { field, isRecord, isStringArray, parseJson } from "./guards";
+
 type Category = Intl.LDMLPluralRule;
 
 /** fbtee's IntlVariations code for each CLDR plural category. */
@@ -63,6 +65,25 @@ interface Line {
   translation: string;
   variations?: Record<string, number | string>;
 }
+const isLine = (value: unknown): value is Line =>
+  isRecord(value) &&
+  typeof value.translation === "string" &&
+  (value.variations === undefined ||
+    (isRecord(value.variations) &&
+      Object.values(value.variations).every(
+        (v) => typeof v === "number" || typeof v === "string",
+      )));
+
+/** A catalog entry as fbtee writes it, each field it has checked. */
+export const isPluralEntry = (value: unknown): value is PluralEntry =>
+  isRecord(value) &&
+  (value.status === undefined || typeof value.status === "string") &&
+  (value.tokens === undefined || isStringArray(value.tokens)) &&
+  (value.types === undefined ||
+    (Array.isArray(value.types) && value.types.every((t) => typeof t === "number"))) &&
+  (value.translations === undefined ||
+    (Array.isArray(value.translations) && value.translations.every(isLine)));
+
 export interface PluralEntry {
   status?: string;
   tokens?: string[];
@@ -88,8 +109,8 @@ export function pluralSlots(phrases: PluralPhrase[]): Map<string, Slots> {
       Object.entries(ph.hashToLeaf ?? {}).map(([h, l]) => [`${l.desc}\u0000${l.text}`, h]),
     );
     const walk = (node: unknown, level: number, slots: Slots) => {
-      if (!node || typeof node !== "object") return;
-      const n = node as Record<string, unknown>;
+      if (!isRecord(node)) return;
+      const n = node;
       if (typeof n.text === "string" && typeof n.desc === "string") {
         const hash = byLeaf.get(`${n.desc}\u0000${n.text}`);
         if (hash && slots.length) out.set(hash, slots);
@@ -126,8 +147,8 @@ export const GENDER_CODE = { male: 1, female: 2, unknown: 3 } as const;
  * withVariants writes, so the two can't differ.
  */
 export const MARKS: Record<number, string> = Object.fromEntries([
-  ...Object.entries(CATEGORY_CODE).map(([word, code]) => [code, word]),
-  ...Object.entries(GENDER_CODE).map(([word, code]) => [code, word]),
+  ...Object.entries(CATEGORY_CODE).map(([word, code]): [number, string] => [code, word]),
+  ...Object.entries(GENDER_CODE).map(([word, code]): [number, string] => [code, word]),
 ]);
 
 /** fbtee's `types` for a token: a count (BITMASK_NUMBER) or a person's gender (BITMASK_GENDER). */
@@ -192,8 +213,14 @@ export function addVariants(
   locale: string,
   options?: { genders?: boolean },
 ): string {
-  const catalog = JSON.parse(json) as { translations: Record<string, PluralEntry> };
-  for (const [hash, entry] of Object.entries(catalog.translations))
-    catalog.translations[hash] = withVariants(entry, slots.get(hash) ?? [], locale, options);
+  const catalog = parseJson(json);
+  const translations = field(catalog, "translations");
+  if (!isRecord(catalog) || !isRecord(translations))
+    throw new Error(`void-fbtee: the ${locale} catalog has no translations`);
+  for (const [hash, entry] of Object.entries(translations)) {
+    if (!isPluralEntry(entry))
+      throw new Error(`void-fbtee: the ${locale} catalog's entry ${hash} isn't fbtee's shape`);
+    translations[hash] = withVariants(entry, slots.get(hash) ?? [], locale, options);
+  }
   return JSON.stringify(catalog);
 }

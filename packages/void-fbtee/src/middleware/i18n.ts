@@ -47,6 +47,7 @@ import { setup as setupZod } from "virtual:void-fbtee/zod";
 import dev from "virtual:void-fbtee/dev";
 import { currentLocale, runIn, siteOrigin } from "../server";
 import { withPending } from "../content-pending";
+import { isRecord } from "../guards";
 import type { TranslatedContent } from "../content";
 
 // Zod's own validation messages (a form's errors) in each request's language, when the app has
@@ -151,7 +152,7 @@ export function i18nMiddleware({
     const current = found ?? source;
     const rest = found ? path.slice(found.segment.length + 1) : path;
     const i18n: SharedI18n = {
-      locale: current.locale as AppLocale,
+      locale: current.locale,
       lang: current.segment,
       dir: current.dir,
       now: Temporal.Now.instant().toString(),
@@ -170,7 +171,8 @@ export function i18nMiddleware({
           }))
           .concat({ rel: "alternate", hreflang: "x-default", href: xDefault(origin, rest) });
     c.set("i18n", i18n);
-    const shared = (c.get("shared") ?? {}) as Record<string, unknown>;
+    const given: unknown = c.get("shared");
+    const shared = isRecord(given) ? given : {};
     const head = c.get("headDefaults") ?? {};
     c.set("shared", { ...shared, i18n });
     // On a page in one of the languages: its own address as canonical (each language version is its

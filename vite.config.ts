@@ -143,6 +143,25 @@ export default defineConfig({
         },
       ],
     },
+    // No casts in the package (plans/no-casts.md): a cast tells TypeScript to believe what it can't
+    // check, and a wrong one loses the type with nothing to say so. A value read at run time
+    // becomes a type through a check (a type guard) instead. `as const` is allowed.
+    overrides: [
+      {
+        files: ["packages/void-fbtee/src/**"],
+        rules: {
+          "typescript/consistent-type-assertions": ["error", { assertionStyle: "never" }],
+          // And no `any`, which loses a type as surely as a cast: JSON.parse, a require(), a
+          // library typed loosely. Its value goes through a check (src/guards.ts) instead.
+          "typescript/no-explicit-any": "error",
+          "typescript/no-unsafe-assignment": "error",
+          "typescript/no-unsafe-member-access": "error",
+          "typescript/no-unsafe-call": "error",
+          "typescript/no-unsafe-return": "error",
+          "typescript/no-unsafe-argument": "error",
+        },
+      },
+    ],
   },
   fmt: {
     // Written by tools, not by hand: fbtee (catalogs), drizzle (migrations), Void, Vite+ and

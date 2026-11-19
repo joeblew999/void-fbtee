@@ -2,7 +2,6 @@
 // adds what's missing, so running it twice changes nothing. Where it can't edit a file safely it
 // prints the exact lines to add instead of guessing. Config files are edited with magicast.
 import { execFileSync } from "node:child_process";
-import { createRequire } from "node:module";
 import {
   existsSync,
   lstatSync,
@@ -29,6 +28,7 @@ import {
 import { DEFAULT_TRANSLATIONS } from "./catalogs";
 import { checkSite } from "./site";
 import { packageDir, packageManager } from "./translate";
+import { field, isRecord, isStringArray, parseJson, textRecord } from "../guards";
 
 export interface InitOptions {
   root: string;
@@ -188,17 +188,84 @@ const OLD_RULE = "void-fbtee/no-show-count-no";
 
 /** Versions void-fbtee itself is built and tested with, for the app's package.json. */
 function testedVersions(): Record<string, string> {
-  const own = createRequire(join(packageDir(), "package.json"))("./package.json") as {
-    devDependencies: Record<string, string>;
-  };
-  return own.devDependencies;
+  return readJson(join(packageDir(), "package.json")).devDependencies ?? {};
 }
 
 /** magicast's writeFile leaves no final newline; formatters (vp fmt) tidy the rest. */
 const writeModule = (mod: ProxifiedModule, file: string) =>
   writeFileSync(file, generateCode(mod).code.trimEnd() + "\n");
 
-const readJson = (file: string) => JSON.parse(readFileSync(file, "utf8"));
+/** A package.json, its dependency lists and scripts checked (each a list of text); the rest kept
+ * as it is, in its order, for writing back. */
+interface PackageJson {
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+  scripts?: Record<string, string>;
+  [key: string]: unknown;
+}
+const readJson = (file: string): PackageJson => {
+  const value = parseJson(readFileSync(file, "utf8"));
+  if (!isRecord(value)) throw new Error(`void-fbtee: ${file} isn't a package.json`);
+  const list = (key: string) => (value[key] === undefined ? undefined : textRecord(value[key]));
+  return {
+    ...value,
+    dependencies: list("dependencies"),
+    devDependencies: list("devDependencies"),
+    scripts: list("scripts"),
+  };
+};
+/**
+ * A config file's default export's options object, as magicast gives it (a proxy that edits the
+ * file), checked to be an object. magicast types it `any`; it's an object, or there's nothing to
+ * edit.
+ */
+function configObject(mod: ProxifiedModule, file: string): Record<string, unknown> {
+  const options: unknown = getDefaultExportOptions(mod);
+  if (!isRecord(options)) throw new Error(`void-fbtee: ${file} doesn't export a config object`);
+  return options;
+}
+
+/**
+ * A list from a config file as plain values, or none. magicast's lists are proxies whose callbacks
+ * (`.some`, `.every`) don't get the plain values; spreading one does (checked 2026-11-19).
+ */
+function plainList(value: unknown): unknown[] {
+  const list: unknown[] = Array.isArray(value) ? value : [];
+  return [...list];
+}
+
+/** An object's object field, made when it isn't one (magicast writes it into the file). */
+function child(parent: Record<string, unknown>, key: string): Record<string, unknown> {
+  if (!isRecord(parent[key])) parent[key] = {};
+  const value = parent[key];
+  if (!isRecord(value)) throw new Error(`void-fbtee: couldn't add "${key}"`);
+  return value;
+}
+
+/** Code written as it is into a config (magicast's builders.raw), checked: magicast types it
+ * `any`; it's an object, a proxy for that code. */
+function rawCode(source: string): Record<string, unknown> {
+  const node: unknown = builders.raw(source);
+  if (!isRecord(node)) throw new Error(`void-fbtee: couldn't write ${source}`);
+  return node;
+}
+
+/** A tsconfig.json, its compilerOptions' `types` and `lib` checked; the rest kept as it is. */
+interface TsConfig {
+  compilerOptions?: { types?: string[]; lib?: string[]; [key: string]: unknown };
+  [key: string]: unknown;
+}
+const readTsconfig = (file: string): TsConfig => {
+  const value = parseJson(readFileSync(file, "utf8"));
+  if (!isRecord(value)) throw new Error(`void-fbtee: ${file} isn't a tsconfig.json`);
+  const options = value.compilerOptions;
+  if (options === undefined) return value;
+  if (!isRecord(options)) throw new Error(`void-fbtee: ${file}'s compilerOptions isn't an object`);
+  const { types, lib } = options;
+  if ((types !== undefined && !isStringArray(types)) || (lib !== undefined && !isStringArray(lib)))
+    throw new Error(`void-fbtee: ${file}'s compilerOptions.types and lib must be lists of text`);
+  return { ...value, compilerOptions: { ...options, types, lib } };
+};
 const writeJson = (file: string, value: unknown) =>
   writeFileSync(file, JSON.stringify(value, null, 2) + "\n");
 
@@ -269,7 +336,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
   // In name order, as package managers keep them.
   for (const field of new Set(added.map(([, f]) => f)))
     pkg[field] = Object.fromEntries(
-      Object.entries(pkg[field] as Record<string, string>).sort(([a], [b]) => a.localeCompare(b)),
+      Object.entries(pkg[field] ?? {}).sort(([a], [b]) => a.localeCompare(b)),
     );
 
   // 2. Scripts: none. vp dev and vp build do the work, so the i18n:* scripts an earlier init
@@ -382,7 +449,7 @@ export async function init(o: InitOptions): Promise<InitResult> {
         from: "void-fbtee/plugin",
         imported: "voidFbtee",
         constructor: "voidFbtee",
-        options: builders.raw(
+        options: rawCode(
           o.site
             ? `{ sourceLocale, locales, site: ${JSON.stringify(o.site)} }`
             : "{ sourceLocale, locales }",
@@ -418,10 +485,12 @@ export async function init(o: InitOptions): Promise<InitResult> {
     } else if (vitePlus) {
       // fbtee's lint plugin and rules, and none of what init added before fbtee 6. Only Vite+'s
       // defineConfig knows `lint`, so the import moves to vite-plus (as `vp migrate` does).
-      const options = getDefaultExportOptions(mod);
-      const lint = options.lint ?? {};
-      const plugins: string[] = [...(lint.jsPlugins ?? [])];
-      const rules: Record<string, unknown> = { ...lint.rules };
+      const options = configObject(mod, viteConfig);
+      const given = field(options, "lint");
+      const givenPlugins = plainList(field(given, "jsPlugins"));
+      const plugins: string[] = isStringArray(givenPlugins) ? givenPlugins : [];
+      const givenRules = field(given, "rules");
+      const rules: Record<string, unknown> = isRecord(givenRules) ? { ...givenRules } : {};
       const wanted = [...plugins.filter((p) => p !== OLD_PLUGIN)];
       if (!wanted.includes("@nkzw/eslint-plugin-fbtee")) wanted.push("@nkzw/eslint-plugin-fbtee");
       const missingRules = Object.keys(LINT_RULES).filter((r) => !(r in rules));
@@ -432,11 +501,11 @@ export async function init(o: InitOptions): Promise<InitResult> {
       ) {
         for (const imp of mod.imports.$items)
           if (imp.from === "vite" && imp.imported === "defineConfig") imp.from = "vite-plus";
-        options.lint ??= {};
-        options.lint.jsPlugins = wanted;
-        options.lint.rules ??= {};
-        for (const r of missingRules) options.lint.rules[r] = LINT_RULES[r];
-        delete options.lint.rules[OLD_RULE];
+        const lint = child(options, "lint");
+        lint.jsPlugins = wanted;
+        const lintRules = child(lint, "rules");
+        for (const r of missingRules) lintRules[r] = LINT_RULES[r];
+        delete lintRules[OLD_RULE];
         changed = true;
         done.push(`${viteConfig}: fbtee's lint rules (Vite+ lint.jsPlugins)`);
       }
@@ -453,18 +522,23 @@ export async function init(o: InitOptions): Promise<InitResult> {
     todo.push(`no void.config.ts found: add worker: { compatibility_flags: ["temporal"] }`);
   } else {
     const mod = await loadFile(at(voidConfig));
-    const options = getDefaultExportOptions(mod);
-    options.worker ??= {};
-    options.worker.compatibility_flags ??= [];
+    const options = configObject(mod, voidConfig);
+    const worker = child(options, "worker");
+    if (!Array.isArray(worker.compatibility_flags)) worker.compatibility_flags = [];
+    const flags: unknown = worker.compatibility_flags;
     let changed = false;
-    if (!options.worker.compatibility_flags.includes("temporal")) {
-      options.worker.compatibility_flags.push("temporal");
+    if (Array.isArray(flags) && !plainList(flags).includes("temporal")) {
+      flags.push("temporal");
       changed = true;
       done.push(`${voidConfig}: added Cloudflare's "temporal" compatibility flag`);
     }
-    const redirects = options.routing?.redirects;
-    const old = redirects?.["/"];
-    if (old && old.to === `/${o.sourceLocale}` && old.status === 301) {
+    const redirects = field(field(options, "routing"), "redirects");
+    const old = field(redirects, "/");
+    if (
+      isRecord(redirects) &&
+      field(old, "to") === `/${o.sourceLocale}` &&
+      field(old, "status") === 301
+    ) {
       delete redirects["/"];
       changed = true;
       done.push(
@@ -485,9 +559,9 @@ export async function init(o: InitOptions): Promise<InitResult> {
 
   // 7. tsconfig.json: fbtee's JSX types, ES2025 (Temporal, Intl.DurationFormat) and the DOM.
   if (existsSync(at("tsconfig.json"))) {
-    let ts: { compilerOptions?: { types?: string[]; lib?: string[] } };
+    let ts: TsConfig;
     try {
-      ts = readJson(at("tsconfig.json"));
+      ts = readTsconfig(at("tsconfig.json"));
     } catch {
       ts = {};
       todo.push(

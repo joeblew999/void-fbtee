@@ -45,21 +45,30 @@ export function routeUrl<R extends string>(
   path: `/[lang]${R}`,
   ...args: `/${Lang}${R}` extends RoutePath ? [options?: MarkdownOptions] : [options: never]
 ): RouteUrl;
-export function routeUrl(
-  path: string,
-  options: { params?: Record<string, string | number> } = {},
-): RouteUrl {
-  if (!path.includes("[lang]")) return voidRouteUrl(path as RoutePath, options as never);
+export function routeUrl(path: string, options: UrlOptions = {}): RouteUrl {
+  if (!path.includes("[lang]")) return buildUrl(path, options);
   const lang = options.params?.lang ?? currentLang();
   if (!lang)
     throw new Error(
       `void-fbtee: routeUrl("${path}"): no current language here (not in a request or inLocale()); pass params.lang`,
     );
-  return voidRouteUrl(
-    path as RoutePath,
-    {
-      ...options,
-      params: { ...options.params, lang },
-    } as never,
-  );
+  return buildUrl(path, { ...options, params: { ...options.params, lang } });
 }
+
+/** A route's parameters, query and hash, as Void's routeUrl takes them. */
+export type UrlOptions = {
+  params?: Record<string, string | number>;
+  query?: RouteQuery;
+  hash?: string;
+};
+
+// Void's routeUrl, for a pattern known only when the code runs. The one cast left in the package
+// (plans/no-casts.md): Void's routeUrl takes only the app's own route patterns (RoutePath, from its
+// generated .void/routes.d.ts), which this package, built without an app, never has; and Void
+// exports no untyped builder to call instead. Copying its URL encoding here would be worse.
+// oxlint-disable-next-line typescript/consistent-type-assertions -- Void exports no untyped route builder (plans/no-casts.md)
+const untypedRouteUrl = voidRouteUrl as unknown as (path: string, options: UrlOptions) => RouteUrl;
+
+/** An address for a route pattern known only at run time ("/[lang]/events/[id]"). */
+export const buildUrl = (path: string, options: UrlOptions = {}): RouteUrl =>
+  untypedRouteUrl(path, options);

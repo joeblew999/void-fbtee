@@ -21,7 +21,7 @@ import langPages from "virtual:void-fbtee/pages";
 import { setServerLang, setServerTranslations } from "./current";
 import type { TranslationDictionary } from "fbtee";
 import type { AppLocale, Dir, Lang, Locale } from "./locales";
-import { routeUrl } from "./routes";
+import { buildUrl } from "./routes";
 import { allTranslations, fallbacksOf, reportMissing } from "./runtime";
 import texts from "virtual:void-fbtee/texts";
 
@@ -100,18 +100,25 @@ export function revalidate(options: {
   paths?: readonly (`/[lang]${string}` | RouteUrl)[];
   all?: boolean;
 }): Promise<void> {
-  const paths = options.paths?.flatMap((path) =>
-    path.startsWith("/[lang]")
-      ? localizedPaths(path.slice("/[lang]".length) as `/${string}`)
-      : [path],
-  );
-  return voidRevalidate({ ...options, paths: paths as RouteUrl[] | undefined });
+  const paths = options.paths?.flatMap((path): string[] => {
+    const rest = path.startsWith("/[lang]") ? path.slice("/[lang]".length) : undefined;
+    return rest !== undefined && isSubPath(rest) ? localizedPaths(rest) : [path];
+  });
+  return clearPaths({ ...options, paths });
 }
 
 /**
  * The same page in every language: `localizedPaths("/events")` is ["/en-US/events",
  * "/th-TH/events", …].
  */
+/** A path below a language's own ("/events"), or none: what follows `/[lang]` in a pattern. */
+const isSubPath = (path: string): path is `/${string}` | "" => path === "" || path.startsWith("/");
+
+// Void's revalidate, for paths built when the code runs: in an app it takes the app's own routes
+// (RouteUrl), which this package, built without an app, doesn't have; its parameter as plain
+// text is what Void's runtime takes. A typed view of the function, which TypeScript checks.
+const clearPaths: (options: { paths?: string[]; all?: boolean }) => Promise<void> = voidRevalidate;
+
 export function localizedPaths<P extends `/${string}` | "">(path: P): `/${Lang}${P}`[] {
   return config.locales.map((l) => `/${l.segment}${path}` as const);
 }
@@ -124,7 +131,7 @@ export function localizedPaths<P extends `/${string}` | "">(path: P): `/${Lang}$
  * `export const prerender = true; export const getPrerenderPaths = langParams;`.
  */
 export function langParams(): { lang: Lang }[] {
-  return config.locales.map((l) => ({ lang: l.segment as Lang }));
+  return config.locales.map((l) => ({ lang: l.segment }));
 }
 
 /**
@@ -207,7 +214,7 @@ export function sitemap(
     Object.fromEntries(
       config.locales.map((l) => [
         l.locale,
-        routeUrl(page.path as never, { params: { ...page.params, lang: l.segment } } as never),
+        buildUrl(page.path, { params: { ...page.params, lang: l.segment } }),
       ]),
     );
   const entries: Entry[] = [
@@ -215,7 +222,7 @@ export function sitemap(
       .filter((path) => !options.exclude?.includes(path))
       .map((path) => ({ urls: urlsOf({ path }), lastmod: lastmodOf.get(path) })),
     ...given
-      .filter((p) => p.params || !(langPages as readonly string[]).includes(p.path))
+      .filter((p) => p.params || !langPages.some((path) => path === p.path))
       .map((p) => ({ urls: urlsOf(p), lastmod: p.lastmod })),
     ...markdownEntries(),
   ];

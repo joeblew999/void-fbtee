@@ -64,6 +64,7 @@
   },
   "devDependencies": {
     "@arethetypeswrong/core": "0.18.5",
+    "@cloudflare/workers-types": "catalog:",
     "@nkzw/eslint-plugin-fbtee": "6.0.0",
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",

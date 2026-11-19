@@ -3,7 +3,9 @@
 // inLocale()'s; in the browser, the page's. The server registers its source when its module loads
 // (server.ts), so nothing here imports node:async_hooks, and the browser can load it.
 import type { TranslationDictionary } from "fbtee";
-import { readMeta, type Lang } from "./locales";
+import config from "virtual:void-fbtee/config";
+import { field } from "./guards";
+import { isLang, readMeta, type Lang } from "./locales";
 
 let serverLang: (() => Lang | undefined) | undefined;
 
@@ -32,5 +34,6 @@ export function currentLang(): Lang | undefined {
   const fromServer = serverLang?.();
   if (fromServer) return fromServer;
   // The page's own i18n data, as islands read it (install.ts, documentI18n).
-  return readMeta<{ lang: Lang }>()?.lang;
+  const lang = field(readMeta(), "lang");
+  return isLang(config, lang) ? lang : undefined;
 }

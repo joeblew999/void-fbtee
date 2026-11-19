@@ -45,7 +45,7 @@ export function sha256(text: string): string {
       const s1 = rotr(w[t - 2]!, 17) ^ rotr(w[t - 2]!, 19) ^ (w[t - 2]! >>> 10);
       w[t] = (w[t - 16]! + s0 + w[t - 7]! + s1) >>> 0;
     }
-    let [a, b, c, d, e, f, g, hh] = h as unknown as number[];
+    let [a, b, c, d, e, f, g, hh] = h;
     for (let t = 0; t < 64; t++) {
       const S1 = rotr(e!, 6) ^ rotr(e!, 11) ^ rotr(e!, 25);
       const ch = (e! & f!) ^ (~e! & g!);

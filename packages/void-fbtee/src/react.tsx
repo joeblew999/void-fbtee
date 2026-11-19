@@ -41,7 +41,8 @@ import { langAttrs, localeFromPath, type Lang, type Locale } from "./locales";
 import { languageEntries, normalize, visitorsOwn, type LanguageEntry } from "./language-list";
 import { translationsFor } from "./runtime";
 export { langAttrs } from "./locales";
-import { install, documentI18n } from "./install";
+import { install, documentI18n, sharedI18n } from "./install";
+import { field, isRecord } from "./guards";
 import type { SharedI18n } from "./middleware/i18n";
 
 /**
@@ -81,8 +82,7 @@ export function useHydrated(): boolean {
 export function useLocale(): SharedI18n {
   // Regular pages, and islands while the server renders them, have Void's shared data. An island
   // hydrating in the browser has only its props, so it reads the middleware's <meta> instead.
-  const shared = useContext(SharedContext) as { i18n?: SharedI18n } | null;
-  const i18n = shared?.i18n ?? documentI18n();
+  const i18n = sharedI18n(field(useContext(SharedContext), "i18n")) ?? documentI18n();
   if (!i18n)
     throw new Error("void-fbtee: shared.i18n is missing. Is middleware/99.i18n.ts set up?");
   return i18n;
@@ -95,7 +95,7 @@ export function useLocales(): Locale[] {
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const { locale } = useLocale();
-  if (!import.meta.env.SSR) use(install(locale) as Promise<void>);
+  if (!import.meta.env.SSR) use(install(locale));
   return children;
 }
 
@@ -150,7 +150,7 @@ const serverRuntimes = new WeakMap<TranslationDictionary, Map<string, FbteeRunti
 function serverRuntime(locale: string, gender: Gender | undefined): FbteeRuntime {
   const translations = currentTranslations() ?? {};
   let byKey = serverRuntimes.get(translations);
-  if (!byKey) serverRuntimes.set(translations, (byKey = new Map()));
+  if (!byKey) serverRuntimes.set(translations, (byKey = new Map<string, FbteeRuntime>()));
   const key = `${locale} ${gender ?? ""}`;
   let runtime = byKey.get(key);
   if (!runtime)
@@ -212,12 +212,22 @@ export function useForm<U extends FormUrl>(
   options?: LangFormOptions<U>,
 ): ReturnType<typeof voidUseForm<U>> {
   const { lang } = useLocale();
-  const given = options as { params?: Record<string, string> } | undefined;
-  const params = String(url).includes("[lang]")
-    ? { ...given?.params, lang: given?.params?.lang ?? lang }
-    : given?.params;
-  return voidUseForm(url, defaults, { ...options, params } as VoidFormOptions<U>);
+  const given = field(options, "params");
+  const own = isRecord(given) ? given : undefined;
+  const params = String(url).includes("[lang]") ? { ...own, lang: own?.lang ?? lang } : own;
+  return untypedUseForm(url, defaults, { ...options, params });
 }
+
+// Void's useForm, with options made when the code runs. The second cast left in the package
+// (plans/no-casts.md), the same case as routeUrl's (routes.ts): Void types useForm only by the
+// app's own actions (its generated route types), which this package, built without an app, never
+// has, and the options with `lang` filled in can't be shown to TypeScript to be that type.
+// oxlint-disable-next-line typescript/consistent-type-assertions -- Void's useForm is typed only by the app's own actions (plans/no-casts.md)
+const untypedUseForm = voidUseForm as unknown as <U extends FormUrl>(
+  url: U,
+  defaults: ResolveActionBody<U>,
+  options: object,
+) => ReturnType<typeof voidUseForm<U>>;
 
 /**
  * "Now" that stays right on cached pages. The first render uses the server's "now", so it hydrates

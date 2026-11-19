@@ -5,11 +5,16 @@ import { setupLocaleContext } from "fbtee";
 import catalogs from "virtual:void-fbtee/catalogs";
 import config from "virtual:void-fbtee/config";
 import texts from "virtual:void-fbtee/texts";
-import { readMeta } from "./locales";
+import { field, textField } from "./guards";
+import { isAppLocale, isLang, readMeta, type Dir } from "./locales";
 import type { SharedI18n } from "./middleware/i18n";
 import { localeContextOptions, reportMissing } from "./runtime";
 
-type Tracked = Promise<void> & { status?: "pending" | "fulfilled"; value?: void };
+/** A load React's `use()` can read the state of: pending, or fulfilled with its value (React's
+ * convention for a promise it's given). */
+type Tracked =
+  | (Promise<void> & { status: "pending" })
+  | (Promise<void> & { status: "fulfilled"; value: undefined });
 const installed = new Map<string, Tracked>();
 const missing = reportMissing(texts);
 
@@ -27,17 +32,15 @@ export function install(locale: string): Tracked {
     // given up front: fbtee's setupLocaleContext never loads a catalog for the source language
     // itself, though it reads one it's given.
     const source = catalogs[config.sourceLocale];
-    const p: Tracked = (async () => {
+    const loading = (async () => {
       const translations = source ? (await source()).default : undefined;
       const context = setupLocaleContext({
         ...localeContextOptions(config, catalogs, locale, onMissing),
         ...(translations && { translations }),
       });
       await context.preloadLocale(locale);
-    })().then(() => {
-      p.status = "fulfilled";
-    });
-    p.status = "pending";
+    })().then(() => void Object.assign(p, { status: "fulfilled", value: undefined }));
+    const p: Tracked = Object.assign(loading, { status: "pending" as const });
     ready = p;
     installed.set(locale, ready);
   }
@@ -46,5 +49,19 @@ export function install(locale: string): Tracked {
 
 /** The middleware's i18n data from the page's <meta name="void-fbtee">, in the browser. */
 export function documentI18n(): SharedI18n | undefined {
-  return readMeta<SharedI18n>();
+  return sharedI18n(readMeta());
 }
+
+/** The middleware's i18n data, checked: from Void's shared data or the page's <meta>. */
+export function sharedI18n(meta: unknown): SharedI18n | undefined {
+  const locale = field(meta, "locale");
+  const lang = field(meta, "lang");
+  const dir = field(meta, "dir");
+  const now = textField(meta, "now");
+  const path = textField(meta, "path");
+  if (!isAppLocale(config, locale) || !isLang(config, lang) || !isDir(dir)) return;
+  if (now === undefined || path === undefined) return;
+  return { locale, lang, dir, now, path };
+}
+
+const isDir = (value: unknown): value is Dir => value === "ltr" || value === "rtl";

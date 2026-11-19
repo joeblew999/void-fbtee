@@ -4,6 +4,7 @@
 // request; the two locale codes and one sentence say what to do; the answer's shape is set with
 // responseJsonSchema; each answer is read back by name, never by position
 // (plans/translation-simple.md). test/request.json is what these must build, written by hand.
+import { field, isRecord } from "./guards";
 import { MARKS } from "./plurals";
 import type { Usage } from "./models";
 
@@ -31,6 +32,45 @@ export interface GeminiRequest {
 }
 
 /** Gemini's answer (generateContent), the parts void-fbtee reads. */
+const isOptional = <T>(value: unknown, check: (v: unknown) => v is T): value is T | undefined =>
+  value === undefined || check(value);
+const isNumber = (value: unknown): value is number => typeof value === "number";
+const isText = (value: unknown): value is string => typeof value === "string";
+const isPart = (value: unknown): value is { text?: string } =>
+  isRecord(value) && isOptional(value.text, isText);
+const isCandidate = (value: unknown): value is NonNullable<GeminiAnswer["candidates"]>[number] =>
+  isRecord(value) &&
+  isOptional(value.finishReason, isText) &&
+  (value.content === undefined ||
+    (isRecord(value.content) &&
+      (value.content.parts === undefined ||
+        (Array.isArray(value.content.parts) && value.content.parts.every(isPart)))));
+
+/** An answer in Gemini's shape (generateContent), each field it has checked. */
+export const isGeminiAnswer = (value: unknown): value is GeminiAnswer =>
+  isRecord(value) &&
+  (value.candidates === undefined ||
+    (Array.isArray(value.candidates) && value.candidates.every(isCandidate))) &&
+  (value.usageMetadata === undefined ||
+    (isRecord(value.usageMetadata) &&
+      isOptional(value.usageMetadata.promptTokenCount, isNumber) &&
+      isOptional(value.usageMetadata.candidatesTokenCount, isNumber) &&
+      isOptional(value.usageMetadata.thoughtsTokenCount, isNumber)));
+
+/** A catalog entry as the dev route is sent it: its description, and lines of text with their
+ * plural forms or genders. */
+export const isEntry = (value: unknown): value is Entry =>
+  isRecord(value) &&
+  typeof value.description === "string" &&
+  Array.isArray(value.lines) &&
+  value.lines.every(
+    (l) =>
+      isRecord(l) &&
+      typeof l.text === "string" &&
+      isRecord(l.variations) &&
+      Object.values(l.variations).every(isNumber),
+  );
+
 export interface GeminiAnswer {
   candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[];
   usageMetadata?: {
@@ -108,11 +148,10 @@ export function stringRequest(
  * A line not answered is undefined.
  */
 export function stringAnswer(entry: Entry, answer: unknown): (string | undefined)[] {
-  const lines = (answer as { lines?: unknown } | undefined)?.lines;
+  const lines = field(answer, "lines");
   if (plain(entry)) return [typeof lines === "string" ? lines : undefined];
-  const named = (lines && typeof lines === "object" ? lines : {}) as Record<string, unknown>;
   return entry.lines.map((l) => {
-    const line = named[lineName(l.variations)];
+    const line = field(lines, lineName(l.variations));
     return typeof line === "string" ? line : undefined;
   });
 }
@@ -143,12 +182,11 @@ export function fieldsAnswer(
   fields: Record<string, string>,
   answer: unknown,
 ): Record<string, string | undefined> {
-  const got = (answer && typeof answer === "object" ? answer : {}) as Record<string, unknown>;
   return Object.fromEntries(
-    Object.keys(fields).map((k) => [
-      k,
-      typeof got[k] === "string" ? (got[k] as string) : undefined,
-    ]),
+    Object.keys(fields).map((k) => {
+      const got = field(answer, k);
+      return [k, typeof got === "string" ? got : undefined];
+    }),
   );
 }
 

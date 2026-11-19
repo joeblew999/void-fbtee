@@ -40,6 +40,7 @@ import {
 } from "./translate";
 import { check } from "./check";
 import { keepTranslations } from "./gen";
+import { parseJson, textField } from "../guards";
 import type { Plugin, ViteDevServer } from "vite";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
 import type { FallbackLocales } from "fbtee";
@@ -579,8 +580,8 @@ function zodMessages(root: string, inApp: boolean, config: LocaleConfig): string
   } catch {
     return none;
   }
-  if (Number(JSON.parse(readFileSync(join(pkg, "package.json"), "utf8")).version.split(".")[0]) < 4)
-    return none;
+  const version = textField(parseJson(readFileSync(join(pkg, "package.json"), "utf8")), "version");
+  if (Number(version?.split(".")[0] ?? 0) < 4) return none;
   const dir = join(pkg, "v4/locales");
   const has = (name: string) => existsSync(join(dir, `${name}.js`));
   const found = config.locales.flatMap((l) => {

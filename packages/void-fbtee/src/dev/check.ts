@@ -14,6 +14,7 @@ import { problemsWith } from "../judge";
 import { fingerprint } from "../fingerprint";
 import { firstFile, hasI18nMiddleware, HOME_PAGES, LAYOUTS, VOID_CONFIGS } from "./app-files";
 import { keepTranslations, wiringProblems } from "./gen";
+import { readCatalog } from "./catalog-file";
 import { sourceOf, translatedOf } from "../locales";
 
 /** Frontmatter key a translated markdown page records its original's hash in. */
@@ -180,7 +181,7 @@ export function leftovers(p: Project): string[] {
       if (f.endsWith(".json") && !wanted.has(f.slice(0, -".json".length)))
         out.push(`${p.translations}/${f}`);
   const pages = join(p.root, "pages");
-  const segments = new Set(p.config.locales.map((l) => l.segment as string));
+  const segments = new Set<string>(p.config.locales.map((l) => l.segment));
   if (existsSync(pages))
     for (const d of readdirSync(pages, { withFileTypes: true }))
       if (d.isDirectory() && !segments.has(d.name) && isLanguage(d.name))
@@ -270,20 +271,15 @@ export function check(p: Project): string[] {
   for (const locale of translatedOf(p.config).map((l) => l.locale)) {
     const file = catalogFile(p, locale);
     if (!existsSync(file)) continue;
-    type Line = { translation: string; variations: Record<string, number> };
-    const catalog = JSON.parse(readFileSync(file, "utf8")) as {
-      translations: Record<
-        string,
-        { status?: string; translations?: Line[]; translatedBy?: string }
-      >;
-    };
-    const source = (
-      JSON.parse(freshCatalog(p, locale)) as {
-        translations: Record<string, { translations: Line[] }>;
-      }
+    const catalog = readCatalog(readFileSync(file, "utf8"), file);
+    const source = readCatalog(
+      freshCatalog(p, locale),
+      `the ${locale} strings in the code`,
     ).translations;
     for (const [hash, entry] of Object.entries(catalog.translations)) {
-      if (entry.status === "new" || !entry.translations?.length || !source[hash]) continue;
+      // What the code says now: none (the string is gone from the code), nothing to check against.
+      const from = source[hash]?.translations;
+      if (entry.status === "new" || !entry.translations?.length || !from?.length) continue;
       // Who translated it, always (plans/translation-provenance.md): a model's id, "claude", a
       // person, or "unknown" when nothing says.
       if (!entry.translatedBy?.trim())
@@ -291,7 +287,7 @@ export function check(p: Project): string[] {
           `strings: ${locale}: ${JSON.stringify(texts[hash] ?? hash)}: doesn't say who translated it (translatedBy)`,
         );
       for (const what of problemsWith(
-        source[hash].translations,
+        from,
         entry.translations.map((l) => l.translation),
         locale,
       ))

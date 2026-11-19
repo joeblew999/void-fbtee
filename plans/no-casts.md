@@ -1,8 +1,6 @@
 # plans/no-casts.md: no casts in the package
 
-Status: found 2026-11-19, while taking the casts out of the translated-content code
-(`plans/types-from-schema.md`); not started. Waits for the user's OK. Each line is checked against
-the code again before it's changed.
+Status: 2026-11-19, approved by the user in the conversation; built, committed locally.
 
 ## Why
 
@@ -36,6 +34,42 @@ The rest of `packages/void-fbtee/src` still has casts on 53 lines (counted 2026-
   from the registered list's type (`VoidFbteeRegister`), so it's the app's type from the start.
 - **What TypeScript's own types lack** (`Intl.Locale`'s `textInfo` and `getTextInfo`, a hash's
   words as `number[]`): a declaration of what the runtime has, once, instead of a cast at each use.
+
+## As built (2026-11-19)
+
+- **The lint rules, for `packages/void-fbtee/src/**`** (the root `vite.config.ts`, `lint.overrides`):
+  `typescript/consistent-type-assertions` set to `never` (no `as`, `as const` aside), and
+  `no-explicit-any` with the five `no-unsafe-*` rules, since a value used as `any` (from
+  `JSON.parse`, `require()`, a loosely typed library) loses its type as surely as a cast. They
+  found 56 casts and 41 uses of `any`; none are left.
+- **Checks instead (`src/guards.ts`):** `isRecord`, `field`, `textField`, `textRecord`,
+  `parseJson` (JSON as `unknown`). Shapes checked where they're read: catalogs
+  (`src/dev/catalog-file.ts`, `readCatalog`: every entry, `usage` and `review`, against the real
+  catalogs), Gemini's answers and the dev route's requests (`isGeminiAnswer`, `isEntry`,
+  `isDevRequest`), the page's `<meta>` data (`sharedI18n`), package.json and tsconfig.json in
+  `init`, fbtee's collected phrases, magicast's config proxies (`configObject`, `child`).
+- **Real bugs the casts hid, now fixed:**
+  - a locale written in another spelling than its canonical one (`en-us`) got a segment the app's
+    types don't have: `resolveLocales` now says to write it as `en-US`;
+  - Cloudflare's D1 types weren't loaded in the package's own build, so every D1 result
+    (`D1Result`) was silently untyped (TypeScript skips library files here): the package now has
+    `@cloudflare/workers-types` (the version Void uses) in its dev dependencies and types;
+  - magicast's lists don't hand their callbacks plain values, so a check written with `.some`
+    never matched and `init` would have replaced an app's `compatibility_flags` with its own
+    (caught by the unit tests): lists are read through a spread (`plainList`).
+- **Typed views instead of casts**, which TypeScript checks: Void's `ai.run` (typed only for
+  Cloudflare's own models, not Gemini through AI Gateway) and Void's `revalidate` (typed by the
+  app's routes), each assigned to a plain function type.
+- **Two casts left, each with a lint exception saying why:** `untypedRouteUrl` in `src/routes.ts`
+  and `untypedUseForm` in `src/react.tsx`. Void's `routeUrl` and `useForm` are typed only by the
+  app's own routes and actions (its generated `.void/routes.d.ts`), which a package built without
+  an app never has; Void exports no untyped builder, and copying its URL encoding would be worse.
+
+## For Void (filed only with the user's OK)
+
+- An untyped `routeUrl` (and `useForm`) for a library that builds a route known only at run time:
+  the two casts left.
+- `ai.run` typed for a model reached through AI Gateway (`google/gemini-…`), not only Workers AI's.
 
 ## Done when
 

@@ -1,7 +1,21 @@
 // The locale table: URL segment <-> catalog locale <-> text direction. Pure functions, used on
 // both the server (middleware) and in the browser (Link, provider).
 
+import { parseJson } from "./guards";
+
 export type Dir = "ltr" | "rtl";
+
+// What runtimes have that TypeScript's own types don't: a locale's text direction, as
+// `getTextInfo()` (the current proposal) or `textInfo` (the earlier one). Neither is everywhere.
+declare global {
+  // oxlint-disable-next-line typescript/no-namespace
+  namespace Intl {
+    interface Locale {
+      getTextInfo?(): { direction?: string };
+      readonly textInfo?: { direction?: string };
+    }
+  }
+}
 
 /** One locale as the app configures it: a BCP 47 tag, optionally with its URL segment and direction. */
 export type LocaleInput = string | { locale: string; segment?: string; dir?: Dir };
@@ -47,7 +61,7 @@ export type AppLocale = VoidFbteeRegister extends { locales: readonly (infer L)[
 
 export interface Locale {
   /** BCP 47 tag, e.g. "th-TH". Also the catalog name: i18n/translations/th-TH.json. */
-  locale: string;
+  locale: AppLocale;
   /** First URL path segment for this locale, e.g. "th-TH" in /th-TH/bookings. */
   segment: Lang;
   dir: Dir;
@@ -72,24 +86,27 @@ export function langAttrs(locale: string): { lang: string; dir: Dir } {
 
 /** The text direction of a locale, from Intl when the runtime knows it, else from its language. */
 export function dirOf(locale: string): Dir {
-  const info =
-    (
-      new Intl.Locale(locale) as Intl.Locale & {
-        getTextInfo?: () => { direction?: string };
-        textInfo?: { direction?: string };
-      }
-    ).getTextInfo?.() ??
-    (new Intl.Locale(locale) as { textInfo?: { direction?: string } }).textInfo;
+  const intl = new Intl.Locale(locale);
+  const info = intl.getTextInfo?.() ?? intl.textInfo;
   if (info?.direction === "rtl" || info?.direction === "ltr") return info.direction;
   return RTL_LANGUAGES.has(new Intl.Locale(locale).language) ? "rtl" : "ltr";
 }
 
 export function resolveLocales(sourceLocale: string, inputs: readonly LocaleInput[]): LocaleConfig {
-  const locales = inputs.map((input) => {
-    const entry = typeof input === "string" ? { locale: input } : input;
+  // The list as the app wrote it, which its register gives the types of (VoidFbteeRegister): a tag
+  // or segment in it is one of the app's. Checked against it, not assumed.
+  const entries = inputs.map((input) => (typeof input === "string" ? { locale: input } : input));
+  const tags = new Set(entries.map((e) => e.locale));
+  const segments = new Set(entries.map((e) => e.segment ?? e.locale));
+  const isTag = (s: string): s is AppLocale => tags.has(s);
+  const isSegment = (s: string): s is Lang => segments.has(s);
+  const locales = entries.map((entry): Locale => {
     const locale = Intl.getCanonicalLocales(entry.locale)[0]!;
-    // The registered type of the same list (Register), so the segment is one of the app's.
-    const segment = (entry.segment ?? locale) as Lang;
+    // Written as its canonical form, or the app's types and its URLs would name another spelling.
+    const spelling = `void-fbtee: locale "${entry.locale}" is written "${locale}": write it so in locales.`;
+    if (!isTag(locale)) throw new Error(spelling);
+    const segment = entry.segment ?? locale;
+    if (!isSegment(segment)) throw new Error(`void-fbtee: no segment for "${locale}".`);
     return { locale, segment, dir: entry.dir ?? dirOf(locale) };
   });
   if (!locales.some((l) => l.locale === sourceLocale)) {
@@ -115,9 +132,18 @@ export function localeFromPath(path: string, config: LocaleConfig): Locale | und
 /** Name of the <meta> tag the middleware writes the page's i18n data into, for islands. */
 export const META_NAME = "void-fbtee";
 
-/** The page's <meta name="void-fbtee"> data, in the browser; undefined on the server or without it. */
-export function readMeta<T>(): T | undefined {
+/** The page's <meta name="void-fbtee"> data, in the browser, for a check to read; undefined on the
+ * server or without it. */
+export function readMeta(): unknown {
   if (typeof document === "undefined") return;
   const content = document.querySelector<HTMLMetaElement>(`meta[name="${META_NAME}"]`)?.content;
-  return content ? (JSON.parse(content) as T) : undefined;
+  return content ? parseJson(content) : undefined;
 }
+
+/** One of the app's URL segments, by its language list. */
+export const isLang = (config: LocaleConfig, value: unknown): value is Lang =>
+  config.locales.some((l) => l.segment === value);
+
+/** One of the app's languages, by its list. */
+export const isAppLocale = (config: LocaleConfig, value: unknown): value is AppLocale =>
+  config.locales.some((l) => l.locale === value);
