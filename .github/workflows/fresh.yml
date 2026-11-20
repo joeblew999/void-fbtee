@@ -1,7 +1,8 @@
-# void-fbtee as a developer receives it (e2e/fresh/check.ts): packed, checked as Void checks its own
+# void-fbtee as a developer receives it (e2e/fresh/fresh.ts): packed, checked as Void checks its own
 # packages, installed into fresh `void init` apps with npm and pnpm, on Vite+ and plain Vite, plus
-# the git install. When what it covers changes, as voidzero-dev/void runs its packed-install tests,
-# and weekly, since new apps get the latest Void, Vite+, Vite, npm and pnpm without this repo changing.
+# a first app with no translator. When what it covers changes, as
+# voidzero-dev/void runs its packed-install tests, and weekly, since new apps get the latest Void,
+# Vite+, Vite, fbtee 6.x, npm and pnpm without this repo changing.
 name: Fresh install
 
 on:
@@ -40,10 +41,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        app: [pnpm-vite-plus, npm-vite-plus, pnpm-vite, npm-vite, git, thai-source]
+        app: [vite-plus-pnpm, vite-plus-npm, vite-pnpm, vite-npm, thai-source, no-translator]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
-      - run: vp run test:fresh ${{ matrix.app }}
+      # The tarball's own checks with each app (they're quick), then that app's steps.
+      - run: vp run test:fresh e2e/fresh/tarball.test.ts e2e/fresh/${{ matrix.app }}.test.ts

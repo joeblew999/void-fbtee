@@ -7,8 +7,8 @@ https://void-fbtee-example.gedw99.workers.dev
 
 ## What it is
 
-A Void add-on, built the way Void's own `@void/md` and `@void/react` are: a Vite plugin
-(`import { voidFbtee } from "void-fbtee/plugin"`) plus the parts a Void app uses at run time:
+A Void add-on, made of the same two kinds of part as Void's own `@void/md` and `@void/react`: a
+Vite plugin (`import { voidFbtee } from "void-fbtee/plugin"`) plus the parts a Void app uses at run time:
 `void-fbtee/middleware` (each request's language), `void-fbtee/react` (components and forms),
 `void-fbtee/routes` (links in the current language) and `void-fbtee/server` (cache clearing in
 every language, and code with no page: a scheduled job, a queue consumer, an email). With Zod 4,
@@ -25,36 +25,42 @@ each browser engine ships its own locale data and writes some values differently
 browser knows, such as the reader's own time zone, the browser formats, once it knows it: the
 server leaves that space empty rather than showing a stand-in.
 
+## What it needs
+
+- **Node.js** 24.22 or later (26.12 or later on 26).
+- **In the app** (void-fbtee's peers; `init` adds the ones the app hasn't got): Void and `@void/react`
+  1.7 or later, React 19.2 or later, fbtee 6 (any 6.x: tested with 6.0.1), `temporal-polyfill` 1.0.8
+  or later, and Vite 8 (plain, or Vite+'s).
+- **React.** A Void app on Vue, Svelte or Solid can't use it: fbtee renders through React. `init`
+  says so and stops.
+- **Vite.** It's a Vite plugin: plain Rollup or Rolldown can't run it (it stops and says so).
+- **Cloudflare's flags**, in `void.config.ts`: `temporal` (`init` adds it; `vp build` checks it), and
+  `nodejs_als`, for `AsyncLocalStorage` in `void-fbtee/server` and translated content, which Void
+  turns on itself.
+- **To translate as you work** (`vp dev`), either or both of:
+  - Gemini, through Void's AI: when the app's code imports `void/ai` (Void's `guide/ai.md`), signed
+    in to Cloudflare (`vp exec void connect --platform cloudflare`);
+  - Claude Code: `claude`, signed in on your machine (`claude auth status`).
+
+  `init` says which you have. With neither, write the translations in `i18n/translations/` by hand:
+  `vp build` stops until every string and page is translated, and its message lists them.
+
+- **Optional:** Vite DevTools 0.8, for void-fbtee's panel (below).
+
 ## Add it to a Void app
 
-It isn't on npm yet: an app installs a
-[release](https://github.com/joeblew999/void-fbtee/releases) from its repo. In the app's
-`package.json`:
-
-```json
-"dependencies": {
-  "void-fbtee": "github:joeblew999/void-fbtee#v0.7.0&path:/packages/void-fbtee"
-}
-```
-
-With pnpm, in its `pnpm-workspace.yaml` (pnpm only builds a git dependency you allow):
-
-```yaml
-allowBuilds:
-  "void-fbtee@git+https://github.com/joeblew999/void-fbtee.git": true
-```
-
-Then, in the app's folder:
+From npm (not there yet: the first version is published by hand, then CI publishes each
+release; the repo's README, "Releasing"). In the app's folder:
 
 ```sh
-vp install
+vp add void-fbtee
 vp exec void-fbtee init --locales ar-EG,th-TH
-vp install
 vp dev      # prepares and translates as you work
 vp build    # fails on anything untranslated
 ```
 
-`init` adds only what's missing, so it's safe to run again. Once the app has a home page under
+`init` adds only what's missing, so it's safe to run again. It installs what it adds, with the
+app's own package manager, and says who will translate as you work on this machine. Once the app has a home page under
 `pages/[lang]/`, it also writes Void's not-found and error pages in the page's language
 (`pages/_not-found.tsx`, `pages/_error.tsx`), unless the app has its own; and a sitemap with
 every page in every language (`routes/sitemap.xml.ts`). `init` is void-fbtee's only command;
@@ -72,6 +78,11 @@ voidFbtee({ sourceLocale, locales, site: "https://example.com" });
 its request came to. With it, a copy at another address answers `X-Robots-Tag: noindex`, so it
 stays out of search results. `vp exec void-fbtee init --site https://example.com` adds it. A change to `voidFbtee()`'s options needs the dev server restarted: Vite reads
 the plugin once, when it starts.
+
+Translating as you work can be left to you: `voidFbtee({ translate: false })` turns both
+translators off, and `{ translate: { gemini: false } }` or `{ translate: { claude: false } }` one of
+them. `vp dev` still reports what's left, and `vp build` still stops on it. Under CI and in tests
+(Vitest) it never translates.
 
 `"/"` sends each visitor to their own language: the first of their browser's languages the app
 has, matched by fbtee's own rule (`th` gets `th-TH`, `ar-SA` gets `ar-EG`), with a 302 that's never
@@ -167,6 +178,7 @@ runs, the same on a developer's machine as in CI. There are no i18n scripts.
 | `vp dev`   | As it starts and on each save, adds new strings to every catalog, with each language's plural and gender forms, marked new, and translates what's new straight after, strings and markdown pages: with Void's AI when the app uses `void/ai` (`void-fbtee/ai`, in the app's own Worker); Claude Code (a `claude` on your machine, signed in) translates what's left and reviews what Void's AI wrote. Reports what's left. |
 | `vp build` | Fails on anything left: an untranslated string or page, a page older than its original, a setup problem. So `void deploy`, and CI, can't ship one.                                                                                                                                                                                                                                                                         |
 | `vp check` | Lints with fbtee's strict rules: text nobody wrapped for translation is an error.                                                                                                                                                                                                                                                                                                                                          |
+| CI         | The same commands on every push: `vp check`, `vp build`, then the deploy.                                                                                                                                                                                                                                                                                                                                                  |
 
 **What people post.** Run `vp exec void-fbtee gen translations events title description` and
 void-fbtee translates every row of `events` into the app's languages, and again when a row is
@@ -191,11 +203,30 @@ don't send what mustn't leave you. When the credits are used up (HTTP 402) or a
 spend limit set on the gateway is reached (429), `vp dev` says so once and stops asking; what's
 left stays new for Claude Code or the next save. A spend limit (Cloudflare's AI Gateway docs,
 "Spend limits") caps what dev and the live site can spend together.
-| CI | The same commands on every push: `vp check`, `vp build`, then the deploy. |
 
 Words a product uses everywhere (its menu, its own terms) go once in `i18n/common_strings.json`,
 fbtee's common strings, with their description, and are written `<fbt common>Seats</fbt>` or
 `fbs.c("Seats")`: one translation each, the same on every page.
+
+## In Vite DevTools
+
+With [Vite DevTools](https://devtools.vite.dev) in the app (`@vitejs/devtools` 0.8 as a dev
+dependency, and in `vite.config.ts` `devtools: { apply: "serve" }`, so it runs in `vp dev` and not
+in builds, whose output Void deploys), void-fbtee has its own panel: each language's translated and
+untranslated strings, fbtee's own, what's waiting for review and its catalog's size; what `vp build`
+would stop on; the translated pages; and who translates (Gemini, Claude Code) and why one doesn't.
+Its buttons, also in DevTools' command palette, prepare, translate and check now. Everything
+void-fbtee says, Claude Code's work included, is in a DevTools terminal too, and DevTools shows a
+message when something would stop the build. Without DevTools nothing of this loads.
+
+## Bundling
+
+`vp build` is Vite's, on Rolldown. Rolldown's own plugins work with it, each tried on a new
+`void init` app (Rolldown 1.2.18, 2026-11-20): `replacePlugin` replaces in the pages void-fbtee
+compiles; `esmExternalRequirePlugin` has nothing of void-fbtee's to change (none of what runs in the
+Worker or the browser uses `require`); `bundleAnalyzerPlugin` lists each language's catalog on its
+own (`virtual:void-fbtee/catalog/th-TH`). Its report goes in the browser's output, which Void deploys
+with the site: name it outside that, or turn it on only for a build you look at.
 
 ## Systems
 

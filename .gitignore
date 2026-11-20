@@ -11,3 +11,8 @@ package-lock.json
 .vitest/
 # Tailscale for the cloud-session dev server (vp run tailscale:login): its download, state and log.
 .tailscale/
+# Agent skills from other projects, put there by vp install: Vite DevTools' (pnpm links the skills a
+# dependency ships, once allowed in pnpm-workspace.yaml's permissions) and tsdown's (restored from
+# skills-lock.json by the prepare script).
+.claude/skills/
+.agents/skills/

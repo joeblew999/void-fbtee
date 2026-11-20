@@ -41,7 +41,13 @@ function app(toolchain: "vite-plus" | "vite") {
   return root;
 }
 const read = (root: string, f: string) => readFileSync(join(root, f), "utf8");
-const options = (root: string) => ({ root, sourceLocale: "en-US", locales: ["en-US", "de-DE"] });
+// install: false: these apps are checked as files; the fresh e2e (e2e/fresh/) runs the real install.
+const options = (root: string) => ({
+  root,
+  sourceLocale: "en-US",
+  locales: ["en-US", "de-DE"],
+  install: false,
+});
 
 /** Every file under root with its text, to show a second run changes nothing. */
 function snapshot(root: string, dir = root): Record<string, string> {
@@ -100,9 +106,10 @@ test("wires void-fbtee into a Vite+ app, and a second run changes nothing", asyn
   const own = parseJson(read(join(import.meta.dirname, "../.."), "package.json"));
   // void-fbtee itself is the app's own choice of source (installed before init runs).
   expect(at(pkg, "dependencies", "void-fbtee")).toBeUndefined();
-  expect(at(pkg, "dependencies", "fbtee")).toBe(at(own, "devDependencies", "fbtee"));
+  // From the versions void-fbtee is tested with up, within their major (`^6.0.1`).
+  expect(at(pkg, "dependencies", "fbtee")).toBe(`^${at(own, "devDependencies", "fbtee")}`);
   expect(at(pkg, "devDependencies", "@nkzw/eslint-plugin-fbtee")).toBe(
-    at(own, "devDependencies", "@nkzw/eslint-plugin-fbtee"),
+    `^${at(own, "devDependencies", "@nkzw/eslint-plugin-fbtee")}`,
   );
   // No scripts: vp dev and vp build do the work.
   expect(
@@ -172,13 +179,23 @@ test("with a home page under pages/[lang]/: Void's not-found and error pages, tr
 test("in an app written in Thai, init says to write its two pages' English text in Thai", async () => {
   const thai = app("vite-plus");
   withHome(thai);
-  const { todo } = await init({ root: thai, sourceLocale: "th-TH", locales: ["th-TH", "en-US"] });
+  const { todo } = await init({
+    root: thai,
+    sourceLocale: "th-TH",
+    locales: ["th-TH", "en-US"],
+    install: false,
+  });
   expect(todo).toContain(
     "pages/_not-found.tsx and pages/_error.tsx: their text is in English; write it in th-TH, the code's language; the dev server then translates it",
   );
   const english = app("vite-plus");
   withHome(english);
-  const { todo: none } = await init({ root: english, sourceLocale: "en-GB", locales: ["en-GB"] });
+  const { todo: none } = await init({
+    root: english,
+    sourceLocale: "en-GB",
+    locales: ["en-GB"],
+    install: false,
+  });
   expect(none.some((line) => line.includes("their text is in English"))).toBe(false);
 });
 

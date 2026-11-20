@@ -258,9 +258,16 @@ export const AGENT_TOOLS = ["Read", "Edit", "Write", "Glob", "Grep"];
 
 /**
  * Run `claude -p` in the app's folder, showing each file it reads or edits as it goes and its
- * final answer. Resolves with claude's exit code.
+ * final answer, through `print` (the dev server passes its log, so it's in DevTools' terminal too).
+ * Resolves with claude's exit code. `signal` stops it (Node kills the child): the dev server
+ * closing does that, so no agent outlives it.
  */
-export function runClaude(root: string, prompt: string): Promise<number> {
+export function runClaude(
+  root: string,
+  prompt: string,
+  signal?: AbortSignal,
+  print: (line: string) => void = console.log,
+): Promise<number> {
   const args = [
     "-p",
     prompt,
@@ -272,7 +279,10 @@ export function runClaude(root: string, prompt: string): Promise<number> {
     "stream-json",
     "--verbose",
   ];
-  const child = spawn("claude", args, { cwd: root, stdio: ["ignore", "pipe", "inherit"] });
+  const child = spawn("claude", args, { cwd: root, stdio: ["ignore", "pipe", "inherit"], signal });
+  // Stopped by the signal, Node reports an AbortError here and then closes the child: the close
+  // below resolves, so this only keeps the error from going unhandled.
+  child.on("error", () => {});
   let buffer = "";
   child.stdout.setEncoding("utf8");
   child.stdout.on("data", (chunk: string) => {
@@ -280,7 +290,7 @@ export function runClaude(root: string, prompt: string): Promise<number> {
     const lines = buffer.split("\n");
     buffer = lines.pop() ?? "";
     for (const line of lines) {
-      showEvent(root, line);
+      showEvent(root, line, print);
     }
   });
   return new Promise((resolve) => child.on("close", (code) => resolve(code ?? 1)));
@@ -288,7 +298,7 @@ export function runClaude(root: string, prompt: string): Promise<number> {
 
 /** One line of `claude -p --output-format stream-json`, shown as it comes: each tool it uses, and its
  * result. Read field by field: a line that isn't that shape shows nothing. */
-function showEvent(root: string, line: string) {
+function showEvent(root: string, line: string, print: (line: string) => void) {
   let event: unknown;
   try {
     event = parseJson(line);
@@ -310,14 +320,12 @@ function showEvent(root: string, line: string) {
         field(input, "pattern"),
       ].find((v): v is string => typeof v === "string");
       const shown = target?.startsWith("/") ? relative(root, target) : (target ?? "");
-      console.log(`  ${textField(c, "name") ?? ""} ${shown}`);
+      print(`  ${textField(c, "name") ?? ""} ${shown}`);
     }
   }
   if (type === "result") {
-    console.log("");
-    console.log(
-      textField(event, "result") ?? `claude finished: ${textField(event, "subtype") ?? ""}`,
-    );
+    print("");
+    print(textField(event, "result") ?? `claude finished: ${textField(event, "subtype") ?? ""}`);
   }
 }
 
@@ -332,6 +340,7 @@ export async function translateApp(
   root: string,
   log: (line: string) => void = console.log,
   handedOut?: string,
+  signal?: AbortSignal,
 ): Promise<{ problems: Array<string>; prompt?: string }> {
   const task = translateTask(p);
   if (!task) {
@@ -359,7 +368,11 @@ export async function translateApp(
       ]),
     );
     const wasNew = newEntries(p);
-    const code = await runClaude(root, task.prompt);
+    const code = await runClaude(root, task.prompt, signal, log);
+    // Stopped part way (the dev server closed): nothing is marked or stamped as Claude's.
+    if (signal?.aborted) {
+      return { problems: [] };
+    }
     markTranslatedBy(p, wasNew, "claude");
     if (code !== 0) {
       log(`\nclaude exited with ${code}`);
@@ -480,6 +493,7 @@ export async function reviewApp(
   root: string,
   log: (line: string) => void = console.log,
   handedOut?: string,
+  signal?: AbortSignal,
 ): Promise<{ problems: Array<string>; prompt?: string }> {
   const prompt = reviewTask(p);
   if (!prompt) {
@@ -498,7 +512,10 @@ export async function reviewApp(
     `\n$ claude -p <review prompt> --permission-mode acceptEdits --allowedTools ${AGENT_TOOLS.join(",")}\n`,
   );
   log(prompt.replace(/^/gm, "  > "));
-  const code = await runClaude(root, prompt);
+  const code = await runClaude(root, prompt, signal, log);
+  if (signal?.aborted) {
+    return { problems: [] };
+  }
   if (code !== 0) {
     log(`\nclaude exited with ${code}`);
   }
@@ -609,6 +626,7 @@ export function routeCall(
   token: string,
   log: (line: string) => void,
   app?: string,
+  signal?: AbortSignal,
 ): TranslateCall {
   let paymentSaid = false;
   let gone = false;
@@ -616,10 +634,13 @@ export function routeCall(
     if (gone) {
       return undefined;
     }
+    // `signal` stops a request in flight (the dev server closing): fetch then throws, and nothing
+    // from it is written.
     const res = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json", "x-void-fbtee-token": token },
       body: JSON.stringify({ ...body, app }),
+      signal,
     });
     if (res.status === 503) {
       const error = textField(await res.json().catch(() => undefined), "error");
@@ -786,8 +807,9 @@ export async function translateWithVoidAi(
   url: string,
   token: string,
   log: (line: string) => void,
+  signal?: AbortSignal,
 ): Promise<boolean> {
-  const call = routeCall(url, token, log, appName(p.root));
+  const call = routeCall(url, token, log, appName(p.root), signal);
   const from = p.config.sourceLocale;
   const rel = (f: string) => relative(p.root, f).split(sep).join("/");
 

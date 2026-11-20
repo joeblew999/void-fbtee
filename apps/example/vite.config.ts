@@ -46,6 +46,10 @@ export default defineConfig({
   server: { port: 5173, strictPort: true, allowedHosts: [".ts.net"] },
   // shadcn's "@/" import alias (tsconfig.json "paths" says the same for TypeScript).
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
+  // Vite DevTools (@vitejs/devtools, devtools.vite.dev), with void-fbtee's own panel in it: each
+  // language, what vp build stops on, the translators, and buttons to prepare, translate and check.
+  // The dev server only (`apply: "serve"`): `true` also runs it in builds, whose output Void deploys.
+  devtools: { apply: "serve" },
   plugins: [
     // site: the deployed address, so the dev server and Worker Previews name it in canonical,
     // hreflang, og:url and the sitemap. common: labels used on several pages, each described once

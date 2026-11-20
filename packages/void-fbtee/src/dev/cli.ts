@@ -50,12 +50,21 @@ async function main() {
       .map((l) => l.trim())
       .filter(Boolean);
     const locales = [sourceLocale, ...rest.filter((l) => l !== sourceLocale)];
-    const { done, todo } = await init({ root, sourceLocale, locales, site: values.site });
+    const { done, todo, translators } = await init({
+      root,
+      sourceLocale,
+      locales,
+      site: values.site,
+    });
     for (const line of done) {
       console.log(`✓ ${line}`);
     }
     if (!done.length) {
       console.log("void-fbtee is already wired in; nothing to change");
+    }
+    console.log("\ntranslating as you work (vp dev), on this machine:");
+    for (const line of translators) {
+      console.log(`  - ${line}`);
     }
     if (todo.length) {
       console.log("\nnext:");

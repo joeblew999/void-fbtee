@@ -3,13 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prepare": "vp config"
+    "prepare": "vp config && skills experimental_install -a claude-code"
   },
   "devDependencies": {
-    "@nkzw/eslint-plugin-fbtee": "6.0.0",
+    "@nkzw/eslint-plugin-fbtee": "6.0.1",
     "@types/node": "26.6.6",
     "playwright": "1.65.0",
     "postal-mime": "4.2.1",
+    "skills": "1.9.0",
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:",

@@ -41,7 +41,7 @@ import {
 import { check } from "./check";
 import { keepTranslations } from "./gen";
 import { group, parseJson, textField } from "../guards";
-import type { Plugin, ViteDevServer } from "vite";
+import { normalizePath, type Plugin, type ViteDevServer } from "vite";
 import type { JsonModules } from "../virtual-types";
 import fbteeVite from "@nkzw/vite-plugin-fbtee";
 import type { FallbackLocales } from "fbtee";
@@ -59,11 +59,13 @@ import {
   catalogLocales,
   collect,
   missing,
+  resolveFbtee,
   runtimeCatalog,
   runtimeTexts,
   type Project,
 } from "./catalogs";
 import { checkSite } from "./site";
+import { devtoolsHook, type DevtoolsSource } from "./devtools";
 
 /** How long the dev server waits after the last save before preparing (milliseconds): saves
  * that come together, as an editor's "save all" does, prepare once. Translating follows the
@@ -122,6 +124,14 @@ export interface VoidFbteeOptions {
    * (or `fbt.c("Save")`) without repeating it. See fbtee's README, "Common Strings".
    */
   common?: Record<string, string>;
+  /**
+   * Translating as you work (`vp dev`), after each save: Gemini through Void's AI (when the app
+   * uses `void/ai`), then Claude Code (`claude -p` when it's signed in, else a prompt for your
+   * coding agent) for what's left, and its review. `false` for neither; `{ gemini: false }` or
+   * `{ claude: false }` to leave one out. Default: both. Never under CI or Vitest. Either way the dev
+   * server reports what's left, and `vp build` stops on it.
+   */
+  translate?: boolean | { gemini?: boolean; claude?: boolean };
 }
 
 /** What the plugin exposes on its `api`, read from the config without running the plugin (loadProject, for tests). */
@@ -186,12 +196,18 @@ export function voidFbtee(options: VoidFbteeOptions): Array<Plugin> {
   const fallbackLocale = checkFallback(options.fallbackLocale, config);
   const translationsDir = options.translations ?? DEFAULT_TRANSLATIONS;
   const src = options.src ?? DEFAULT_SRC;
-  const require = createRequire(import.meta.url);
   // fbtee's own exports: index.mjs for "default"; index-server.mjs beside it.
-  const fbteeServer = require.resolve("fbtee").replace(/index\.mjs$/, "index-server.mjs");
+  const fbteeServer = resolveFbtee(import.meta.url).replace(/index\.mjs$/, "index-server.mjs");
   let root = process.cwd();
   let command: "build" | "serve" = "serve";
   let devServer: ViteDevServer | undefined;
+  // Set once Vite has run configResolved: a bundler that isn't Vite (plain Rollup or Rolldown)
+  // never does, and buildStart stops there rather than build without void-fbtee's checks.
+  let resolvedByVite = false;
+  // The dev server closed (closeServer, also on every restart, when Vite makes a new instance of
+  // this plugin): no timer or translator of this one runs again, and `stop` ends any that's running.
+  let closed = false;
+  const stop = new AbortController();
   // What the dev server's translate route answers to: made fresh each run, never in a build.
   const devToken = randomUUID();
   let prepareTimer: ReturnType<typeof setTimeout> | undefined;
@@ -203,8 +219,21 @@ export function voidFbtee(options: VoidFbteeOptions): Array<Plugin> {
   let handedOut: string | undefined;
   // The review prompt last shown, likewise.
   let reviewHandedOut: string | undefined;
+  // What the DevTools panel follows (devtools.ts): void-fbtee's last lines, and who wants to hear
+  // of each new one and of each change.
+  const lines: Array<string> = [];
+  const lineListeners: Array<(line: string) => void> = [];
+  const changeListeners: Array<() => void> = [];
+  const changed = () => changeListeners.forEach((l) => l());
   const log = (text: string) =>
-    text.split("\n").forEach((l) => devServer?.config.logger.info(`void-fbtee: ${l}`));
+    text.split("\n").forEach((l) => {
+      devServer?.config.logger.info(`void-fbtee: ${l}`);
+      lines.push(l);
+      if (lines.length > 500) {
+        lines.shift();
+      }
+      lineListeners.forEach((listener) => listener(l));
+    });
   // What Claude Code was given to translate, by language (each string's text): when it's done,
   // the log says so, so it's clear which translations are Claude's.
   const withClaude = new Map<string, Set<string>>();
@@ -242,9 +271,24 @@ export function voidFbtee(options: VoidFbteeOptions): Array<Plugin> {
     if (waiting) {
       log(`not yet reviewed by Claude: ${waiting}`);
     }
+    changed();
   };
-  // Tests (Vitest's server, CI) don't start an agent: they report.
-  const agentAllowed = () => !underVitest && !process.env.CI;
+  // Which translators run after a save: voidFbtee({ translate }), and never in tests (Vitest's
+  // server, CI), which only report. Why one doesn't, or undefined when it does.
+  const translatorOff = (which: "gemini" | "claude") => {
+    const wanted = options.translate ?? true;
+    if (!(typeof wanted === "boolean" ? wanted : (wanted[which] ?? true))) {
+      return "off: voidFbtee({ translate })";
+    }
+    if (underVitest) {
+      return "off: under Vitest";
+    }
+    if (process.env.CI) {
+      return "off: CI";
+    }
+    return undefined;
+  };
+  const translatorOn = (which: "gemini" | "claude") => translatorOff(which) === undefined;
   // After a save, straight after its prepare: translate what's new (a source file or original page saved), or
   // only report (a catalog or translated page saved, which is the translating itself).
   let translateWanted = false;
@@ -252,6 +296,10 @@ export function voidFbtee(options: VoidFbteeOptions): Array<Plugin> {
     translateWanted ||= translate;
     clearTimeout(translateTimer);
     translateTimer = setTimeout(() => {
+      // The dev server closed (closeServer) after this was asked for: nothing more runs.
+      if (closed) {
+        return;
+      }
       const wanted = translateWanted;
       translateWanted = false;
       if (translating) {
@@ -262,69 +310,113 @@ export function voidFbtee(options: VoidFbteeOptions): Array<Plugin> {
         translateAgain = true;
         return;
       }
-      if (!wanted || !agentAllowed()) {
+      const gemini = translatorOn("gemini");
+      const claude = translatorOn("claude");
+      if (!wanted || !(gemini || claude)) {
         return report(check(project()));
       }
       // Void's AI first, the one translator (models.ts GEMINI, as at runtime), through the dev
       // server's own route, when the app has it. Then Claude Code for anything left (what didn't
       // pass the checks, or everything when Void's AI isn't there): `claude -p` when it's signed
       // in here, otherwise its prompt, for whatever coding agent the developer uses.
-      const base = devServer?.resolvedUrls?.local[0];
+      const base = gemini ? devServer?.resolvedUrls?.local[0] : undefined;
       const url = base && new URL(DEV_TRANSLATE_PATH, base).href;
       // Who translates, said before they start.
       const open = openNow();
       if (count(open)) {
-        log(
-          `translating ${count(open)} new strings (${byLanguage(open)}) with ${
-            url
-              ? "Void's AI, then Claude Code for anything left"
-              : "nobody here: no Void's AI; Claude Code, or the prompt below for your coding agent"
-          }`,
-        );
+        const who = url
+          ? claude
+            ? "Void's AI, then Claude Code for anything left"
+            : "Void's AI (Claude Code is off: voidFbtee({ translate }))"
+          : claude
+            ? `${gemini ? "no Void's AI here" : "Void's AI is off (voidFbtee({ translate }))"}; Claude Code, or the prompt below for your coding agent`
+            : "nobody";
+        log(`translating ${count(open)} new strings (${byLanguage(open)}) with ${who}`);
       }
-      translating = (
-        url ? translateWithVoidAi(project(), url, devToken, log) : Promise.resolve(false)
-      )
-        .catch((error) => {
-          log(`Void's AI couldn't translate: ${String(error)}`);
-          return false;
-        })
-        .then(() => {
-          // What Claude Code is given: whatever Void's AI left.
-          if (hasClaude()) {
-            for (const [locale, texts] of openNow()) {
-              for (const t of texts) {
-                let given = withClaude.get(locale);
-                if (!given) {
-                  given = new Set();
-                  withClaude.set(locale, given);
-                }
-                given.add(t);
+      // Each step checks `signal`: once the dev server has closed, nothing more is written or
+      // reported, and the translator that's running is stopped (closeServer).
+      const { signal } = stop;
+      const run = async () => {
+        if (url) {
+          await translateWithVoidAi(project(), url, devToken, log, signal).catch((error) => {
+            if (!signal.aborted) {
+              log(`Void's AI couldn't translate: ${String(error)}`);
+            }
+          });
+        }
+        if (signal.aborted) {
+          return;
+        }
+        // Claude Code left out (voidFbtee({ translate: { claude: false } })): what Void's AI left
+        // is reported, not handed on.
+        if (!claude) {
+          return report(check(project()));
+        }
+        // What Claude Code is given: whatever Void's AI left.
+        if (hasClaude()) {
+          for (const [locale, texts] of openNow()) {
+            for (const t of texts) {
+              let given = withClaude.get(locale);
+              if (!given) {
+                given = new Set();
+                withClaude.set(locale, given);
               }
+              given.add(t);
             }
           }
-          return translateApp(project(), root, log, handedOut);
-        })
-        .then(async (result) => {
-          handedOut = result.prompt;
-          // Then Claude reviews what the AI wrote (step 6 of plans/translation-rework.md), once
-          // nothing is left to translate: a review of half a catalog would be done twice.
-          if (result.prompt) {
-            return report(result.problems);
+        }
+        const result = await translateApp(project(), root, log, handedOut, signal);
+        if (signal.aborted) {
+          return;
+        }
+        handedOut = result.prompt;
+        // Then Claude reviews what the AI wrote (step 6 of plans/translation-rework.md), once
+        // nothing is left to translate: a review of half a catalog would be done twice.
+        if (result.prompt) {
+          return report(result.problems);
+        }
+        const reviewed = await reviewApp(project(), root, log, reviewHandedOut, signal);
+        if (signal.aborted) {
+          return;
+        }
+        reviewHandedOut = reviewed.prompt;
+        report(reviewed.problems);
+      };
+      translating = run()
+        .catch((error) => {
+          if (!signal.aborted) {
+            log(`couldn't translate: ${String(error)}`);
           }
-          const reviewed = await reviewApp(project(), root, log, reviewHandedOut);
-          reviewHandedOut = reviewed.prompt;
-          report(reviewed.problems);
         })
-        .catch((error) => log(`couldn't translate: ${String(error)}`))
         .finally(() => {
           translating = undefined;
-          if (translateAgain) {
+          changed();
+          if (translateAgain && !closed) {
             translateAgain = false;
             translateSoon();
           }
         });
+      changed();
     }, 0);
+  };
+  // A save's prepare (fbtee's collect and prepare-translations): a new string is in every catalog,
+  // marked new. Writes only catalogs that change (commands.ts).
+  const prepareNow = (then: string) => {
+    try {
+      const written = prepare(project());
+      if (written.length) {
+        log(`prepared ${written.join(", ")}${then}`);
+      }
+    } catch (error) {
+      devServer?.config.logger.warn(`void-fbtee: couldn't prepare: ${String(error)}`);
+    }
+    changed();
+  };
+  // Asked once: `claude auth status` runs a process, and the panel redraws on every change.
+  let claudeHere: boolean | undefined;
+  const claudeSignedIn = () => {
+    claudeHere ??= hasClaude();
+    return claudeHere;
   };
   // Whether the app uses @void/md, as void-md tells its own adapters (by plugin name): no peer
   // dependency on it, which an app without markdown pages would have to install anyway.
@@ -344,6 +436,28 @@ export function voidFbtee(options: VoidFbteeOptions): Array<Plugin> {
   });
 
   const api: VoidFbteeApi = { options, project };
+
+  // What the DevTools panel shows and does (devtools.ts).
+  const panel: DevtoolsSource = {
+    project,
+    translators: () => ({
+      gemini:
+        translatorOff("gemini") ??
+        "on: when the app uses void/ai, signed in to Cloudflare (vp exec void connect --platform cloudflare)",
+      claude:
+        translatorOff("claude") ??
+        (claudeSignedIn()
+          ? "on: claude is signed in here"
+          : "no signed-in claude here (claude auth login): vp dev prints a prompt for your coding agent"),
+      now: translating ? "translating" : "idle",
+    }),
+    lines: () => lines,
+    prepare: () => prepareNow(""),
+    translate: () => translateSoon(true),
+    check: () => report(check(project())),
+    onChange: (listener) => changeListeners.push(listener),
+    onLine: (listener) => lineListeners.push(listener),
+  };
 
   /** The translations tables void-fbtee keeps, rewritten where they aren't its current ones. */
   const keepTables = () => {
@@ -366,7 +480,10 @@ export function voidFbtee(options: VoidFbteeOptions): Array<Plugin> {
     name: "void-fbtee",
     enforce: "pre",
     api,
+    // Vite DevTools, when the app turns it on (devtools.ts); otherwise never called.
+    devtools: devtoolsHook(panel),
     configResolved(resolved) {
+      resolvedByVite = true;
       root = resolved.root;
       command = resolved.command;
       hasMarkdown = resolved.plugins.some((p) => p.name === "void-md");
@@ -378,6 +495,14 @@ export function voidFbtee(options: VoidFbteeOptions): Array<Plugin> {
     // language's leftovers), so `void deploy`, which builds, can't ship gaps. Each environment's
     // build checks (Void builds the browser and the worker separately): the first one fails.
     buildStart() {
+      // Plain Rollup or Rolldown run this hook but none of Vite's (configResolved, configureServer):
+      // void-fbtee would build without knowing it's a build, so without its checks. Shown
+      // 2026-11-20: both built an app with untranslated strings that Vite stops on.
+      if (!resolvedByVite) {
+        this.error(
+          "void-fbtee is a Vite plugin for Void apps: it needs Vite (vp dev, vp build) and can't run under plain Rollup or Rolldown.",
+        );
+      }
       if (command !== "build") {
         return;
       }
@@ -388,8 +513,23 @@ export function voidFbtee(options: VoidFbteeOptions): Array<Plugin> {
         this.info(`void-fbtee: machine translations not yet reviewed: ${waiting}`);
       }
       if (problems.length) {
+        // What to do about it, by kind: untranslated strings and pages are filled in by `vp dev`
+        // (either translator), or by hand; setup is what init writes.
+        const has = (kind: string) => problems.some((p) => p.startsWith(`${kind}: `));
+        const ways = [
+          ...(has("strings") || has("pages")
+            ? [
+                "",
+                "vp dev translates these after each save, with either or both of:",
+                "- Gemini, through Void's AI: when the app uses void/ai, signed in to Cloudflare (vp exec void connect --platform cloudflare);",
+                "- Claude Code: claude, signed in on this machine (claude auth status).",
+                `Without them, write the translations by hand: ${translationsDir}/<language>.json for strings, and the pages listed.`,
+              ]
+            : []),
+          ...(has("setup") ? ["", "Setup: vp exec void-fbtee init writes it."] : []),
+        ];
         this.error(
-          `void-fbtee: ${problems.length} to fix before this can build (vp dev translates them):\n${problems.join("\n")}`,
+          `void-fbtee: ${problems.length} to fix before this can build:\n${problems.join("\n")}${ways.length ? "\n" + ways.join("\n") : ""}`,
         );
       }
     },
@@ -399,14 +539,7 @@ export function voidFbtee(options: VoidFbteeOptions): Array<Plugin> {
       // Once as it starts, as on every save: a language just added to the app's list (the dev
       // server restarts when its config changes) gets its catalog, with every string marked new,
       // then everything that isn't translated is, once the start has settled.
-      try {
-        const written = prepare(project());
-        if (written.length) {
-          log(`prepared ${written.join(", ")}`);
-        }
-      } catch (error) {
-        server.config.logger.warn(`void-fbtee: couldn't prepare: ${String(error)}`);
-      }
+      prepareNow("");
       // The translations tables void-fbtee keeps, made the package's current ones, as Void
       // rewrites its Better Auth tables (plans/like-better-auth.md); and again on each save in
       // db/schema/ (watchChange).
@@ -431,8 +564,10 @@ export function voidFbtee(options: VoidFbteeOptions): Array<Plugin> {
     // A hook rather than watcher listeners: Vite, Void and Cloudflare's plugin already put Node
     // near its 10-listener warning on the watcher.
     watchChange(file, { event }) {
-      const dir = join(root, translationsDir);
-      if (!devServer || !isClient(this.environment)) {
+      // Vite hands plugins forward-slash paths (normalizePath), on Windows too; join() gives
+      // backslashes there, so the folder is normalised the same way before it's compared.
+      const dir = normalizePath(join(root, translationsDir));
+      if (!devServer || closed || !isClient(this.environment)) {
         return;
       }
       const rel = relative(root, file).split(sep).join("/");
@@ -444,19 +579,10 @@ export function voidFbtee(options: VoidFbteeOptions): Array<Plugin> {
       if (rel.startsWith("db/schema/") && event !== "delete") {
         keepTables();
       }
-      // A markdown page the agent marked done: record which version of the original it's from.
-      // That write is another save, which then finds the page recorded.
-      if (/\.mdx?$/.test(file) && event !== "delete" && existsSync(file)) {
-        try {
-          const text = readFileSync(file, "utf8");
-          if (markedDone(text)) {
-            stamp(project(), file, agentProvenance(text));
-            log(`recorded ${rel}`);
-            return;
-          }
-        } catch (error) {
-          log(`couldn't record ${rel}: ${String(error)}`);
-        }
+      // Markdown pages are hotUpdate's: it reads a saved file with Vite's read(), which waits for
+      // the editor to finish writing it.
+      if (/\.mdx?$/.test(file)) {
+        return;
       }
       const source = !file.startsWith(dir) && src.some((glob) => matchesGlob(rel, glob));
       if (file.startsWith(dir)) {
@@ -479,24 +605,59 @@ export function voidFbtee(options: VoidFbteeOptions): Array<Plugin> {
         // only catalogs that change (commands.ts).
         clearTimeout(prepareTimer);
         prepareTimer = setTimeout(() => {
-          try {
-            const written = prepare(project());
-            if (written.length) {
-              log(`prepared ${written.join(", ")}: translating`);
-            }
-          } catch (error) {
-            devServer?.config.logger.warn(`void-fbtee: couldn't prepare: ${String(error)}`);
+          if (closed) {
+            return;
           }
+          prepareNow(": translating");
           // Then at once: translate what's new.
           translateSoon(true);
         }, PREPARE_DELAY);
-        return;
-      } else if (!/\.mdx?$/.test(file) || !rel.startsWith("pages/")) {
+      }
+    },
+    // A markdown page saved. Read with Vite's read(), not readFileSync: an editor that saves in
+    // place (empties the file, then writes it) fires one event, in between, and a direct read
+    // finds it empty: 30 saves of 30, against 30 of 30 read in full this way (2026-11-20). Vite
+    // runs this hook for every saved file, imported or not, once per environment: act once (client).
+    async hotUpdate({ file, read, type }) {
+      if (!devServer || closed || !isClient(this.environment) || !/\.mdx?$/.test(file)) {
         return;
       }
-      // A markdown page saved: translate what's new (an original page), or report what's left.
+      const rel = relative(root, file).split(sep).join("/");
+      if (rel.startsWith("..")) {
+        return;
+      }
+      // One the agent marked done: record which version of the original it's from. That write is
+      // another save, which then finds the page recorded.
+      if (type !== "delete") {
+        try {
+          const text = await read();
+          if (markedDone(text)) {
+            stamp(project(), file, agentProvenance(text));
+            log(`recorded ${rel}`);
+            return;
+          }
+        } catch (error) {
+          log(`couldn't record ${rel}: ${String(error)}`);
+        }
+      }
+      if (!rel.startsWith("pages/")) {
+        return;
+      }
+      // Otherwise: translate what's new (an original page), or report what's left.
       const original = `pages/${sourceOf(config).segment}/`;
       translateSoon(rel.startsWith(original));
+    },
+    // Vite closes the dev server on quit and on every restart (a config change), and makes a new
+    // instance of this plugin for the next one. This one stops: its timers don't fire, the
+    // translator it started (`claude -p`, a request to Void's AI) is stopped, and nothing it
+    // started writes afterwards. Shown 2026-11-20: without it, catalogs were rewritten 156 ms after
+    // the close, and translating went on.
+    closeServer() {
+      closed = true;
+      clearTimeout(prepareTimer);
+      clearTimeout(translateTimer);
+      stop.abort();
+      devServer = undefined;
     },
     configEnvironment(name, env) {
       // The virtual modules must reach void-fbtee's own files, so it is never pre-bundled.

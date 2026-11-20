@@ -13,7 +13,10 @@
     },
     "observability": {
       "enabled": true
-    }
+    },
+    "workers_dev": true,
+    "preview_urls": true,
+    "routes": []
   },
   "resolved": {
     "name": "void-fbtee-example",
@@ -25,6 +28,9 @@
     "browser": {
       "binding": "BROWSER",
       "remote": true
+    },
+    "observability": {
+      "enabled": true
     },
     "kv_namespaces": [
       {
@@ -55,9 +61,9 @@
         "bucket_name": "void-fbtee-example-storage"
       }
     ],
-    "observability": {
-      "enabled": true
-    }
+    "workers_dev": true,
+    "preview_urls": true,
+    "routes": []
   },
-  "text": "{\n  \"name\": \"void-fbtee-example\",\n  \"account_id\": \"7384af54e33b8a54ff240371ea368440\",\n  \"ai\": {\n    \"binding\": \"AI\",\n    \"remote\": true\n  },\n  \"browser\": {\n    \"binding\": \"BROWSER\",\n    \"remote\": true\n  },\n  \"kv_namespaces\": [\n    {\n      \"binding\": \"ISR_CACHE\",\n      \"id\": \"aed8524aaceb4369b8c9705d4480191a\"\n    }\n  ],\n  \"d1_databases\": [\n    {\n      \"binding\": \"DB\",\n      \"database_name\": \"void-fbtee-example-db\",\n      \"database_id\": \"a61a1673-1b3d-4fc6-9e38-62acce3abedc\",\n      \"migrations_dir\": \"./db/migrations\"\n    }\n  ],\n  \"compatibility_date\": \"2026-02-24\",\n  \"send_email\": [\n    {\n      \"name\": \"SEND_EMAIL\"\n    }\n  ],\n  \"vars\": {\n    \"__VOID_EMAIL_FROM\": \"void-fbtee <events@events.ubuntusoftware.net>\"\n  },\n  \"r2_buckets\": [\n    {\n      \"binding\": \"STORAGE\",\n      \"bucket_name\": \"void-fbtee-example-storage\"\n    }\n  ],\n  \"observability\": {\n    \"enabled\": true\n  }\n}\n"
+  "text": "{\n  \"name\": \"void-fbtee-example\",\n  \"account_id\": \"7384af54e33b8a54ff240371ea368440\",\n  \"ai\": {\n    \"binding\": \"AI\",\n    \"remote\": true\n  },\n  \"browser\": {\n    \"binding\": \"BROWSER\",\n    \"remote\": true\n  },\n  \"observability\": {\n    \"enabled\": true\n  },\n  \"kv_namespaces\": [\n    {\n      \"binding\": \"ISR_CACHE\",\n      \"id\": \"aed8524aaceb4369b8c9705d4480191a\"\n    }\n  ],\n  \"d1_databases\": [\n    {\n      \"binding\": \"DB\",\n      \"database_name\": \"void-fbtee-example-db\",\n      \"database_id\": \"a61a1673-1b3d-4fc6-9e38-62acce3abedc\",\n      \"migrations_dir\": \"./db/migrations\"\n    }\n  ],\n  \"compatibility_date\": \"2026-02-24\",\n  \"send_email\": [\n    {\n      \"name\": \"SEND_EMAIL\"\n    }\n  ],\n  \"vars\": {\n    \"__VOID_EMAIL_FROM\": \"void-fbtee <events@events.ubuntusoftware.net>\"\n  },\n  \"r2_buckets\": [\n    {\n      \"binding\": \"STORAGE\",\n      \"bucket_name\": \"void-fbtee-example-storage\"\n    }\n  ],\n  \"workers_dev\": true,\n  \"preview_urls\": true,\n  \"routes\": []\n}\n"
 }

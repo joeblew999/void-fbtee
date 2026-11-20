@@ -68,8 +68,8 @@ jobs:
       - run: vp run test:deployed
 
   # A release when packages/void-fbtee/package.json has a version with no tag yet: the tag and the
-  # GitHub release (notes written by GitHub from the commits). Apps pin it in their dependency:
-  # github:joeblew999/void-fbtee#v<version>&path:/packages/void-fbtee
+  # GitHub release (notes written by GitHub from the commits). The publish job below puts the same
+  # version on npm, where apps install it from.
   release:
     name: release
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -90,4 +90,32 @@ jobs:
             echo "v$version is already released"
           else
             gh release create "v$version" --target "$GITHUB_SHA" --generate-notes --title "v$version"
+          fi
+
+  # The same version to npm, once the repository variable NPM_PUBLISH is "true" (off until then:
+  # README, "Releasing"). npm's trusted publishing (https://docs.npmjs.com/trusted-publishers): no
+  # token is stored; npm trusts this workflow file and the job's OIDC token, and adds provenance.
+  # pnpm publish, not npm publish: pnpm applies publishConfig, and it does trusted publishing
+  # itself (pnpm 11 and later; the repo's pnpm is in package.json). Its prepublishOnly builds dist.
+  publish:
+    name: publish to npm
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.NPM_PUBLISH == 'true'
+    needs: [release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - name: Publish the package's version, if npm hasn't got it
+        working-directory: packages/void-fbtee
+        run: |
+          version=$(jq -r .version package.json)
+          if pnpm view "void-fbtee@$version" version > /dev/null 2>&1; then
+            echo "void-fbtee@$version is already on npm"
+          else
+            pnpm publish --provenance --no-git-checks
           fi

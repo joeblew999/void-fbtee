@@ -100,10 +100,24 @@ export function readPhrases(json: unknown, what: string): Array<PluralPhrase> {
 const LANGS = ["tsx", "ts", "jsx", "js"] as const;
 const langOf = (file: string) => LANGS.find((l) => file.endsWith("." + l)) ?? "js";
 
+/**
+ * Where `fbtee` (or a file of it) is, from `from`: the app's own fbtee, a peer dependency of
+ * void-fbtee. Without it, a clear stop rather than Node's "Cannot find module", which once took
+ * the dev server down (2026-11-20).
+ */
+export function resolveFbtee(from: string, request = "fbtee"): string {
+  try {
+    return createRequire(from).resolve(request);
+  } catch {
+    throw new Error(
+      "void-fbtee needs fbtee installed in the app (a peer dependency): vp exec void-fbtee init adds it; then install.",
+    );
+  }
+}
+
 /** fbtee's built-in strings, resolved from the app's own fbtee. */
 function builtinPhrases(root: string): Array<PluralPhrase> {
-  const require = createRequire(join(root, "package.json"));
-  const file = require.resolve("fbtee/Strings.json");
+  const file = resolveFbtee(join(root, "package.json"), "fbtee/Strings.json");
   return readPhrases(parseJson(readFileSync(file, "utf8")), file);
 }
 

@@ -80,10 +80,17 @@ export default defineConfig({
       // (scripts/production.ts), less the tests that post or book: on the live site those would
       // call Workers AI and send real email (Void: live tests are opt-in and send nothing).
       "test:production": { command: "vpx scripts/production.ts", cache: false },
-      // void-fbtee installed into fresh `void init` apps, as a user's app installs it.
-      "test:fresh": { command: "vpx e2e/fresh/check.ts", cache: false },
+      // void-fbtee installed into fresh `void init` apps, as a developer's app installs it
+      // (e2e/fresh/fresh.ts). One app: `vp run test:fresh e2e/fresh/vite-npm.test.ts`.
+      "test:fresh": { command: "vp test run --project fresh", cache: false },
       // Vite+'s, Void's and void-fbtee's setup commands, run again: fails if any changes a file.
       "check:tools": { command: "vpx scripts/check-tools.ts", cache: false },
+      // Agent skills from other projects, the way their authors say to install them (tsdown's:
+      // `skills add rolldown/tsdown`, tsdown.dev/guide/skills). skills-lock.json says which commit;
+      // vp install restores them into .claude/skills/ (the root package.json's prepare). This moves
+      // them to their newest commit, to commit with the other tool updates. (Skills a dependency
+      // ships, like Vite DevTools', come with that dependency instead: pnpm-workspace.yaml.)
+      "skills:update": { command: "skills update -p -y", cache: false },
       // In a Claude cloud session: the dev server (vp run dev) on a public https address through
       // Tailscale Funnel, so any browser can open it without deploying (scripts/tailscale.ts). On a
       // Mac, open http://localhost:5173 instead.
@@ -182,10 +189,10 @@ export default defineConfig({
   // The tests, by stage (Void's TESTING.md and its own vite.config.ts): `unit`, the package's
   // (packages/void-fbtee/vite.config.ts); `preview` and `browsers` on the production build in the
   // local preview (e2e/preview/setup.ts); `dev` on the dev server (e2e/dev/setup.ts); `deployed` on
-  // the live site (e2e/deployed/setup.ts). The browser tests drive Playwright's library from Vitest,
+  // the live site (e2e/deployed/setup.ts); `fresh` in new `void init` apps (e2e/fresh/setup.ts). The browser tests drive Playwright's library from Vitest,
   // as Void's do. The example's own unit tests run from inside it (`vp run void-fbtee-example#test`): Void
-  // finds an app from where it runs. A plain `vp test run` selects every project; `dev` and
-  // `deployed` then skip themselves and say which task runs them.
+  // finds an app from where it runs. A plain `vp test run` selects every project; `dev`,
+  // `deployed` and `fresh` then skip themselves and say which task runs them.
   test: {
     // Every run's report, where Vitest 5 puts it: .vitest/index.html (open in a browser) and
     // .vitest/json/output.json. Git ignores .vitest/.
@@ -209,6 +216,8 @@ export default defineConfig({
       e2e("browsers", 3, { setup: "preview" }),
       e2e("dev", 4),
       e2e("deployed", 5, { oneFileAtATime: false }),
+      // Fresh `void init` apps, one file each, one after another (each starts its own dev server).
+      e2e("fresh", 6),
     ],
   },
 });

@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/vitejs/vite-plugin-registry/refs/heads/main/data/schema/extended-package-json.schema.json",
   "name": "void-fbtee",
   "version": "0.7.0",
   "description": "i18n for Void apps, as a Void add-on: fbtee strings, Temporal dates and Intl formatting, with a Vite plugin, Void middleware and React helpers",
@@ -57,20 +58,22 @@
     "prepublishOnly": "vp run build"
   },
   "dependencies": {
-    "@nkzw/fbtee-compiler": "6.0.0",
-    "@nkzw/vite-plugin-fbtee": "6.0.0",
+    "@nkzw/fbtee-compiler": "6.0.1",
+    "@nkzw/vite-plugin-fbtee": "6.0.1",
     "magicast": "0.5.5",
     "unhead": "3.4.3"
   },
   "devDependencies": {
     "@arethetypeswrong/core": "0.18.5",
     "@cloudflare/workers-types": "catalog:",
-    "@nkzw/eslint-plugin-fbtee": "6.0.0",
+    "@nkzw/eslint-plugin-fbtee": "6.0.1",
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",
+    "@vitejs/devtools": "0.8.3",
+    "@vitejs/devtools-kit": "0.8.3",
     "@void/md": "catalog:",
     "@void/react": "catalog:",
-    "fbtee": "6.0.0",
+    "fbtee": "6.0.1",
     "hono": "catalog:",
     "publint": "0.3.25",
     "react": "19.3.1",
@@ -83,14 +86,36 @@
     "zod": "4.6.7"
   },
   "peerDependencies": {
+    "@vitejs/devtools": "^0.8.3",
     "@void/react": "^1.7.0",
-    "fbtee": "6.0.0",
+    "fbtee": "^6.0.0",
     "react": "^19.2.0",
     "temporal-polyfill": "^1.0.8",
     "vite": "^8.0.0",
     "void": "^1.7.0"
   },
+  "peerDependenciesMeta": {
+    "@vitejs/devtools": {
+      "optional": true
+    }
+  },
   "engines": {
     "node": "^24.22.0 || >=26.12.0"
+  },
+  "compatiblePackages": {
+    "schemaVersion": 1,
+    "vite": {
+      "type": "compatible",
+      "versions": "^8.0.0",
+      "note": "In Void apps on React only (Void, @void/react)"
+    },
+    "rollup": {
+      "type": "incompatible",
+      "reason": "A Vite plugin: it uses Vite-only hooks (the dev server, environments, configResolved), and without them would build without its checks"
+    },
+    "rolldown": {
+      "type": "incompatible",
+      "reason": "A Vite plugin: it uses Vite-only hooks (the dev server, environments, configResolved), and without them would build without its checks"
+    }
   }
 }

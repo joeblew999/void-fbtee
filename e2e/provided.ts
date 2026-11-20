@@ -11,6 +11,10 @@ declare module "vitest" {
     devToken?: string;
     /** Why the dev tests skip, or "" when they run. The dev stage's. */
     devSkip?: string;
+    /** Why the fresh-app tests skip, or "" when they run. The fresh stage's. */
+    freshSkip?: string;
+    /** The package packed as npm would publish it (a .tgz path). The fresh stage's. */
+    freshTarball?: string;
   }
 }
 export {};

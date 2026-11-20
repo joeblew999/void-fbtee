@@ -15,7 +15,9 @@ an app up is the one void-fbtee command: `vp exec void-fbtee init`. After that:
   "new""); a coding agent given it translates by this skill. Each entry records who translated
   it (`translatedBy`, `translatedAt`), and what it cost (`usage`, when Void's AI made it). It
   records each markdown page you mark done and reports
-  what's left, until "all translated, nothing to fix".
+  what's left, until "all translated, nothing to fix". `voidFbtee({ translate })` in
+  `vite.config.ts` can turn either translator off (`false`, `{ gemini: false }`, `{ claude: false }`),
+  and neither runs under CI or Vitest: then `vp dev` only reports, and translating is yours.
 - `vp build` (and so `void deploy` and CI) fails on anything left or broken: untranslated strings
   and pages, a translation missing a line or a `{placeholder}` (the check `vp dev` runs on each
   answer), setup problems, a removed language's leftovers. Its message lists them. Nothing

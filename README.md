@@ -21,8 +21,9 @@ vp env on                             # the Node in .node-version for everything
                                       # included, ahead of any other Node on the machine (Void
                                       # needs Node 24.22+; without this, vp install fails where an
                                       # older Node comes first, as in a Claude cloud session)
-vp install                            # dependencies; Void generates its types and links its
-                                      # skills for coding agents
+vp install                            # dependencies; Void generates its types, and the skills
+                                      # for coding agents go into .claude/skills
+                                      # (Vite DevTools' and tsdown's here, Void's in apps/example)
 vp run install:browser                # Chromium and WebKit (Safari's engine) for the tests
 vp run login                          # Cloudflare sign-in (Void's void connect), for vp run dev
                                       # and deploys from this machine
@@ -113,7 +114,8 @@ Now and then:
 
 ```sh
 vp run deploy:atomic     # only when Void's deploy asks for it (a Durable Object changed)
-vp run test:fresh        # after changing the package or its dependencies
+vp run test:fresh        # after changing the package or its dependencies;
+                         # one app: vp run test:fresh e2e/fresh/vite-npm.test.ts
 vp upgrade && vp migrate   # upgrade Vite+, then vp check and the tests (Testing)
 ```
 
@@ -136,7 +138,9 @@ vp upgrade && vp migrate   # upgrade Vite+, then vp check and the tests (Testing
   replicas elsewhere; D1 sets where a database lives only when it's made (a location hint), so an
   app whose visitors are mostly in Asia makes its database in `apac`.
 - `e2e/`: the end-to-end tests, by stage (see Testing): `e2e/preview/`, `e2e/dev/`,
-  `e2e/browsers/`, `e2e/deployed/`, and `e2e/fresh/` (the fresh-install check; `e2e/fresh/app/`
+  `e2e/browsers/`, `e2e/deployed/`, and `e2e/fresh/` (the fresh-install check: one test file per
+  app, its steps in `e2e/fresh/fresh.ts`, among them a first app on a machine with no translator;
+  `e2e/fresh/app/`
   holds Void's own docs examples, put into each fresh app and checked in Thai, with what doesn't
   work yet listed as a known gap and the step of `plans/quiet-harbor-atlas.md` that fixes it;
   `e2e/fresh/thai/` is the app written in Thai, `init --source-locale th-TH`, translated into
@@ -230,6 +234,19 @@ Run them after a change to the head tags or the picture.
 - **Void's lint rules:** copy `lint.rules` and `lint.plugins` from the root `vite.config.ts` of
   Void's repo into `lint/void-rules.ts`, and put the commit you copied from at its top.
 - **Node:** change `.node-version`.
+- **Agent skills from other projects:** tsdown's (`skills-lock.json`) with `vp run skills:update`, then
+  commit `skills-lock.json`; the `skills` tool itself is a root devDependency, updated like the
+  others. Vite DevTools' skill comes inside `@vitejs/devtools-kit`, so it moves with that package
+  (pnpm links it on install: `permissions` in `pnpm-workspace.yaml`).
+- **fbtee:** its packages are released together, at one version: move `fbtee`,
+  `@nkzw/fbtee-compiler`, `@nkzw/vite-plugin-fbtee` and `@nkzw/eslint-plugin-fbtee` together (in
+  `packages/void-fbtee/package.json`, the root's and the example's). Apps get any fbtee 6.x
+  (void-fbtee's peer is `^6.0.0`); a new major waits for a void-fbtee release tested on it, and
+  `src/negotiate.ts`'s copy of fbtee's locale matching is checked against it. The weekly fresh run
+  installs the newest 6.x, so a release that breaks void-fbtee shows there first.
+- **Vite DevTools:** `@vitejs/devtools` (the example's) and `@vitejs/devtools-kit` (the package's,
+  for types) together; void-fbtee's optional peer is `^0.8.3`, as DevTools isn't 1.0 yet and a
+  0.9 may change its API (`src/dev/devtools.ts`).
 
 Then `vp check`, `vp run test:unit`, `vp run test:dev`, `vp run test:preview` and `vp run test:fresh`.
 
@@ -243,14 +260,14 @@ and if so remove what depends on it.
   "^2.0.0-beta.v.15"`, which also takes `2.0.0-rc.0`, and that writes its build to
   `.cloudflare/output/v1` where Void 1.8.0 reads `v0`, so a new Void app's `vp build` fails ("no
   root config found"). This repo pins `2.0.0-beta.v.17`, and the `cf` CLI's beta, in `pnpm-workspace.yaml`'s overrides; `test:fresh` pins its apps to it
-  (`pinUpstream` in `e2e/fresh/check.ts`).
+  (`pinUpstream` in `e2e/fresh/fresh.ts`).
 
 - Reported 2026-11-18 (Void 1.8.0 and 1.10.0, Vite+ 1.7.0): `void init` writes `"vite-plus":
   "^1.6.0"` and `"vite": "npm:@voidzero-dev/vite-plus-core@^1.6.0"`. Vite+ 1.7.0 needs its core at
   `8.3.8000`, which that range can't take, so a new Void app's `vp build` stops ("Failed to resolve
   vite command"). npm hits it now; pnpm, which waits a day before taking a release, from today.
   This repo stays on Vite+ 1.6.0 (the catalog in `pnpm-workspace.yaml`); `test:fresh` pins its apps
-  to it (`pinUpstream` in `e2e/fresh/check.ts`).
+  to it (`pinUpstream` in `e2e/fresh/fresh.ts`).
 
 - [voidzero-dev/void#802](https://github.com/voidzero-dev/void/issues/802) (2026-11-12, Void
   1.8.0): `@void/md` in right-to-left and translated pages. Heading anchors and the copy button
@@ -276,9 +293,26 @@ and if so remove what depends on it.
 
 ## Releasing
 
-Raise `version` in `packages/void-fbtee/package.json`, and the tag in the install line of
-`packages/void-fbtee/README.md`, and push to main. When CI passes, it tags
+Raise `version` in `packages/void-fbtee/package.json` and push to main. When CI passes, it tags
 `v<version>` and makes the GitHub release.
+
+**npm (off for now).** CI's `publish` job (`.github/workflows/ci.yml`) also puts the new version
+on npm, with `pnpm publish` and npm's trusted publishing: no npm token is stored anywhere, and
+npm adds provenance (which commit and workflow built it). It runs only once the repository
+variable `NPM_PUBLISH` is `true`. npm can only trust a workflow for a package that already
+exists (npm's docs, checked 2026-11-20), so the first version goes up by hand, once, from your
+Mac. The name `void-fbtee` was free on npm on 2026-11-20.
+
+```sh
+cd packages/void-fbtee
+npm login                     # opens the browser; the account needs two-factor on
+pnpm publish                  # builds dist, then publishes this version
+npm trust github void-fbtee --repo joeblew999/void-fbtee --file ci.yml --allow-publish
+gh variable set NPM_PUBLISH --body true --repo joeblew999/void-fbtee
+```
+
+From then on, raising `version` and pushing to main is the whole release. `pnpm publish
+--dry-run --no-git-checks` in `packages/void-fbtee` shows what would go up, without publishing.
 
 ## License
 

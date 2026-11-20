@@ -4,6 +4,7 @@
 import { execFileSync } from "node:child_process";
 import {
   existsSync,
+  globSync,
   lstatSync,
   mkdirSync,
   readdirSync,
@@ -25,9 +26,9 @@ import {
   VITE_CONFIGS,
   VOID_CONFIGS,
 } from "./app-files";
-import { DEFAULT_TRANSLATIONS } from "./catalogs";
+import { DEFAULT_SRC, DEFAULT_TRANSLATIONS } from "./catalogs";
 import { checkSite } from "./site";
-import { packageDir, packageManager } from "./translate";
+import { hasClaude, packageDir, packageManager } from "./translate";
 import { field, isRecord, isStringArray, parseJson, textRecord } from "../guards";
 
 export interface InitOptions {
@@ -36,6 +37,12 @@ export interface InitOptions {
   locales: Array<string>;
   /** The site's own address, for voidFbtee({ site }); checked as the plugin checks it. */
   site?: string;
+  /**
+   * Install what init adds to package.json, with the app's own package manager (`vp install` in a
+   * Vite+ app). Default true. Never from inside an install (an app's postinstall that runs init):
+   * that install already installs it.
+   */
+  install?: boolean;
 }
 
 export interface InitResult {
@@ -43,7 +50,12 @@ export interface InitResult {
   done: Array<string>;
   /** What the person must do by hand, one line each (with the exact text to add). */
   todo: Array<string>;
+  /** Who will translate as you work (`vp dev`) on this machine, and what each needs: one line each. */
+  translators: Array<string>;
 }
+
+/** Void's UI add-ons other than React's: fbtee is React-based, so void-fbtee isn't for them. */
+const OTHER_UIS = ["@void/vue", "@void/svelte", "@void/solid"];
 
 const SKILL = `${SKILL_DIR}/SKILL.md`;
 const AGENTS_START = "<!--injected-by-void-fbtee-->";
@@ -349,7 +361,16 @@ export async function init(o: InitOptions): Promise<InitResult> {
     );
   }
   const pkg = readJson(at("package.json"));
-  const vitePlus = !!(pkg.devDependencies?.["vite-plus"] ?? pkg.dependencies?.["vite-plus"]);
+  const dependsOn = (name: string) => !!(pkg.dependencies?.[name] ?? pkg.devDependencies?.[name]);
+  // React only: fbtee renders through React. A Void app on another UI stops here, before anything
+  // is written, rather than at an install that can't satisfy void-fbtee's peers.
+  const other = OTHER_UIS.find(dependsOn);
+  if (other && !dependsOn("@void/react")) {
+    throw new Error(
+      `void-fbtee is for Void apps on React (fbtee, which it builds on, is React-based); this app uses ${other}.`,
+    );
+  }
+  const vitePlus = dependsOn("vite-plus");
   const versions = testedVersions();
   // In a workspace, Vite+ runs lint from the root, so fbtee's lint plugin and its rules live there.
   const wsRoot = workspaceRoot(o.root);
@@ -369,7 +390,9 @@ export async function init(o: InitOptions): Promise<InitResult> {
     if (version === undefined) {
       throw new Error(`void-fbtee: no tested version of ${name} in void-fbtee's own package.json`);
     }
-    (pkg[field] ??= {})[name] = version;
+    // From the tested version up, within its major (`^6.0.1`), so the app gets fixes; a new major
+    // waits for a void-fbtee release tested on it (void-fbtee's peer ranges say the same).
+    (pkg[field] ??= {})[name] = /^\d/.test(version) ? `^${version}` : version;
   }
   // In name order, as package managers keep them.
   for (const field of new Set(added.map(([, f]) => f))) {
@@ -713,10 +736,55 @@ export async function init(o: InitOptions): Promise<InitResult> {
   // Vite+ apps run everything through vp (it picks the package manager itself).
   const pm = vitePlus ? "vp" : packageManager(o.root);
   if (added.length) {
-    todo.unshift(`${pm} install (for the added dependencies)`);
+    // Inside an install (the app's postinstall runs init), installing again would start a second
+    // install inside the first: that one installs what's added anyway.
+    // Only an install's own scripts: `npx`/`npm exec` set npm_lifecycle_event too ("npx"), and
+    // that's how an npm developer runs init.
+    const insideInstall = ["preinstall", "install", "postinstall", "prepare"].includes(
+      process.env.npm_lifecycle_event ?? "",
+    );
+    if (o.install === false || insideInstall) {
+      todo.unshift(`${pm} install (for the added dependencies)`);
+    } else {
+      try {
+        // Not frozen: init has just changed package.json, so a frozen install (pnpm's default
+        // under CI) could only fail.
+        const args = pm === "npm" ? ["install"] : ["install", "--no-frozen-lockfile"];
+        execFileSync(pm, args, { cwd: o.root, stdio: "inherit" });
+        done.push(`${pm} install: installed ${added.map(([n]) => n).join(", ")}`);
+      } catch {
+        todo.unshift(`${pm} install (for the added dependencies; init's own run of it failed)`);
+      }
+    }
   }
   todo.push(
     `${vitePlus ? "vp dev" : `${pm} run dev`}: makes each language's catalog and translates what's new as you work; ${vitePlus ? "vp build" : `${pm} run build`} fails on anything left`,
   );
-  return { done, todo };
+  return { done, todo, translators: translators(o.root) };
+}
+
+/**
+ * Who translates as you work, on this machine, said at setup rather than first met at a build
+ * that stops: Gemini through Void's AI (the app uses `void/ai`; it needs a Cloudflare sign-in
+ * when `vp dev` runs, which only Void can tell), and Claude Code (`claude`, signed in here).
+ */
+function translators(root: string): Array<string> {
+  const usesVoidAi = globSync(DEFAULT_SRC, {
+    cwd: root,
+    exclude: (f) => f.includes("node_modules"),
+  }).some((f) => /from\s+["']void\/ai["']/.test(readFileSync(join(root, f), "utf8")));
+  const claude = hasClaude();
+  return [
+    usesVoidAi
+      ? "Gemini, through Void's AI: yes, the app uses void/ai. It needs a Cloudflare sign-in when vp dev runs (vp exec void connect --platform cloudflare)."
+      : "Gemini, through Void's AI: no, the app doesn't use void/ai (Void turns its AI on when the app's code imports void/ai: Void's guide/ai.md).",
+    claude
+      ? "Claude Code: yes, claude is signed in on this machine."
+      : "Claude Code: no signed-in claude here (claude auth login); vp dev prints a prompt for your coding agent instead.",
+    ...(!usesVoidAi && !claude
+      ? [
+          `With neither, vp dev translates nothing: write the translations in ${DEFAULT_TRANSLATIONS}/<language>.json by hand, or vp build stops.`,
+        ]
+      : []),
+  ];
 }

@@ -42,6 +42,10 @@ peerDependencyRules:
     vite: "*"
     vitest: "*"
 permissions:
+  # Vite DevTools' own skill for writing DevTools panels (void-fbtee's src/dev/devtools.ts), linked
+  # by pnpm into packages/void-fbtee's agent skill folders, at the version installed.
+  "@vitejs/devtools-kit":
+    skills: true
   fbtee:
     skills: false
   void:
